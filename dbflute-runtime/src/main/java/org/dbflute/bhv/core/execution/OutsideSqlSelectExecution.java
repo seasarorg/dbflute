@@ -13,9 +13,9 @@ import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfSystemUtil;
 import org.seasar.extension.jdbc.ResultSetHandler;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 
 
 
@@ -73,14 +73,14 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
         final Object firstArg = args[0];
         String staticSql = getSql();
         if (firstArg != null) {
-            final BeanDesc beanDesc = BeanDescFactory.getBeanDesc(firstArg.getClass());
+            final TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(firstArg.getClass());
 
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // Resolve embedded comment for parsing bind variable comment in embedded comment.
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             final List<String> proppertyNameList = beanDesc.getProppertyNameList();
             for (String proppertyName : proppertyNameList) {
-                final PropertyDesc propertyDesc = beanDesc.getPropertyDesc(proppertyName);
+                final TnPropertyDesc propertyDesc = beanDesc.getPropertyDesc(proppertyName);
                 final Class<?> propertyType = propertyDesc.getPropertyType();
                 if (!propertyType.equals(String.class)) {
                     continue;

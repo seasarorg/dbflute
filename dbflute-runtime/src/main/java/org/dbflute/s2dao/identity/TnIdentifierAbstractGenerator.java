@@ -15,7 +15,7 @@ import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 import org.seasar.extension.jdbc.ValueType;
-import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 
 
 /**
@@ -62,7 +62,7 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
             String msg = "The arguement[propertyType] should not be null: value=" + value;
             throw new IllegalArgumentException(msg);
         }
-        PropertyDesc pd = propertyType.getPropertyDesc();
+        TnPropertyDesc pd = propertyType.getPropertyDesc();
         pd.setValue(bean, value);
     }
 

@@ -33,9 +33,9 @@ import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.extension.jdbc.util.ConnectionUtil;
 import org.seasar.extension.jdbc.util.DataSourceUtil;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 
 /**
  * @author jflute
@@ -91,12 +91,12 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         bmd.setModifiedPropertySupport(new TnModifiedPropertySupport() {
             @SuppressWarnings("unchecked")
             public Set<String> getModifiedPropertyNames(Object bean) {
-                BeanDesc beanDesc = BeanDescFactory.getBeanDesc(bean.getClass());
+                TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(bean.getClass());
                 String propertyName = "modifiedPropertyNames";
                 if (!beanDesc.hasPropertyDesc(propertyName)) {
                     return Collections.EMPTY_SET;
                 } else {
-                    PropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
+                    TnPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
                     Object value = propertyDesc.getValue(bean);
                     Set<String> names = (Set<String>) value;
                     return names;

@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
@@ -68,7 +68,7 @@ public class TnRowCreatorImpl implements TnRowCreator {
     protected void registerValue(ResultSet rs, Object row, TnPropertyType pt, String name) throws SQLException {
         final ValueType valueType = pt.getValueType();
         final Object value = valueType.getValue(rs, name);
-        final PropertyDesc pd = pt.getPropertyDesc();
+        final TnPropertyDesc pd = pt.getPropertyDesc();
         pd.setValue(row, value);
     }
 

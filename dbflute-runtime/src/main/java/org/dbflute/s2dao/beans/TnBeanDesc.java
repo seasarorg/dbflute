@@ -20,16 +20,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.dbflute.s2dao.beans.exception.ConstructorNotFoundRuntimeException;
-import org.dbflute.s2dao.beans.exception.FieldNotFoundRuntimeException;
-import org.dbflute.s2dao.beans.exception.MethodNotFoundRuntimeException;
-import org.dbflute.s2dao.beans.exception.PropertyNotFoundRuntimeException;
+import org.dbflute.s2dao.beans.exception.TnConstructorNotFoundRuntimeException;
+import org.dbflute.s2dao.beans.exception.TnFieldNotFoundRuntimeException;
+import org.dbflute.s2dao.beans.exception.TnMethodNotFoundRuntimeException;
+import org.dbflute.s2dao.beans.exception.TnPropertyNotFoundRuntimeException;
 
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public interface BeanDesc {
+public interface TnBeanDesc {
     
     // ===================================================================================
     //                                                                                Bean
@@ -39,7 +39,7 @@ public interface BeanDesc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    Constructor<?> getSuitableConstructor(Object[] args) throws ConstructorNotFoundRuntimeException;
+    Constructor<?> getSuitableConstructor(Object[] args) throws TnConstructorNotFoundRuntimeException;
     
     Constructor<?> getConstructor(Class<?>[] paramTypes);
     
@@ -49,7 +49,7 @@ public interface BeanDesc {
     //                                                                            ========
     boolean hasPropertyDesc(String propertyName);
 
-    PropertyDesc getPropertyDesc(String propertyName) throws PropertyNotFoundRuntimeException;
+    TnPropertyDesc getPropertyDesc(String propertyName) throws TnPropertyNotFoundRuntimeException;
 
     int getPropertyDescSize();
     
@@ -60,21 +60,21 @@ public interface BeanDesc {
     //                                                                               =====
     boolean hasField(String fieldName);
 
-    Field getField(String fieldName) throws FieldNotFoundRuntimeException;
+    Field getField(String fieldName) throws TnFieldNotFoundRuntimeException;
 
     int getFieldSize();
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
-    Method getMethod(String methodName) throws MethodNotFoundRuntimeException;
+    Method getMethod(String methodName) throws TnMethodNotFoundRuntimeException;
 
-    Method getMethod(String methodName, Class<?>[] paramTypes) throws MethodNotFoundRuntimeException;
+    Method getMethod(String methodName, Class<?>[] paramTypes) throws TnMethodNotFoundRuntimeException;
 
     Method getMethodNoException(String methodName);
 
     Method getMethodNoException(String methodName, Class<?>[] paramTypes);
 
-    Method[] getMethods(String methodName) throws MethodNotFoundRuntimeException;
+    Method[] getMethods(String methodName) throws TnMethodNotFoundRuntimeException;
 
     boolean hasMethod(String methodName);
 
@@ -83,7 +83,7 @@ public interface BeanDesc {
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
-    Object newInstance(Object[] args) throws ConstructorNotFoundRuntimeException;
-    Object invoke(Object target, String methodName, Object[] args) throws MethodNotFoundRuntimeException;
-    Object getFieldValue(String fieldName, Object target) throws FieldNotFoundRuntimeException;
+    Object newInstance(Object[] args) throws TnConstructorNotFoundRuntimeException;
+    Object invoke(Object target, String methodName, Object[] args) throws TnMethodNotFoundRuntimeException;
+    Object getFieldValue(String fieldName, Object target) throws TnFieldNotFoundRuntimeException;
 }

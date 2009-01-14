@@ -6,9 +6,9 @@ import java.util.Map;
 
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.seasar.framework.util.ClassUtil;
 import org.seasar.framework.util.ConstructorUtil;
 
@@ -75,8 +75,8 @@ public class TnIdentifierGeneratorFactory {
     }
 
     protected static void setProperty(TnIdentifierGenerator generator, String propertyName, String value) {
-        BeanDesc beanDesc = BeanDescFactory.getBeanDesc(generator.getClass());
-        PropertyDesc pd = beanDesc.getPropertyDesc(propertyName);
+        TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(generator.getClass());
+        TnPropertyDesc pd = beanDesc.getPropertyDesc(propertyName);
         pd.setValue(generator, value);
     }
 }

@@ -27,7 +27,7 @@ import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ValueType;
-import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.framework.util.ClassUtil;
 
 /**
@@ -118,7 +118,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
             final String yourKey = rpt.getYourKey(i);
             final TnPropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
-            final PropertyDesc pd = pt.getPropertyDesc();
+            final TnPropertyDesc pd = pt.getPropertyDesc();
             pd.setValue(res.getRow(), value);
             continue;
         }
@@ -183,7 +183,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     protected void registerRelationValidValue(TnRelationRowCreationResource res, TnPropertyType pt, Object value)
             throws SQLException {
         res.incrementValidValueCount();
-        final PropertyDesc pd = pt.getPropertyDesc();
+        final TnPropertyDesc pd = pt.getPropertyDesc();
         pd.setValue(res.getRow(), value);
     }
 

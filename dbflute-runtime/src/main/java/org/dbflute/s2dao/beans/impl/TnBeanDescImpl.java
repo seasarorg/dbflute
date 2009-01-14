@@ -29,12 +29,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.beans.exception.ConstructorNotFoundRuntimeException;
-import org.dbflute.s2dao.beans.exception.FieldNotFoundRuntimeException;
-import org.dbflute.s2dao.beans.exception.MethodNotFoundRuntimeException;
-import org.dbflute.s2dao.beans.exception.PropertyNotFoundRuntimeException;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.exception.TnConstructorNotFoundRuntimeException;
+import org.dbflute.s2dao.beans.exception.TnFieldNotFoundRuntimeException;
+import org.dbflute.s2dao.beans.exception.TnMethodNotFoundRuntimeException;
+import org.dbflute.s2dao.beans.exception.TnPropertyNotFoundRuntimeException;
 import org.seasar.framework.util.ClassUtil;
 import org.seasar.framework.util.ConstructorUtil;
 import org.seasar.framework.util.DoubleConversionUtil;
@@ -50,7 +50,7 @@ import org.seasar.framework.util.StringUtil;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class BeanDescImpl implements BeanDesc {
+public class TnBeanDescImpl implements TnBeanDesc {
 
     // ===================================================================================
     //                                                                          Definition
@@ -64,7 +64,7 @@ public class BeanDescImpl implements BeanDesc {
     private Class<?> beanClass;
     private Constructor<?>[] constructors;
     
-    private StringKeyMap<PropertyDesc> propertyDescMap = StringKeyMap.createAsCaseInsensitive();
+    private StringKeyMap<TnPropertyDesc> propertyDescMap = StringKeyMap.createAsCaseInsensitive();
     private Map<String, Method[]> methodsMap = new ConcurrentHashMap<String, Method[]>();
     private Map<String, Field> fieldMap = new ConcurrentHashMap<String, Field>();
 
@@ -73,7 +73,7 @@ public class BeanDescImpl implements BeanDesc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public BeanDescImpl(Class<?> beanClass) {
+    public TnBeanDescImpl(Class<?> beanClass) {
         if (beanClass == null) {
             String msg = "The argument 'beanClass' should not be null!";
             throw new IllegalArgumentException(msg);
@@ -95,7 +95,7 @@ public class BeanDescImpl implements BeanDesc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public Constructor<?> getSuitableConstructor(Object[] args) throws ConstructorNotFoundRuntimeException {
+    public Constructor<?> getSuitableConstructor(Object[] args) throws TnConstructorNotFoundRuntimeException {
         if (args == null) {
             args = EMPTY_ARGS;
         }
@@ -107,7 +107,7 @@ public class BeanDescImpl implements BeanDesc {
         if (constructor != null) {
             return constructor;
         }
-        throw new ConstructorNotFoundRuntimeException(beanClass, args);
+        throw new TnConstructorNotFoundRuntimeException(beanClass, args);
     }
 
     public Constructor<?> getConstructor(final Class<?>[] paramTypes) {
@@ -116,7 +116,7 @@ public class BeanDescImpl implements BeanDesc {
                 return constructors[i];
             }
         }
-        throw new ConstructorNotFoundRuntimeException(beanClass, paramTypes);
+        throw new TnConstructorNotFoundRuntimeException(beanClass, paramTypes);
     }
 
     // ===================================================================================
@@ -126,15 +126,15 @@ public class BeanDescImpl implements BeanDesc {
         return getPropertyDescInternally(propertyName) != null;
     }
 
-    public PropertyDesc getPropertyDesc(String propertyName) throws PropertyNotFoundRuntimeException {
-        PropertyDesc pd = getPropertyDescInternally(propertyName);
+    public TnPropertyDesc getPropertyDesc(String propertyName) throws TnPropertyNotFoundRuntimeException {
+        TnPropertyDesc pd = getPropertyDescInternally(propertyName);
         if (pd == null) {
-            throw new PropertyNotFoundRuntimeException(beanClass, propertyName);
+            throw new TnPropertyNotFoundRuntimeException(beanClass, propertyName);
         }
         return pd;
     }
 
-    private PropertyDesc getPropertyDescInternally(String propertyName) {
+    private TnPropertyDesc getPropertyDescInternally(String propertyName) {
         return propertyDescMap.get(propertyName);
     }
 
@@ -156,7 +156,7 @@ public class BeanDescImpl implements BeanDesc {
     public Field getField(String fieldName) {
         Field field = (Field) fieldMap.get(fieldName);
         if (field == null) {
-            throw new FieldNotFoundRuntimeException(beanClass, fieldName);
+            throw new TnFieldNotFoundRuntimeException(beanClass, fieldName);
         }
         return field;
     }
@@ -181,7 +181,7 @@ public class BeanDescImpl implements BeanDesc {
         if (method != null) {
             return method;
         }
-        throw new MethodNotFoundRuntimeException(beanClass, methodName, paramTypes);
+        throw new TnMethodNotFoundRuntimeException(beanClass, methodName, paramTypes);
     }
 
     public Method getMethodNoException(final String methodName, final Class<?>[] paramTypes) {
@@ -197,11 +197,11 @@ public class BeanDescImpl implements BeanDesc {
         return null;
     }
 
-    public Method[] getMethods(String methodName) throws MethodNotFoundRuntimeException {
+    public Method[] getMethods(String methodName) throws TnMethodNotFoundRuntimeException {
 
         Method[] methods = (Method[]) methodsMap.get(methodName);
         if (methods == null) {
-            throw new MethodNotFoundRuntimeException(beanClass, methodName, null);
+            throw new TnMethodNotFoundRuntimeException(beanClass, methodName, null);
         }
         return methods;
     }
@@ -345,12 +345,12 @@ public class BeanDescImpl implements BeanDesc {
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
-    public Object newInstance(Object[] args) throws ConstructorNotFoundRuntimeException {
+    public Object newInstance(Object[] args) throws TnConstructorNotFoundRuntimeException {
         Constructor<?> constructor = getSuitableConstructor(args);
         return ConstructorUtil.newInstance(constructor, args);
     }
 
-    public Object getFieldValue(String fieldName, Object target) throws FieldNotFoundRuntimeException {
+    public Object getFieldValue(String fieldName, Object target) throws TnFieldNotFoundRuntimeException {
         Field field = getField(fieldName);
         return FieldUtil.get(field, target);
     }
@@ -487,7 +487,7 @@ public class BeanDescImpl implements BeanDesc {
         return new String(chars);
     }
 
-    private void addPropertyDesc(PropertyDesc propertyDesc) {
+    private void addPropertyDesc(TnPropertyDesc propertyDesc) {
         if (propertyDesc == null) {
             String msg = "The argument 'propertyDesc' should not be null!";
             throw new IllegalArgumentException(msg);
@@ -497,7 +497,7 @@ public class BeanDescImpl implements BeanDesc {
 
     private void setupReadMethod(Method readMethod, String propertyName) {
         Class<?> propertyType = readMethod.getReturnType();
-        PropertyDesc propDesc = getPropertyDescInternally(propertyName);
+        TnPropertyDesc propDesc = getPropertyDescInternally(propertyName);
         if (propDesc != null) {
             if (!propDesc.getPropertyType().equals(propertyType)) {
                 invalidPropertyNames.add(propertyName);
@@ -505,14 +505,14 @@ public class BeanDescImpl implements BeanDesc {
                 propDesc.setReadMethod(readMethod);
             }
         } else {
-            propDesc = new PropertyDescImpl(propertyName, propertyType, readMethod, null, null, this);
+            propDesc = new TnPropertyDescImpl(propertyName, propertyType, readMethod, null, null, this);
             addPropertyDesc(propDesc);
         }
     }
 
     private void setupWriteMethod(Method writeMethod, String propertyName) {
         Class<?> propertyType = writeMethod.getParameterTypes()[0];
-        PropertyDesc propDesc = getPropertyDescInternally(propertyName);
+        TnPropertyDesc propDesc = getPropertyDescInternally(propertyName);
         if (propDesc != null) {
             if (!propDesc.getPropertyType().equals(propertyType)) {
                 invalidPropertyNames.add(propertyName);
@@ -520,12 +520,12 @@ public class BeanDescImpl implements BeanDesc {
                 propDesc.setWriteMethod(writeMethod);
             }
         } else {
-            propDesc = new PropertyDescImpl(propertyName, propertyType, null, writeMethod, null, this);
+            propDesc = new TnPropertyDescImpl(propertyName, propertyType, null, writeMethod, null, this);
             addPropertyDesc(propDesc);
         }
     }
 
-    private Method getSuitableMethod(String methodName, Object[] args) throws MethodNotFoundRuntimeException {
+    private Method getSuitableMethod(String methodName, Object[] args) throws TnMethodNotFoundRuntimeException {
         if (args == null) {
             args = EMPTY_ARGS;
         }
@@ -538,7 +538,7 @@ public class BeanDescImpl implements BeanDesc {
         if (method != null) {
             return method;
         }
-        throw new MethodNotFoundRuntimeException(beanClass, methodName, args);
+        throw new TnMethodNotFoundRuntimeException(beanClass, methodName, args);
     }
 
     private Method findSuitableMethod(Method[] methods, Object[] args) {
@@ -638,10 +638,10 @@ public class BeanDescImpl implements BeanDesc {
                 fieldMap.put(fname, field);
                 if (FieldUtil.isInstanceField(field)) {
                     if (hasPropertyDesc(fname)) {
-                        PropertyDesc pd = getPropertyDesc(field.getName());
+                        TnPropertyDesc pd = getPropertyDesc(field.getName());
                         pd.setField(field);
                     } else if (FieldUtil.isPublicField(field)) {
-                        PropertyDesc pd = new PropertyDescImpl(field.getName(), field.getType(), null, null, field,
+                        TnPropertyDesc pd = new TnPropertyDescImpl(field.getName(), field.getType(), null, null, field,
                                 this);
                         propertyDescMap.put(fname, pd);
                     }

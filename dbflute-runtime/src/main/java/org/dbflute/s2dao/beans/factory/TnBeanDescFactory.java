@@ -18,33 +18,33 @@ package org.dbflute.s2dao.beans.factory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.impl.BeanDescImpl;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.impl.TnBeanDescImpl;
 
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class BeanDescFactory {
+public class TnBeanDescFactory {
     
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static Map<Class<?>, BeanDesc> beanDescCache = new ConcurrentHashMap<Class<?>, BeanDesc>(1024);
+    private static Map<Class<?>, TnBeanDesc> beanDescCache = new ConcurrentHashMap<Class<?>, TnBeanDesc>(1024);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected BeanDescFactory() {
+    protected TnBeanDescFactory() {
     }
 
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public static BeanDesc getBeanDesc(Class<?> clazz) {
-        BeanDesc beanDesc = beanDescCache.get(clazz);
+    public static TnBeanDesc getBeanDesc(Class<?> clazz) {
+        TnBeanDesc beanDesc = beanDescCache.get(clazz);
         if (beanDesc == null) {
-            beanDesc = new BeanDescImpl(clazz);
+            beanDesc = new TnBeanDescImpl(clazz);
             beanDescCache.put(clazz, beanDesc);
         }
         return beanDesc;

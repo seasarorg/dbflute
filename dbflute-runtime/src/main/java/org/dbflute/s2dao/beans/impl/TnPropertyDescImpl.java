@@ -21,9 +21,9 @@ import java.lang.reflect.Method;
 import java.sql.Time;
 import java.sql.Timestamp;
 
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.beans.exception.IllegalPropertyRuntimeException;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.exception.TnIllegalPropertyRuntimeException;
 import org.seasar.framework.util.BooleanConversionUtil;
 import org.seasar.framework.util.CalendarConversionUtil;
 import org.seasar.framework.util.ConstructorUtil;
@@ -40,7 +40,7 @@ import org.seasar.framework.util.TimestampConversionUtil;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class PropertyDescImpl implements PropertyDesc {
+public class TnPropertyDescImpl implements TnPropertyDesc {
 
     // ===================================================================================
     //                                                                          Definition
@@ -55,7 +55,7 @@ public class PropertyDescImpl implements PropertyDesc {
     private Method readMethod;
     private Method writeMethod;
     private Field field;
-    private BeanDesc beanDesc;
+    private TnBeanDesc beanDesc;
     private Constructor<?> stringConstructor;
     private Method valueOfMethod;
     private boolean readable = false;
@@ -64,14 +64,14 @@ public class PropertyDescImpl implements PropertyDesc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public PropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
-            BeanDesc beanDesc) {
+    public TnPropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
+            TnBeanDesc beanDesc) {
 
         this(propertyName, propertyType, readMethod, writeMethod, null, beanDesc);
     }
 
-    public PropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
-            Field field, BeanDesc beanDesc) {
+    public TnPropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
+            Field field, TnBeanDesc beanDesc) {
         if (propertyName == null) {
             String msg = "The argument 'propertyName' should not be null!";
             throw new IllegalArgumentException(msg);
@@ -119,7 +119,7 @@ public class PropertyDescImpl implements PropertyDesc {
     // ===================================================================================
     //                                                                                Bean
     //                                                                                ====
-    public BeanDesc getBeanDesc() {
+    public TnBeanDesc getBeanDesc() {
         return beanDesc;
     }
 
@@ -206,7 +206,7 @@ public class PropertyDescImpl implements PropertyDesc {
                 return FieldUtil.get(field, target);
             }
         } catch (Throwable t) {
-            throw new IllegalPropertyRuntimeException(beanDesc.getBeanClass(), propertyName, t);
+            throw new TnIllegalPropertyRuntimeException(beanDesc.getBeanClass(), propertyName, t);
         }
     }
 
@@ -221,7 +221,7 @@ public class PropertyDescImpl implements PropertyDesc {
                 FieldUtil.set(field, target, value);
             }
         } catch (Throwable t) {
-            throw new IllegalPropertyRuntimeException(beanDesc.getBeanClass(), propertyName, t);
+            throw new TnIllegalPropertyRuntimeException(beanDesc.getBeanClass(), propertyName, t);
         }
     }
 

@@ -15,7 +15,7 @@
  */
 package org.dbflute.s2dao.metadata.impl;
 
-import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
@@ -26,7 +26,7 @@ import org.seasar.extension.jdbc.types.ValueTypes;
  */
 public class TnPropertyTypeImpl implements TnPropertyType {
 
-    private PropertyDesc propertyDesc;
+    private TnPropertyDesc propertyDesc;
 
     private String propertyName;
 
@@ -38,15 +38,15 @@ public class TnPropertyTypeImpl implements TnPropertyType {
 
     private boolean persistent = true;
 
-    public TnPropertyTypeImpl(PropertyDesc propertyDesc) {
+    public TnPropertyTypeImpl(TnPropertyDesc propertyDesc) {
         this(propertyDesc, ValueTypes.OBJECT, propertyDesc.getPropertyName());
     }
 
-    public TnPropertyTypeImpl(PropertyDesc propertyDesc, ValueType valueType) {
+    public TnPropertyTypeImpl(TnPropertyDesc propertyDesc, ValueType valueType) {
         this(propertyDesc, valueType, propertyDesc.getPropertyName());
     }
 
-    public TnPropertyTypeImpl(PropertyDesc propertyDesc, ValueType valueType, String columnName) {
+    public TnPropertyTypeImpl(TnPropertyDesc propertyDesc, ValueType valueType, String columnName) {
         this.propertyDesc = propertyDesc;
         this.propertyName = propertyDesc.getPropertyName();
         this.valueType = valueType;
@@ -63,7 +63,7 @@ public class TnPropertyTypeImpl implements TnPropertyType {
         this.columnName = columnName;
     }
 
-    public PropertyDesc getPropertyDesc() {
+    public TnPropertyDesc getPropertyDesc() {
         return propertyDesc;
     }
 

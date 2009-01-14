@@ -19,7 +19,7 @@ package org.dbflute.s2dao.beans.exception;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class IllegalPropertyRuntimeException extends RuntimeException {
+public class TnPropertyNotFoundRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,9 +27,9 @@ public class IllegalPropertyRuntimeException extends RuntimeException {
 
     private String propertyName;
 
-    public IllegalPropertyRuntimeException(Class<?> targetClass, String propertyName, Throwable cause) {
-        super("The property was illegal: class=" + targetClass.getName() + " property=" + propertyName, cause);
-        this.targetClass = targetClass;
+    public TnPropertyNotFoundRuntimeException(Class<?> componentClass, String propertyName) {
+        super("The property was not found: class=" + componentClass.getName() + " property=" + propertyName);
+        this.targetClass = componentClass;
         this.propertyName = propertyName;
     }
 

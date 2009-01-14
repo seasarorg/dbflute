@@ -25,9 +25,9 @@ import org.dbflute.exception.EmbeddedValueCommentNotFoundPropertyException;
 import org.dbflute.exception.RequiredOptionNotFoundException;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfSystemUtil;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 
 /**
  * @author jflute
@@ -60,7 +60,7 @@ public class ValueAndTypeSetupper {
             }
             final String currentName = _names[pos];
             if (pos == 1) {// at the First Loop
-                final BeanDesc beanDesc = BeanDescFactory.getBeanDesc(clazz);
+                final TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(clazz);
                 if (hasLikeSearchOption(beanDesc, currentName)) {
                     likeSearchOption = getLikeSearchOption(beanDesc, currentName, value);
                 }
@@ -75,9 +75,9 @@ public class ValueAndTypeSetupper {
                 clazz = (value != null ? value.getClass() : clazz);
                 continue;
             }
-            final BeanDesc beanDesc = BeanDescFactory.getBeanDesc(clazz);
+            final TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(clazz);
             if (beanDesc.hasPropertyDesc(currentName)) {
-                final PropertyDesc pd = beanDesc.getPropertyDesc(currentName);
+                final TnPropertyDesc pd = beanDesc.getPropertyDesc(currentName);
                 value = getPropertyValue(clazz, value, currentName, pd);
                 if (isLastLoop4LikeSearch(pos, likeSearchOption) && isValidStringValue(value)) {// at the Last Loop
                     value = likeSearchOption.generateRealValue((String) value);
@@ -120,13 +120,13 @@ public class ValueAndTypeSetupper {
     }
 
     // for OutsideSql
-    protected boolean hasLikeSearchOption(BeanDesc beanDesc, String currentName) {
+    protected boolean hasLikeSearchOption(TnBeanDesc beanDesc, String currentName) {
         return beanDesc.hasPropertyDesc(currentName + "InternalLikeSearchOption");
     }
 
     // for OutsideSql
-    protected LikeSearchOption getLikeSearchOption(BeanDesc beanDesc, String currentName, Object resourceBean) {
-        final PropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
+    protected LikeSearchOption getLikeSearchOption(TnBeanDesc beanDesc, String currentName, Object resourceBean) {
+        final TnPropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
         final LikeSearchOption option = (LikeSearchOption) pb.getValue(resourceBean);
         if (option == null) {
             throwLikeSearchOptionNotFoundException(resourceBean, currentName);
@@ -185,7 +185,7 @@ public class ValueAndTypeSetupper {
         throw new UnsupportedOperationException(msg);
     }
 
-    protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, PropertyDesc pd) {
+    protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, TnPropertyDesc pd) {
         try {
             return pd.getValue(beanValue);
         } catch (RuntimeException e) {

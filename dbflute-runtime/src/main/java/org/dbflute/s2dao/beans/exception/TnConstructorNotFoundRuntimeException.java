@@ -19,7 +19,7 @@ package org.dbflute.s2dao.beans.exception;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class ConstructorNotFoundRuntimeException extends RuntimeException {
+public class TnConstructorNotFoundRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,13 +29,13 @@ public class ConstructorNotFoundRuntimeException extends RuntimeException {
 
     private Class<?>[] paramTypes;
 
-    public ConstructorNotFoundRuntimeException(Class<?> targetClass, Object[] methodArgs) {
+    public TnConstructorNotFoundRuntimeException(Class<?> targetClass, Object[] methodArgs) {
         super("The constructor was not found: class=" + targetClass.getName() + " args=" + getSignature(methodArgs));
         this.targetClass = targetClass;
         this.methodArgs = methodArgs;
     }
 
-    public ConstructorNotFoundRuntimeException(Class<?> targetClass, Class<?>[] paramTypes) {
+    public TnConstructorNotFoundRuntimeException(Class<?> targetClass, Class<?>[] paramTypes) {
         super("The constructor was not found: class=" + targetClass.getName() + " args=" + getSignature(paramTypes));
         this.targetClass = targetClass;
         this.paramTypes = paramTypes;

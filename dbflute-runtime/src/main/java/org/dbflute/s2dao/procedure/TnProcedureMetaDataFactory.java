@@ -14,8 +14,8 @@ import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.extension.jdbc.ValueType;
 import org.seasar.extension.jdbc.types.ValueTypes;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -40,7 +40,7 @@ public class TnProcedureMetaDataFactory {
                 throw new IllegalStateException("The pmb type was Not DTO type: " + pmbType.getName());
             }
         }
-        final BeanDesc pmbDesc = BeanDescFactory.getBeanDesc(pmbType);
+        final TnBeanDesc pmbDesc = TnBeanDescFactory.getBeanDesc(pmbType);
 
         // *Point
         final Stack<Class<?>> stack = new Stack<Class<?>>();
@@ -55,7 +55,7 @@ public class TnProcedureMetaDataFactory {
         return metaData;
     }
 
-    protected void registerParameterType(TnProcedureMetaData metaData, BeanDesc pmbDesc, Field[] fields) {
+    protected void registerParameterType(TnProcedureMetaData metaData, TnBeanDesc pmbDesc, Field[] fields) {
         for (Field field : fields) {
             if (!isInstanceField(field)) {
                 continue;
@@ -68,7 +68,7 @@ public class TnProcedureMetaDataFactory {
         }
     }
 
-    protected TnProcedureParameterType getProcedureParameterType(final BeanDesc dtoDesc, final Field field) {
+    protected TnProcedureParameterType getProcedureParameterType(final TnBeanDesc dtoDesc, final Field field) {
         final String procedureParameter = annotationReader.getProcedureParameter(dtoDesc, field);
         if (procedureParameter == null) {
             return null;
@@ -123,7 +123,7 @@ public class TnProcedureMetaDataFactory {
         return null;
     }
 
-    protected ValueType getValueType(final BeanDesc dtoDesc, final Field field) {
+    protected ValueType getValueType(final TnBeanDesc dtoDesc, final Field field) {
         final String name = annotationReader.getValueType(dtoDesc, field);
         if (name != null) {
             return valueTypeFactory.getValueTypeByName(name);
@@ -183,7 +183,7 @@ public class TnProcedureMetaDataFactory {
             VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
         }
 
-        public String getProcedureParameter(BeanDesc dtoDesc, Field field) {
+        public String getProcedureParameter(TnBeanDesc dtoDesc, Field field) {
             String fieldName = removeInstanceVariablePrefix(field.getName());// *Point
             String annotationName = fieldName + PROCEDURE_PARAMETER_SUFFIX;
             if (dtoDesc.hasField(annotationName)) {
@@ -194,7 +194,7 @@ public class TnProcedureMetaDataFactory {
             }
         }
 
-        public String getValueType(BeanDesc dtoDesc, Field field) {
+        public String getValueType(TnBeanDesc dtoDesc, Field field) {
             String fieldName = removeInstanceVariablePrefix(field.getName());// *Point
             String annotationName = fieldName + VALUE_TYPE_SUFFIX;
             if (dtoDesc.hasField(annotationName)) {

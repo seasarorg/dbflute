@@ -19,25 +19,25 @@ package org.dbflute.s2dao.beans.exception;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class PropertyNotFoundRuntimeException extends RuntimeException {
+public class TnFieldNotFoundRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
     private Class<?> targetClass;
 
-    private String propertyName;
+    private String fieldName;
 
-    public PropertyNotFoundRuntimeException(Class<?> componentClass, String propertyName) {
-        super("The property was not found: class=" + componentClass.getName() + " property=" + propertyName);
-        this.targetClass = componentClass;
-        this.propertyName = propertyName;
+    public TnFieldNotFoundRuntimeException(Class<?> targetClass, String fieldName) {
+        super("The field was not found: class=" + targetClass.getName() + " field=" + fieldName);
+        this.targetClass = targetClass;
+        this.fieldName = fieldName;
     }
 
     public Class<?> getTargetClass() {
         return targetClass;
     }
 
-    public String getPropertyName() {
-        return propertyName;
+    public String getFieldName() {
+        return fieldName;
     }
 }

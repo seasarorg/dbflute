@@ -22,10 +22,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.dbflute.helper.StringKeyMap;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.beans.exception.PropertyNotFoundRuntimeException;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.exception.TnPropertyNotFoundRuntimeException;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -56,7 +56,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
     }
 
     public void initialize() {
-        BeanDesc beanDesc = BeanDescFactory.getBeanDesc(getBeanClass());
+        TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(getBeanClass());
         setupTableName(beanDesc);
         setupProperty();
         setupPrimaryKey();
@@ -66,11 +66,11 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         return tableName;
     }
 
-    public TnPropertyType getVersionNoPropertyType() throws PropertyNotFoundRuntimeException {
+    public TnPropertyType getVersionNoPropertyType() throws TnPropertyNotFoundRuntimeException {
         return getPropertyType(getVersionNoPropertyName());
     }
 
-    public TnPropertyType getTimestampPropertyType() throws PropertyNotFoundRuntimeException {
+    public TnPropertyType getTimestampPropertyType() throws TnPropertyNotFoundRuntimeException {
         return getPropertyType(getTimestampPropertyName());
     }
 
@@ -187,7 +187,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         return (TnRelationPropertyType) relationPropertyTypes.get(index);
     }
 
-    public TnRelationPropertyType getRelationPropertyType(String propertyName) throws PropertyNotFoundRuntimeException {
+    public TnRelationPropertyType getRelationPropertyType(String propertyName) throws TnPropertyNotFoundRuntimeException {
 
         for (int i = 0; i < getRelationPropertyTypeSize(); i++) {
             TnRelationPropertyType rpt = (TnRelationPropertyType) relationPropertyTypes.get(i);
@@ -195,10 +195,10 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
                 return rpt;
             }
         }
-        throw new PropertyNotFoundRuntimeException(getBeanClass(), propertyName);
+        throw new TnPropertyNotFoundRuntimeException(getBeanClass(), propertyName);
     }
 
-    protected void setupTableName(BeanDesc beanDesc) {
+    protected void setupTableName(TnBeanDesc beanDesc) {
         String ta = beanAnnotationReader.getTableAnnotation();
         if (ta != null) {
             tableName = ta;
@@ -237,7 +237,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
     }
 
     protected void setupIdentifierGenerator(TnPropertyType propertyType) {
-        PropertyDesc pd = propertyType.getPropertyDesc();
+        TnPropertyDesc pd = propertyType.getPropertyDesc();
         String propertyName = propertyType.getPropertyName();
         String idType = beanAnnotationReader.getId(pd);
         TnIdentifierGenerator generator = TnIdentifierGeneratorFactory.createIdentifierGenerator(propertyType,

@@ -19,7 +19,7 @@ package org.dbflute.s2dao.beans.exception;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class ConverterRuntimeException extends RuntimeException {
+public class TnConverterRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,7 +27,7 @@ public class ConverterRuntimeException extends RuntimeException {
 
     private Object value;
 
-    public ConverterRuntimeException(String propertyName, Object value, Throwable cause) {
+    public TnConverterRuntimeException(String propertyName, Object value, Throwable cause) {
         super("Failed to convert: property=" + propertyName + " value=" + value, cause);
         this.propertyName = propertyName;
         this.value = value;

@@ -9,7 +9,7 @@
     <component class="com.example.dbflute.basic.dbflute.allcommon.DBFluteInitializer"/>
     <component name="invokerAssistant" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedInvokerAssistant"/>
     <component name="commonColumnAutoSetupper" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedCommonColumnAutoSetupper"/>
-    <component name="behaviorSelector" class="com.example.dbflute.basic.dbflute.allcommon.CacheBehaviorSelector">
+    <component name="behaviorSelector" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedBehaviorSelector">
         <destroyMethod name="destroy"/>
     </component>
 

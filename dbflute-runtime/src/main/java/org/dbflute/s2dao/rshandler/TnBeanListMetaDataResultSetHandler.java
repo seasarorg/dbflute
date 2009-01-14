@@ -11,7 +11,7 @@ import java.util.Set;
 import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.outsidesql.OutsideSqlContext;
-import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
@@ -113,7 +113,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
                     }
                 }
                 if (relationRow != null) {
-                    final PropertyDesc pd = rpt.getPropertyDesc();
+                    final TnPropertyDesc pd = rpt.getPropertyDesc();
                     pd.setValue(row, relationRow);
                 }
             }

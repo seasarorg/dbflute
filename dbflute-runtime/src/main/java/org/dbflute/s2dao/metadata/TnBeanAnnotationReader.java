@@ -15,14 +15,14 @@
  */
 package org.dbflute.s2dao.metadata;
 
-import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 
 /**
  * @author jflute
  */
 public interface TnBeanAnnotationReader {
 
-    String getColumnAnnotation(PropertyDesc pd);
+    String getColumnAnnotation(TnPropertyDesc pd);
 
     String getTableAnnotation();
 
@@ -30,13 +30,13 @@ public interface TnBeanAnnotationReader {
 
     String getTimestampPropertyName();
 
-    String getId(PropertyDesc pd);
+    String getId(TnPropertyDesc pd);
 
-    boolean hasRelationNo(PropertyDesc pd);
+    boolean hasRelationNo(TnPropertyDesc pd);
 
-    int getRelationNo(PropertyDesc pd);
+    int getRelationNo(TnPropertyDesc pd);
 
-    String getRelationKey(PropertyDesc pd);
+    String getRelationKey(TnPropertyDesc pd);
 
-    String getValueType(PropertyDesc pd);
+    String getValueType(TnPropertyDesc pd);
 }

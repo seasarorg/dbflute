@@ -24,9 +24,9 @@ import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.extension.jdbc.ValueType;
 import org.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 
 /**
  * @author jflute
@@ -46,10 +46,10 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
 
     public TnPropertyType[] createDtoPropertyTypes() {
         List<TnPropertyType> list = new ArrayList<TnPropertyType>();
-        BeanDesc beanDesc = getBeanDesc();
+        TnBeanDesc beanDesc = getBeanDesc();
         List<String> proppertyNameList = beanDesc.getProppertyNameList();
         for (String proppertyName : proppertyNameList) {
-            PropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
+            TnPropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
             TnPropertyType pt = createPropertyType(pd);
             list.add(pt);
         }
@@ -57,49 +57,49 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
     }
 
     /**
-     * {@link BeanDesc}を返します。
+     * {@link TnBeanDesc}を返します。
      * 
-     * @return {@link BeanDesc}
+     * @return {@link TnBeanDesc}
      */
-    protected BeanDesc getBeanDesc() {
-        return BeanDescFactory.getBeanDesc(beanClass);
+    protected TnBeanDesc getBeanDesc() {
+        return TnBeanDescFactory.getBeanDesc(beanClass);
     }
 
     /**
      * 関連を表すのプロパティである場合<code>true</code>を返します。
      * 
-     * @param propertyDesc {@link PropertyDesc}
+     * @param propertyDesc {@link TnPropertyDesc}
      * @return 関連を表すプロパティである場合<code>true</code>、そうでない場合<code>false</code>
      */
-    protected boolean isRelation(PropertyDesc propertyDesc) {
+    protected boolean isRelation(TnPropertyDesc propertyDesc) {
         return beanAnnotationReader.hasRelationNo(propertyDesc);
     }
 
     /**
      * 主キーを表すプロパティである場合<code>true</code>を返します。
      * 
-     * @param propertyDesc {@link PropertyDesc}
+     * @param propertyDesc {@link TnPropertyDesc}
      * @return　主キーを表すプロパティである場合<code>true</code>、そうでない場合<code>false</code>
      */
-    protected boolean isPrimaryKey(PropertyDesc propertyDesc) {
+    protected boolean isPrimaryKey(TnPropertyDesc propertyDesc) {
         return beanAnnotationReader.getId(propertyDesc) != null;
     }
 
     protected abstract boolean isPersistent(TnPropertyType propertyType);
 
-    protected TnPropertyType createPropertyType(PropertyDesc propertyDesc) {
+    protected TnPropertyType createPropertyType(TnPropertyDesc propertyDesc) {
         final String columnName = getColumnName(propertyDesc);
         final ValueType valueType = getValueType(propertyDesc);
         return new TnPropertyTypeImpl(propertyDesc, valueType, columnName);
     }
 
-    protected String getColumnName(PropertyDesc propertyDesc) {
+    protected String getColumnName(TnPropertyDesc propertyDesc) {
         String propertyName = propertyDesc.getPropertyName();
         String name = beanAnnotationReader.getColumnAnnotation(propertyDesc);
         return name != null ? name : propertyName;
     }
 
-    protected ValueType getValueType(PropertyDesc propertyDesc) {
+    protected ValueType getValueType(TnPropertyDesc propertyDesc) {
         final String name = beanAnnotationReader.getValueType(propertyDesc);
         if (name != null) {
             return valueTypeFactory.getValueTypeByName(name);

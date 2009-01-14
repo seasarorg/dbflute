@@ -18,7 +18,7 @@ package org.dbflute.s2dao.metadata.impl;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
-import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 
 /**
  * @author jflute
@@ -33,11 +33,11 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
 
     protected TnBeanMetaData beanMetaData;
 
-    public TnRelationPropertyTypeImpl(PropertyDesc propertyDesc) {
+    public TnRelationPropertyTypeImpl(TnPropertyDesc propertyDesc) {
         super(propertyDesc);
     }
 
-    public TnRelationPropertyTypeImpl(PropertyDesc propertyDesc, int relationNo, String[] myKeys, String[] yourKeys,
+    public TnRelationPropertyTypeImpl(TnPropertyDesc propertyDesc, int relationNo, String[] myKeys, String[] yourKeys,
             TnBeanMetaData beanMetaData) {
         super(propertyDesc);
         this.relationNo = relationNo;

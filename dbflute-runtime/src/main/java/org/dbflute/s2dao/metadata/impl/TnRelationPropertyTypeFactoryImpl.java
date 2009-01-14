@@ -25,9 +25,9 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 
 /**
  * @author jflute
@@ -59,10 +59,10 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
 
     public TnRelationPropertyType[] createRelationPropertyTypes() {
         final List<TnRelationPropertyType> list = new ArrayList<TnRelationPropertyType>();
-        final BeanDesc beanDesc = getBeanDesc();
+        final TnBeanDesc beanDesc = getBeanDesc();
         final List<String> proppertyNameList = beanDesc.getProppertyNameList();
         for (String proppertyName : proppertyNameList) {
-            final PropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
+            final TnPropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
             if (isStopRelationCreation || !isRelationProperty(pd)) {
                 continue;
             }
@@ -72,7 +72,7 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
         return (TnRelationPropertyType[]) list.toArray(new TnRelationPropertyType[list.size()]);
     }
 
-    protected TnRelationPropertyType createRelationPropertyType(PropertyDesc propertyDesc) {
+    protected TnRelationPropertyType createRelationPropertyType(TnPropertyDesc propertyDesc) {
         String[] myKeys = new String[0];
         String[] yourKeys = new String[0];
         int relno = beanAnnotationReader.getRelationNo(propertyDesc);
@@ -96,7 +96,7 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
             yourKeys = (String[]) yourKeyList.toArray(new String[yourKeyList.size()]);
         }
         final TnBeanMetaData beanMetaData = createRelationBeanMetaData(propertyDesc.getPropertyType());
-        PropertyDesc pd = propertyDesc;
+        TnPropertyDesc pd = propertyDesc;
         final TnRelationPropertyType rpt = new TnRelationPropertyTypeImpl(pd, relno, myKeys, yourKeys, beanMetaData);
         return rpt;
     }
@@ -105,12 +105,12 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
         return beanMetaDataFactory.createBeanMetaData(databaseMetaData, relationBeanClass, relationNestLevel + 1);
     }
 
-    protected boolean isRelationProperty(PropertyDesc propertyDesc) {
+    protected boolean isRelationProperty(TnPropertyDesc propertyDesc) {
         return beanAnnotationReader.hasRelationNo(propertyDesc);
     }
 
-    protected BeanDesc getBeanDesc() {
-        return BeanDescFactory.getBeanDesc(beanClass);
+    protected TnBeanDesc getBeanDesc() {
+        return TnBeanDescFactory.getBeanDesc(beanClass);
     }
 
 }

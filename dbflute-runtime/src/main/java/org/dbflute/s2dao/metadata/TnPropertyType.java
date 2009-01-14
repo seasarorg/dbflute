@@ -15,7 +15,7 @@
  */
 package org.dbflute.s2dao.metadata;
 
-import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.extension.jdbc.ValueType;
 
 /**
@@ -24,7 +24,7 @@ import org.seasar.extension.jdbc.ValueType;
  */
 public interface TnPropertyType {
 
-    PropertyDesc getPropertyDesc();
+    TnPropertyDesc getPropertyDesc();
 
     ValueType getValueType();
 

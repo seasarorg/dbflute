@@ -7,7 +7,7 @@ import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.resource.ResourceParameter;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 
@@ -89,7 +89,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
                     // Register for BeanDescFactory
                     DisposableUtil.add(new Disposable() {
                         public void dispose() {
-                            BeanDescFactory.clear();
+                            TnBeanDescFactory.clear();
                         }
                     });
                     _disposable = true;

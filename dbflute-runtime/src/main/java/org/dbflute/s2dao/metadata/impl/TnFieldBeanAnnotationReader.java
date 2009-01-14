@@ -18,9 +18,9 @@ package org.dbflute.s2dao.metadata.impl;
 import java.lang.reflect.Field;
 
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
-import org.dbflute.s2dao.beans.factory.BeanDescFactory;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.seasar.framework.util.FieldUtil;
 
 public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
@@ -43,13 +43,13 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
 
     public String VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
 
-    private BeanDesc beanDesc;
+    private TnBeanDesc beanDesc;
 
     public TnFieldBeanAnnotationReader(Class<?> beanClass_) {
-        this.beanDesc = BeanDescFactory.getBeanDesc(beanClass_);
+        this.beanDesc = TnBeanDescFactory.getBeanDesc(beanClass_);
     }
 
-    public String getColumnAnnotation(PropertyDesc pd) {
+    public String getColumnAnnotation(TnPropertyDesc pd) {
         String propertyName = pd.getPropertyName();
         String columnNameKey = propertyName + COLUMN_SUFFIX;
         return getField(columnNameKey);
@@ -79,7 +79,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
         return null;
     }
 
-    public String getId(PropertyDesc pd) {
+    public String getId(TnPropertyDesc pd) {
         String id = getField(pd.getPropertyName() + ID_SUFFIX);
         if (id != null) {
             return id;
@@ -88,24 +88,24 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     }
 
 
-    public String getRelationKey(PropertyDesc pd) {
+    public String getRelationKey(TnPropertyDesc pd) {
         String propertyName = pd.getPropertyName();
         String relkeysKey = propertyName + RELKEYS_SUFFIX;
         return getField(relkeysKey);
     }
 
-    public int getRelationNo(PropertyDesc pd) {
+    public int getRelationNo(TnPropertyDesc pd) {
         String relnoKey = pd.getPropertyName() + RELNO_SUFFIX;
         Field field = beanDesc.getField(relnoKey);
         return FieldUtil.getInt(field, null);
     }
 
-    public boolean hasRelationNo(PropertyDesc pd) {
+    public boolean hasRelationNo(TnPropertyDesc pd) {
         String relnoKey = pd.getPropertyName() + RELNO_SUFFIX;
         return beanDesc.hasField(relnoKey);
     }
 
-    public String getValueType(PropertyDesc pd) {
+    public String getValueType(TnPropertyDesc pd) {
         String valueTypeKey = pd.getPropertyName() + VALUE_TYPE_SUFFIX;
         return getField(valueTypeKey);
     }

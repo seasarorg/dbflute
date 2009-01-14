@@ -19,7 +19,7 @@ package org.dbflute.s2dao.beans.exception;
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public class MethodNotFoundRuntimeException extends RuntimeException {
+public class TnMethodNotFoundRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class MethodNotFoundRuntimeException extends RuntimeException {
 
     private Class<?>[] methodArgClasses;
 
-    public MethodNotFoundRuntimeException(Class<?> targetClass, String methodName, Object[] methodArgs) {
+    public TnMethodNotFoundRuntimeException(Class<?> targetClass, String methodName, Object[] methodArgs) {
         super("The method was not found: class=" + targetClass.getName() + " method=" + methodName + " args="
                 + getSignature(methodArgs));
         this.targetClass = targetClass;
@@ -44,7 +44,7 @@ public class MethodNotFoundRuntimeException extends RuntimeException {
         }
     }
 
-    public MethodNotFoundRuntimeException(Class<?> targetClass, String methodName, Class<?>[] methodArgClasses) {
+    public TnMethodNotFoundRuntimeException(Class<?> targetClass, String methodName, Class<?>[] methodArgClasses) {
         super("The method was not found: class=" + targetClass.getName() + " method=" + methodName + " args="
                 + getSignature(methodArgClasses));
         this.targetClass = targetClass;

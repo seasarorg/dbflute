@@ -18,15 +18,15 @@ package org.dbflute.s2dao.beans;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.dbflute.s2dao.beans.exception.IllegalPropertyRuntimeException;
+import org.dbflute.s2dao.beans.exception.TnIllegalPropertyRuntimeException;
 
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
-public interface PropertyDesc {
+public interface TnPropertyDesc {
 
-    BeanDesc getBeanDesc();
+    TnBeanDesc getBeanDesc();
     
     String getPropertyName();
 
@@ -54,7 +54,7 @@ public interface PropertyDesc {
 
     Object getValue(Object target) throws IllegalStateException;
 
-    void setValue(Object target, Object value) throws IllegalPropertyRuntimeException, IllegalStateException;
+    void setValue(Object target, Object value) throws TnIllegalPropertyRuntimeException, IllegalStateException;
 
     Object convertIfNeed(Object value);
 }

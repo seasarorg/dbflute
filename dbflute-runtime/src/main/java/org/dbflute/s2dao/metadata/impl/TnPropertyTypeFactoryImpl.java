@@ -23,8 +23,8 @@ import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.dbflute.s2dao.beans.BeanDesc;
-import org.dbflute.s2dao.beans.PropertyDesc;
+import org.dbflute.s2dao.beans.TnBeanDesc;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 
 /**
  * @author jflute
@@ -65,10 +65,10 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
 
     public TnPropertyType[] createBeanPropertyTypes(String tableName) {
         final List<TnPropertyType> list = new ArrayList<TnPropertyType>();
-        final BeanDesc beanDesc = getBeanDesc();
+        final TnBeanDesc beanDesc = getBeanDesc();
         final List<String> proppertyNameList = beanDesc.getProppertyNameList();
         for (String proppertyName : proppertyNameList) {
-            final PropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
+            final TnPropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
 
             // Read-only property is unnecessary!
             if (!pd.hasWriteMethod()) {
@@ -89,7 +89,7 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     }
 
     @Override
-    protected boolean isRelation(PropertyDesc propertyDesc) {
+    protected boolean isRelation(TnPropertyDesc propertyDesc) {
         final String propertyName = propertyDesc.getPropertyName();
         if (hasDBMeta() && (_dbmeta.hasForeign(propertyName) || _dbmeta.hasReferrer(propertyName))) {
             return true;
@@ -97,12 +97,12 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
         return hasRelationNoAnnotation(propertyDesc);
     }
 
-    protected boolean hasRelationNoAnnotation(PropertyDesc propertyDesc) {
+    protected boolean hasRelationNoAnnotation(TnPropertyDesc propertyDesc) {
         return beanAnnotationReader.hasRelationNo(propertyDesc);
     }
 
     @Override
-    protected boolean isPrimaryKey(PropertyDesc propertyDesc) {
+    protected boolean isPrimaryKey(TnPropertyDesc propertyDesc) {
         final String propertyName = propertyDesc.getPropertyName();
         if (hasDBMeta() && _dbmeta.hasPrimaryKey() && _dbmeta.hasColumn(propertyName)) {
             if (_dbmeta.findColumnInfo(propertyName).isPrimary()) {
@@ -112,21 +112,21 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
         return hasIdAnnotation(propertyDesc);
     }
 
-    protected boolean hasIdAnnotation(PropertyDesc propertyDesc) {
+    protected boolean hasIdAnnotation(TnPropertyDesc propertyDesc) {
         return beanAnnotationReader.getId(propertyDesc) != null;
     }
 
     @Override
     protected boolean isPersistent(TnPropertyType propertyType) {
         final String propertyName = propertyType.getPropertyName();
-        final PropertyDesc propertyDesc = propertyType.getPropertyDesc();
+        final TnPropertyDesc propertyDesc = propertyType.getPropertyDesc();
         if ((hasDBMeta() && _dbmeta.hasColumn(propertyName)) || hasColumnAnnotation(propertyDesc)) {
             return true;
         }
         return false;
     }
 
-    protected boolean hasColumnAnnotation(PropertyDesc propertyDesc) {
+    protected boolean hasColumnAnnotation(TnPropertyDesc propertyDesc) {
         return beanAnnotationReader.getColumnAnnotation(propertyDesc) != null;
     }
 }
