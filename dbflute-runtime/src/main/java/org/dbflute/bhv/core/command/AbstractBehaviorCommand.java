@@ -16,10 +16,10 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.dbflute.s2dao.rshandler.TnBeanListMetaDataResultSetHandler;
 import org.dbflute.s2dao.sqlcommand.InternalUpdateDynamicCommand;
+import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.extension.jdbc.ValueType;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -74,22 +74,22 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     }
 
     protected ResultSetHandler createObjectResultSetHandler(Class<?> objectType) {
-        final ValueType valueType = TnValueTypes.getValueType(objectType);
+        final TnValueType valueType = TnValueTypes.getValueType(objectType);
         return new InternalObjectResultSetHandler(valueType);
     }
 
     protected ResultSetHandler createObjectListResultSetHandler(Class<?> objectType) {
-        final ValueType valueType = TnValueTypes.getValueType(objectType);
+        final TnValueType valueType = TnValueTypes.getValueType(objectType);
         return createObjectListResultSetHandler(valueType);
     }
 
-    protected ResultSetHandler createObjectListResultSetHandler(ValueType valueType) {
+    protected ResultSetHandler createObjectListResultSetHandler(TnValueType valueType) {
         return new InternalObjectListResultSetHandler(valueType);
     }
 
     protected static class InternalObjectResultSetHandler implements ResultSetHandler {
-        private ValueType valueType;
-        public InternalObjectResultSetHandler(ValueType valueType) {
+        private TnValueType valueType;
+        public InternalObjectResultSetHandler(TnValueType valueType) {
             this.valueType = valueType;
         }
         public Object handle(ResultSet rs) throws SQLException {
@@ -101,8 +101,8 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     }
 
     protected static class InternalObjectListResultSetHandler implements ResultSetHandler {
-        private ValueType valueType;
-        public InternalObjectListResultSetHandler(ValueType valueType) {
+        private TnValueType valueType;
+        public InternalObjectListResultSetHandler(TnValueType valueType) {
             this.valueType = valueType;
         }
         public Object handle(ResultSet rs) throws SQLException {

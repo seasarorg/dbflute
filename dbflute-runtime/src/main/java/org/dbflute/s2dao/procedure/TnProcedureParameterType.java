@@ -2,7 +2,7 @@ package org.dbflute.s2dao.procedure;
 
 import java.lang.reflect.Field;
 
-import org.seasar.extension.jdbc.ValueType;
+import org.dbflute.s2dao.valuetype.TnValueType;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -15,7 +15,7 @@ public class TnProcedureParameterType {
     private String parameterName;
     private Integer parameterIndex;
     private Field field;
-    private ValueType valueType;
+    private TnValueType valueType;
     private boolean inType;
     private boolean outType;
     private boolean returnType;
@@ -68,11 +68,11 @@ public class TnProcedureParameterType {
         this.parameterIndex = parameterIndex;
     }
 
-    public ValueType getValueType() {
+    public TnValueType getValueType() {
         return valueType;
     }
 
-    public void setValueType(final ValueType valueType) {
+    public void setValueType(final TnValueType valueType) {
         this.valueType = valueType;
     }
 

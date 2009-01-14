@@ -13,9 +13,9 @@ import org.dbflute.DBDef;
 import org.dbflute.resource.ResourceContext;
 import org.dbflute.s2dao.beans.TnBeanDesc;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
-import org.seasar.extension.jdbc.ValueType;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -95,7 +95,7 @@ public class TnProcedureMetaDataFactory {
         }
         final Integer index = extractParameterIndex(procedureParameter, field);
         ppt.setParameterIndex(index);
-        final ValueType valueType = getValueType(dtoDesc, field);
+        final TnValueType valueType = getValueType(dtoDesc, field);
         ppt.setValueType(valueType);
         return ppt;
     }
@@ -123,7 +123,7 @@ public class TnProcedureMetaDataFactory {
         return null;
     }
 
-    protected ValueType getValueType(final TnBeanDesc dtoDesc, final Field field) {
+    protected TnValueType getValueType(final TnBeanDesc dtoDesc, final Field field) {
         final String name = annotationReader.getValueType(dtoDesc, field);
         if (name != null) {
             return valueTypeFactory.getValueTypeByName(name);

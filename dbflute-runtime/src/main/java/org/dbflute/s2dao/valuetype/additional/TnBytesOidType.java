@@ -1,4 +1,4 @@
-package org.dbflute.s2dao.valuetype;
+package org.dbflute.s2dao.valuetype.additional;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import org.seasar.extension.jdbc.types.BytesType;
 
 /**
  * The value type of bytes OID. (for PostgreSQL) 
@@ -22,13 +21,13 @@ public class TnBytesOidType extends BytesType {
     //                                                                         Constructor
     //                                                                         ===========
     public TnBytesOidType() {
-        super(new InternalBytesOidTrait());
+        super(new TnBytesOidTrait());
     }
 
     // ===================================================================================
     //                                                                          Blob Trait
     //                                                                          ==========
-    protected static class InternalBytesOidTrait implements Trait {
+    protected static class TnBytesOidTrait implements Trait {
 	
         public int getSqlType() {
             return Types.BLOB;
@@ -39,7 +38,7 @@ public class TnBytesOidType extends BytesType {
         }
 
         protected Blob createBytesOidImpl(byte[] bytes) {
-            return new InternalBytesOidImpl(bytes);
+            return new TnBytesOidImpl(bytes);
         }
 
         public void set(CallableStatement cs, String parameterName, byte[] bytes) throws SQLException {
@@ -66,11 +65,11 @@ public class TnBytesOidType extends BytesType {
     // ===================================================================================
     //                                                                 Blob Implementation
     //                                                                 ===================
-    protected static class InternalBytesOidImpl implements Blob {
+    protected static class TnBytesOidImpl implements Blob {
 
         protected byte[] bytes;
 
-        public InternalBytesOidImpl(byte[] bytes) {
+        public TnBytesOidImpl(byte[] bytes) {
             this.bytes = bytes;
         }
 

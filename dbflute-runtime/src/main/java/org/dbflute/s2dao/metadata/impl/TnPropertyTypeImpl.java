@@ -17,8 +17,8 @@ package org.dbflute.s2dao.metadata.impl;
 
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnPropertyType;
+import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
-import org.seasar.extension.jdbc.ValueType;
 
 /**
  * {Refers to S2Container's utility and Extends it}
@@ -32,7 +32,7 @@ public class TnPropertyTypeImpl implements TnPropertyType {
 
     private String columnName;
 
-    private ValueType valueType;
+    private TnValueType valueType;
 
     private boolean primaryKey = false;
 
@@ -42,22 +42,22 @@ public class TnPropertyTypeImpl implements TnPropertyType {
         this(propertyDesc, TnValueTypes.OBJECT, propertyDesc.getPropertyName());
     }
 
-    public TnPropertyTypeImpl(TnPropertyDesc propertyDesc, ValueType valueType) {
+    public TnPropertyTypeImpl(TnPropertyDesc propertyDesc, TnValueType valueType) {
         this(propertyDesc, valueType, propertyDesc.getPropertyName());
     }
 
-    public TnPropertyTypeImpl(TnPropertyDesc propertyDesc, ValueType valueType, String columnName) {
+    public TnPropertyTypeImpl(TnPropertyDesc propertyDesc, TnValueType valueType, String columnName) {
         this.propertyDesc = propertyDesc;
         this.propertyName = propertyDesc.getPropertyName();
         this.valueType = valueType;
         this.columnName = columnName;
     }
 
-    public TnPropertyTypeImpl(String propertyName, ValueType valueType) {
+    public TnPropertyTypeImpl(String propertyName, TnValueType valueType) {
         this(propertyName, valueType, propertyName);
     }
 
-    public TnPropertyTypeImpl(String propertyName, ValueType valueType, String columnName) {
+    public TnPropertyTypeImpl(String propertyName, TnValueType valueType, String columnName) {
         this.propertyName = propertyName;
         this.valueType = valueType;
         this.columnName = columnName;
@@ -79,7 +79,7 @@ public class TnPropertyTypeImpl implements TnPropertyType {
         this.columnName = columnName;
     }
 
-    public ValueType getValueType() {
+    public TnValueType getValueType() {
         return valueType;
     }
 

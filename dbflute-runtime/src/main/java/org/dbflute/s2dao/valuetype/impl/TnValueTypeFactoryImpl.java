@@ -15,28 +15,37 @@
  */
 package org.dbflute.s2dao.valuetype.impl;
 
+import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.seasar.extension.jdbc.ValueType;
-import org.seasar.extension.jdbc.types.ValueTypes;
-import org.seasar.framework.container.S2Container;
+import org.dbflute.s2dao.valuetype.TnValueTypes;
+import org.dbflute.s2dao.valuetype.additional.TnBytesOidType;
+import org.dbflute.s2dao.valuetype.additional.TnStringClobType;
 
 /**
  * @author jflute
  */
 public class TnValueTypeFactoryImpl implements TnValueTypeFactory {
 
-    private S2Container container;
-
-    public ValueType getValueTypeByName(String name) {
-        return (ValueType) container.getComponent(name);
+    // ===================================================================================
+    //                                                                Additional ValueType
+    //                                                                ====================
+    {
+        TnValueTypes.registerAdditionalValueType("stringClobType", new TnStringClobType());
+        TnValueTypes.registerAdditionalValueType("bytesOidType", new TnBytesOidType());
+        
+        // for compatible
+        TnValueTypes.registerAdditionalValueType("dbfluteStringClobType", new TnStringClobType());
+        TnValueTypes.registerAdditionalValueType("dbfluteBytesOidType", new TnBytesOidType());
     }
 
-    public ValueType getValueTypeByClass(Class<?> clazz) {
-        return ValueTypes.getValueType(clazz);
+    // ===================================================================================
+    //                                                                   ValueType Getting
+    //                                                                   =================
+    public TnValueType getValueTypeByName(String valueTypeName) {
+        return TnValueTypes.getAdditionalValueType(valueTypeName);
     }
 
-    public void setContainer(S2Container container) {
-        this.container = container.getRoot();
+    public TnValueType getValueTypeByClass(Class<?> clazz) {
+        return TnValueTypes.getValueType(clazz);
     }
-
 }

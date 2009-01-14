@@ -27,8 +27,8 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
+import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.util.DfReflectionUtil;
-import org.seasar.extension.jdbc.ValueType;
 
 /**
  * @author jflute
@@ -172,7 +172,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         if (res.containsRelKeyValueIfExists(columnName)) {
             value = res.extractRelKeyValue(columnName);
         } else {
-            final ValueType valueType = pt.getValueType();
+            final TnValueType valueType = pt.getValueType();
             value = valueType.getValue(res.getResultSet(), columnName);
         }
         if (value != null) {

@@ -12,12 +12,12 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
-import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
-import org.seasar.extension.jdbc.ValueType;
+import org.dbflute.s2dao.valuetype.TnValueType;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -128,7 +128,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
         final List<Object> keyList = new ArrayList<Object>();
         final TnBeanMetaData bmd = rpt.getBeanMetaData();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
-            final ValueType valueType;
+            final TnValueType valueType;
             String columnName = rpt.getMyKey(i);
             if (columnNames.contains(columnName)) {
                 final TnPropertyType pt = getBeanMetaData().getPropertyTypeByColumnName(columnName);

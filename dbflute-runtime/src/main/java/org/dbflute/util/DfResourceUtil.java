@@ -1,8 +1,10 @@
 package org.dbflute.util;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -68,10 +70,10 @@ public class DfResourceUtil {
     public static boolean isExist(String path) {
         return getResourceUrl(path) != null;
     }
-    
+
     // ===================================================================================
-    //                                                                           Text Read
-    //                                                                           =========
+    //                                                                     Reader Handling
+    //                                                                     ===============
     public static String readText(Reader reader) {
         BufferedReader in = new BufferedReader(reader);
         StringBuilder out = new StringBuilder(100);
@@ -91,7 +93,61 @@ public class DfResourceUtil {
         }
         return out.toString();
     }
-    
+
+    // ===================================================================================
+    //                                                                InputStream Handling
+    //                                                                ====================
+    public static void close(InputStream is) {
+        if (is == null) {
+            return;
+        }
+        try {
+            is.close();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static final byte[] getBytes(InputStream is) {
+        byte[] bytes = null;
+        byte[] buf = new byte[8192];
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int n = 0;
+            while ((n = is.read(buf, 0, buf.length)) != -1) {
+                baos.write(buf, 0, n);
+            }
+            bytes = baos.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (is != null) {
+                close(is);
+            }
+        }
+        return bytes;
+    }
+
+    public static final void copy(InputStream is, OutputStream os) {
+        byte[] buf = new byte[8192];
+        try {
+            int n = 0;
+            while ((n = is.read(buf, 0, buf.length)) != -1) {
+                os.write(buf, 0, n);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static int available(InputStream is) {
+        try {
+            return is.available();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============

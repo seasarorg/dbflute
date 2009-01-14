@@ -16,7 +16,7 @@
 package org.dbflute.s2dao.metadata;
 
 import org.dbflute.s2dao.beans.TnPropertyDesc;
-import org.seasar.extension.jdbc.ValueType;
+import org.dbflute.s2dao.valuetype.TnValueType;
 
 /**
  * {Refers to S2Container's utility and Extends it}
@@ -26,7 +26,7 @@ public interface TnPropertyType {
 
     TnPropertyDesc getPropertyDesc();
 
-    ValueType getValueType();
+    TnValueType getValueType();
 
     String getPropertyName();
 

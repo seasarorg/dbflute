@@ -3,9 +3,9 @@ package org.dbflute.bhv.core.command;
 import java.util.List;
 
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.extension.jdbc.ValueType;
 
 /**
  * The behavior command for OutsideSql.selectList().
@@ -46,7 +46,7 @@ public class OutsideSqlSelectListCommand<ENTITY> extends AbstractOutsideSqlSelec
     //                                      ResultSetHandler
     //                                      ----------------
     protected ResultSetHandler createOutsideSqlBeanListResultSetHandler(TnBeanMetaData bmd) {
-        final ValueType valueType = TnValueTypes.getValueType(_entityType);
+        final TnValueType valueType = TnValueTypes.getValueType(_entityType);
         if (valueType == null || !valueType.equals(TnValueTypes.OBJECT)) {
             return createObjectListResultSetHandler(valueType);
         }

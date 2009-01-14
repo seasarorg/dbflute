@@ -27,9 +27,9 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.s2dao.rowcreator.TnRowCreator;
+import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.util.DfReflectionUtil;
 import org.dbflute.util.DfStringUtil;
-import org.seasar.extension.jdbc.ValueType;
 
 /**
  * @author jflute
@@ -66,7 +66,7 @@ public class TnRowCreatorImpl implements TnRowCreator {
     }
 
     protected void registerValue(ResultSet rs, Object row, TnPropertyType pt, String name) throws SQLException {
-        final ValueType valueType = pt.getValueType();
+        final TnValueType valueType = pt.getValueType();
         final Object value = valueType.getValue(rs, name);
         final TnPropertyDesc pd = pt.getPropertyDesc();
         pd.setValue(row, value);

@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -17,11 +18,19 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.seasar.framework.util.DecimalFormatUtil;
+import org.seasar.framework.util.StringUtil;
+
 /**
  * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class DfTypeUtil {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final String NULL = "null";
 
     // ===================================================================================
     //                                                                          Convert To
@@ -51,6 +60,14 @@ public class DfTypeUtil {
         } else {
             return Boolean.TRUE;
         }
+    }
+
+    public static boolean toPrimitiveBoolean(Object o) {
+        Boolean b = toBoolean(o);
+        if (b != null) {
+            return b.booleanValue();
+        }
+        return false;
     }
 
     // -----------------------------------------------------
@@ -119,67 +136,6 @@ public class DfTypeUtil {
     }
 
     // -----------------------------------------------------
-    //                                            BigDecimal
-    //                                            ----------
-    public static BigDecimal toBigDecimal(Object o) {
-        return toBigDecimal(o, null);
-    }
-
-    public static BigDecimal toBigDecimal(Object o, String pattern) {
-        if (o == null) {
-            return null;
-        } else if (o instanceof BigDecimal) {
-            return (BigDecimal) o;
-        } else if (o instanceof java.util.Date) {
-            if (pattern != null) {
-                return new BigDecimal(new SimpleDateFormat(pattern).format(o));
-            }
-            return new BigDecimal(Long.toString(((java.util.Date) o).getTime()));
-        } else if (o instanceof String) {
-            String s = (String) o;
-            if (s == null || s.trim().length() == 0) {
-                return null;
-            }
-            return new BigDecimal(new BigDecimal(s).toPlainString());
-        } else {
-            return new BigDecimal(new BigDecimal(o.toString()).toPlainString());
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                                Double
-    //                                                ------
-    public static Double toDouble(Object o) {
-        return toDouble(o, null);
-    }
-
-    public static Double toDouble(Object o, String pattern) {
-        if (o == null) {
-            return null;
-        } else if (o instanceof Double) {
-            return (Double) o;
-        } else if (o instanceof Number) {
-            return new Double(((Number) o).doubleValue());
-        } else if (o instanceof String) {
-            return toDouble((String) o);
-        } else if (o instanceof java.util.Date) {
-            if (pattern != null) {
-                return new Double(new SimpleDateFormat(pattern).format(o));
-            }
-            return new Double(((java.util.Date) o).getTime());
-        } else {
-            return toDouble(o.toString());
-        }
-    }
-
-    protected static Double toDouble(String s) {
-        if (s == null || s.trim().length() == 0) {
-            return null;
-        }
-        return new Double(normalize(s));
-    }
-
-    // -----------------------------------------------------
     //                                                  Long
     //                                                  ----
     public static Long toLong(Object o) {
@@ -245,6 +201,95 @@ public class DfTypeUtil {
     }
 
     // -----------------------------------------------------
+    //                                            BigDecimal
+    //                                            ----------
+    public static BigDecimal toBigDecimal(Object o) {
+        return toBigDecimal(o, null);
+    }
+
+    public static BigDecimal toBigDecimal(Object o, String pattern) {
+        if (o == null) {
+            return null;
+        } else if (o instanceof BigDecimal) {
+            return (BigDecimal) o;
+        } else if (o instanceof java.util.Date) {
+            if (pattern != null) {
+                return new BigDecimal(new SimpleDateFormat(pattern).format(o));
+            }
+            return new BigDecimal(Long.toString(((java.util.Date) o).getTime()));
+        } else if (o instanceof String) {
+            String s = (String) o;
+            if (s == null || s.trim().length() == 0) {
+                return null;
+            }
+            return new BigDecimal(new BigDecimal(s).toPlainString());
+        } else {
+            return new BigDecimal(new BigDecimal(o.toString()).toPlainString());
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                                Double
+    //                                                ------
+    public static Double toDouble(Object o) {
+        return toDouble(o, null);
+    }
+
+    public static Double toDouble(Object o, String pattern) {
+        if (o == null) {
+            return null;
+        } else if (o instanceof Double) {
+            return (Double) o;
+        } else if (o instanceof Number) {
+            return new Double(((Number) o).doubleValue());
+        } else if (o instanceof String) {
+            return toDouble((String) o);
+        } else if (o instanceof java.util.Date) {
+            if (pattern != null) {
+                return new Double(new SimpleDateFormat(pattern).format(o));
+            }
+            return new Double(((java.util.Date) o).getTime());
+        } else {
+            return toDouble(o.toString());
+        }
+    }
+
+    protected static Double toDouble(String s) {
+        if (s == null || s.trim().length() == 0) {
+            return null;
+        }
+        return new Double(normalize(s));
+    }
+
+    public static double toPrimitiveDouble(Object o) {
+        return toPrimitiveDouble(o, null);
+    }
+
+    public static double toPrimitiveDouble(Object o, String pattern) {
+        if (o == null) {
+            return 0;
+        } else if (o instanceof Number) {
+            return ((Number) o).doubleValue();
+        } else if (o instanceof String) {
+            return toPrimitiveDouble((String) o);
+        } else if (o instanceof java.util.Date) {
+            if (pattern != null) {
+                return Double.parseDouble(new SimpleDateFormat(pattern).format(o));
+            }
+            return ((java.util.Date) o).getTime();
+        } else {
+            return toPrimitiveDouble(o.toString());
+        }
+    }
+
+    private static double toPrimitiveDouble(String s) {
+        if (StringUtil.isEmpty(s)) {
+            return 0;
+        }
+        return Double.parseDouble(DecimalFormatUtil.normalize(s));
+    }
+
+    // -----------------------------------------------------
     //                                                 Float
     //                                                 -----
     public static Float toFloat(Object o) {
@@ -275,6 +320,34 @@ public class DfTypeUtil {
             return null;
         }
         return new Float(normalize(s));
+    }
+
+    public static float toPrimitiveFloat(Object o) {
+        return toPrimitiveFloat(o, null);
+    }
+
+    public static float toPrimitiveFloat(Object o, String pattern) {
+        if (o == null) {
+            return 0;
+        } else if (o instanceof Number) {
+            return ((Number) o).floatValue();
+        } else if (o instanceof String) {
+            return toPrimitiveFloat((String) o);
+        } else if (o instanceof java.util.Date) {
+            if (pattern != null) {
+                return Float.parseFloat(new SimpleDateFormat(pattern).format(o));
+            }
+            return ((java.util.Date) o).getTime();
+        } else {
+            return toPrimitiveFloat(o.toString());
+        }
+    }
+
+    private static float toPrimitiveFloat(String s) {
+        if (StringUtil.isEmpty(s)) {
+            return 0;
+        }
+        return Float.parseFloat(DecimalFormatUtil.normalize(s));
     }
 
     // -----------------------------------------------------
@@ -310,6 +383,36 @@ public class DfTypeUtil {
             return null;
         }
         return new Short(normalize(s));
+    }
+
+    public static short toPrimitiveShort(Object o) {
+        return toPrimitiveShort(o, null);
+    }
+
+    public static short toPrimitiveShort(Object o, String pattern) {
+        if (o == null) {
+            return 0;
+        } else if (o instanceof Number) {
+            return ((Number) o).shortValue();
+        } else if (o instanceof String) {
+            return toPrimitiveShort((String) o);
+        } else if (o instanceof java.util.Date) {
+            if (pattern != null) {
+                return Short.parseShort(new SimpleDateFormat(pattern).format(o));
+            }
+            return (short) ((java.util.Date) o).getTime();
+        } else if (o instanceof Boolean) {
+            return ((Boolean) o).booleanValue() ? (short) 1 : (short) 0;
+        } else {
+            return toPrimitiveShort(o.toString());
+        }
+    }
+
+    private static short toPrimitiveShort(String s) {
+        if (StringUtil.isEmpty(s)) {
+            return 0;
+        }
+        return Short.parseShort(DecimalFormatUtil.normalize(s));
     }
 
     // -----------------------------------------------------
@@ -366,6 +469,36 @@ public class DfTypeUtil {
             return null;
         }
         return new Byte(normalize(s));
+    }
+
+    public static byte toPrimitiveByte(Object o) {
+        return toPrimitiveByte(o, null);
+    }
+
+    public static byte toPrimitiveByte(Object o, String pattern) {
+        if (o == null) {
+            return 0;
+        } else if (o instanceof Number) {
+            return ((Number) o).byteValue();
+        } else if (o instanceof String) {
+            return toPrimitiveByte((String) o);
+        } else if (o instanceof java.util.Date) {
+            if (pattern != null) {
+                return Byte.parseByte(new SimpleDateFormat(pattern).format(o));
+            }
+            return (byte) ((java.util.Date) o).getTime();
+        } else if (o instanceof Boolean) {
+            return ((Boolean) o).booleanValue() ? (byte) 1 : (byte) 0;
+        } else {
+            return toPrimitiveByte(o.toString());
+        }
+    }
+
+    private static byte toPrimitiveByte(String s) {
+        if (StringUtil.isEmpty(s)) {
+            return 0;
+        }
+        return Byte.parseByte(DecimalFormatUtil.normalize(s));
     }
 
     // -----------------------------------------------------
@@ -717,9 +850,187 @@ public class DfTypeUtil {
     }
 
     // ===================================================================================
+    //                                                                 toString() Handling
+    //                                                                 ===================
+    public static String toString(Object value) {
+        return toString(value, null);
+    }
+
+    public static String toString(Object value, String pattern) {
+        if (value == null) {
+            return null;
+        } else if (value instanceof String) {
+            return (String) value;
+        } else if (value instanceof java.util.Date) {
+            return toString((java.util.Date) value, pattern);
+        } else if (value instanceof Number) {
+            return toString((Number) value, pattern);
+        } else if (value instanceof byte[]) {
+            return DfBase64Util.encode((byte[]) value);
+        } else {
+            return value.toString();
+        }
+    }
+
+    public static String toString(Number value, String pattern) {
+        if (value != null) {
+            if (pattern != null) {
+                return new DecimalFormat(pattern).format(value);
+            }
+            return value.toString();
+        }
+        return null;
+    }
+
+    public static String toString(java.util.Date value, String pattern) {
+        if (value != null) {
+            if (pattern != null) {
+                return new SimpleDateFormat(pattern).format(value);
+            }
+            return value.toString();
+        }
+        return null;
+    }
+
+    // ===================================================================================
+    //                                                                   toText() Handling
+    //                                                                   =================
+    public static String nullText() {
+        return NULL;
+    }
+
+    public static String toText(Number value) {
+        if (value == null) {
+            return NULL;
+        }
+        return value.toString();
+    }
+
+    public static String toText(Boolean value) {
+        if (value == null) {
+            return NULL;
+        }
+        return quote(value.toString());
+    }
+
+    public static String toText(String value) {
+        if (value == null) {
+            return NULL;
+        }
+        return quote(value);
+    }
+
+    public static String toText(Date value) {
+        if (value == null) {
+            return NULL;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(value);
+        StringBuilder buf = new StringBuilder();
+        addDate(buf, calendar);
+        return quote(buf.toString());
+    }
+
+    public static String toText(Time value) {
+        if (value == null) {
+            return NULL;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(value);
+        StringBuilder buf = new StringBuilder();
+        addTime(buf, calendar);
+        addTimeDecimalPart(buf, calendar.get(Calendar.MILLISECOND));
+        return quote(buf.toString());
+    }
+
+    public static String toText(Timestamp value) {
+        if (value == null) {
+            return NULL;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(value);
+        StringBuilder buf = new StringBuilder(30);
+        addDate(buf, calendar);
+        addTime(buf, calendar);
+        addTimeDecimalPart(buf, value.getNanos());
+        return quote(buf.toString());
+    }
+
+    public static String toText(byte[] value) {
+        if (value == null) {
+            return NULL;
+        }
+        return quote(value.toString() + "(byteLength=" + Integer.toString(value.length) + ")");
+    }
+
+    public static String toText(Object value) {
+        if (value == null) {
+            return NULL;
+        }
+        return quote(value.toString());
+    }
+
+    // yyyy-mm-dd
+    protected static void addDate(StringBuilder buf, Calendar calendar) {
+        int year = calendar.get(Calendar.YEAR);
+        buf.append(year);
+        buf.append('-');
+        int month = calendar.get(Calendar.MONTH) + 1;
+        if (month < 10) {
+            buf.append('0');
+        }
+        buf.append(month);
+        buf.append('-');
+        int date = calendar.get(Calendar.DATE);
+        if (date < 10) {
+            buf.append('0');
+        }
+        buf.append(date);
+    }
+
+    // hh:mm:ss
+    protected static void addTime(StringBuilder buf, Calendar calendar) {
+        if (buf.length() > 0) {
+            buf.append(' ');
+        }
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        if (hour < 10) {
+            buf.append('0');
+        }
+        buf.append(hour);
+        buf.append(':');
+        int minute = calendar.get(Calendar.MINUTE);
+        if (minute < 10) {
+            buf.append('0');
+        }
+        buf.append(minute);
+        buf.append(':');
+        int second = calendar.get(Calendar.SECOND);
+        if (second < 10) {
+            buf.append('0');
+        }
+        buf.append(second);
+    }
+
+    // .000
+    protected static void addTimeDecimalPart(StringBuilder buf, int decimalPart) {
+        if (decimalPart == 0) {
+            return;
+        }
+        if (buf.length() > 0) {
+            buf.append('.');
+        }
+        buf.append(decimalPart);
+    }
+
+    // 'text'
+    protected static String quote(String text) {
+        return "'" + text + "'";
+    }
+
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-
     // -----------------------------------------------------
     //                                            DateFormat
     //                                            ----------

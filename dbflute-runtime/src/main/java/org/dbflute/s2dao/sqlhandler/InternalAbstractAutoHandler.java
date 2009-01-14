@@ -11,12 +11,13 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.dbflute.exception.EntityAlreadyUpdatedException;
-import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.jdbc.StatementFactory;
+import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.dbflute.s2dao.metadata.TnPropertyType;
+import org.dbflute.s2dao.valuetype.TnValueType;
 import org.dbflute.util.DfTypeUtil;
 import org.seasar.extension.jdbc.ValueType;
-import org.dbflute.s2dao.beans.TnPropertyDesc;
 
 
 /**
@@ -115,7 +116,7 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
 
     protected void setupInsertBindVariables(Object bean) {
         final List<Object> varList = new ArrayList<Object>();
-        final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
+        final List<TnValueType> varValueTypeList = new ArrayList<TnValueType>();
         final TnBeanMetaData bmd = getBeanMetaData();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
@@ -138,7 +139,7 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
 
     protected void setupUpdateBindVariables(Object bean) {
         final List<Object> varList = new ArrayList<Object>();
-        final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
+        final List<TnValueType> varValueTypeList = new ArrayList<TnValueType>();
         final TnBeanMetaData bmd = getBeanMetaData();
         final String timestampPropertyName = bmd.getTimestampPropertyName();
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
@@ -170,13 +171,13 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
 
     protected void setupDeleteBindVariables(Object bean) {
         final List<Object> varList = new ArrayList<Object>();
-        final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
+        final List<TnValueType> varValueTypeList = new ArrayList<TnValueType>();
         addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
         setBindVariables(varList.toArray());
         setBindVariableValueTypes((ValueType[])varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
     }
 
-    protected void addAutoUpdateWhereBindVariables(List<Object> varList, List<ValueType> varValueTypeList, Object bean) {
+    protected void addAutoUpdateWhereBindVariables(List<Object> varList, List<TnValueType> varValueTypeList, Object bean) {
         TnBeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
             TnPropertyType pt = bmd.getPropertyTypeByColumnName(bmd.getPrimaryKey(i));

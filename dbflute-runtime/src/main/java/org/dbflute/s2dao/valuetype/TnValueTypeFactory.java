@@ -15,15 +15,13 @@
  */
 package org.dbflute.s2dao.valuetype;
 
-import org.seasar.extension.jdbc.ValueType;
-
 /**
  * @author jflute
  */
 public interface TnValueTypeFactory {
 
-    public ValueType getValueTypeByName(String name);
+    public TnValueType getValueTypeByName(String name);
 
-    public ValueType getValueTypeByClass(Class<?> clazz);
+    public TnValueType getValueTypeByClass(Class<?> clazz);
 
 }

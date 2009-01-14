@@ -11,11 +11,11 @@ import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.resource.SQLExceptionHandler;
-import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
-import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.extension.jdbc.ResultSetHandler;
-import org.seasar.extension.jdbc.ValueType;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
+import org.dbflute.s2dao.metadata.TnPropertyType;
+import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
+import org.dbflute.s2dao.valuetype.TnValueType;
+import org.seasar.extension.jdbc.ResultSetHandler;
 
 
 /**
@@ -70,8 +70,8 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     //                                                                  Result Set Handler
     //                                                                  ==================
     protected static class InternalIdentifierResultSetHandler implements ResultSetHandler {
-        private ValueType valueType;
-        public InternalIdentifierResultSetHandler(ValueType valueType) {
+        private TnValueType valueType;
+        public InternalIdentifierResultSetHandler(TnValueType valueType) {
             this.valueType = valueType;
         }
         public Object handle(ResultSet rs) throws SQLException {

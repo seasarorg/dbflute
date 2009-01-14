@@ -11,10 +11,10 @@ import org.dbflute.Entity;
 import org.dbflute.dbmeta.DBMeta;
 import org.dbflute.resource.InternalMapContext;
 import org.dbflute.resource.ResourceContext;
-import org.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
-import org.dbflute.util.DfSystemUtil;
 import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.extension.jdbc.ValueType;
+import org.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
+import org.dbflute.s2dao.valuetype.TnValueType;
+import org.dbflute.util.DfSystemUtil;
 
 
 /**
@@ -79,7 +79,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                     pt = (TnPropertyType) propertyCache.get(columnName);
                     propertyName = pt.getPropertyName();
                     if (dbmeta.hasEntityPropertySetupper(propertyName)) {
-                        final ValueType valueType = pt.getValueType();
+                        final TnValueType valueType = pt.getValueType();
                         final Object value = valueType.getValue(rs, columnName);
                         dbmeta.setupEntityProperty(propertyName, row, value);
                     } else {
