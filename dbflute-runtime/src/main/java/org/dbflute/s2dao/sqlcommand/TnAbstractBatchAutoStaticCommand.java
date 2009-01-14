@@ -4,7 +4,7 @@ import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlhandler.InternalAbstractBatchAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
 
 
 /**
@@ -26,7 +26,7 @@ public abstract class TnAbstractBatchAutoStaticCommand extends TnAbstractAutoSta
     //                                                                             =======
     @Override
     public Object execute(Object[] args) {
-        final InternalAbstractBatchAutoHandler handler = createBatchAutoHandler();
+        final TnAbstractBatchAutoHandler handler = createBatchAutoHandler();
         handler.setOptimisticLockHandling(optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
 		handler.setSql(getSql());
@@ -35,5 +35,5 @@ public abstract class TnAbstractBatchAutoStaticCommand extends TnAbstractAutoSta
         return handler.executeBatch(args);
     }
 
-    protected abstract InternalAbstractBatchAutoHandler createBatchAutoHandler();
+    protected abstract TnAbstractBatchAutoHandler createBatchAutoHandler();
 }

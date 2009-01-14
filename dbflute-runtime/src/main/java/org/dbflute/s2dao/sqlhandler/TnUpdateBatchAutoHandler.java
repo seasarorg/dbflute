@@ -9,14 +9,15 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalUpdateAutoHandler extends InternalAbstractAutoHandler {
+public class TnUpdateBatchAutoHandler extends TnAbstractBatchAutoHandler {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalUpdateAutoHandler(DataSource dataSource,
+    public TnUpdateBatchAutoHandler(DataSource dataSource,
             StatementFactory statementFactory, TnBeanMetaData beanMetaData,
             TnPropertyType[] propertyTypes) {
+
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
     }
 
@@ -26,12 +27,5 @@ public class InternalUpdateAutoHandler extends InternalAbstractAutoHandler {
 	@Override
     protected void setupBindVariables(Object bean) {
         setupUpdateBindVariables(bean);
-        setLoggingMessageSqlArgs(bindVariables);
-    }
-
-	@Override
-    protected void postUpdateBean(Object bean, int ret) {
-        updateVersionNoIfNeed(bean);
-        updateTimestampIfNeed(bean);
     }
 }

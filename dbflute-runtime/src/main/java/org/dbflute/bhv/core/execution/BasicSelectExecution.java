@@ -4,7 +4,7 @@ import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
-import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
+import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.seasar.extension.jdbc.ResultSetHandler;
 
@@ -43,7 +43,7 @@ public class BasicSelectExecution extends TnAbstractDynamicCommand {
      */
     public Object execute(Object[] args) {
         final CommandContext ctx = apply(args);
-        final InternalBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
+        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
         final Object[] bindVariableArray = ctx.getBindVariables();
         selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
         return selectHandler.execute(bindVariableArray, ctx.getBindVariableTypes());
@@ -52,8 +52,8 @@ public class BasicSelectExecution extends TnAbstractDynamicCommand {
     // ===================================================================================
     //                                                                      Select Handler
     //                                                                      ==============
-    protected InternalBasicSelectHandler createBasicSelectHandler(String realSql, ResultSetHandler rsh) {
-        return new InternalBasicSelectHandler(getDataSource(), realSql, rsh, getStatementFactory());
+    protected TnBasicSelectHandler createBasicSelectHandler(String realSql, ResultSetHandler rsh) {
+        return new TnBasicSelectHandler(getDataSource(), realSql, rsh, getStatementFactory());
     }
 
     // ===================================================================================

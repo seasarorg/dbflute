@@ -9,15 +9,14 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalDeleteBatchAutoHandler extends InternalAbstractBatchAutoHandler {
+public class TnDeleteAutoHandler extends TnAbstractAutoHandler {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalDeleteBatchAutoHandler(DataSource dataSource,
+    public TnDeleteAutoHandler(DataSource dataSource,
             StatementFactory statementFactory, TnBeanMetaData beanMetaData,
             TnPropertyType[] propertyTypes) {
-
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
     }
 
@@ -27,5 +26,6 @@ public class InternalDeleteBatchAutoHandler extends InternalAbstractBatchAutoHan
 	@Override
     protected void setupBindVariables(Object bean) {
         setupDeleteBindVariables(bean);
+        setLoggingMessageSqlArgs(bindVariables);
     }
 }

@@ -4,9 +4,9 @@ import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlhandler.InternalAbstractAutoHandler;
-import org.dbflute.s2dao.sqlhandler.InternalAbstractBatchAutoHandler;
-import org.dbflute.s2dao.sqlhandler.InternalDeleteBatchAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnDeleteBatchAutoHandler;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -25,17 +25,17 @@ public class InternalDeleteBatchAutoStaticCommand extends TnAbstractBatchAutoSta
     //                                                                            Override
     //                                                                            ========
 	@Override
-    protected InternalAbstractAutoHandler createAutoHandler() {
+    protected TnAbstractAutoHandler createAutoHandler() {
         return createBatchAutoHandler();
     }
 
 	@Override
-    protected InternalAbstractBatchAutoHandler createBatchAutoHandler() {
+    protected TnAbstractBatchAutoHandler createBatchAutoHandler() {
         return newInternalBatchAutoHandler();
     }
 
-    protected InternalDeleteBatchAutoHandler newInternalBatchAutoHandler() {
-        return new InternalDeleteBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+    protected TnDeleteBatchAutoHandler newInternalBatchAutoHandler() {
+        return new TnDeleteBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
     }
 
 	@Override

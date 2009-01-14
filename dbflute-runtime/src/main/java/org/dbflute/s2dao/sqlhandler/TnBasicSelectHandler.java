@@ -18,7 +18,7 @@ import org.dbflute.s2dao.jdbc.FetchNarrowingResultSetWrapper;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalBasicSelectHandler extends TnBasicHandler {
+public class TnBasicSelectHandler extends TnBasicHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -28,7 +28,7 @@ public class InternalBasicSelectHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalBasicSelectHandler(DataSource dataSource, String sql,
+    public TnBasicSelectHandler(DataSource dataSource, String sql,
             ResultSetHandler resultSetHandler, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
         setSql(sql);

@@ -10,12 +10,12 @@ import org.dbflute.jdbc.StatementFactory;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalBasicUpdateHandler extends TnBasicHandler {
+public class TnBasicUpdateHandler extends TnBasicHandler {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalBasicUpdateHandler(DataSource dataSource, String sql, StatementFactory statementFactory) {
+    public TnBasicUpdateHandler(DataSource dataSource, String sql, StatementFactory statementFactory) {
         super(dataSource, sql, statementFactory);
     }
 

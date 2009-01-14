@@ -10,7 +10,7 @@ import org.dbflute.exception.EntityAlreadyUpdatedException;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlhandler.InternalAbstractAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
@@ -42,7 +42,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) { // NOT for Batch. Batch should override.
-        InternalAbstractAutoHandler handler = createAutoHandler();
+        TnAbstractAutoHandler handler = createAutoHandler();
         handler.setOptimisticLockHandling(optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
         handler.setSql(getSql());
@@ -63,7 +63,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         this.propertyTypes = propertyTypes;
     }
 
-    protected abstract InternalAbstractAutoHandler createAutoHandler();
+    protected abstract TnAbstractAutoHandler createAutoHandler();
 
     protected abstract void setupPropertyTypes(String[] propertyNames);
 

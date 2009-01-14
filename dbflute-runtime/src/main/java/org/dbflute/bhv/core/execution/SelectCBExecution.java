@@ -9,7 +9,7 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
-import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
+import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.dbflute.twowaysql.context.CommandContext;
 import org.dbflute.util.DfStringUtil;
 import org.dbflute.util.DfSystemUtil;
@@ -53,7 +53,7 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
         final List<Class<?>> bindVariableTypeList = new ArrayList<Class<?>>();
 
         final String finalClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
-        final InternalBasicSelectHandler selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
+        final TnBasicSelectHandler selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
         final Object[] bindVariableArray = bindVariableList.toArray();
         selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
         return selectHandler.execute(bindVariableArray, toClassArray(bindVariableTypeList));
@@ -87,8 +87,8 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
     // ===================================================================================
     //                                                                      Select Handler
     //                                                                      ==============
-    protected InternalBasicSelectHandler createBasicSelectHandler(String realSql, ResultSetHandler rsh) {
-        return new InternalBasicSelectHandler(getDataSource(), realSql, rsh, getStatementFactory());
+    protected TnBasicSelectHandler createBasicSelectHandler(String realSql, ResultSetHandler rsh) {
+        return new TnBasicSelectHandler(getDataSource(), realSql, rsh, getStatementFactory());
     }
 
     // ===================================================================================

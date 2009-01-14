@@ -3,7 +3,7 @@ package org.dbflute.s2dao.sqlcommand;
 import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
-import org.dbflute.s2dao.sqlhandler.InternalBasicUpdateHandler;
+import org.dbflute.s2dao.sqlhandler.TnBasicUpdateHandler;
 import org.dbflute.twowaysql.context.CommandContext;
 
 /**
@@ -23,13 +23,13 @@ public class InternalUpdateDynamicCommand extends TnAbstractDynamicCommand {
     //                                                                             =======
     public Object execute(Object args[]) {
         final CommandContext ctx = apply(args);
-        final InternalBasicUpdateHandler updateHandler = createBasicUpdateHandler(ctx);
+        final TnBasicUpdateHandler updateHandler = createBasicUpdateHandler(ctx);
         final Object[] bindVariables = ctx.getBindVariables();
         updateHandler.setLoggingMessageSqlArgs(bindVariables);
         return new Integer(updateHandler.execute(bindVariables, ctx.getBindVariableTypes()));
     }
     
-    protected InternalBasicUpdateHandler createBasicUpdateHandler(CommandContext ctx) {
-        return new InternalBasicUpdateHandler(getDataSource(), ctx.getSql(), getStatementFactory());
+    protected TnBasicUpdateHandler createBasicUpdateHandler(CommandContext ctx) {
+        return new TnBasicUpdateHandler(getDataSource(), ctx.getSql(), getStatementFactory());
     }
 }

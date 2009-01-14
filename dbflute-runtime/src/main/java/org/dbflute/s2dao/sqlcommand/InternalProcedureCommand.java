@@ -6,7 +6,7 @@ import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.outsidesql.OutsideSqlContext;
 import org.dbflute.s2dao.procedure.TnProcedureMetaData;
-import org.dbflute.s2dao.sqlhandler.InternalProcedureHandler;
+import org.dbflute.s2dao.sqlhandler.TnProcedureHandler;
 import org.seasar.extension.jdbc.ResultSetHandler;
 
 
@@ -38,15 +38,15 @@ public class InternalProcedureCommand implements TnSqlCommand, SqlExecution {
     //                                                                             Execute
     //                                                                             =======
     public Object execute(final Object[] args) {
-        final InternalProcedureHandler handler = newArgumentDtoProcedureHandler();
+        final TnProcedureHandler handler = newArgumentDtoProcedureHandler();
         final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
         final Object pmb = outsideSqlContext.getParameterBean();
         // The logging message SQL of procedure is unnecessary.
         // handler.setLoggingMessageSqlArgs(...);
         return handler.execute(new Object[]{pmb});
     }
-    protected InternalProcedureHandler newArgumentDtoProcedureHandler() {
-        return new InternalProcedureHandler(dataSource, createSql(procedureMetaData), resultSetHandler,
+    protected TnProcedureHandler newArgumentDtoProcedureHandler() {
+        return new TnProcedureHandler(dataSource, createSql(procedureMetaData), resultSetHandler,
                 statementFactory, procedureMetaData);
     }
     protected String createSql(final TnProcedureMetaData procedureMetaData) {

@@ -22,18 +22,18 @@ import org.dbflute.s2dao.metadata.TnBeanMetaData;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public abstract class InternalAbstractBatchAutoHandler extends InternalAbstractAutoHandler {
+public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(InternalAbstractBatchAutoHandler.class);
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(TnAbstractBatchAutoHandler.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalAbstractBatchAutoHandler(DataSource dataSource,
+    public TnAbstractBatchAutoHandler(DataSource dataSource,
             StatementFactory statementFactory, TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
     }

@@ -4,9 +4,9 @@ import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlhandler.InternalAbstractAutoHandler;
-import org.dbflute.s2dao.sqlhandler.InternalAbstractBatchAutoHandler;
-import org.dbflute.s2dao.sqlhandler.InternalUpdateBatchAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnUpdateBatchAutoHandler;
 
 
 /**
@@ -27,19 +27,19 @@ public class InternalUpdateBatchAutoStaticCommand extends TnAbstractBatchAutoSta
     //                                                                            Override
     //                                                                            ========
 	@Override
-    protected InternalAbstractAutoHandler createAutoHandler() {
+    protected TnAbstractAutoHandler createAutoHandler() {
         return createBatchAutoHandler();
     }
 
 	@Override
-    protected InternalAbstractBatchAutoHandler createBatchAutoHandler() {
-        InternalUpdateBatchAutoHandler handler = newInternalBatchAutoHandler();
+    protected TnAbstractBatchAutoHandler createBatchAutoHandler() {
+        TnUpdateBatchAutoHandler handler = newInternalBatchAutoHandler();
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
         return handler;
     }
 
-    protected InternalUpdateBatchAutoHandler newInternalBatchAutoHandler() {
-        return new InternalUpdateBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+    protected TnUpdateBatchAutoHandler newInternalBatchAutoHandler() {
+        return new TnUpdateBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
     }
 
 	@Override

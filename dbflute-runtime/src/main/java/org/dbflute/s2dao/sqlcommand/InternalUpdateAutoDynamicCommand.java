@@ -9,7 +9,7 @@ import org.dbflute.XLog;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlhandler.InternalUpdateAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnUpdateAutoHandler;
 
 
 /**
@@ -51,7 +51,7 @@ public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
             }
             return NO_UPDATE;
         }
-        InternalUpdateAutoHandler handler = createInternalUpdateAutoHandler(bmd, propertyTypes);
+        TnUpdateAutoHandler handler = createInternalUpdateAutoHandler(bmd, propertyTypes);
         handler.setSql(createUpdateSql(bmd, propertyTypes, bean));
         handler.setLoggingMessageSqlArgs(args);
         int i = handler.execute(args);
@@ -64,8 +64,8 @@ public class InternalUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         return new Integer(i);
     }
 
-    protected InternalUpdateAutoHandler createInternalUpdateAutoHandler(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
-        InternalUpdateAutoHandler handler = new InternalUpdateAutoHandler(getDataSource(), getStatementFactory(), bmd, propertyTypes);
+    protected TnUpdateAutoHandler createInternalUpdateAutoHandler(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
+        TnUpdateAutoHandler handler = new TnUpdateAutoHandler(getDataSource(), getStatementFactory(), bmd, propertyTypes);
         handler.setOptimisticLockHandling(optimisticLockHandling); // [DBFlute-0.8.0]
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
         return handler;

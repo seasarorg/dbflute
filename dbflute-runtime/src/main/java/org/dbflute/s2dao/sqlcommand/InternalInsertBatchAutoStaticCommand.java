@@ -4,9 +4,9 @@ import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlhandler.InternalAbstractAutoHandler;
-import org.dbflute.s2dao.sqlhandler.InternalAbstractBatchAutoHandler;
-import org.dbflute.s2dao.sqlhandler.InternalInsertBatchAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnInsertBatchAutoHandler;
 
 
 /**
@@ -27,13 +27,13 @@ public class InternalInsertBatchAutoStaticCommand extends TnAbstractBatchAutoSta
     //                                                                            Override
     //                                                                            ========
 	@Override
-    protected InternalAbstractAutoHandler createAutoHandler() {
+    protected TnAbstractAutoHandler createAutoHandler() {
         return createBatchAutoHandler();
     }
 
 	@Override
-    protected InternalAbstractBatchAutoHandler createBatchAutoHandler() {
-        return new InternalInsertBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+    protected TnAbstractBatchAutoHandler createBatchAutoHandler() {
+        return new TnInsertBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
     }
 
 	@Override

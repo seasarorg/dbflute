@@ -13,7 +13,7 @@ import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.resource.SQLExceptionHandler;
 import org.dbflute.s2dao.beans.TnPropertyDesc;
 import org.dbflute.s2dao.metadata.TnPropertyType;
-import org.dbflute.s2dao.sqlhandler.InternalBasicSelectHandler;
+import org.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.dbflute.s2dao.valuetype.TnValueType;
 import org.seasar.extension.jdbc.ResultSetHandler;
 
@@ -41,16 +41,16 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     //                                                                       Assist Helper
     //                                                                       =============
     protected Object executeSql(DataSource ds, String sql, Object[] args) {
-        InternalBasicSelectHandler selectHandler = createSelectHandler(ds, sql);
+        TnBasicSelectHandler selectHandler = createSelectHandler(ds, sql);
         if (args != null) {
             selectHandler.setLoggingMessageSqlArgs(args);
         }
         return selectHandler.execute(args);
     }
 
-    protected InternalBasicSelectHandler createSelectHandler(DataSource ds, String sql) {
+    protected TnBasicSelectHandler createSelectHandler(DataSource ds, String sql) {
         // Use original statement factory for identifier generator.
-        return new InternalBasicSelectHandler(ds, sql, resultSetHandler, createStatementFactory(ds, sql));
+        return new TnBasicSelectHandler(ds, sql, resultSetHandler, createStatementFactory(ds, sql));
     }
 
     protected StatementFactory createStatementFactory(DataSource ds, String sql) {

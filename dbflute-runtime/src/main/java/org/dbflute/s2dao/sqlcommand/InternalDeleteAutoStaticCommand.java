@@ -4,8 +4,8 @@ import javax.sql.DataSource;
 
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlhandler.InternalAbstractAutoHandler;
-import org.dbflute.s2dao.sqlhandler.InternalDeleteAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnDeleteAutoHandler;
 
 
 /**
@@ -26,8 +26,8 @@ public class InternalDeleteAutoStaticCommand extends TnAbstractAutoStaticCommand
     //                                                                            Override
     //                                                                            ========
     @Override
-    protected InternalAbstractAutoHandler createAutoHandler() {
-        return new InternalDeleteAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+    protected TnAbstractAutoHandler createAutoHandler() {
+        return new TnDeleteAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
     }
 	
 	@Override

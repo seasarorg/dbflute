@@ -25,7 +25,7 @@ import org.seasar.extension.jdbc.ResultSetHandler;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class InternalProcedureHandler extends InternalBasicSelectHandler {
+public class TnProcedureHandler extends TnBasicSelectHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -35,7 +35,7 @@ public class InternalProcedureHandler extends InternalBasicSelectHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalProcedureHandler(final DataSource dataSource, final String sql,
+    public TnProcedureHandler(final DataSource dataSource, final String sql,
             final ResultSetHandler resultSetHandler, final StatementFactory statementFactory,
             final TnProcedureMetaData procedureMetaData) {
         super(dataSource, sql, resultSetHandler, statementFactory);

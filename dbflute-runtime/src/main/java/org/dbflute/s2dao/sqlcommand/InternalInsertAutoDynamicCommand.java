@@ -9,7 +9,7 @@ import org.dbflute.bhv.core.SqlExecution;
 import org.dbflute.jdbc.StatementFactory;
 import org.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.dbflute.s2dao.sqlhandler.InternalInsertAutoHandler;
+import org.dbflute.s2dao.sqlhandler.TnInsertAutoHandler;
 import org.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
@@ -39,7 +39,7 @@ public class InternalInsertAutoDynamicCommand implements TnSqlCommand, SqlExecut
         final TnBeanMetaData bmd = getBeanMetaData();
         final TnPropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, getPropertyNames());
         final String sql = createInsertSql(bmd, propertyTypes);
-        final InternalInsertAutoHandler handler = new InternalInsertAutoHandler(getDataSource(), getStatementFactory(),
+        final TnInsertAutoHandler handler = new TnInsertAutoHandler(getDataSource(), getStatementFactory(),
                 bmd, propertyTypes);
         handler.setSql(sql);
         handler.setLoggingMessageSqlArgs(args);

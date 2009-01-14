@@ -23,7 +23,7 @@ import org.seasar.extension.jdbc.ValueType;
 /**
  * @author DBFlute(AutoGenerator)
  */
-public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
+public abstract class TnAbstractAutoHandler extends TnBasicHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -40,7 +40,7 @@ public abstract class InternalAbstractAutoHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public InternalAbstractAutoHandler(DataSource dataSource,
+    public TnAbstractAutoHandler(DataSource dataSource,
             StatementFactory statementFactory, TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
         super(dataSource, statementFactory);
         this.beanMetaData = beanMetaData;
