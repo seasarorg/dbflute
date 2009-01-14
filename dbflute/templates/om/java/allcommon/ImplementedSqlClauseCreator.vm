@@ -1,24 +1,24 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
-import ${glPackageBaseCommonCBean}.${glConditionBean};
-import ${glPackageBaseCommonSqlClause}.*;
+import org.dbflute.DBDef;
+import org.dbflute.cbean.ConditionBean;
+import org.dbflute.cbean.sqlclause.*;
+import org.dbflute.dbmeta.DBMetaProvider;
 
 /**
  * The creator of SQL clause.
  * @author ${database.ClassAuthor}
  */
-public class ${glImplementedSqlClauseCreator} implements ${glSqlClauseCreator} {
+public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 
 	/**
 	 * Create SQL clause. {for condition-bean}
 	 * @param cb Condition-bean. (NotNull) 
 	 * @return SQL clause. (NotNull)
 	 */
-    public ${glSqlClause} createSqlClause(${glConditionBean} cb) {
+    public SqlClause createSqlClause(ConditionBean cb) {
         final String tableSqlName = cb.getTableSqlName();
-		final ${glSqlClause} sqlClause = createSqlClause(tableSqlName);
+		final SqlClause sqlClause = createSqlClause(tableSqlName);
         return sqlClause;
     }
 
@@ -27,30 +27,30 @@ public class ${glImplementedSqlClauseCreator} implements ${glSqlClauseCreator} {
 	 * @param tableDbName The DB name of table. (NotNull) 
 	 * @return SQL clause. (NotNull)
 	 */
-    public ${glSqlClause} createSqlClause(String tableDbName) {
-        ${glDBMetaProvider} dbmetaProvider = new ${glDBMetaInstanceHandler}();
-        if (isCurrentDBDef(${glDBDef}.MySQL)) {
-            return new ${glSqlClause}MySql(tableDbName).provider(dbmetaProvider);
-        } else if (isCurrentDBDef(${glDBDef}.PostgreSQL)) {
-            return new ${glSqlClause}PostgreSql(tableDbName).provider(dbmetaProvider);
-        } else if (isCurrentDBDef(${glDBDef}.Oracle)) {
-            return new ${glSqlClause}Oracle(tableDbName).provider(dbmetaProvider);
-        } else if (isCurrentDBDef(${glDBDef}.DB2)) {
-            return new ${glSqlClause}Db2(tableDbName).provider(dbmetaProvider);
-        } else if (isCurrentDBDef(${glDBDef}.SQLServer)) {
-            return new ${glSqlClause}SqlServer(tableDbName).provider(dbmetaProvider);
-        } else if (isCurrentDBDef(${glDBDef}.FireBird)) {
-            return new ${glSqlClause}Firebird(tableDbName).provider(dbmetaProvider);
-        } else if (isCurrentDBDef(${glDBDef}.H2)) {
-            return new ${glSqlClause}H2(tableDbName).provider(dbmetaProvider);
-        } else if (isCurrentDBDef(${glDBDef}.Derby)) {
-            return new ${glSqlClause}Derby(tableDbName).provider(dbmetaProvider);
+    public SqlClause createSqlClause(String tableDbName) {
+        DBMetaProvider dbmetaProvider = new ${glDBMetaInstanceHandler}();
+        if (isCurrentDBDef(DBDef.MySQL)) {
+            return new SqlClauseMySql(tableDbName).provider(dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.PostgreSQL)) {
+            return new SqlClausePostgreSql(tableDbName).provider(dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.Oracle)) {
+            return new SqlClauseOracle(tableDbName).provider(dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.DB2)) {
+            return new SqlClauseDb2(tableDbName).provider(dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.SQLServer)) {
+            return new SqlClauseSqlServer(tableDbName).provider(dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.FireBird)) {
+            return new SqlClauseFirebird(tableDbName).provider(dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.H2)) {
+            return new SqlClauseH2(tableDbName).provider(dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.Derby)) {
+            return new SqlClauseDerby(tableDbName).provider(dbmetaProvider);
         } else {
-            return new ${glSqlClause}${database.generateDbName}(tableDbName).provider(dbmetaProvider);
+            return new SqlClause${database.generateDbName}(tableDbName).provider(dbmetaProvider);
         }
     }
 
-    protected boolean isCurrentDBDef(${glDBDef} currentDBDef) {
+    protected boolean isCurrentDBDef(DBDef currentDBDef) {
 	    return ${glDBCurrent}.getInstance().isCurrentDBDef(currentDBDef);
     }
 }

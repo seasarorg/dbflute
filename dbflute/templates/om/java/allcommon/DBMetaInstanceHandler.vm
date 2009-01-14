@@ -1,27 +1,28 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-#set ($myClassName = "${glDBMetaInstanceHandler}")
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Method;
 
-import ${glPackageBaseCommonException}.${glDBMetaNotFoundException};
-import ${glPackageBaseCommonHelper}.${glStringKeyMap};
-import ${glPackageBaseCommonUtil}.${glSimpleAssertUtil};
+import org.dbflute.dbmeta.DBMeta;
+import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.exception.DBMetaNotFoundException;
+import org.dbflute.helper.StringKeyMap;
+import org.dbflute.util.DfAssertUtil;
 
 /**
  * The handler of the instance of DB meta.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} implements ${glDBMetaProvider} {
+public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
 
     // ===================================================================================
     //                                                                        Resource Map
     //                                                                        ============
     /** Table DB-name instance map. */
-    protected static final Map<String, ${glDBMeta}> _tableDbNameInstanceMap = newConcurrentHashMap();
+    protected static final Map<String, DBMeta> _tableDbNameInstanceMap = newConcurrentHashMap();
 
     /** The map of table DB name and class name. This is for initialization. */
     protected static final Map<String, String> _tableDbNameClassNameMap;
@@ -45,7 +46,7 @@ public class ${myClassName} implements ${glDBMetaProvider} {
     /**
      * @return The initialized map that contains all instances of DB meta. (NotNull & NotEmpty)
      */
-    public static Map<String, ${glDBMeta}> getDBMetaMap() {
+    public static Map<String, DBMeta> getDBMetaMap() {
         initializeDBMetaMap();
         return _tableDbNameInstanceMap;
     }
@@ -86,8 +87,8 @@ public class ${myClassName} implements ${glDBMetaProvider} {
      * @return The instance of DB meta. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glDBMetaNotFoundException} When the DB meta is not found.
      */
-    public static ${glDBMeta} findDBMeta(String tableFlexibleName) {
-        ${glDBMeta} dbmeta = byTableFlexibleName(tableFlexibleName);
+    public static DBMeta findDBMeta(String tableFlexibleName) {
+        DBMeta dbmeta = byTableFlexibleName(tableFlexibleName);
         if (dbmeta == null) {
             String msg = "The DB meta was not found by the table flexible name: " + tableFlexibleName;
             msg = msg + " key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
@@ -100,7 +101,7 @@ public class ${myClassName} implements ${glDBMetaProvider} {
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
      */
-    protected static ${glDBMeta} byTableFlexibleName(String tableFlexibleName) {
+    protected static DBMeta byTableFlexibleName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
         final int dotLastIndex = tableFlexibleName.lastIndexOf(".");
         if (dotLastIndex >= 0) {
@@ -117,12 +118,12 @@ public class ${myClassName} implements ${glDBMetaProvider} {
      * @param tableDbName The DB name of table. (NotNull)
      * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
      */
-    protected static ${glDBMeta} byTableDbName(String tableDbName) {
+    protected static DBMeta byTableDbName(String tableDbName) {
         assertStringNotNullAndNotTrimmedEmpty("tableDbName", tableDbName);
         return getCachedDBMeta(tableDbName);
     }
     
-    protected static ${glDBMeta} getCachedDBMeta(String tableName) {// For lazy-load! Thank you koyak!
+    protected static DBMeta getCachedDBMeta(String tableName) {// For lazy-load! Thank you koyak!
         if (_tableDbNameInstanceMap.containsKey(tableName)) {
             return _tableDbNameInstanceMap.get(tableName);
         }
@@ -136,12 +137,12 @@ public class ${myClassName} implements ${glDBMetaProvider} {
         return _tableDbNameInstanceMap.get(tableName);
     }
 
-    protected static ${glDBMeta} getDBMeta(String className) {
+    protected static DBMeta getDBMeta(String className) {
         try {
             Class<?> clazz = Class.forName(className);
             Method methoz = clazz.getMethod("getInstance", (Class[])null);
             Object result = methoz.invoke(null, (Object[])null);
-            return (${glDBMeta})result;
+            return (DBMeta)result;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -154,7 +155,7 @@ public class ${myClassName} implements ${glDBMetaProvider} {
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
      */
-    public ${glDBMeta} provideDBMeta(String tableFlexibleName) {
+    public DBMeta provideDBMeta(String tableFlexibleName) {
         return byTableFlexibleName(tableFlexibleName);
     }
 
@@ -163,7 +164,7 @@ public class ${myClassName} implements ${glDBMetaProvider} {
      * @return The instance of DB meta. (NotNull)
      * @exception ${glPackageBaseCommonException}.${glDBMetaNotFoundException} When the DB meta is not found.
      */
-    public ${glDBMeta} provideDBMetaChecked(String tableFlexibleName) {
+    public DBMeta provideDBMetaChecked(String tableFlexibleName) {
         return findDBMeta(tableFlexibleName);
     }
 
@@ -178,13 +179,13 @@ public class ${myClassName} implements ${glDBMetaProvider} {
     //                                         Assert Object
     //                                         -------------
     protected static void assertObjectNotNull(String variableName, Object value) {
-        ${glSimpleAssertUtil}.assertObjectNotNull(variableName, value);
+        DfAssertUtil.assertObjectNotNull(variableName, value);
     }
 
     // -----------------------------------------------------
     //                                         Assert String
     //                                         -------------
     protected static void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
-        ${glSimpleAssertUtil}.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
+        DfAssertUtil.assertStringNotNullAndNotTrimmedEmpty(variableName, value);
     }
 }

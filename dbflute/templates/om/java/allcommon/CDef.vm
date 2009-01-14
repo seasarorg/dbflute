@@ -1,5 +1,4 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
-#set ($myClassName = "${glCDef}")
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +7,7 @@ import java.util.Map;
  * The definition class that has classification.
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} {
+public class ${glCDef} {
 
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))

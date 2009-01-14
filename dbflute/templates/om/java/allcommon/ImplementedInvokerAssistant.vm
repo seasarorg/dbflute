@@ -1,37 +1,36 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import org.dbflute.DBDef;
+import org.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.dbflute.bhv.core.InvokerAssistant;
+import org.dbflute.cbean.sqlclause.SqlClauseCreator;
+import org.dbflute.dbmeta.DBMetaProvider;
+import org.dbflute.jdbc.StatementConfig;
+import org.dbflute.resource.ResourceParameter;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
-
-import ${glPackageBaseCommonBhvCore}.${glBehaviorCommandInvoker};
-import ${glPackageBaseCommonBhvCore}.${glInvokerAssistant};
-import ${glPackageBaseCommonBhvCore}.${glResourceParameter};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
-import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
-import ${glPackageBaseCommonJdbc}.${glStatementConfig};
-import ${glPackageBaseCommonSqlClause}.${glSqlClauseCreator};
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glImplementedInvokerAssistant} implements ${glInvokerAssistant}, Disposable {
+public class ${glImplementedInvokerAssistant} implements InvokerAssistant, Disposable {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final ${glDBMetaProvider} _dbmetaProvider = createDBMetaProvider();
-    protected final ${glSqlClauseCreator} _sqlClauseCreator = createSqlClauseCreator();
-    protected ${glBehaviorCommandInvoker} _behaviorCommandInvoker;
+    protected final DBMetaProvider _dbmetaProvider = createDBMetaProvider();
+    protected final SqlClauseCreator _sqlClauseCreator = createSqlClauseCreator();
+    protected BehaviorCommandInvoker _behaviorCommandInvoker;
     protected boolean _disposable;
 
     // ===================================================================================
     //                                                                            Creation
     //                                                                            ========
-    protected ${glSqlClauseCreator} createSqlClauseCreator() {
+    protected SqlClauseCreator createSqlClauseCreator() {
         return new ${glImplementedSqlClauseCreator}();
     }
 
-    protected ${glDBMetaProvider} createDBMetaProvider() {
+    protected DBMetaProvider createDBMetaProvider() {
         return new ${glDBMetaInstanceHandler}();
     }
 
@@ -42,16 +41,16 @@ public class ${glImplementedInvokerAssistant} implements ${glInvokerAssistant}, 
         return ${glDBCurrent}.getInstance().currentDBDef();
     }
 
-    public ${glDBMetaProvider} assistDBMetaProvider() {
+    public DBMetaProvider assistDBMetaProvider() {
         return _dbmetaProvider;
     }
 
-    public ${glSqlClauseCreator} assistSqlClauseCreator() {
+    public SqlClauseCreator assistSqlClauseCreator() {
         return _sqlClauseCreator;
     }
 
-    public ${glResourceParameter} assistResourceParameter() {
-        ${glResourceParameter} resourceParameter = new ${glResourceParameter}();
+    public ResourceParameter assistResourceParameter() {
+        ResourceParameter resourceParameter = new ResourceParameter();
         resourceParameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
         resourceParameter.setLogDateFormat(${glDBFluteConfig}.getInstance().getLogDateFormat());
         resourceParameter.setLogTimestampFormat(${glDBFluteConfig}.getInstance().getLogTimestampFormat());
@@ -62,7 +61,7 @@ public class ${glImplementedInvokerAssistant} implements ${glInvokerAssistant}, 
         return "${database.sqlFileEncoding}";
     }
 
-    public ${glStatementConfig} assistDefaultStatementConfig() {
+    public StatementConfig assistDefaultStatementConfig() {
         return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
     }
     
@@ -107,7 +106,7 @@ public class ${glImplementedInvokerAssistant} implements ${glInvokerAssistant}, 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setBehaviorCommandInvoker(${glBehaviorCommandInvoker} behaviorCommandInvoker) {
+    public void setBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
     }
 }

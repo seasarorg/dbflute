@@ -1,14 +1,14 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dbflute.cbean.ConditionBeanContext;
+import org.dbflute.resource.TnSqlLogRegistry;
+import org.dbflute.util.DfSystemUtil;
 import javax.sql.XADataSource;
 #if ($database.isTargetContainerSeasar())
-
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 #end
-
-import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
-import ${glPackageBaseCommonS2DaoInternalSqlLog}.${glInternalSqlLogRegistry};
-import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
 
 /**
  * @author ${database.ClassAuthor}
@@ -18,8 +18,8 @@ public class ${glDBFluteInitializer} {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log-instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${glDBFluteInitializer}.class);
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(${glDBFluteInitializer}.class);
 
     // ===================================================================================
     //                                                                         Constructor

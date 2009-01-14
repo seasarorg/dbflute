@@ -1,20 +1,22 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-#set ($myClassName = "${glDBCurrent}")
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dbflute.DBDef;
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} {
+public class ${glDBCurrent} {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
+    private static final Log _log = LogFactory.getLog(${glDBCurrent}.class);
 
     /** Singleton instance. */
-    private static final ${myClassName} _instance = new ${myClassName}();
+    private static final ${glDBCurrent} _instance = new ${glDBCurrent}();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -33,17 +35,17 @@ public class ${myClassName} {
     /**
      * Constructor.
      */
-    private ${myClassName}() {
+    private ${glDBCurrent}() {
     }
 
     // ===================================================================================
     //                                                                           Singleton
     //                                                                           =========
     /**
-     * Get instance.
+     * Get singleton instance.
      * @return Singleton instance. (NotNull)
      */
-    public static ${myClassName} getInstance() {
+    public static ${glDBCurrent} getInstance() {
         return _instance;
     }
 

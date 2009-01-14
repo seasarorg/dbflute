@@ -1,10 +1,12 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import org.dbflute.Entity;
+
 /**
- * The interface of entity defined common column.
+ * The interface of entity defined common columns.
  * @author ${database.ClassAuthor}
  */
-public interface ${glEntityDefinedCommonColumn} extends ${glEntity} {
+public interface ${glEntityDefinedCommonColumn} extends Entity {
 #foreach ($columnName in ${database.commonColumnNameList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($commonColumnMap = ${database.CommonColumnMap})

@@ -1,21 +1,24 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
-#set ($myClassName = "${glDBFluteConfig}")
 
-import ${glPackageBaseCommonJdbc}.${glStatementConfig};
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dbflute.QLog;
+import org.dbflute.XLog;
+import org.dbflute.jdbc.StatementConfig;
 
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} {
+public class ${glDBFluteConfig} {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(${myClassName}.class);
+    private static final Log _log = LogFactory.getLog(${glDBFluteConfig}.class);
 
     /** Singleton instance. */
-    private static final ${myClassName} _instance = new ${myClassName}();
+    private static final ${glDBFluteConfig} _instance = new ${glDBFluteConfig}();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -44,17 +47,17 @@ public class ${myClassName} {
     /**
      * Constructor.
      */
-    private ${myClassName}() {
+    private ${glDBFluteConfig}() {
     }
 
     // ===================================================================================
     //                                                                           Singleton
     //                                                                           =========
     /**
-     * Get instance.
+     * Get singleton instance.
      * @return Singleton instance. (NotNull)
      */
-    public static ${myClassName} getInstance() {
+    public static ${glDBFluteConfig} getInstance() {
         return _instance;
     }
 
