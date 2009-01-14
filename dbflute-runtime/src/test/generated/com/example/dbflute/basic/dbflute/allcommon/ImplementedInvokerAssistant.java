@@ -7,13 +7,14 @@ import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.resource.ResourceParameter;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 
 /**
  * @author DBFlute(AutoGenerator)
  */
-public class ImplementedInvokerAssistant implements InvokerAssistant, Disposable {
+public class ImplementedInvokerAssistant implements InvokerAssistant {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -76,17 +77,25 @@ public class ImplementedInvokerAssistant implements InvokerAssistant, Disposable
         if (!_disposable) {
             synchronized (this) {
                 if (!_disposable) {
-                    DisposableUtil.add(this);
+                    // Register for BehaviorCommandInvoker
+                    DisposableUtil.add(new Disposable() {
+                        public void dispose() {
+                            if (_behaviorCommandInvoker != null) {
+                                _behaviorCommandInvoker.clearExecutionCache();
+                            }
+                            _disposable = false;
+                        }
+                    });
+                    // Register for BeanDescFactory
+                    DisposableUtil.add(new Disposable() {
+                        public void dispose() {
+                            BeanDescFactory.clear();
+                        }
+                    });
                     _disposable = true;
                 }
             }
         }
-    }
-
-    public void dispose() {
-        assertBehaviorCommandInvoker();
-        _behaviorCommandInvoker.clearExecutionCache();
-        _disposable = false;
     }
 
     public boolean isDisposable() {

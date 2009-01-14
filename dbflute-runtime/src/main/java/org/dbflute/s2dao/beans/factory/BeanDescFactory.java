@@ -20,8 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.dbflute.s2dao.beans.BeanDesc;
 import org.dbflute.s2dao.beans.impl.BeanDescImpl;
-import org.seasar.framework.util.Disposable;
-import org.seasar.framework.util.DisposableUtil;
 
 /**
  * {Refers to S2Container's utility and Extends it}
@@ -32,13 +30,7 @@ public class BeanDescFactory {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static volatile boolean initialized;
-
     private static Map<Class<?>, BeanDesc> beanDescCache = new ConcurrentHashMap<Class<?>, BeanDesc>(1024);
-
-    static {
-        initialize();
-    }
 
     // ===================================================================================
     //                                                                         Constructor
@@ -50,9 +42,6 @@ public class BeanDescFactory {
     //                                                                                Main
     //                                                                                ====
     public static BeanDesc getBeanDesc(Class<?> clazz) {
-        if (!initialized) {
-            initialize();
-        }
         BeanDesc beanDesc = beanDescCache.get(clazz);
         if (beanDesc == null) {
             beanDesc = new BeanDescImpl(clazz);
@@ -61,17 +50,7 @@ public class BeanDescFactory {
         return beanDesc;
     }
 
-    public static void initialize() {
-        DisposableUtil.add(new Disposable() {
-            public void dispose() {
-                clear();
-            }
-        });
-        initialized = true;
-    }
-
     public static void clear() {
         beanDescCache.clear();
-        initialized = false;
     }
 }
