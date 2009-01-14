@@ -100,7 +100,7 @@ public class TnValueTypes {
     //                                                                           Attribute
     //                                                                           =========
     private static Map<Class<?>, TnValueType> types = new HashMap<Class<?>, TnValueType>();
-    private static Map<String, TnValueType> additionalValueTypeMap = new HashMap<String, TnValueType>();
+    private static Map<String, TnValueType> pluginValueTypeMap = new HashMap<String, TnValueType>();
     private static Method isEnumMethod;
 
     private static Constructor<?> enumDefaultValueTypeConstructor;
@@ -351,19 +351,19 @@ public class TnValueTypes {
      * @param valueTypeName The name of value type. (NotNull)
      * @param valueType The value type. (NotNull)
      */
-    public static void registerAdditionalValueType(String valueTypeName, TnValueType valueType) {
+    public static void registerPluginValueType(String valueTypeName, TnValueType valueType) {
         assertObjectNotNull("valueTypeName", valueTypeName);
         assertObjectNotNull("valueType", valueType);
-        additionalValueTypeMap.put(valueTypeName, valueType);
+        pluginValueTypeMap.put(valueTypeName, valueType);
     }
 
     /**
      * @param valueTypeName The name of value type. (NotNull)
      * @return The value type. (Nullable)
      */
-    public static TnValueType getAdditionalValueType(String valueTypeName) {
+    public static TnValueType getPluginValueType(String valueTypeName) {
         assertObjectNotNull("valueTypeName", valueTypeName);
-        return additionalValueTypeMap.get(valueTypeName);
+        return pluginValueTypeMap.get(valueTypeName);
     }
 
     // ===================================================================================

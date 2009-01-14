@@ -22,27 +22,28 @@ import org.dbflute.s2dao.valuetype.plugin.TnBytesOidType;
 import org.dbflute.s2dao.valuetype.plugin.TnStringClobType;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnValueTypeFactoryImpl implements TnValueTypeFactory {
 
     // ===================================================================================
-    //                                                                Additional ValueType
-    //                                                                ====================
+    //                                                                   Plug-in ValueType
+    //                                                                   =================
     {
-        TnValueTypes.registerAdditionalValueType("stringClobType", new TnStringClobType());
-        TnValueTypes.registerAdditionalValueType("bytesOidType", new TnBytesOidType());
+        TnValueTypes.registerPluginValueType("stringClobType", new TnStringClobType());
+        TnValueTypes.registerPluginValueType("bytesOidType", new TnBytesOidType());
         
         // for compatible
-        TnValueTypes.registerAdditionalValueType("dbfluteStringClobType", new TnStringClobType());
-        TnValueTypes.registerAdditionalValueType("dbfluteBytesOidType", new TnBytesOidType());
+        TnValueTypes.registerPluginValueType("dbfluteStringClobType", new TnStringClobType());
+        TnValueTypes.registerPluginValueType("dbfluteBytesOidType", new TnBytesOidType());
     }
 
     // ===================================================================================
     //                                                                   ValueType Getting
     //                                                                   =================
     public TnValueType getValueTypeByName(String valueTypeName) {
-        return TnValueTypes.getAdditionalValueType(valueTypeName);
+        return TnValueTypes.getPluginValueType(valueTypeName);
     }
 
     public TnValueType getValueTypeByClass(Class<?> clazz) {
