@@ -155,13 +155,6 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
     }
 
     // ===================================================================================
-    //                                                                             Destroy
-    //                                                                             =======
-    public void destroy() {
-        _container = null;
-    }
-
-    // ===================================================================================
     //                                                                              Helper
     //                                                                              ======
     protected String initUncap(String str) {
