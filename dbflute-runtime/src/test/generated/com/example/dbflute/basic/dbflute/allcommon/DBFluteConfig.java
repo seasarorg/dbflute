@@ -1,5 +1,7 @@
 package com.example.dbflute.basic.dbflute.allcommon;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dbflute.QLog;
 import org.dbflute.XLog;
 import org.dbflute.jdbc.StatementConfig;
@@ -13,7 +15,7 @@ public class DBFluteConfig {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(DBFluteConfig.class);
+    private static final Log _log = LogFactory.getLog(DBFluteConfig.class);
 
     /** Singleton instance. */
     private static final DBFluteConfig _instance = new DBFluteConfig();

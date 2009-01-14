@@ -1,5 +1,7 @@
 package com.example.dbflute.basic.dbflute.allcommon;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dbflute.Entity;
 import org.dbflute.bhv.core.CommonColumnAutoSetupper;
 
@@ -14,7 +16,7 @@ public class ImplementedCommonColumnAutoSetupper implements CommonColumnAutoSetu
     //                                                                            Definition
     //                                                                            ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(ImplementedCommonColumnAutoSetupper.class);
+    private static final Log _log = LogFactory.getLog(ImplementedCommonColumnAutoSetupper.class);
 
     // =====================================================================================
     //                                                                             Attribute

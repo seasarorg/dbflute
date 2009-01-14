@@ -10,8 +10,6 @@ import org.dbflute.resource.ResourceParameter;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 
-
-
 /**
  * @author DBFlute(AutoGenerator)
  */

@@ -2,12 +2,12 @@ package com.example.dbflute.basic.dbflute.allcommon;
 
 import javax.sql.XADataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dbflute.cbean.ConditionBeanContext;
 import org.dbflute.resource.TnSqlLogRegistry;
 import org.dbflute.util.DfSystemUtil;
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
-
-
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -17,8 +17,8 @@ public class DBFluteInitializer {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log-instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(DBFluteInitializer.class);
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(DBFluteInitializer.class);
 
     // ===================================================================================
     //                                                                         Constructor

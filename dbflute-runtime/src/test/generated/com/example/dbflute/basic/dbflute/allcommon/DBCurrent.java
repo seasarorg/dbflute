@@ -1,5 +1,7 @@
 package com.example.dbflute.basic.dbflute.allcommon;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dbflute.DBDef;
 
 
@@ -12,7 +14,7 @@ public class DBCurrent {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(DBCurrent.class);
+    private static final Log _log = LogFactory.getLog(DBCurrent.class);
 
     /** Singleton instance. */
     private static final DBCurrent _instance = new DBCurrent();

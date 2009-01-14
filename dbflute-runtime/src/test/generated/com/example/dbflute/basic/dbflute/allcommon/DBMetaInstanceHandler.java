@@ -12,7 +12,6 @@ import org.dbflute.exception.DBMetaNotFoundException;
 import org.dbflute.helper.StringKeyMap;
 import org.dbflute.util.DfAssertUtil;
 
-
 /**
  * The handler of the instance of DB meta.
  * @author DBFlute(AutoGenerator)

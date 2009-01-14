@@ -5,7 +5,6 @@ import org.dbflute.cbean.ConditionBean;
 import org.dbflute.cbean.sqlclause.*;
 import org.dbflute.dbmeta.DBMetaProvider;
 
-
 /**
  * The creator of SQL clause.
  * @author DBFlute(AutoGenerator)
