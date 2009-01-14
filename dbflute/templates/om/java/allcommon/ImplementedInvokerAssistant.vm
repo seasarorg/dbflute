@@ -8,8 +8,12 @@ import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.resource.ResourceParameter;
 import org.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+import org.dbflute.s2dao.valuetype.ValueTypes;
+
+#if ($database.isTargetContainerSeasar())
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
+#end
 
 /**
  * @author ${database.ClassAuthor}
@@ -74,6 +78,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                                                                             Dispose
     //                                                                             =======
     public void toBeDisposable() { // for HotDeploy
+#if ($database.isTargetContainerSeasar())
         if (!_disposable) {
             synchronized (this) {
                 if (!_disposable) {
@@ -92,10 +97,17 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
                             TnBeanDescFactory.clear();
                         }
                     });
+                    // Register for ValueTypes
+                    DisposableUtil.add(new Disposable() {
+                        public void dispose() {
+                            ValueTypes.clear();
+                        }
+                    });
                     _disposable = true;
                 }
             }
         }
+#end
     }
 
     public boolean isDisposable() {
