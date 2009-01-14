@@ -101,7 +101,8 @@ public class TnBasicHandler {
     protected void logSql(Object[] args, Class<?>[] argTypes) {
         final SqlLogHandler sqlLogHandler = getSqlLogHander();
         final boolean existsSqlLogHandler = sqlLogHandler != null;
-        final boolean existsSqlLogRegistry = TnSqlLogRegistry.exists();
+        final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
+        final boolean existsSqlLogRegistry = sqlLogRegistry != null;
         if (isLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
             final String completeSql = getCompleteSql(args);
             if (isLogEnabled()) {
@@ -111,7 +112,6 @@ public class TnBasicHandler {
                 sqlLogHandler.handle(getSql(), completeSql, args, argTypes);
             }
             if (existsSqlLogRegistry) { // S2Container provides
-                final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
                 TnSqlLogRegistry.push(getSql(), completeSql, args, argTypes, sqlLogRegistry);
             }
         }

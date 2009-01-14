@@ -29,46 +29,14 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     //                                                                           =========
     protected BehaviorCommandInvoker _behaviorCommandInvoker;
     protected DataSource _dataSource;
-    protected final DBMetaProvider _dbmetaProvider = createDBMetaProvider();
-    protected final SqlClauseCreator _sqlClauseCreator = createSqlClauseCreator();
-    protected final StatementFactory _statementFactory = createStatementFactory();
-    protected final TnValueTypeFactory _valueTypeFactory = createValueTypeFactory();
-
-    // This should be initialized after initializing the factory of value type.
-    // Because createBeanMetaDataFactory() uses the variable '_valueTypeFactory'.
-    protected final TnBeanMetaDataFactory _beanMetaDataFactory = createBeanMetaDataFactory();
+    protected DBMetaProvider _dbmetaProvider;
+    protected SqlClauseCreator _sqlClauseCreator;
+    protected StatementFactory _statementFactory;
+    protected TnBeanMetaDataFactory _beanMetaDataFactory;
+    protected TnValueTypeFactory _valueTypeFactory;
 
     protected boolean _disposable;
-
-    // ===================================================================================
-    //                                                                            Creation
-    //                                                                            ========
-    protected DBMetaProvider createDBMetaProvider() {
-        return new DBMetaInstanceHandler();
-    }
     
-    protected SqlClauseCreator createSqlClauseCreator() {
-        return new ImplementedSqlClauseCreator();
-    }
-
-    protected StatementFactory createStatementFactory() {
-        final TnStatementFactoryImpl factory = new TnStatementFactoryImpl();
-        factory.setDefaultStatementConfig(DBFluteConfig.getInstance().getDefaultStatementConfig());
-        factory.setInternalDebug(DBFluteConfig.getInstance().isInternalDebug());
-        return factory;
-    }
-
-    protected TnValueTypeFactory createValueTypeFactory() {
-        return new TnValueTypeFactoryImpl();
-    }
-
-    protected TnBeanMetaDataFactory createBeanMetaDataFactory() {
-        final TnBeanMetaDataFactoryExtension factory = new TnBeanMetaDataFactoryExtension();
-        factory.setDataSource(_dataSource);
-        factory.setValueTypeFactory(_valueTypeFactory);
-        return factory;
-    }
-
     // ===================================================================================
     //                                                                 Assistant Main Work
     //                                                                 ===================
@@ -81,23 +49,70 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     }
 
     public DBMetaProvider assistDBMetaProvider() {
+        if (_dbmetaProvider != null) {
+            return _dbmetaProvider;
+        }
+        _dbmetaProvider = createDBMetaProvider();
         return _dbmetaProvider;
+    }
+    
+    protected DBMetaProvider createDBMetaProvider() {
+        return new DBMetaInstanceHandler();
     }
 
     public SqlClauseCreator assistSqlClauseCreator() {
+        if (_sqlClauseCreator != null) {
+            return _sqlClauseCreator;
+        }
+        _sqlClauseCreator = createSqlClauseCreator();
         return _sqlClauseCreator;
     }
 
+    protected SqlClauseCreator createSqlClauseCreator() {
+        return new ImplementedSqlClauseCreator();
+    }
+
     public StatementFactory assistStatementFactory() {
+        if (_statementFactory != null) {
+            return _statementFactory;
+        }
+        _statementFactory = createStatementFactory();
         return _statementFactory;
     }
 
+    protected StatementFactory createStatementFactory() {
+        final TnStatementFactoryImpl factory = new TnStatementFactoryImpl();
+        factory.setDefaultStatementConfig(DBFluteConfig.getInstance().getDefaultStatementConfig());
+        factory.setInternalDebug(DBFluteConfig.getInstance().isInternalDebug());
+        return factory;
+    }
+
+
     public TnBeanMetaDataFactory assistBeanMetaDataFactory() {
+        if (_beanMetaDataFactory != null) {
+            return _beanMetaDataFactory;
+        }
+        _beanMetaDataFactory = createBeanMetaDataFactory();
         return _beanMetaDataFactory;
     }
 
+    protected TnBeanMetaDataFactory createBeanMetaDataFactory() {
+        final TnBeanMetaDataFactoryExtension factory = new TnBeanMetaDataFactoryExtension();
+        factory.setDataSource(_dataSource);
+        factory.setValueTypeFactory(assistValueTypeFactory());
+        return factory;
+    }
+    
     public TnValueTypeFactory assistValueTypeFactory() {
+        if (_valueTypeFactory != null) {
+            return _valueTypeFactory;
+        }
+        _valueTypeFactory = createValueTypeFactory();
         return _valueTypeFactory;
+    }
+
+    protected TnValueTypeFactory createValueTypeFactory() {
+        return new TnValueTypeFactoryImpl();
     }
 
     public ResourceParameter assistResourceParameter() {
