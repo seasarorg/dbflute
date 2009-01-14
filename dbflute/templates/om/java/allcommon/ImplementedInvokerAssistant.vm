@@ -7,6 +7,7 @@ import org.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.dbflute.dbmeta.DBMetaProvider;
 import org.dbflute.jdbc.StatementConfig;
 import org.dbflute.resource.ResourceParameter;
+import org.dbflute.s2dao.beans.factory.BeanDescFactory;
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 
@@ -86,6 +87,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant, Dispo
     public void dispose() {
         assertBehaviorCommandInvoker();
         _behaviorCommandInvoker.clearExecutionCache();
+        BeanDescFactory.clear();
         _disposable = false;
     }
 
