@@ -1,4 +1,6 @@
-
+#
+# @until DBFlute-0.8.x
+#
 
 targetdatabase = $targetDatabase
 

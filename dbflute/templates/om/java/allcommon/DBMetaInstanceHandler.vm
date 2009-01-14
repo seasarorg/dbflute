@@ -1,4 +1,4 @@
-${database.allClassCopyright}package ${glPackageBaseCommonDBMeta};
+${database.allClassCopyright}package ${glPackageBaseCommon};
 
 #set ($myClassName = "${glDBMetaInstanceHandler}")
 import java.util.Collections;

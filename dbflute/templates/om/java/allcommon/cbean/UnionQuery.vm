@@ -1,5 +1,0 @@
-${database.allClassCopyright}package ${glPackageBaseCommonCBean};
-
-public interface ${glUnionQuery}<UNION_CB extends ${glConditionBean}> {
-    public void query(UNION_CB unionCB);
-}

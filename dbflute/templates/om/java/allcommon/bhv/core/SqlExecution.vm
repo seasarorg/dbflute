@@ -1,9 +1,0 @@
-${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
-
-/**
- * @author ${database.ClassAuthor}
- */
-public interface ${glSqlExecution} {
-
-    public Object execute(Object[] args);
-}

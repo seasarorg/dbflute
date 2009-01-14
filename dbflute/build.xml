@@ -127,7 +127,7 @@
         <zipfileset prefix="templates/doc" dir="templates/doc">
             <exclude name="**/*---.txt"/>
         </zipfileset>
-        <zipfileset prefix="templates/om" dir="templates/om">
+        <zipfileset prefix="templates/om" dir="templates/om/javaoldctl">
             <include name="ControlGenerateJava.vm"/>
             <include name="ControlSql2EntityJava.vm"/>
         </zipfileset>
