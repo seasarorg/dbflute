@@ -1,0 +1,121 @@
+${database.allClassCopyright}package ${glPackageBaseCommonSqlClause};
+
+#set ($myClassName = "${glSqlClause}MySql")
+
+/**
+ * SqlClause for MySQL.
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glAbstractSqlClause} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** String of fetch-scope as sql-suffix. */
+    protected String _fetchScopeSqlSuffix = "";
+
+    /** String of lock as sql-suffix. */
+    protected String _lockSqlSuffix = "";
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     * @param tableName Table name. (NotNull)
+     **/
+    public ${myClassName}(String tableName) {
+        super(tableName);
+    }
+
+    // ===================================================================================
+    //                                                                    OrderBy Override
+    //                                                                    ================
+	@Override
+    protected ${glOrderByClause}.OrderByNullsSetupper createOrderByNullsSetupper() {
+	    return createOrderByNullsSetupperByCaseWhen();
+	}
+
+    // ===================================================================================
+    //                                                                 FetchScope Override
+    //                                                                 ===================
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchFirst() {
+        doFetchPage();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doFetchPage() {
+        _fetchScopeSqlSuffix = " limit " + getPageStartIndex() + ", " + getFetchSize();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    protected void doClearFetchPageClause() {
+        _fetchScopeSqlSuffix = "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return this. (NotNull)
+     */
+    public ${glSqlClause} lockForUpdate() {
+        _lockSqlSuffix = " for update";
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return Select-hint. (NotNull)
+     */
+    protected String createSelectHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
+     */
+    protected String createFromBaseTableHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return From-hint. (NotNull)
+     */
+    protected String createFromHint() {
+        return "";
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return Sql-suffix. (NotNull)
+     */
+    protected String createSqlSuffix() {
+        return _fetchScopeSqlSuffix + _lockSqlSuffix;
+    }
+    
+    // [DBFlute-0.7.5]
+    // ===================================================================================
+    //                                                               Query Update Override
+    //                                                               =====================
+	@Override
+    protected boolean isUpdateSubQueryUseLocalTableSupported() {
+        return false;
+    }
+
+    // [DBFlute-0.7.7]
+    // ===================================================================================
+    //                                                          Unique Constraint Override
+    //                                                          ==========================
+    @Override
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
+        return errorCode != null && errorCode == 1062;
+    }
+}

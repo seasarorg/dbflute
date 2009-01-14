@@ -1,0 +1,9 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glSqlExecutionCreator} {
+
+    ${glSqlExecution} createSqlExecution();
+}

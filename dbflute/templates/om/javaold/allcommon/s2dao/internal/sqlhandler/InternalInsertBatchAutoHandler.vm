@@ -1,0 +1,31 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlHandler};
+
+import javax.sql.DataSource;
+
+import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.dao.BeanMetaData;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalInsertBatchAutoHandler} extends ${glInternalAbstractBatchAutoHandler} {
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalInsertBatchAutoHandler}(DataSource dataSource,
+            StatementFactory statementFactory, BeanMetaData beanMetaData,
+            PropertyType[] propertyTypes) {
+        super(dataSource, statementFactory, beanMetaData, propertyTypes);
+        setOptimisticLockHandling(false);
+    }
+
+    // ===================================================================================
+    //                                                                            Override
+    //                                                                            ========
+	@Override
+    protected void setupBindVariables(Object bean) {
+        setupInsertBindVariables(bean);
+    }
+}

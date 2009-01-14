@@ -1,0 +1,46 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
+
+import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
+
+/**
+ * The order-by-bean as interface.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public interface ${glOrderByBean} extends ${glSelectResource} {
+
+    /**
+     * Get sql component of order-by clause.
+     * 
+     * @return Sql component of order-by clause. (NotNull)
+     */
+    public ${glOrderByClause} getSqlComponentOfOrderByClause();
+
+    /**
+     * Get order-by clause.
+     * 
+     * @return Order-by clause. (NotNull)
+     */
+    public String getOrderByClause();
+
+    /**
+     * Clear order-by.
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBean} clearOrderBy();
+
+    /**
+     * Ignore order-by.
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBean} ignoreOrderBy();
+
+    /**
+     * Make order-by effective.
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBean} makeOrderByEffective();
+}

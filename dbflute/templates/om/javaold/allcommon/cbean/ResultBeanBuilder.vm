@@ -1,0 +1,72 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
+
+import java.util.List;
+
+/**
+ * The builder of result bean.
+ * @param <ENTITY> The type of entity.
+ * @author ${database.ClassAuthor}
+ */
+public class ${glResultBeanBuilder}<ENTITY> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected String _tableDbName;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glResultBeanBuilder}(String tableDbName) {
+        _tableDbName = tableDbName;
+    }
+
+    // ===================================================================================
+    //                                                                             Builder
+    //                                                                             =======
+    /**
+     * Build the result bean of list without order-by clause. {for Various}
+     * @param selectedList Selected list. (NotNull)
+     * @return The result bean of list. (NotNull)
+     */
+    public ${glListResultBean}<ENTITY> buildListResultBean(List<ENTITY> selectedList) {
+        ${glListResultBean}<ENTITY> rb = new ${glListResultBean}<ENTITY>();
+        rb.setTableDbName(_tableDbName);
+        rb.setAllRecordCount(selectedList.size());
+        rb.setSelectedList(selectedList);
+        return rb;
+    }
+
+    /**
+     * Build the result bean of list. {for CB}
+     * @param cb The condition-bean. (NotNull)
+     * @param selectedList Selected list. (NotNull)
+     * @return The result bean of list. (NotNull)
+     */
+    public ${glListResultBean}<ENTITY> buildListResultBean(${glConditionBean} cb, List<ENTITY> selectedList) {
+        ${glListResultBean}<ENTITY> rb = new ${glListResultBean}<ENTITY>();
+        rb.setTableDbName(_tableDbName);
+        rb.setAllRecordCount(selectedList.size());
+        rb.setSelectedList(selectedList);
+        rb.setOrderByClause(cb.getSqlComponentOfOrderByClause());
+        return rb;
+    }
+
+    /**
+     * Build the result bean of paging. {for Paging}
+     * @param pb The bean of paging. (NotNull)
+     * @param allRecordCount All record count.
+     * @param selectedList The list of selected entity. (NotNull)
+     * @return The result bean of paging. (NotNull)
+     */
+    public ${glPagingResultBean}<ENTITY> buildPagingResultBean(${glPagingBean} pb, int allRecordCount, List<ENTITY> selectedList) {
+        ${glPagingResultBean}<ENTITY> rb = new ${glPagingResultBean}<ENTITY>();
+        rb.setTableDbName(_tableDbName);
+        rb.setAllRecordCount(allRecordCount);
+        rb.setSelectedList(selectedList);
+        rb.setOrderByClause(pb.getSqlComponentOfOrderByClause());
+        rb.setPageSize(pb.getFetchSize());
+        rb.setCurrentPageNumber(pb.getFetchPageNumber());
+        return rb;
+    }
+}

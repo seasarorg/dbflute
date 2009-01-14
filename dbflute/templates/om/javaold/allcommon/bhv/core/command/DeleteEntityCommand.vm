@@ -1,0 +1,46 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import org.seasar.dao.BeanMetaData;
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalDeleteAutoStaticCommand};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glDeleteEntityCommand} extends ${glAbstractEntityCommand} {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    public String getCommandName() {
+        return "delete";
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
+        assertStatus("createSqlExecutionCreator");
+        return new ${glSqlExecutionCreator}() {
+            public ${glSqlExecution} createSqlExecution() {
+                final BeanMetaData bmd = createBeanMetaData();
+                return createDeleteEntitySqlExecution(bmd);
+            }
+        };
+    }
+
+    protected ${glSqlExecution} createDeleteEntitySqlExecution(BeanMetaData bmd) {
+        final String[] propertyNames = getPersistentPropertyNames(bmd);
+        return createDeleteAutoStaticCommand(bmd, propertyNames);
+    }
+
+    protected ${glInternalDeleteAutoStaticCommand} createDeleteAutoStaticCommand(BeanMetaData bmd, String[] propertyNames) {
+        return new ${glInternalDeleteAutoStaticCommand}(_dataSource, _statementFactory, bmd, propertyNames, isOptimisticLockHandling());
+    }
+
+    protected boolean isOptimisticLockHandling() {
+        return true;
+    }
+}

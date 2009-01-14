@@ -1,0 +1,79 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+import javax.sql.DataSource;
+
+import org.seasar.dao.CommandContext;
+import org.seasar.dao.Node;
+import org.seasar.extension.jdbc.StatementFactory;
+
+import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalCommandContextCreator};
+import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public abstract class ${glInternalAbstractDynamicCommand} extends ${glInternalAbstractSqlCommand} {
+
+	// ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected Node rootNode;
+    protected String[] argNames = new String[0];
+    protected Class<?>[] argTypes = new Class[0];
+
+	// ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalAbstractDynamicCommand}(DataSource dataSource, StatementFactory statementFactory) {
+        super(dataSource, statementFactory);
+    }
+
+	// ===================================================================================
+    //                                                                        Sql Handling
+    //                                                                        ============
+    public void setSql(String sql) {
+        super.setSql(sql);
+        this.rootNode = createInternalSqlParser(sql).parse();
+    }
+	
+	protected ${glInternalSqlParser} createInternalSqlParser(String sql) {
+	    return new ${glInternalSqlParser}(sql, isBlockNullParameter());
+	}
+
+    protected boolean isBlockNullParameter() { // Extension Point!
+        return false;
+    }
+
+    public CommandContext apply(Object[] args) { // It is necessary to be public!
+        final CommandContext ctx = createCommandContext(args);
+        rootNode.accept(ctx);
+        return ctx;
+    }
+
+    protected CommandContext createCommandContext(Object[] args) {
+	    return createCommandContextCreator().createCommandContext(args);
+    }
+
+	protected ${glInternalCommandContextCreator} createCommandContextCreator() {
+	    return new ${glInternalCommandContextCreator}(argNames, argTypes);
+	}
+	
+	// ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String[] getArgNames() {
+        return argNames;
+    }
+
+    public void setArgNames(String[] argNames) {
+        this.argNames = argNames;
+    }
+
+    public Class<?>[] getArgTypes() {
+        return argTypes;
+    }
+
+    public void setArgTypes(Class<?>[] argTypes) {
+        this.argTypes = argTypes;
+    }
+}

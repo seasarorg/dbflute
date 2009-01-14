@@ -1,0 +1,308 @@
+${database.allClassCopyright}package ${glPackageBaseCommonDBMetaHierarchy};
+
+#set ($myClassName = "${glHierarchyRequest}")
+
+import java.util.ArrayList;
+import java.util.List;
+
+import ${glPackageBaseCommon}.${glEntity};
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityColumn};
+import ${glPackageBaseCommonDBMetaHierarchyBasic}.${glHierarchySourceEntityListIterator};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
+import ${glPackageBaseCommonDBMetaInfo}.${glRelationInfo};
+
+/**
+ * The request of hierarchy.
+ * @author ${database.ClassAuthor}
+ * @param <LOCAL_ENTITY> The type of local entity.
+ */
+public class ${myClassName}<LOCAL_ENTITY extends ${glEntity}> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The dbmeta of desination. */
+    protected ${glDBMeta} destinationDBMeta;
+
+    /** The iterator of hierarychy source. */
+    protected ${glHierarchySourceIterator} sourceIterator;
+
+    /** The list of request element. */
+    protected List<${glHierarchyRequestElement}> requestElementList = new ArrayList<${glHierarchyRequestElement}>();
+
+    /** The set of already registered source column info for check. */
+    protected java.util.Set<${glColumnInfo}> alreadyRegisteredSourceColumnInfoSet4Check = new java.util.HashSet<${glColumnInfo}>();
+
+    /** First source column info for check. */
+    protected ${glColumnInfo} firstSourceColumnInfo4Check;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     * 
+     * @param localEntityType The type of local entity. (NotNull)
+     */
+    public ${myClassName}(Class<LOCAL_ENTITY> localEntityType) {
+        LOCAL_ENTITY localEntity;
+        try {
+            localEntity = localEntityType.newInstance();
+        } catch (InstantiationException e) {
+            String msg = "localEntityType.newInstance() threw the InstantiationException:";
+            msg = msg + " localEntityType=" + localEntityType;
+            throw new IllegalStateException(msg, e);
+        } catch (IllegalAccessException e) {
+            String msg = "localEntityType.newInstance() threw the IllegalAccessException:";
+            msg = msg + " localEntityType=" + localEntityType;
+            throw new IllegalStateException(msg, e);
+        }
+        destinationDBMeta = localEntity.getDBMeta();
+    }
+
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                                public
+    //                                                ------
+    /**
+     * Register the list of source. <br />
+     * This method uses the default source iterator.
+     * 
+     * @param sourceList The list of source. (NotNull)
+     * @param <SOURCE> The type of source. (NotNull)
+     */
+    public <SOURCE> void registerSourceList(java.util.List<SOURCE> sourceList) {
+        sourceIterator = createDefaultSourceIterator(sourceList);
+    }
+
+    /**
+     * Set up mapping between the source column and the destination relation.
+     * 
+     * @param sourceColumn The column of source. (NotNull)
+     * @param relationTrace The relation trace of destination. (NotNull)
+     */
+    public void mapping(${glHierarchySourceColumn} sourceColumn, ${glDBMeta}.RelationTrace relationTrace) {
+        setupElement(sourceColumn, relationTrace.getTraceColumn());
+        addRelationToLastElement(relationTrace.getTraceRelation());
+    }
+
+    /**
+     * Set up mapping between the source column and the destination relation.
+     * 
+     * @param sourceColumnInfo The column info of source. (NotNull)
+     * @param relationTrace The relation trace of destination. (NotNull)
+     */
+    public void mapping(${glColumnInfo} sourceColumnInfo, ${glDBMeta}.RelationTrace relationTrace) {
+        setupElement(sourceColumnInfo, relationTrace.getTraceColumn());
+        addRelationToLastElement(relationTrace.getTraceRelation());
+    }
+
+    // -----------------------------------------------------
+    //                                               internal
+    //                                               -------
+    /**
+     * Set up element.
+     * 
+     * @param sourceColumn The column of source. (NotNull)
+     * @param destinationColumnInfo The column info of destination. (NotNull)
+     */
+    protected void setupElement(${glHierarchySourceColumn} sourceColumn, ${glColumnInfo} destinationColumnInfo) {
+        assertSameLocalDestinationDBMeta(destinationColumnInfo);
+        final ${glHierarchyRequestElement} element = new ${glHierarchyRequestElement}();
+        requestElementList.add(element);
+        element.mapping(sourceColumn, destinationColumnInfo);
+        element.setDestinationDBMeta(destinationColumnInfo.getDBMeta());
+    }
+
+    /**
+     * Set up element. <br />
+     * This method uses the default source column.
+     * 
+     * @param sourceColumnInfo The column info of source. (NotNull)
+     * @param destinationColumnInfo The column info of destination. (NotNull)
+     */
+    protected void setupElement(${glColumnInfo} sourceColumnInfo, ${glColumnInfo} destinationColumnInfo) {
+        if (alreadyRegisteredSourceColumnInfoSet4Check.contains(sourceColumnInfo)) {
+            String msg = "The wrong sourceColumnInfo!" + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The source column has already been registered:" + getLineSeparator();
+            msg = msg + "- - - - -" + getLineSeparator();
+            msg = msg + " sourceColumnInfo=" + sourceColumnInfo + getLineSeparator();
+            msg = msg + " registeredColumnInfo=" + alreadyRegisteredSourceColumnInfoSet4Check + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
+        alreadyRegisteredSourceColumnInfoSet4Check.add(sourceColumnInfo);
+        assertSameSourceDBMeta(sourceColumnInfo);
+        assertSameLocalDestinationDBMeta(destinationColumnInfo);
+        final ${glHierarchyRequestElement} element = new ${glHierarchyRequestElement}();
+        requestElementList.add(element);
+        final ${glHierarchySourceColumn} sourceColumn = createDefaultSourceColumn(sourceColumnInfo);
+        element.mapping(sourceColumn, destinationColumnInfo);
+        element.setDestinationDBMeta(destinationColumnInfo.getDBMeta());
+    }
+
+    /**
+     * Make relatetion by the list of relation info.
+     * 
+     * @param relationInfoList The list of relation info. (NotNull)
+     */
+    protected void addRelationToLastElement(List<${glRelationInfo}> relationInfoList) {
+        if (requestElementList.isEmpty()) {
+            String msg = "You shuold invoke mapping() before invoking relation()!";
+            throw new IllegalStateException(msg);
+        }
+        for (${glRelationInfo} relationInfo : relationInfoList) {
+            final int lastIndex = requestElementList.size() - 1;
+            final ${glHierarchyRequestElement} element = (${glHierarchyRequestElement}) requestElementList.get(lastIndex);
+            element.relation(relationInfo);
+        }
+    }
+
+    /**
+     * Assert same source dbmeta.
+     * 
+     * @param sourceColumnInfo The column info of source. (NotNull)
+     */
+    protected void assertSameSourceDBMeta(${glColumnInfo} sourceColumnInfo) {
+        if (firstSourceColumnInfo4Check == null) {
+            firstSourceColumnInfo4Check = sourceColumnInfo;
+            return;
+        }
+        final ${glDBMeta} expectedDBMeta = firstSourceColumnInfo4Check.getDBMeta();
+        final ${glDBMeta} actualDBMeta = sourceColumnInfo.getDBMeta();
+        if (!expectedDBMeta.equals(actualDBMeta)) {
+            String msg = "The wrong sourceColumnInfo!" + getLineSeparator();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+            msg = msg + "The dbmeta of sourceColumnInfo is difference from";
+            msg = msg + " the one of Your First Source Column Info:" + getLineSeparator();
+            msg = msg + "- - - - -" + getLineSeparator();
+            msg = msg + "sourceColumnInfo=" + sourceColumnInfo + getLineSeparator();
+            msg = msg + "firstSourceColumnInfo4Check=" + firstSourceColumnInfo4Check + getLineSeparator();
+            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    /**
+     * Assert same source dbmeta.
+     * @param destinationColumnInfo The column info of destination. (NotNull)
+     */
+    protected void assertSameLocalDestinationDBMeta(${glColumnInfo} destinationColumnInfo) {
+        if (!requestElementList.isEmpty()) {
+            final ${glHierarchyRequestElement} currentElement = currentElement();
+            final List<${glRelationInfo}> relationInfoList = currentElement.getRelationInfoList();
+            if (relationInfoList.isEmpty()) {
+                final ${glDBMeta} actualDBMeta = currentElement().getDestinationDBMeta();
+                final ${glDBMeta} expectedDBMeta = destinationDBMeta;
+                if (!expectedDBMeta.equals(actualDBMeta)) {
+                    String msg = "The wrong destinationColumnInfo!" + getLineSeparator();
+                    msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+                    msg = msg + "The dbmeta of destinationColumnInfo is difference from";
+                    msg = msg + " the one of Your Local Entity:" + getLineSeparator();
+                    msg = msg + "- - - - -" + getLineSeparator();
+                    msg = msg + "destinationColumnInfo=" + currentElement.getDestinationColumnInfo() + getLineSeparator();
+                    msg = msg + "localEntity=" + destinationDBMeta.getEntityTypeName() + getLineSeparator();
+                    msg = msg + "* * * * * * * * * */" + getLineSeparator();
+                    throw new IllegalStateException(msg);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param sourceList The list of source. (NotNull)
+     * @param <SOURCE> The type of source. (NotNull)
+     * @return Default source iterator. (NotNull)
+     */
+    protected <SOURCE> ${glHierarchySourceIterator} createDefaultSourceIterator(java.util.List<SOURCE> sourceList) {
+        return new ${glHierarchySourceEntityListIterator}<SOURCE>(sourceList);
+    }
+
+    /**
+     * @param sourceColumnInfo The column info of source. (NotNull)
+     * @return Default source column. (NotNull)
+     */
+    protected ${glHierarchySourceColumn} createDefaultSourceColumn(${glColumnInfo} sourceColumnInfo) {
+        return new ${glHierarchySourceEntityColumn}(sourceColumnInfo);
+    }
+
+    /**
+     * Get current element.
+     * 
+     * @return Current element. (NotNull)
+     */
+    protected ${glHierarchyRequestElement} currentElement() {
+        final int lastIndex = requestElementList.size() - 1;
+        return (${glHierarchyRequestElement}) requestElementList.get(lastIndex);
+    }
+
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
+    /**
+     * @param relationPropertyKey Relation Property key. (NotNull)
+     * @return The list of request element. (NotNull)
+     */
+    public List<${glHierarchyRequestElement}> findPrimaryKeyElement(String relationPropertyKey) {
+        final List<${glHierarchyRequestElement}> resultList = new ArrayList<${glHierarchyRequestElement}>();
+        for (${glHierarchyRequestElement} element : requestElementList) {
+            if (!relationPropertyKey.equals(element.getRelationPropertyKey())) {
+                continue;
+            }
+            final ${glColumnInfo} destinationColumnInfo = element.getDestinationColumnInfo();
+            if (!destinationColumnInfo.isPrimary()) {
+                continue;
+            }
+            resultList.add(element);
+        }
+        if (resultList.isEmpty()) {
+            String msg = "Not found primary key element by relationPropertyKey in requestElementList: ";
+            msg = msg + " relationPropertyKey=" + relationPropertyKey + " requestElementList=" + requestElementList;
+            throw new IllegalStateException(msg);
+        }
+        return resultList;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public ${glDBMeta} getDestinationDBMeta() {
+        return destinationDBMeta;
+    }
+
+    public void setDestinationDBMeta(${glDBMeta} destinationDBMeta) {
+        this.destinationDBMeta = destinationDBMeta;
+    }
+
+    public List<${glHierarchyRequestElement}> getRequestElementList() {
+        return requestElementList;
+    }
+
+    public void addRequestElementList(${glHierarchyRequestElement} element) {
+        this.requestElementList.add(element);
+    }
+
+    public ${glHierarchySourceIterator} getSourceIterator() {
+        return sourceIterator;
+    }
+
+    public void setSourceIterator(${glHierarchySourceIterator} sourceIterator) {
+        this.sourceIterator = sourceIterator;
+    }
+
+    // ===================================================================================
+    //                                                                              Helper
+    //                                                                              ======
+    /**
+     * Get the value of line separator.
+     * 
+     * @return The value of line separator. (NotNull)
+     */
+    protected String getLineSeparator() {
+        return System.getProperty("line.separator");
+    }
+}

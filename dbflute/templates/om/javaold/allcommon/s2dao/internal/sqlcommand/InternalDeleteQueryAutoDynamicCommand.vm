@@ -1,0 +1,92 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+import javax.sql.DataSource;
+
+import org.seasar.extension.jdbc.StatementFactory;
+import org.seasar.dao.CommandContext;
+import org.seasar.dao.Node;
+import org.seasar.dao.SqlCommand;
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalCommandContextHandler};
+import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalCommandContextCreator};
+import ${glPackageBaseCommonS2DaoInternalSqlParser}.${glInternalSqlParser};
+import ${glPackageBaseCommonUtil}.${glSimpleSystemUtil};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalDeleteQueryAutoDynamicCommand} implements SqlCommand, ${glSqlExecution} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected DataSource dataSource;
+    protected StatementFactory statementFactory;
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalDeleteQueryAutoDynamicCommand}(DataSource dataSource, StatementFactory statementFactory) {
+        this.dataSource = dataSource;
+        this.statementFactory = statementFactory;
+    }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    public Object execute(Object[] args) {
+        ${glConditionBean} cb = extractConditionBeanWithCheck(args);
+        String[] argNames = new String[]{"dto"};
+        Class<?>[] argTypes = new Class<?>[]{cb.getClass()};
+        String twoWaySql = buildQueryDeleteTwoWaySql(cb);
+        CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
+        ${glInternalCommandContextHandler} handler = createCommandContextHandler(context);
+        handler.setLoggingMessageSqlArgs(context.getBindVariables());
+        int rows = handler.execute(args);
+        return new Integer(rows);
+    }
+    
+    protected ${glConditionBean} extractConditionBeanWithCheck(Object[] args) {
+        if (args == null || args.length == 0) {
+            String msg = "The arguments should have one argument! But:";
+            msg = msg + " args=" + (args != null ? args.length : null);
+            throw new IllegalArgumentException(msg);
+        }
+        Object fisrtArg = args[0];
+        if (!(fisrtArg instanceof ${glConditionBean})) {
+            String msg = "The type of argument should be " + ${glConditionBean}.class + "! But:";
+            msg = msg + " type=" + fisrtArg.getClass();
+            throw new IllegalArgumentException(msg);
+        }
+        return (${glConditionBean}) fisrtArg;
+    }
+    
+    protected ${glInternalCommandContextHandler} createCommandContextHandler(CommandContext context) {
+        return new ${glInternalCommandContextHandler}(dataSource, statementFactory, context);
+    }
+
+    protected String buildQueryDeleteTwoWaySql(${glConditionBean} cb) {
+        return cb.getSqlClause().getClauseQueryDelete();
+    }
+    
+    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
+        CommandContext context;
+        {
+            ${glInternalSqlParser} parser = new ${glInternalSqlParser}(twoWaySql, true);
+            Node node = parser.parse();
+            ${glInternalCommandContextCreator} creator = new ${glInternalCommandContextCreator}(argNames, argTypes);
+            context = creator.createCommandContext(args);
+            node.accept(context);
+        }
+        return context;
+    }
+	
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return ${glSimpleSystemUtil}.getLineSeparator();
+    }
+}

@@ -1,0 +1,89 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCOption};
+
+#set ($myClassName = "${glInScopeOption}")
+
+import ${glPackageBaseCommonCOptionPartsLocal}.${glJapaneseOptionPartsAgent};
+
+/**
+ * The class of in-scope-option.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glSimpleStringOption} {
+
+    // =====================================================================================
+    //                                                                                 Split
+    //                                                                                 =====
+    public ${myClassName} splitBySpace() {
+        return (${myClassName})doSplitBySpace();
+    }
+
+    public ${myClassName} splitBySpace(int splitLimitCount) {
+        return (${myClassName})doSplitBySpace(splitLimitCount);
+    }
+
+    public ${myClassName} splitBySpaceContainsDoubleByte() {
+        return (${myClassName})doSplitBySpaceContainsDoubleByte();
+    }
+
+    public ${myClassName} splitBySpaceContainsDoubleByte(int splitLimitCount) {
+        return (${myClassName})doSplitBySpaceContainsDoubleByte(splitLimitCount);
+    }
+
+    public ${myClassName} splitByPipeLine() {
+        return (${myClassName})doSplitByPipeLine();
+    }
+
+    public ${myClassName} splitByPipeLine(int splitLimitCount) {
+        return (${myClassName})doSplitByPipeLine(splitLimitCount);
+    }
+
+    // =====================================================================================
+    //                                                                   To Upper/Lower Case
+    //                                                                   ===================
+    public ${myClassName} toUpperCase() {
+        return (${myClassName})doToUpperCase();
+    }
+
+    public ${myClassName} toLowerCase() {
+        return (${myClassName})doToLowerCase();
+    }
+
+    // =====================================================================================
+    //                                                                        To Single Byte
+    //                                                                        ==============
+    public ${myClassName} toSingleByteSpace() {
+        return (${myClassName})doToSingleByteSpace();
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumber() {
+        return (${myClassName})doToSingleByteAlphabetNumber();
+    }
+
+    public ${myClassName} toSingleByteAlphabetNumberMark() {
+        return (${myClassName})doToSingleByteAlphabetNumberMark();
+    }
+
+    // =====================================================================================
+    //                                                                        To Double Byte
+    //                                                                        ==============
+
+    // =====================================================================================
+    //                                                                              Japanese
+    //                                                                              ========
+    public ${glJapaneseOptionPartsAgent} localJapanese() {
+        return doLocalJapanese();
+    }
+
+    // =====================================================================================
+    //                                                                            Real Value
+    //                                                                            ==========
+    public java.util.List<String> generateRealValueList(java.util.List<String> valueList) {
+        final java.util.List<String> resultList = new java.util.ArrayList<String>();
+        for (final java.util.Iterator<String> ite = valueList.iterator(); ite.hasNext(); ) {
+            final String value = ite.next();
+            resultList.add(generateRealValue(value));
+        }
+        return resultList;
+    }
+}

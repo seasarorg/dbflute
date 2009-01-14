@@ -1,0 +1,184 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2Dao};
+
+import java.sql.DatabaseMetaData;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.seasar.framework.beans.PropertyDesc;
+import org.seasar.extension.jdbc.PropertyType;
+import org.seasar.dao.BeanMetaData;
+import org.seasar.dao.IdentifierGenerator;
+import org.seasar.dao.impl.BeanMetaDataFactoryImpl;
+import org.seasar.dao.impl.BeanMetaDataImpl;
+
+import ${glPackageBaseCommon}.${glEntity};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalIdentifierGeneratorFactory};
+
+/**
+ * BeanMetaDataFactoryImpl for DBFlute.
+ * @author ${database.ClassAuthor}
+ */
+ @SuppressWarnings("unchecked")
+public class ${glBeanMetaDataFactoryExtension} extends BeanMetaDataFactoryImpl {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The map of bean meta data for cache. */
+    protected Map<Class<? extends ${glEntity}>, BeanMetaData> _metaMap = newConcurrentHashMap();
+
+    // ===================================================================================
+    //                                                                  Override for Cache
+    //                                                                  ==================
+    @Override
+    public BeanMetaData createBeanMetaData(Class beanClass) {
+        final BeanMetaData cachedMeta = findCachedMeta(beanClass);
+        if (cachedMeta != null) {
+            return cachedMeta;
+        } else {
+            return super.createBeanMetaData(beanClass);
+        }
+    }
+
+    @Override
+    public BeanMetaData createBeanMetaData(Class beanClass, int relationNestLevel) {
+        final BeanMetaData cachedMeta = findCachedMeta(beanClass);
+        if (cachedMeta != null) {
+            return cachedMeta;
+        } else {
+            return super.createBeanMetaData(beanClass, relationNestLevel);
+        }
+    }
+
+    @Override
+    public BeanMetaData createBeanMetaData(DatabaseMetaData dbMetaData, Class beanClass, int relationNestLevel) {
+        final BeanMetaData cachedMeta = findOrCreateCachedMetaIfNeeds(dbMetaData, beanClass, relationNestLevel);
+        if (cachedMeta != null) {
+            return cachedMeta;
+        } else {
+            return super.createBeanMetaData(dbMetaData, beanClass, relationNestLevel);
+        }
+    }
+
+    protected BeanMetaData findCachedMeta(Class beanClass) {
+        if (isDBFluteEntity(beanClass)) {
+            final BeanMetaData cachedMeta = getMetaFromCache(beanClass);
+            if (cachedMeta != null) {
+                return cachedMeta;
+            }
+        }
+        return null;
+    }
+
+    protected BeanMetaData findOrCreateCachedMetaIfNeeds(DatabaseMetaData dbMetaData, Class beanClass, int relationNestLevel) {
+        if (isDBFluteEntity(beanClass)) {
+            final BeanMetaData cachedMeta = getMetaFromCache(beanClass);
+            if (cachedMeta != null) {
+                return cachedMeta;
+            } else {
+                return super.createBeanMetaData(dbMetaData, beanClass, 0);
+            }
+        }
+        return null;
+    }
+
+    // ===================================================================================
+    //                                                               BeanMetaData Creation
+    //                                                               =====================
+    @Override
+    protected BeanMetaDataImpl createBeanMetaDataImpl() {
+        // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+        // for ConditionBean and insert() and update() and delete() and so on...
+        // = = = = = = = = = =/
+        return new BeanMetaDataImpl() {
+            protected List<IdentifierGenerator> _internalIdentifierGeneratorList = new ArrayList<IdentifierGenerator>();
+            protected Map<String, IdentifierGenerator> _internalIdentifierGeneratorsByPropertyName = newConcurrentHashMap();
+
+            // /= = = = = = =
+            // for cache
+            // = = = = =/
+            @Override
+            public void initialize() { // for Cache
+                final Class myBeanClass = getBeanClass();
+                if (isDBFluteEntity(myBeanClass)) {
+                    final BeanMetaData cachedMeta = getMetaFromCache(myBeanClass);
+                    if (cachedMeta == null) {
+                        _metaMap.put(myBeanClass, this);
+                    }
+                }
+                super.initialize();
+            }
+
+            // /= = = = = = =
+            // for insert()
+            // = = = = =/
+            // The attributes 'identifierGenerators' and 'identifierGeneratorsByPropertyName'
+            // of super class are unused. It prepares original atributes here.
+            @Override
+            protected void setupIdentifierGenerator(PropertyType propertyType) {
+                final PropertyDesc pd = propertyType.getPropertyDesc();
+                final String propertyName = propertyType.getPropertyName();
+                final String idType = beanAnnotationReader.getId(pd, getDbms());
+                final IdentifierGenerator generator = createInternalIdentifierGenerator(propertyType, idType);
+                _internalIdentifierGeneratorList.add(generator);
+                _internalIdentifierGeneratorsByPropertyName.put(propertyName, generator);
+            }
+            protected IdentifierGenerator createInternalIdentifierGenerator(PropertyType propertyType, String idType) {
+                return ${glInternalIdentifierGeneratorFactory}.createIdentifierGenerator(propertyType, getDbms(), idType);
+            }
+            @Override
+            public IdentifierGenerator getIdentifierGenerator(int index) {
+                return _internalIdentifierGeneratorList.get(index);
+            }
+            @Override
+            public int getIdentifierGeneratorSize() {
+                return _internalIdentifierGeneratorList.size();
+            }
+            @Override
+            public IdentifierGenerator getIdentifierGenerator(String propertyName) {
+                return _internalIdentifierGeneratorsByPropertyName.get(propertyName);
+            }
+        };
+    }
+    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    // Other extension points about BeanMetaDataImpl is as follows:
+    // 
+    //   S2DaoMetaDataExtension.createNonConcurrencyBmdFactory()
+    //     --> for NonConcurrency (updateNonstrict() and deleteNonstrict() and so on...) 
+    // 
+    //   S2DaoMetaDataExtension.createOutsideSqlCustomizeBeanMetaDataFactory()
+    //     --> for OutsideSql but it overrides nothing.
+    // = = = = = = = = = =/
+    
+    // ===================================================================================
+    //                                                                 Relation Next Level
+    //                                                                 ===================
+    /**
+     * Get the limit nest level of relation.
+     * @return The limit nest level of relation.
+     */
+    @Override
+    protected int getLimitRelationNestLevel() {
+        return 2; // for Compatible to old version DBFlute
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+	protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+        return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected boolean isDBFluteEntity(Class beanClass) {
+        return ${glEntity}.class.isAssignableFrom(beanClass);
+    }
+    
+    protected BeanMetaData getMetaFromCache(Class beanClass) {
+        return _metaMap.get(beanClass);
+    }
+}

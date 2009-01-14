@@ -1,0 +1,61 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import org.seasar.extension.jdbc.ResultSetHandler;
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBean}.${glConditionBeanContext};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glSelectCountCBCommand} extends ${glAbstractSelectCBCommand}<Integer> {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    public String getCommandName() {
+        return "selectCount";
+    }
+
+    public Class<?> getCommandReturnType() {
+        return Integer.class;
+    }
+
+    // ===================================================================================
+    //                                                                    Process Callback
+    //                                                                    ================
+    public void beforeGettingSqlExecution() {
+        assertStatus("beforeGettingSqlExecution");
+        final ${glConditionBean} cb = _conditionBean;
+        cb.xsetupSelectCountIgnoreFetchScope(); // *Point!
+        ${glConditionBeanContext}.setConditionBeanOnThread(cb);
+    }
+
+    public void afterExecuting() {
+        assertStatus("afterExecuting");
+        final ${glConditionBean} cb = _conditionBean;
+        cb.xafterCareSelectCountIgnoreFetchScope();
+    }
+
+    // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    public boolean isSelectCount() {
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
+        assertStatus("createSqlExecutionCreator");
+        return new ${glSqlExecutionCreator}() {
+            public ${glSqlExecution} createSqlExecution() {
+                ResultSetHandler handler = createObjectResultSetHandler(getCommandReturnType());
+                return createSelectCBExecution(_conditionBeanType, handler);
+            }
+        };
+    }
+}

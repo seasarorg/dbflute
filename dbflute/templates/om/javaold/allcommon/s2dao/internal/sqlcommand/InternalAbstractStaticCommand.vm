@@ -1,0 +1,32 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+import javax.sql.DataSource;
+
+import org.seasar.dao.BeanMetaData;
+import org.seasar.extension.jdbc.StatementFactory;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public abstract class ${glInternalAbstractStaticCommand} extends ${glInternalAbstractSqlCommand} {
+
+	// ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    private BeanMetaData beanMetaData;
+
+	// ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalAbstractStaticCommand}(DataSource dataSource, StatementFactory statementFactory, BeanMetaData beanMetaData) {
+        super(dataSource, statementFactory);
+        this.beanMetaData = beanMetaData;
+    }
+
+	// ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public BeanMetaData getBeanMetaData() {
+        return beanMetaData;
+    }
+}

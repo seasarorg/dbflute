@@ -1,0 +1,21 @@
+${database.allClassCopyright}package ${myBaseBaoPackageName};
+#set ($myClassName = "${myBaseBaoClassName}")
+
+import java.util.List;
+
+import org.escafe.buri.annotation.Buri;
+import org.escafe.buri.annotation.BuriActivity;
+import org.escafe.buri.annotation.BuriConversionRule;
+import org.escafe.buri.annotation.BuriConverter;
+import ${myExtendedEntityPackageName}.*;
+
+/**
+ * The BAO of ${table.basicInfoDispString}.
+ * @author ${database.ClassAuthor}
+ */
+@Buri(process="${myBuriProcessName}", dtoClass=${myExtendedObjectClassName}.class)
+@BuriConverter( { @BuriConversionRule(convertClass = Long.class, ognl = "BigDecimalConverter.convert(#data)") })
+public interface ${myClassName} {
+
+    // ...Making
+}

@@ -1,0 +1,82 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCOptionParts};
+
+#set ($myClassName = "${glToSingleByteOptionParts}")
+
+import ${glPackageBaseCommonHelperCharacter}.${glGeneralCharacter};
+import ${glPackageBaseCommonHelperCharacterImpl}.${glGeneralCharacterImpl};
+
+/**
+ * The interface of condition-option.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+    protected boolean _toSingleByteSpace;
+    protected boolean _toSingleByteAlphabetNumber;
+    protected boolean _toSingleByteAlphabetNumberMark;
+
+    private ${glGeneralCharacter} _generalCharacter;
+
+    // =====================================================================================
+    //                                                                                  Main
+    //                                                                                  ====
+    public boolean isToSingleByteSpace() {
+        return _toSingleByteSpace;
+    }
+    public void toSingleByteSpace() {
+        _toSingleByteSpace = true;
+    }
+
+    public void toSingleByteAlphabetNumber() {
+        _toSingleByteAlphabetNumber = true;
+    }
+
+    public void toSingleByteAlphabetNumberMark() {
+        _toSingleByteAlphabetNumberMark = true;
+    }
+
+    // =====================================================================================
+    //                                                                            Real Value
+    //                                                                            ==========
+    public String generateRealValue(String value) {
+        if (value == null) {
+            return value;
+        }
+
+        // To Single Byte
+        if (_toSingleByteSpace) {
+            value = (value != null ? value.replaceAll("\u3000", " ") : value);
+        }
+        if (_toSingleByteAlphabetNumberMark) {
+            value = getGeneralCharacter().toSingleByteAlphabetNumberMark(value);
+        } else if (_toSingleByteAlphabetNumber) {
+            value = getGeneralCharacter().toSingleByteAlphabetNumber(value);
+        }
+        return value;
+    }
+
+    // =====================================================================================
+    //                                                                                Helper
+    //                                                                                ======
+    protected ${glGeneralCharacter} getGeneralCharacter() {
+        if (_generalCharacter == null) {
+            _generalCharacter = new ${glGeneralCharacterImpl}();
+        }
+        return _generalCharacter;
+    }
+
+    // =====================================================================================
+    //                                                                              DeepCopy
+    //                                                                              ========
+    public Object createDeepCopy() {
+        final ${myClassName} deepCopy = new ${myClassName}();
+        deepCopy._toSingleByteSpace = _toSingleByteSpace;
+        deepCopy._toSingleByteAlphabetNumber = _toSingleByteAlphabetNumber;
+        deepCopy._toSingleByteAlphabetNumberMark = _toSingleByteAlphabetNumberMark;
+        return deepCopy;
+    }
+}

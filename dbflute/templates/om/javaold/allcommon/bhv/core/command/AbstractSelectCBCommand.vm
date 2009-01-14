@@ -1,0 +1,107 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import org.seasar.extension.jdbc.ResultSetHandler;
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCoreExecution}.${glSelectCBExecution};
+import ${glPackageBaseCommonCBean}.${glConditionBean};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlOption};
+
+/**
+ * @author ${database.ClassAuthor}
+ * @param <RESULT> The type of result.
+ */
+public abstract class ${glAbstractSelectCBCommand}<RESULT> extends ${glAbstractBehaviorCommand}<RESULT> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The type of condition-bean. (Derived from conditionBean) */
+    protected Class<? extends ${glConditionBean}> _conditionBeanType;
+
+    /** The instance of condition-bean. (Required) */
+    protected ${glConditionBean} _conditionBean;
+
+    // ===================================================================================
+    //                                                                  Detail Information
+    //                                                                  ==================
+    public boolean isConditionBean() {
+        return true;
+    }
+
+    public boolean isOutsideSql() {
+        return false;
+    }
+
+    public boolean isProcedure() {
+        return false;
+    }
+
+    public boolean isSelect() {
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public String buildSqlExecutionKey() {
+        assertStatus("buildSqlExecutionKey");
+        return _tableDbName + ":" + getCommandName() + "(" + _conditionBeanType.getSimpleName() + ")";
+    }
+
+    protected ${glSqlExecution} createSelectCBExecution(Class<? extends ${glConditionBean}> cbType, ResultSetHandler handler) {
+        return createSelectCBExecution(handler, new String[] { "dto" }, new Class<?>[] { cbType });
+    }
+
+    protected ${glSelectCBExecution} createSelectCBExecution(ResultSetHandler handler, String[] argNames, Class<?>[] argTypes) {
+        final ${glSelectCBExecution} cmd = new ${glSelectCBExecution}(_dataSource, _statementFactory, handler);
+        cmd.setArgNames(argNames);
+        cmd.setArgTypes(argTypes);
+        return cmd;
+    }
+
+    public Object[] getSqlExecutionArgument() {
+        assertStatus("getSqlExecutionArgument");
+        return new Object[] { _conditionBean };
+    }
+
+    // ===================================================================================
+    //                                                                Argument Information
+    //                                                                ====================
+    public ${glConditionBean} getConditionBean() {
+        return _conditionBean;
+    }
+
+    public String getOutsideSqlPath() {
+        return null;
+    }
+
+    public ${glOutsideSqlOption} getOutsideSqlOption() {
+        return null;
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
+    protected void assertStatus(String methodName) {
+        assertBasicProperty(methodName);
+        assertComponentProperty(methodName);
+        if (_conditionBeanType == null) {
+            throw new IllegalStateException(buildAssertMessage("_conditionBeanType", methodName));
+        }
+        if (_conditionBean == null) {
+            throw new IllegalStateException(buildAssertMessage("_conditionBean", methodName));
+        }
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setConditionBeanType(Class<? extends ${glConditionBean}> conditionBeanType) {
+        _conditionBeanType = conditionBeanType;
+    }
+
+    public void setConditionBean(${glConditionBean} conditionBean) {
+        _conditionBean = conditionBean;
+    }
+}

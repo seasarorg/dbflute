@@ -1,0 +1,29 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalVarious};
+
+import javax.sql.DataSource;
+
+import org.seasar.dao.Dbms;
+import org.seasar.extension.jdbc.PropertyType;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalIdentifierAssignedGenerator} extends ${glInternalIdentifierAbstractGenerator} {
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalIdentifierAssignedGenerator}(PropertyType propertyType, Dbms dbms) {
+        super(propertyType, dbms);
+    }
+
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
+    public void setIdentifier(Object bean, DataSource ds) {
+    }
+
+    public boolean isSelfGenerate() {
+        return true;
+    }
+}

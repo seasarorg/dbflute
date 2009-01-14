@@ -1,0 +1,810 @@
+${database.allClassCopyright}package ${glPackageBaseCQ};
+
+#set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
+import java.util.Collection;
+
+#if ($table.hasClassification())
+import ${glPackageBaseCommon}.${glCDef};
+#end
+import ${glPackageBaseCommonDBMeta}.${glDBMetaInstanceHandler};
+import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
+import ${glPackageBaseCommonCBean}.*;
+import ${glPackageBaseCommonCKey}.*;
+import ${glPackageBaseCommonCValue}.${glConditionValue};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
+import ${glPackageCB}.*;
+import ${glPackageCQ}.*;
+
+/**
+ * The abstract condition-query of ${table.name}.
+ * @author ${database.ClassAuthor}
+ */
+public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final ${glDBMetaProvider} _dbmetaProvider = new ${glDBMetaInstanceHandler}();
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
+        super(childQuery, sqlClause, aliasName, nestLevel);
+    }
+
+    // ===================================================================================
+    //                                                                     DBMeta Provider
+    //                                                                     ===============
+    @Override
+    protected ${glDBMetaProvider} getDBMetaProvider() {
+        return _dbmetaProvider;
+    }
+
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    public String getTableDbName() {
+        return "${table.Name}";
+    }
+    
+    public String getTableSqlName() {
+        return "${table.tableSqlName}";
+    }
+
+    // ===================================================================================
+    //                                                                               Query
+    //                                                                               =====
+#foreach ($col in $table.columns)
+#set ($tmpJavaName = "${col.javaName}")
+#set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
+#if (${col.isJavaNativeStringObject()})
+
+    /**
+     * Equal(=). And NullOrEmptyIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
+     */
+    public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_EQ, fRES(${tmpUncapitalisedJavaName}));
+    }
+#if ($database.isMakeConditionQueryEqualEmptyString())
+
+    /**
+     * Equal(=). As the empty-string. And NullOrEmptyIgnored, OnlyOnceRegistered.
+     */
+    public void set${tmpJavaName}_Equal_EmptyString() {
+        reg${tmpJavaName}(CK_EQ, "");
+    }
+#end
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.classificationMapList)
+
+    /**
+     * Equal(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
+        reg${tmpJavaName}(CK_EQ, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code());
+    }
+#end
+#end
+#if (${col.isAvailableStringNotEqual()})
+
+    /**
+     * NotEqual(!=). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
+     */
+    public void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_NE, fRES(${tmpUncapitalisedJavaName}));
+    }
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.ClassificationMapList)
+
+    /**
+     * NotEqual(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
+        reg${tmpJavaName}(CK_NE, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code());
+    }
+#end
+#end
+#end
+#if (${col.isAvailableStringGreaterThan()})
+
+    /**
+     * GreaterThan(&gt;). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan.
+     */
+    public void set${tmpJavaName}_GreaterThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_GT, fRES(${tmpUncapitalisedJavaName}));
+    }
+#end
+#if (${col.isAvailableStringLessThan()})
+
+    /**
+     * LessThan(&lt;). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan.
+     */
+    public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_LT, fRES(${tmpUncapitalisedJavaName}));
+    }
+#end
+#if (${col.isAvailableStringGreaterEqual()})
+
+    /**
+     * GreaterEqual(&gt;=). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual.
+     */
+    public void set${tmpJavaName}_GreaterEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_GE, fRES(${tmpUncapitalisedJavaName}));
+    }
+#end
+#if (${col.isAvailableStringLessEqual()})
+
+    /**
+     * LessEqual(&lt;=). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual.
+     */
+    public void set${tmpJavaName}_LessEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_LE, fRES(${tmpUncapitalisedJavaName}));
+    }
+#end
+#if (${col.isAvailableStringPrefixSearch()})
+
+    /**
+     * PrefixSearch(like 'xxx%'). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch.
+     */
+    public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_PS, fRES(${tmpUncapitalisedJavaName}));
+    }
+#end
+#if (${col.isAvailableStringInScope()})
+
+    /**
+     * InScope(in ('a', 'b')). And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered.
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope.
+     */
+    public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+        reg${tmpJavaName}(CK_INS, cTL(${tmpUncapitalisedJavaName}List));
+    }
+#end
+#if (${col.isAvailableStringNotInScope()})
+
+    /**
+     * NotInScope(not in ('a', 'b')). And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered.
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope.
+     */
+    public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+        reg${tmpJavaName}(CK_NINS, cTL(${tmpUncapitalisedJavaName}List));
+    }
+#end
+#if (${col.isAvailableStringLikeSearch()})
+
+    /**
+     * LikeSearch(like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch.
+     * @param likeSearchOption The option of like-search. (NotNull)
+     */
+    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glLikeSearchOption} likeSearchOption) {
+        regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
+    }
+#end
+#if (${col.isAvailableStringNotLikeSearch()})
+
+    /**
+     * NotLikeSearch(not like 'xxx%' escape ...). And NullOrEmptyIgnored, SeveralRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch.
+     * @param likeSearchOption The option of not-like-search. (NotNull)
+     */
+    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glLikeSearchOption} likeSearchOption) {
+        regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
+    }
+#end
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
+#set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+
+    public void inScope${col.foreignKey.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerInScopeSubQuery(cb.query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
+#end
+
+    public void inScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerInScopeSubQuery(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
+#end
+
+    public void notInScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerNotInScopeSubQuery(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up 'exists' sub-query. {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
+     */
+    public void exists${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerExistsSubQuery(cb.query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up 'not exists' sub-query. {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
+     */
+    public void notExists${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerNotExistsSubQuery(cb.query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+
+    public void xsderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerSpecifyDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+
+    public QDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+        return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
+    }
+    protected QDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
+        return new QDRFunction<${relatedCBClassName}>(new QDRSetupper<${relatedCBClassName}>() {
+            public void setup(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+                xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
+            }
+        });
+    }
+    public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
+        registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+    public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue);
+#end
+#end
+#end
+#end
+#if (${col.isJavaNativeNumberObject()})
+    
+    /**
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
+     */
+    public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
+    }
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.ClassificationMapList)
+
+    /**
+     * Equal(=). As ${classificationMap.get('name')}. And NullIgnored, OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
+        reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
+    }
+#end
+#end
+#if (${col.isAvailableNumberNotEqual()})
+
+    /**
+     * NotEqual(!=). And NullIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
+     */
+    public void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_NE, ${tmpUncapitalisedJavaName});
+    }
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.ClassificationMapList)
+
+    /**
+     * NotEqual(!=). As ${classificationMap.get('name')}. And NullIgnored, OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
+        reg${tmpJavaName}(CK_NE, new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
+    }
+#end
+#end
+#end
+#if (${col.isAvailableNumberGreaterThan()})
+
+    /**
+     * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan.
+     */
+    public void set${tmpJavaName}_GreaterThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_GT, ${tmpUncapitalisedJavaName});
+    }
+#end
+#if (${col.isAvailableNumberLessThan()})
+
+    /**
+     * LessThan(&lt;). And NullIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan.
+     */
+    public void set${tmpJavaName}_LessThan(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_LT, ${tmpUncapitalisedJavaName});
+    }
+#end
+#if (${col.isAvailableNumberGreaterEqual()})
+
+    /**
+     * GreaterEqual(&gt;=). And NullIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual.
+     */
+    public void set${tmpJavaName}_GreaterEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_GE, ${tmpUncapitalisedJavaName});
+    }
+#end
+#if (${col.isAvailableNumberLessEqual()})
+
+    /**
+     * LessEqual(&lt;=). And NullIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual.
+     */
+    public void set${tmpJavaName}_LessEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_LE, ${tmpUncapitalisedJavaName});
+    }
+#end
+#if (${col.isAvailableNumberInScope()})
+
+    /**
+     * InScope(in (1, 2)). And NullIgnored, NullElementIgnored, SeveralRegistered.
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope.
+     */
+    public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+        reg${tmpJavaName}(CK_INS, cTL(${tmpUncapitalisedJavaName}List));
+    }
+#end
+#if (${col.isAvailableNumberNotInScope()})
+
+    /**
+     * NotInScope(not in (1, 2)). And NullIgnored, NullElementIgnored, SeveralRegistered.
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope.
+     */
+    public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+        reg${tmpJavaName}(CK_NINS, cTL(${tmpUncapitalisedJavaName}List));
+    }
+#end
+#if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
+#set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${col.foreignKey.foreignPropertyNameInitCap}")
+
+    public void inScope${col.foreignKey.foreignPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerInScopeSubQuery(cb.query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_InScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_InScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
+#end
+
+    public void inScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerInScopeSubQuery(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotInScopeSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotInScopeSubQuery_${referrer.ReferrerPropertyNameInitCap}")
+#end
+
+    public void notInScope${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerNotInScopeSubQuery(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_ExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up 'exists' sub-query. {exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'exists'. (NotNull)
+     */
+    public void exists${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerExistsSubQuery(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#if (${referrer.isOneToOne()})
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsSubQuery_${referrer.referrerPropertyNameInitCapAsOne}")
+#else
+#set ($relationPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_NotExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_NotExistsSubQuery_${referrer.referrerPropertyNameInitCap}")
+#end
+
+    /**
+     * Set up 'not exists' sub-query. {not exists (select ${referrer.firstLocalColumnName} from ${referrer.table.name} where ...)}
+     * @param subQuery The sub-query of ${subQueryPropertyNameInitCap} for 'not exists'. (NotNull)
+     */
+    public void notExists${relationPropertyNameInitCap}(${glSubQuery}<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerNotExistsSubQuery(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+
+    public void xsderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        registerSpecifyDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+#end
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+
+    public QDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+        return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
+    }
+    protected QDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
+        return new QDRFunction<${relatedCBClassName}>(new QDRSetupper<${relatedCBClassName}>() {
+            public void setup(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+                xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
+            }
+        });
+    }
+    public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.query(cb);
+        String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+        String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
+        registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
+    }
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
+    public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue);
+#end
+#end
+#end
+#end
+#if (${col.isJavaNativeDateObject()})
+    
+    /**
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
+     */
+    public void set${tmpJavaName}_Equal($col.javaNative ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
+    }
+#if (${col.isAvailableDateNotEqual()})
+
+    /**
+     * NotEqual(!=). And NullIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
+     */
+    public void set${tmpJavaName}_NotEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_NE, ${tmpUncapitalisedJavaName});
+    }
+#end
+#if (${col.isAvailableDateGreaterThan()})
+
+    /**
+     * GreaterThan(&gt;). And NullIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan.
+     */
+    public void set${tmpJavaName}_GreaterThan($col.javaNative ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_GT, ${tmpUncapitalisedJavaName});
+    }
+#end
+#if (${col.isAvailableDateLessThan()})
+
+    /**
+     * LessThan(&gt;). And NullIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan.
+     */
+    public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_LT, ${tmpUncapitalisedJavaName});
+    }
+#end
+#if (${col.isAvailableDateGreaterEqual()})
+
+    /**
+     * GreaterEqual(&gt;). And NullIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual.
+     */
+    public void set${tmpJavaName}_GreaterEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_GE, ${tmpUncapitalisedJavaName});
+    }
+#end
+#if (${col.isAvailableDateLessEqual()})
+
+    /**
+     * LessEqual(&gt;). And NullIgnored, OnlyOnceRegistered.
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual.
+     */
+    public void set${tmpJavaName}_LessEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_LE, ${tmpUncapitalisedJavaName});
+    }
+#end
+#if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
+
+    /**
+     * FromTo($fromDate &lt;= COLUMN_NAME &lt;= $toDate). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * @param fromDate The from-date of ${col.uncapitalisedJavaName}. (Nullable)
+     * @param toDate The to-date of ${col.uncapitalisedJavaName}. (Nullable)
+     * @param fromToOption The option of from-to. (NotNull)
+     */
+    public void set${tmpJavaName}_FromTo(java.util.Date fromDate, java.util.Date toDate, ${glPackageBaseCommonCOption}.${glFromToOption} fromToOption) {
+#if ($col.javaNative == "java.util.Date")
+        registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", fromToOption);
+#else
+        registerFromToQuery((fromDate != null ? new ${col.javaNative}(fromDate.getTime()) : null), (toDate != null ? new ${col.javaNative}(toDate.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", fromToOption);
+#end
+    }
+
+    /**
+     * FromTo($fromDate &lt;= COLUMN_NAME &lt; $toDate + 1). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * @param fromDate The from-date of ${col.uncapitalisedJavaName}. (Nullable)
+     * @param toDate The to-date of ${col.uncapitalisedJavaName}. (Nullable)
+     */
+    public void set${tmpJavaName}_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
+        set${tmpJavaName}_FromTo(fromDate, toDate, new ${glPackageBaseCommonCOption}.${glDateFromToOption}());
+    }
+#end
+#end
+#if (${col.isJavaNativeBooleanObject()})
+
+    /**
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
+     */
+    public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
+    }
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.classificationMapList)
+
+    /**
+     * Equal(=). As ${classificationMap.get('name')}. And OnlyOnceRegistered. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
+        reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
+    }
+#end
+#end
+#end
+#if (!${col.isNotNull()} || ${col.isPrimaryKey()})
+
+    /**
+     * IsNull(is null). And OnlyOnceRegistered.
+     */
+    public void set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DUMMY_OBJECT); }
+
+    /**
+     * IsNotNull(is not null). And OnlyOnceRegistered.
+     */
+    public void set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DUMMY_OBJECT); }
+#end
+
+    protected void reg${tmpJavaName}(${glConditionKey} key, Object value) {
+        registerQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
+    }
+    protected void registerInline${tmpJavaName}(${glConditionKey} key, Object value) {
+        registerInlineQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
+    }
+    abstract protected ${glConditionValue} getCValue${tmpJavaName}();
+#end
+#if ($table.hasOnlyOnePrimaryKey())
+
+    // ===================================================================================
+    //                                                                     Scalar SubQuery
+    //                                                                     ===============
+    public SSQFunction<${myConditionBeanClassName}> scalar_Equal() {
+        return xcreateSSQFunction("=");
+    }
+
+    public SSQFunction<${myConditionBeanClassName}> scalar_GreaterEqual() {
+        return xcreateSSQFunction(">=");
+    }
+
+    public SSQFunction<${myConditionBeanClassName}> scalar_GreaterThan() {
+        return xcreateSSQFunction(">");
+    }
+
+    public SSQFunction<${myConditionBeanClassName}> scalar_LessEqual() {
+        return xcreateSSQFunction("<=");
+    }
+    
+    public SSQFunction<${myConditionBeanClassName}> scalar_LessThan() {
+        return xcreateSSQFunction("<");
+    }
+    
+    protected SSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(final String operand) {
+        return new SSQFunction<${myConditionBeanClassName}>(new SSQSetupper<${myConditionBeanClassName}>() {
+            public void setup(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery) {
+                xscalarSubQuery(function, subQuery, operand);
+            }
+        });
+    }
+
+    protected void xscalarSubQuery(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery, String operand) {
+        assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForScalarSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keepScalarSubQuery(cb.query()); // for saving query-value.
+        registerScalarSubQuery(function, cb.query(), subQueryPropertyName, operand);
+    }
+    public abstract String keepScalarSubQuery(${myConditionQueryClassName} subQuery);
+#end
+
+    // ===================================================================================
+    //                                                                       Very Internal
+    //                                                                       =============
+    // Very Internal (for Suppressing Warn about 'Not Use Import')
+    protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
+    protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
+}

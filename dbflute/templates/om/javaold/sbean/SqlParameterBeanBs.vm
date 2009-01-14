@@ -1,0 +1,114 @@
+${database.allClassCopyright}package ${glPackageBaseSqlParameterBean};
+
+#set ($myClassName = "${myBaseSqlParameterClassName}")
+
+/**
+ * The sql-parametaer-bean of ${mySqlParameterBeanName}.
+ * 
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} {
+
+    // =====================================================================================
+    //                                                                     Static Definition
+    //                                                                     =================
+#foreach ($propertyName in $propertyDefinitionMap.keySet())
+
+    /// <summary>The java name of ${propertyName}</summary>
+    public static final String JAVA_NAME_OF_${database.initCap($propertyName)} = "${database.initCap($propertyName)}";
+#end
+
+#foreach ($propertyName in $propertyDefinitionMap.keySet())
+
+    /// <summary>The property name of ${propertyName}</summary>
+    public static final String PROPERTY_NAME_OF_${database.initCap($propertyName)} = "${propertyName}";
+#end
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+#foreach ($propertyName in $propertyDefinitionMap.keySet())
+  #set ($propertyJavaNative = $database.getSqlParameterBeanPropertyType($mySqlParameterBeanName, $propertyName))
+
+    /// <summary>The value of ${propertyName}.</summary>
+    protected ${propertyJavaNative} _${propertyName};
+
+    /// <summary>Has the setter of ${col.UncapitalisedJavaName} been invoked?</summary>
+    protected boolean _isSetterInvoked${database.initCap($propertyName)};
+#end
+
+    // =====================================================================================
+    //                                                                           Constructor
+    //                                                                           ===========
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /**
+     * Constructor.
+     */
+    public ${myClassName}() {
+    }
+
+    // =====================================================================================
+    //                                                                         Getter Setter
+    //                                                                         =============
+#foreach ($propertyName in $propertyDefinitionMap.keySet())
+  #set ($propertyJavaNative = $database.getSqlParameterBeanPropertyType($mySqlParameterBeanName, $propertyName))
+
+    /**
+     * Get the value of ${propertyName}.
+     * 
+     * @return The value of ${propertyName}.
+     */
+    public ${propertyJavaNative} get${database.initCap($propertyName)}() {
+        return _${propertyName};
+        set { _isSetterInvoked${database.initCap($propertyName)} = true; _${propertyName} = value; }
+    }
+
+    /**
+     * Set the value of ${propertyName}.
+     * 
+     * @param value The value of ${propertyName}.
+     */
+    public ${propertyJavaNative} set${database.initCap($propertyName)}(${propertyJavaNative} value) {
+        _isSetterInvoked${database.initCap($propertyName)} = true;
+        _${propertyName} = value;
+    }
+#end
+
+    // =====================================================================================
+    //                                                                Invoking Determination
+    //                                                                ======================
+#foreach ($propertyName in $propertyDefinitionMap.keySet())
+  #set ($propertyJavaNative = $database.getSqlParameterBeanPropertyType($mySqlParameterBeanName, $propertyName))
+
+    /**
+     * Has the setter of ${propertyName} been invoked?
+     * 
+     * @return Determination.
+     */
+    public boolean isSetterInvoked${database.initCap($propertyName)}() {
+        return _isSetterInvoked${database.initCap($propertyName)};
+    }
+#end
+
+    // =====================================================================================
+    //                                                                 Basic Override Method
+    //                                                                 =====================
+    /**
+     * ${database.OverrideComment}
+     * 
+     * @return Property-string. (NotNull)
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+#foreach ($propertyName in $propertyDefinitionMap.keySet())
+  #set ($propertyJavaNative = $database.getSqlParameterBeanPropertyType($mySqlParameterBeanName, $propertyName))
+
+            sb.append(" ${propertyName}=").append(this.${database.initCap($propertyName)});
+#end
+
+            return sb.toString();
+        }
+    }
+}

@@ -1,0 +1,103 @@
+${database.allClassCopyright}package ${glPackageBaseCommonCBean};
+
+import ${glPackageBaseCommonSqlClause}.${glOrderByClause};
+import ${glPackageBaseCommonSqlClause}.${glSqlClause};
+
+/**
+ * @deprecated
+ */
+public class ${glSimpleOrderByBeanName} implements ${glOrderByBean} {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** SQL clause instance. */
+    protected final ${glSqlClause} _sqlClause;
+    {
+        _sqlClause = ${glConditionBeanContext}.createSqlClause("Dummy");
+    }
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    /**
+     * Constructor.
+     */
+    public ${glSimpleOrderByBeanName}() {
+    }
+
+    // ===================================================================================
+    //                                                                           SqlClause
+    //                                                                           =========
+    /**
+     * Get sql-clause.
+     * 
+     * @return Sql clause. (NotNull)
+     */
+    protected ${glSqlClause} getSqlClause() {
+        return _sqlClause;
+    }
+
+    // ===================================================================================
+    //                                                                     Select Resource
+    //                                                                     ===============
+    /**
+     * Check safety result.
+     * 
+     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     */
+    public void checkSafetyResult(int safetyMaxResultSize) {
+        throw new UnsupportedOperationException();
+    }
+
+    // ===================================================================================
+    //                                                                             OrderBy
+    //                                                                             =======
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Sql component of order-by clause. (NotNull)
+     */
+    public ${glOrderByClause} getSqlComponentOfOrderByClause() {
+        return getSqlClause().getSqlComponentOfOrderByClause();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return Order-by clause. (NotNull)
+     */
+    public String getOrderByClause() {
+        return getSqlClause().getOrderByClause();
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBean} clearOrderBy() {
+        getSqlClause().clearOrderBy();
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBean} ignoreOrderBy() {
+        getSqlClause().ignoreOrderBy();
+        return this;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * 
+     * @return this. (NotNull)
+     */
+    public ${glOrderByBean} makeOrderByEffective() {
+        getSqlClause().makeOrderByEffective();
+        return this;
+    }
+}

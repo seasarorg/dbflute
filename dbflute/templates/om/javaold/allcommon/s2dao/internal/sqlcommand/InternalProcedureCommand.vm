@@ -1,0 +1,71 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2DaoInternalSqlCommand};
+
+import javax.sql.DataSource;
+
+import org.seasar.dao.SqlCommand;
+import org.seasar.extension.jdbc.ResultSetHandler;
+import org.seasar.extension.jdbc.StatementFactory;
+
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
+import ${glPackageBaseCommonS2DaoInternalSqlHandler}.${glInternalProcedureHandler};
+import ${glPackageBaseCommonS2DaoInternalVarious}.${glInternalProcedureMetaData};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInternalProcedureCommand} implements SqlCommand, ${glSqlExecution} {
+
+	// ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected DataSource dataSource;
+    protected ResultSetHandler resultSetHandler;
+    protected StatementFactory statementFactory;
+    protected ${glInternalProcedureMetaData} procedureMetaData;
+
+	// ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glInternalProcedureCommand}(DataSource dataSource, ResultSetHandler resultSetHandler,
+            StatementFactory statementFactory, ${glInternalProcedureMetaData} procedureMetaData) {
+        this.dataSource = dataSource;
+        this.resultSetHandler = resultSetHandler;
+        this.statementFactory = statementFactory;
+        this.procedureMetaData = procedureMetaData;
+    }
+
+	// ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    public Object execute(final Object[] args) {
+        final ${glInternalProcedureHandler} handler = newArgumentDtoProcedureHandler();
+        final ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
+        final Object pmb = outsideSqlContext.getParameterBean();
+        // The logging message SQL of procedure is unnecessary.
+        // handler.setLoggingMessageSqlArgs(...);
+        return handler.execute(new Object[]{pmb});
+    }
+    protected ${glInternalProcedureHandler} newArgumentDtoProcedureHandler() {
+        return new ${glInternalProcedureHandler}(dataSource, createSql(procedureMetaData), resultSetHandler,
+                statementFactory, procedureMetaData);
+    }
+    protected String createSql(final ${glInternalProcedureMetaData} procedureMetaData) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int size = procedureMetaData.parameterTypes().size();
+        if (procedureMetaData.hasReturnParameterType()) {
+            sb.append("? = ");
+            size--;
+        }
+        sb.append("call ").append(procedureMetaData.getProcedureName()).append("(");
+        for (int i = 0; i < size; i++) {
+            sb.append("?, ");
+        }
+        if (size > 0) {
+            sb.setLength(sb.length() - 2);
+        }
+        sb.append(")}");
+        return sb.toString();
+    }
+}

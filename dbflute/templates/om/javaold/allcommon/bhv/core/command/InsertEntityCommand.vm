@@ -1,0 +1,79 @@
+${database.allClassCopyright}package ${glPackageBaseCommonBhvCoreCommand};
+
+import java.util.List;
+
+import org.seasar.dao.BeanMetaData;
+
+import ${glPackageBaseCommonDBMeta}.${glDBMeta};
+import ${glPackageBaseCommonDBMetaInfo}.${glColumnInfo};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecution};
+import ${glPackageBaseCommonBhvCore}.${glSqlExecutionCreator};
+import ${glPackageBaseCommonS2DaoInternalSqlCommand}.${glInternalInsertAutoDynamicCommand};
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glInsertEntityCommand} extends ${glAbstractEntityCommand} {
+
+    // ===================================================================================
+    //                                                                   Basic Information
+    //                                                                   =================
+    public String getCommandName() {
+        return "insert";
+    }
+
+    // ===================================================================================
+    //                                                               SqlExecution Handling
+    //                                                               =====================
+    public ${glSqlExecutionCreator} createSqlExecutionCreator() {
+        assertStatus("createSqlExecutionCreator");
+        return new ${glSqlExecutionCreator}() {
+            public ${glSqlExecution} createSqlExecution() {
+                final BeanMetaData bmd = createBeanMetaData();
+                return createInsertEntitySqlExecution(bmd);
+            }
+        };
+    }
+
+    protected ${glSqlExecution} createInsertEntitySqlExecution(BeanMetaData bmd) {
+        final ${glSqlExecution} nonPrimaryKeySqlExecution = createNonPrimaryInsertSqlExecution(bmd);
+        if (nonPrimaryKeySqlExecution != null) {
+            return nonPrimaryKeySqlExecution;
+        }
+        final String[] propertyNames = getPersistentPropertyNames(bmd);
+        return createInsertAutoDynamicCommand(bmd, propertyNames);
+    }
+
+    protected ${glInternalInsertAutoDynamicCommand} createInsertAutoDynamicCommand(BeanMetaData bmd, String[] propertyNames) {
+        final ${glInternalInsertAutoDynamicCommand} cmd = new ${glInternalInsertAutoDynamicCommand}();
+        cmd.setBeanMetaData(bmd);
+        cmd.setDataSource(_dataSource);
+        cmd.setPropertyNames(propertyNames);
+        cmd.setStatementFactory(_statementFactory);
+        return cmd;
+    }
+
+    /**
+     * @param bmd The meta data of bean. (NotNull)
+     * @return Whether the method is target. (For example if it has primary key, returns false.)
+     */
+    protected ${glSqlExecution} createNonPrimaryInsertSqlExecution(BeanMetaData bmd) {
+        final ${glDBMeta} dbmeta = findDBMeta();
+        if (dbmeta.hasPrimaryKey()) {
+            return null;
+        }
+        final List<${glColumnInfo}> columnInfoList = dbmeta.getColumnInfoList();
+        final StringBuilder columnDefSb = new StringBuilder();
+        for (${glPackageBaseCommonDBMetaInfo}.${glColumnInfo} columnInfo : columnInfoList) {
+            columnDefSb.append(", ").append(columnInfo.getColumnDbName());
+        }
+        columnDefSb.delete(0, ", ".length()).insert(0, "(").append(")");
+        final StringBuilder columnValuesSb = new StringBuilder();
+        for (${glPackageBaseCommonDBMetaInfo}.${glColumnInfo} columnInfo : columnInfoList) {
+            columnValuesSb.append(", /*dto.").append(columnInfo.getPropertyName()).append("*/null");
+        }
+        columnValuesSb.delete(0, ", ".length()).insert(0, "(").append(")");
+        final String sql = "insert into " + dbmeta.getTableSqlName() + columnDefSb + " values" + columnValuesSb;
+        return createUpdateDynamicCommand(new String[]{"dto"}, new Class<?>[]{ _entityType }, sql);
+    }
+}
