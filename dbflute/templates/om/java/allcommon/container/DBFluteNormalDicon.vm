@@ -30,5 +30,4 @@
 #end
     <component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}"/>
 #end
-
 </components>
