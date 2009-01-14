@@ -17,13 +17,14 @@ public class TnSqlLogRegistry {
 	// ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-	protected static final String NAME_SqlLogRegistryLocator = "org.seasar.extension.jdbc.SqlLogRegistryLocator";
+    protected static final String PKG_ORG_SEASAR = "org.seasar";
+	protected static final String NAME_SqlLogRegistryLocator = PKG_ORG_SEASAR + "extension.jdbc.SqlLogRegistryLocator";
 	protected static final String NAME_getInstance = "getInstance";
 	protected static final String NAME_setInstance = "setInstance";
-	protected static final String NAME_SqlLogRegistry = "org.seasar.extension.jdbc.SqlLogRegistry";
-	protected static final String NAME_SqlLogRegistryImpl = "org.seasar.extension.jdbc.impl.SqlLogRegistryImpl";
-	protected static final String NAME_SqlLog = "org.seasar.extension.jdbc.SqlLog";
-	protected static final String NAME_SqlLogImpl = "org.seasar.extension.jdbc.impl.SqlLogImpl";
+	protected static final String NAME_SqlLogRegistry = PKG_ORG_SEASAR + "extension.jdbc.SqlLogRegistry";
+	protected static final String NAME_SqlLogRegistryImpl = PKG_ORG_SEASAR + "extension.jdbc.impl.SqlLogRegistryImpl";
+	protected static final String NAME_SqlLog = PKG_ORG_SEASAR + "extension.jdbc.SqlLog";
+	protected static final String NAME_SqlLogImpl = PKG_ORG_SEASAR + "extension.jdbc.impl.SqlLogImpl";
 	static {
 	    forNameContainerSqlLogRegistryLocator();
 	}
