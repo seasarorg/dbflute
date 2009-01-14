@@ -28,7 +28,7 @@ public class S2SqlLogRegistry {
     protected static final String NAME_SqlLogRegistryImpl = PKG_ORG_SEASAR + "extension.jdbc.impl.SqlLogRegistryImpl";
     protected static final String NAME_SqlLog = PKG_ORG_SEASAR + "extension.jdbc.SqlLog";
     protected static final String NAME_SqlLogImpl = PKG_ORG_SEASAR + "extension.jdbc.impl.SqlLogImpl";
-    protected static boolean exists = false;
+    protected static final boolean exists;
     static {
         exists = forNameContainerSqlLogRegistryLocator() != null;
     }
