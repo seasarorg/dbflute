@@ -50,7 +50,7 @@
 
     <mkdir dir="dist"/>
 
-    <delete file="dist/dbflute-runtime.jar-*"/>
-    <jar jarfile="dist/dbflute-runtime.jar-${version}" basedir="target/classes"></jar>
+    <delete file="dist/dbflute-runtime-*.jar"/>
+    <jar jarfile="dist/dbflute-runtime-${version}.jar" basedir="target/classes"></jar>
   </target>
 </project>

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingResultBean;
 import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.SubQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
@@ -15,8 +16,10 @@ import com.example.dbflute.basic.dbflute.cbean.MemberLoginCB;
 import com.example.dbflute.basic.dbflute.cbean.MemberStatusCB;
 import com.example.dbflute.basic.dbflute.exbhv.MemberBhv;
 import com.example.dbflute.basic.dbflute.exbhv.MemberStatusBhv;
+import com.example.dbflute.basic.dbflute.exbhv.pmbean.UnpaidSummaryMemberPmb;
 import com.example.dbflute.basic.dbflute.exentity.Member;
 import com.example.dbflute.basic.dbflute.exentity.MemberStatus;
+import com.example.dbflute.basic.dbflute.exentity.customize.UnpaidSummaryMember;
 import com.example.dbflute.basic.unit.ContainerTestCase;
 
 /**
@@ -166,5 +169,43 @@ public class PinpointTest extends ContainerTestCase {
 
         // ## Act & Assert ##
         memberStatusBhv.update(memberStatus); // Expect no exception!
+    }
+    
+    public void test_conditionBean_paging_disablePagingReSelect_Tx() {
+        // ## Arrange ##
+        MemberCB cb = new MemberCB();
+        cb.query().addOrderBy_MemberName_Asc();
+        cb.paging(4, 99999);// The page size is 4 records per 1 page, and The page number is 3.
+        cb.disablePagingReSelect();
+
+        // ## Act ##
+        PagingResultBean<Member> page99999 = memberBhv.selectPage(cb);
+
+        // ## Assert ##
+        assertTrue(page99999.isEmpty());
+    }
+    
+    public void test_outsideSql_paging_disablePagingReSelect_Tx() {
+        // ## Arrange ##
+        // SQLのパス
+        String path = MemberBhv.PATH_selectUnpaidSummaryMember;
+
+        // 検索条件
+        UnpaidSummaryMemberPmb pmb = new UnpaidSummaryMemberPmb();
+        pmb.setMemberStatusCode_Formalized();// 正式会員
+        pmb.disablePagingReSelect();
+
+        // 戻り値Entityの型
+        Class<UnpaidSummaryMember> entityType = UnpaidSummaryMember.class;
+
+        // ## Act ##
+        // SQL実行！
+        int pageSize = 3;
+        pmb.paging(pageSize, 99999);
+        PagingResultBean<UnpaidSummaryMember> page99999 = memberBhv.outsideSql().autoPaging().selectPage(path, pmb,
+                entityType);
+
+        // ## Assert ##
+        assertTrue(page99999.isEmpty());
     }
 }

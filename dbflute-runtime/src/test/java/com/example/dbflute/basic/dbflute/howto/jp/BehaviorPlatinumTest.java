@@ -39,6 +39,7 @@ import com.example.dbflute.basic.dbflute.exentity.MemberStatus;
 import com.example.dbflute.basic.dbflute.exentity.Product;
 import com.example.dbflute.basic.dbflute.exentity.Purchase;
 import com.example.dbflute.basic.dbflute.exentity.customize.SimpleMember;
+import com.example.dbflute.basic.dbflute.exentity.customize.UnpaidSummaryMember;
 import com.example.dbflute.basic.unit.ContainerTestCase;
 
 /**
@@ -66,6 +67,8 @@ import com.example.dbflute.basic.unit.ContainerTestCase;
  *   o 外だしSQLでBooleanでないIFコメントの場合の挙動と専用メッセージ: IfCommentNotBooleanResultException.
  *   o 外だしSQLで間違ったIFコメントの場合の挙動と専用メッセージ: IfCommentWrongExpressionException.
  *   o 共通カラムの自動設定を無視して明示的に登録(or 更新): disableCommonColumnAutoSetup().
+ *   o ページングの超過ページ番号での検索時の再検索を無効化(ConditionBean): disablePagingReSelect().
+ *   o ページングの超過ページ番号での検索時の再検索を無効化(OutsideSql): disablePagingReSelect().
  *   o Entityリストの件数ごとのグルーピング: ListResultBean.groupingList().
  *   o Entityリストのグルーピング(コントロールブレイク): ListResultBean.groupingList(), determine().
  * </pre>
@@ -777,8 +780,8 @@ public class BehaviorPlatinumTest extends ContainerTestCase {
     }
 
     // ===================================================================================
-    //                                                                       Common Column
-    //                                                                       =============
+    //                                                            Common Column Auto Setup
+    //                                                            ========================
     /**
      * 共通カラムの自動設定を無視して明示的に登録(or 更新): disableCommonColumnAutoSetup().
      */
@@ -830,6 +833,53 @@ public class BehaviorPlatinumTest extends ContainerTestCase {
         log("updateProcess = " + updateProcess);
         assertNotNull(updateProcess);
         assertEquals("suppressUpdateProcess", updateProcess);
+    }
+
+    // ===================================================================================
+    //                                                                    Paging Re-Select
+    //                                                                    ================
+    /**
+     * ページングの超過ページ番号での検索時の再検索を無効化(ConditionBean): disablePagingReSelect().
+     */
+    public void test_conditionBean_paging_disablePagingReSelect_Tx() {
+        // ## Arrange ##
+        MemberCB cb = new MemberCB();
+        cb.query().addOrderBy_MemberName_Asc();
+        cb.paging(4, 99999);
+        cb.disablePagingReSelect();
+
+        // ## Act ##
+        PagingResultBean<Member> page99999 = memberBhv.selectPage(cb);
+
+        // ## Assert ##
+        assertTrue(page99999.isEmpty());
+    }
+    
+    /**
+     * ページングの超過ページ番号での検索時の再検索を無効化(OutsideSql): disablePagingReSelect().
+     */
+    public void test_outsideSql_paging_disablePagingReSelect_Tx() {
+        // ## Arrange ##
+        // SQLのパス
+        String path = MemberBhv.PATH_selectUnpaidSummaryMember;
+
+        // 検索条件
+        UnpaidSummaryMemberPmb pmb = new UnpaidSummaryMemberPmb();
+        pmb.setMemberStatusCode_Formalized();// 正式会員
+        pmb.disablePagingReSelect();
+
+        // 戻り値Entityの型
+        Class<UnpaidSummaryMember> entityType = UnpaidSummaryMember.class;
+
+        // ## Act ##
+        // SQL実行！
+        int pageSize = 3;
+        pmb.paging(pageSize, 99999);
+        PagingResultBean<UnpaidSummaryMember> page99999 = memberBhv.outsideSql().autoPaging().selectPage(path, pmb,
+                entityType);
+
+        // ## Assert ##
+        assertTrue(page99999.isEmpty());
     }
     
     // ===================================================================================
