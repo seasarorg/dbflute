@@ -2,11 +2,9 @@ package org.seasar.dbflute.twowaysql;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -169,136 +167,7 @@ public class CompleteSqlBuilder {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    public static String nullText() {
-        return NULL;
-    }
-
-    public static String toText(Number value) {
-        if (value == null) {
-            return NULL;
-        }
-        return value.toString();
-    }
-
-    public static String toText(Boolean value) {
-        if (value == null) {
-            return NULL;
-        }
-        return quote(value.toString());
-    }
-
-    public static String toText(String value) {
-        if (value == null) {
-            return NULL;
-        }
-        return quote(value);
-    }
-
-    public static String toText(Date value) {
-        if (value == null) {
-            return NULL;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(value);
-        StringBuilder buf = new StringBuilder();
-        addDate(buf, calendar);
-        return quote(buf.toString());
-    }
-
-    public static String toText(Time value) {
-        if (value == null) {
-            return NULL;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(value);
-        StringBuilder buf = new StringBuilder();
-        addTime(buf, calendar);
-        addTimeDecimalPart(buf, calendar.get(Calendar.MILLISECOND));
-        return quote(buf.toString());
-    }
-
-    public static String toText(Timestamp value) {
-        if (value == null) {
-            return NULL;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(value);
-        StringBuilder buf = new StringBuilder(30);
-        addDate(buf, calendar);
-        addTime(buf, calendar);
-        addTimeDecimalPart(buf, value.getNanos());
-        return quote(buf.toString());
-    }
-
-    public static String toText(byte[] value) {
-        if (value == null) {
-            return NULL;
-        }
-        return quote(value.toString() + "(byteLength=" + Integer.toString(value.length) + ")");
-    }
-
-    public static String toText(Object value) {
-        if (value == null) {
-            return NULL;
-        }
-        return quote(value.toString());
-    }
-
-	// yyyy-mm-dd
-    protected static void addDate(StringBuilder buf, Calendar calendar) {
-        int year = calendar.get(Calendar.YEAR);
-        buf.append(year);
-        buf.append('-');
-        int month = calendar.get(Calendar.MONTH) + 1;
-        if (month < 10) {
-            buf.append('0');
-        }
-        buf.append(month);
-        buf.append('-');
-        int date = calendar.get(Calendar.DATE);
-        if (date < 10) {
-            buf.append('0');
-        }
-        buf.append(date);
-    }
-
-	// hh:mm:ss
-    protected static void addTime(StringBuilder buf, Calendar calendar) {
-        if (buf.length() > 0) {
-            buf.append(' ');
-        }
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        if (hour < 10) {
-            buf.append('0');
-        }
-        buf.append(hour);
-        buf.append(':');
-        int minute = calendar.get(Calendar.MINUTE);
-        if (minute < 10) {
-            buf.append('0');
-        }
-        buf.append(minute);
-        buf.append(':');
-        int second = calendar.get(Calendar.SECOND);
-        if (second < 10) {
-            buf.append('0');
-        }
-        buf.append(second);
-    }
-
-	// .000
-    protected static void addTimeDecimalPart(StringBuilder buf, int decimalPart) {
-        if (decimalPart == 0) {
-            return;
-        }
-        if (buf.length() > 0) {
-            buf.append('.');
-        }
-        buf.append(decimalPart);
-    }
-
-	// 'text'
     protected static String quote(String text) {
-        return "'" + text + "'";
+        return "'" + text + "'"; // 'text'
     }
 }

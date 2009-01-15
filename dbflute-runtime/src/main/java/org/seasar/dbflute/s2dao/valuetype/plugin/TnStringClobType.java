@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
-import org.seasar.dbflute.twowaysql.CompleteSqlBuilder;
 import org.seasar.dbflute.util.DfResourceUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -89,10 +88,10 @@ public class TnStringClobType extends TnAbstractValueType {
 
     public String toText(Object value) {
         if (value == null) {
-            return CompleteSqlBuilder.nullText();
+            return DfTypeUtil.nullText();
         }
         String var = DfTypeUtil.toString(value);
-        return CompleteSqlBuilder.toText(var);
+        return DfTypeUtil.toText(var);
     }
 
 }
