@@ -110,6 +110,7 @@ public class Database {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
+    protected Integer _version;
     protected String _name;
 
     // -----------------------------------------------------
@@ -140,7 +141,14 @@ public class Database {
     // protected String _defaultIdMethod;
     // protected String _defaultJavaType;
     // protected boolean _isHeavyIndexing;
-
+    
+    // ===================================================================================
+    //                                                                             Version
+    //                                                                             =======
+    public void initializeVersion(Integer version) {
+        DfBuildProperties.getInstance().setVersion(version);
+    }
+    
     // ===================================================================================
     //                                                                             Loading
     //                                                                             =======
@@ -331,28 +339,19 @@ public class Database {
     public String getPmbMetaDataSuperClassDefinition(String className) {
         assertArgumentPmbMetaDataClassName(className);
         final DfParameterBeanMetaData metaData = findPmbMetaData(className);
-        final String superClassName = metaData.getSuperClassName();
+        String superClassName = metaData.getSuperClassName();
         if (superClassName == null || superClassName.trim().length() == 0) {
             return "";
+        }
+        if (DfBuildProperties.getInstance().isVersionJavaOverNinety()) { // as patch for 90
+            if (superClassName.contains("SimplePagingBean")) {
+                superClassName = "org.seasar.dbflute.cbean.SimplePagingBean";
+            }
         }
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
         return languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName + " ";
     }
     
-    public String getPmbMetaDataSuperClassDefinitionNinety(String className) { // as patch for 90
-        assertArgumentPmbMetaDataClassName(className);
-        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
-        String superClassName = metaData.getSuperClassName();
-        if (superClassName == null || superClassName.trim().length() == 0) {
-            return "";
-        }
-        if (superClassName.contains("SimplePagingBean")) {
-            superClassName = "org.seasar.dbflute.cbean.SimplePagingBean";
-        }
-        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        return languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName + " ";
-    }
-
     public Map<String, String> getPmbMetaDataPropertyNameTypeMap(String className) {
         assertArgumentPmbMetaDataClassName(className);
         final DfParameterBeanMetaData metaData = findPmbMetaData(className);
@@ -1007,7 +1006,7 @@ public class Database {
         return getProperties().getDependencyInjectionProperties().getDBFluteBeansFileName();
     }
 
-    public List<String> getDBFluteBeansackageNameList() {
+    public List<String> getDBFluteBeansPackageNameList() {
         return getProperties().getDependencyInjectionProperties().getDBFluteBeansPackageNameList();
     }
 

@@ -17,6 +17,7 @@ targetdatabase = $targetDatabase
     ## - - - - - - - - - - - -
     ## Initialize properties.
     ## - - - - - - - - - - - -
+    $database.initializeVersion(90)
     $database.initializeClassificationDeployment()
 
     ## *****************************************************************************************************************

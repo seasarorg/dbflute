@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
@@ -294,8 +295,13 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
                 value = DfStringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
             }
             if (value != null && value.contains("$$AccessContext$$")) {
-                final String accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
-                value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
+                if (DfBuildProperties.getInstance().isVersionJavaOverNinety()) { // as patch for 90
+                    final String accessContext = "org.seasar.dbflute.AccessContext";
+                    value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
+                } else {
+                    final String accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
+                    value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
+                }
             }
             final String prefixMark = COMMON_COLUMN_SETUP_RESOURCE_PREFIX_MARK;
             final String secondMark = COMMON_COLUMN_SETUP_RESOURCE_SECOND_MARK;

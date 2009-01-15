@@ -11,8 +11,8 @@ import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import ${glPackageBaseCommon}.${glDBFluteConfig};
-import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
 import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
+import ${glPackageBaseCommon}.${glImplementedSqlClauseCreator};
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
 #if ($table.hasForeignKeyOrReferrerAsOne())
@@ -28,14 +28,14 @@ public class ${myClassName} extends ${glAbstractConditionBean} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private final ${glDBMetaProvider} _dbmetaProvider = new ${glDBMetaInstanceHandler}();
+    private final DBMetaProvider _dbmetaProvider = new DBMetaInstanceHandler();
     protected ${myConditionQueryClassName} _conditionQuery;
 
     // ===================================================================================
     //                                                                           SqlClause
     //                                                                           =========
     @Override
-    protected ${glSqlClause} createSqlClause() {
+    protected SqlClause createSqlClause() {
         return new ${glImplementedSqlClauseCreator}().createSqlClause(this);
     }
     
@@ -43,7 +43,7 @@ public class ${myClassName} extends ${glAbstractConditionBean} {
     //                                                                     DBMeta Provider
     //                                                                     ===============
     @Override
-    protected ${glDBMetaProvider} getDBMetaProvider() {
+    protected DBMetaProvider getDBMetaProvider() {
         return _dbmetaProvider;
     }
 

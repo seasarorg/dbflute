@@ -183,4 +183,8 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     public void setBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
     }
+
+    public void setDataSource(DataSource dataSource) {
+        _dataSource = dataSource;
+    }
 }

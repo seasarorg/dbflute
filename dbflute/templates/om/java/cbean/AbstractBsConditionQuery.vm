@@ -9,8 +9,9 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 #if ($table.hasClassification())
-import ${glPackageBaseCommon}.${glCDef};
+import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
 #end
+import ${glPackageBaseCommon}.*;
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
 
@@ -23,12 +24,12 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final ${glDBMetaProvider} _dbmetaProvider = new ${glDBMetaInstanceHandler}();
+    protected final DBMetaProvider _dbmetaProvider = new ${glDBMetaInstanceHandler}();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
+    public ${myClassName}(ConditionQuery childQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
         super(childQuery, sqlClause, aliasName, nestLevel);
     }
 
@@ -36,7 +37,7 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
     //                                                                     DBMeta Provider
     //                                                                     ===============
     @Override
-    protected ${glDBMetaProvider} getDBMetaProvider() {
+    protected DBMetaProvider getDBMetaProvider() {
         return _dbmetaProvider;
     }
 
@@ -186,7 +187,7 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glLikeSearchOption} likeSearchOption) {
+    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
     }
 #end
@@ -197,7 +198,7 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, ${glPackageBaseCommonCOption}.${glLikeSearchOption} likeSearchOption) {
+    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
         regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
     }
 #end
@@ -697,7 +698,7 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
      * @param toDate The to-date of ${col.uncapitalisedJavaName}. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void set${tmpJavaName}_FromTo(java.util.Date fromDate, java.util.Date toDate, ${glPackageBaseCommonCOption}.${glFromToOption} fromToOption) {
+    public void set${tmpJavaName}_FromTo(java.util.Date fromDate, java.util.Date toDate, org.seasar.dbflute.cbean.coption.FromToOption fromToOption) {
 #if ($col.javaNative == "java.util.Date")
         registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", fromToOption);
 #else
@@ -711,7 +712,7 @@ public abstract class ${myClassName} extends ${glAbstractConditionQuery} {
      * @param toDate The to-date of ${col.uncapitalisedJavaName}. (Nullable)
      */
     public void set${tmpJavaName}_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
-        set${tmpJavaName}_FromTo(fromDate, toDate, new ${glPackageBaseCommonCOption}.${glDateFromToOption}());
+        set${tmpJavaName}_FromTo(fromDate, toDate, new org.seasar.dbflute.cbean.coption.DateFromToOption());
     }
 #end
 #end
