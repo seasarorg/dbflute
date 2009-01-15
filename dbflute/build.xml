@@ -93,7 +93,9 @@
     </tstamp>
 
     <delete file="etc/mark/product-is-dbflute-*"/>
-    <copy filtering="" file="etc/mark/product-is-dbflute" tofile="etc/mark/product-is-dbflute-${version}">
+    <copy file="etc/mark/product-is-dbflute"
+    	  tofile="etc/mark/product-is-dbflute-${version}"
+    	  overwrite="true">
 	  <filterset>
 	    <filter token="version" value="${internal.version}" />
 	    <filter token="datetime" value="${now.date}" />
