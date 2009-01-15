@@ -136,16 +136,17 @@
   	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-limit-runtime" depends="expand-dist" description="==> reflect to basic example">
+  <target name="reflect-mac-limit-runtime" depends="expand-dist" description="==> reflect to runtime project">
     <copy todir="${dbflute.runtime.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.runtime.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-win-limit-spring" depends="expand-dist" description="==> reflect to test application">
+  <target name="reflect-mac-limit-spring" depends="expand-dist" description="==> reflect to spring application">
     <copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
+  	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 </project>

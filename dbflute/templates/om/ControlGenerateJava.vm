@@ -478,13 +478,9 @@ targetdatabase = $targetDatabase
     #end
 
     #if ($database.hasClassificationDefinitionMap())
-      $database.info("parseAllcommonClassification() {")
-
       $database.info("    parse('CDef');")
       #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCDef}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/allcommon/CDef.${glTemplateFileExtension}",$path ,"" ,"")
-
-      $database.info("}")
     #end
 
     $database.info("    parse('DBCurrent');")
@@ -519,7 +515,7 @@ targetdatabase = $targetDatabase
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedInvokerAssistant}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedInvokerAssistant.${glTemplateFileExtension}",$path,"", "")
 
-    $database.info("parse('ImplementedSqlClauseCreator');")
+    $database.info("    parse('ImplementedSqlClauseCreator');")
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedSqlClauseCreator}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/allcommon/ImplementedSqlClauseCreator.${glTemplateFileExtension}",$path ,"" ,"")
 
