@@ -69,7 +69,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
             final DatabaseMetaData metaData = conn.getMetaData();
             return createBeanMetaData(metaData, beanClass, relationNestLevel);
         } catch (SQLException e) {
-            new SQLExceptionHandler().handleSQLException(e, null);
+            new SQLExceptionHandler().handleSQLException(e);
             return null; // Unreachable!
         } finally {
             if (conn != null) {

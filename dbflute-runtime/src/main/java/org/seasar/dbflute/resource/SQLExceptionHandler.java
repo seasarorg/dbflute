@@ -14,7 +14,14 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * @author DBFlute(AutoGenerator)
  */
 public class SQLExceptionHandler {
-
+    
+    /**
+     * @param e The instance of SQLException. (NotNull)
+     */
+    public void handleSQLException(SQLException e) {
+        handleSQLException(e, null, false);
+    }
+    
     /**
      * @param e The instance of SQLException. (NotNull)
      * @param statement The instance of statement. (Nullable)
