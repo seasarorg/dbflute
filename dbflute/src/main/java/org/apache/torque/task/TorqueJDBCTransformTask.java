@@ -216,8 +216,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ ");
 
         if (tableList.isEmpty()) {
-            String msg = "Not found tables: url=" + _url + " schema=" + _schema;
-            throw new IllegalStateException(msg);
+            throwTableNotFoundException();
         }
 
         _databaseNode = _doc.createElement("database");
@@ -406,6 +405,34 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ Object Types: {" + typeString + "}");
     }
 
+    protected void throwTableNotFoundException() {
+        String msg = "Look! Read the message below." + getLineSeparator();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        msg = msg + "The tables was was Not Found in the schema!" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Advice]" + getLineSeparator();
+        msg = msg + "Please confirm the database connection settings." + getLineSeparator();
+        msg = msg + "If you've not created the schema yet, please create it." + getLineSeparator();
+        msg = msg + "You can create easily by using replace-schema." + getLineSeparator();
+        msg = msg + "Set up ./playsql/replace-schema.sql and execute ReplaceSchema task." + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Connection Settings]" + getLineSeparator();
+        msg = msg + " driver = " + _driver + getLineSeparator();
+        msg = msg + " url    = " + _url + getLineSeparator();
+        msg = msg + " schema = " + _schema + getLineSeparator();
+        msg = msg + " user   = " + _userId + getLineSeparator();
+        msg = msg + "* * * * * * * * * */";
+        throw new TableNotFoundException(msg);
+    }
+
+    public static class TableNotFoundException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public TableNotFoundException(String msg) {
+            super(msg);
+        }
+    }
+
     protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
         columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo));
     }
@@ -552,8 +579,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @return The list of unique columns. (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta,
-            DfTableMetaInfo tableMetaInfo) throws SQLException {
+    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
+            throws SQLException {
         final String schema = getHandlerUseSchema(tableMetaInfo);
         return _uniqueKeyHandler.getUniqueKeyMap(dbMeta, schema, tableMetaInfo);
     }
