@@ -5,10 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.seasar.dbflute.util.DfSystemUtil;
-import javax.sql.XADataSource;
-#if ($database.isTargetContainerSeasar())
-import org.seasar.extension.dbcp.impl.XADataSourceImpl;
-#end
 
 /**
  * @author ${database.ClassAuthor}
@@ -26,16 +22,12 @@ public class ${glDBFluteInitializer} {
     //                                                                         ===========
     /**
      * Constructor. And initialize various components.
-     * @param xaDataSource The data source of XA. (Nullable)
      */
-    public ${glDBFluteInitializer}(XADataSource xaDataSource) {
+    public ${glDBFluteInitializer}() {
         _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
         ${glDBFluteConfig}.getInstance().unlock();
         handleSqlLogRegistry();
         loadCoolClasses();
-        if (xaDataSource != null) {
-            showInformation(xaDataSource);
-        }
         ${glDBFluteConfig}.getInstance().lock();
         _log.info("* * * * */");
     }
@@ -68,34 +60,6 @@ public class ${glDBFluteInitializer} {
                 TnSqlLogRegistry.closeRegistration();
             }
         }
-    }
-
-    // ===================================================================================
-    //                                                                         Information
-    //                                                                         ===========
-    protected void showInformation(XADataSource xaDataSource) {
-#if ($database.isTargetContainerSeasar())
-        if (xaDataSource != null && xaDataSource instanceof XADataSourceImpl) { // by Seasar
-            final StringBuilder sb = new StringBuilder();
-            final XADataSourceImpl xaDataSourceImpl = (XADataSourceImpl)xaDataSource;
-            final String driverClassName = xaDataSourceImpl.getDriverClassName();
-            final String url = xaDataSourceImpl.getURL();
-            final String user = xaDataSourceImpl.getUser();
-            sb.append("  [XADataSource]:").append(getLineSeparator());
-            sb.append("    driver = " + driverClassName).append(getLineSeparator());
-            sb.append("    url    = " + url).append(getLineSeparator());
-            sb.append("    user   = " + user);
-            _log.info("{Injection Information}" + getLineSeparator() + sb);
-        }
-#end
-#if ($database.isTargetContainerSpring())
-        if (xaDataSource != null) { // by Spring
-            final StringBuilder sb = new StringBuilder();
-            sb.append("  [XADataSource]:").append(getLineSeparator());
-            sb.append("    " + xaDataSource).append(getLineSeparator());
-            _log.info("{Injection Information}" + getLineSeparator() + sb);
-        }
-#end
     }
 
     // ===================================================================================
