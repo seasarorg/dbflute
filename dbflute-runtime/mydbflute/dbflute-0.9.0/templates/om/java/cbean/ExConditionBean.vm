@@ -1,0 +1,14 @@
+${database.allClassCopyright}package ${glPackageCB};
+
+#set ($myClassName = "${myConditionBeanClassName}")
+
+/**
+ * The condition-bean of ${table.name}.
+ * <p>
+ * You can implement your original methods here.
+ * This class remains when re-generating.
+ * </p>
+ * @author ${database.ClassAuthor}
+ */
+public class ${myClassName} extends ${glPackageBaseCB}.${myBaseConditionBeanClassName} {
+}

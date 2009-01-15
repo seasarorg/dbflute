@@ -9,13 +9,12 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
-import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.seasar.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 import org.seasar.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl;
+
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 
@@ -34,9 +33,9 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     protected StatementFactory _statementFactory;
     protected TnBeanMetaDataFactory _beanMetaDataFactory;
     protected TnValueTypeFactory _valueTypeFactory;
-
-    protected boolean _disposable;
     
+    protected boolean _disposable;
+
     // ===================================================================================
     //                                                                 Assistant Main Work
     //                                                                 ===================
@@ -55,7 +54,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
         _dbmetaProvider = createDBMetaProvider();
         return _dbmetaProvider;
     }
-    
+
     protected DBMetaProvider createDBMetaProvider() {
         return new DBMetaInstanceHandler();
     }
@@ -151,7 +150,7 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
                     // Register for ValueTypes
                     DisposableUtil.add(new Disposable() {
                         public void dispose() {
-                            TnValueTypes.clear();
+                            ValueTypes.clear();
                         }
                     });
                     _disposable = true;
@@ -177,11 +176,11 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setDataSource(DataSource dataSource) {
-        _dataSource = dataSource;
-    }
-
     public void setBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
         _behaviorCommandInvoker = behaviorCommandInvoker;
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        _dataSource = dataSource;
     }
 }

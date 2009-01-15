@@ -14,10 +14,8 @@ import org.seasar.dbflute.cbean.PagingResultBean;
 import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementConfig;
-
+import com.example.dbflute.basic.dbflute.allcommon.*;
 import com.example.dbflute.basic.dbflute.exentity.*;
-import com.example.dbflute.basic.dbflute.allcommon.DBCurrent;
-import com.example.dbflute.basic.dbflute.allcommon.DBFluteConfig;
 import com.example.dbflute.basic.dbflute.bsentity.dbmeta.*;
 import com.example.dbflute.basic.dbflute.cbean.*;
 
@@ -143,8 +141,8 @@ public abstract class BsPurchaseBhv extends org.seasar.dbflute.bhv.AbstractBehav
      * Select the entity with deleted check. {by primary-key value}
      * @param primaryKey The keys of primary.
      * @return The selected entity. (NotNull)
-     * @exception com.example.dbflute.basic.dbflute.allcommon.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception com.example.dbflute.basic.dbflute.allcommon.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public Purchase selectByPKValueWithDeletedCheck(Long purchaseId) {
         Purchase entity = new Purchase();

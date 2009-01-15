@@ -1,0 +1,121 @@
+${database.allClassCopyright}package ${myBaseEntityPackageName} {
+#set ($myClassName = "${myBaseObjectClassName}")
+
+import ${myExtendedEntityPackageName}.*;
+
+/**
+ * The flex DTO of ${table.basicInfoDispString}.
+ * <pre>
+ * [primary-key]
+ *     ${table.primaryKeyNameCommaString}
+ * 
+ * [column]
+ *     ${table.columnNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.definedSequenceName}
+ * 
+ * [identity]
+ *     ${table.identityColumnName}
+ * 
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ * 
+ * [foreign-table]
+ *     ${table.foreignTableNameCommaString}
+ * 
+ * [referrer-table]
+ *     ${table.referrerTableNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
+ * </pre>
+ * @author ${database.ClassAuthor}
+ */
+#if ($table.isFlexDtoBindable())
+[Bindable]
+#end
+public class $myClassName {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($col in $table.columns)
+    private var _${col.uncapitalisedJavaName}:${col.flexNative};
+
+#end
+
+    // ===================================================================================
+    //                                                                       Foreign Table
+    //                                                                       =============
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
+#set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKey.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
+    private var ${foreignVariableName}:${foreignEntityClassName};
+
+    public function get ${foreignKey.foreignJavaBeansRulePropertyName}():${foreignEntityClassName} {
+        return ${foreignVariableName};
+    }
+
+    public function set ${foreignKey.foreignJavaBeansRulePropertyName}(${foreignKey.foreignPropertyName}:${foreignEntityClassName}):void {
+        ${foreignVariableName} = ${foreignKey.foreignPropertyName};
+    }
+
+#end
+#foreach ($referrer in $table.referrers)
+#set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
+#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#if ($referrer.isOneToOne())
+    private var ${referrerVariableName}:${referrerEntityClassName};
+
+    public function get ${referrer.refererJavaBeansRulePropertyNameAsOne}():${referrerEntityClassName} {
+        return ${referrerVariableName};
+    }
+
+    public function set ${referrer.refererJavaBeansRulePropertyNameAsOne}(${referrer.refererJavaBeansRulePropertyNameAsOne}:${referrerEntityClassName}):void {
+        ${referrerVariableName} = ${referrer.refererJavaBeansRulePropertyNameAsOne};
+    }
+#end
+#end
+    // ===================================================================================
+    //                                                                      Referrer Table
+    //                                                                      ==============
+#foreach ($referrer in $table.referrers)
+#set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
+#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#set ($referrerEntityLongClassName = "${referrerEntityClassName}")
+#if (!${referrer.isOneToOne()})
+    ${referrerEntityClassName};
+    protected var ${referrerVariableName}:Array;/* of the entity '${referrerEntityClassName}'. */
+
+    public function get ${referrer.refererJavaBeansRulePropertyName}():Array {
+        if (${referrerVariableName} == null) { ${referrerVariableName} = new Array(); }
+        return ${referrerVariableName};
+    }
+
+    public function set ${referrer.refererJavaBeansRulePropertyName}(${referrer.referrerPropertyName}:Array):void {
+        this.${referrerVariableName} = ${referrer.referrerPropertyName};
+    }
+
+#end
+#end
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#foreach ($col in $table.columns)
+    public function get ${col.uncapitalisedJavaName}():${col.flexNative} {
+        return _${col.uncapitalisedJavaName};
+    }
+
+    public function set ${col.uncapitalisedJavaName}(${col.uncapitalisedJavaName}:${col.flexNative}):void {
+        this._${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
+    }
+
+#end
+}
+
+}

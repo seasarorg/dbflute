@@ -3,7 +3,7 @@ package com.example.dbflute.basic.dbflute.allcommon;
 import org.seasar.dbflute.Entity;
 
 /**
- * The interface of entity defined common column.
+ * The interface of entity defined common columns.
  * @author DBFlute(AutoGenerator)
  */
 public interface EntityDefinedCommonColumn extends Entity {

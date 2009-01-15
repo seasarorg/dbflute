@@ -5,7 +5,6 @@ import org.seasar.dbflute.cbean.ckey.*;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-
 import com.example.dbflute.basic.dbflute.cbean.*;
 import com.example.dbflute.basic.dbflute.cbean.cq.bs.*;
 import com.example.dbflute.basic.dbflute.cbean.cq.*;

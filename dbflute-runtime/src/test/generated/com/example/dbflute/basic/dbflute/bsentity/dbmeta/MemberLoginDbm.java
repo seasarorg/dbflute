@@ -7,7 +7,6 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.AbstractDBMeta;
 import org.seasar.dbflute.dbmeta.info.*;
 import org.seasar.dbflute.helper.StringKeyMap;
-
 import com.example.dbflute.basic.dbflute.exentity.MemberLogin;
 
 /**

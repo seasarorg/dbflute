@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DBDef;
 
-
 /**
  * @author DBFlute(AutoGenerator)
  */
@@ -43,7 +42,7 @@ public class DBCurrent {
     //                                                                           Singleton
     //                                                                           =========
     /**
-     * Get instance.
+     * Get singleton instance.
      * @return Singleton instance. (NotNull)
      */
     public static DBCurrent getInstance() {

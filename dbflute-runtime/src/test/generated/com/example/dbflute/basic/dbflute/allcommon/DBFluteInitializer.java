@@ -1,12 +1,11 @@
 package com.example.dbflute.basic.dbflute.allcommon;
 
-import javax.sql.XADataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.seasar.dbflute.util.DfSystemUtil;
+import javax.sql.XADataSource;
 import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 
 /**

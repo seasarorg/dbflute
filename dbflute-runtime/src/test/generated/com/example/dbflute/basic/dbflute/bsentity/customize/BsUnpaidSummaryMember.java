@@ -5,7 +5,6 @@ import java.util.*;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 
-
 /**
  * The entity of UnpaidSummaryMember that the type is null. <br />
  * <pre>

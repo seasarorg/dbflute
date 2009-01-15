@@ -46,7 +46,7 @@ public class DBFluteConfig {
     //                                                                           Singleton
     //                                                                           =========
     /**
-     * Get instance.
+     * Get singleton instance.
      * @return Singleton instance. (NotNull)
      */
     public static DBFluteConfig getInstance() {

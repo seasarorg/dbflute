@@ -3,7 +3,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.seasar.dbflute.jdbc.CursorHandler;
-
 import com.example.dbflute.basic.dbflute.exbhv.cursor.PurchaseSummaryMemberCursor;
 
 /**

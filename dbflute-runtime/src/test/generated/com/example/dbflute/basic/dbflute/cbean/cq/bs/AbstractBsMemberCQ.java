@@ -7,9 +7,8 @@ import org.seasar.dbflute.cbean.ckey.*;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
-
-import com.example.dbflute.basic.dbflute.allcommon.CDef;
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
+import com.example.dbflute.basic.dbflute.allcommon.*;
 import com.example.dbflute.basic.dbflute.cbean.*;
 import com.example.dbflute.basic.dbflute.cbean.cq.*;
 

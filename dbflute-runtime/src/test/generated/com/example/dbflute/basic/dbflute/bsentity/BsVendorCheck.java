@@ -4,9 +4,7 @@ import java.util.*;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
-
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
-
 
 /**
  * The entity of VENDOR_CHECK that the type is TABLE. <br />

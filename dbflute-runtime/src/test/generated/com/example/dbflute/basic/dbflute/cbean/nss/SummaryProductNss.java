@@ -1,7 +1,6 @@
 package com.example.dbflute.basic.dbflute.cbean.nss;
 
 import org.seasar.dbflute.cbean.ConditionQuery;
-
 import com.example.dbflute.basic.dbflute.cbean.cq.SummaryProductCQ;
 
 /**

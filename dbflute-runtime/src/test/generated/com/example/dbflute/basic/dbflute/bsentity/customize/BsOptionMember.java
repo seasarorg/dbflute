@@ -2,11 +2,9 @@ package com.example.dbflute.basic.dbflute.bsentity.customize;
 
 import java.util.*;
 
+import com.example.dbflute.basic.dbflute.allcommon.CDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
-
-import com.example.dbflute.basic.dbflute.allcommon.CDef;
-
 
 /**
  * The entity of OptionMember that the type is null. <br />

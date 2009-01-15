@@ -94,7 +94,7 @@ public class DBMetaInstanceHandler implements DBMetaProvider {
      * </pre>
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (NotNull)
-     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
+     * @exception ${glPackageBaseCommonException}.DBMetaNotFoundException When the DB meta is not found.
      */
     public static DBMeta findDBMeta(String tableFlexibleName) {
         DBMeta dbmeta = byTableFlexibleName(tableFlexibleName);
@@ -171,7 +171,7 @@ public class DBMetaInstanceHandler implements DBMetaProvider {
     /**
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (NotNull)
-     * @exception org.seasar.dbflute.exception.DBMetaNotFoundException When the DB meta is not found.
+     * @exception ${glPackageBaseCommonException}.DBMetaNotFoundException When the DB meta is not found.
      */
     public DBMeta provideDBMetaChecked(String tableFlexibleName) {
         return findDBMeta(tableFlexibleName);

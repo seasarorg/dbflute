@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 
-
 /**
  * The basic implementation of the auto set-upper of common column.
  * @author DBFlute(AutoGenerator)

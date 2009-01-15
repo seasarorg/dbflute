@@ -10,8 +10,9 @@ import org.seasar.dbflute.BehaviorSelector;
 import org.seasar.dbflute.bhv.BehaviorReadable;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.util.TraceViewUtil;
-import org.seasar.framework.container.ComponentNotFoundRuntimeException;
+
 import org.seasar.framework.container.S2Container;
+import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 
 /**
  * The implementation of behavior-selector.
@@ -22,7 +23,7 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log-instance. */
+    /** Log instance. */
     private static final Log _log = LogFactory.getLog(ImplementedBehaviorSelector.class);
 
     // ===================================================================================
@@ -42,18 +43,18 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
         assertObjectNotNull("componentType", componentType);
         assertObjectNotNull("_container", _container);
         try {
-            return (COMPONENT) _container.getComponent(componentType);
-        } catch (ComponentNotFoundRuntimeException e) { // Normally it doesn't come.
-            final COMPONENT component;
-            try {
-                // for HotDeploy Mode
-                component = (COMPONENT) _container.getRoot().getComponent(componentType);
-            } catch (ComponentNotFoundRuntimeException ignored) {
-                throw e;
-            }
-            _container = _container.getRoot(); // Change container.
-            return component;
-        }
+		    return (COMPONENT)_container.getComponent(componentType);
+		} catch (ComponentNotFoundRuntimeException e) { // Normally it doesn't come.
+		    final COMPONENT component;
+		    try {
+		        // for HotDeploy Mode
+		        component = (COMPONENT)_container.getRoot().getComponent(componentType);
+		    } catch (ComponentNotFoundRuntimeException ignored) {
+		        throw e;
+		    }
+		    _container = _container.getRoot(); // Change container.
+		    return component;
+		}
     }
 
     // ===================================================================================

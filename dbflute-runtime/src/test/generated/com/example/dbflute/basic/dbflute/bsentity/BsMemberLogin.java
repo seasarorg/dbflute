@@ -2,10 +2,9 @@ package com.example.dbflute.basic.dbflute.bsentity;
 
 import java.util.*;
 
+import com.example.dbflute.basic.dbflute.allcommon.CDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
-
-import com.example.dbflute.basic.dbflute.allcommon.CDef;
 import com.example.dbflute.basic.dbflute.allcommon.DBMetaInstanceHandler;
 import com.example.dbflute.basic.dbflute.exentity.*;
 

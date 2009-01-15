@@ -5,7 +5,6 @@ import java.sql.SQLException;
 
 import org.seasar.dbflute.util.DfTypeUtil;
 
-
 /**
  * The cursor of PurchaseSummaryMember.
  * @author DBFlute(AutoGenerator)

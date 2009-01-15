@@ -5,7 +5,6 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-
 import com.example.dbflute.basic.dbflute.cbean.cq.ciq.*;
 import com.example.dbflute.basic.dbflute.cbean.*;
 import com.example.dbflute.basic.dbflute.cbean.cq.*;

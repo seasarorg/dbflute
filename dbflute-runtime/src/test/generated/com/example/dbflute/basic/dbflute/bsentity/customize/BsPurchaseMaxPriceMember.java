@@ -5,7 +5,6 @@ import java.util.*;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 
-
 /**
  * The entity of PurchaseMaxPriceMember that the type is null. <br />
  * <pre>
