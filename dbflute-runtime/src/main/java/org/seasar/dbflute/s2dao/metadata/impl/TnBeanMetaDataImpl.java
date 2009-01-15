@@ -40,7 +40,9 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
  */
 public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaData {
 
+    /** The name of table. (NotNull: If it's not entity, this value is 'df:Unknown') */
     private String tableName;
+    
     private Map<String, TnPropertyType> columnNamePropertyTypeMap = StringKeyMap.createAsCaseInsensitiveConcurrent();
     private List<TnRelationPropertyType> relationPropertyTypes = new ArrayList<TnRelationPropertyType>();
     private TnPropertyType[] primaryKeys;
@@ -61,6 +63,9 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         setupPrimaryKey();
     }
 
+    /**
+     * @return The name of table. (NotNull: If it's not entity, this value is 'df:Unknown')
+     */
     public String getTableName() {
         return tableName;
     }
@@ -210,13 +215,12 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         if (ta != null) {
             tableName = ta;
         } else {
-            String msg = "The bean should have a table annotation: " + getBeanClass();
-            throw new IllegalStateException(msg);
+            tableName = "df:Unknown";
         }
     }
 
     protected void setupProperty() {
-        TnPropertyType[] propertyTypes = propertyTypeFactory.createBeanPropertyTypes(tableName);
+        TnPropertyType[] propertyTypes = propertyTypeFactory.createBeanPropertyTypes();
         for (int i = 0; i < propertyTypes.length; i++) {
             TnPropertyType pt = propertyTypes[i];
             addPropertyType(pt);

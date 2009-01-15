@@ -28,9 +28,16 @@ import org.seasar.dbflute.twowaysql.context.CommandContextPropertyAccessor;
  * @author jflute
  */
 public class CommandContextImpl implements CommandContext {
-
-    private StringKeyMap<Object> args = StringKeyMap.createAsCaseInsensitiveConcurrent();
-    private StringKeyMap<Class<?>> argTypes = StringKeyMap.createAsCaseInsensitiveConcurrent();
+    
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** The arguments. it should be allowed null value. */
+    private StringKeyMap<Object> args = StringKeyMap.createAsCaseInsensitive();
+    
+    /** The types of argument. it should be allowed null value. */
+    private StringKeyMap<Class<?>> argTypes = StringKeyMap.createAsCaseInsensitive();
+    
     private StringBuffer sqlBuf = new StringBuffer(100);
     private List<Object> bindVariables = new ArrayList<Object>();
     private List<Class<?>> bindVariableTypes = new ArrayList<Class<?>>();
@@ -41,6 +48,9 @@ public class CommandContextImpl implements CommandContext {
         OgnlRuntime.setPropertyAccessor(CommandContext.class, new CommandContextPropertyAccessor());
     }
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public CommandContextImpl() {
     }
 
@@ -49,6 +59,9 @@ public class CommandContextImpl implements CommandContext {
         enabled = false;
     }
 
+    // ===================================================================================
+    //                                                                    Context Handling
+    //                                                                    ================
     public Object getArg(String name) {
         if (args.containsKey(name)) {
             return args.get(name);

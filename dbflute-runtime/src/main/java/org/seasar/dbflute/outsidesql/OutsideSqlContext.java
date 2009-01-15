@@ -287,7 +287,7 @@ public class OutsideSqlContext {
     }
 
     protected boolean isBehaviorQueryPathEnabled() {
-        if (isProcedure()) {// [DBFlute-0.7.5]
+        if (isProcedure()) { // [DBFlute-0.7.5]
             return false;
         }
         return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && !_outsideSqlPath.contains(".") && _tableDbName != null;

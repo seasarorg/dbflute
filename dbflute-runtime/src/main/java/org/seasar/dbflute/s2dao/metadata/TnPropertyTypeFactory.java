@@ -23,6 +23,6 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 public interface TnPropertyTypeFactory {
 
     TnPropertyType[] createDtoPropertyTypes();
-    TnPropertyType[] createBeanPropertyTypes(String tableName);
+    TnPropertyType[] createBeanPropertyTypes();
 
 }

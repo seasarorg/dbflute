@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <VALUE> The type of value.
  */
 public class StringKeyMap<VALUE> implements Map<String, VALUE> {
-
+    
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -30,6 +30,26 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
             _internalMap = newHashMap();
         }
     }
+    
+    /**
+     * Create The map of string key as case insensitive. <br />
+     * You can set null value.
+     * @param <VALUE> The type of value.
+     * @return The map of string key as case insensitive. (NotNull)
+     */
+    public static <VALUE> StringKeyMap<VALUE> createAsCaseInsensitive() {
+        return new StringKeyMap<VALUE>(false, false);
+    }
+    
+    /**
+     * Create The map of string key as case insensitive and concurrent. <br />
+     * You cannot set null value.
+     * @param <VALUE> The type of value.
+     * @return The map of string key as case insensitive and concurrent. (NotNull)
+     */
+    public static <VALUE> StringKeyMap<VALUE> createAsCaseInsensitiveConcurrent() {
+        return new StringKeyMap<VALUE>(false, true);
+    }
 
     public static <VALUE> StringKeyMap<VALUE> createAsFlexible() {
         return new StringKeyMap<VALUE>(true, false);
@@ -37,14 +57,6 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
 
     public static <VALUE> StringKeyMap<VALUE> createAsFlexibleConcurrent() {
         return new StringKeyMap<VALUE>(true, true);
-    }
-
-    public static <VALUE> StringKeyMap<VALUE> createAsCaseInsensitive() {
-        return new StringKeyMap<VALUE>(false, false);
-    }
-
-    public static <VALUE> StringKeyMap<VALUE> createAsCaseInsensitiveConcurrent() {
-        return new StringKeyMap<VALUE>(false, true);
     }
 
     // ===================================================================================

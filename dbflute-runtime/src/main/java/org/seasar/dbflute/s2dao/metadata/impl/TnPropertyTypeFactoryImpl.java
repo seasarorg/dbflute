@@ -63,7 +63,7 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
         }
     }
 
-    public TnPropertyType[] createBeanPropertyTypes(String tableName) {
+    public TnPropertyType[] createBeanPropertyTypes() {
         final List<TnPropertyType> list = new ArrayList<TnPropertyType>();
         final TnBeanDesc beanDesc = getBeanDesc();
         final List<String> proppertyNameList = beanDesc.getProppertyNameList();
