@@ -87,7 +87,6 @@ public class ImplementedInvokerAssistant implements InvokerAssistant {
         return factory;
     }
 
-
     public TnBeanMetaDataFactory assistBeanMetaDataFactory() {
         if (_beanMetaDataFactory != null) {
             return _beanMetaDataFactory;

@@ -1,8 +1,7 @@
-<project name="DBFluteExample" default="compile" basedir=".">
+<project name="DBFluteRuntime" default="dist" basedir=".">
 
-  <!-- ================================================================ -->
-  <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
-  <!-- ================================================================ -->
+  <property name="version" value="0.9.0"/>
+
   <target name="clean">
     <delete dir="target/classes"/>
     <mkdir dir="target/classes"/>
@@ -39,5 +38,19 @@
       <compilerarg value="-Xlint:deprecation" />
       <compilerarg value="-Xlint:unchecked" />
     </javac>
+  </target>
+
+  <target name="dist" depends="compile" description="==> generates distribution">
+
+    <echo message="+------------------------------------------+"/>
+    <echo message="|                                          |"/>
+    <echo message="| Generating dist for YOUR project!        |"/>
+    <echo message="|                                          |"/>
+    <echo message="+------------------------------------------+"/>
+
+    <mkdir dir="dist"/>
+
+    <delete file="dist/dbflute-runtime.jar-*"/>
+    <jar jarfile="dist/dbflute-runtime.jar-${version}" basedir="target/classes"></jar>
   </target>
 </project>
