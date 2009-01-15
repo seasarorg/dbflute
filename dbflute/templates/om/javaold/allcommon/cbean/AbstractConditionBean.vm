@@ -60,6 +60,9 @@ public abstract class ${myClassName} implements ${glConditionBean} {
     /** The config of statement. (Nullable) */
     protected ${glStatementConfig} _statementConfig;
 
+    /** Can the paging re-select? */
+    protected boolean _canPagingReSelect = true;
+
     // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
     protected boolean _forDerivedReferrer;
     protected boolean _forScalarSelect;
@@ -215,6 +218,21 @@ public abstract class ${myClassName} implements ${glConditionBean} {
     public void xsetPaging(boolean paging) {// Very Internal!
         String msg = "This method is unsupported on ConditionBean!";
         throw new UnsupportedOperationException(msg);
+    }
+
+    /**
+     * ${database.ImplementComment}
+     */
+    public void disablePagingReSelect() {
+        _canPagingReSelect = false;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return Can the paging re-select execute?
+     */
+    public boolean canPagingReSelect() {
+        return _canPagingReSelect;
     }
 
     // -----------------------------------------------------
