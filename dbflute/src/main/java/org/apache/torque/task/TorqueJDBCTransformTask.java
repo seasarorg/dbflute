@@ -54,8 +54,11 @@ package org.apache.torque.task;
  * <http://www.apache.org/>.
  */
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -179,10 +182,16 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
             _log.info("$ * * * * * * * * */");
             _log.info("$ ");
-
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
-            _log.error("JDBCToXMLSchema failed: ", e);
-            throw new BuildException(e);
+            throw new RuntimeException(e);
         }
         _log.info("------------------------------------------------------- [Torque - JDBCToXMLSchema] Finish!");
     }
