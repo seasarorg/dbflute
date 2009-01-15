@@ -5,8 +5,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.seasar.dbflute.util.DfSystemUtil;
-import javax.sql.XADataSource;
-import org.seasar.extension.dbcp.impl.XADataSourceImpl;
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -24,16 +22,12 @@ public class DBFluteInitializer {
     //                                                                         ===========
     /**
      * Constructor. And initialize various components.
-     * @param xaDataSource The data source of XA. (Nullable)
      */
-    public DBFluteInitializer(XADataSource xaDataSource) {
+    public DBFluteInitializer() {
         _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
         DBFluteConfig.getInstance().unlock();
         handleSqlLogRegistry();
         loadCoolClasses();
-        if (xaDataSource != null) {
-            showInformation(xaDataSource);
-        }
         DBFluteConfig.getInstance().lock();
         _log.info("* * * * */");
     }
@@ -65,24 +59,6 @@ public class DBFluteInitializer {
             if (sqlLogRegistry != null) {
                 TnSqlLogRegistry.closeRegistration();
             }
-        }
-    }
-
-    // ===================================================================================
-    //                                                                         Information
-    //                                                                         ===========
-    protected void showInformation(XADataSource xaDataSource) {
-        if (xaDataSource != null && xaDataSource instanceof XADataSourceImpl) { // by Seasar
-            final StringBuilder sb = new StringBuilder();
-            final XADataSourceImpl xaDataSourceImpl = (XADataSourceImpl)xaDataSource;
-            final String driverClassName = xaDataSourceImpl.getDriverClassName();
-            final String url = xaDataSourceImpl.getURL();
-            final String user = xaDataSourceImpl.getUser();
-            sb.append("  [XADataSource]:").append(getLineSeparator());
-            sb.append("    driver = " + driverClassName).append(getLineSeparator());
-            sb.append("    url    = " + url).append(getLineSeparator());
-            sb.append("    user   = " + user);
-            _log.info("{Injection Information}" + getLineSeparator() + sb);
         }
     }
 

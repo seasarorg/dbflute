@@ -13,7 +13,7 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
-    ; projectName = dbflute-framework
+    ; projectName = dbflute-runtime
     ; requestUrl = http://localhost:8386/
 }
 # ----------------/
