@@ -50,7 +50,7 @@ public class PagingInvoker<ENTITY> {
             selectedList = handler.paging();
         }
         final PagingResultBean<ENTITY> rb = new ResultBeanBuilder<ENTITY>(_tableDbName).buildPagingResultBean(pagingBean, allRecordCount, selectedList);
-        if (isNecessaryToReadPageAgain(rb)) {
+        if (pagingBean.canPagingReSelect() && isNecessaryToReadPageAgain(rb)) {
             pagingBean.fetchPage(rb.getAllPageCount());
             final int reAllRecordCount = handler.count();
             final java.util.List<ENTITY> reSelectedList = handler.paging();

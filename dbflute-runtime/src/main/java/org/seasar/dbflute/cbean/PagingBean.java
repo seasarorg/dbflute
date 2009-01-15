@@ -43,6 +43,17 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
      */
     public void xsetPaging(boolean paging);
 
+    /**
+     * Disable paging re-select that is executed when the page number is over page count.
+     */
+    public void disablePagingReSelect();
+
+    /**
+     * Can the paging re-select?
+     * @return Can the paging re-select?
+     */
+    public boolean canPagingReSelect();
+
     // ===================================================================================
     //                                                                       Fetch Setting
     //                                                                       =============

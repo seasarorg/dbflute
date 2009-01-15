@@ -35,6 +35,9 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     /** Is the count executed later? */
     protected boolean _countLater;
 
+    /** Can the paging re-select? */
+    protected boolean _canPagingReSelect = true;
+
     /** Is fetch narrowing valid? */
     protected boolean _fetchNarrowing = true;
 
@@ -95,6 +98,21 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
         this._paging = paging;
     }
 
+    /**
+     * ${database.ImplementComment}
+     */
+    public void disablePagingReSelect() {
+        _canPagingReSelect = false;
+    }
+
+    /**
+     * ${database.ImplementComment}
+     * @return Can the paging re-select execute?
+     */
+    public boolean canPagingReSelect() {
+        return _canPagingReSelect;
+    }
+    
     // -----------------------------------------------------
     //                                         Fetch Setting
     //                                         -------------
