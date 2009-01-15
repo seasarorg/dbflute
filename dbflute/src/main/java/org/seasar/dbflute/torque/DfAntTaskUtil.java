@@ -115,7 +115,6 @@ public final class DfAntTaskUtil {
         msg = msg + getLineSeparator();
         msg = msg + "[Runtime Exception]" + getLineSeparator();
         msg = msg + "exception class   = " + e.getClass() + getLineSeparator();
-        msg = msg + "exception message = " + e.getMessage() + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         _log.error(msg, e);
     }
@@ -135,7 +134,6 @@ public final class DfAntTaskUtil {
         msg = msg + getLineSeparator();
         msg = msg + "[Error]" + getLineSeparator();
         msg = msg + "error class   = " + e.getClass() + getLineSeparator();
-        msg = msg + "error message = " + e.getMessage() + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         _log.error(msg, e);
     }
