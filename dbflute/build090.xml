@@ -15,6 +15,7 @@
   <property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
   <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
   <property name="dbflute.runtime.dir" value="${workspace.base}/dbflute-runtime"/>
+  <property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
 
   <target name="clean">
     <delete dir="target/classes"/>
@@ -140,5 +141,11 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.runtime.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  </target>
+
+  <target name="reflect-win-limit-spring" depends="expand-dist" description="==> reflect to test application">
+    <copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
   </target>
 </project>

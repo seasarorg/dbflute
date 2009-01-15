@@ -1,16 +1,21 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+import javax.sql.DataSource;
+
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
-import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
-import org.seasar.dbflute.s2dao.valuetype.ValueTypes;
-
+import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
+import org.seasar.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
+import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
+import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
+import org.seasar.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl;
 #if ($database.isTargetContainerSeasar())
+
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
 #end
@@ -23,21 +28,15 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DBMetaProvider _dbmetaProvider = createDBMetaProvider();
-    protected final SqlClauseCreator _sqlClauseCreator = createSqlClauseCreator();
     protected BehaviorCommandInvoker _behaviorCommandInvoker;
+    protected DataSource _dataSource;
+    protected DBMetaProvider _dbmetaProvider;
+    protected SqlClauseCreator _sqlClauseCreator;
+    protected StatementFactory _statementFactory;
+    protected TnBeanMetaDataFactory _beanMetaDataFactory;
+    protected TnValueTypeFactory _valueTypeFactory;
+    
     protected boolean _disposable;
-
-    // ===================================================================================
-    //                                                                            Creation
-    //                                                                            ========
-    protected SqlClauseCreator createSqlClauseCreator() {
-        return new ${glImplementedSqlClauseCreator}();
-    }
-
-    protected DBMetaProvider createDBMetaProvider() {
-        return new ${glDBMetaInstanceHandler}();
-    }
 
     // ===================================================================================
     //                                                                 Assistant Main Work
@@ -46,12 +45,74 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return ${glDBCurrent}.getInstance().currentDBDef();
     }
 
+    public DataSource assistDataSource() {
+        return _dataSource;
+    }
+
     public DBMetaProvider assistDBMetaProvider() {
+        if (_dbmetaProvider != null) {
+            return _dbmetaProvider;
+        }
+        _dbmetaProvider = createDBMetaProvider();
         return _dbmetaProvider;
     }
 
+    protected DBMetaProvider createDBMetaProvider() {
+        return new ${glDBMetaInstanceHandler}();
+    }
+
     public SqlClauseCreator assistSqlClauseCreator() {
+        if (_sqlClauseCreator != null) {
+            return _sqlClauseCreator;
+        }
+        _sqlClauseCreator = createSqlClauseCreator();
         return _sqlClauseCreator;
+    }
+
+    protected SqlClauseCreator createSqlClauseCreator() {
+        return new ${glImplementedSqlClauseCreator}();
+    }
+
+    public StatementFactory assistStatementFactory() {
+        if (_statementFactory != null) {
+            return _statementFactory;
+        }
+        _statementFactory = createStatementFactory();
+        return _statementFactory;
+    }
+
+    protected StatementFactory createStatementFactory() {
+        final TnStatementFactoryImpl factory = new TnStatementFactoryImpl();
+        factory.setDefaultStatementConfig(DBFluteConfig.getInstance().getDefaultStatementConfig());
+        factory.setInternalDebug(DBFluteConfig.getInstance().isInternalDebug());
+        return factory;
+    }
+
+    public TnBeanMetaDataFactory assistBeanMetaDataFactory() {
+        if (_beanMetaDataFactory != null) {
+            return _beanMetaDataFactory;
+        }
+        _beanMetaDataFactory = createBeanMetaDataFactory();
+        return _beanMetaDataFactory;
+    }
+
+    protected TnBeanMetaDataFactory createBeanMetaDataFactory() {
+        final TnBeanMetaDataFactoryExtension factory = new TnBeanMetaDataFactoryExtension();
+        factory.setDataSource(_dataSource);
+        factory.setValueTypeFactory(assistValueTypeFactory());
+        return factory;
+    }
+    
+    public TnValueTypeFactory assistValueTypeFactory() {
+        if (_valueTypeFactory != null) {
+            return _valueTypeFactory;
+        }
+        _valueTypeFactory = createValueTypeFactory();
+        return _valueTypeFactory;
+    }
+
+    protected TnValueTypeFactory createValueTypeFactory() {
+        return new TnValueTypeFactoryImpl();
     }
 
     public ResourceParameter assistResourceParameter() {
@@ -64,14 +125,6 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 
     public String assistSqlFileEncoding() {
         return "${database.sqlFileEncoding}";
-    }
-
-    public StatementConfig assistDefaultStatementConfig() {
-        return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
-    }
-    
-    public boolean assistInternalDebug() {
-        return ${glDBFluteConfig}.getInstance().isInternalDebug();
     }
 
     // ===================================================================================

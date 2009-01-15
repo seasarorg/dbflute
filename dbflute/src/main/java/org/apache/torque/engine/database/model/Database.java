@@ -338,6 +338,20 @@ public class Database {
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
         return languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName + " ";
     }
+    
+    public String getPmbMetaDataSuperClassDefinitionNinety(String className) { // as patch for 90
+        assertArgumentPmbMetaDataClassName(className);
+        final DfParameterBeanMetaData metaData = findPmbMetaData(className);
+        String superClassName = metaData.getSuperClassName();
+        if (superClassName == null || superClassName.trim().length() == 0) {
+            return "";
+        }
+        if (superClassName.contains("SimplePagingBean")) {
+            superClassName = "org.seasar.dbflute.cbean.SimplePagingBean";
+        }
+        final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
+        return languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName + " ";
+    }
 
     public Map<String, String> getPmbMetaDataPropertyNameTypeMap(String className) {
         assertArgumentPmbMetaDataClassName(className);

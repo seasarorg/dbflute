@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
-import org.seasar.dbflute.resource.TnSqlLogRegistry;
+import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.seasar.dbflute.util.DfSystemUtil;
 import javax.sql.XADataSource;
 #if ($database.isTargetContainerSeasar())
@@ -55,7 +55,7 @@ public class ${glDBFluteInitializer} {
             final StringBuilder sb = new StringBuilder();
             sb.append("{SqlLog Information}").append(getLineSeparator());
             sb.append("  [SqlLogRegistry]").append(getLineSeparator());
-            if (${glInternalSqlLogRegistry}.setupSqlLogRegistry()) {
+            if (TnSqlLogRegistry.setupSqlLogRegistry()) {
                 sb.append("    ...Setting up SqlLogRegistry(org.seasar.extension.jdbc)!").append(getLineSeparator());
                 sb.append("    Because the property 'useSqlLogRegistry' of the config of DBFlute is true.");
             } else {
@@ -63,9 +63,9 @@ public class ${glDBFluteInitializer} {
             }
            _log.info(sb);
         } else {
-            final Object sqlLogRegistry = ${glInternalSqlLogRegistry}.findContainerSqlLogRegistry();
+            final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
             if (sqlLogRegistry != null) {
-                ${glInternalSqlLogRegistry}.closeRegistration();
+                TnSqlLogRegistry.closeRegistration();
             }
         }
     }
@@ -102,6 +102,6 @@ public class ${glDBFluteInitializer} {
     //                                                                      General Helper
     //                                                                      ==============
     protected String getLineSeparator() {
-        return ${glSimpleSystemUtil}.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
 }

@@ -12,7 +12,7 @@ import org.seasar.dbflute.outsidesql.ProcedurePmb;
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 public class ${myClassName} implements ${glProcedurePmb} {
 #else
-public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} {
+public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinitionNinety($pmbClassName)} {
 #end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 
@@ -50,7 +50,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
 
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
     /** The value of likeSearchOption for ${propertyName}. */
-    protected ${glPackageBaseCommonCOption}.${glLikeSearchOption} _${propertyName}InternalLikeSearchOption;
+    protected org.seasar.dbflute.cbean.coption.LikeSearchOption _${propertyName}InternalLikeSearchOption;
 
 #end
 #end
@@ -138,7 +138,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      * @param ${propertyName}Option The option of likeSearch for ${propertyName}. (Nullable)
      */
-    public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}, ${glPackageBaseCommonCOption}.${glLikeSearchOption} ${propertyName}Option) {
+    public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}, org.seasar.dbflute.cbean.coption.LikeSearchOption ${propertyName}Option) {
         _${propertyName} = ${propertyName};
         _${propertyName}InternalLikeSearchOption = ${propertyName}Option;
     }
@@ -147,7 +147,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
      * Get the internal option of likeSearch for ${propertyName}. {Internal Method: Don't Invoke This!}
      * @return The internal option of likeSearch for ${propertyName}. (Nullable)
      */
-    public ${glPackageBaseCommonCOption}.${glLikeSearchOption} get${database.initCap($propertyName)}InternalLikeSearchOption() {
+    public org.seasar.dbflute.cbean.coption.LikeSearchOption get${database.initCap($propertyName)}InternalLikeSearchOption() {
         return _${propertyName}InternalLikeSearchOption;
     }
 #end

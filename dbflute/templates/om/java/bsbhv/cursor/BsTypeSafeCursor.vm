@@ -109,7 +109,7 @@ public class ${myClassName} {
     }
 
     protected Object extractValueAsNumber(Class<?> type, String name) throws SQLException {
-        return ${glSimpleTypeUtil}.toNumber(type, extractValueAsObject(name));
+        return DfTypeUtil.toNumber(type, extractValueAsObject(name));
     }
 
     protected Object extractValueAsDate(Class<?> type, String name) throws SQLException {
@@ -125,7 +125,7 @@ public class ${myClassName} {
     }
 
     protected java.util.Date toDate(Object object) {
-        return ${glSimpleTypeUtil}.toDate(object);
+        return DfTypeUtil.toDate(object);
     }
 
     protected Object extractValueAsObject(String name) throws SQLException {
