@@ -14,6 +14,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected int _safetyMaxResultSize;
         protected bool _paging = true;
         protected bool _countLater;
+        protected bool _canPagingReSelect = true;
         protected bool _fetchNarrowing = true;
         protected IDictionary<String, Object> _parameterMap;
 
@@ -57,6 +58,9 @@ namespace ${glPackageBaseCommonCBean} {
 		    FetchPage(pageNumber);
 		}
 
+        public void DisablePagingReSelect() { _canPagingReSelect = false; }
+        public virtual bool CanPagingReSelect { get { return _canPagingReSelect; } }
+        
         // -------------------------------------------------
         //                                     Fetch Setting
         //                                     -------------

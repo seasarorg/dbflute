@@ -20,6 +20,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected readonly ${glSqlClause} _sqlClause;
         protected int _safetyMaxResultSize;
         protected ${glStatementConfig} _statementConfig;
+        protected bool _canPagingReSelect = true;
 
         // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
         protected bool _forDerivedReferrer;
@@ -83,6 +84,9 @@ namespace ${glPackageBaseCommonCBean} {
             FetchFirst(pageSize);
             FetchPage(pageNumber);
         }
+
+        public void DisablePagingReSelect() { _canPagingReSelect = false; }
+        public virtual bool CanPagingReSelect { get { return _canPagingReSelect; } }
 
         // -------------------------------------------------
         //                                     Fetch Setting

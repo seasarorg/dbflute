@@ -42,7 +42,7 @@ namespace ${glPackageBaseCommonCBean} {
                 selectedList = handler.Paging();
             }
             ${glPagingResultBean}<ENTITY> rb = new ${glResultBeanBuilder}<ENTITY>(_tableDbName).BuildPagingResultBean(pagingBean, allRecordCount, selectedList);
-            if (IsNecessaryToReadPageAgain(rb)) {
+            if (pagingBean.CanPagingReSelect && IsNecessaryToReadPageAgain(rb)) {
                 pagingBean.FetchPage(rb.AllPageCount);
                 int reAllRecordCount = handler.Count();
                 IList<ENTITY> reSelectedList = handler.Paging();
