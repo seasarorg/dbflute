@@ -1496,14 +1496,6 @@ public abstract class AbstractSqlClause implements SqlClause {
         return true;
     }
 
-    // [DBFlute-0.7.7]
-    // ===================================================================================
-    //                                                                   Unique Constraint
-    //                                                                   =================
-    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
-        return false;
-    }
-
     // [DBFlute-0.8.6]
     // ===================================================================================
     //                                                                  Select Clause Type

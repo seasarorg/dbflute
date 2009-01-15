@@ -108,13 +108,4 @@ public class SqlClauseMySql extends AbstractSqlClause {
     protected boolean isUpdateSubQueryUseLocalTableSupported() {
         return false;
     }
-
-    // [DBFlute-0.7.7]
-    // ===================================================================================
-    //                                                          Unique Constraint Override
-    //                                                          ==========================
-    @Override
-    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
-        return errorCode != null && errorCode == 1062;
-    }
 }

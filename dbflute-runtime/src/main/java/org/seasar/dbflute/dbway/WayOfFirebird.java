@@ -12,4 +12,11 @@ public class WayOfFirebird implements DBWay {
     public String getIdentitySelectSql() {
         return null;
     }
+    
+    // ===================================================================================
+    //                                                                   SQLException Info
+    //                                                                   =================
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
+        return false; // Unknown
+    }
 }

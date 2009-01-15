@@ -12,4 +12,11 @@ public class WayOfPostgreSQL implements DBWay {
     public String getIdentitySelectSql() {
         return null;
     }
+    
+    // ===================================================================================
+    //                                                                   SQLException Info
+    //                                                                   =================
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
+        return "23505".equals(sqlState);
+    }
 }

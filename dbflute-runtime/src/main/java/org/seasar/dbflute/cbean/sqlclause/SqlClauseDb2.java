@@ -116,15 +116,6 @@ public class SqlClauseDb2 extends AbstractSqlClause {
         return _fetchFirstSqlSuffix + _lockSqlSuffix;
     }
 
-    // [DBFlute-0.7.7]
-    // ===================================================================================
-    //                                                          Unique Constraint Override
-    //                                                          ==========================
-    @Override
-    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
-        return "23505".equals(sqlState);
-    }
-
     // [DBFlute-0.7.9]
     // ===================================================================================
     //                                                                      DB2 Dependency

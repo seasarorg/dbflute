@@ -131,7 +131,7 @@ public class ResourceContext {
         if (sqlClauseCreator == null) {
             return false;
         }
-        return sqlClauseCreator.createSqlClause("dummy").isUniqueConstraintException(sqlState, errorCode);
+        return currentDBDef().dbway().isUniqueConstraintException(sqlState, errorCode);
     }
     
     public static String getOutsideSqlPackage() {

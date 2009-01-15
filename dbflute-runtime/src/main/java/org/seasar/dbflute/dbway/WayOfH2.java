@@ -12,4 +12,11 @@ public class WayOfH2 implements DBWay {
     public String getIdentitySelectSql() {
         return "CALL IDENTITY()";
     }
+    
+    // ===================================================================================
+    //                                                                   SQLException Info
+    //                                                                   =================
+    public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
+        return "23001".equals(sqlState);
+    }
 }
