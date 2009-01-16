@@ -24,12 +24,8 @@ public class ${glDBFluteInitializer} {
      * Constructor. And initialize various components.
      */
     public ${glDBFluteInitializer}() {
-        _log.info("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * {DBFlute}");
-        ${glDBFluteConfig}.getInstance().unlock();
         handleSqlLogRegistry();
         loadCoolClasses();
-        ${glDBFluteConfig}.getInstance().lock();
-        _log.info("* * * * */");
     }
 
     // ===================================================================================
@@ -48,10 +44,10 @@ public class ${glDBFluteInitializer} {
             sb.append("{SqlLog Information}").append(getLineSeparator());
             sb.append("  [SqlLogRegistry]").append(getLineSeparator());
             if (TnSqlLogRegistry.setupSqlLogRegistry()) {
-                sb.append("    ...Setting up SqlLogRegistry(org.seasar.extension.jdbc)!").append(getLineSeparator());
+                sb.append("    ...Setting up sqlLogRegistry(org.seasar.extension.jdbc)!").append(getLineSeparator());
                 sb.append("    Because the property 'useSqlLogRegistry' of the config of DBFlute is true.");
             } else {
-                sb.append("    SqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version!");
+                sb.append("    The sqlLogRegistry(org.seasar.extension.jdbc) is not supported at the version!");
             }
            _log.info(sb);
         } else {
