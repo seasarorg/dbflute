@@ -2,12 +2,17 @@ package org.seasar.dbflute.util;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
+
+import org.seasar.framework.util.JarFileUtil;
 
 /**
  * {Refers to S2Container's utility and Extends it}
@@ -52,6 +57,19 @@ public class DfResourceUtil {
         return loader.getResource(path);
     }
 
+    private static String getFileName(URL url) {
+        String s = url.getFile();
+        return decode(s, "UTF8");
+    }
+
+    private static String decode(String s, String enc) {
+        try {
+            return URLDecoder.decode(s, enc);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     // ===================================================================================
     //                                                                     Resource Stream
     //                                                                     ===============
@@ -92,6 +110,29 @@ public class DfResourceUtil {
             throw new IllegalStateException(msg, e);
         }
         return out.toString();
+    }
+
+    // ===================================================================================
+    //                                                            Build Directory Handling
+    //                                                            ========================
+    public static File getBuildDir(Class<?> clazz) {
+        return getBuildDir(getResourcePath(clazz));
+    }
+
+    public static File getBuildDir(String path) {
+        File dir = null;
+        URL url = getResourceUrl(path);
+        if ("file".equals(url.getProtocol())) {
+            int num = path.split("/").length;
+            dir = new File(getFileName(url));
+            for (int i = 0; i < num;) {
+                i++;
+                dir = dir.getParentFile();
+            }
+        } else {
+            dir = new File(JarFileUtil.toJarFilePath(url));
+        }
+        return dir;
     }
 
     // ===================================================================================

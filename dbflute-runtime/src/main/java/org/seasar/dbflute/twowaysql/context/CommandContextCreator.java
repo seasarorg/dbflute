@@ -3,7 +3,7 @@ package org.seasar.dbflute.twowaysql.context;
 import org.seasar.dbflute.twowaysql.context.impl.CommandContextImpl;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class CommandContextCreator {
 

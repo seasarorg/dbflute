@@ -68,7 +68,7 @@ public class ResourceContext {
     public static boolean isCurrentDBDef(DBDef targetDBDef) {
         return currentDBDef().equals(targetDBDef);
     }
-
+    
     /**
      * @return The provider of DB meta. (NotNull)
      */
@@ -133,7 +133,7 @@ public class ResourceContext {
         }
         return currentDBDef().dbway().isUniqueConstraintException(sqlState, errorCode);
     }
-    
+
     public static String getOutsideSqlPackage() {
         ResourceParameter resourceParameter = resourceParameter();
         if (resourceParameter == null) {
@@ -141,7 +141,7 @@ public class ResourceContext {
         }
         return resourceParameter.getOutsideSqlPackage();
     }
-    
+
     public static String getLogDateFormat() {
         ResourceParameter resourceParameter = resourceParameter();
         if (resourceParameter == null) {
@@ -149,7 +149,7 @@ public class ResourceContext {
         }
         return resourceParameter.getLogDateFormat();
     }
-    
+
     public static String getLogTimestampFormat() {
         ResourceParameter resourceParameter = resourceParameter();
         if (resourceParameter == null) {
@@ -157,7 +157,7 @@ public class ResourceContext {
         }
         return resourceParameter.getLogTimestampFormat();
     }
-    
+
     protected static ResourceParameter resourceParameter() {
         if (!isExistResourceContextOnThread()) {
             return null;

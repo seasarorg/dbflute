@@ -40,7 +40,7 @@
     </javac>
   </target>
 
-  <target name="dist" depends="compile" description="==> generates distribution">
+  <target name="dist" depends="compile">
 
     <echo message="+------------------------------------------+"/>
     <echo message="|                                          |"/>
@@ -52,5 +52,19 @@
 
     <delete file="dist/dbflute-runtime-*.jar"/>
     <jar jarfile="dist/dbflute-runtime-${version}.jar" basedir="target/classes"></jar>
+  </target>
+
+  <target name="reflect-mac-limit-spring">
+
+    <echo message="+------------------------------------------+"/>
+    <echo message="|                                          |"/>
+    <echo message="| Reflecting library to Spring project!    |"/>
+    <echo message="|                                          |"/>
+    <echo message="+------------------------------------------+"/>
+
+    <delete file="../dbflute-spring-example/lib/forDBFlute/dbflute-runtime-*.jar"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-spring-example/lib/forDBFlute/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
   </target>
 </project>

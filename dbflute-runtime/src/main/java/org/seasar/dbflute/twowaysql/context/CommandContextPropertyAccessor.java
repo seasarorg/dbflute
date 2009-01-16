@@ -31,5 +31,4 @@ public class CommandContextPropertyAccessor extends ObjectPropertyAccessor {
         String argName = name.toString();
         return ctx.getArg(argName);
     }
-
 }

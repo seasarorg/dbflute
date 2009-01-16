@@ -16,23 +16,22 @@ import org.seasar.dbflute.s2dao.metadata.impl.TnBeanMetaDataFactoryImpl;
 import org.seasar.dbflute.s2dao.metadata.impl.TnBeanMetaDataImpl;
 
 /**
- * BeanMetaDataFactoryImpl for DBFlute.
- * @author DBFlute(AutoGenerator)
+ * The extension of the factory of bean meta data.
+ * @author jflute
  */
-@SuppressWarnings("unchecked")
 public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The map of bean meta data for cache. */
-    protected Map<Class<? extends Entity>, TnBeanMetaData> _metaMap = newConcurrentHashMap();
+    protected Map<Class<?>, TnBeanMetaData> _metaMap = newConcurrentHashMap();
 
     // ===================================================================================
     //                                                                  Override for Cache
     //                                                                  ==================
     @Override
-    public TnBeanMetaData createBeanMetaData(Class beanClass) {
+    public TnBeanMetaData createBeanMetaData(Class<?> beanClass) {
         final TnBeanMetaData cachedMeta = findCachedMeta(beanClass);
         if (cachedMeta != null) {
             return cachedMeta;
@@ -42,7 +41,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     }
 
     @Override
-    public TnBeanMetaData createBeanMetaData(Class beanClass, int relationNestLevel) {
+    public TnBeanMetaData createBeanMetaData(Class<?> beanClass, int relationNestLevel) {
         final TnBeanMetaData cachedMeta = findCachedMeta(beanClass);
         if (cachedMeta != null) {
             return cachedMeta;
@@ -52,7 +51,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     }
 
     @Override
-    public TnBeanMetaData createBeanMetaData(DatabaseMetaData dbMetaData, Class beanClass, int relationNestLevel) {
+    public TnBeanMetaData createBeanMetaData(DatabaseMetaData dbMetaData, Class<?> beanClass, int relationNestLevel) {
         final TnBeanMetaData cachedMeta = findOrCreateCachedMetaIfNeeds(dbMetaData, beanClass, relationNestLevel);
         if (cachedMeta != null) {
             return cachedMeta;
@@ -61,7 +60,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
         }
     }
 
-    protected TnBeanMetaData findCachedMeta(Class beanClass) {
+    protected TnBeanMetaData findCachedMeta(Class<?> beanClass) {
         if (isDBFluteEntity(beanClass)) {
             final TnBeanMetaData cachedMeta = getMetaFromCache(beanClass);
             if (cachedMeta != null) {
@@ -71,7 +70,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
         return null;
     }
 
-    protected TnBeanMetaData findOrCreateCachedMetaIfNeeds(DatabaseMetaData dbMetaData, Class beanClass,
+    protected TnBeanMetaData findOrCreateCachedMetaIfNeeds(DatabaseMetaData dbMetaData, Class<?> beanClass,
             int relationNestLevel) {
         if (isDBFluteEntity(beanClass)) {
             final TnBeanMetaData cachedMeta = getMetaFromCache(beanClass);
@@ -101,7 +100,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
             // = = = = =/
             @Override
             public void initialize() { // for Cache
-                final Class myBeanClass = getBeanClass();
+                final Class<?> myBeanClass = getBeanClass();
                 if (isDBFluteEntity(myBeanClass)) {
                     final TnBeanMetaData cachedMeta = getMetaFromCache(myBeanClass);
                     if (cachedMeta == null) {
@@ -179,11 +178,11 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected boolean isDBFluteEntity(Class beanClass) {
+    protected boolean isDBFluteEntity(Class<?> beanClass) {
         return Entity.class.isAssignableFrom(beanClass);
     }
 
-    protected TnBeanMetaData getMetaFromCache(Class beanClass) {
+    protected TnBeanMetaData getMetaFromCache(Class<?> beanClass) {
         return _metaMap.get(beanClass);
     }
 }
