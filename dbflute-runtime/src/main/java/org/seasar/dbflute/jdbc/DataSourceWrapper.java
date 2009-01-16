@@ -12,9 +12,15 @@ import javax.sql.DataSource;
  */
 public class DataSourceWrapper implements DataSource {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private final DataSource _dataSource;
     private final DataSourceHandler _dataSourceHandler;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DataSourceWrapper(DataSource dataSource, DataSourceHandler dataSourceHandler) {
         if (dataSource == null) {
             String msg = "The argument 'dataSource' should not be null!";
@@ -28,6 +34,9 @@ public class DataSourceWrapper implements DataSource {
         _dataSourceHandler = dataSourceHandler;
     }
 
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
     public Connection getConnection() throws SQLException {
         return _dataSourceHandler.getConnection(_dataSource);
     }
