@@ -4,7 +4,7 @@
     "http://www.springframework.org/dtd/spring-beans.dtd"
 >
 <beans>
-    <!-- The component of DBFlute. (Basically internal components except for behaviorSelector) -->
+    <!-- The components of DBFlute Runtime. -->
     <bean id="dbfluteInitializer" class="${glPackageBaseCommon}.DBFluteInitializer"/>
     <bean id="invokerAssistant" class="${glPackageBaseCommon}.ImplementedInvokerAssistant" autowire="byType">
         <property name="dataSource">
@@ -15,6 +15,7 @@
     <bean id="behaviorSelector" class="${glPackageBaseCommon}.ImplementedBehaviorSelector" autowire="byType"/>
     <bean id="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker" autowire="byType"/>
 
+    <!-- The components of Behavior. -->
 #foreach ($table in $database.tables)
 	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}" autowire="byType"/>
 #end

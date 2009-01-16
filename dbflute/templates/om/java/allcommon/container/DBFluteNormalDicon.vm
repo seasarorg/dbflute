@@ -14,20 +14,15 @@
     <include path="buri/dicon/buriSimple.dicon"/>
 #end
 
-    <!-- The component of DBFlute. (Basically internal components except for behaviorSelector) -->
+    <!-- The components of DBFlute Runtime. -->
     <component class="com.example.dbflute.basic.dbflute.allcommon.DBFluteInitializer"/>
     <component name="invokerAssistant" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedInvokerAssistant"/>
     <component name="commonColumnAutoSetupper" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedCommonColumnAutoSetupper"/>
     <component name="behaviorSelector" class="com.example.dbflute.basic.dbflute.allcommon.ImplementedBehaviorSelector"/>
     <component name="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker"/>
 
+    <!-- The components of Behavior. -->
 #foreach ($table in $database.tables)
-#if ($database.isMakeDaoInterface())
-    <!-- ${table.name} -->
-    <component name="${table.daoComponentName}" class="${table.extendedDaoFullClassName}">
-        <aspect>${glDBFluteDiconNamespace}.interceptor</aspect>
-    </component>
-#end
     <component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}"/>
 #end
 </components>
