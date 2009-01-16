@@ -26,6 +26,7 @@ public class ${glDBFluteInitializer} {
     public ${glDBFluteInitializer}() {
         handleSqlLogRegistry();
         loadCoolClasses();
+        ${glDBFluteConfig}.getInstance().lock();
     }
 
     // ===================================================================================
