@@ -90,32 +90,14 @@ public class DBFluteConfigSettingTest extends ContainerTestCase {
     // ===================================================================================
     //                                                                                Lock
     //                                                                                ====
-    public void test_setDefaultStatementConfig_Locked() throws Exception {
-        // ## Arrange ##
-        final StatementConfig expected = new StatementConfig();
-
-        // ## Act & Assert ##
-        try {
-            DBFluteConfig.getInstance().setDefaultStatementConfig(expected);
-            fail();
-        } catch (IllegalStateException e) {
-            // OK
-            log(e.getMessage());
-        }
+    public void test_defaultStatementConfig() throws Exception {
+        // ## Arrange & Act & Assert ##
+        assertNotNull(DBFluteConfig.getInstance().getDefaultStatementConfig());
     }
 
     public void test_setInternalDebug_Locked() throws Exception {
-        // ## Arrange ##
-        final boolean expected = false;
-
-        // ## Act & Assert ##
-        try {
-            DBFluteConfig.getInstance().setInternalDebug(expected);
-            fail();
-        } catch (IllegalStateException e) {
-            // OK
-            log(e.getMessage());
-        }
+        // ## Arrange & Act & Assert ##
+        assertTrue(DBFluteConfig.getInstance().isInternalDebug());
     }
     
     // ===================================================================================
