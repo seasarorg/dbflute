@@ -18,6 +18,9 @@ import org.seasar.framework.container.ComponentNotFoundRuntimeException;
 #if ($database.isTargetContainerSpring())
 import org.springframework.context.ApplicationContext;
 #end
+#if ($database.isTargetContainerLucy())
+import org.t2framework.lucy.Lucy;
+#end
 
 /**
  * The implementation of behavior-selector.
@@ -45,6 +48,10 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
     /** The container of Spring. */
     protected ApplicationContext _container;
 #end
+#if ($database.isTargetContainerLucy())
+    /** The container of Lucy. */
+    protected Lucy _container;
+#end
 
     // ===================================================================================
     //                                                                           Component
@@ -70,6 +77,9 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
 #end
 #if ($database.isTargetContainerSpring())
 		return (COMPONENT)_container.getBean(initUncap(componentType.getSimpleName()));
+#end
+#if ($database.isTargetContainerLucy())
+		return (COMPONENT)_container.get(initUncap(componentType.getSimpleName()));
 #end
     }
 
@@ -211,6 +221,11 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
 #end
 #if ($database.isTargetContainerSpring())
     public void setContainer(ApplicationContext container) {
+        this._container = container;
+    }
+#end
+#if ($database.isTargetContainerLucy())
+    public void setContainer(Lucy container) {
         this._container = container;
     }
 #end

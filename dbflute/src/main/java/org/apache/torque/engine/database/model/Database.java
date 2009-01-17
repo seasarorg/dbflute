@@ -783,6 +783,10 @@ public class Database {
     public boolean isTargetContainerSpring() {
         return getBasicProperties().isTargetContainerSpring();
     }
+    
+    public boolean isTargetContainerLucy() {
+        return getBasicProperties().isTargetContainerLucy();
+    }
 
     // -----------------------------------------------------
     //                                             Extension

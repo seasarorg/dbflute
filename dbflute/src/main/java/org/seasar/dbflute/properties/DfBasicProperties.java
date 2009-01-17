@@ -202,6 +202,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isTargetContainerSpring() {
         return getTargetContainerName().trim().equalsIgnoreCase("spring");
     }
+    
+    public boolean isTargetContainerLucy() {
+        return getTargetContainerName().trim().equalsIgnoreCase("lucy");
+    }
 
     protected void checkContainer(String containerName) {
         if (!containerName.equalsIgnoreCase("seasar") && !containerName.equalsIgnoreCase("spring")) {
