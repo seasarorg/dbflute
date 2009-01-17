@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.sandbox</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>0.9.0</version>
+	<version>0.9.0-SNAPSHOT</version>
 
 	<name>DBFlute Runtime</name>
 	<description>DBFlute Microsoft Access Example</description>
