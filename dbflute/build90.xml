@@ -152,7 +152,7 @@
   	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-limit-lucy" depends="expand-dist" description="==> reflect to spring application">
+  <target name="reflect-mac-limit-lucy" depends="expand-dist" description="==> reflect to lucy application">
     <copy todir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
