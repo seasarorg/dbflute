@@ -1,9 +1,0 @@
-map:{
-; REGISTER_DATETIME = sysdate
-; REGISTER_USER     = replace-schema
-; REGISTER_PROCESS  = replace-schema
-; UPDATE_DATETIME   = sysdate
-; UPDATE_USER       = replace-schema
-; UPDATE_PROCESS    = replace-schema
-; VERSION_NO        = 0
-}

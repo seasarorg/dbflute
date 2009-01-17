@@ -1,7 +1,0 @@
-
-
-set NATIVE_PROPERTIES_PATH=%1
-
-copy %NATIVE_PROPERTIES_PATH% %S2DAOGEN_HOME%\build.properties
-
-
