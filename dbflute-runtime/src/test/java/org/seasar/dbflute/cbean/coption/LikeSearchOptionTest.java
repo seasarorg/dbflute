@@ -1,4 +1,4 @@
-package org.seasar.dbflute.dbflute.allcommon.cbean.coption;
+package org.seasar.dbflute.cbean.coption;
 
 
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
