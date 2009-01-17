@@ -8,11 +8,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-
-import org.seasar.framework.util.JarFileUtil;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 /**
  * {Refers to S2Container's utility and Extends it}
@@ -38,6 +39,14 @@ public class DfResourceUtil {
         return clazz.getName().replace('.', '/') + ".class";
     }
 
+    public static String getCanonicalPath(File file) {
+        try {
+            return file.getCanonicalPath();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     // ===================================================================================
     //                                                                        Resource URL
     //                                                                        ============
@@ -57,12 +66,49 @@ public class DfResourceUtil {
         return loader.getResource(path);
     }
 
-    private static String getFileName(URL url) {
+    public static String getFileName(URL url) {
         String s = url.getFile();
-        return decode(s, "UTF8");
+        return decodeURL(s, "UTF8");
     }
 
-    private static String decode(String s, String enc) {
+    public static InputStream openStream(URL url) {
+        try {
+            URLConnection connection = url.openConnection();
+            connection.setUseCaches(false);
+            return connection.getInputStream();
+        } catch (IOException e) {
+            String msg = "Failed to open the stream: url=" + url;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    public static URLConnection openConnection(URL url) {
+        try {
+            URLConnection connection = url.openConnection();
+            connection.setUseCaches(false);
+            return connection;
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static URL createURL(String spec) {
+        try {
+            return new URL(spec);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static URL create(URL context, String spec) {
+        try {
+            return new URL(context, spec);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static String decodeURL(String s, String enc) {
         try {
             return URLDecoder.decode(s, enc);
         } catch (UnsupportedEncodingException e) {
@@ -130,7 +176,7 @@ public class DfResourceUtil {
                 dir = dir.getParentFile();
             }
         } else {
-            dir = new File(JarFileUtil.toJarFilePath(url));
+            dir = new File(toJarFilePath(url));
         }
         return dir;
     }
@@ -190,21 +236,71 @@ public class DfResourceUtil {
     }
 
     // ===================================================================================
+    //                                                                   JAR File Handling
+    //                                                                   =================
+    public static JarFile create(String file) {
+        try {
+            return new JarFile(file);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static JarFile create(File file) {
+        try {
+            return new JarFile(file);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static InputStream getInputStream(JarFile file, ZipEntry entry) {
+        try {
+            return file.getInputStream(entry);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static JarFile toJarFile(URL jarUrl) {
+        java.net.URLConnection con = openConnection(jarUrl);
+        if (con instanceof JarURLConnection) {
+            return getJarFile((JarURLConnection) con);
+        } else {
+            return create(new File(toJarFilePath(jarUrl)));
+        }
+    }
+
+    public static String toJarFilePath(URL jarUrl) {
+        URL nestedUrl = createURL(jarUrl.getPath());
+        String nestedUrlPath = nestedUrl.getPath();
+        int pos = nestedUrlPath.lastIndexOf('!');
+        String jarFilePath = nestedUrlPath.substring(0, pos);
+        File jarFile = new File(decodeURL(jarFilePath, "UTF8"));
+        return getCanonicalPath(jarFile);
+    }
+
+    public static JarFile getJarFile(JarURLConnection conn) {
+        try {
+            return conn.getJarFile();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static void close(JarFile jarFile) {
+        try {
+            jarFile.close();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected static ClassLoader getClassLoader() {
         return Thread.currentThread().getContextClassLoader();
-    }
-
-    protected static InputStream openStream(URL url) {
-        try {
-            URLConnection connection = url.openConnection();
-            connection.setUseCaches(false);
-            return connection.getInputStream();
-        } catch (IOException e) {
-            String msg = "Failed to open the stream: url=" + url;
-            throw new IllegalStateException(msg, e);
-        }
     }
 
     // ===================================================================================

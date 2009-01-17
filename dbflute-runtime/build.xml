@@ -54,17 +54,20 @@
     <jar jarfile="dist/dbflute-runtime-${version}.jar" basedir="target/classes"></jar>
   </target>
 
-  <target name="reflect-mac-limit-spring">
+  <target name="reflect-mac-all">
 
     <echo message="+------------------------------------------+"/>
     <echo message="|                                          |"/>
-    <echo message="| Reflecting library to Spring project!    |"/>
+    <echo message="| Reflecting library to all projects!      |"/>
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
     <delete file="../dbflute-spring-example/lib/forDBFlute/dbflute-runtime-*.jar"/>
     <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-spring-example/lib/forDBFlute/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-basic-example90/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
     	  overwrite="true"/>
   </target>
 </project>
