@@ -1,11 +1,11 @@
-package com.example.dbflute.basic.dbflute.allcommon.helper;
+package org.seasar.dbflute.dbflute.allcommon.helper;
 
 import java.util.Arrays;
 import java.util.Map;
 
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
+import org.seasar.dbflute.unit.PlainTestCase;
 
-import com.example.dbflute.basic.unit.PlainTestCase;
 
 /**
  * @author jflute

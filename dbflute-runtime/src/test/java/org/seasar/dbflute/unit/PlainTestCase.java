@@ -1,4 +1,4 @@
-package com.example.dbflute.basic.unit;
+package org.seasar.dbflute.unit;
 
 import java.sql.Timestamp;
 

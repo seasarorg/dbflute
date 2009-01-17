@@ -1,9 +1,9 @@
-package com.example.dbflute.basic.dbflute.allcommon.cbean.coption;
+package org.seasar.dbflute.dbflute.allcommon.cbean.coption;
 
 
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+import org.seasar.dbflute.unit.PlainTestCase;
 
-import com.example.dbflute.basic.unit.PlainTestCase;
 
 /**
  * The test of like-search option.
