@@ -23,7 +23,7 @@ import org.t2framework.lucy.Lucy;
 #end
 
 /**
- * The implementation of behavior-selector.
+ * The implementation of behavior selector.
  * @author DBFlute(AutoGenerator)
  */
 public class ImplementedBehaviorSelector implements BehaviorSelector {
