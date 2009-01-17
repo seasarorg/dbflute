@@ -17,6 +17,7 @@
   <property name="dbflute.runtime.dir" value="${workspace.base}/dbflute-runtime"/>
   <property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example90"/>
   <property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
+  <property name="dbflute.lucy.example.dir" value="${workspace.base}/dbflute-lucy-example"/>
 
   <target name="clean">
     <delete dir="target/classes"/>
@@ -149,5 +150,12 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  </target>
+
+  <target name="reflect-mac-limit-lucy" depends="expand-dist" description="==> reflect to spring application">
+    <copy todir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  	<chmod dir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 </project>
