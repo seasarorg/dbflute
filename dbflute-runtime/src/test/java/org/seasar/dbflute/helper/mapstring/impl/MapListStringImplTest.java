@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper;
+package org.seasar.dbflute.helper.mapstring.impl;
 
 import java.util.Arrays;
 import java.util.Map;
