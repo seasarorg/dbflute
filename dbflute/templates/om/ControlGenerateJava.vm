@@ -532,7 +532,7 @@ targetdatabase = $targetDatabase
 
         $database.info("    parse('BehaviorCreator');")
         #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2Container})}${glBehaviorCreator}.${glClassFileExtension}" )
-        $generator.parse("om/${glResourceDirectory}/allcommon/container/BehaviorCreator.${glTemplateFileExtension}",$path ,"" ,"")
+        $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/BehaviorCreator.${glTemplateFileExtension}",$path ,"" ,"")
 
         #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
           #set ($path = "${dbfluteDiconPackageName}" )
@@ -540,15 +540,15 @@ targetdatabase = $targetDatabase
 
           #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
           $database.info("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/container/DBFluteHotDeployDicon.${glTemplateFileExtension}", $path, "", "")
+          $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/HotDeployDicon.${glTemplateFileExtension}", $path, "", "")
 
           #set ($path = "${dbfluteDiconPackageName}/${glCreatorDiconFileName}" )
           $database.info("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/container/DBFluteCreatorDicon.${glTemplateFileExtension}", $path, "", "")
+          $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/CreatorDicon.${glTemplateFileExtension}", $path, "", "")
 
           #set ($path = "${dbfluteDiconPackageName}/${glCustomizerDiconFileName}" )
           $database.info("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/container/DBFluteCustomizerDicon.${glTemplateFileExtension}", $path, "", "")
+          $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/hotdeploy/CustomizerDicon.${glTemplateFileExtension}", $path, "", "")
         #end
       #else
         #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
@@ -557,7 +557,7 @@ targetdatabase = $targetDatabase
 
           #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
           $database.info("    ${path}")
-          $generator.parse("om/${glResourceDirectory}/allcommon/container/DBFluteNormalDicon.${glTemplateFileExtension}", $path, "", "")
+          $generator.parse("om/${glResourceDirectory}/allcommon/container/seasar/DBFluteDicon.${glTemplateFileExtension}", $path, "", "")
         #end
       #end
     #end
@@ -568,7 +568,17 @@ targetdatabase = $targetDatabase
 
         #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
         $database.info("    ${path}")
-        $generator.parse("om/${glResourceDirectory}/allcommon/container/DBFluteBeans.${glTemplateFileExtension}", $path, "", "")
+        $generator.parse("om/${glResourceDirectory}/allcommon/container/spring/SpringDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
+      #end
+    #end
+    #if ($database.isTargetContainerLucy())
+      #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
+        #set ($path = "${dbfluteBeansPackageName}" )
+        $database.makeDirectory($path)
+
+        #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
+        $database.info("    ${path}")
+        $generator.parse("om/${glResourceDirectory}/allcommon/container/lucy/LucyDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
       #end
     #end
     $database.info("}")

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE lucy-config PUBLIC "-//LUCY//DTD LUCY//EN" "http://www.lucy.org/dtd/lucy-config.dtd">
+<lucy-config>
+    <!-- The components of DBFlute Runtime. -->
+    <component name="dbfluteInitializer" class="com.example.dbflute.lucy.dbflute.allcommon.DBFluteInitializer"/>
+    <component name="invokerAssistant" class="com.example.dbflute.lucy.dbflute.allcommon.ImplementedInvokerAssistant">
+        <inject method="setDataSource">dataSource</inject>
+    </component>
+    <component name="commonColumnAutoSetupper" class="com.example.dbflute.lucy.dbflute.allcommon.ImplementedCommonColumnAutoSetupper"/>
+    <component name="behaviorSelector" class="com.example.dbflute.lucy.dbflute.allcommon.ImplementedBehaviorSelector"/>
+    <component name="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker">
+        <inject method="setInvokerAssistant">invokerAssistant</inject>
+    </component>
+    
+    <!-- The components of Behavior. -->
+#foreach ($table in $database.tables)
+	<component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}">
+        <inject method="setBehaviorCommandInvoker">behaviorCommandInvoker</inject>
+        <inject method="setBehaviorSelector">behaviorSelector</inject>
+        <inject method="setCommonColumnAutoSetupper">commonColumnAutoSetupper</inject>
+    </component>
+#end
+</lucy-config>
