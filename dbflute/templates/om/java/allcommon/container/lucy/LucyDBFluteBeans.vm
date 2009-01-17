@@ -7,7 +7,9 @@
         <inject method="setDataSource">dataSource</inject>
     </component>
     <component name="commonColumnAutoSetupper" class="${glPackageBaseCommon}.ImplementedCommonColumnAutoSetupper"/>
-    <component name="behaviorSelector" class="${glPackageBaseCommon}.ImplementedBehaviorSelector"/>
+    <component name="behaviorSelector" class="${glPackageBaseCommon}.ImplementedBehaviorSelector">
+        <inject method="setContainer">lucy</inject>
+    </component>
     <component name="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker">
         <inject method="setInvokerAssistant">invokerAssistant</inject>
     </component>
