@@ -37,9 +37,6 @@ public class ${glDBFluteConfig} {
     private static final boolean DEFAULT_USE_SQL_LOG_REGISTRY = false;
 #end
 
-    /** The default value of whether it uses Select Index. The default value is true. */
-    private static final boolean DEFAULT_DISABLE_SELECT_INDEX = true;
-
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -51,7 +48,7 @@ public class ${glDBFluteConfig} {
     protected DataSourceHandler _dataSourceHandler;
     protected String _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
 	protected boolean _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
-	protected boolean _disableSelectIndex = DEFAULT_DISABLE_SELECT_INDEX;
+	protected boolean _disableSelectIndex;
 	protected boolean _internalDebug;
 
 	protected boolean _locked = true;
@@ -275,7 +272,7 @@ public class ${glDBFluteConfig} {
 	    _dataSourceHandler = null;
 	    _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
 	    _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
-	    _disableSelectIndex = DEFAULT_DISABLE_SELECT_INDEX;
+	    _disableSelectIndex = false;
 		_internalDebug = false;
 	}
 }
