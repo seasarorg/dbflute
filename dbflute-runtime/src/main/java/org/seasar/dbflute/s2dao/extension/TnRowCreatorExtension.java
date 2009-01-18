@@ -12,10 +12,10 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
 import org.seasar.dbflute.util.DfSystemUtil;
-
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -26,7 +26,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(TnRowCreatorExtension.class);
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory
+            .getLog(TnRowCreatorExtension.class);
 
     /** The key of DBMeta cache. */
     protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
@@ -35,11 +36,12 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                           Attribute
     //                                                                           =========
     protected DBMeta _dbmeta;
-    
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected TnRowCreatorExtension() {}
+    protected TnRowCreatorExtension() {
+    }
 
     /**
      * @param beanClass The class of target bean to find DB-meta. (Nullable)
@@ -56,13 +58,24 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    @SuppressWarnings("unchecked")
-    @Override
-    public Object createRow(ResultSet rs, Map propertyCache, Class beanClass) throws SQLException  {
-        final Set columnNameSet = propertyCache.keySet();
+    /**
+     * @param rs Result set. (NotNull)
+     * @param propertyCache The map of property cache. Map{String(columnName), PropertyType} (NotNull)
+     * @param beanClass Bean class. (NotNull)
+     * @return Created row. (NotNull)
+     * @throws SQLException
+     */
+    public Object createRow(ResultSet rs, Map<String, TnPropertyType> propertyCache, Class<?> beanClass)
+            throws SQLException {
+        if (propertyCache.isEmpty()) {
+            String msg = "The propertyCache should not be empty: bean=" + beanClass.getName();
+            throw new IllegalStateException(msg);
+        }
+        final Set<String> columnNameSet = propertyCache.keySet();
         String columnName = null;
         TnPropertyType pt = null;
         String propertyName = null;
+        final Map<String, Integer> selectIndexMap = ResourceContext.getSelectIndexMap();
         final Object row;
         final DBMeta dbmeta;
         if (_dbmeta != null) {
@@ -74,24 +87,24 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
         try {
             if (dbmeta != null) {
-                for (final Iterator ite = columnNameSet.iterator(); ite.hasNext();) {
-                    columnName = (String) ite.next();
+                for (final Iterator<String> ite = columnNameSet.iterator(); ite.hasNext();) {
+                    columnName = ite.next();
                     pt = (TnPropertyType) propertyCache.get(columnName);
                     propertyName = pt.getPropertyName();
                     if (dbmeta.hasEntityPropertySetupper(propertyName)) {
                         final ValueType valueType = pt.getValueType();
-                        final Object value = valueType.getValue(rs, columnName);
+                        final Object value = getValue(rs, columnName, valueType, selectIndexMap);
                         dbmeta.setupEntityProperty(propertyName, row, value);
                     } else {
-                        registerValue(rs, row, pt, columnName);
+                        registerValueByReflection(rs, row, pt, columnName, selectIndexMap);
                     }
                 }
             } else {
-                for (final Iterator ite = columnNameSet.iterator(); ite.hasNext();) {
-                    columnName = (String) ite.next();
+                for (final Iterator<String> ite = columnNameSet.iterator(); ite.hasNext();) {
+                    columnName = ite.next();
                     pt = (TnPropertyType) propertyCache.get(columnName);
                     propertyName = pt.getPropertyName();
-                    registerValue(rs, row, pt, columnName);
+                    registerValueByReflection(rs, row, pt, columnName, selectIndexMap);
                 }
             }
             return row;
@@ -110,7 +123,26 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             throw e;
         }
     }
-    
+
+    protected void registerValueByReflection(ResultSet rs, Object row, TnPropertyType pt, String columnName,
+            Map<String, Integer> selectIndexMap) throws SQLException {
+        final ValueType valueType = pt.getValueType();
+        final Object value = getValue(rs, columnName, valueType, selectIndexMap);
+        final TnPropertyDesc pd = pt.getPropertyDesc();
+        pd.setValue(row, value);
+    }
+
+    protected Object getValue(ResultSet rs, String columnName, ValueType valueType, Map<String, Integer> selectIndexMap)
+            throws SQLException {
+        final Object value;
+        if (selectIndexMap != null) {
+            value = ResourceContext.getValue(rs, columnName, valueType, selectIndexMap);
+        } else {
+            value = valueType.getValue(rs, columnName);
+        }
+        return value;
+    }
+
     protected void throwNonsenseClassCastException(Object entity, DBMeta dbmeta, ClassCastException e) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -128,17 +160,20 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         msg = msg + getLineSeparator();
         msg = msg + "[Target Entity]" + getLineSeparator() + entity + getLineSeparator();
         msg = msg + getLineSeparator();
-        msg = msg + "[Target Entity Class Loader]" + getLineSeparator() + entity.getClass().getClassLoader() + getLineSeparator();
+        msg = msg + "[Target Entity Class Loader]" + getLineSeparator() + entity.getClass().getClassLoader()
+                + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Target DBMeta]" + getLineSeparator() + dbmeta + getLineSeparator();
         msg = msg + getLineSeparator();
-        msg = msg + "[Target DBMeta Class Loader]" + getLineSeparator() + dbmeta.getClass().getClassLoader() + getLineSeparator();
+        msg = msg + "[Target DBMeta Class Loader]" + getLineSeparator() + dbmeta.getClass().getClassLoader()
+                + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         throw new NonsenseClassCastException(msg, e);
     }
 
     public static class NonsenseClassCastException extends RuntimeException {
         private static final long serialVersionUID = 1L;
+
         public NonsenseClassCastException(String msg, ClassCastException e) {
             super(msg, e);
         }
@@ -165,7 +200,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     }
 
     protected static class DBMetaCacheHandler {
-        
+
         /** The key of DBMeta cache. */
         protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";
 
@@ -182,7 +217,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             cacheDBMeta(entity, dbmeta);
             return dbmeta;
         }
-        
+
         public static DBMeta findDBMeta(Class<?> rowType, String tableName) {
             DBMeta dbmeta = findCachedDBMeta(rowType);
             if (dbmeta != null) {
@@ -202,19 +237,19 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             }
             return dbmetaCache.get(rowType);
         }
-        
+
         protected static void cacheDBMeta(Entity entity, DBMeta dbmeta) {
             cacheDBMeta(entity.getClass(), dbmeta);
         }
-        
+
         protected static void cacheDBMeta(Class<?> type, DBMeta dbmeta) {
             final Map<Class<?>, DBMeta> dbmetaCache = findDBMetaCache();
             dbmetaCache.put(type, dbmeta);
         }
-        
+
         @SuppressWarnings("unchecked")
         protected static Map<Class<?>, DBMeta> findDBMetaCache() {
-            return (Map<Class<?>, DBMeta>)InternalMapContext.getObject(DBMETA_CACHE_KEY);
+            return (Map<Class<?>, DBMeta>) InternalMapContext.getObject(DBMETA_CACHE_KEY);
         }
     }
 
@@ -223,7 +258,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         if (!(instance instanceof Entity)) {
             return null;
         }
-        return ((Entity)instance).getDBMeta();
+        return ((Entity) instance).getDBMeta();
     }
 
     protected static Object newInstance(Class<?> clazz) {

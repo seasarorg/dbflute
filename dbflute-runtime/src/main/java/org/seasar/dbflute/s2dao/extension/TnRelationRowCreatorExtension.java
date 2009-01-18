@@ -11,6 +11,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -18,15 +19,13 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRelationRowCreationResource;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRelationRowCreatorImpl;
 
-
 /**
  * @author DBFlute(AutoGenerator)
  */
 public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     @Override
-    protected Object createRelationRow(TnRelationRowCreationResource res)
-            throws SQLException {
+    protected Object createRelationRow(TnRelationRowCreationResource res) throws SQLException {
         // - - - - - - - - - - - 
         // Recursive Call Point!
         // - - - - - - - - - - -
@@ -109,7 +108,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             setupNextRelationRow(res);
         }
     }
-    
+
     @Override
     protected void registerRelationValue(TnRelationRowCreationResource res, String columnName) throws SQLException {
         final TnPropertyType pt = res.getCurrentPropertyType();
@@ -118,9 +117,14 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             value = res.extractRelKeyValue(columnName);
         } else {
             final ValueType valueType = pt.getValueType();
-            value = valueType.getValue(res.getResultSet(), columnName);
+            Map<String, Integer> selectIndexMap = res.getSelectIndexMap();
+            if (selectIndexMap != null) {
+                value = ResourceContext.getValue(res.getResultSet(), columnName, valueType, selectIndexMap);
+            } else {
+                value = valueType.getValue(res.getResultSet(), columnName);
+            }
         }
-        
+
         if (value != null) {
             res.incrementValidValueCount();
             final DBMeta dbmeta = findDBMeta(res.getRow());
@@ -133,7 +137,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             }
         }
     }
-    
+
     /**
      * @param row The instance of row. (NotNull)
      * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
@@ -166,7 +170,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             }
             setupPropertyCacheElement(res);
         }
-        
+
         // Set up next relation.
         if (res.hasNextRelationProperty() && (hasConditionBean(res) || res.hasNextRelationLevel())) {
             res.backupRelationPropertyType();
@@ -196,7 +200,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     protected boolean isCreateDeadLink() {
         return false;
     }
-    
+
     @Override
     protected int getLimitRelationNestLevel() {
         return 2;// for Compatible
@@ -204,9 +208,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected TnRelationRowCreationResource createResourceForRow(ResultSet rs,
-            TnRelationPropertyType rpt, Set columnNames, Map relKeyValues,
-            Map relationPropertyCache) throws SQLException {
+    protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
+            Set columnNames, Map relKeyValues, Map relationPropertyCache) throws SQLException {
         final TnRelationRowCreationResource res = new TnRelationRowCreationResourceExtension();
         res.setResultSet(rs);
         res.setRelationPropertyType(rpt);
@@ -218,6 +221,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         res.setLimitRelationNestLevel(getLimitRelationNestLevel());
         res.setCurrentRelationNestLevel(1);// as Default
         res.setCreateDeadLink(isCreateDeadLink());
+        res.setSelectIndexMap(ResourceContext.getSelectIndexMap());
         return res;
     }
 
@@ -234,9 +238,10 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         res.setRelationNoSuffix(relationNoSuffix);
         res.setLimitRelationNestLevel(limitRelationNestLevel);
         res.setCurrentRelationNestLevel(1);// as Default
+        res.setSelectIndexMap(ResourceContext.getSelectIndexMap());
         return res;
     }
-    
+
     protected boolean isConditionBeanSelectedRelation(TnRelationRowCreationResource res) {
         if (hasConditionBean(res)) {
             final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
@@ -246,11 +251,11 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         }
         return false;
     }
-    
+
     protected boolean hasConditionBean(TnRelationRowCreationResource res) {
         return ConditionBeanContext.isExistConditionBeanOnThread();
     }
-    
+
     protected boolean hasSelectedForeignInfo(TnRelationRowCreationResource res) {
         final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
         if (cb.getSqlClause().hasSelectedForeignInfo(res.getRelationNoSuffix())) {
@@ -258,22 +263,22 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         }
         return false;
     }
-    
+
     protected static class TnRelationRowCreationResourceExtension extends TnRelationRowCreationResource {
         protected Stack<TnRelationPropertyType> backupRelationPropertyType = new Stack<TnRelationPropertyType>();
         protected Stack<String> backupBaseSuffix = new Stack<String>();
         protected Stack<String> backupRelationSuffix = new Stack<String>();
-        
+
         @Override
         public void backupRelationPropertyType() {
             backupRelationPropertyType.push(getRelationPropertyType());
         }
-        
+
         @Override
         public void restoreRelationPropertyType() {
             setRelationPropertyType(backupRelationPropertyType.pop());
         }
-        
+
         @Override
         public void backupSuffixAndPrepare(String baseSuffix, String additionalRelationNoSuffix) {
             backupBaseSuffixExtension();
@@ -281,13 +286,13 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             setBaseSuffix(baseSuffix);
             addRelationNoSuffix(additionalRelationNoSuffix);
         }
-        
+
         @Override
         public void restoreSuffix() {
             restoreBaseSuffixExtension();
             restoreRelationNoSuffixExtension();
         }
-        
+
         protected void backupBaseSuffixExtension() {
             backupBaseSuffix.push(getBaseSuffix());
         }
@@ -295,11 +300,11 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         protected void restoreBaseSuffixExtension() {
             setBaseSuffix(backupBaseSuffix.pop());
         }
-        
+
         protected void backupRelationNoSuffixExtension() {
             backupRelationSuffix.push(getRelationNoSuffix());
         }
-        
+
         protected void restoreRelationNoSuffixExtension() {
             setRelationNoSuffix(backupRelationSuffix.pop());
         }

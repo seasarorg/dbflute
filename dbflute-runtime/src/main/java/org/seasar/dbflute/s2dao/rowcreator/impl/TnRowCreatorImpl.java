@@ -15,15 +15,12 @@
  */
 package org.seasar.dbflute.s2dao.rowcreator.impl;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -34,42 +31,13 @@ import org.seasar.dbflute.util.DfStringUtil;
 /**
  * @author jflute
  */
-public class TnRowCreatorImpl implements TnRowCreator {
+public abstract class TnRowCreatorImpl implements TnRowCreator {
 
     // ===================================================================================
     //                                                                        Row Creation
     //                                                                        ============
-    /**
-     * @param rs Result set. (NotNull)
-     * @param propertyCache The map of property cache. Map{String(columnName), PropertyType} (NotNull)
-     * @param beanClass Bean class. (NotNull)
-     * @return Created row. (NotNull)
-     * @throws SQLException
-     */
-    public Object createRow(ResultSet rs, Map<String, TnPropertyType> propertyCache, Class<?> beanClass)
-            throws SQLException {
-        // - - - - - - - 
-        // Entry Point!
-        // - - - - - - -
-        final Object row = newBean(beanClass);
-        final Set<String> columnNameSet = propertyCache.keySet();
-        for (final Iterator<String> ite = columnNameSet.iterator(); ite.hasNext();) {
-            final String columnName = ite.next();
-            final TnPropertyType pt = (TnPropertyType) propertyCache.get(columnName);
-            registerValue(rs, row, pt, columnName);
-        }
-        return row;
-    }
-
     protected Object newBean(Class<?> beanClass) {
         return DfReflectionUtil.newInstance(beanClass);
-    }
-
-    protected void registerValue(ResultSet rs, Object row, TnPropertyType pt, String name) throws SQLException {
-        final ValueType valueType = pt.getValueType();
-        final Object value = valueType.getValue(rs, name);
-        final TnPropertyDesc pd = pt.getPropertyDesc();
-        pd.setValue(row, value);
     }
 
     // ===================================================================================

@@ -12,6 +12,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -57,14 +58,15 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
             final boolean specifiedOutsideSql = isSpecifiedOutsideSql();
 
             // If it has condition-bean that has no relation to get
-            // or it has outside-sql context that is specified-outside-sql,
+            // or it has outside SQL context that is specified-outside-sql,
             // they are unnecessary to do relation loop!
             skipRelationLoop = (hasCB && emptyRelation) || (hasOSC && specifiedOutsideSql);
         }
+        final Map<String, Integer> selectIndexMap = ResourceContext.getSelectIndexMap();
 
         while (rs.next()) {
             if (columnNames == null) {
-                columnNames = createColumnNames(rs.getMetaData());
+                columnNames = createColumnNames(rs);
             }
             if (propertyCache == null) {
                 propertyCache = createPropertyCache(columnNames);
@@ -100,7 +102,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
                 }
 
                 final Map<String, Object> relKeyValues = new HashMap<String, Object>();
-                final TnRelationKey relKey = createRelationKey(rs, rpt, columnNames, relKeyValues);
+                final TnRelationKey relKey = createRelationKey(rs, rpt, columnNames, relKeyValues, selectIndexMap);
                 Object relationRow = null;
                 if (relKey != null) {
                     relationRow = relRowCache.getRelationRow(i, relKey);
@@ -123,8 +125,18 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
         return list;
     }
 
+    /**
+     * Create the key of relation.
+     * @param rs The result set. (NotNull)
+     * @param rpt The property type of relation. (NotNull)
+     * @param columnNames The names of columns. (NotNull)
+     * @param relKeyValues The values of relation keys. (NotNull)
+     * @param selectIndexMap The map of select index. (Nullable: If it's null, it doesn't use select index.)
+     * @return The key of relation. (NotNull)
+     * @throws SQLException
+     */
     protected TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
-            Map<String, Object> relKeyValues) throws SQLException {
+            Map<String, Object> relKeyValues, Map<String, Integer> selectIndexMap) throws SQLException {
         final List<Object> keyList = new ArrayList<Object>();
         final TnBeanMetaData bmd = rpt.getBeanMetaData();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
@@ -142,7 +154,12 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
                     return null;
                 }
             }
-            final Object value = valueType.getValue(rs, columnName);
+            final Object value;
+            if (selectIndexMap != null) {
+                value = ResourceContext.getValue(rs, columnName, valueType, selectIndexMap);
+            } else {
+                value = valueType.getValue(rs, columnName);
+            }
             if (value == null) {
                 return null;
             }

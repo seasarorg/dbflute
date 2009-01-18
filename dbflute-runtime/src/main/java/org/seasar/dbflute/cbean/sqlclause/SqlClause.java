@@ -6,7 +6,6 @@ import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 
-
 /**
  * The interface of SQL clause.
  * @author DBFlute(AutoGenerator)
@@ -44,7 +43,7 @@ public interface SqlClause {
      * @return The 'from-where' clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
     public String getClauseFromWhereWithUnionTemplate();
-    
+
     /**
      * Get from-where clause without select and orderBy and sqlSuffix as template. 
      * For subQuery and selectCount.
@@ -64,7 +63,26 @@ public interface SqlClause {
      * @return The clause of select. {[select ...] from table...} (NotNull)
      */
     public String getSelectClause();
+
+    /**
+     * Get the map of select index.
+     * @return The map of select index. {key:columnName, value:selectIndex}
+     *         (Nullable: Null means select index is disabled.)
+     */
+    public Map<String, Integer> getSelectIndexMap();
+
+    /**
+     * Get the reverse map of select index.
+     * @return The reverse map of select index. {key:selectIndex(AliasName), value:columnName}
+     *         (Nullable: Null means select index is disabled.)
+     */
+    public Map<String, String> getSelectIndexReverseMap();
     
+    /**
+     * Disable select index.
+     */
+    public void disableSelectIndex();
+
     /**
      * Get the hint of 'select'. This is an internal method.
      * @return The hint of 'select'. {select [select-hint] * from table...} (NotNull)
@@ -117,11 +135,9 @@ public interface SqlClause {
      * @param foreignPropertyName The property name of foreign table. (NotNull)
      * @param localRelationPath The path of local relation. (Nullable)
      */
-    public void registerSelectedSelectColumn(String foreignTableAliasName
-                                           , String localTableName
-                                           , String foreignPropertyName
-                                           , String localRelationPath);
-    
+    public void registerSelectedSelectColumn(String foreignTableAliasName, String localTableName,
+            String foreignPropertyName, String localRelationPath);
+
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
@@ -151,7 +167,8 @@ public interface SqlClause {
      * @param value Condition-value. (NotNull)
      * @param option Condition-option. (NotNull)
      */
-    public void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value, ConditionOption option);
+    public void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value,
+            ConditionOption option);
 
     /**
      * Register 'where' clause.
@@ -168,47 +185,62 @@ public interface SqlClause {
     //                                                                         InlineWhere
     //                                                                         ===========
     public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value);
-    public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value, ConditionOption option);
+
+    public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value,
+            ConditionOption option);
+
     public void registerBaseTableInlineWhereClause(String value);
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key, ConditionValue value, boolean onClauseInline);
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key, ConditionValue value, ConditionOption option, boolean onClauseInline);
+
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
+            ConditionValue value, boolean onClauseInline);
+
+    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
+            ConditionValue value, ConditionOption option, boolean onClauseInline);
+
     public void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline);
 
     // ===================================================================================
     //                                                             AdditionalConditionAsOr
     //                                                             =======================
     public void makeAdditionalConditionAsOrEffective();
+
     public void ignoreAdditionalConditionAsOr();
 
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======
     public OrderByClause getSqlComponentOfOrderByClause();
+
     public SqlClause clearOrderBy();
+
     public SqlClause ignoreOrderBy();
+
     public SqlClause makeOrderByEffective();
-    
+
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
      * @param ascOrDesc Is it ascend or descend?
      */
     public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
-    
+
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
      * @param ascOrDesc Is it ascend or descend?
      */
-    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
+    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty,
+            boolean ascOrDesc);
 
     public void addNullsFirstToPreviousOrderBy();
+
     public void addNullsLastToPreviousOrderBy();
-    
+
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====
     public void registerUnionQuery(String unionClause, boolean unionAll);
+
     public boolean hasUnionQuery();
 
     // ===================================================================================
@@ -366,42 +398,53 @@ public interface SqlClause {
     //                                                                    Table Alias Info
     //                                                                    ================
     public String getLocalTableAliasName();
+
     public String getForeignTableAliasPrefix();
 
     // ===================================================================================
     //                                                                       Template Mark
     //                                                                       =============
     public String getWhereClauseMark();
+
     public String getWhereFirstConditionMark();
+
     public String getUnionSelectClauseMark();
+
     public String getUnionWhereClauseMark();
+
     public String getUnionWhereFirstConditionMark();
-    
+
     // ===================================================================================
     //                                                          Where Clause Simple Filter
     //                                                          ==========================
     public void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter);
-    
+
     // ===================================================================================
     //                                                               Selected Foreign Info
     //                                                               =====================
     public boolean isSelectedForeignInfoEmpty();
+
     public boolean hasSelectedForeignInfo(String relationPath);
+
     public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
 
     // ===================================================================================
     //                                                                    Sub Query Indent
     //                                                                    ================
     public String resolveSubQueryBeginMark(String subQueryIdentity);
+
     public String resolveSubQueryEndMark(String subQueryIdentity);
+
     public String filterSubQueryIndent(String sql);
-    
+
     // [DBFlute-0.7.4]
     // ===================================================================================
     //                                                                       Specification
     //                                                                       =============
     public void specifySelectColumn(String tableAliasName, String columnName);
+
     public void specifyDeriveSubQuery(String aliasName, String deriveSubQuery);
+
     public boolean hasSpecifiedDeriveSubQuery(String aliasName);
 
     /**
@@ -414,7 +457,7 @@ public interface SqlClause {
      * Clear specified select columns.
      */
     public void clearSpecifiedSelectColumn();
-    
+
     // [DBFlute-0.7.5]
     // ===================================================================================
     //                                                                        Query Update
@@ -424,6 +467,7 @@ public interface SqlClause {
      * @return The clause of query update. (Nullable: If columnParameterMap is empty, return null)
      */
     public String getClauseQueryUpdate(Map<String, String> columnParameterMap);
+
     public String getClauseQueryDelete();
 
     // [DBFlute-0.8.6]

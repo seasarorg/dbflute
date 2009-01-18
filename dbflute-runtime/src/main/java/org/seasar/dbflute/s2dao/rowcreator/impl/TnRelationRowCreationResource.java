@@ -80,6 +80,9 @@ public class TnRelationRowCreationResource {
 
     /** The backup of base suffix. The element type is String. */
     protected Stack<String> relationSuffixBackup;
+    
+    /** The map of select index. (Nullable) */
+    protected Map<String, Integer> _selectIndexMap;
 
     // ===================================================================================
     //                                                                            Behavior
@@ -356,5 +359,13 @@ public class TnRelationRowCreationResource {
 
     public void setCreateDeadLink(boolean createDeadLink) {
         this.createDeadLink = createDeadLink;
+    }
+
+    public Map<String, Integer> getSelectIndexMap() {
+        return _selectIndexMap;
+    }
+
+    public void setSelectIndexMap(Map<String, Integer> selectIndexMap) {
+        _selectIndexMap = selectIndexMap;
     }
 }

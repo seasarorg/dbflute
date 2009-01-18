@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -33,7 +32,7 @@ import org.seasar.dbflute.util.DfReflectionUtil;
 /**
  * @author jflute
  */
-public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
+public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
     // ===================================================================================
     //                                                                        Row Creation
@@ -58,22 +57,9 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         return createRelationRow(res);
     }
 
-    protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
+    protected abstract TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
             Set<String> columnNames, Map<String, Object> relKeyValues,
-            Map<String, Map<String, TnPropertyType>> relationPropertyCache) throws SQLException {
-        final TnRelationRowCreationResource res = new TnRelationRowCreationResource();
-        res.setResultSet(rs);
-        res.setRelationPropertyType(rpt);
-        res.setColumnNames(columnNames);
-        res.setRelKeyValues(relKeyValues);
-        res.setRelationPropertyCache(relationPropertyCache);
-        res.setBaseSuffix("");// as Default
-        res.setRelationNoSuffix(buildRelationNoSuffix(rpt));
-        res.setLimitRelationNestLevel(getLimitRelationNestLevel());
-        res.setCurrentRelationNestLevel(1);// as Default
-        res.setCreateDeadLink(isCreateDeadLink());
-        return res;
-    }
+            Map<String, Map<String, TnPropertyType>> relationPropertyCache) throws SQLException;
 
     /**
      * @param res The resource of relation row creation. (NotNull)
@@ -166,19 +152,7 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         registerRelationValue(res, columnName);
     }
 
-    protected void registerRelationValue(TnRelationRowCreationResource res, String columnName) throws SQLException {
-        final TnPropertyType pt = res.getCurrentPropertyType();
-        Object value = null;
-        if (res.containsRelKeyValueIfExists(columnName)) {
-            value = res.extractRelKeyValue(columnName);
-        } else {
-            final ValueType valueType = pt.getValueType();
-            value = valueType.getValue(res.getResultSet(), columnName);
-        }
-        if (value != null) {
-            registerRelationValidValue(res, pt, value);
-        }
-    }
+    protected abstract void registerRelationValue(TnRelationRowCreationResource res, String columnName) throws SQLException;
 
     protected void registerRelationValidValue(TnRelationRowCreationResource res, TnPropertyType pt, Object value)
             throws SQLException {
@@ -257,19 +231,9 @@ public class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         return relationPropertyCache;
     }
 
-    protected TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
+    protected abstract TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
             Set<String> columnNames, Map<String, Map<String, TnPropertyType>> relationPropertyCache, String baseSuffix,
-            String relationNoSuffix, int limitRelationNestLevel) throws SQLException {
-        final TnRelationRowCreationResource res = new TnRelationRowCreationResource();
-        res.setRelationPropertyType(rpt);
-        res.setColumnNames(columnNames);
-        res.setRelationPropertyCache(relationPropertyCache);
-        res.setBaseSuffix(baseSuffix);
-        res.setRelationNoSuffix(relationNoSuffix);
-        res.setLimitRelationNestLevel(limitRelationNestLevel);
-        res.setCurrentRelationNestLevel(1);// as Default
-        return res;
-    }
+            String relationNoSuffix, int limitRelationNestLevel) throws SQLException;
 
     protected void setupPropertyCache(TnRelationRowCreationResource res) throws SQLException {
         // - - - - - - - - - - - 

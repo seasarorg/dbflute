@@ -1,17 +1,15 @@
 package org.seasar.dbflute.s2dao.rshandler;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
-
 
 /**
  * @author DBFlute(AutoGenerator)
@@ -19,13 +17,13 @@ import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 @SuppressWarnings("unchecked")
 public abstract class TnAbstractDtoMetaDataResultSetHandler implements TnResultSetHandler {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     private TnDtoMetaData dtoMetaData;
     protected TnRowCreator rowCreator; // [DAO-118] (2007/08/25)
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
@@ -37,7 +35,7 @@ public abstract class TnAbstractDtoMetaDataResultSetHandler implements TnResultS
         this.rowCreator = rowCreator;
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     /**
@@ -60,19 +58,8 @@ public abstract class TnAbstractDtoMetaDataResultSetHandler implements TnResultS
         return rowCreator.createRow(rs, propertyCache, beanClass);
     }
 
-    protected Set<String> createColumnNames(final ResultSetMetaData rsmd) throws SQLException {
-        final int count = rsmd.getColumnCount();
-        final Set<String> columnNames = StringSet.createAsCaseInsensitive();
-        for (int i = 0; i < count; ++i) {
-            final String columnName = rsmd.getColumnLabel(i + 1);
-            final int pos = columnName.lastIndexOf('.'); // [DAO-41]
-            if (-1 < pos) {
-                columnNames.add(columnName.substring(pos + 1));
-            } else {
-                columnNames.add(columnName);
-            }
-        }
-        return columnNames;
+    protected Set<String> createColumnNames(ResultSet rs) throws SQLException {
+        return ResourceContext.createSelectColumnNames(rs);
     }
 
     public TnDtoMetaData getDtoMetaData() {

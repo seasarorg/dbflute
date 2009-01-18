@@ -1,9 +1,19 @@
 package org.seasar.dbflute.resource;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Set;
+
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.jdbc.ValueType;
 
 /**
  * The context of resource.
@@ -68,7 +78,7 @@ public class ResourceContext {
     public static boolean isCurrentDBDef(DBDef targetDBDef) {
         return currentDBDef().equals(targetDBDef);
     }
-    
+
     /**
      * @return The provider of DB meta. (NotNull)
      */
@@ -167,6 +177,71 @@ public class ResourceContext {
             return null;
         }
         return resourceParameter;
+    }
+
+    // -----------------------------------------------------
+    //                                          Select Index
+    //                                          ------------
+    public static Set<String> createSelectColumnNames(ResultSet rs) throws SQLException {
+        final ResultSetMetaData rsmd = rs.getMetaData();
+        final int count = rsmd.getColumnCount();
+        final Set<String> columnNames = StringSet.createAsCaseInsensitive();
+        for (int i = 0; i < count; ++i) {
+            final String columnName = rsmd.getColumnLabel(i + 1);
+            final int pos = columnName.lastIndexOf('.'); // for SQLite
+            if (-1 < pos) {
+                columnNames.add(columnName.substring(pos + 1));
+            } else {
+                columnNames.add(columnName);
+            }
+        }
+        Map<String, Integer> selectIndexMap = getSelectIndexMap();
+        if (selectIndexMap == null) {
+            return columnNames;
+        }
+        Map<String, String> selectIndexReverseMap = getSelectIndexReverseMap();
+        final Set<String> realColumnNames = StringSet.createAsCaseInsensitive();
+        for (String columnName : columnNames) {
+            String uniqueName = selectIndexReverseMap.get(columnName);
+            if (uniqueName != null) {
+                realColumnNames.add(uniqueName);
+            } else {
+                realColumnNames.add(columnName);
+            }
+        }
+        return realColumnNames;
+    }
+
+    public static Map<String, Integer> getSelectIndexMap() {
+        if (!ConditionBeanContext.isExistConditionBeanOnThread()) {
+            return null;
+        }
+        ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+        if (cb == null) {
+            return null;
+        }
+        return cb.getSqlClause().getSelectIndexMap();
+    }
+
+    protected static Map<String, String> getSelectIndexReverseMap() {
+        if (!ConditionBeanContext.isExistConditionBeanOnThread()) {
+            return null;
+        }
+        ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+        if (cb == null) {
+            return null;
+        }
+        return cb.getSqlClause().getSelectIndexReverseMap();
+    }
+
+    public static Object getValue(ResultSet rs, String columnName, ValueType valueType,
+            Map<String, Integer> selectIndexMap) throws SQLException { // No check!
+        Integer selectIndex = selectIndexMap.get(columnName);
+        if (selectIndex != null) {
+            return valueType.getValue(rs, selectIndex);
+        } else {
+            return valueType.getValue(rs, columnName);
+        }
     }
 
     // ===================================================================================

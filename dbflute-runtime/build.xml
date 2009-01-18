@@ -69,5 +69,8 @@
     <copy file="dist/dbflute-runtime-${version}.jar"
     	  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
     	  overwrite="true"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-lucy-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
   </target>
 </project>
