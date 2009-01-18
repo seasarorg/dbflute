@@ -67,6 +67,9 @@
     	  tofile="../dbflute-basic-example90/lib/dbflute-runtime-${version}.jar"
     	  overwrite="true"/>
     <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-mysql-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
     	  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
     	  overwrite="true"/>
     <copy file="dist/dbflute-runtime-${version}.jar"
