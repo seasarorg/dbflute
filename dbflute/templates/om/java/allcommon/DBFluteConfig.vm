@@ -37,6 +37,9 @@ public class ${glDBFluteConfig} {
     private static final boolean DEFAULT_USE_SQL_LOG_REGISTRY = false;
 #end
 
+    /** The default value of whether it uses Select Index. The default value is true. */
+    private static final boolean DEFAULT_DISABLE_SELECT_INDEX = true;
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -48,6 +51,7 @@ public class ${glDBFluteConfig} {
     protected DataSourceHandler _dataSourceHandler;
     protected String _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
 	protected boolean _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
+	protected boolean _disableSelectIndex = DEFAULT_DISABLE_SELECT_INDEX;
 	protected boolean _internalDebug;
 
 	protected boolean _locked = true;
@@ -199,6 +203,22 @@ public class ${glDBFluteConfig} {
 	    _useSqlLogRegistry = useSqlLogRegistry;
 	}
 
+    // [DBFlute-0.9.0]
+    // ===================================================================================
+    //                                                                        Select Index
+    //                                                                        ============
+	public boolean isDisableSelectIndex() {
+	    return _disableSelectIndex;
+	}
+
+	public void setDisableSelectIndex(boolean disableSelectIndex) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Setting disableSelectIndex: " + disableSelectIndex);
+		}
+	    _disableSelectIndex = disableSelectIndex;
+	}
+
     // ===================================================================================
     //                                                                      Internal Debug
     //                                                                      ==============
@@ -255,6 +275,7 @@ public class ${glDBFluteConfig} {
 	    _dataSourceHandler = null;
 	    _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
 	    _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
+	    _disableSelectIndex = DEFAULT_DISABLE_SELECT_INDEX;
 		_internalDebug = false;
 	}
 }
