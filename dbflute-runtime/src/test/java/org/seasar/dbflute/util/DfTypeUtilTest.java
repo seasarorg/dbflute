@@ -41,7 +41,7 @@ public class DfTypeUtilTest extends TestCase {
         assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toTimestampFlexibly("2008-12-30")));
         assertEquals("2008/12/30 12:34:56.000", f.format(DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56")));
         assertEquals("2008/12/30 12:34:56.789", f.format(DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56.789")));
-        
+
         SimpleDateFormat f6 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSSSSS");
         assertEquals("2008/12/30 12:34:56.123456", f6.format(Timestamp.valueOf("2008-12-30 12:34:56.123456")));
     }

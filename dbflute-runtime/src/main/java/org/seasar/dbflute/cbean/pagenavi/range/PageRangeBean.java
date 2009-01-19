@@ -1,12 +1,11 @@
 package org.seasar.dbflute.cbean.pagenavi.range;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.seasar.dbflute.cbean.pagenavi.PageNumberLink;
 import org.seasar.dbflute.cbean.pagenavi.PageNumberLinkSetupper;
-
 
 /**
  * The bean of page range.
@@ -32,14 +31,15 @@ public class PageRangeBean implements java.io.Serializable {
     //                                                                                ====
     /**
      * Build the list of page number link.
-	 * @param <LINK> The type of link.
+     * @param <LINK> The type of link.
      * @param pageNumberLinkSetupper Page number link setupper. (NotNull and Required LINK)
      * @return The list of Page number link. (NotNull)
      */
-    public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(PageNumberLinkSetupper<LINK> pageNumberLinkSetupper) {
+    public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(
+            PageNumberLinkSetupper<LINK> pageNumberLinkSetupper) {
         final List<Integer> pageNumberList = createPageNumberList();
         final List<LINK> pageNumberLinkList = new ArrayList<LINK>();
-        for (Integer pageNumber: pageNumberList) {
+        for (Integer pageNumber : pageNumberList) {
             pageNumberLinkList.add(pageNumberLinkSetupper.setup(pageNumber, pageNumber.equals(_currentPageNumber)));
         }
         return pageNumberLinkList;
@@ -66,21 +66,21 @@ public class PageRangeBean implements java.io.Serializable {
         resultList.add(new Integer(currentPageNumber));
 
         final int endPageNumber = (currentPageNumber + pageRangeSize);
-        for (int i = currentPageNumber + 1 ; i <= endPageNumber && i <= allPageCount; i++) {
+        for (int i = currentPageNumber + 1; i <= endPageNumber && i <= allPageCount; i++) {
             resultList.add(new Integer(i));
         }
 
         final boolean fillLimit = _pageRangeOption.isFillLimit();
         final int limitSize = (pageRangeSize * 2) + 1;
         if (fillLimit && !resultList.isEmpty() && resultList.size() < limitSize) {
-            final Integer firstElements = (Integer)resultList.get(0);
-            final Integer lastElements = (Integer)resultList.get(resultList.size() - 1);
+            final Integer firstElements = (Integer) resultList.get(0);
+            final Integer lastElements = (Integer) resultList.get(resultList.size() - 1);
             if (firstElements.intValue() > 1) {
-                for (int i = firstElements.intValue() - 1 ; resultList.size() < limitSize && i > 0; i--) {
+                for (int i = firstElements.intValue() - 1; resultList.size() < limitSize && i > 0; i--) {
                     resultList.add(0, new Integer(i));
                 }
             }
-            for (int i = lastElements.intValue() + 1 ; resultList.size() < limitSize && i <= allPageCount; i++) {
+            for (int i = lastElements.intValue() + 1; resultList.size() < limitSize && i <= allPageCount; i++) {
                 resultList.add(new Integer(i));
             }
         }
@@ -119,7 +119,7 @@ public class PageRangeBean implements java.io.Serializable {
         if (array.length == 0) {
             return false;
         }
-        return array[array.length-1] < _allPageCount;
+        return array[array.length - 1] < _allPageCount;
     }
 
     // ===================================================================================
@@ -128,8 +128,8 @@ public class PageRangeBean implements java.io.Serializable {
     protected int[] convertListToIntArray(List<Integer> ls) {
         final int[] resultArray = new int[ls.size()];
         int arrayIndex = 0;
-        for (Iterator<Integer> ite = ls.iterator(); ite.hasNext(); ) {
-            final Integer tmpPageNumber = (Integer)ite.next();
+        for (Iterator<Integer> ite = ls.iterator(); ite.hasNext();) {
+            final Integer tmpPageNumber = (Integer) ite.next();
             resultArray[arrayIndex] = tmpPageNumber.intValue();
             arrayIndex++;
         }
@@ -149,25 +149,12 @@ public class PageRangeBean implements java.io.Serializable {
     }
 
     // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setCurrentPageNumber(int currentPageNumber) {
-        this._currentPageNumber = currentPageNumber;
-    }
-    public void setAllPageCount(int allPageCount) {
-        this._allPageCount = allPageCount;
-    }
-    public void setPageRangeOption(PageRangeOption pageRangeOption) {
-        this._pageRangeOption = pageRangeOption;
-    }
-
-    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     /**
      * @return The view string of all attribute values. (NotNull)
      */
-	 @Override
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
 
@@ -176,5 +163,20 @@ public class PageRangeBean implements java.io.Serializable {
         sb.append(" pageRangeOption=").append(_pageRangeOption);
 
         return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setCurrentPageNumber(int currentPageNumber) {
+        this._currentPageNumber = currentPageNumber;
+    }
+
+    public void setAllPageCount(int allPageCount) {
+        this._allPageCount = allPageCount;
+    }
+
+    public void setPageRangeOption(PageRangeOption pageRangeOption) {
+        this._pageRangeOption = pageRangeOption;
     }
 }

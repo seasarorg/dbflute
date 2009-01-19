@@ -1,12 +1,11 @@
 package org.seasar.dbflute.cbean.pagenavi.group;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.seasar.dbflute.cbean.pagenavi.PageNumberLink;
 import org.seasar.dbflute.cbean.pagenavi.PageNumberLinkSetupper;
-
 
 /**
  * The bean of page group.
@@ -32,14 +31,15 @@ public class PageGroupBean implements java.io.Serializable {
     //                                                                                ====
     /**
      * Build the list of page number link.
-	 * @param <LINK> The type of link.
+     * @param <LINK> The type of link.
      * @param pageNumberLinkSetupper Page number link setupper. (NotNull and Required LINK)
      * @return The list of Page number link. (NotNull)
      */
-    public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(PageNumberLinkSetupper<LINK> pageNumberLinkSetupper) {
+    public <LINK extends PageNumberLink> List<LINK> buildPageNumberLinkList(
+            PageNumberLinkSetupper<LINK> pageNumberLinkSetupper) {
         final List<Integer> pageNumberList = createPageNumberList();
         final List<LINK> pageNumberLinkList = new ArrayList<LINK>();
-        for (Integer pageNumber: pageNumberList) {
+        for (Integer pageNumber : pageNumberList) {
             pageNumberLinkList.add(pageNumberLinkSetupper.setup(pageNumber, pageNumber.equals(_currentPageNumber)));
         }
         return pageNumberLinkList;
@@ -55,8 +55,7 @@ public class PageGroupBean implements java.io.Serializable {
         final int currentPageNumber = _currentPageNumber;
 
         int currentPageGroupNumber = (currentPageNumber / pageGroupSize);
-        if ((currentPageNumber % pageGroupSize) == 0)
-        {
+        if ((currentPageNumber % pageGroupSize) == 0) {
             currentPageGroupNumber--;
         }
         final int currentPageGroupStartPageNumber = (pageGroupSize * currentPageGroupNumber) + 1;
@@ -86,7 +85,7 @@ public class PageGroupBean implements java.io.Serializable {
         final int nextPageGroupStartPageNumber = currentPageGroupStartPageNumber + pageGroupSize;
 
         final List<Integer> resultList = new ArrayList<Integer>();
-        for (int i=currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
+        for (int i = currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
             resultList.add(new Integer(i));
         }
         return resultList;
@@ -136,8 +135,8 @@ public class PageGroupBean implements java.io.Serializable {
     protected int[] convertListToIntArray(List<Integer> ls) {
         final int[] resultArray = new int[ls.size()];
         int arrayIndex = 0;
-        for (Iterator<Integer> ite = ls.iterator(); ite.hasNext(); ) {
-            final Integer tmpPageNumber = (Integer)ite.next();
+        for (Iterator<Integer> ite = ls.iterator(); ite.hasNext();) {
+            final Integer tmpPageNumber = (Integer) ite.next();
             resultArray[arrayIndex] = tmpPageNumber.intValue();
             arrayIndex++;
         }
@@ -167,7 +166,7 @@ public class PageGroupBean implements java.io.Serializable {
     /**
      * @return The view string of all attribute values. (NotNull)
      */
-	@Override
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
 
@@ -184,9 +183,11 @@ public class PageGroupBean implements java.io.Serializable {
     public void setCurrentPageNumber(int currentPageNumber) {
         this._currentPageNumber = currentPageNumber;
     }
+
     public void setAllPageCount(int allPageCount) {
         this._allPageCount = allPageCount;
     }
+
     public void setPageGroupOption(PageGroupOption pageGroupOption) {
         this._pageGroupOption = pageGroupOption;
     }
