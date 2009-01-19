@@ -75,5 +75,21 @@
     <copy file="dist/dbflute-runtime-${version}.jar"
     	  tofile="../dbflute-lucy-example/lib/dbflute-runtime-${version}.jar"
     	  overwrite="true"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+  </target>
+
+  <target name="reflect-mac-container">
+    <delete file="../dbflute-spring-example/lib/forDBFlute/dbflute-runtime-*.jar"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-basic-example90/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-lucy-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
   </target>
 </project>

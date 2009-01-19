@@ -576,6 +576,48 @@ public class DfTypeUtil {
         return pattern;
     }
 
+    public static Date toDateFlexibly(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        if (!(obj instanceof String)) {
+            return toDate(obj);
+        }
+        String value = filterDateStringValue((String) obj);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            return format.parse(value);
+        } catch (ParseException e) {
+            throw new IllegalStateException(e); // System Exception!
+        }
+    }
+
+    protected static String filterDateStringValue(String value) {
+        value = value.trim();
+        if (value.length() <= 8) { // If the value is '20090119'
+            if (value.length() == 7) {
+                value = "0" + value;
+            } else if (value.length() == 6) {
+                value = "00" + value;
+            } else if (value.length() == 5) {
+                value = "000" + value;
+            }
+            String yyyy = value.substring(0, 4);
+            String mm = value.substring(4, 6);
+            String dd = value.substring(6, 8);
+            value = yyyy + "-" + mm + "-" + dd;
+        }
+        if (value.indexOf("/") == 4 && value.lastIndexOf("/") == 7) {
+            value = value.replaceAll("/", "-");
+        }
+        if (value.indexOf("-") == 4 && value.lastIndexOf("-") == 7) {
+            if (value.length() == "2007-07-09".length()) {
+                value = value + " 00:00:00";
+            }
+        }
+        return value;
+    }
+
     // -----------------------------------------------------
     //                                             Timestamp
     //                                             ---------
@@ -596,6 +638,43 @@ public class DfTypeUtil {
 
     public static String getPattern(Locale locale) {
         return getDateY4Pattern(locale) + " " + getTimePattern(locale);
+    }
+
+    public static Date toTimestampFlexibly(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        if (!(obj instanceof String)) {
+            return toDate(obj);
+        }
+        String value = filterTimestampStringValue((String) obj);
+        return Timestamp.valueOf(value);
+    }
+
+    protected static String filterTimestampStringValue(String value) {
+        value = value.trim();
+        if (value.length() <= 8) { // If the value is '20090119'
+            if (value.length() == 7) {
+                value = "0" + value;
+            } else if (value.length() == 6) {
+                value = "00" + value;
+            } else if (value.length() == 5) {
+                value = "000" + value;
+            }
+            String yyyy = value.substring(0, 4);
+            String mm = value.substring(4, 6);
+            String dd = value.substring(6, 8);
+            value = yyyy + "-" + mm + "-" + dd;
+        }
+        if (value.indexOf("/") == 4 && value.lastIndexOf("/") == 7) {
+            value = value.replaceAll("/", "-");
+        }
+        if (value.indexOf("-") == 4 && value.lastIndexOf("-") == 7) {
+            if (value.length() == "2007-07-09".length()) {
+                value = value + " 00:00:00";
+            }
+        }
+        return value;
     }
 
     // -----------------------------------------------------
