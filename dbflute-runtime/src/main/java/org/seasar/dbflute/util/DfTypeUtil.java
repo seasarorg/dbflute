@@ -576,6 +576,11 @@ public class DfTypeUtil {
         return pattern;
     }
 
+    /**
+     * Convert the date object to the instance of date flexibly.
+     * @param obj The date object. (Nullable)
+     * @return The instance of date. (Nullable: If the value is null or empty, it returns null.)
+     */
     public static Date toDateFlexibly(Object obj) {
         if (obj == null) {
             return null;
@@ -583,10 +588,14 @@ public class DfTypeUtil {
         if (!(obj instanceof String)) {
             return toDate(obj);
         }
-        String value = filterDateStringValue((String) obj);
+        String value = (String) obj;
+        if (value.length() == 0) {
+            return null;
+        }
+        String filtered = filterDateStringValue(value);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            return format.parse(value);
+            return format.parse(filtered);
         } catch (ParseException e) {
             throw new IllegalStateException(e); // System Exception!
         }
@@ -601,6 +610,8 @@ public class DfTypeUtil {
                 value = "00" + value;
             } else if (value.length() == 5) {
                 value = "000" + value;
+            } else if (value.length() <= 4) {
+                return value;
             }
             String yyyy = value.substring(0, 4);
             String mm = value.substring(4, 6);
@@ -640,6 +651,11 @@ public class DfTypeUtil {
         return getDateY4Pattern(locale) + " " + getTimePattern(locale);
     }
 
+    /**
+     * Convert the time-stamp object to the instance of time-stamp flexibly.
+     * @param obj The time-stamp object. (Nullable)
+     * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
+     */
     public static Date toTimestampFlexibly(Object obj) {
         if (obj == null) {
             return null;
@@ -647,8 +663,12 @@ public class DfTypeUtil {
         if (!(obj instanceof String)) {
             return toDate(obj);
         }
-        String value = filterTimestampStringValue((String) obj);
-        return Timestamp.valueOf(value);
+        String value = (String) obj;
+        if (value.trim().length() == 0) {
+            return null;
+        }
+        String filtered = filterTimestampStringValue((String) obj);
+        return Timestamp.valueOf(filtered);
     }
 
     protected static String filterTimestampStringValue(String value) {
@@ -660,6 +680,8 @@ public class DfTypeUtil {
                 value = "00" + value;
             } else if (value.length() == 5) {
                 value = "000" + value;
+            } else if (value.length() <= 4) {
+                return value;
             }
             String yyyy = value.substring(0, 4);
             String mm = value.substring(4, 6);
