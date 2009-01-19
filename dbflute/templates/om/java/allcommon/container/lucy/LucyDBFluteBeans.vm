@@ -19,7 +19,9 @@
 	<component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}">
         <inject method="setBehaviorCommandInvoker">behaviorCommandInvoker</inject>
         <inject method="setBehaviorSelector">behaviorSelector</inject>
+#if ($table.isWritable())
         <inject method="setCommonColumnAutoSetupper">commonColumnAutoSetupper</inject>
+#end
     </component>
 #end
 </lucy-config>
