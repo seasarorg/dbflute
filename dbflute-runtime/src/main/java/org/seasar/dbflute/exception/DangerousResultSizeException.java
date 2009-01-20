@@ -2,7 +2,6 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the result size is dangerous.
- * 
  * @author DBFlute(AutoGenerator)
  */
 public class DangerousResultSizeException extends RuntimeException {
@@ -18,7 +17,6 @@ public class DangerousResultSizeException extends RuntimeException {
      * 
      * @param msg Exception message.
      * @param safetyMaxResultSize Safety max result size.
-     * @param selectedCount Selected count.
      */
     public DangerousResultSizeException(String msg, int safetyMaxResultSize) {
         super(msg);
@@ -27,7 +25,6 @@ public class DangerousResultSizeException extends RuntimeException {
 
     /**
      * Get safety max result size.
-     * 
      * @return Safety max result size.
      */
     public int getSafetyMaxResultSize() {
