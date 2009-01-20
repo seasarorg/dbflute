@@ -146,7 +146,7 @@ public final class DfAntTaskUtil {
         } else if (taskName.endsWith("data-model")) {
             return "Generate";
         } else if (taskName.endsWith("sql2entity")) {
-            return "OutsideSqlTest";
+            return "Sql2Entity";
         } else if (taskName.endsWith("outside-sql-test")) {
             return "OutsideSqlTest";
         } else if (taskName.endsWith("create-schema")) {

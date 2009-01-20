@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
@@ -207,8 +208,13 @@ public final class DfBehaviorFilterProperties extends DfAbstractHelperProperties
                 value = DfStringUtil.replace(value, "$$allcommon$$", baseCommonPackage);
             }
             if (value != null && value.contains("$$AccessContext$$")) {
-                final String accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
-                value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
+                if (DfBuildProperties.getInstance().isVersionJavaOverNinety()) { // as patch for 90
+                    final String accessContext = "org.seasar.dbflute.AccessContext";
+                    value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
+                } else {
+                    final String accessContext = baseCommonPackage + "." + projectPrefix + "AccessContext";
+                    value = DfStringUtil.replace(value, "$$AccessContext$$", accessContext);
+                }
             }
             map.put(key, value);
         }
