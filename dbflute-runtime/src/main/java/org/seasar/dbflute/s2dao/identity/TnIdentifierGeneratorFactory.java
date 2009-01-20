@@ -12,7 +12,7 @@ import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnIdentifierGeneratorFactory {
 

@@ -2,7 +2,7 @@ package org.seasar.dbflute.dbway;
 
 /**
  * The DB way of MySQL.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class WayOfMySQL implements DBWay {
 

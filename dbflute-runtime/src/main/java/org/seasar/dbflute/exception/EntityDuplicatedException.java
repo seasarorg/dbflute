@@ -3,7 +3,7 @@ package org.seasar.dbflute.exception;
 /**
  * The exception of when the entity has been duplicated.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class EntityDuplicatedException extends RecordHasOverlappedException {
 

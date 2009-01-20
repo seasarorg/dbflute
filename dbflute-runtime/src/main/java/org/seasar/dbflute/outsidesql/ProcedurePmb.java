@@ -2,7 +2,7 @@ package org.seasar.dbflute.outsidesql;
 
 /**
  * The parameter-bean for procedure.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface ProcedurePmb {
 

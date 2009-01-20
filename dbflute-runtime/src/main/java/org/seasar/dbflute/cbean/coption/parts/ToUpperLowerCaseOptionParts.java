@@ -4,7 +4,7 @@ package org.seasar.dbflute.cbean.coption.parts;
 /**
  * The class of condition-option-parts about toUpperCase/toLowerCase.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ToUpperLowerCaseOptionParts {
 

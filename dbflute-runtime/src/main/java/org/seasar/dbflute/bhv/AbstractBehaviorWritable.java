@@ -39,7 +39,7 @@ import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
 
 /**
  * The abstract class of writable behavior.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable implements BehaviorWritable {
 

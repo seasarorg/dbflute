@@ -12,7 +12,7 @@ package org.seasar.dbflute.cbean.coption;
  *   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
  * 
  * </pre>
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class DateFromToOption extends FromToOption {
 

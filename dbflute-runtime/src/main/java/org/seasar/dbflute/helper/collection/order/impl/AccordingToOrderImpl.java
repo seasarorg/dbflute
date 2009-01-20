@@ -12,7 +12,7 @@ import org.seasar.dbflute.helper.collection.order.AccordingToOrderOption;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class AccordingToOrderImpl implements AccordingToOrder {
 

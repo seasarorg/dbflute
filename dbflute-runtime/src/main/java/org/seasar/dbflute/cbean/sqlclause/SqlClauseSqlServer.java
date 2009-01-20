@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean.sqlclause;
 
 /**
  * SqlClause for MSSQL.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SqlClauseSqlServer extends AbstractSqlClause {
 

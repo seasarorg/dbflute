@@ -8,7 +8,7 @@ import org.seasar.dbflute.Entity;
 /**
  * The interface of entity list setupper.
  * @param <ENTITY> The type of entity.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface EntityListSetupper<ENTITY extends Entity> {
 

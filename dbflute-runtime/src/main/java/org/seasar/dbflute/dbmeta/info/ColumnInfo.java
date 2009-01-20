@@ -5,7 +5,7 @@ import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
 
 /**
  * The information of column.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ColumnInfo {
 

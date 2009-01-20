@@ -11,7 +11,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 
 /**
  * The information of foreign relation.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ForeignInfo implements RelationInfo {
 

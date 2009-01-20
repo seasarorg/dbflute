@@ -22,7 +22,7 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <RESULT> The type of result.
  */
 public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand<RESULT>, BehaviorCommandComponentSetup {

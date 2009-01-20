@@ -2,7 +2,7 @@ package org.seasar.dbflute.cbean.pagenavi.range;
 
 /**
  * The option of page range.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class PageRangeOption implements java.io.Serializable {
 

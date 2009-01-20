@@ -2,7 +2,7 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the IF comment has a wrong expression about outsideSql.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class IfCommentWrongExpressionException extends RuntimeException {
 

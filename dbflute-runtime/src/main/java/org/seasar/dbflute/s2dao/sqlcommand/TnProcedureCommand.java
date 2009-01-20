@@ -11,7 +11,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnProcedureHandler;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
 

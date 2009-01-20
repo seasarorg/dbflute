@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OrderByClause implements Serializable {
 

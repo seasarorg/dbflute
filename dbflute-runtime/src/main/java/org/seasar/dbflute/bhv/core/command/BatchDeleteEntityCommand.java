@@ -7,7 +7,7 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnDeleteBatchAutoStaticCommand;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class BatchDeleteEntityCommand extends AbstractListEntityCommand {
 

@@ -7,7 +7,7 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnDeleteAutoStaticCommand;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class DeleteEntityCommand extends AbstractEntityCommand {
 

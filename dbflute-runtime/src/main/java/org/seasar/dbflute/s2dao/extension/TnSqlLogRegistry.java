@@ -7,7 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnSqlLogRegistry {
 

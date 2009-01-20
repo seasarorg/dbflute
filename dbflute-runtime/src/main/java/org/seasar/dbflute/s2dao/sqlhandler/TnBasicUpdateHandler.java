@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.jdbc.StatementFactory;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnBasicUpdateHandler extends TnBasicHandler {
 

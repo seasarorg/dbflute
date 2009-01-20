@@ -4,7 +4,7 @@ package org.seasar.dbflute.exception;
  * The exception when the record has already been deleted (by other thread). <br />
  * This class is old.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class RecordHasAlreadyBeenDeletedException extends RuntimeException {
 

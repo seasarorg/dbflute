@@ -2,7 +2,7 @@ package org.seasar.dbflute.bhv;
 
 /**
  * The class of Value-Label Box.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ValueLabelBox {
 

@@ -5,7 +5,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 
 /**
  * The condition-query as interface.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface ConditionQuery {
 

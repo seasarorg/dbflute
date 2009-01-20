@@ -23,7 +23,7 @@ import org.seasar.dbflute.s2dao.procedure.TnProcedureParameterType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnProcedureHandler extends TnBasicSelectHandler {
 

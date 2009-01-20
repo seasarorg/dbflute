@@ -5,7 +5,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnIdentifierAssignedGenerator extends TnIdentifierAbstractGenerator {
 

@@ -10,7 +10,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateBatchAutoHandler;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnUpdateBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
 

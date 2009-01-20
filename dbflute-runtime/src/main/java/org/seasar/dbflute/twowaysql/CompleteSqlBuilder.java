@@ -10,7 +10,7 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class CompleteSqlBuilder {
 

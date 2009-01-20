@@ -18,7 +18,7 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnProcedureMetaDataFactory {
 

@@ -6,7 +6,7 @@ import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
 /**
  * The class of in-scope-option.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class InScopeOption extends SimpleStringOption {
 

@@ -6,7 +6,7 @@ import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnIdentifierIdentityGenerator extends TnIdentifierAbstractGenerator {
 

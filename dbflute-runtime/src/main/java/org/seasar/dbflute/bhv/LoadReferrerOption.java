@@ -10,7 +10,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
  * The class of load referrer option.
  * @param <REFERRER_CONDITION_BEAN> The type of referrer condition-bean.
  * @param <REFERRER_ENTITY> The type of referrer entity.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class LoadReferrerOption<REFERRER_CONDITION_BEAN extends ConditionBean, REFERRER_ENTITY extends Entity> {
 

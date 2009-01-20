@@ -5,7 +5,7 @@ import org.seasar.dbflute.dbmeta.hierarchy.HierarchySourceColumn;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class HierarchySourceEntityColumn implements HierarchySourceColumn {
 

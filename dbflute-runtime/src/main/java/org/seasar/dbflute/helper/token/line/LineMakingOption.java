@@ -1,7 +1,7 @@
 package org.seasar.dbflute.helper.token.line;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class LineMakingOption {
 

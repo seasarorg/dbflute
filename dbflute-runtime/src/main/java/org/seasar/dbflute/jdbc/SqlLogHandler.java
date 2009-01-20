@@ -2,7 +2,7 @@ package org.seasar.dbflute.jdbc;
 
 /**
  * The handler of SQL log.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface SqlLogHandler {
 

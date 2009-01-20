@@ -4,7 +4,7 @@ package org.seasar.dbflute.cbean.sqlclause;
 /**
  * SqlClause for H2.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SqlClauseH2 extends AbstractSqlClause {
 

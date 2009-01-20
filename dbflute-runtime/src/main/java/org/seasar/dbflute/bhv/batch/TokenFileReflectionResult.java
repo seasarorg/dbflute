@@ -1,7 +1,7 @@
 package org.seasar.dbflute.bhv.batch;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TokenFileReflectionResult {
 

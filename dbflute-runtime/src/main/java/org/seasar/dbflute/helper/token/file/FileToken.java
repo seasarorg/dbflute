@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.token.file;
 /**
  * File-Token.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface FileToken {
 

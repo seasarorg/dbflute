@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class StringSet implements Set<String> {
 

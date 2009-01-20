@@ -8,7 +8,7 @@ import org.seasar.dbflute.jdbc.StatementConfig;
 
 /**
  * The interface of condition-bean.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface ConditionBean extends PagingBean {
 

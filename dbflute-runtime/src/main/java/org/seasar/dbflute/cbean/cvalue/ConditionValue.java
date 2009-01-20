@@ -12,7 +12,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * Condition-value.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ConditionValue {
 

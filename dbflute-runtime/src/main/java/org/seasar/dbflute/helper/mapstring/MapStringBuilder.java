@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.mapstring;
 /**
  * The interface of map-string-builder.
  *
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface MapStringBuilder {
 

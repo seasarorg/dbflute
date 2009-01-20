@@ -1,7 +1,7 @@
 package org.seasar.dbflute.bhv.core;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface SqlExecutionCreator {
 

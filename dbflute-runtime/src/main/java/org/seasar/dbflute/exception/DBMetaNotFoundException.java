@@ -2,7 +2,7 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the DB meta is not found.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class DBMetaNotFoundException extends RuntimeException {
 

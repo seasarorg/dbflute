@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean;
 /**
  * Fetch-Narrowing-Bean context. (referring to s2pager)
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class FetchNarrowingBeanContext {
 

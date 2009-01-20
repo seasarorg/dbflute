@@ -2,7 +2,7 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the condition of IF comment is not found about outsideSql.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class IfCommentConditionNotFoundException extends IfCommentWrongExpressionException {
 

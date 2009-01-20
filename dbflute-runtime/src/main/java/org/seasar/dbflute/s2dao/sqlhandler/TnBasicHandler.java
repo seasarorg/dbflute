@@ -22,7 +22,7 @@ import org.seasar.dbflute.twowaysql.CompleteSqlBuilder;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnBasicHandler {
 

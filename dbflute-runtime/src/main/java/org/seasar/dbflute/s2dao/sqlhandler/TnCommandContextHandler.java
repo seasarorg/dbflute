@@ -9,7 +9,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnCommandContextHandler extends TnBasicHandler {
 

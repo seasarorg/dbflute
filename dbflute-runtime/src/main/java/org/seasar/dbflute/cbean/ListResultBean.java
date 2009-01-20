@@ -18,7 +18,7 @@ import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 /**
  * The result bean for list.
  * @param <ENTITY> The type of entity for the element of selected list.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
 

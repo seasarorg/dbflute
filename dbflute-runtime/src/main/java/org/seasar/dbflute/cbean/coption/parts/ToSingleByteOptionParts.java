@@ -7,7 +7,7 @@ import org.seasar.dbflute.helper.character.impl.GeneralCharacterImpl;
 /**
  * The interface of condition-option.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ToSingleByteOptionParts {
 

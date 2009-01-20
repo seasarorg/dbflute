@@ -9,7 +9,7 @@ import org.seasar.dbflute.dbmeta.info.RelationInfo;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class HierarchyRequestElement {
 

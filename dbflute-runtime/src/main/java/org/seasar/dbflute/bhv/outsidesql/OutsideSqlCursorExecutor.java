@@ -11,7 +11,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 /**
  * The cursor executor of outside-SQL.
  * @param <PARAMETER_BEAN> The type of parameter-bean.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
 

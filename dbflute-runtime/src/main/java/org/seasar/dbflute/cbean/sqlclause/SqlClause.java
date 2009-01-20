@@ -8,7 +8,7 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 
 /**
  * The interface of SQL clause.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface SqlClause {
 

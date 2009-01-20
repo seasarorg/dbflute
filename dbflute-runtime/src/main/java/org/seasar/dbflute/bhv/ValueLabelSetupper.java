@@ -5,7 +5,7 @@ import org.seasar.dbflute.Entity;
 /**
  * The interface of Value-Label Setupper.
  * @param <ENTITY> The type of entity.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface ValueLabelSetupper<ENTITY extends Entity> {
 

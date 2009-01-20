@@ -17,7 +17,7 @@ import org.seasar.dbflute.dbway.WayOfUnknown;
 
 /**
  * The definition of database.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public enum DBDef {
 

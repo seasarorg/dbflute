@@ -2,7 +2,7 @@ package org.seasar.dbflute.dbway;
 
 /**
  * The DB way of H2.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class WayOfH2 implements DBWay {
 

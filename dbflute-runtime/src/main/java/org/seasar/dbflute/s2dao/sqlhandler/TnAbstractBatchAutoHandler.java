@@ -20,7 +20,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
 

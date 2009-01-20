@@ -4,7 +4,7 @@ package org.seasar.dbflute.exception;
  * The exception when the record has overlapped.
  * This class is old.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class RecordHasOverlappedException extends RuntimeException {
 

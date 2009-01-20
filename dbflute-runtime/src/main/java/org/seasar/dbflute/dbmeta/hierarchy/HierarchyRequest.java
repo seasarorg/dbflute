@@ -14,7 +14,7 @@ import org.seasar.dbflute.dbmeta.info.RelationInfo;
 
 /**
  * The request of hierarchy.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <LOCAL_ENTITY> The type of local entity.
  */
 public class HierarchyRequest<LOCAL_ENTITY extends Entity> {

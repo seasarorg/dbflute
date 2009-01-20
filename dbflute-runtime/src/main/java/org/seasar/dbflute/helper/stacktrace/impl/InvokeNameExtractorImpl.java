@@ -5,7 +5,7 @@ import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractor;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class InvokeNameExtractorImpl implements InvokeNameExtractor {
 

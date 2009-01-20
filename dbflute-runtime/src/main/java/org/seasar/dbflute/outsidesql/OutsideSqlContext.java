@@ -18,7 +18,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The context of outside-SQL.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OutsideSqlContext {
 

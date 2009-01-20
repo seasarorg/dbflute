@@ -2,7 +2,7 @@ package org.seasar.dbflute.dbmeta.hierarchy;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface HierarchySourceRow {
 

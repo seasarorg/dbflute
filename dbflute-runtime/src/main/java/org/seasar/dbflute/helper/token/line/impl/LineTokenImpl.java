@@ -10,7 +10,7 @@ import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class LineTokenImpl implements LineToken {
 

@@ -2,7 +2,7 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the property on embedded value comment is not found about outsideSql.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class EmbeddedValueCommentNotFoundPropertyException extends RuntimeException {
 

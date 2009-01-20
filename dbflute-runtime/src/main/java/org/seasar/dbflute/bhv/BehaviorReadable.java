@@ -8,7 +8,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 
 /**
  * The interface of behavior-readable.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface BehaviorReadable {
 

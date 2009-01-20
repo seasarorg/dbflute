@@ -14,7 +14,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticCommand {
 

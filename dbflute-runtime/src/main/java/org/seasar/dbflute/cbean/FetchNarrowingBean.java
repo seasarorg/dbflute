@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean;
 /**
  * The bean of fetch narrowing.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface FetchNarrowingBean {
 

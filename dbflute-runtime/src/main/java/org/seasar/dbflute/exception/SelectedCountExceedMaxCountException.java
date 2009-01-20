@@ -3,7 +3,7 @@ package org.seasar.dbflute.exception;
 /**
  * The exception when selected count exceeds max count.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SelectedCountExceedMaxCountException extends RuntimeException {
 

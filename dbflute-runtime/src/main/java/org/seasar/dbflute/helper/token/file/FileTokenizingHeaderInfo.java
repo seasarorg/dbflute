@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.token.file;
 import java.util.List;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class FileTokenizingHeaderInfo {
 

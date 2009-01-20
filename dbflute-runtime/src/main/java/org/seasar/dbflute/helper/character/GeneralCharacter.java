@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.character;
 /**
  * The interface of general character.
  *
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface GeneralCharacter {
 

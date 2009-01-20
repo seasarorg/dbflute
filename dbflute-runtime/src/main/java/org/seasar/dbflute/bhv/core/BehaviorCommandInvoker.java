@@ -29,7 +29,7 @@ import org.seasar.dbflute.util.TraceViewUtil;
  *   o injectComponentProperty(BehaviorCommandComponentSetup behaviorCommand);
  *   o invoke(BehaviorCommand behaviorCommand);
  * </pre>
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class BehaviorCommandInvoker {
 

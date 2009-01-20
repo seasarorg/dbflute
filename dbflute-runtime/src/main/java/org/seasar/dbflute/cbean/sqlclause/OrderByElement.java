@@ -7,7 +7,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OrderByElement implements Serializable {
 

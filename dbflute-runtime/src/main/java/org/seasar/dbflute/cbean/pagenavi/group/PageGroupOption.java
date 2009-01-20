@@ -2,7 +2,7 @@ package org.seasar.dbflute.cbean.pagenavi.group;
 
 /**
  * The option of page group.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class PageGroupOption implements java.io.Serializable {
 

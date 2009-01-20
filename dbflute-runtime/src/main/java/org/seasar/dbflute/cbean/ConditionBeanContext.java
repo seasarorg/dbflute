@@ -8,7 +8,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The context of condition-bean.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ConditionBeanContext {
 

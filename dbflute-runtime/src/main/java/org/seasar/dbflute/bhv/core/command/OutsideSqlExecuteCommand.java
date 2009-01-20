@@ -7,7 +7,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
 /**
  * The behavior command for OutsideSql.execute().
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer> {
 

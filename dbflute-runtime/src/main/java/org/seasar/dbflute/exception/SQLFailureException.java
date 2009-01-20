@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 /**
  * The exception of when the SQL failed to execute.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SQLFailureException extends RuntimeException {
 

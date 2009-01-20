@@ -8,7 +8,7 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 
 /**
  * The abstract class of condition-key.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class ConditionKey {
 

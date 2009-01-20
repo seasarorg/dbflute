@@ -23,7 +23,7 @@ import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class FileTokenImpl implements FileToken {
 

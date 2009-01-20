@@ -15,7 +15,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 /**
  * The cursor executor of outside-SQL.
  * @param <PARAMETER_BEAN> The type of parameter-bean.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
 

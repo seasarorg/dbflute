@@ -6,7 +6,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class TnAbstractStaticCommand extends TnAbstractSqlCommand {
 

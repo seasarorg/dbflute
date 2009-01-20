@@ -1,7 +1,7 @@
 package org.seasar.dbflute.helper.token.file;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface FileMakingSimpleFacade {
 

@@ -2,7 +2,7 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the required option is not found.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class RequiredOptionNotFoundException extends RuntimeException {
 

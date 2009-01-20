@@ -18,7 +18,7 @@ import org.seasar.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnRowCreatorExtension extends TnRowCreatorImpl {
 

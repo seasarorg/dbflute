@@ -4,7 +4,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 
 /**
  * The creator of SQL clause.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface SqlClauseCreator {
 

@@ -11,7 +11,7 @@ import org.seasar.dbflute.resource.ResourceContext;
 
 /**
  * The class of like-search-option.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class LikeSearchOption extends SimpleStringOption {
 

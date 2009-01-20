@@ -7,7 +7,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnBasicUpdateHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnUpdateDynamicCommand extends TnAbstractDynamicCommand {
 

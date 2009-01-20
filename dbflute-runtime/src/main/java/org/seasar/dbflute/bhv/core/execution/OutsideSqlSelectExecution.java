@@ -20,7 +20,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
 

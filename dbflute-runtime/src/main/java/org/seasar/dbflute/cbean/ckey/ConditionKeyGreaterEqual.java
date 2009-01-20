@@ -10,7 +10,7 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 /**
  * The condition-key of greaterEqual.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ConditionKeyGreaterEqual extends ConditionKey {
 

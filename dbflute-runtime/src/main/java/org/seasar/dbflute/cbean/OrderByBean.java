@@ -5,7 +5,7 @@ import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 /**
  * The order-by-bean as interface.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface OrderByBean extends SelectResource {
 

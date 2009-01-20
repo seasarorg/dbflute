@@ -2,7 +2,7 @@ package org.seasar.dbflute.dbway;
 
 /**
  * The DB way of Unknown.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class WayOfUnknown implements DBWay {
 

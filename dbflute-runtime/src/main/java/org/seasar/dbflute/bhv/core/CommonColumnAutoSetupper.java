@@ -4,7 +4,7 @@ import org.seasar.dbflute.Entity;
 
 /**
  * The auto set-upper of common column.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface CommonColumnAutoSetupper {
 

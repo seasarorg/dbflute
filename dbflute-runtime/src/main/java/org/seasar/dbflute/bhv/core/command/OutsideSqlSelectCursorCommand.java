@@ -9,7 +9,7 @@ import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 /**
  * The behavior command for OutsideSql.selectList().
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectCommand<Object> {
 

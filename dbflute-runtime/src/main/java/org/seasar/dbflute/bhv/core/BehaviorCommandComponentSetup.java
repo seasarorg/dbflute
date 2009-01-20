@@ -7,7 +7,7 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface BehaviorCommandComponentSetup {
 

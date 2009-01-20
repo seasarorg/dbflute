@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 /**
  * The exception of when the entity already exists on the database.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class EntityAlreadyExistsException extends SQLFailureException {
 

@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 /**
  * The handler of cursor.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface CursorHandler {
 

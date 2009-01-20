@@ -4,7 +4,7 @@ package org.seasar.dbflute.cbean.grouping;
  * The setupper of grouping row.
  * @param <ROW> The type of row.
  * @param <ENTITY> The type of entity.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface GroupingRowSetupper<ROW, ENTITY> {
 

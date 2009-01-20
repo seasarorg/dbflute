@@ -4,7 +4,7 @@ import org.seasar.dbflute.bhv.BehaviorReadable;
 
 /**
  * The interface of behavior-selector.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface BehaviorSelector {
 

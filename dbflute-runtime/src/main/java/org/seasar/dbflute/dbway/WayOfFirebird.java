@@ -2,7 +2,7 @@ package org.seasar.dbflute.dbway;
 
 /**
  * The DB way of Firebird.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class WayOfFirebird implements DBWay {
 

@@ -9,7 +9,7 @@ import org.seasar.dbflute.cbean.pagenavi.PageNumberLinkSetupper;
 
 /**
  * The bean of page range.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class PageRangeBean implements java.io.Serializable {
 

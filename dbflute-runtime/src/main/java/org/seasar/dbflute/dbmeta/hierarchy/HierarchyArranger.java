@@ -220,7 +220,7 @@ import org.seasar.dbflute.dbmeta.info.RelationInfo;
  *
  * 
  * <pre>
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <LOCAL_ENTITY> The type of local entity extends Entity
  */
 public class HierarchyArranger<LOCAL_ENTITY extends Entity> {

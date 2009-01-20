@@ -10,7 +10,7 @@ import org.seasar.dbflute.helper.mapstring.MapListString;
 /**
  * The implementation of MapList-String.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class MapListStringImpl implements MapListString {
 

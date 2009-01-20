@@ -2,7 +2,7 @@ package org.seasar.dbflute.dbway;
 
 /**
  * The DB way of PostgreSQL.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class WayOfPostgreSQL implements DBWay {
 

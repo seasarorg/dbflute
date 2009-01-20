@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.collection.order;
 import java.util.List;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <ELEMENT_TYPE> The type of element.
  * @param <ID_TYPE> The type of ID.
  */

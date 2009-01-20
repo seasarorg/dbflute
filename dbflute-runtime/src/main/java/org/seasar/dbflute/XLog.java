@@ -1,7 +1,7 @@
 package org.seasar.dbflute;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class XLog {
 

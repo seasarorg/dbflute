@@ -8,7 +8,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 /**
  * The basic request of hierarchy.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <LOCAL_ENTITY> The type of local entity.
  * @param <LOCAL_RELATION_TRACE> The type of local relation trace.
  */

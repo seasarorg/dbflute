@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnProcedureMetaData {
 

@@ -2,7 +2,7 @@ package org.seasar.dbflute.dbway;
 
 /**
  * The DB way of SQLServer.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class WayOfSQLServer implements DBWay {
 

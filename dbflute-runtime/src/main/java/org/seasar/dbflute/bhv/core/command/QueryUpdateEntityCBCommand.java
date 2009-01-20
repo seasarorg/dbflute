@@ -9,7 +9,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateQueryAutoDynamicCommand;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class QueryUpdateEntityCBCommand extends AbstractEntityCommand {
 

@@ -4,7 +4,7 @@ import org.seasar.dbflute.jdbc.StatementConfig;
 
 /**
  * The option of outside-SQL. It contains various information about execution.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OutsideSqlOption {
 

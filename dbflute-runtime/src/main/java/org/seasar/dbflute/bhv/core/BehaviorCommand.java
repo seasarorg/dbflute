@@ -4,7 +4,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <RESULT> The type of result.
  */
 public interface BehaviorCommand<RESULT> {

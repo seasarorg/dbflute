@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean;
 /**
  * The select-resource as marker-interface.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface SelectResource {
 

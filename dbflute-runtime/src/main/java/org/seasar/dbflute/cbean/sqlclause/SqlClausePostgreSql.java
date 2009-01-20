@@ -4,7 +4,7 @@ package org.seasar.dbflute.cbean.sqlclause;
 /**
  * SqlClause for PostreSQL.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SqlClausePostgreSql extends AbstractSqlClause {
 

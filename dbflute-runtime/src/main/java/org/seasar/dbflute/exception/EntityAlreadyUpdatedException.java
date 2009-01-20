@@ -2,7 +2,7 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the entity has already been updated by other thread.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class EntityAlreadyUpdatedException extends SQLFailureException {
 

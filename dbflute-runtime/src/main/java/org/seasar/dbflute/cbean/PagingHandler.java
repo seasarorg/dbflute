@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * The handler of paging.
  * @param <ENTITY> The type of entity.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface PagingHandler<ENTITY> {
 

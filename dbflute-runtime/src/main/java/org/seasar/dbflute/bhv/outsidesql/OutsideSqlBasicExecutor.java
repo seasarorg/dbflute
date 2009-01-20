@@ -41,7 +41,7 @@ import org.seasar.dbflute.outsidesql.ProcedurePmb;
  *   o dynamicBinding().selectList()
  * </pre>
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OutsideSqlBasicExecutor {
 

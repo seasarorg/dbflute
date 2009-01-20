@@ -10,7 +10,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class BasicSelectExecution extends TnAbstractDynamicCommand {
 

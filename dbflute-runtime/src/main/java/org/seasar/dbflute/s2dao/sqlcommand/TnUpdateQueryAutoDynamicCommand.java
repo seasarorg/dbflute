@@ -23,7 +23,7 @@ import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecution {
 

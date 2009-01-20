@@ -2,7 +2,7 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the result size is dangerous.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class DangerousResultSizeException extends RuntimeException {
 

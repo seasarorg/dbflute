@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 
 /**
  * The config of statement.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class StatementConfig {
 

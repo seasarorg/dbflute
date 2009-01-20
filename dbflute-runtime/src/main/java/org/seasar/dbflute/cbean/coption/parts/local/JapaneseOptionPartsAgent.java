@@ -6,7 +6,7 @@ import org.seasar.dbflute.helper.character.impl.JapaneseCharacterImpl;
 
 /**
  * The class of condition-option-parts-agent.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class JapaneseOptionPartsAgent {
 

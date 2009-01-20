@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /**
  * The class of row resource for grouping making.
  * @param <ENTITY> The type of entity.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class GroupingRowResource<ENTITY> {
 

@@ -1,7 +1,7 @@
 package org.seasar.dbflute.util;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class DfSystemUtil {
 

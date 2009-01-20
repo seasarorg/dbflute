@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 
 /**
  * The creator of statement.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface StatementFactory {
 

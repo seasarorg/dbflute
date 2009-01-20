@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <VALUE> The type of value.
  */
 public class StringKeyMap<VALUE> implements Map<String, VALUE> {

@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 import org.seasar.dbflute.jdbc.ValueType;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnProcedureParameterType {
 

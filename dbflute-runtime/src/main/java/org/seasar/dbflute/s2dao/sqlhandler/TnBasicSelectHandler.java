@@ -16,7 +16,7 @@ import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnBasicSelectHandler extends TnBasicHandler {
 

@@ -2,7 +2,7 @@ package org.seasar.dbflute.dbmeta.hierarchy.basic;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <SOURCE_ROW> The type of source.
  */
 public class HierarchySourceEntityListIterator<SOURCE_ROW> extends HierarchySourceListIterator<SOURCE_ROW> {

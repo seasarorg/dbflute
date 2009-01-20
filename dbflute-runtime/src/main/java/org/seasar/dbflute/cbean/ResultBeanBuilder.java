@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * The builder of result bean.
  * @param <ENTITY> The type of entity.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ResultBeanBuilder<ENTITY> {
 

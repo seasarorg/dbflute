@@ -15,7 +15,7 @@ import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
 
 /**
  * The interface of DB meta.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface DBMeta {
 

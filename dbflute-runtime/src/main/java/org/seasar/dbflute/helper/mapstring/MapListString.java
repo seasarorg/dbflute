@@ -14,7 +14,7 @@ import java.util.Map;
  * # 
  * </pre>
  *
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface MapListString {
 

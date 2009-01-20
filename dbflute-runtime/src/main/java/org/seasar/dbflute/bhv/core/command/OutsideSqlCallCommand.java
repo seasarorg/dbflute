@@ -12,7 +12,7 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnProcedureCommand;
 
 /**
  * The behavior command for OutsideSql.execute().
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
 

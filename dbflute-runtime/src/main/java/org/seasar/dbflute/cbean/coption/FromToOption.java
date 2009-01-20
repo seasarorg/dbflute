@@ -29,7 +29,7 @@ import org.seasar.dbflute.cbean.ckey.ConditionKey;
  *     --&gt; column &gt; '2007/04/10 08:24:53' and column &lt; '2007/04/16 14:36:29'
  * 
  * </pre>
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class FromToOption implements ConditionOption {
 

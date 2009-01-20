@@ -2,7 +2,7 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the value of embedded value is null about outsideSql.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class EmbeddedValueParameterNullValueException extends RuntimeException {
 

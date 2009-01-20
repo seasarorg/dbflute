@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean.grouping;
 /**
  * The interface of grouping end(switch point) determiner.
  * @param <ENTITY> The type of entity.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface GroupingRowEndDeterminer<ENTITY> {
 

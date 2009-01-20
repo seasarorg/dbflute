@@ -13,7 +13,7 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <ENTITY> The type of entity.
  */
 public class SelectListCBCommand<ENTITY extends Entity> extends AbstractSelectCBCommand<List<ENTITY>> {

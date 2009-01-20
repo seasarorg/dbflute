@@ -20,7 +20,7 @@ import org.seasar.dbflute.s2dao.rowcreator.impl.TnRelationRowCreationResource;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRelationRowCreatorImpl;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 

@@ -12,7 +12,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 @SuppressWarnings("unchecked")
 public abstract class TnAbstractDtoMetaDataResultSetHandler implements TnResultSetHandler {

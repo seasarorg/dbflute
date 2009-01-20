@@ -7,7 +7,7 @@ import org.seasar.dbflute.Entity;
 
 /**
  * The interface of behavior-writable.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface BehaviorWritable extends BehaviorReadable {
 

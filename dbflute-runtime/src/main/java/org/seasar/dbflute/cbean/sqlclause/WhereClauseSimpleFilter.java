@@ -5,7 +5,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 
 /**
  * The simple filter for where clause.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface WhereClauseSimpleFilter {
 
@@ -29,7 +29,7 @@ public interface WhereClauseSimpleFilter {
      * The simple filter for where clause to embedded. <br />
      * *Attention -- Target column is not perfect. This class determines by column name only!
      * So when the column name of base table is same as the column name of join table, both are target!
-     * @author DBFlute(AutoGenerator)
+     * @author jflute
      */
     public static class WhereClauseToEmbeddedSimpleFilter implements WhereClauseSimpleFilter {
 
@@ -101,7 +101,7 @@ public interface WhereClauseSimpleFilter {
      * The simple filter for where clause to embedded and quoted. <br />
      * *Attention -- Target column is not perfect. This class determines by column name only!
      * So when the column name of base table is same as the column name of join table, both are target!
-     * @author DBFlute(AutoGenerator)
+     * @author jflute
      */
     public static class WhereClauseToEmbeddedQuotedSimpleFilter extends WhereClauseToEmbeddedSimpleFilter {
 

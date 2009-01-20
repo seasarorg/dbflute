@@ -9,7 +9,7 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
  * The behavior command for OutsideSql.selectList().
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <ENTITY> The type of entity.
  */
 public class OutsideSqlSelectListCommand<ENTITY> extends AbstractOutsideSqlSelectCommand<List<ENTITY>> {

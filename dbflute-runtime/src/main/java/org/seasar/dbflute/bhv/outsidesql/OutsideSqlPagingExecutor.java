@@ -18,7 +18,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
 /**
  * The paging executor of outside-SQL.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class OutsideSqlPagingExecutor {
 

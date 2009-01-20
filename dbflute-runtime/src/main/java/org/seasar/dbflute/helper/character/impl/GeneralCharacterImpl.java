@@ -4,7 +4,7 @@ import org.seasar.dbflute.helper.character.GeneralCharacter;
 
 /**
  * The implementation of general character.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class GeneralCharacterImpl implements GeneralCharacter {
 

@@ -4,7 +4,7 @@ import org.seasar.dbflute.exception.EndCommentNotFoundException;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SqlTokenizer {
 

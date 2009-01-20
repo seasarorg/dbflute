@@ -7,7 +7,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 
 /**
  * The interface of entity.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface Entity {
 

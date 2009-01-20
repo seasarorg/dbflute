@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 /**
  * The context of internal map.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class InternalMapContext {
 

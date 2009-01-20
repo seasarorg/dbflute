@@ -9,7 +9,7 @@ import org.seasar.dbflute.cbean.pagenavi.range.PageRangeOption;
 /**
  * The result bean of paging.
  * @param <ENTITY> The type of entity for the element of selected list.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
 

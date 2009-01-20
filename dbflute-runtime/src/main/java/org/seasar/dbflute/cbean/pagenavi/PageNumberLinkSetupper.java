@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean.pagenavi;
 /**
  * The setupper of page number link.
  * @param <LINK> The type of link.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface PageNumberLinkSetupper<LINK extends PageNumberLink> {
 

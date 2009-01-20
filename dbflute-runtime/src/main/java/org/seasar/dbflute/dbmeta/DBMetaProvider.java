@@ -2,7 +2,7 @@ package org.seasar.dbflute.dbmeta;
 
 /**
  * The interface of DB meta.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface DBMetaProvider {
 

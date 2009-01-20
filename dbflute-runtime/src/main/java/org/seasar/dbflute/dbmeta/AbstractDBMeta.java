@@ -30,7 +30,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The abstract class of DB meta.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class AbstractDBMeta implements DBMeta {
 

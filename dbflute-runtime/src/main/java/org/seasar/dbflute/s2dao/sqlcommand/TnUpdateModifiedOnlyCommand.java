@@ -11,7 +11,7 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnUpdateModifiedOnlyCommand extends TnUpdateAutoDynamicCommand {
 

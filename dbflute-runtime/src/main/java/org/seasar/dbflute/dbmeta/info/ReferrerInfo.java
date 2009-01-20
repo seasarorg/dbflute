@@ -11,7 +11,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 
 /**
  * The information of referrer relation.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ReferrerInfo implements RelationInfo {
 

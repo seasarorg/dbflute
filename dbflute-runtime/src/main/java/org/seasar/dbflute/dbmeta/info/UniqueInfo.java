@@ -9,7 +9,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 
 /**
  * The information of unique constraint.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class UniqueInfo {
 

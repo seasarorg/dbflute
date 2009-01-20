@@ -26,7 +26,7 @@ import org.seasar.dbflute.util.TraceViewUtil;
 
 /**
  * The abstract class of condition-query.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class AbstractConditionQuery implements ConditionQuery {
 

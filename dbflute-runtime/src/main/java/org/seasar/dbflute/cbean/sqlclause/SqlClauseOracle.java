@@ -6,7 +6,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 
 /**
  * SqlClause for Oracle.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SqlClauseOracle extends AbstractSqlClause {
 

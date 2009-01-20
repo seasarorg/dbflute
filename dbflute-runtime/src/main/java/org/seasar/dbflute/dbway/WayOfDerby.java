@@ -2,7 +2,7 @@ package org.seasar.dbflute.dbway;
 
 /**
  * The DB way of Derby.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class WayOfDerby implements DBWay {
 

@@ -4,8 +4,7 @@ import org.seasar.dbflute.helper.character.JapaneseCharacter;
 
 /**
  * The implementation of Japanese character.
- *
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class JapaneseCharacterImpl implements JapaneseCharacter {
 

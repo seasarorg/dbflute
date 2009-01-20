@@ -45,7 +45,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The abstract class of readable behavior.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 

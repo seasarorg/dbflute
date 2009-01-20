@@ -2,7 +2,7 @@ package org.seasar.dbflute.resource;
 
 /**
  * The context of internal resource.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ResourceParameter {
 

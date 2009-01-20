@@ -3,7 +3,7 @@ package org.seasar.dbflute.exception;
 /**
  * The exception of when the result of IF comment is not boolean about outsideSql.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class IfCommentNotBooleanResultException extends IfCommentWrongExpressionException {
 

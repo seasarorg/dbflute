@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean.sqlclause;
 
 /**
  * SqlClause for MySQL.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SqlClauseMySql extends AbstractSqlClause {
 

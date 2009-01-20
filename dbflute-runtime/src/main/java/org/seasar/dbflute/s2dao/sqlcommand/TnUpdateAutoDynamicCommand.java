@@ -13,7 +13,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateAutoHandler;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 

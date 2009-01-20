@@ -23,7 +23,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The abstract class of SQL clause.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class AbstractSqlClause implements SqlClause {
 

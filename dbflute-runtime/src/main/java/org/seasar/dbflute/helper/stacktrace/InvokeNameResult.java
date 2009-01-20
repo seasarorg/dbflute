@@ -1,7 +1,7 @@
 package org.seasar.dbflute.helper.stacktrace;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class InvokeNameResult {
 

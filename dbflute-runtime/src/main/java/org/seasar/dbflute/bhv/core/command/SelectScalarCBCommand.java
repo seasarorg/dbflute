@@ -9,7 +9,7 @@ import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <RESULT> The type of result.
  */
 public class SelectScalarCBCommand<RESULT> extends AbstractSelectCBCommand<RESULT> {

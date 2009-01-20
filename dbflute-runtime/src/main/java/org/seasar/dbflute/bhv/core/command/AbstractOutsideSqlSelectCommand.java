@@ -12,7 +12,7 @@ import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 /**
  * The abstract command for OutsideSql.selectSomething().
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <RESULT> The type of result.
  */
 public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOutsideSqlCommand<RESULT> {

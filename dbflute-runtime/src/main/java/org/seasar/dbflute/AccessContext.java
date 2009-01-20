@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 /**
  * The context of DB access.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class AccessContext {
 

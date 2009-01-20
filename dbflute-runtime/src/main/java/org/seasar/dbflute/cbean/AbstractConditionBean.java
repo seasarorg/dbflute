@@ -20,7 +20,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The condition-bean as abstract.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class AbstractConditionBean implements ConditionBean {
 

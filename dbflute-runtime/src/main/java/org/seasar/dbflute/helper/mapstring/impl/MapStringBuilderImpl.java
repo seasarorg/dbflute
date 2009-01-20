@@ -10,7 +10,7 @@ import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 
 /**
  * The implementation of map-string builder.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class MapStringBuilderImpl implements MapStringBuilder {
 

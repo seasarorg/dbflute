@@ -3,7 +3,7 @@ package org.seasar.dbflute.bhv.batch;
 import org.seasar.dbflute.helper.token.file.FileTokenizingOption;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TokenFileReflectionOption {
 

@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.character;
 /**
  * The interface of Japanese character.
  *
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface JapaneseCharacter {
 

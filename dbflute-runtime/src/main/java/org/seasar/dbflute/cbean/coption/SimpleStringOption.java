@@ -10,7 +10,7 @@ import org.seasar.dbflute.util.DfStringUtil;
 /**
  * The class of simple-string-option.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SimpleStringOption implements ConditionOption {
 

@@ -12,7 +12,7 @@ import org.seasar.dbflute.resource.SQLExceptionHandler;
 
 /**
  * The wrapper of fetch narrowing result set.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnPagingResultSet extends ResultSetWrapper {
 

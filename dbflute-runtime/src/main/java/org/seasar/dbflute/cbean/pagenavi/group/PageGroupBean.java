@@ -9,7 +9,7 @@ import org.seasar.dbflute.cbean.pagenavi.PageNumberLinkSetupper;
 
 /**
  * The bean of page group.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class PageGroupBean implements java.io.Serializable {
 

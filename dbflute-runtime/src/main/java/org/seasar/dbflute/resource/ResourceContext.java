@@ -17,7 +17,7 @@ import org.seasar.dbflute.jdbc.ValueType;
 
 /**
  * The context of resource.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class ResourceContext {
 

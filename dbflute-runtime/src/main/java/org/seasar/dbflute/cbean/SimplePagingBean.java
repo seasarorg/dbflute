@@ -10,7 +10,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClauseDefault;
 
 /**
  * The simple paging-bean.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SimplePagingBean implements PagingBean, MapParameterBean {
 

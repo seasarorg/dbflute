@@ -7,7 +7,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.resource.ResourceContext;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  * @param <RESULT> The type of result.
  */
 public abstract class AbstractOutsideSqlCommand<RESULT> extends AbstractBehaviorCommand<RESULT> {

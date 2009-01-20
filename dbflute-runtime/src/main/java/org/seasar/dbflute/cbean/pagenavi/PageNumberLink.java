@@ -2,7 +2,7 @@ package org.seasar.dbflute.cbean.pagenavi;
 
 /**
  * The class of page number link.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class PageNumberLink implements java.io.Serializable {
 

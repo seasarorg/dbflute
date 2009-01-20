@@ -4,7 +4,7 @@ import org.seasar.dbflute.jdbc.SqlLogHandler;
 
 /**
  * The context of callback.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class CallbackContext {
 

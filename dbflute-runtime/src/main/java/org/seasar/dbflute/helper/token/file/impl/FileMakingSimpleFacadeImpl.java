@@ -8,7 +8,7 @@ import org.seasar.dbflute.helper.token.file.FileToken;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class FileMakingSimpleFacadeImpl implements FileMakingSimpleFacade {
 

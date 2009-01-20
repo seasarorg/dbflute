@@ -11,7 +11,7 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnInsertAutoDynamicCommand;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class InsertEntityCommand extends AbstractEntityCommand {
 

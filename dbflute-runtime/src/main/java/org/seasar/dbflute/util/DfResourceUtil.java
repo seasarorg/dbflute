@@ -17,7 +17,7 @@ import java.util.zip.ZipEntry;
 
 /**
  * {Refers to S2Container's utility and Extends it}
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class DfResourceUtil {
 

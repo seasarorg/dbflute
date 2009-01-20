@@ -4,7 +4,7 @@ package org.seasar.dbflute.cbean.coption;
 /**
  * The interface of condition-option.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface ConditionOption {
     public String getRearOption();

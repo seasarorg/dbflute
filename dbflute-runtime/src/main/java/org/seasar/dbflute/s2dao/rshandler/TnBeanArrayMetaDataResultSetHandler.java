@@ -10,7 +10,7 @@ import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 @SuppressWarnings("unchecked")
 public class TnBeanArrayMetaDataResultSetHandler extends TnBeanListMetaDataResultSetHandler {

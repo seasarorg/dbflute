@@ -4,7 +4,7 @@ package org.seasar.dbflute.cbean.coption.parts;
 /**
  * The interface of condition-option.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class SplitOptionParts {
 

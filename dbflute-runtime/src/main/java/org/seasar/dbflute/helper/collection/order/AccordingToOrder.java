@@ -3,7 +3,7 @@ package org.seasar.dbflute.helper.collection.order;
 import java.util.List;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface AccordingToOrder {
 

@@ -13,7 +13,7 @@ import java.sql.Types;
 
 /**
  * The value type of bytes OID. (for PostgreSQL) 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnBytesOidType extends BytesType {
 

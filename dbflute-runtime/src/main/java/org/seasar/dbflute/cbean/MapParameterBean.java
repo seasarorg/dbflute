@@ -4,7 +4,7 @@ import java.util.Map;
 
 /**
  * The bean of map parameter.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public interface MapParameterBean {
 

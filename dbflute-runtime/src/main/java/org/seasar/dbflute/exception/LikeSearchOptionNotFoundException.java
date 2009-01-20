@@ -3,7 +3,7 @@ package org.seasar.dbflute.exception;
 /**
  * The exception of when the required likeSearchOption is not found.
  * 
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class LikeSearchOptionNotFoundException extends RuntimeException {
 

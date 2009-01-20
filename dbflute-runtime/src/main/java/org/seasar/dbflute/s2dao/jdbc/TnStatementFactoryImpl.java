@@ -16,7 +16,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.SQLExceptionHandler;
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class TnStatementFactoryImpl implements StatementFactory {
 

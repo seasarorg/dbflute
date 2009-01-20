@@ -8,7 +8,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
 
 
 /**
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public abstract class TnAbstractBatchAutoStaticCommand extends TnAbstractAutoStaticCommand {
 

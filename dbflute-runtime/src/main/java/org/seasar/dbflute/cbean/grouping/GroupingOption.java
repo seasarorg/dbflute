@@ -3,7 +3,7 @@ package org.seasar.dbflute.cbean.grouping;
 /**
  * The class of option for grouping.
  * @param  <ENTITY> The type of entity.
- * @author DBFlute(AutoGenerator)
+ * @author jflute
  */
 public class GroupingOption<ENTITY> {
 
