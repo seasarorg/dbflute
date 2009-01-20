@@ -104,24 +104,31 @@ public abstract class DfAbstractTask extends Task {
         } finally {
             long after = getTaskAfterTimeMillis();
             if (isValidTaskEndInformation()) {
-                _log.info("");
-                _log.info("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/ {Task End}");
-                _log.info("[" + getDisplayTaskName() + "]: " + getPerformanceView(after - before));
-                _log.info("");
-                _log.info("  MY_PROJECT_NAME: {" + getBasicProperties().getProjectName() + "}");
-                _log.info("    database  = " + getBasicProperties().getDatabaseName());
-                _log.info("    language  = " + getBasicProperties().getTargetLanguage());
-                _log.info("    container = " + getBasicProperties().getTargetContainerName());
-                _log.info("");
-                _log.info("  DBFLUTE_ENVIRONMENT_TYPE: {" + DfEnvironmentType.getInstance().getEnvironmentType() + "}");
-                _log.info("    driver = " + _driver);
-                _log.info("    url    = " + _url);
-                _log.info("    schema = " + _schema);
-                _log.info("    user   = " + _userId);
-                _log.info("    props  = " + _connectionProperties);
-                _log.info("_/_/_/_/_/_/_/_/_/_/");
+                StringBuilder sb = new StringBuilder();
+                String ln = getLineSeparator();
+                sb.append(ln);
+                sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+                sb.append(ln).append("[Task End]: " + getPerformanceView(after - before));
+                sb.append(ln);
+                sb.append(ln).append("  MY_PROJECT_NAME: {" + getBasicProperties().getProjectName() + "}");
+                sb.append(ln).append("    database  = " + getBasicProperties().getDatabaseName());
+                sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
+                sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
+                sb.append(ln);
+                sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + DfEnvironmentType.getInstance().getEnvironmentType() + "}");
+                sb.append(ln).append("    driver = " + _driver);
+                sb.append(ln).append("    url    = " + _url);
+                sb.append(ln).append("    schema = " + _schema);
+                sb.append(ln).append("    user   = " + _userId);
+                sb.append(ln).append("    props  = " + _connectionProperties);
+                String finalInformation = getFinalInformation();
+                if (finalInformation != null) {
+                    sb.append(ln);
+                    sb.append(finalInformation);
+                }
+                sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");
+                _log.info(sb.toString());
             }
-            _log.info("");
         }
     }
 
@@ -148,6 +155,10 @@ public abstract class DfAbstractTask extends Task {
     protected String getDisplayTaskName() {
         final String taskName = getTaskName();
         return DfAntTaskUtil.getDisplayTaskName(taskName);
+    }
+
+    protected String getFinalInformation() {
+        return null; // as default
     }
 
     protected void initializeDatabaseInfo() {
@@ -196,10 +207,6 @@ public abstract class DfAbstractTask extends Task {
         }
 
         return sb.toString();
-    }
-
-    protected String getLineSeparator() {
-        return System.getProperty("line.separator");
     }
 
     abstract protected boolean isUseDataSource();
@@ -271,6 +278,13 @@ public abstract class DfAbstractTask extends Task {
         final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
         final SqlFileCollector sqlFileCollector = new SqlFileCollector(sqlDirectory, getBasicProperties());
         return sqlFileCollector.collectSqlFileList();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return "\n";
     }
 
     // ===================================================================================

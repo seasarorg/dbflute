@@ -30,6 +30,8 @@ public class DfSqlFileFireMan {
     /** Log instance. */
     private static Log _log = LogFactory.getLog(DfSqlFileFireMan.class);
 
+    private String _executorName;
+
     /**
      * Load the SQL files and then execute them.
      * @return The result about firing SQL. (NotNull)
@@ -45,7 +47,7 @@ public class DfSqlFileFireMan {
                 }
 
                 if (_log.isInfoEnabled()) {
-                    _log.info("[SQL File] " + file);
+                    _log.info("{SQL File}: " + file);
                 }
 
                 runner.setSrc(file);
@@ -54,7 +56,8 @@ public class DfSqlFileFireMan {
                 goodSqlCount = goodSqlCount + runner.getGoodSqlCount();
                 totalSqlCount = totalSqlCount + runner.getTotalSqlCount();
             }
-            String msg = "[Fired SQL] success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount);
+            String title = _executorName != null ? _executorName : "Fired SQL";
+            String msg = "{" + title + "}: success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount);
             msg = msg + " (in " + fileList.size() + " files)";
             _log.info(msg);
             fireResult.setResultMessage(msg);
@@ -88,5 +91,13 @@ public class DfSqlFileFireMan {
         public void setExistsError(boolean existsError) {
             this.existsError = existsError;
         }
+    }
+
+    public String getExecutorName() {
+        return _executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this._executorName = executorName;
     }
 }

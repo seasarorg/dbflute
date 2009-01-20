@@ -38,6 +38,9 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     //                                                                           =========
     protected Timestamp beforeTimestamp;
 
+    /** The result of take-finally for final information. */
+    protected FireResult takeFinallyResult;
+
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
@@ -46,12 +49,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         final DfRunnerInformation runInfo = createRunnerInformation();
 
         beforeTakeFinally();
-        final FireResult takeFinallyResult = takeFinally(runInfo);
-        try {
-            showFinalInformation(takeFinallyResult);
-        } catch (Throwable ignored) {
-            _log.info("Failed to show final information!", ignored);
-        }
+        takeFinallyResult = takeFinally(runInfo);
     }
 
     @Override
@@ -113,6 +111,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         _log.info("*              *");
         _log.info("* * * * * * * **");
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
+        fireMan.setExecutorName("Take Finally");
         return fireMan.execute(getSqlFileRunner4TakeFinally(runInfo), getTakeFinallySqlFileList());
     }
 
@@ -275,36 +274,35 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         }
     }
 
-    protected String getLineSeparator() {
-        return "\n";
+    @Override
+    protected String getFinalInformation() {
+        return buildFinalInformation(takeFinallyResult);
     }
 
-    protected void showFinalInformation(FireResult result) {
+    protected String buildFinalInformation(FireResult result) {
         final File file = new File(DfCreateSchemaTask.LOG_PATH);
         if (!file.exists()) {
-            return;
+            return null;
         }
         BufferedReader br = null;
         try {
             final FileInputStream fis = new FileInputStream(file);
             br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
             final String line = br.readLine();
-            if (line != null) {
-                final String line2 = br.readLine();
-                final boolean existsError = isLine2True(line2) || result.isExistsError();
-                final StringBuilder sb = new StringBuilder();
-                final String ln = getLineSeparator();
-                sb.append(ln).append("/* * * * * * * * * * * * * * * * * * *");
-                sb.append(ln).append("[Final Information]").append(existsError ? " *Failure" : "");
-                sb.append(ln).append("");
-                sb.append(ln).append("  {Create Schema}");
-                sb.append(ln).append("  ").append(line);
-                sb.append(ln).append("  ");
-                sb.append(ln).append("  {Take Finally}");
-                sb.append(ln).append("  ").append(result.getResultMessage());
-                sb.append(ln).append("* * * * * * * * * */");
-                _log.info(sb.toString());
+            if (line == null) {
+                return null;
             }
+            final String line2 = br.readLine();
+            final boolean existsError = isLine2True(line2) || result.isExistsError();
+            final StringBuilder sb = new StringBuilder();
+            final String ln = getLineSeparator();
+            sb.append(ln).append("[Final Information]");
+            sb.append(ln).append("  ").append(line);
+            sb.append(ln).append("  ").append(result.getResultMessage());
+            if (existsError) {
+                sb.append(ln).append("  *Failure");
+            }
+            return sb.toString();
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         } catch (FileNotFoundException e) {
@@ -318,9 +316,9 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
                 } catch (IOException ignored) {
                 }
             }
-        }
-        if (file.exists()) {
-            file.delete();
+            if (file.exists()) {
+                file.delete();
+            }
         }
     }
 

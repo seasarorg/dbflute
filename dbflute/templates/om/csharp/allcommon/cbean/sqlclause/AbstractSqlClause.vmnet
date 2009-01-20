@@ -284,6 +284,18 @@ public abstract class ${myClassName} : ${glSqlClause} {
             foreach (String deriveSubQuery in deriveSubQuerySet) {
                 sb.append(getLineSeparator()).append("     ");
                 sb.append(", ").append(deriveSubQuery);
+                
+                // [DBFlute-0.8.3]
+                int beginIndex = deriveSubQuery.LastIndexOf(" as ");
+                if (beginIndex >= 0) { // basically true
+                    String aliasName = deriveSubQuery.Substring(beginIndex + " as ".Length);
+                    int endIndex = aliasName.IndexOf("--df:");
+                    if (endIndex >= 0) { // basically true
+                        aliasName = aliasName.Substring(0, endIndex);
+                    }
+                    // for SpecifiedDerivedOrderBy
+                    _selectClauseRealColumnAliasMap.put(aliasName, aliasName);
+                }
             }
         }
 
