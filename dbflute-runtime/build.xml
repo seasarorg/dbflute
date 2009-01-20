@@ -1,12 +1,82 @@
 <project name="DBFluteRuntime" default="dist" basedir=".">
 
-  <property name="version" value="0.9.0-1-SNAPSHOT"/>
+  <property name="version" value="0.9.0"/>
+  <property name="build.version" value="0.9.0-1-SNAPSHOT"/>
 
+  <target name="dist">
+
+    <echo message="+------------------------------------------+"/>
+    <echo message="|                                          |"/>
+    <echo message="| Generating dist for YOUR project!        |"/>
+    <echo message="|                                          |"/>
+    <echo message="+------------------------------------------+"/>
+
+    <delete file="../dbflute/dist/dbflute-runtime-*.jar"/>
+    <copy file="target/dbflute-runtime-${build.version}.jar"
+    	  tofile="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="target/dbflute-runtime-${build.version}-sources.jar"
+    	  tofile="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+  </target>
+
+  <target name="reflect-mac-all">
+
+    <echo message="+------------------------------------------+"/>
+    <echo message="|                                          |"/>
+    <echo message="| Reflecting library to all projects!      |"/>
+    <echo message="|                                          |"/>
+    <echo message="+------------------------------------------+"/>
+
+    <delete file="../dbflute-basic-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-basic-example90/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-basic-example90/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+
+    <delete file="../dbflute-spring-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-spring-example/lib_sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+
+    <delete file="../dbflute-lucy-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-lucy-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-lucy-example/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+  	
+    <delete file="../dbflute-mysql-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-mysql-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-mysql-example/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+
+    <delete file="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-ymir-example/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+  </target>
+
+  <!--
   <target name="clean">
     <delete dir="target/classes"/>
     <mkdir dir="target/classes"/>
   </target>
+  -->
 
+  <!--
   <target name="copy-resources">
     <copy todir="target/classes">
       <fileset dir="src/main/java">
@@ -17,14 +87,10 @@
       </fileset>
     </copy>
   </target>
+  -->
 
+  <!--
   <target name="compile" depends="clean, copy-resources" description="==> compiles sources">
-
-    <echo message="+------------------------------------------+"/>
-    <echo message="|                                          |"/>
-    <echo message="| Compiling sources!                       |"/>
-    <echo message="|                                          |"/>
-    <echo message="+------------------------------------------+"/>
 
     <javac destdir="target/classes" encoding="UTF-8" debug="true">
       <src path="src/main/java" />
@@ -39,64 +105,6 @@
       <compilerarg value="-Xlint:unchecked" />
     </javac>
   </target>
+  -->
 
-  <target name="dist" depends="compile">
-
-    <echo message="+------------------------------------------+"/>
-    <echo message="|                                          |"/>
-    <echo message="| Generating dist for YOUR project!        |"/>
-    <echo message="|                                          |"/>
-    <echo message="+------------------------------------------+"/>
-
-    <mkdir dir="dist"/>
-    <delete file="dist/dbflute-runtime-*.jar"/>
-    <copy file="target/dbflute-runtime-${version}.jar"
-    	  tofile="dist/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-  	
-    <delete file="../dbflute/dist/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute/dist/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-
-  	<!--
-    <delete file="dist/dbflute-runtime-*.jar"/>
-    <jar jarfile="dist/dbflute-runtime-${version}.jar" basedir="target/classes"></jar>
-  	
-    <delete file="../dbflute/dist/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute/dist/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-    -->
-  </target>
-
-  <target name="reflect-mac-all">
-
-    <echo message="+------------------------------------------+"/>
-    <echo message="|                                          |"/>
-    <echo message="| Reflecting library to all projects!      |"/>
-    <echo message="|                                          |"/>
-    <echo message="+------------------------------------------+"/>
-
-    <delete file="../dbflute-basic-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-basic-example90/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-    <delete file="../dbflute-spring-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-    <delete file="../dbflute-lucy-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-lucy-example/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-    <delete file="../dbflute-mysql-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-mysql-example/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-    <delete file="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-  </target>
 </project>
