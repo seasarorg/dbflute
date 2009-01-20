@@ -1,263 +1,276 @@
 <project name="DBFlute" default="dist" basedir=".">
 
-  <!-- ================================================================ -->
-  <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
-  <!-- ================================================================ -->
-  <property name="version" value="0.9.0"/>
-  <property name="internal.version" value="${version}-RC1"/>
-  <property name="deploy.base" value="../../dbflute"/>
-  <property name="workspace.base" value=".."/>
+	<!-- ============================================================================= -->
+	<!--                                          P R O P E R T Y  D E F I N I T I O N -->
+	<!--                                          ==================================== -->
 
-  <property name="dbflute.dist" value="dist"/>
-  <property name="dbflute.jar.file" value="dbflute.jar"/>
-  <property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
-  <property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
-  <property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
-  <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
-  <property name="dbflute.runtime.dir" value="${workspace.base}/dbflute-runtime"/>
-  <property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example90"/>
-  <property name="dbflute.oracle.example.dir" value="${workspace.base}/dbflute-oracle-example"/>
-  <property name="dbflute.postgresql.example.dir" value="${workspace.base}/dbflute-postgresql-example"/>
-  <property name="dbflute.mysql.example.dir" value="${workspace.base}/dbflute-mysql-example"/>
-  <property name="dbflute.db2.example.dir" value="${workspace.base}/dbflute-db2-example"/>
-  <property name="dbflute.sqlserver.example.dir" value="${workspace.base}/dbflute-sqlserver-example"/>
-  <property name="dbflute.msaccess.example.dir" value="${workspace.base}/dbflute-msaccess-example"/>
-  <property name="dbflute.ymir.example.dir" value="${workspace.base}/dbflute-ymir-example"/>
-  <property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
-  <property name="dbflute.lucy.example.dir" value="${workspace.base}/dbflute-lucy-example"/>
+	<!-- Version -->
+	<property name="version" value="0.9.0"/>
+	<property name="internal.version" value="${version}-RC1"/>
 
-  <target name="clean">
-    <delete dir="target/classes"/>
-    <mkdir dir="target/classes"/>
-  </target>
-  
-  <target name="copy-resources">
-    <copy todir="target/classes">
-      <fileset dir="src/main/java">
-        <exclude name="**/*.java"/>
-      </fileset>
-      <fileset dir="src/main/resources">
-        <exclude name="**/*.java"/>
-      </fileset>
-    </copy>
-  </target>
+	<!-- Directories and Module Files -->
+	<property name="deploy.base" value="../../dbflute"/>
+	<property name="workspace.base" value=".."/>
+	<property name="dbflute.dist" value="dist"/>
+	<property name="dbflute.jar.file" value="dbflute.jar"/>
+	<property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
+	<property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
+	<property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
+	<property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
+	<property name="dbflute.runtime.dir" value="${workspace.base}/dbflute-runtime"/>
 
-  <target name="compile" depends="clean, copy-resources" description="==> compiles sources">
+	<!-- Basic -->
+	<property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example90"/>
 
-    <echo message="+------------------------------------------+"/>
-    <echo message="|                                          |"/>
-    <echo message="| Compiling sources!                       |"/>
-    <echo message="|                                          |"/>
-    <echo message="+------------------------------------------+"/>
+	<!-- Container -->
+	<property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
+	<property name="dbflute.lucy.example.dir" value="${workspace.base}/dbflute-lucy-example"/>
 
-  	<javac destdir="target/classes" encoding="UTF-8" debug="true">
-      <src path="src/main/java" />
-  	  <src path="src/main/resources" />
-      <classpath>
-        <fileset dir="lib/forCompile">
-          <include name="**/*.jar" />
-        </fileset>
-      </classpath>
-  	  <include name="**/*"/>
-  	  <compilerarg value="-Xlint:deprecation" />
-  	  <compilerarg value="-Xlint:unchecked" />
-  	</javac>
-  </target>
+	<!-- Database -->
+	<property name="dbflute.mysql.example.dir" value="${workspace.base}/dbflute-mysql-example"/>
+	<property name="dbflute.postgresql.example.dir" value="${workspace.base}/dbflute-postgresql-example"/>
+	<property name="dbflute.oracle.example.dir" value="${workspace.base}/dbflute-oracle-example"/>
+	<property name="dbflute.sqlserver.example.dir" value="${workspace.base}/dbflute-sqlserver-example"/>
+	<property name="dbflute.db2.example.dir" value="${workspace.base}/dbflute-db2-example"/>
+	<property name="dbflute.msaccess.example.dir" value="${workspace.base}/dbflute-msaccess-example"/>
 
-  <target name="dist" depends="compile" description="==> generates distribution">
+	<!-- Friendly -->
+	<property name="dbflute.ymir.example.dir" value="${workspace.base}/dbflute-ymir-example"/>
+	<property name="dbflute.buri.example.dir" value="${workspace.base}/dbflute-buri-example"/>
 
-    <echo message="+------------------------------------------+"/>
-    <echo message="|                                          |"/>
-    <echo message="| Generating dist for YOUR datamodel!      |"/>
-    <echo message="|                                          |"/>
-    <echo message="+------------------------------------------+"/>
+	<!-- ============================================================================= -->
+	<!--                                                        C O M P I L E  T A S K -->
+	<!--                                                        ====================== -->
 
-    <mkdir dir="${dbflute.dist}"/>
+	<target name="clean">
+  		<delete dir="target/classes"/>
+  		<mkdir dir="target/classes"/>
+	</target>
 
-    <delete file="${dbflute.jar.dirfile}"/>
-    <jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
-    <delete file="${dbflute.zip.dirfile}"/>
-  	
-    <delete file="etc/client-template/dbflute_dfclient.zip"/>
-    <zip zipfile="etc/client-template/dbflute_dfclient.zip">
-        <zipfileset prefix="dbflute_dfclient" dir="etc/client-template/dbflute_dfclient"/>
-    </zip>
+	<target name="copy-resources">
+	  	<copy todir="target/classes">
+	    	<fileset dir="src/main/java">
+	      	<exclude name="**/*.java"/>
+	    	</fileset>
+	    	<fileset dir="src/main/resources">
+	      	<exclude name="**/*.java"/>
+	    	</fileset>
+	  	</copy>
+	</target>
 
-    <tstamp>
-      <format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
-    </tstamp>
+	<target name="compile" depends="clean, copy-resources" description="==> compiles sources">
 
-    <delete file="etc/mark/product-is-dbflute-*"/>
-    <copy filtering="" file="etc/mark/product-is-dbflute" tofile="etc/mark/product-is-dbflute-${version}">
-	  <filterset>
-	    <filter token="version" value="${internal.version}" />
-	    <filter token="datetime" value="${now.date}" />
-	  </filterset>
-    </copy>
-
-    <zip zipfile="${dbflute.zip.dirfile}">
-        <zipfileset prefix="etc/cmd" dir="etc/cmd">
-            <include name="*.cmd"/>
-            <include name="*.sh"/>
-        </zipfileset>
-        <zipfileset prefix="etc/client-template" dir="etc/client-template">
-            <include name="dbflute_dfclient.zip"/>
-        </zipfileset>
-        <zipfileset prefix="lib/forExecute" dir="dist">
-            <include name="${dbflute.jar.file}"/>
-        </zipfileset>
-        <zipfileset prefix="lib/forExecute" dir="lib/forExecute">
-            <include name="*.jar"/>
-            <include name="*.zip"/>
-        </zipfileset>
-        <zipfileset prefix="log" dir="log">
-            <include name="readme.txt"/>
-        </zipfileset>
-        <zipfileset prefix="output/doc" dir="output/doc">
-            <include name="readme.txt"/>
-        </zipfileset>
-        <zipfileset prefix="schema" dir="schema">
-            <include name="readme.txt"/>
-        </zipfileset>
-        <zipfileset prefix="templates/doc" dir="templates/doc">
-            <exclude name="**/*---.txt"/>
-        </zipfileset>
-        <zipfileset prefix="templates/om" dir="templates/om">
-            <include name="ControlGenerateJava.vm"/>
-            <include name="ControlSql2EntityJava.vm"/>
-        </zipfileset>
-        <zipfileset prefix="templates/om/java" dir="templates/om/java">
-            <exclude name="**/*---.txt"/>
-        </zipfileset>
-        <zipfileset prefix="ant" dir="ant"/>
-        <zipfileset prefix="" dir="">
-            <include name="build-torque.xml"/>
-        </zipfileset>
-        <zipfileset prefix="" dir="etc/mark">
-            <include name="product-is-dbflute-${version}"/>
-        </zipfileset>
-    </zip>
-  </target>
-
-  <target name="expand-dist">
-    <delete dir="${dbflute.deploy.dir}"/>
-    <unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
-  	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
+	  	<echo message="+------------------------------------------+"/>
+	  	<echo message="|                                          |"/>
+	  	<echo message="| Compiling sources!                       |"/>
+	  	<echo message="|                                          |"/>
+	  	<echo message="+------------------------------------------+"/>
 	
-  <!-- Reflection for Mac -->
+	  	<javac destdir="target/classes" encoding="UTF-8" debug="true">
+	    	<src path="src/main/java" />
+	  		<src path="src/main/resources" />
+	    	<classpath>
+	      	<fileset dir="lib/forCompile">
+	        	<include name="**/*.jar" />
+	      	</fileset>
+	    	</classpath>
+	  		<include name="**/*"/>
+	  		<compilerarg value="-Xlint:deprecation" />
+	  		<compilerarg value="-Xlint:unchecked" />
+	  	</javac>
+	</target>
 
-  <target name="reflect-mac-all" depends="expand-dist" description="==> reflect to basic application">
-    <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
-    <copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
+	<!-- ============================================================================= -->
+	<!--                                              D I S T R I B U T I O N  T A S K -->
+	<!--                                              ================================ -->
+		
+	<target name="dist" depends="compile" description="==> generates distribution">
+	
+	  	<echo message="+------------------------------------------+"/>
+	  	<echo message="|                                          |"/>
+	  	<echo message="| Generating dist for YOUR datamodel!      |"/>
+	  	<echo message="|                                          |"/>
+	  	<echo message="+------------------------------------------+"/>
+	
+	  	<mkdir dir="${dbflute.dist}"/>
+	
+	  	<delete file="${dbflute.jar.dirfile}"/>
+	  	<jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
+	  	<delete file="${dbflute.zip.dirfile}"/>
+	  	
+	  	<delete file="etc/client-template/dbflute_dfclient.zip"/>
+	  	<zip zipfile="etc/client-template/dbflute_dfclient.zip">
+	      	<zipfileset prefix="dbflute_dfclient" dir="etc/client-template/dbflute_dfclient"/>
+	  	</zip>
+	
+	  	<tstamp>
+	    	<format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
+	  	</tstamp>
+	
+	  	<delete file="etc/mark/product-is-dbflute-*"/>
+	  	<copy filtering="" file="etc/mark/product-is-dbflute" tofile="etc/mark/product-is-dbflute-${version}">
+			<filterset>
+		  	<filter token="version" value="${internal.version}" />
+		  	<filter token="datetime" value="${now.date}" />
+			</filterset>
+	  	</copy>
+	
+	  	<zip zipfile="${dbflute.zip.dirfile}">
+	      	<zipfileset prefix="etc/cmd" dir="etc/cmd">
+	          	<include name="*.cmd"/>
+	          	<include name="*.sh"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="etc/client-template" dir="etc/client-template">
+	          	<include name="dbflute_dfclient.zip"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="lib/forExecute" dir="dist">
+	          	<include name="${dbflute.jar.file}"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="lib/forExecute" dir="lib/forExecute">
+	          	<include name="*.jar"/>
+	          	<include name="*.zip"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="log" dir="log">
+	          	<include name="readme.txt"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="output/doc" dir="output/doc">
+	          	<include name="readme.txt"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="schema" dir="schema">
+	          	<include name="readme.txt"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="templates/doc" dir="templates/doc">
+	          	<exclude name="**/*---.txt"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="templates/om" dir="templates/om">
+	          	<include name="ControlGenerateJava.vm"/>
+	          	<include name="ControlSql2EntityJava.vm"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="templates/om/java" dir="templates/om/java">
+	          	<exclude name="**/*---.txt"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="ant" dir="ant"/>
+	      	<zipfileset prefix="" dir="">
+	          	<include name="build-torque.xml"/>
+	      	</zipfileset>
+	      	<zipfileset prefix="" dir="etc/mark">
+	          	<include name="product-is-dbflute-${version}"/>
+	      	</zipfileset>
+	  	</zip>
+	</target>
+
+	<target name="expand-dist">
+	  	<delete dir="${dbflute.deploy.dir}"/>
+	  	<unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
+	  	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	</target>
+	
+	<!-- ============================================================================= -->
+	<!--                                             R E F L E C T I O N  F O R  M A C -->
+	<!--                                             ================================= -->
+
+	<target name="reflect-mac-all" depends="expand-dist" description="==> reflect to basic application">
+	  	<copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	  	
+	  	<copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	  	
+	  	<copy todir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<chmod dir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	
+	  	<copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<chmod dir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	  		
+	  	<copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<chmod dir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	</target>
+
+	<target name="reflect-mac-basic" depends="expand-dist" description="==> reflect to basic application">
+	  	<copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	</target>
+
+	<target name="reflect-mac-spring" depends="expand-dist" description="==> reflect to spring application">
+  	<copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
+    	<fileset dir="${dbflute.deploy.dir}"/>
+  	</copy>
   	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
-    <copy todir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
+	</target>
+
+	<target name="reflect-mac-lucy" depends="expand-dist" description="==> reflect to lucy application">
+  	<copy todir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}">
+    	<fileset dir="${dbflute.deploy.dir}"/>
+  	</copy>
   	<chmod dir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	</target>
 
-    <copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
+	<target name="reflect-mac-mysql" depends="expand-dist" description="==> reflect to mysql example">
+  	<copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
+    	<fileset dir="${dbflute.deploy.dir}"/>
+  	</copy>
   	<chmod dir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  		
-    <copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
+	</target>
+	
+	<target name="reflect-mac-ymir" depends="expand-dist" description="==> reflect to ymir example">
+  	<copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}">
+    	<fileset dir="${dbflute.deploy.dir}"/>
+  	</copy>
   	<chmod dir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
+	</target>
 
-  <target name="reflect-mac-basic" depends="expand-dist" description="==> reflect to basic application">
-    <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
+	<!-- ============================================================================= -->
+	<!--                                     R E F L E C T I O N  F O R  W I N D O W S -->
+	<!--                                     ========================================= -->
+	
+	<target name="reflect-win-all" depends="expand-dist" description="==> reflect to all examples">
+	  	<copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<copy todir="${dbflute.buri.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	</target>
 
-  <target name="reflect-mac-spring" depends="expand-dist" description="==> reflect to spring application">
-    <copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
+	<target name="reflect-win-oracle" depends="expand-dist" description="==> reflect to oracle example">
+	  	<copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	</target>
 
-  <target name="reflect-mac-lucy" depends="expand-dist" description="==> reflect to lucy application">
-    <copy todir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
+	<target name="reflect-win-postgresql" depends="expand-dist" description="==> reflect to postgresql example">
+	  	<copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	</target>
 
-  <target name="reflect-mac-mysql" depends="expand-dist" description="==> reflect to mysql example">
-    <copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
-	
-  <target name="reflect-mac-ymir" depends="expand-dist" description="==> reflect to ymir example">
-    <copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
-	
-  <!-- Reflection for Windows -->
-	
-  <target name="reflect-win-all" depends="expand-dist" description="==> reflect to all examples">
-    <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    <delete file="../dbflute-oracle-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-oracle-example/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-  	
-  	<!--
-    <copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    <delete file="../dbflute-postgresql-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-postgresql-example/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-    -->
-  	
-    <copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  </target>
-	
-  <target name="reflect-win-oracle" depends="expand-dist" description="==> reflect to oracle example">
-    <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    <delete file="../dbflute-oracle-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-oracle-example/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-  </target>
+	<target name="reflect-win-msaccess" depends="expand-dist" description="==> reflect to msaccess example">
+	  	<copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	</target>
 
-  <target name="reflect-win-postgresql" depends="expand-dist" description="==> reflect to postgresql example">
-    <copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-    <delete file="../dbflute-postgresql-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-postgresql-example/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-  </target>
-	
-  <target name="reflect-win-msaccess" depends="expand-dist" description="==> reflect to msaccess example">
-    <copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  </target>
+	<target name="reflect-win-buri" depends="expand-dist" description="==> reflect to buri example">
+	  	<copy todir="${dbflute.buri.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	</target>
 </project>
