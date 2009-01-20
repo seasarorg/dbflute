@@ -11,7 +11,7 @@ import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.resource.SQLExceptionHandler;
 
 /**
- * The wrapper of fetch narrowing result set.
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnPagingResultSet extends ResultSetWrapper {

@@ -23,6 +23,7 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnRelationPropertyTypeFactoryBuilderImpl implements TnRelationPropertyTypeFactoryBuilder {

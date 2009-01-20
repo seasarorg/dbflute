@@ -35,7 +35,7 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 
 /**
- * It draws upon S2Dao.
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaData {

@@ -27,6 +27,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {

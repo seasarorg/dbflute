@@ -23,6 +23,10 @@ import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
+/**
+ * {Refers to S2Container's utility and Extends it}
+ * @author jflute
+ */
 public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
 
     public String TABLE = "TABLE";

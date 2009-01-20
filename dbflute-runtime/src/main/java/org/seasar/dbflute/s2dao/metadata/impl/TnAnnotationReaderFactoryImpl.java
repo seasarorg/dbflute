@@ -19,6 +19,7 @@ import org.seasar.dbflute.s2dao.metadata.TnAnnotationReaderFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnAnnotationReaderFactoryImpl implements TnAnnotationReaderFactory {
