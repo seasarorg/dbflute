@@ -6,7 +6,7 @@
 	<version>0.9.0-1-SNAPSHOT</version>
 
 	<name>DBFlute Runtime</name>
-	<description>DBFlute Microsoft Access Example</description>
+	<description>The runtime library of DBFlute</description>
 
 	<url>http://dbflute.sandbox.seasar.org/</url>
 	<inceptionYear>2006</inceptionYear>
