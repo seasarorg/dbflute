@@ -48,6 +48,7 @@
 		<developerConnection>scm:svn:https://www.seasar.org/svn/sandbox/dbflute/trunk/dbflute-runtime/</developerConnection>
 		<url>http://svn.seasar.org/browse/?root=sandbox.dbflute</url>
 	</scm>
+	
 	<repositories>
 		<repository>
 			<id>maven.seasar.org</id>
@@ -56,22 +57,6 @@
 		</repository>
 	</repositories>
 
-	<distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>maven.seasar.org</id>
-			<name>The Seasar Foundation Maven2 Repository</name>
-			<url>dav:https://www.seasar.org/maven/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<uniqueVersion>true</uniqueVersion>
-			<id>maven.seasar.org</id>
-			<name>The Seasar Foundation Maven2 Snapshot Repository</name>
-			<url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
-		</snapshotRepository>
-	</distributionManagement>
-
-	<!-- Build Settings -->
 	<build>
 		<defaultGoal>validate</defaultGoal>
 		<pluginManagement>
@@ -152,8 +137,23 @@
 		</extensions>
 	</build>
 
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>maven.seasar.org</id>
+			<name>The Seasar Foundation Maven2 Repository</name>
+			<url>dav:https://www.seasar.org/maven/maven2</url>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>true</uniqueVersion>
+			<id>maven.seasar.org</id>
+			<name>The Seasar Foundation Maven2 Snapshot Repository</name>
+			<url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<dependencies>
-	    <!-- Compile Dependencies -->
+        <!-- for Compile -->
 		<dependency>
             <groupId>ognl</groupId>
             <artifactId>ognl</artifactId>
@@ -185,7 +185,7 @@
             </exclusions>
         </dependency>
 
-        <!-- Test Dependencies -->
+        <!-- for Test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
