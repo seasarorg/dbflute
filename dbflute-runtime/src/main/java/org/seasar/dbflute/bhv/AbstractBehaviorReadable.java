@@ -465,7 +465,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * Create the list of value-label.
      * @param <ENTITY> The type of entity.
      * @param entityList The list of entity. (NotNull)
-     * @param valueLabelSetupper The setupper of value-label. (NotNull)
+     * @param valueLabelSetupper The set-upper of value-label. (NotNull)
      * @return The list of value-label. (NotNull)
      * @deprecated Sorry! This class will be deleted at the future.
      */
