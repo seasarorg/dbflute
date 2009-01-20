@@ -144,6 +144,8 @@
     <unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
   	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
+	
+  <!-- Reflection for Mac -->
 
   <target name="reflect-mac-all" depends="expand-dist" description="==> reflect to basic application">
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
@@ -207,10 +209,26 @@
   	<chmod dir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 	
+  <!-- Reflection for Windows -->
+	
   <target name="reflect-win-oracle" depends="expand-dist" description="==> reflect to oracle example">
     <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
+    <delete file="../dbflute-oracle-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-oracle-example90/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+  </target>
+
+  <target name="reflect-win-postgresql" depends="expand-dist" description="==> reflect to postgresql example">
+    <copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <delete file="../dbflute-postgresql-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-postgresql-example90/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
   </target>
 	
   <target name="reflect-win-msaccess" depends="expand-dist" description="==> reflect to msaccess example">
