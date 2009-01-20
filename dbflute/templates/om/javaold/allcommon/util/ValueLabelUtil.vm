@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 
 /**
  * @author ${database.ClassAuthor}
+ * @deprecated Sorry! This class will be deleted at the future.
  */
 public class ${glValueLabelUtil} {
 

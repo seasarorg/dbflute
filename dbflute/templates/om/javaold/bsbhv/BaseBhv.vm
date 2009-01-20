@@ -240,6 +240,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @param valueLabelSetupper The setupper of value-label. (NotNull)
      * @return The list of value-label. (NotNull)
+     * @deprecated Sorry! This method will be deleted at the future.
      */
     public List<Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, ${glValueLabelSetupper}<${myExtendedObjectClassName}> valueLabelSetupper) {
         return createValueLabelList(selectList(cb), valueLabelSetupper);
