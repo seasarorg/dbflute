@@ -13,6 +13,8 @@ public class DfTypeUtilTest extends TestCase {
     public void test_toDateFlexibly() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        
+        // ## Act & Assert ##
         assertNull(DfTypeUtil.toDateFlexibly(null));
         assertNull(DfTypeUtil.toDateFlexibly(""));
         assertEquals("0002/01/12 00:00:00", f.format(DfTypeUtil.toDateFlexibly("20112")));
@@ -28,6 +30,8 @@ public class DfTypeUtilTest extends TestCase {
     public void test_toTimestampFlexibly() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        
+        // ## Act & Assert ##
         assertNull(DfTypeUtil.toTimestampFlexibly(null));
         assertNull(DfTypeUtil.toTimestampFlexibly(""));
         assertEquals("0002/01/12 00:00:00.000", f.format(DfTypeUtil.toTimestampFlexibly("20112")));
