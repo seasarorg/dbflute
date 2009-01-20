@@ -52,6 +52,11 @@
 
     <delete file="dist/dbflute-runtime-*.jar"/>
     <jar jarfile="dist/dbflute-runtime-${version}.jar" basedir="target/classes"></jar>
+  	
+    <delete file="../dbflute/dist/dbflute-runtime-*.jar"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
   </target>
 
   <target name="reflect-mac-all">
@@ -103,10 +108,6 @@
     <delete file="../dbflute-oracle-example/lib/dbflute-runtime-*.jar"/>
     <copy file="dist/dbflute-runtime-${version}.jar"
     	  tofile="../dbflute-oracle-example90/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-    <delete file="../dbflute-msaccess-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-msaccess-example90/lib/dbflute-runtime-${version}.jar"
     	  overwrite="true"/>
   </target>
 </project>

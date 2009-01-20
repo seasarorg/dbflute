@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.sandbox</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>0.9.0-SNAPSHOT</version>
+	<version>0.9.0-1-SNAPSHOT</version>
 
 	<name>DBFlute Runtime</name>
 	<description>DBFlute Microsoft Access Example</description>
@@ -143,6 +143,13 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-webdav</artifactId>
+			<version>1.0-beta-2</version>
+	 		</extension>
+		</extensions>
 	</build>
 
 	<dependencies>
