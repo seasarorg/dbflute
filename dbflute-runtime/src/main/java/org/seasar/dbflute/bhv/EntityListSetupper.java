@@ -6,7 +6,7 @@ import org.seasar.dbflute.Entity;
 
 
 /**
- * The interface of entity list setupper.
+ * The interface of entity list set-upper.
  * @param <ENTITY> The type of entity.
  * @author jflute
  */

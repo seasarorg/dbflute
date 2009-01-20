@@ -3,6 +3,7 @@ package org.seasar.dbflute.bhv;
 /**
  * The class of Value-Label Box.
  * @author jflute
+ * @deprecated Sorry! This class will be deleted at the future.
  */
 public class ValueLabelBox {
 

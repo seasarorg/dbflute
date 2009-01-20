@@ -467,6 +467,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param entityList The list of entity. (NotNull)
      * @param valueLabelSetupper The setupper of value-label. (NotNull)
      * @return The list of value-label. (NotNull)
+     * @deprecated Sorry! This class will be deleted at the future.
      */
     public <ENTITY extends Entity> List<Map<String, Object>> createValueLabelList(List<ENTITY> entityList, ValueLabelSetupper<ENTITY> valueLabelSetupper) {
         final List<Map<String, Object>> valueLabelList = new ArrayList<Map<String, Object>>();
