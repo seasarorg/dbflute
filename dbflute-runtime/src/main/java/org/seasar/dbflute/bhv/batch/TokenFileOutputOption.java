@@ -7,14 +7,14 @@ import org.seasar.dbflute.helper.token.file.FileMakingOption;
  */
 public class TokenFileOutputOption {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected FileMakingOption _fileMakingOption = new FileMakingOption();
 
-    // =====================================================================================
-    //                                                                           Easy-to-Use
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
     public TokenFileOutputOption delimitateByComma() {
         _fileMakingOption.delimitateByComma();
         return this;
@@ -50,9 +50,9 @@ public class TokenFileOutputOption {
         return this;
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getEncoding() {
         return _fileMakingOption.getEncoding();
     }

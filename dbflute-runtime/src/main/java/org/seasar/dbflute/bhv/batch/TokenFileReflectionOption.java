@@ -7,16 +7,15 @@ import org.seasar.dbflute.helper.token.file.FileTokenizingOption;
  */
 public class TokenFileReflectionOption {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected boolean _interruptIfError;
-
     protected FileTokenizingOption _fileTokenizingOption = new FileTokenizingOption();
 
-    // =====================================================================================
-    //                                                                           Easy-to-Use
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
     public TokenFileReflectionOption delimitateByComma() {
         _fileTokenizingOption.delimitateByComma();
         return this;
@@ -47,9 +46,9 @@ public class TokenFileReflectionOption {
         return this;
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getDelimiter() {
         return _fileTokenizingOption.getDelimiter();
     }

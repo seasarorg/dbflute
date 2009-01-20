@@ -7,9 +7,9 @@ import org.seasar.dbflute.Entity;
  */
 public class TokenFileReflectionFailure {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected java.util.List<String> _columnNameList;
     protected java.util.List<String> _valueList;
 
@@ -24,9 +24,9 @@ public class TokenFileReflectionFailure {
     protected Entity _entity;
     protected Exception _exception;
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public java.util.List<String> getColumnNameList() {
         return _columnNameList;
     }

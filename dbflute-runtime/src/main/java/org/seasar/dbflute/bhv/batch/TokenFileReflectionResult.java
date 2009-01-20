@@ -5,23 +5,23 @@ package org.seasar.dbflute.bhv.batch;
  */
 public class TokenFileReflectionResult {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected java.util.List<String> _columnNameList;
     protected int _successCount;
     protected java.util.List<TokenFileReflectionFailure> _failureList;
 
-    // =====================================================================================
-    //                                                                           Easy-to-Use
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
     public void incrementSuccessCount() {
         ++_successCount;
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public java.util.List<String> getColumnNameList() {
         return _columnNameList;
     }
