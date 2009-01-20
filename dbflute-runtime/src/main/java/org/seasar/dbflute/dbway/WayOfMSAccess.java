@@ -10,7 +10,7 @@ public class WayOfMSAccess implements DBWay {
     //                                                                       Identity Info
     //                                                                       =============
     public String getIdentitySelectSql() {
-        return null;
+        return "SELECT @@IDENTITY";
     }
     
     // ===================================================================================
