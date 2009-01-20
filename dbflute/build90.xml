@@ -152,22 +152,22 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-    <copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
+  	
+    <copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  	
     <copy todir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-    <copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}">
+
+    <copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-    <copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  		
     <copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
