@@ -237,9 +237,6 @@
   </target>
 
   <target name="reflect-win-main" depends="expand-dist" description="==> reflect to test application">
-    <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
     <copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
@@ -249,22 +246,7 @@
     <copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
-    <copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
     <copy todir="${dbflute.buri.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  </target>
-
-  <target name="reflect-win-limit-basic" depends="expand-dist" description="==> reflect to test application">
-    <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  </target>
-
-  <target name="reflect-win-limit-oracle" depends="expand-dist" description="==> reflect to oracle example">
-    <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>

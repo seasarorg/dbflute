@@ -211,6 +211,30 @@
 	
   <!-- Reflection for Windows -->
 	
+  <target name="reflect-win-all" depends="expand-dist" description="==> reflect to all examples">
+    <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <delete file="../dbflute-oracle-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-oracle-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+  	
+  	<!--
+    <copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+    <delete file="../dbflute-postgresql-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-postgresql-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    -->
+  	
+    <copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
+	
   <target name="reflect-win-oracle" depends="expand-dist" description="==> reflect to oracle example">
     <copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
