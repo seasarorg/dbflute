@@ -71,7 +71,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.BuildException;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.torque.engine.database.transform.DTDResolver;
 import org.apache.xerces.dom.DocumentImpl;
