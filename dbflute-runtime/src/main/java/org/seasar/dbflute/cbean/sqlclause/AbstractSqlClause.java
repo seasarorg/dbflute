@@ -329,6 +329,18 @@ public abstract class AbstractSqlClause implements SqlClause {
             for (String deriveSubQuery : deriveSubQuerySet) {
                 sb.append(getLineSeparator()).append("     ");
                 sb.append(", ").append(deriveSubQuery);
+                
+                // [DBFlute-0.8.3]
+                int beginIndex = deriveSubQuery.lastIndexOf(" as ");
+                if (beginIndex >= 0) { // basically true
+                    String aliasName = deriveSubQuery.substring(beginIndex + " as ".length());
+                    int endIndex = aliasName.indexOf("--df:");
+                    if (endIndex >= 0) { // basically true
+                        aliasName = aliasName.substring(0, endIndex);
+                    }
+                    // for SpecifiedDerivedOrderBy
+                    _selectClauseRealColumnAliasMap.put(aliasName, aliasName);
+                }
             }
         }
 
