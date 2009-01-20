@@ -212,4 +212,10 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
+	
+  <target name="reflect-win-msaccess" depends="expand-dist" description="==> reflect to msaccess example">
+    <copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
+  </target>
 </project>
