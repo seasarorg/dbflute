@@ -217,7 +217,7 @@
     </copy>
     <delete file="../dbflute-oracle-example/lib/dbflute-runtime-*.jar"/>
     <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-oracle-example90/lib/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-oracle-example/lib/dbflute-runtime-${version}.jar"
     	  overwrite="true"/>
   </target>
 
@@ -227,7 +227,7 @@
     </copy>
     <delete file="../dbflute-postgresql-example/lib/dbflute-runtime-*.jar"/>
     <copy file="dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-postgresql-example90/lib/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-postgresql-example/lib/dbflute-runtime-${version}.jar"
     	  overwrite="true"/>
   </target>
 	
