@@ -76,7 +76,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                           =========
     /**
      * The implementation.
-     * @return Sql clause. (NotNull)
+     * @return SQL clause. (NotNull)
      */
     public SqlClause getSqlClause() {
         return _sqlClause;
@@ -84,7 +84,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * Create SQL clause. {for condition-bean}
-     * @param cb Condition-bean. (NotNull) 
      * @return SQL clause. (NotNull)
      */
     protected abstract SqlClause createSqlClause();
