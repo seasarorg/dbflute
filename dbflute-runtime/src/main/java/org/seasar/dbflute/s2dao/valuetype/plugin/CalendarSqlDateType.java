@@ -24,6 +24,7 @@ import org.seasar.dbflute.s2dao.valuetype.registered.SqlDateType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class CalendarSqlDateType extends SqlDateType {

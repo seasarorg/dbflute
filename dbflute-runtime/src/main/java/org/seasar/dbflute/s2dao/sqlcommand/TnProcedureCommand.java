@@ -9,8 +9,8 @@ import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.seasar.dbflute.s2dao.sqlhandler.TnProcedureHandler;
 
-
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnProcedureCommand implements TnSqlCommand, SqlExecution {

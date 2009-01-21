@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnProcedureMetaData {

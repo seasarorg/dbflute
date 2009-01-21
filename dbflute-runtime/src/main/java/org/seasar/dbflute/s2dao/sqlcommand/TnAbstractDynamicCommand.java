@@ -9,6 +9,7 @@ import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.node.Node;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public abstract class TnAbstractDynamicCommand extends TnAbstractSqlCommand {

@@ -7,6 +7,7 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnDeleteAutoHandler extends TnAbstractAutoHandler {

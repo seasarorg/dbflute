@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.jdbc.StatementFactory;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnBasicUpdateHandler extends TnBasicHandler {

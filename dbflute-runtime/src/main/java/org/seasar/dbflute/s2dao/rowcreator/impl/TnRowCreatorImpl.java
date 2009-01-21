@@ -29,6 +29,7 @@ import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public abstract class TnRowCreatorImpl implements TnRowCreator {

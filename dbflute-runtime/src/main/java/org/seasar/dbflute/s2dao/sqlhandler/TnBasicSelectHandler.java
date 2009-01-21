@@ -14,8 +14,8 @@ import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.s2dao.jdbc.TnPagingResultSet;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
-
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnBasicSelectHandler extends TnBasicHandler {

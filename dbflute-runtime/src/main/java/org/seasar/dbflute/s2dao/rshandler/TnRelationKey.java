@@ -16,7 +16,7 @@
 package org.seasar.dbflute.s2dao.rshandler;
 
 /**
- * {Refers to S2Dao's utility and Extends it}
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public final class TnRelationKey {

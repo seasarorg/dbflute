@@ -9,6 +9,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnDeleteBatchAutoHandler;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public class TnDeleteBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {

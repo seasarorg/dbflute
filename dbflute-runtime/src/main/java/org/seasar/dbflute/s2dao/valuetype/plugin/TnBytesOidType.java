@@ -10,8 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-
 /**
+ * {Refers to S2Container's utility and Extends it}
  * The value type of bytes OID. (for PostgreSQL) 
  * @author jflute
  */

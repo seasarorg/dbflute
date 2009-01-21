@@ -19,6 +19,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public abstract class TnAbstractAutoHandler extends TnBasicHandler {

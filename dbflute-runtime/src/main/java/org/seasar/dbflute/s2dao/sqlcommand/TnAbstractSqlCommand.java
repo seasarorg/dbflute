@@ -6,6 +6,7 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.jdbc.StatementFactory;
 
 /**
+ * {Refers to S2Container's utility and Extends it}
  * @author jflute
  */
 public abstract class TnAbstractSqlCommand implements TnSqlCommand, SqlExecution {
