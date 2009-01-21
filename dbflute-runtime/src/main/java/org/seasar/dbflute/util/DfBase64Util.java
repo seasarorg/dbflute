@@ -16,7 +16,7 @@
 package org.seasar.dbflute.util;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class DfBase64Util {
