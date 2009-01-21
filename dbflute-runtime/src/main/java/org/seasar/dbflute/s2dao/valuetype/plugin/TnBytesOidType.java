@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Refers to a S2Dao's class and Extends it}
  * The value type of bytes OID. (for PostgreSQL) 
  * @author jflute
  */

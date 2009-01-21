@@ -19,7 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Refers to a S2Dao's class and Extends it}
  * @author jflute
  */
 public interface TnResultSetHandler {

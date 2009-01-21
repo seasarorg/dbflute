@@ -26,7 +26,7 @@ import org.seasar.dbflute.s2dao.beans.exception.TnMethodNotFoundRuntimeException
 import org.seasar.dbflute.s2dao.beans.exception.TnPropertyNotFoundRuntimeException;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Refers to a S2Dao's class and Extends it}
  * @author jflute
  */
 public interface TnBeanDesc {

@@ -16,7 +16,7 @@ import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.SQLExceptionHandler;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Refers to a S2Dao's class and Extends it}
  * @author jflute
  */
 public class TnStatementFactoryImpl implements StatementFactory {

@@ -20,7 +20,7 @@ import java.util.Set;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Refers to a S2Dao's class and Extends it}
  * @author jflute
  */
 public interface TnBeanMetaData extends TnDtoMetaData {

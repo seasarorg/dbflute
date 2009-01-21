@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 import org.seasar.dbflute.s2dao.beans.exception.TnIllegalPropertyRuntimeException;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Refers to a S2Dao's class and Extends it}
  * @author jflute
  */
 public interface TnPropertyDesc {

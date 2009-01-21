@@ -30,7 +30,7 @@ import org.seasar.dbflute.util.DfResourceUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Refers to a S2Dao's class and Extends it}
  * @author jflute
  */
 public class BytesType extends TnAbstractValueType {

@@ -13,7 +13,7 @@ import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Refers to a S2Dao's class and Extends it}
  * @author jflute
  */
 public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecution {

@@ -9,7 +9,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 
 /**
- * {Refers to S2Container's utility and Extends it}
+ * {Refers to a S2Dao's class and Extends it}
  * @author jflute
  */
 public class TnCommandContextHandler extends TnBasicHandler {
