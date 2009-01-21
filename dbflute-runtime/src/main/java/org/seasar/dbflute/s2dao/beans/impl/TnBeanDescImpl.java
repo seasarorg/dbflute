@@ -40,7 +40,7 @@ import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class TnBeanDescImpl implements TnBeanDesc {

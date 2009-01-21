@@ -18,7 +18,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGenerator {

@@ -12,7 +12,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 @SuppressWarnings("unchecked")

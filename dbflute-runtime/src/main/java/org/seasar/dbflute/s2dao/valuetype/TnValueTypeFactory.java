@@ -18,7 +18,7 @@ package org.seasar.dbflute.s2dao.valuetype;
 import org.seasar.dbflute.jdbc.ValueType;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public interface TnValueTypeFactory {

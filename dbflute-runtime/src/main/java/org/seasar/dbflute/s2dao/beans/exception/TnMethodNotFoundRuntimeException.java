@@ -16,7 +16,7 @@
 package org.seasar.dbflute.s2dao.beans.exception;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class TnMethodNotFoundRuntimeException extends RuntimeException {

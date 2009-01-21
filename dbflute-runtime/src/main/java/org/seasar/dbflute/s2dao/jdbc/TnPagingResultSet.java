@@ -11,7 +11,7 @@ import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.resource.SQLExceptionHandler;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class TnPagingResultSet extends ResultSetWrapper {

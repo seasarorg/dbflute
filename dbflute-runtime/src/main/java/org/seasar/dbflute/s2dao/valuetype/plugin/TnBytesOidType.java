@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * The value type of bytes OID. (for PostgreSQL) 
  * @author jflute
  */

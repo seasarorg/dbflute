@@ -13,7 +13,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnInsertAutoHandler;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {

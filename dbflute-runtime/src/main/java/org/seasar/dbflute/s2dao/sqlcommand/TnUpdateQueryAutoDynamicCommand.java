@@ -23,7 +23,7 @@ import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecution {

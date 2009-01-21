@@ -3,7 +3,7 @@ package org.seasar.dbflute.s2dao.metadata;
 import java.util.Set;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public interface TnModifiedPropertySupport {

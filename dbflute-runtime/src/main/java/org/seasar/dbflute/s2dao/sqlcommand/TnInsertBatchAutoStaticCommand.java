@@ -9,7 +9,7 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
 import org.seasar.dbflute.s2dao.sqlhandler.TnInsertBatchAutoHandler;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class TnInsertBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {

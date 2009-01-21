@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 import org.seasar.dbflute.jdbc.ValueType;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class TnProcedureParameterType {

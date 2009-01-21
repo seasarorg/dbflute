@@ -28,7 +28,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFactory {

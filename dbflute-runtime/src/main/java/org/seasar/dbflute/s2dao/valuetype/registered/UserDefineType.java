@@ -25,7 +25,7 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class UserDefineType implements ValueType {

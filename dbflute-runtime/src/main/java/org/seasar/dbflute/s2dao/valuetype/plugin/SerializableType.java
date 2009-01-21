@@ -27,7 +27,7 @@ import java.sql.SQLException;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class SerializableType extends BytesType {

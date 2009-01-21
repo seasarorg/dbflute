@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.jdbc.StatementFactory;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class TnBasicUpdateHandler extends TnBasicHandler {

@@ -30,7 +30,7 @@ import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {

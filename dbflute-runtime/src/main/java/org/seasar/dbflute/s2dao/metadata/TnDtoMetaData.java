@@ -20,7 +20,7 @@ import java.util.Map;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public interface TnDtoMetaData {

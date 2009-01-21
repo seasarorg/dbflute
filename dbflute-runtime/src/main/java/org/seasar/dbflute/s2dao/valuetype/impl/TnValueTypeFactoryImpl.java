@@ -22,7 +22,7 @@ import org.seasar.dbflute.s2dao.valuetype.plugin.TnBytesOidType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.TnStringClobType;
 
 /**
- * {Refers to a S2Dao's class and Extends it}
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class TnValueTypeFactoryImpl implements TnValueTypeFactory {
