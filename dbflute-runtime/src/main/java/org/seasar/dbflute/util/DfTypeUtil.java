@@ -685,12 +685,12 @@ public class DfTypeUtil {
      * @param obj The time-stamp object. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
      */
-    public static Date toTimestampFlexibly(Object obj) {
+    public static Timestamp toTimestampFlexibly(Object obj) {
         if (obj == null) {
             return null;
         }
         if (!(obj instanceof String)) {
-            return toDate(obj);
+            return toTimestamp(obj);
         }
         String value = (String) obj;
         if (value.trim().length() == 0) {
@@ -726,20 +726,6 @@ public class DfTypeUtil {
             }
         }
         return value;
-    }
-
-    /**
-     * Format time-stamp as specified pattern.
-     * @param timestamp The value of time-stamp. (Nullable: If the value is null, it returns null.)
-     * @param pattern The pattern of format for SimpleDateFormat. (NotNull)
-     * @return The formatted string. (Nullable) 
-     */
-    public static String format(Timestamp timestamp, String pattern) {
-        if (timestamp == null) {
-            return null;
-        }
-        SimpleDateFormat format = new SimpleDateFormat(pattern);
-        return format.format(timestamp);
     }
 
     // -----------------------------------------------------

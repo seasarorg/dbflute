@@ -1,6 +1,8 @@
 package org.seasar.dbflute.util;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import junit.framework.TestCase;
 
@@ -13,7 +15,7 @@ public class DfTypeUtilTest extends TestCase {
     public void test_toDateFlexibly() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        
+
         // ## Act & Assert ##
         assertNull(DfTypeUtil.toDateFlexibly(null));
         assertNull(DfTypeUtil.toDateFlexibly(""));
@@ -27,10 +29,27 @@ public class DfTypeUtilTest extends TestCase {
         assertEquals("2008/12/30 12:34:56", f.format(DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789")));
     }
 
+    public void test_format_Date() {
+        // ## Arrange ##
+        Date date = DfTypeUtil.toDateFlexibly("2008/12/30 12:34:56");
+        Timestamp timestamp = DfTypeUtil.toTimestampFlexibly("2008/12/30 12:34:56");
+
+        // ## Act & Assert ##
+        assertNull(DfTypeUtil.format((Date) null, "yyyy/MM/dd HH:mm:ss"));
+        assertEquals("2008/12/30 12:34:56", DfTypeUtil.format(date, "yyyy/MM/dd HH:mm:ss"));
+        assertEquals("2008/12/30", DfTypeUtil.format(date, "yyyy/MM/dd"));
+        assertEquals("2008-12-30", DfTypeUtil.format(date, "yyyy-MM-dd"));
+        assertEquals("2008-12-30 12:34:56.000", DfTypeUtil.format(date, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2008/12/30 12:34:56", DfTypeUtil.format(timestamp, "yyyy/MM/dd HH:mm:ss"));
+        assertEquals("2008/12/30", DfTypeUtil.format(timestamp, "yyyy/MM/dd"));
+        assertEquals("2008-12-30", DfTypeUtil.format(timestamp, "yyyy-MM-dd"));
+        assertEquals("2008-12-30 12:34:56.000", DfTypeUtil.format(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
     public void test_toTimestampFlexibly() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        
+
         // ## Act & Assert ##
         assertNull(DfTypeUtil.toTimestampFlexibly(null));
         assertNull(DfTypeUtil.toTimestampFlexibly(""));
