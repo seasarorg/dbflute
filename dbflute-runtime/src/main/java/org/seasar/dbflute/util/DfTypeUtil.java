@@ -644,6 +644,20 @@ public class DfTypeUtil {
         return value;
     }
 
+    /**
+     * Format date as specified pattern.
+     * @param date The value of date. (Nullable: If the value is null, it returns null.)
+     * @param pattern The pattern of format for SimpleDateFormat. (NotNull)
+     * @return The formatted string. (Nullable) 
+     */
+    public static String format(Date date, String pattern) {
+        if (date == null) {
+            return null;
+        }
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+        return format.format(date);
+    }
+
     // -----------------------------------------------------
     //                                             Timestamp
     //                                             ---------
@@ -712,6 +726,20 @@ public class DfTypeUtil {
             }
         }
         return value;
+    }
+
+    /**
+     * Format time-stamp as specified pattern.
+     * @param timestamp The value of time-stamp. (Nullable: If the value is null, it returns null.)
+     * @param pattern The pattern of format for SimpleDateFormat. (NotNull)
+     * @return The formatted string. (Nullable) 
+     */
+    public static String format(Timestamp timestamp, String pattern) {
+        if (timestamp == null) {
+            return null;
+        }
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+        return format.format(timestamp);
     }
 
     // -----------------------------------------------------
@@ -1008,6 +1036,14 @@ public class DfTypeUtil {
     // ===================================================================================
     //                                                                   toText() Handling
     //                                                                   =================
+    // /- - - - - - - - - - - - - - - - - - - - - - - - - - 
+    // The text cannot be null.
+    // If the value is null, it returns 'null' text.
+    // - - - - - - - - - -/
+    
+    /**
+     * @return The 'null' text as string. (NotNull)
+     */
     public static String nullText() {
         return NULL;
     }
@@ -1033,6 +1069,10 @@ public class DfTypeUtil {
         return quote(value);
     }
 
+    /**
+     * @param value The instance of Date. (Nullable: If the value is null, returns 'null'.)
+     * @return The text for the argument. (NotNull)
+     */
     public static String toText(Date value) {
         if (value == null) {
             return NULL;
