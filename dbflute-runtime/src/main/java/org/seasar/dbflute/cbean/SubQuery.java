@@ -15,6 +15,24 @@
  */
 package org.seasar.dbflute.cbean;
 
+/**
+ * <pre>
+ * cb.query.existsBarList(new SubQuery&lt;FooCB&gt;() {
+ *     public void query(FooCB subCB) {
+ *         subCB.query().setXxx_Yyy...
+ *     }
+ * }
+ * </pre>
+ * @author jflute
+ * @param <SUB_CB> The type of condition-bean for sub-query.
+ */
 public interface SubQuery<SUB_CB extends ConditionBean> {
+    
+    /**
+     * Set up your query condition for sub-query. <br />
+     * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
+     * and they are ignored if you call.
+     * @param subCB The condition-bean for sub-query. (NotNull)
+     */
     public void query(SUB_CB subCB);
 }

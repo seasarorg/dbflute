@@ -15,6 +15,24 @@
  */
 package org.seasar.dbflute.cbean;
 
+/**
+ * <pre>
+ * cb.union(new UnionQuery&lt;FooCB&gt;() {
+ *     public void query(MemberCB unionCB) {
+ *         unionCB.query().setXxx_Yyy...
+ *     }
+ * }
+ * </pre>
+ * @author jflute
+ * @param <UNION_CB> The type of condition-bean for union.
+ */
 public interface UnionQuery<UNION_CB extends ConditionBean> {
+    
+    /**
+     * Set up your query condition for union. <br />
+     * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'
+     * and they are ignored if you call.
+     * @param unionCB The condition-bean for union. (NotNull)
+     */
     public void query(UNION_CB unionCB);
 }
