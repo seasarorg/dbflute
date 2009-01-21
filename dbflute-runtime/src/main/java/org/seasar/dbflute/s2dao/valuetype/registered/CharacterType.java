@@ -38,8 +38,7 @@ public class CharacterType extends TnAbstractValueType {
         return toCharacter(resultSet.getString(index));
     }
 
-    public Object getValue(ResultSet resultSet, String columnName)
-            throws SQLException {
+    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
         return toCharacter(resultSet.getString(columnName));
     }
 
@@ -47,8 +46,7 @@ public class CharacterType extends TnAbstractValueType {
         return toCharacter(cs.getString(index));
     }
 
-    public Object getValue(CallableStatement cs, String parameterName)
-            throws SQLException {
+    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
         return toCharacter(cs.getString(parameterName));
     }
 
@@ -63,12 +61,10 @@ public class CharacterType extends TnAbstractValueType {
         if (chars.length == 0) {
             return null;
         }
-        throw new IllegalStateException("length of String should be 1."
-                + " actual is [" + value + "]");
+        throw new IllegalStateException("length of String should be 1." + " actual is [" + value + "]");
     }
 
-    public void bindValue(PreparedStatement ps, int index, Object value)
-            throws SQLException {
+    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
@@ -76,8 +72,7 @@ public class CharacterType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(CallableStatement cs, String parameterName,
-            Object value) throws SQLException {
+    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {

@@ -39,8 +39,7 @@ public class OracleResultSetType extends TnAbstractValueType {
         throw new SQLException("not supported");
     }
 
-    public Object getValue(ResultSet resultSet, String columnName)
-            throws SQLException {
+    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
         throw new SQLException("not supported");
     }
 
@@ -48,18 +47,15 @@ public class OracleResultSetType extends TnAbstractValueType {
         return cs.getObject(index);
     }
 
-    public Object getValue(CallableStatement cs, String parameterName)
-            throws SQLException {
+    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
         return cs.getObject(parameterName);
     }
 
-    public void bindValue(PreparedStatement ps, int index, Object value)
-            throws SQLException {
+    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         throw new SQLException("not supported");
     }
 
-    public void bindValue(CallableStatement cs, String parameterName,
-            Object value) throws SQLException {
+    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
         throw new SQLException("not supported");
     }
 

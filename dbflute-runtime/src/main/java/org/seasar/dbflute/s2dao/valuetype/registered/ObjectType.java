@@ -38,8 +38,7 @@ public class ObjectType extends TnAbstractValueType {
         return resultSet.getObject(index);
     }
 
-    public Object getValue(ResultSet resultSet, String columnName)
-            throws SQLException {
+    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
         return resultSet.getObject(columnName);
     }
 
@@ -47,13 +46,11 @@ public class ObjectType extends TnAbstractValueType {
         return cs.getObject(index);
     }
 
-    public Object getValue(CallableStatement cs, String parameterName)
-            throws SQLException {
+    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
         return cs.getObject(parameterName);
     }
 
-    public void bindValue(PreparedStatement ps, int index, Object value)
-            throws SQLException {
+    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
@@ -61,8 +58,7 @@ public class ObjectType extends TnAbstractValueType {
         }
     }
 
-    public void bindValue(CallableStatement cs, String parameterName,
-            Object value) throws SQLException {
+    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {

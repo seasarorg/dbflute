@@ -33,7 +33,7 @@ public class TnValueTypeFactoryImpl implements TnValueTypeFactory {
     {
         TnValueTypes.registerPluginValueType("stringClobType", new TnStringClobType());
         TnValueTypes.registerPluginValueType("bytesOidType", new TnBytesOidType());
-        
+
         // for compatible
         TnValueTypes.registerPluginValueType("dbfluteStringClobType", new TnStringClobType());
         TnValueTypes.registerPluginValueType("dbfluteBytesOidType", new TnBytesOidType());

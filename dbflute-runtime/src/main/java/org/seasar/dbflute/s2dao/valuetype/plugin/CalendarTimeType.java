@@ -34,8 +34,7 @@ public class CalendarTimeType extends TimeType {
         return toCalendar(super.getValue(resultSet, index));
     }
 
-    public Object getValue(ResultSet resultSet, String columnName)
-            throws SQLException {
+    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
         return toCalendar(super.getValue(resultSet, columnName));
     }
 
@@ -43,8 +42,7 @@ public class CalendarTimeType extends TimeType {
         return toCalendar(super.getValue(cs, index));
     }
 
-    public Object getValue(CallableStatement cs, String parameterName)
-            throws SQLException {
+    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
         return toCalendar(super.getValue(cs, parameterName));
     }
 

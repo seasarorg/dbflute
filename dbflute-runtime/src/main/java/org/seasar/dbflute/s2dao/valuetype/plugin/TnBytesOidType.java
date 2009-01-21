@@ -43,7 +43,7 @@ public class TnBytesOidType extends BytesType {
     //                                                                          Blob Trait
     //                                                                          ==========
     protected static class TnBytesOidTrait implements Trait {
-	
+
         public int getSqlType() {
             return Types.BLOB;
         }

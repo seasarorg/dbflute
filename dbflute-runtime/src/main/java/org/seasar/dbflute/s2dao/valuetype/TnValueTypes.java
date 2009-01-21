@@ -94,7 +94,7 @@ public class TnValueTypes {
 
     // Internal
     private static final ValueType NULL = new NullType();
-    
+
     private static final Class<?> BYTE_ARRAY_CLASS = new byte[0].getClass();
 
     // ===================================================================================
