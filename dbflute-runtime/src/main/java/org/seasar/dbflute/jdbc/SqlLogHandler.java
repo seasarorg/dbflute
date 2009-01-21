@@ -17,11 +17,20 @@ package org.seasar.dbflute.jdbc;
 
 /**
  * The handler of SQL log.
+ * <pre>
+ * context.setSqlLogHandler(new SqlLogHandler() {
+ *     public void handle(String executedSql, String displaySql
+ *                      , Object[] args, Class&lt;?&gt;[] argTypes) {
+ *         // You can get your SQL string here.
+ *     }
+ * });
+ * </pre>
  * @author jflute
  */
 public interface SqlLogHandler {
 
     /**
+     * Handle the SQL log.
      * @param executedSql The executed SQL. (NotNull)
      * @param displaySql The SQL for display. (NotNull)
      * @param args The arguments of the SQL. (Nullable)

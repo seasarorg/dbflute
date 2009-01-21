@@ -76,6 +76,17 @@ public class CallbackContext {
         return _sqlLogHandler;
     }
 
+    /**
+     * <pre>
+     * context.setSqlLogHandler(new SqlLogHandler() {
+     *     public void handle(String executedSql, String displaySql
+     *                      , Object[] args, Class&lt;?&gt;[] argTypes) {
+     *         // You can get your SQL string here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlLogHandler The handler of SQL log. (Nullable)
+     */
     public void setSqlLogHandler(SqlLogHandler sqlLogHandler) {
         this._sqlLogHandler = sqlLogHandler;
     }
