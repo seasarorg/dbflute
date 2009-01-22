@@ -332,7 +332,6 @@ public class DfXlsReader {
             boolean b = cell.getBooleanCellValue();
             return Boolean.valueOf(b);
         default:
-            System.out.println("cell=" + cell);
             return null;
         }
     }
