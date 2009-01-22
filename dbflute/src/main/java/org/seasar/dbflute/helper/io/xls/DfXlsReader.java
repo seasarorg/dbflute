@@ -60,6 +60,7 @@ public class DfXlsReader {
 
     protected static final DfFlexibleMap<String, String> EMPTY_TABLE_NAME_MAP = new DfFlexibleMap<String, String>();
     protected static final DfFlexibleMap<String, List<String>> EMPTY_NOT_TRIM_TABLE_COLUMN_MAP = new DfFlexibleMap<String, List<String>>();
+    protected static final DfFlexibleMap<String, List<String>> EMPTY_EMPTY_STRING_TABLE_COLUMN_MAP = new DfFlexibleMap<String, List<String>>();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -80,24 +81,29 @@ public class DfXlsReader {
 
     protected DfFlexibleMap<String, List<String>> _notTrimTableColumnMap;
 
+    protected DfFlexibleMap<String, List<String>> _emptyStringTableColumnMap;
+
     protected Pattern _skipSheetPattern;// Not Required
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfXlsReader(File file) {
-        this(file, EMPTY_TABLE_NAME_MAP, EMPTY_NOT_TRIM_TABLE_COLUMN_MAP, null);
+        this(file, EMPTY_TABLE_NAME_MAP, EMPTY_NOT_TRIM_TABLE_COLUMN_MAP, EMPTY_EMPTY_STRING_TABLE_COLUMN_MAP, null);
     }
 
     public DfXlsReader(File file, DfFlexibleMap<String, String> tableNameMap,
-            DfFlexibleMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
-        this(create(file), tableNameMap, notTrimTableColumnMap, skipSheetPattern);
+            DfFlexibleMap<String, List<String>> notTrimTableColumnMap,
+            DfFlexibleMap<String, List<String>> emptyStringTableColumnMap, Pattern skipSheetPattern) {
+        this(create(file), tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap, skipSheetPattern);
     }
 
-    public DfXlsReader(InputStream in, DfFlexibleMap<String, String> tableNameMap,
-            DfFlexibleMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
+    protected DfXlsReader(InputStream in, DfFlexibleMap<String, String> tableNameMap,
+            DfFlexibleMap<String, List<String>> notTrimTableColumnMap,
+            DfFlexibleMap<String, List<String>> emptyStringTableColumnMap, Pattern skipSheetPattern) {
         this._tableNameMap = tableNameMap;
         this._notTrimTableColumnMap = notTrimTableColumnMap;
+        this._emptyStringTableColumnMap = emptyStringTableColumnMap;
         this._skipSheetPattern = skipSheetPattern;
         setupWorkbook(in);
     }
@@ -302,7 +308,7 @@ public class DfXlsReader {
             if (s != null) {
                 if (isNotTrimTarget(cell, table)) {
                     if (s.length() != s.trim().length()) {
-                        s = "\"" + s + "\"";
+                        s = "\"" + s + "\""; // for preventing trimming later
                     }
                 } else {
                     s = DfStringUtil.rtrim(s);
@@ -310,6 +316,9 @@ public class DfXlsReader {
             }
             if ("".equals(s)) {
                 s = null;
+            }
+            if (isEmptyStringTarget(cell, table) && s == null) {
+                s = "\"\""; // for preventing trimming later
             }
             if (isCellBase64Formatted(cell)) {
                 return DfBase64Util.decode(s);
@@ -323,7 +332,6 @@ public class DfXlsReader {
         }
     }
 
-    // /----------------------------------------------------------------- Modification
     public boolean isNotTrimTarget(HSSFCell cell, DataTable table) {
         final String tableName = table.getTableName();
         if (!_notTrimTableColumnMap.containsKey(tableName)) {
@@ -340,7 +348,21 @@ public class DfXlsReader {
         return false;
     }
 
-    // --------------------/
+    public boolean isEmptyStringTarget(HSSFCell cell, DataTable table) {
+        final String tableName = table.getTableName();
+        if (!_emptyStringTableColumnMap.containsKey(tableName)) {
+            return false;
+        }
+        final List<String> emptyStringTargetColumnMap = _emptyStringTableColumnMap.get(tableName);
+        final DataColumn column = table.getColumn(cell.getColumnIndex());
+        final String targetColumnName = column.getColumnName();
+        for (String currentColumnName : emptyStringTargetColumnMap) {
+            if (targetColumnName.equalsIgnoreCase(currentColumnName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     protected ColumnType getColumnType(HSSFCell cell) {
         switch (cell.getCellType()) {

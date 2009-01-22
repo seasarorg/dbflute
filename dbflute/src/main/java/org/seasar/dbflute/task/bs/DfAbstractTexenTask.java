@@ -140,7 +140,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
             sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
             sb.append(ln);
-            sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + DfEnvironmentType.getInstance().getEnvironmentType() + "}");
+            sb.append(ln).append(
+                    "  DBFLUTE_ENVIRONMENT_TYPE: {" + DfEnvironmentType.getInstance().getEnvironmentType() + "}");
             sb.append(ln).append("    driver = " + _driver);
             sb.append(ln).append("    url    = " + _url);
             sb.append(ln).append("    schema = " + _schema);
@@ -172,7 +173,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected String getFinalInformation() {
         return null; // as default
     }
-    
+
     protected void initializeDatabaseInfo() {
         _driver = getDatabaseInfoProperties().getDatabaseDriver();
         _url = getDatabaseInfoProperties().getDatabaseUri();
@@ -576,7 +577,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                      General Helper
     //                                                                      ==============
     protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+        return "\n";
     }
 
     // ===================================================================================

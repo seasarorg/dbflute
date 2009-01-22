@@ -188,8 +188,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             // Remove double quotation if it exists.
                             // - - - - - - - - - - - - - - - - - - -
                             if (value != null && value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
-                                value = value.substring(1);
-                                value = value.substring(0, value.length() - 1);
+                                value = removeDoubleQuotation(value);
                             }
 
                             // - - - - - - - - - - - - - - 
@@ -216,7 +215,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                                 continue;
                             }
 
-                            ps.setObject(bindCount, value);
+                            ps.setString(bindCount, value);
                             bindCount++;
                         }
                         ps.addBatch();
@@ -258,6 +257,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     }
 
     protected void finallyHandlingTable(DataSource dataSource, DataTable dataTable) {
+    }
+
+    protected String removeDoubleQuotation(String value) {
+        value = value.substring(1);
+        value = value.substring(0, value.length() - 1);
+        return value;
     }
 
     // ===================================================================================
@@ -531,7 +536,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     protected DfXlsReader createXlsReader(String dataDirectoryName, File file) {
         final DfFlexibleMap<String, String> tableNameMap = getTableNameMap(dataDirectoryName);
         final DfFlexibleMap<String, List<String>> notTrimTableColumnMap = getNotTrimTableColumnMap(dataDirectoryName);
-        final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap, _skipSheetPattern);
+        final DfFlexibleMap<String, List<String>> emptyStringTableColumnMap = getEmptyStringTableColumnMap(dataDirectoryName);
+        final DfXlsReader xlsReader = new DfXlsReader(file, tableNameMap, notTrimTableColumnMap,
+                emptyStringTableColumnMap, _skipSheetPattern);
         if (tableNameMap != null && !tableNameMap.isEmpty()) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - - - - - - ");
             _log.info("tableNameMap = " + tableNameMap);
@@ -617,23 +624,51 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
     }
 
     private Map<String, String> getDefaultValueMap(String dataDirectoryName) {
-        final String path = dataDirectoryName + "/default-value.txt";
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        return reader.readMapAsStringValue(path, "UTF-8");
+        String path = dataDirectoryName + "/defaultValueMap.rsprop";
+        Map<String, String> resultMap = reader.readMapAsStringValue(path, "UTF-8");
+        if (resultMap != null && !resultMap.isEmpty()) {
+            return resultMap;
+        }
+        path = dataDirectoryName + "/default-value.txt";
+        resultMap = reader.readMapAsStringValue(path, "UTF-8");
+        return resultMap;
     }
 
     private DfFlexibleMap<String, String> getTableNameMap(String dataDirectoryName) {
-        final String path = dataDirectoryName + "/table-name.txt";
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        final Map<String, String> targetMap = reader.readMapAsStringValue(path, "UTF-8");
-        return new DfFlexibleMap<String, String>(targetMap);
+        String path = dataDirectoryName + "/tableNameMap.rsprop";
+        Map<String, String> resultMap = reader.readMapAsStringValue(path, "UTF-8");
+        if (resultMap != null && !resultMap.isEmpty()) {
+            return new DfFlexibleMap<String, String>(resultMap);
+        }
+        path = dataDirectoryName + "/table-name.txt";
+        resultMap = reader.readMapAsStringValue(path, "UTF-8");
+        return new DfFlexibleMap<String, String>(resultMap);
     }
 
     private DfFlexibleMap<String, List<String>> getNotTrimTableColumnMap(String dataDirectoryName) {
-        final String path = dataDirectoryName + "/not-trim-column.txt";
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        final Map<String, List<String>> targetMap = reader.readMapAsListStringValue(path, "UTF-8");
-        return new DfFlexibleMap<String, List<String>>(targetMap);
+        String path = dataDirectoryName + "/notTrimColumnMap.rsprop";
+        Map<String, List<String>> resultMap = reader.readMapAsListStringValue(path, "UTF-8");
+        if (resultMap != null && !resultMap.isEmpty()) {
+            return new DfFlexibleMap<String, List<String>>(resultMap);
+        }
+        path = dataDirectoryName + "/not-trim-column.txt";
+        resultMap = reader.readMapAsListStringValue(path, "UTF-8");
+        return new DfFlexibleMap<String, List<String>>(resultMap);
+    }
+
+    private DfFlexibleMap<String, List<String>> getEmptyStringTableColumnMap(String dataDirectoryName) {
+        final DfMapStringFileReader reader = new DfMapStringFileReader();
+        String path = dataDirectoryName + "/emptyStringColumnMap.rsprop";
+        Map<String, List<String>> resultMap = reader.readMapAsListStringValue(path, "UTF-8");
+        if (resultMap != null && !resultMap.isEmpty()) {
+            return new DfFlexibleMap<String, List<String>>(resultMap);
+        }
+        path = dataDirectoryName + "/empty-string-column.txt";
+        resultMap = reader.readMapAsListStringValue(path, "UTF-8");
+        return new DfFlexibleMap<String, List<String>>(resultMap);
     }
 
     protected String getSql4Log(String tableName, List<String> columnNameList,

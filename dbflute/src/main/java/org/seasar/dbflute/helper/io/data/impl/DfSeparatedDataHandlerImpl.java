@@ -126,15 +126,27 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
     }
 
     private Map<String, Map<String, String>> getConvertValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
-        final String path = info.getBasePath() + "/" + encoding + "/convert-value.txt";
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        return reader.readMapAsMapValue(path, encoding);
+        String path = info.getBasePath() + "/" + encoding + "/convertValueMap.rsprop";
+        Map<String, Map<String, String>> resultMap = reader.readMapAsMapValue(path, encoding);
+        if (resultMap != null && !resultMap.isEmpty()) {
+            return resultMap;
+        }
+        path = info.getBasePath() + "/" + encoding + "/convert-value.txt";
+        resultMap = reader.readMapAsMapValue(path, encoding);
+        return resultMap;
     }
 
     private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
-        final String path = info.getBasePath() + "/" + encoding + "/default-value.txt";
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        return reader.readMapAsStringValue(path, encoding);
+        String path = info.getBasePath() + "/" + encoding + "/defaultValueMap.rsprop";
+        Map<String, String> resultMap = reader.readMapAsStringValue(path, encoding);
+        if (resultMap != null && !resultMap.isEmpty()) {
+            return resultMap;
+        }
+        path = info.getBasePath() + "/" + encoding + "/default-value.txt";
+        resultMap = reader.readMapAsStringValue(path, encoding);
+        return resultMap;
     }
 
     protected FilenameFilter createFilenameFilter(final String typeName) {
