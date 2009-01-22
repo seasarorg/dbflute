@@ -151,12 +151,14 @@
   	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-mac-main" depends="expand-dist" description="==> reflect to main examples">
+  <target name="reflect-mac-basic" depends="expand-dist" description="==> reflect to basic example">
     <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+  </target>
 
+  <target name="reflect-mac-others" depends="expand-dist" description="==> reflect to other examples">
     <copy todir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
@@ -176,23 +178,16 @@
 -->
   </target>
 
-  <target name="reflect-mac-limit-basic" depends="expand-dist" description="==> reflect to basic example">
-    <copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
-
-  <target name="reflect-win-main" depends="expand-dist" description="==> reflect to test application">
-    <copy todir="${dbflute.db2.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
+  <target name="reflect-win-sqlserver" depends="expand-dist" description="==> reflect to sqlserver example">
     <copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
 
-  <target name="reflect-win-limit-sqlserver" depends="expand-dist" description="==> reflect to sqlserver example">
+  <target name="reflect-win-others" depends="expand-dist" description="==> reflect to other examples">
+    <copy todir="${dbflute.db2.example.dir}/mydbflute/dbflute-${version}">
+      <fileset dir="${dbflute.deploy.dir}"/>
+    </copy>
     <copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
