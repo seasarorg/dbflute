@@ -10,7 +10,7 @@ import org.seasar.dbflute.outsidesql.ProcedurePmb;
  * @author ${database.ClassAuthor}
  */
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-public class ${myClassName} implements ${glProcedurePmb} {
+public class ${myClassName} implements ProcedurePmb {
 #else
 public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} {
 #end
