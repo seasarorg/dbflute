@@ -26,13 +26,13 @@ import org.t2framework.lucy.Lucy;
  * The implementation of behavior selector.
  * @author DBFlute(AutoGenerator)
  */
-public class ImplementedBehaviorSelector implements BehaviorSelector {
+public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(ImplementedBehaviorSelector.class);
+    private static final Log _log = LogFactory.getLog(${glImplementedBehaviorSelector}.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -90,7 +90,7 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
      * Initialize condition-bean meta data. <br />
      */
     public void initializeConditionBeanMetaData() {
-        final Map<String, DBMeta> dbmetaMap = DBMetaInstanceHandler.getDBMetaMap();
+        final Map<String, DBMeta> dbmetaMap = ${glDBMetaInstanceHandler}.getDBMetaMap();
         final Collection<DBMeta> dbmetas = dbmetaMap.values();
         long before = 0;
         if (_log.isInfoEnabled()) {
@@ -139,7 +139,7 @@ public class ImplementedBehaviorSelector implements BehaviorSelector {
      */
     public BehaviorReadable byName(String tableFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
-        final DBMeta dbmeta = DBMetaInstanceHandler.findDBMeta(tableFlexibleName);
+        final DBMeta dbmeta = ${glDBMetaInstanceHandler}.findDBMeta(tableFlexibleName);
         return select(getBehaviorType(dbmeta));
     }
 

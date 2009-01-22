@@ -25,7 +25,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ) {
+    public ${myClassName}(ConditionQuery childQuery, SqlClause sqlClause, String aliasName, int nestLevel, ${myCQClassName} myCQ) {
         super(childQuery, sqlClause, aliasName, nestLevel);
         _myCQ = myCQ;
         _foreignPropertyName = _myCQ.getForeignPropertyName();// Accept foreign property name.
@@ -36,19 +36,19 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                             Override about Register
     //                                                             =======================
     @Override
-    protected void reflectRelationOnUnionQuery(${glConditionQuery} baseQueryAsSuper, ${glConditionQuery} unionQueryAsSuper) {
+    protected void reflectRelationOnUnionQuery(ConditionQuery baseQueryAsSuper, ConditionQuery unionQueryAsSuper) {
         throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper);
     }
 
     @Override
-    protected void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
+    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue
                                                              , String colName, String capPropName, String uncapPropName) {
         registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
     }
 
     @Override
-    protected void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
+    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue
+                                                             , String colName, String capPropName, String uncapPropName, ConditionOption option) {
         registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
     }
 
@@ -66,8 +66,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     @Override
-    protected void registerExistsSubQuery(${glConditionQuery} subQuery
-                                 , String columnName, String relatedColumnName, String propertyName) {
+    protected void registerExistsSubQuery(ConditionQuery subQuery
+            , String columnName, String relatedColumnName, String propertyName) {
         throw new UnsupportedOperationException("Sorry! ExistsSubQuery at inline view is unsupported. So please use InScopeSubQyery.");
     }
 
@@ -77,7 +77,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #foreach ($col in $table.columns)
 #set ($tmpJavaName = "${col.JavaName}")
 #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
-    protected ${glConditionValue} getCValue${tmpJavaName}() {
+    protected ConditionValue getCValue${tmpJavaName}() {
         return _myCQ.get${tmpJavaName}();
     }
 #if (${col.isJavaNativeStringObject()})

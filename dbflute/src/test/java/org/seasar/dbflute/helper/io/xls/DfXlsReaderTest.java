@@ -94,14 +94,17 @@ public class DfXlsReaderTest extends DfDBFluteTestCase {
     protected DfXlsReader createEmptyXlsReader(Pattern skipSheetPattern) {
         final DfFlexibleMap<String, String> tableNameMap = new DfFlexibleMap<String, String>();
         final DfFlexibleMap<String, List<String>> notTrimTableColumnMap = new DfFlexibleMap<String, List<String>>();
-        return new DfXlsReaderEmpty(tableNameMap, notTrimTableColumnMap, skipSheetPattern);
+        final DfFlexibleMap<String, List<String>> stringEmptyTableColumnMap = new DfFlexibleMap<String, List<String>>();
+        return new DfXlsReaderEmpty(tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap, skipSheetPattern);
     }
 
     protected static class DfXlsReaderEmpty extends DfXlsReader {
 
         public DfXlsReaderEmpty(DfFlexibleMap<String, String> tableNameMap,
-                DfFlexibleMap<String, List<String>> notTrimTableColumnMap, Pattern skipSheetPattern) {
-            super(new ByteArrayInputStream(new byte[] {}), tableNameMap, notTrimTableColumnMap, skipSheetPattern);
+                DfFlexibleMap<String, List<String>> notTrimTableColumnMap,
+                DfFlexibleMap<String, List<String>> stringEmptyTableColumnMap, Pattern skipSheetPattern) {
+            super(new ByteArrayInputStream(new byte[] {}), tableNameMap, notTrimTableColumnMap,
+                    stringEmptyTableColumnMap, skipSheetPattern);
         }
 
         @Override

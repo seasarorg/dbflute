@@ -25,7 +25,7 @@ public class ${myClassName} extends ${myBaseConditionQueryClassName} {
      * @param aliasName My alias name. (NotNull)
      * @param nestLevel Nest level.
      */
-    public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
+    public ${myClassName}(ConditionQuery childQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
         super(childQuery, sqlClause, aliasName, nestLevel);
     }
 	

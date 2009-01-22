@@ -33,70 +33,58 @@ targetdatabase = $targetDatabase
     ##                                                                  ==================
     #set ($glResourceDirectory = ${database.resourceDirectory})
 
-    ## [Extension]
-    #set ($glTemplateFileExtension = ${database.TemplateFileExtension})
-    #set ($glClassFileExtension = ${database.ClassFileExtension})
+    ## ===================================================================================
+    ##                                                                           Extension
+    ##                                                                           =========
+    #set ($glTemplateFileExtension = ${database.templateFileExtension})
+    #set ($glClassFileExtension = ${database.classFileExtension})
 
-    ## [Prefix-and-Suffix]
-    #set ($glProjectPrefix = ${database.ProjectPrefix})
-    #set ($glBasePrefix = ${database.BasePrefix})
-    #set ($glBaseSuffixForEntity = ${database.BaseSuffixForEntity})
+    ## ===================================================================================
+    ##                                                                              Prefix
+    ##                                                                              ======
+    #set ($glProjectPrefix = ${database.projectPrefix})
+    #set ($glBasePrefix = ${database.basePrefix})
+    #set ($glBaseSuffixForEntity = ${database.baseSuffixForEntity})
 
-    #set ($glDaoReadable = "${glProjectPrefix}DaoReadable")
-    #set ($glDaoWritable = "${glProjectPrefix}DaoWritable")
+    ## ===================================================================================
+    ##                                                                           Container
+    ##                                                                           =========
+    #set ($glDBFluteDiconNamespace = "${database.DBFluteDiconNamespace}")
+    #set ($glDBFluteDiconFileName = "${database.DBFluteDiconFileName}")
+    #set ($glCreatorDiconFileName = "${database.DBFluteCreatorDiconFileName}")
+    #set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
+    #set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
+    #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
 
-    ## [Common-Entity]
-    #set ($glEntity = "${glProjectPrefix}Entity")
-    #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
-
-    ## [ConditionBean]
-    #set ($glConditionBean = "${glProjectPrefix}ConditionBean")
-
-    ## [OutsideSql]
-    #set ($glProcedurePmb = "${glProjectPrefix}ProcedurePmb")
-
-    ## [Allcommon-ConditionBean-Option]
-    #set ($glLikeSearchOption = "${glProjectPrefix}LikeSearchOption")
-
-    ## [DBMeta]
-    #set ($glDBMeta = "${glProjectPrefix}DBMeta")
-    #set ($glAbstractDBMeta = "${glProjectPrefix}AbstractDBMeta")
-    #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
-
-    ## [Allcommon-DBMetaInfo]
-    #set ($glForeignInfo = "${glProjectPrefix}ForeignInfo")
-    #set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
-    #set ($glRelationInfo = "${glProjectPrefix}RelationInfo")
-    #set ($glUniqueInfo = "${glProjectPrefix}UniqueInfo")
-    #set ($glColumnInfo = "${glProjectPrefix}ColumnInfo")
-
-    ## [Helper]
-    #set ($glMapListString = "${glProjectPrefix}MapListString")
-    #set ($glMapListStringImpl = "${glProjectPrefix}MapListStringImpl")
-    #set ($glMapStringBuilder = "${glProjectPrefix}MapStringBuilder")
-    #set ($glMapStringBuilderImpl = "${glProjectPrefix}MapStringBuilderImpl")
-    #set ($glStringKeyMap = "${glProjectPrefix}StringKeyMap")
-    #set ($glStringSet = "${glProjectPrefix}StringSet")
-
-    ## [Allcommon-JDBC]
-    #set ($glCursorHandler = "${glProjectPrefix}CursorHandler")
-    #set ($glCursorFetcher = "${glProjectPrefix}CursorFetcher")
-    #set ($glLatestSqlProvider = "${glProjectPrefix}LatestSqlProvider")
-
-    ## [ClassificationDefinition]
+    ## ===================================================================================
+    ##                                                                          Class Name
+    ##                                                                          ==========
+    ## [Allcommon]
+    #set ($glAccessContext = "${glProjectPrefix}AccessContext")
+    #set ($glBuriDef = "${glProjectPrefix}BuriDef")
     #set ($glCDef = "${glProjectPrefix}CDef")
-    #set ($glClassificationDefinition = "${glProjectPrefix}ClassificationDefinition")
+    #set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
+    #set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
+    #set ($glDBFluteInitializer = "${glProjectPrefix}DBFluteInitializer")
+    #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
+    #set ($glImplementedBehaviorSelector = "${glProjectPrefix}ImplementedBehaviorSelector")
+    #set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}ImplementedCommonColumnAutoSetupper")
+    #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
+    #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
+    #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
+    
+    ## ===================================================================================
+    ##                                                                            Variable
+    ##                                                                            ========
+    #set ($glConditionBeanInitialName = "CB")
+    #set ($glConditionQueryInitialName = "CQ")
+    #set ($glAttachedCBArgsVariableName = "cb")
+    #set ($glParentVariablePrefix = "_parent")
+    #set ($glChildrenVariablePrefix = "_children")
 
-    ## [Allcommon-Util]
-    #set ($glSimpleAssertUtil = "${glProjectPrefix}SimpleAssertUtil")
-    #set ($glSimpleResourceUtil = "${glProjectPrefix}SimpleResourceUtil")
-    #set ($glSimpleStringUtil = "${glProjectPrefix}SimpleStringUtil")
-    #set ($glSimpleSystemUtil = "${glProjectPrefix}SimpleSystemUtil")
-    #set ($glSimpleTypeUtil = "${glProjectPrefix}SimpleTypeUtil")
-    #set ($glValueLabelUtil = "${glProjectPrefix}ValueLabelUtil")
-    #set ($glTraceViewUtil = "${glProjectPrefix}TraceViewUtil")
-
-    ## [Package]
+    ## ===================================================================================
+    ##                                                                             Package
+    ##                                                                             =======
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
     #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
     #set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.cbean.coption")
@@ -113,13 +101,6 @@ targetdatabase = $targetDatabase
     #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
     #set ($glPackageBaseCursor = "${database.sql2EntityBaseCursorPackage}" )
     #set ($glPackageExtendedCursor = "${database.sql2EntityExtendedCursorPackage}")
-
-    ## [Other]
-    #set ($glConditionBeanInitialName = "CB")
-    #set ($glConditionQueryInitialName = "CQ")
-    #set ($glAttachedCBArgsVariableName = "cb")
-    #set ($glParentVariablePrefix = "_parent")
-    #set ($glChildrenVariablePrefix = "_children")
 
     ## -----------------------------------------------------------------------------------------------------
     ##                                                                                 Parse cutomize entity

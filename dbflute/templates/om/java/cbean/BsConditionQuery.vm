@@ -24,7 +24,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
+    public ${myClassName}(ConditionQuery childQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
         super(childQuery, sqlClause, aliasName, nestLevel);
     }
 
@@ -60,12 +60,12 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #set ($tmpJavaName = "${col.JavaName}")
 #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
 
-    protected ${glConditionValue} _${tmpUncapitalisedJavaName};
-    public ${glConditionValue} get${tmpJavaName}() {
-        if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = new ${glConditionValue}(); }
+    protected ConditionValue _${tmpUncapitalisedJavaName};
+    public ConditionValue get${tmpJavaName}() {
+        if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = new ConditionValue(); }
         return _${tmpUncapitalisedJavaName};
     }
-    protected ${glConditionValue} getCValue${tmpJavaName}() { return get${tmpJavaName}(); }
+    protected ConditionValue getCValue${tmpJavaName}() { return get${tmpJavaName}(); }
 #if (${col.isJavaNativeStringObject()})
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
@@ -370,7 +370,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                         Union Query
     //                                                                         ===========
-    protected void reflectRelationOnUnionQuery(${glConditionQuery} baseQueryAsSuper, ${glConditionQuery} unionQueryAsSuper) {
+    protected void reflectRelationOnUnionQuery(ConditionQuery baseQueryAsSuper, ConditionQuery unionQueryAsSuper) {
 #if ($table.hasForeignKeyOrRefererAsOne())
         ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
         ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;

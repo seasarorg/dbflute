@@ -48,7 +48,7 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
      * Handle common columns of insert if it needs.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    public void handleCommonColumnOfInsertIfNeeds(${glEntity} targetEntity) {
+    public void handleCommonColumnOfInsertIfNeeds(Entity targetEntity) {
 #if ($database.isExistCommonColumnSetupElement())
         if (!(targetEntity instanceof ${glEntityDefinedCommonColumn})) {
             return;
@@ -89,7 +89,7 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
      * Handle common columns of update if it needs.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
      */
-    public void handleCommonColumnOfUpdateIfNeeds(${glEntity} targetEntity) {
+    public void handleCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
 #if ($database.isExistCommonColumnSetupElement())
         if (!(targetEntity instanceof ${glEntityDefinedCommonColumn})) {
             return;

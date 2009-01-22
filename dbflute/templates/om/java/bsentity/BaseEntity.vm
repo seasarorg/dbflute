@@ -25,7 +25,7 @@ import ${myExtendedEntityPackageName}.*;
 #if (${table.hasAllCommonColumn()})
   #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumn})
 #else
-  #set ($myEntityInterfaceName = ${glEntity})
+  #set ($myEntityInterfaceName = "Entity")
 #end
 
 /**
@@ -138,14 +138,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
     // ===================================================================================
     //                                                                              DBMeta
     //                                                                              ======
-    public ${glDBMeta} getDBMeta() {
+    public DBMeta getDBMeta() {
         return ${myDBMetaPackageName}.${myDBMetaClassName}.getInstance();
     }
 #else
     // ===================================================================================
     //                                                                              DBMeta
     //                                                                              ======
-    public ${glDBMeta} getDBMeta() {
+    public DBMeta getDBMeta() {
         return ${glDBMetaInstanceHandler}.findDBMeta(getTableDbName());
     }
 #end

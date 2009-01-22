@@ -33,9 +33,11 @@
 	<property name="dbflute.sqlserver.example.dir" value="${workspace.base}/dbflute-sqlserver-example"/>
 	<property name="dbflute.db2.example.dir" value="${workspace.base}/dbflute-db2-example"/>
 	<property name="dbflute.msaccess.example.dir" value="${workspace.base}/dbflute-msaccess-example"/>
-
+	<property name="dbflute.multipledb.example.dir" value="${workspace.base}/dbflute-multipledb-example"/>
+		
 	<!-- Friendly -->
 	<property name="dbflute.ymir.example.dir" value="${workspace.base}/dbflute-ymir-example"/>
+	<property name="dbflute.sastruts.example.dir" value="${workspace.base}/dbflute-sastruts-example"/>
 	<property name="dbflute.buri.example.dir" value="${workspace.base}/dbflute-buri-example"/>
 
 	<!-- ============================================================================= -->
@@ -169,7 +171,7 @@
 	<!--                                             R E F L E C T I O N  F O R  M A C -->
 	<!--                                             ================================= -->
 
-	<target name="reflect-mac-all" depends="expand-dist" description="==> reflect to basic application">
+	<target name="reflect-mac-all" depends="expand-dist" description="==> reflect to all applications">
 	  	<copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
 	    	<fileset dir="${dbflute.deploy.dir}"/>
 	  	</copy>
@@ -189,11 +191,21 @@
 	    	<fileset dir="${dbflute.deploy.dir}"/>
 	  	</copy>
 	  	<chmod dir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+
+	  	<copy todir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<chmod dir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
 	  		
 	  	<copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}">
 	    	<fileset dir="${dbflute.deploy.dir}"/>
 	  	</copy>
 	  	<chmod dir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	  		
+	  	<copy todir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<chmod dir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
 	</target>
 
 	<target name="reflect-mac-basic" depends="expand-dist" description="==> reflect to basic application">
@@ -222,6 +234,13 @@
     	<fileset dir="${dbflute.deploy.dir}"/>
   	</copy>
   	<chmod dir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	</target>
+	
+	<target name="reflect-mac-multipledb" depends="expand-dist" description="==> reflect to multipledb example">
+  	<copy todir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}">
+    	<fileset dir="${dbflute.deploy.dir}"/>
+  	</copy>
+  	<chmod dir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
 	</target>
 	
 	<target name="reflect-mac-ymir" depends="expand-dist" description="==> reflect to ymir example">

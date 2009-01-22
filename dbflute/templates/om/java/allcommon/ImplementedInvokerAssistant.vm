@@ -47,7 +47,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // ===================================================================================
     //                                                                 Assistant Main Work
     //                                                                 ===================
-    public ${glDBDef} assistCurrentDBDef() {
+    public DBDef assistCurrentDBDef() {
         return ${glDBCurrent}.getInstance().currentDBDef();
     }
 
@@ -93,8 +93,8 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 
     protected StatementFactory createStatementFactory() {
         final TnStatementFactoryImpl factory = new TnStatementFactoryImpl();
-        factory.setDefaultStatementConfig(DBFluteConfig.getInstance().getDefaultStatementConfig());
-        factory.setInternalDebug(DBFluteConfig.getInstance().isInternalDebug());
+        factory.setDefaultStatementConfig(${glDBFluteConfig}.getInstance().getDefaultStatementConfig());
+        factory.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return factory;
     }
 

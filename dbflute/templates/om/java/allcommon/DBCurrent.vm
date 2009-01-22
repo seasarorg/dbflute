@@ -21,11 +21,11 @@ public class ${glDBCurrent} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected ${glDBDef} _currentDBDef;
+    protected DBDef _currentDBDef;
     {
-        _currentDBDef = ${glDBDef}.codeOf("${database.defaultDBDef}");
+        _currentDBDef = DBDef.codeOf("${database.defaultDBDef}");
         if (_currentDBDef == null) {
-            _currentDBDef = ${glDBDef}.Unknown;
+            _currentDBDef = DBDef.Unknown;
         }
     }
 	
@@ -52,7 +52,7 @@ public class ${glDBCurrent} {
     // ===================================================================================
     //                                                                       Current DBDef
     //                                                                       =============
-    public void initializeCurrentDBDef(${glDBDef} currentDBDef) {
+    public void initializeCurrentDBDef(DBDef currentDBDef) {
 	    if (_log.isInfoEnabled()) {
 		    _log.info("...Setting currentDBDef: " + currentDBDef);
 		}
@@ -63,11 +63,11 @@ public class ${glDBCurrent} {
         _currentDBDef = currentDBDef;
     }
 
-    public ${glDBDef} currentDBDef() {
+    public DBDef currentDBDef() {
         return _currentDBDef;
     }
 
-    public boolean isCurrentDBDef(${glDBDef} currentDBDef) {
+    public boolean isCurrentDBDef(DBDef currentDBDef) {
 	    return _currentDBDef.equals(currentDBDef);
     }
 }

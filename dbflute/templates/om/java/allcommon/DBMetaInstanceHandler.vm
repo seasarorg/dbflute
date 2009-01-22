@@ -35,7 +35,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     }
 
     /** The flexible map of table DB name. This is for conversion at finding. */
-    protected static final Map<String, String> _tableDbNameFlexibleMap = ${glStringKeyMap}.createAsFlexibleConcurrent();
+    protected static final Map<String, String> _tableDbNameFlexibleMap = StringKeyMap.createAsFlexibleConcurrent();
     static {
         final Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
         for (String tableDbName : tableDbNameSet) {
@@ -92,7 +92,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
         if (dbmeta == null) {
             String msg = "The DB meta was not found by the table flexible name: " + tableFlexibleName;
             msg = msg + " key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
-            throw new ${glDBMetaNotFoundException}(msg);
+            throw new DBMetaNotFoundException(msg);
         }
         return dbmeta;
     }

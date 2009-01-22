@@ -33,7 +33,7 @@ public class ${glDBFluteInitializer} {
     //                                                                        Cool Classes
     //                                                                        ============
     protected void loadCoolClasses() { // for S2Container basically 
-        ${glConditionBeanContext}.loadCoolClasses(); // Against the ClassLoader Headache!
+        ConditionBeanContext.loadCoolClasses(); // Against the ClassLoader Headache!
     }
 
     // ===================================================================================

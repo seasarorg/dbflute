@@ -187,7 +187,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      */
     public ListResultBean<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
         assertCBNotNull(cb);
-        return new ${glResultBeanBuilder}<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
+        return new ResultBeanBuilder<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
     }
 
     // ===================================================================================
@@ -200,9 +200,9 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      */
     public PagingResultBean<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
         assertCBNotNull(cb);
-        final ${glPagingInvoker}<${myExtendedObjectClassName}> invoker = new ${glPagingInvoker}<${myExtendedObjectClassName}>(getTableDbName());
-        final ${glPagingHandler}<${myExtendedObjectClassName}> handler = new ${glPagingHandler}<${myExtendedObjectClassName}>() {
-            public ${glPagingBean} getPagingBean() { return cb; }
+        final PagingInvoker<${myExtendedObjectClassName}> invoker = new PagingInvoker<${myExtendedObjectClassName}>(getTableDbName());
+        final PagingHandler<${myExtendedObjectClassName}> handler = new PagingHandler<${myExtendedObjectClassName}>() {
+            public PagingBean getPagingBean() { return cb; }
             public int count() { return selectCount(cb); }
             public List<${myExtendedObjectClassName}> paging() { return selectList(cb); }
         };

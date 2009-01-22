@@ -10,7 +10,7 @@ import ${myExtendedDaoCursorPackageName}.${myExtendedTypeSafeCursorClassName};
  * The cursor handler of ${table.name}.
  * @author ${database.ClassAuthor}
  */
-public abstract class ${myClassName} implements ${glCursorHandler} {
+public abstract class ${myClassName} implements CursorHandler {
 
     /**
      * Handle.

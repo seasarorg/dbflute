@@ -157,20 +157,10 @@
     </copy>
   	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
 
-    <copy todir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-
     <copy todir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.teeda.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  	
-    <copy todir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
 
 <!--
     <copy todir="${dbflute.flexserver.example.dir}/mydbflute/dbflute-${version}">
@@ -191,13 +181,6 @@
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   	<chmod dir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
-  </target>
-
-  <target name="reflect-mac-limit-multipledb" depends="expand-dist" description="==> reflect to multipledb example">
-    <copy todir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  	<chmod dir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
   <target name="reflect-win-main" depends="expand-dist" description="==> reflect to test application">

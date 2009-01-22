@@ -55,6 +55,17 @@ public class DfXlsDataHandlerImplTest {
         assertTrue(impl.isNotNullNotString(new Timestamp(System.currentTimeMillis())));
     }
 
+    @Test
+    public void test_removeDoubleQuotation() {
+        // ## Arrange ##
+        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl();
+
+        // ## Act & Assert ##
+        assertEquals("aaa", impl.removeDoubleQuotation("\"aaa\""));
+        assertEquals("a", impl.removeDoubleQuotation("\"a\""));
+        assertEquals("", impl.removeDoubleQuotation("\"\""));
+    }
+
     protected void log(Object msg) {
         _log.debug(msg);
     }
