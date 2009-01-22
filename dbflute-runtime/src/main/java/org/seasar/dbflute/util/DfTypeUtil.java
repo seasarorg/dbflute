@@ -516,10 +516,22 @@ public class DfTypeUtil {
     // -----------------------------------------------------
     //                                                  Date
     //                                                  ----
+
+    /**
+     * @param o The parsed object. (Nullable)
+     * @return The instance of date. (Nullable)
+     * @throws ToDateParseException When it failed to parse the string to date.
+     */
     public static Date toDate(Object o) {
         return toDate(o, null);
     }
 
+    /**
+     * @param o The parsed object. (Nullable)
+     * @param pattern The pattern format to parse. (Nullable)
+     * @return The instance of date. (Nullable)
+     * @throws ToDateParseException When it failed to parse the string to date.
+     */
     public static Date toDate(Object o, String pattern) {
         if (o == null) {
             return null;
@@ -534,10 +546,23 @@ public class DfTypeUtil {
         }
     }
 
+    /**
+     * @param s The parsed string. (Nullable)
+     * @param pattern The pattern format to parse. (Nullable)
+     * @return The instance of date. (Nullable)
+     * @throws ToDateParseException When it failed to parse the string to date.
+     */
     protected static Date toDate(String s, String pattern) {
         return toDate(s, pattern, Locale.getDefault());
     }
 
+    /**
+     * @param s The parsed string. (Nullable)
+     * @param pattern The pattern format to parse. (Nullable)
+     * @param locale The locale to parse. (NotNull)
+     * @return The instance of date. (Nullable)
+     * @throws ToDateParseException When it failed to parse the string to date.
+     */
     protected static Date toDate(String s, String pattern, Locale locale) {
         if (s == null || s.trim().length() == 0) {
             return null;
@@ -547,24 +572,61 @@ public class DfTypeUtil {
             return sdf.parse(s);
         } catch (ParseException e) {
             String msg = "Failed to parse the string to date: ";
-            msg = msg + " string=" + s + " format=" + sdf + " locale=" + locale;
-            throw new IllegalStateException(msg, e);
+            msg = msg + " string=" + s + " pattern=" + pattern + " locale=" + locale;
+            throw new ToDateParseException(msg, e);
         }
     }
 
+    public static class ToDateParseException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToDateParseException(String msg, ParseException e) {
+            super(msg, e);
+        }
+    }
+
+    /**
+     * @param o The parsed object. (Nullable)
+     * @return The instance of SQL date. (Nullable)
+     * @throws ToDateParseException When it failed to parse the string to SQL date.
+     */
     public static java.sql.Date toSqlDate(Object o) {
         return toSqlDate(o, null);
     }
 
+    /**
+     * @param o The parsed object. (Nullable)
+     * @param pattern The pattern format to parse. (Nullable)
+     * @return The instance of SQL date. (Nullable)
+     * @throws ToDateParseException When it failed to parse the string to SQL date.
+     */
     public static java.sql.Date toSqlDate(Object o, String pattern) {
+        if (o == null) {
+            return null;
+        }
         if (o instanceof java.sql.Date) {
             return (java.sql.Date) o;
         }
-        java.util.Date date = toDate(o, pattern);
+        java.util.Date date;
+        try {
+            date = toDate(o, pattern);
+        } catch (ToDateParseException e) {
+            String msg = "Failed to parse the string to date: ";
+            msg = msg + " obj=" + o + " pattern=" + pattern;
+            throw new ToSqlDateParseException(msg, e);
+        }
         if (date != null) {
             return new java.sql.Date(date.getTime());
         }
         return null;
+    }
+
+    public static class ToSqlDateParseException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToSqlDateParseException(String msg, Exception e) {
+            super(msg, e);
+        }
     }
 
     public static String getDateY4Pattern(Locale locale) {
@@ -592,19 +654,26 @@ public class DfTypeUtil {
     }
 
     /**
-     * Convert the date object to the instance of date flexibly.
-     * @param obj The date object. (Nullable)
+     * Convert the object to the instance of date flexibly.
+     * @param obj The parsed object. (Nullable)
      * @return The instance of date. (Nullable: If the value is null or empty, it returns null.)
+     * @throws ToDateFlexiblyParseException When it failed to parse the string to date flexibly.
      */
     public static Date toDateFlexibly(Object obj) {
         if (obj == null) {
             return null;
         }
         if (!(obj instanceof String)) {
-            return toDate(obj);
+            try {
+                return toDate(obj);
+            } catch (ToDateParseException e) {
+                String msg = "Failed to parse the string to date flexibly: ";
+                msg = msg + " obj=" + obj;
+                throw new ToDateFlexiblyParseException(msg, e);
+            }
         }
         String value = (String) obj;
-        if (value.length() == 0) {
+        if (value.trim().length() == 0) {
             return null;
         }
         String filtered = filterDateStringValue(value);
@@ -612,7 +681,17 @@ public class DfTypeUtil {
         try {
             return format.parse(filtered);
         } catch (ParseException e) {
-            throw new IllegalStateException(e); // System Exception!
+            String msg = "Failed to parse the string to date flexibly: ";
+            msg = msg + " string=" + obj + " filtered=" + filtered;
+            throw new ToDateFlexiblyParseException(msg, e);
+        }
+    }
+
+    public static class ToDateFlexiblyParseException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToDateFlexiblyParseException(String msg, Exception e) {
+            super(msg, e);
         }
     }
 
@@ -661,19 +740,48 @@ public class DfTypeUtil {
     // -----------------------------------------------------
     //                                             Timestamp
     //                                             ---------
+    /**
+     * @param o The parsed object. (Nullable)
+     * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
+     * @throws ToTimestampParseException When it failed to parse the string to time-stamp.
+     */
     public static Timestamp toTimestamp(Object o) {
         return toTimestamp(o, null);
     }
 
+    /**
+     * @param o The parsed object. (Nullable)
+     * @param pattern The pattern format to parse. (Nullable)
+     * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
+     * @throws ToTimestampParseException When it failed to parse the string to time-stamp.
+     */
     public static Timestamp toTimestamp(Object o, String pattern) {
+        if (o == null) {
+            return null;
+        }
         if (o instanceof Timestamp) {
             return (Timestamp) o;
         }
-        Date date = toDate(o, pattern);
+        Date date;
+        try {
+            date = toDate(o, pattern);
+        } catch (ToDateParseException e) {
+            String msg = "Failed to parse the string to time-stamp: ";
+            msg = msg + " obj=" + o + " pattern=" + pattern;
+            throw new ToTimestampParseException(msg, e);
+        }
         if (date != null) {
             return new Timestamp(date.getTime());
         }
         return null;
+    }
+
+    public static class ToTimestampParseException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToTimestampParseException(String msg, Exception e) {
+            super(msg, e);
+        }
     }
 
     public static String getPattern(Locale locale) {
@@ -681,7 +789,7 @@ public class DfTypeUtil {
     }
 
     /**
-     * Convert the time-stamp object to the instance of time-stamp flexibly.
+     * Convert the object to the instance of time-stamp flexibly.
      * @param obj The time-stamp object. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
      */
@@ -690,14 +798,33 @@ public class DfTypeUtil {
             return null;
         }
         if (!(obj instanceof String)) {
-            return toTimestamp(obj);
+            try {
+                return toTimestamp(obj);
+            } catch (ToTimestampParseException e) {
+                String msg = "Failed to parse the string to time-stamp flexibly: ";
+                msg = msg + " obj=" + obj;
+            }
         }
-        String value = (String) obj;
-        if (value.trim().length() == 0) {
+        String string = (String) obj;
+        if (string.trim().length() == 0) {
             return null;
         }
-        String filtered = filterTimestampStringValue((String) obj);
-        return Timestamp.valueOf(filtered);
+        String filtered = filterTimestampStringValue(string);
+        try {
+            return Timestamp.valueOf(filtered);
+        } catch (Exception e) {
+            String msg = "Failed to parse the string to time-stamp flexibly: ";
+            msg = msg + " string=" + string + " filtered=" + filtered;
+            throw new ToTimestampFlexiblyParseException(msg, e);
+        }
+    }
+
+    public static class ToTimestampFlexiblyParseException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToTimestampFlexiblyParseException(String msg, Exception e) {
+            super(msg, e);
+        }
     }
 
     protected static String filterTimestampStringValue(String value) {
@@ -731,10 +858,21 @@ public class DfTypeUtil {
     // -----------------------------------------------------
     //                                                  Time
     //                                                  ----
+    /**
+     * @param o The parsed object. (Nullable)
+     * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
+     * @throws ToTimeParseException When it failed to parse the string to time.
+     */
     public static Time toTime(Object o) {
         return toTime(o, null);
     }
 
+    /**
+     * @param o The parsed object. (Nullable)
+     * @param pattern The pattern format to parse. (Nullable)
+     * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
+     * @throws ToTimeParseException When it failed to parse the string to time.
+     */
     public static Time toTime(Object o, String pattern) {
         if (o == null) {
             return null;
@@ -749,19 +887,42 @@ public class DfTypeUtil {
         }
     }
 
-    public static Time toTime(String s, String pattern) {
+    /**
+     * @param s The parsed string. (Nullable)
+     * @param pattern The pattern format to parse. (Nullable)
+     * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
+     * @throws ToTimeParseException When it failed to parse the string to time.
+     */
+    protected static Time toTime(String s, String pattern) {
         return toTime(s, pattern, Locale.getDefault());
     }
 
-    public static Time toTime(String s, String pattern, Locale locale) {
-        if (DfStringUtil.isEmpty(s)) {
+    /**
+     * @param s The parsed string. (Nullable)
+     * @param pattern The pattern format to parse. (Nullable)
+     * @param locale The locale to parse. (NotNull)
+     * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
+     * @throws ToTimeParseException When it failed to parse the string to time.
+     */
+    protected static Time toTime(String s, String pattern, Locale locale) {
+        if (s == null || s.trim().length() == 0) {
             return null;
         }
         SimpleDateFormat sdf = getTimeDateFormat(s, pattern, locale);
         try {
             return new Time(sdf.parse(s).getTime());
         } catch (ParseException e) {
-            throw new IllegalStateException(e);
+            String msg = "Failed to parse the string to time-stamp flexibly: ";
+            msg = msg + " string=" + s + " pattern=" + pattern + " locale=" + locale;
+            throw new ToTimeParseException(msg, e);
+        }
+    }
+
+    public static class ToTimeParseException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToTimeParseException(String msg, Exception e) {
+            super(msg, e);
         }
     }
 
@@ -1026,7 +1187,7 @@ public class DfTypeUtil {
     // The text cannot be null.
     // If the value is null, it returns 'null' text.
     // - - - - - - - - - -/
-    
+
     /**
      * @return The 'null' text as string. (NotNull)
      */
