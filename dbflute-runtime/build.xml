@@ -41,7 +41,7 @@
     	  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
     	  overwrite="true"/>
     <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-    	  tofile="../dbflute-spring-example/lib_sources/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-spring-example/lib/sources/dbflute-runtime-${version}-sources.jar"
     	  overwrite="true"/>
 
     <delete file="../dbflute-lucy-example/lib/dbflute-runtime-*.jar"/>
