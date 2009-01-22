@@ -625,7 +625,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     private Map<String, String> getDefaultValueMap(String dataDirectoryName) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectoryName + "/defaultValueMap.rsprop";
+        String path = dataDirectoryName + "/defaultValueMap.dataprop";
         Map<String, String> resultMap = reader.readMapAsStringValue(path, "UTF-8");
         if (resultMap != null && !resultMap.isEmpty()) {
             return resultMap;
@@ -637,7 +637,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     private DfFlexibleMap<String, String> getTableNameMap(String dataDirectoryName) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectoryName + "/tableNameMap.rsprop";
+        String path = dataDirectoryName + "/tableNameMap.dataprop";
         Map<String, String> resultMap = reader.readMapAsStringValue(path, "UTF-8");
         if (resultMap != null && !resultMap.isEmpty()) {
             return new DfFlexibleMap<String, String>(resultMap);
@@ -649,7 +649,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     private DfFlexibleMap<String, List<String>> getNotTrimTableColumnMap(String dataDirectoryName) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectoryName + "/notTrimColumnMap.rsprop";
+        String path = dataDirectoryName + "/notTrimColumnMap.dataprop";
         Map<String, List<String>> resultMap = reader.readMapAsListStringValue(path, "UTF-8");
         if (resultMap != null && !resultMap.isEmpty()) {
             return new DfFlexibleMap<String, List<String>>(resultMap);
@@ -661,7 +661,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     private DfFlexibleMap<String, List<String>> getEmptyStringTableColumnMap(String dataDirectoryName) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = dataDirectoryName + "/emptyStringColumnMap.rsprop";
+        String path = dataDirectoryName + "/emptyStringColumnMap.dataprop";
         Map<String, List<String>> resultMap = reader.readMapAsListStringValue(path, "UTF-8");
         if (resultMap != null && !resultMap.isEmpty()) {
             return new DfFlexibleMap<String, List<String>>(resultMap);

@@ -127,7 +127,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
     private Map<String, Map<String, String>> getConvertValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = info.getBasePath() + "/" + encoding + "/convertValueMap.rsprop";
+        String path = info.getBasePath() + "/" + encoding + "/convertValueMap.dataprop";
         Map<String, Map<String, String>> resultMap = reader.readMapAsMapValue(path, encoding);
         if (resultMap != null && !resultMap.isEmpty()) {
             return resultMap;
@@ -139,7 +139,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
     private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        String path = info.getBasePath() + "/" + encoding + "/defaultValueMap.rsprop";
+        String path = info.getBasePath() + "/" + encoding + "/defaultValueMap.dataprop";
         Map<String, String> resultMap = reader.readMapAsStringValue(path, encoding);
         if (resultMap != null && !resultMap.isEmpty()) {
             return resultMap;
