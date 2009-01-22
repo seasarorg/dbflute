@@ -28,7 +28,7 @@
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
-    <delete file="../dbflute-basic-example/lib/dbflute-runtime-*.jar"/>
+    <delete file="../dbflute-basic-example90/lib/dbflute-runtime-*.jar"/>
     <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
     	  tofile="../dbflute-basic-example90/lib/dbflute-runtime-${version}.jar"
     	  overwrite="true"/>
@@ -58,6 +58,14 @@
     	  overwrite="true"/>
     <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
     	  tofile="../dbflute-ymir-example/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+  	
+    <delete file="../dbflute-sastruts-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-sastruts-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-sastruts-example/lib/sources/dbflute-runtime-${version}-sources.jar"
     	  overwrite="true"/>
   </target>
 
