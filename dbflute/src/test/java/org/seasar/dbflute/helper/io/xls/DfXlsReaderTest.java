@@ -1,5 +1,6 @@
 package org.seasar.dbflute.helper.io.xls;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -8,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -45,6 +47,8 @@ public class DfXlsReaderTest extends DfDBFluteTestCase {
         log("[DataSet]:" + getLineSeparator() + dataSet);
         final int tableSize = dataSet.getTableSize();
         assertTrue(tableSize > 0);
+        boolean existsNull = false;
+        boolean existsTrimmed = false;
         for (int i = 0; i < tableSize; i++) {
             final DataTable dataTable = dataSet.getTable(i);
             final int columnSize = dataTable.getColumnSize();
@@ -53,13 +57,44 @@ public class DfXlsReaderTest extends DfDBFluteTestCase {
             assertTrue(rowSize > 0);
             for (int j = 0; j < rowSize; j++) {
                 final DataRow dataRow = dataTable.getRow(j);
-                for (int k = 0; k < rowSize; k++) {
+                for (int k = 0; k < columnSize; k++) {
                     final DataColumn dataColumn = dataTable.getColumn(k);
                     final Object value = dataRow.getValue(dataColumn.getColumnName());
-                    assertNotNull(value);
+                    if (dataColumn.getColumnName().equals("AAA")) {
+                        assertNotNull(value);
+                    } else if (dataColumn.getColumnName().equals("BBB")) {
+                        existsNull = true;
+                    } else if (dataColumn.getColumnName().equals("CCC")) {
+                        assertNotNull(value);
+                    } else if (dataColumn.getColumnName().equals("DDD")) {
+                        assertNotNull(value);
+                        assertEquals(((String) value).length(), ((String) value).trim().length());
+                    } else if (dataColumn.getColumnName().equals("EEE")) {
+                        assertNotNull(value);
+                        String str = (String) value;
+                        if (str.startsWith("\"") && str.endsWith("\"")) {
+                            str = str.substring(1);
+                            str = str.substring(0, str.length() - 1);
+                            if (str.length() != str.trim().length()) {
+                                existsTrimmed = true;
+                            }
+                        }
+                    }
                 }
             }
         }
+        assertTrue(existsNull);
+        assertTrue(existsTrimmed);
+    }
+
+    protected DfXlsReader createXlsReader(File xlsFile, Pattern skipSheetPattern) {
+        final DfFlexibleMap<String, String> tableNameMap = new DfFlexibleMap<String, String>();
+        final DfFlexibleMap<String, List<String>> notTrimTableColumnMap = new DfFlexibleMap<String, List<String>>();
+        notTrimTableColumnMap.put("TEST_TABLE", Arrays.asList("EEE"));
+        final DfFlexibleMap<String, List<String>> stringEmptyTableColumnMap = new DfFlexibleMap<String, List<String>>();
+        stringEmptyTableColumnMap.put("TEST_TABLE", Arrays.asList("CCC"));
+        return new DfXlsReader(xlsFile, tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap,
+                skipSheetPattern);
     }
 
     @Test
@@ -85,10 +120,6 @@ public class DfXlsReaderTest extends DfDBFluteTestCase {
         assertFalse(reader.isSkipSheet("AMST_STATUS"));
         assertFalse(reader.isSkipSheet("9MST_STATUS"));
         assertFalse(reader.isSkipSheet("#MST_STATUS"));
-    }
-
-    protected DfXlsReader createXlsReader(File xlsFile, Pattern skipSheetPattern) {
-        return new DfXlsReader(xlsFile);
     }
 
     protected DfXlsReader createEmptyXlsReader(Pattern skipSheetPattern) {

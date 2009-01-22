@@ -214,7 +214,7 @@ public class DfXlsReader {
         try {
             for (int i = 0; i < table.getColumnSize(); ++i) {
                 cell = row.getCell(i);
-                value = getValue(cell, table);
+                value = getValue(i, cell, table);
                 final DataColumn column = table.getColumn(i);
                 final String columnName = column.getColumnName();
                 try {
@@ -289,9 +289,13 @@ public class DfXlsReader {
     // ===================================================================================
     //                                                                      Value Handling
     //                                                                      ==============
-    public Object getValue(HSSFCell cell, DataTable table) {
+    public Object getValue(int columnIndex, HSSFCell cell, DataTable table) {
         if (cell == null) {
-            return null;
+            if (isEmptyStringTarget(columnIndex, table)) {
+                return "\"\""; // for preventing trimming later
+            } else {
+                return null;
+            }
         }
         switch (cell.getCellType()) {
         case HSSFCell.CELL_TYPE_NUMERIC:
@@ -317,7 +321,7 @@ public class DfXlsReader {
             if ("".equals(s)) {
                 s = null;
             }
-            if (isEmptyStringTarget(cell, table) && s == null) {
+            if (isEmptyStringTarget(columnIndex, table) && s == null) {
                 s = "\"\""; // for preventing trimming later
             }
             if (isCellBase64Formatted(cell)) {
@@ -328,6 +332,7 @@ public class DfXlsReader {
             boolean b = cell.getBooleanCellValue();
             return Boolean.valueOf(b);
         default:
+            System.out.println("cell=" + cell);
             return null;
         }
     }
@@ -348,13 +353,13 @@ public class DfXlsReader {
         return false;
     }
 
-    public boolean isEmptyStringTarget(HSSFCell cell, DataTable table) {
+    public boolean isEmptyStringTarget(int columnIndex, DataTable table) {
         final String tableName = table.getTableName();
         if (!_emptyStringTableColumnMap.containsKey(tableName)) {
             return false;
         }
         final List<String> emptyStringTargetColumnMap = _emptyStringTableColumnMap.get(tableName);
-        final DataColumn column = table.getColumn(cell.getColumnIndex());
+        final DataColumn column = table.getColumn(columnIndex);
         final String targetColumnName = column.getColumnName();
         for (String currentColumnName : emptyStringTargetColumnMap) {
             if (targetColumnName.equalsIgnoreCase(currentColumnName)) {
