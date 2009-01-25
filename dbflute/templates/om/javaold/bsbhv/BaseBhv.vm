@@ -602,40 +602,8 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         return invoke(createQueryDeleteCBCommand(cb));
     }
 #end
-
-    // ===================================================================================
-    //                                                                      Various Update
-    //                                                                      ==============
-#if ($database.isMakeBehaviorCopyInsert())
-#if ($table.isUseIdentity())
-#if ($table.hasPrimaryKey())
-
-    /* (non-javadoc) 
-     * Copy-insert.
-     * @param primaryKey Primary-keys. (NotNull)
-     * @return Inserted count.
-     * @exception ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}
-     */
-    public int copyInsertByPKValueAfterSelect(${table.PrimaryKeyArgsString}) {
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
-        ${myExtendedObjectClassName} currentEntity = selectEntityWithDeletedCheck(cb);
-        return delegateInsert(currentEntity);
-    }
-#end
-
-    /**
-     * Filter 'copy-insert' entity.
-     * @param ${myEntityVariableName} Entity. (NotNull)
-     */
-    protected void filterCopyInsertEntity(${myExtendedObjectClassName} ${myEntityVariableName}) {
-    }
-#end
-#end
 #else
-  #if ($table.isAvailableNonPrimaryKeyWritable())
+#if ($table.isAvailableNonPrimaryKeyWritable())
 
     // ===================================================================================
     //                                                                       Entity Update
@@ -648,7 +616,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         assertEntityNotNull(${myEntityVariableName});
         delegateInsert(${myEntityVariableName});
     }
-  #end
+#end
 #end
 #if ($table.isBuriTarget())
 
@@ -802,6 +770,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #if ($table.isAvailableNonPrimaryKeyWritable())
     protected int delegateInsert(${myExtendedObjectClassName} e) {
         assertEntityNotNull(e); // If this table use identity, the entity does not have primary-key.
+        filterEntityOfInsert(e);
         return invoke(createInsertEntityCommand(e));
     }
     protected ${glInsertEntityCommand} createInsertEntityCommand(${glEntity} entity) {

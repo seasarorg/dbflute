@@ -169,7 +169,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
         </td>
       </tr>
 #end
-    <tbody>
+    </tbody>
   </table>
 #end
 </body>

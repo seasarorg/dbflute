@@ -810,6 +810,13 @@ public abstract class $myClassName implements ${glBehaviorReadable} {
     }
     protected abstract List<${glEntity}> doCallReadList(${glConditionBean} cb);
 
+    /**
+     * Filter the entity of insert.
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     */
+    protected void filterEntityOfInsert(${glEntity} targetEntity) { // for isAvailableNonPrimaryKeyWritable
+    }
+
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
