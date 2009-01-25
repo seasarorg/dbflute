@@ -823,6 +823,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
     protected abstract List<Entity> doCallReadList(ConditionBean cb);
 
+    /**
+     * Filter the entity of insert.
+     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     */
+    protected void filterEntityOfInsert(Entity targetEntity) { // for isAvailableNonPrimaryKeyWritable
+    }
+
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
