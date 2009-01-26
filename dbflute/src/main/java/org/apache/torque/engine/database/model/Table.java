@@ -2220,6 +2220,9 @@ public class Table {
      * @return Determination.
      */
     public boolean hasAllCommonColumn() {
+        if (!isWritable()) {
+            return false;
+        }
         final List<String> commonColumnNameList = getDatabase().getCommonColumnNameList();
         if (commonColumnNameList.isEmpty()) {
             return false;
@@ -2242,6 +2245,9 @@ public class Table {
     }
 
     public List<Column> getCommonColumnList() {
+        if (!isWritable()) {
+            return new ArrayList<Column>();
+        }
         final List<Column> ls = new ArrayList<Column>();
         if (!hasAllCommonColumn()) {
             return ls;
@@ -2377,7 +2383,7 @@ public class Table {
         Set<String> columnNameSet = map.keySet();
         _behaviorFilterBeforeInsertColumnList = new ArrayList<Column>();
         Set<String> commonColumnNameSet = new HashSet<String>();
-        {
+        if (hasAllCommonColumn()) {
             List<Column> commonColumnList = getCommonColumnList();
             for (Column commonColumn : commonColumnList) {
                 commonColumnNameSet.add(commonColumn.getName());
@@ -2419,7 +2425,7 @@ public class Table {
         Set<String> columnNameSet = map.keySet();
         _behaviorFilterBeforeUpdateColumnList = new ArrayList<Column>();
         Set<String> commonColumnNameSet = new HashSet<String>();
-        {
+        if (hasAllCommonColumn()) {
             List<Column> commonColumnList = getCommonColumnList();
             for (Column commonColumn : commonColumnList) {
                 commonColumnNameSet.add(commonColumn.getName());
