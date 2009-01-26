@@ -799,6 +799,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
 #end
     }
 #end
+#if ($table.isWritable())
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
     @Override
     protected void filterEntityOfUpdate(${glEntity} targetEntity) {
@@ -808,6 +809,7 @@ public abstract class ${myClassName} extends ${glPackageBaseCommonBhv}.${myExten
         entity.set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});
 #end
     }
+#end
 #end
 #end
 #if ($database.isMakeFlatExpansion())

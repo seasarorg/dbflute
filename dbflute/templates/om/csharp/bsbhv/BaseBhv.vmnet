@@ -424,6 +424,7 @@ namespace ${glPackageExtendedBhv} {
 #end
         }
 #end
+#if ($table.isWritable())
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
         protected override void FilterEntityOfUpdate(${glEntity} targetEntity) {
             base.FilterEntityOfUpdate(targetEntity);
@@ -432,6 +433,7 @@ namespace ${glPackageExtendedBhv} {
             entity.${column.javaName} = ${column.behaviorFilterBeforeUpdateColumnExpression};
 #end
         }
+#end
 #end
         #endregion
 #end

@@ -800,6 +800,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #end
     }
 #end
+#if ($table.isWritable())
 #if ($table.hasBehaviorFilterBeforeUpdateColumn())
     @Override
     protected void filterEntityOfUpdate(Entity targetEntity) {
@@ -809,6 +810,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         entity.set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});
 #end
     }
+#end
 #end
 #end
 #if ($database.isMakeFlatExpansion())
