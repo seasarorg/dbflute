@@ -2376,9 +2376,16 @@ public class Table {
         Map<String, Object> map = prop.getBeforeInsertMap();
         Set<String> columnNameSet = map.keySet();
         _behaviorFilterBeforeInsertColumnList = new ArrayList<Column>();
+        Set<String> commonColumnNameSet = new HashSet<String>();
+        {
+            List<Column> commonColumnList = getCommonColumnList();
+            for (Column commonColumn : commonColumnList) {
+                commonColumnNameSet.add(commonColumn.getName());
+            }
+        }
         for (String columnName : columnNameSet) {
             Column column = getColumn(columnName);
-            if (column != null) {
+            if (column != null && !commonColumnNameSet.contains(columnName)) {
                 _behaviorFilterBeforeInsertColumnList.add(column);
                 String expression = (String) map.get(columnName);
                 if (expression == null || expression.trim().length() == 0) {
@@ -2411,9 +2418,16 @@ public class Table {
         Map<String, Object> map = prop.getBeforeUpdateMap();
         Set<String> columnNameSet = map.keySet();
         _behaviorFilterBeforeUpdateColumnList = new ArrayList<Column>();
+        Set<String> commonColumnNameSet = new HashSet<String>();
+        {
+            List<Column> commonColumnList = getCommonColumnList();
+            for (Column commonColumn : commonColumnList) {
+                commonColumnNameSet.add(commonColumn.getName());
+            }
+        }
         for (String columnName : columnNameSet) {
             Column column = getColumn(columnName);
-            if (column != null) {
+            if (column != null && !commonColumnNameSet.contains(columnName)) {
                 _behaviorFilterBeforeUpdateColumnList.add(column);
                 String expression = (String) map.get(columnName);
                 if (expression == null || expression.trim().length() == 0) {
