@@ -48,14 +48,6 @@
 		<developerConnection>scm:svn:https://www.seasar.org/svn/sandbox/dbflute/trunk/dbflute-runtime/</developerConnection>
 		<url>http://svn.seasar.org/browse/?root=sandbox.dbflute</url>
 	</scm>
-	
-	<repositories>
-		<repository>
-			<id>maven.seasar.org</id>
-			<name>The Seasar Foundation Maven2 Repository</name>
-			<url>http://maven.seasar.org/maven2</url>
-		</repository>
-	</repositories>
 
 	<build>
 		<defaultGoal>validate</defaultGoal>
@@ -151,6 +143,14 @@
 			<url>dav:https://www.seasar.org/maven/maven2-snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
+	
+	<repositories>
+		<repository>
+			<id>maven.seasar.org</id>
+			<name>The Seasar Foundation Maven2 Repository</name>
+			<url>http://maven.seasar.org/maven2</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
         <!-- for Compile -->
