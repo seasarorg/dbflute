@@ -1,7 +1,6 @@
 cd %~p0
 cd ..
 
-rem call .\ant\bin\ant -f build.xml dist
-call .\ant\bin\ant -f build.xml reflect-win-sqlserver
+call .\ant\bin\ant -f build88.xml reflect-win-sqlserver
 
 pause
