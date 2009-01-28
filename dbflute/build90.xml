@@ -20,7 +20,7 @@
 	<property name="dbflute.runtime.dir" value="${workspace.base}/dbflute-runtime"/>
 
 	<!-- Basic -->
-	<property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example90"/>
+	<property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
 
 	<!-- Container -->
 	<property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
