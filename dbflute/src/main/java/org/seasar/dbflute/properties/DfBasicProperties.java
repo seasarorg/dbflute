@@ -96,21 +96,17 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public String getDatabaseName() {
         return getProperty("database", "");
     }
+    
+    public boolean isDatabaseMySQL() {
+        return getDatabaseName().equalsIgnoreCase("mysql");
+    }
 
     public boolean isDatabasePostgreSQL() {
         return getDatabaseName().equalsIgnoreCase("postgresql");
     }
 
-    public boolean isDatabaseMySQL() {
-        return getDatabaseName().equalsIgnoreCase("mysql");
-    }
-
     public boolean isDatabaseOracle() {
         return getDatabaseName().equalsIgnoreCase("oracle");
-    }
-
-    public boolean isDatabaseDerby() {
-        return getDatabaseName().equalsIgnoreCase("derby");
     }
 
     public boolean isDatabaseDB2() {
@@ -119,6 +115,14 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     public boolean isDatabaseSqlServer() {
         return getDatabaseName().equalsIgnoreCase("mssql");
+    }
+    
+    public boolean isDatabaseDerby() {
+        return getDatabaseName().equalsIgnoreCase("derby");
+    }
+    
+    public boolean isDatabaseH2() {
+        return getDatabaseName().equalsIgnoreCase("h2");
     }
 
     public boolean isDatabaseMsAccess() {

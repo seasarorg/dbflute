@@ -89,6 +89,7 @@ import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefini
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.torque.DfAdditionalPrimaryKeyInitializer;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.seasar.dbflute.velocity.DfGenerator;
 import org.xml.sax.Attributes;
 
@@ -141,14 +142,14 @@ public class Database {
     // protected String _defaultIdMethod;
     // protected String _defaultJavaType;
     // protected boolean _isHeavyIndexing;
-    
+
     // ===================================================================================
     //                                                                             Version
     //                                                                             =======
     public void initializeVersion(Integer version) {
         DfBuildProperties.getInstance().setVersion(version);
     }
-    
+
     // ===================================================================================
     //                                                                             Loading
     //                                                                             =======
@@ -351,7 +352,7 @@ public class Database {
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
         return languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName + " ";
     }
-    
+
     public Map<String, String> getPmbMetaDataPropertyNameTypeMap(String className) {
         assertArgumentPmbMetaDataClassName(className);
         final DfParameterBeanMetaData metaData = findPmbMetaData(className);
@@ -391,7 +392,14 @@ public class Database {
     public String getPmbMetaDataPropertyType(String className, String propertyName) {
         assertArgumentPmbMetaDataClassName(className);
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        return getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
+        final String columnInfoName = "org.seasar.dbflute.dbmeta.info.ColumnInfo";
+        String propertyType = getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
+        if (propertyType.contains("Map<" + columnInfoName + ", ")) {
+            if (!DfBuildProperties.getInstance().isVersionJavaOverNinety()) { // for compatible!
+                DfStringUtil.replace(propertyType, "Map<" + columnInfoName + ", ", "Map<String, ");
+            }
+        }
+        return propertyType;
     }
 
     public String getPmbMetaDataPropertyColumnName(String className, String propertyName) {
@@ -713,24 +721,36 @@ public class Database {
         return getBasicProperties().getDatabaseName();
     }
 
-    public boolean isDatabaseOracle() {
-        return getBasicProperties().isDatabaseOracle();
+    public boolean isDatabaseMySQL() {
+        return getBasicProperties().isDatabaseMySQL();
     }
 
     public boolean isDatabasePostgreSQL() {
         return getBasicProperties().isDatabasePostgreSQL();
     }
 
+    public boolean isDatabaseOracle() {
+        return getBasicProperties().isDatabaseOracle();
+    }
+    
     public boolean isDatabaseDB2() {
         return getBasicProperties().isDatabaseDB2();
     }
 
-    public boolean isDatabaseMySQL() {
-        return getBasicProperties().isDatabaseMySQL();
-    }
-
     public boolean isDatabaseSQLServer() {
         return getBasicProperties().isDatabaseSqlServer();
+    }
+    
+    public boolean isDatabaseDerby() {
+        return getBasicProperties().isDatabaseDerby();
+    }
+    
+    public boolean isDatabaseH2() {
+        return getBasicProperties().isDatabaseH2();
+    }
+    
+    public boolean isDatabaseMSAccess() {
+        return getBasicProperties().isDatabaseMsAccess();
     }
 
     // -----------------------------------------------------
@@ -783,7 +803,7 @@ public class Database {
     public boolean isTargetContainerSpring() {
         return getBasicProperties().isTargetContainerSpring();
     }
-    
+
     public boolean isTargetContainerLucy() {
         return getBasicProperties().isTargetContainerLucy();
     }
