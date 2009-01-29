@@ -5,8 +5,8 @@ playsql
      |-common
      |  |-xls
      |     |-Xxx.xls
-     |     |-default-value.txt
+     |     |-defaultValueMap.dataprop
      |-ut
         |-xls
            |-Yyy.xls  
-           |-default-value.txt
+           |-defaultValueMap.dataprop
