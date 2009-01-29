@@ -507,7 +507,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 
     // Very Internal (for Suppressing Warn about 'Not Use Import')
-    protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
-    protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
-    protected String getMapClassNameInternally() { return Map.class.getName(); }
+    String xCB() { return ${myConditionBeanClassName}.class.getName(); }
+    String xCQ() { return ${myConditionQueryClassName}.class.getName(); }
+    String xMap() { return Map.class.getName(); }
 }

@@ -250,37 +250,34 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                          Normal Query
     //                                          ------------
-    protected virtual void registerQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                         , String colName, String capPropName, String uncapPropName) {
+    protected virtual void regQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName);
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
         }
     }
 	
-	protected virtual void registerQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                         , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
+	protected virtual void regQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName, ${glConditionOption} option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
         }
     }
 
     // -----------------------------------------------------
     //                                          FromTo Query
     //                                          ------------
-    protected void registerFromToQuery(DateTime? fromDate, DateTime? toDate, ${glConditionValue} cvalue
-                                 , String colName, String capPropName, String uncapPropName, ${glFromToOption} option) {
+    protected void regFTQ(DateTime? fromDate, DateTime? toDate, ${glConditionValue} cvalue, String colName, ${glFromToOption} option) {
         {
             DateTime? filteredFromDate = option.filterFromDate(fromDate);
             ${glConditionKey} fromKey = option.getFromDateConditionKey();
-            if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
-                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName, capPropName, uncapPropName);
+            if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName);
             }
         }
         {
             DateTime? filteredToDate = option.filterToDate(toDate);
             ${glConditionKey} toKey = option.getToDateConditionKey();
-            if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
-                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName, capPropName, uncapPropName);
+            if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName);
             }
         }
     }
@@ -292,30 +289,26 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                         , String value
                         , ${glConditionValue} cvalue
                         , String colName
-                        , String capPropName
-                        , String uncapPropName
                         , ${glLikeSearchOption} option) {
-        registerLikeSearchQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
+        registerLikeSearchQuery(key, value, cvalue, colName, option);
     }
 
     protected void registerLikeSearchQuery(${glConditionKey} key
                                          , String value
                                          , ${glConditionValue} cvalue
                                          , String colName
-                                         , String capPropName
-                                         , String uncapPropName
                                          , ${glLikeSearchOption} option) {
         String validationMsg = key.getConditionKey() + " of " + getRealAliasName() + "." + colName;
         if (!key.isValidRegistration(cvalue, value, validationMsg)) {
             return;
         }
         if (option == null) {
-            throwLikeSearchOptionNotFoundException(capPropName, value);
+            throwLikeSearchOptionNotFoundException(colName, value);
             return;// Unreachable!
         }
         if (value == null || !option.isSplit()) {
             // As Normal Condition.
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
             return;
         }
         // - - - - - - - - -
@@ -324,7 +317,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         throw new UnsupportedOperationException("The method 'splitByXxx()' have been unsupported yet!");
     }
 
-    protected void throwLikeSearchOptionNotFoundException(String capPropName, String value) {
+    protected void throwLikeSearchOptionNotFoundException(String colName, String value) {
+        DBMeta dbmeta = DBMetaInstanceHandler.findDBMeta(getTableDbName());
+        String propertyName = dbmeta.FindPropertyName();
+        String capPropName = initCap(propertyName);
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + getLineSeparator();
@@ -345,8 +341,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                          Inline Query
     //                                          ------------
-    protected virtual void registerInlineQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                       , String colName, String capPropName, String uncapPropName) {
+    protected virtual void regIQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
+        DBMeta dbmeta = DBMetaInstanceHandler.findDBMeta(getTableDbName());
+        String propertyName = dbmeta.FindPropertyName();
+        String capPropName = initCap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If CSharp, it is necessary to use capPropName!
             if (isBaseQuery(this)) {
@@ -357,8 +355,11 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
     }
 
-    protected virtual void registerInlineQuery(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                       , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
+    protected virtual void regIQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue
+                               , String colName, ${glConditionOption} option) {
+        DBMeta dbmeta = DBMetaInstanceHandler.findDBMeta(getTableDbName());
+        String propertyName = dbmeta.FindPropertyName();
+        String capPropName = initCap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If CSharp, it is necessary to use capPropName!
             if (isBaseQuery(this)) {
@@ -704,14 +705,19 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                          Where Clause
     //                                          ------------
-    protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                             , String colName, String capPropName, String uncapPropName) {
+    protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
+        DBMeta dbmeta = DBMetaInstanceHandler.findDBMeta(getTableDbName());
+        String propertyName = dbmeta.FindPropertyName();
+        String capPropName = initCap(propertyName);
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key)); // If CSharp, it is necessary to use capPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
     }
 
     protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                             , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
+                                                                   , String colName, ${glConditionOption} option) {
+        DBMeta dbmeta = DBMetaInstanceHandler.findDBMeta(getTableDbName());
+        String propertyName = dbmeta.FindPropertyName();
+        String capPropName = initCap(propertyName);
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option); // If CSharp, it is necessary to use capPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }
@@ -1054,6 +1060,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     protected String initCap(String str) {
 	    return ${glSimpleStringUtil}.InitCap(str);
+    }
+
+    protected String initUncap(String str) {
+	    return ${glSimpleStringUtil}.InitUncap(str);
     }
 
     protected String convertObjectArrayToStringView(Object[] objArray) {

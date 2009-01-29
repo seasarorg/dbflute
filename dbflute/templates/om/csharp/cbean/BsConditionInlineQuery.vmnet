@@ -32,7 +32,6 @@ namespace ${glPackageCIQ} {
             _relationPath = _myCQ.getRelationPath();// Accept relation path.
         }
 
-            
         // ===================================================================================
         //                                                             Override about Register
         //                                                             =======================
@@ -40,14 +39,13 @@ namespace ${glPackageCIQ} {
             throw new UnsupportedOperationException("InlineQuery must not need UNION method: " + baseQueryAsSuper + " : " + unionQueryAsSuper);
         }
     
-        protected override void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                                 , String colName, String capPropName, String uncapPropName) {
-            registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
+        protected override void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
+            regIQ(key, value, cvalue, colName);
         }
     
         protected override void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
-                                                                 , String colName, String capPropName, String uncapPropName, ${glConditionOption} option) {
-            registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
+                                                                        , String colName, ${glConditionOption} option) {
+            regIQ(key, value, cvalue, colName, option);
         }
     
         protected override void registerWhereClause(String whereClause) {

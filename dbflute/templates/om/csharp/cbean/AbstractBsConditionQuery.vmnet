@@ -77,11 +77,11 @@ namespace ${glPackageBaseCQ} {
 #end
 #if (${col.isAvailableStringLikeSearch()})
         public void Set${tmpJavaName}_LikeSearch($col.javaNative v, ${glLikeSearchOption} option)
-        { regLSQ(CK_LS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", option); }
+        { regLSQ(CK_LS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", option); }
 #end
 #if (${col.isAvailableStringNotLikeSearch()})
         public void Set${tmpJavaName}_NotLikeSearch($col.javaNative v, ${glLikeSearchOption} option)
-        { regLSQ(CK_NLS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", option); }
+        { regLSQ(CK_NLS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", option); }
 #end
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
@@ -389,7 +389,7 @@ namespace ${glPackageBaseCQ} {
 #end
 #if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
         public void Set${tmpJavaName}_FromTo(DateTime? from, DateTime? to, ${glFromToOption} option)
-        { registerFromToQuery(from, to, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", option); }
+        { regFTQ(from, to, getCValue${tmpJavaName}(), "${col.name}", option); }
         public void Set${tmpJavaName}_DateFromTo(DateTime? from, DateTime? to) { Set${tmpJavaName}_FromTo(from, to, new ${glDateFromToOption}()); }
 #end
 #end
@@ -413,10 +413,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DUMMY_OBJECT); }
         public void Set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DUMMY_OBJECT); }
 #end
-        protected void reg${tmpJavaName}(${glConditionKey} key, Object value)
-        { registerQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}"); }
-        protected void registerInline${tmpJavaName}(${glConditionKey} key, Object value)
-        { registerInlineQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}"); }
+        protected void reg${tmpJavaName}(${glConditionKey} k, Object v) { regQ(k, v, getCValue${tmpJavaName}(), "${col.name}"); }
         protected abstract ${glConditionValue} getCValue${tmpJavaName}();
 #end
 

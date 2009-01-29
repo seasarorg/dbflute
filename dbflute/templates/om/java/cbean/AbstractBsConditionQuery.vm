@@ -5,6 +5,7 @@ import java.util.Collection;
 
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.cbean.ckey.*;
+import org.seasar.dbflute.cbean.coption.*;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -187,8 +188,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as likeSearch.
      * @param likeSearchOption The option of like-search. (NotNull)
      */
-    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
-        regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
+    public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
+        regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
     }
 #end
 #if (${col.isAvailableStringNotLikeSearch()})
@@ -198,8 +199,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notLikeSearch.
      * @param likeSearchOption The option of not-like-search. (NotNull)
      */
-    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, org.seasar.dbflute.cbean.coption.LikeSearchOption likeSearchOption) {
-        regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
+    public void set${tmpJavaName}_NotLikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
+        regLSQ(CK_NLS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
     }
 #end
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
@@ -698,11 +699,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param toDate The to-date of ${col.uncapitalisedJavaName}. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
      */
-    public void set${tmpJavaName}_FromTo(java.util.Date fromDate, java.util.Date toDate, org.seasar.dbflute.cbean.coption.FromToOption fromToOption) {
+    public void set${tmpJavaName}_FromTo(java.util.Date fromDate, java.util.Date toDate, FromToOption fromToOption) {
 #if ($col.javaNative == "java.util.Date")
-        registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", fromToOption);
+        regFTQ(fromDate, toDate, getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #else
-        registerFromToQuery((fromDate != null ? new ${col.javaNative}(fromDate.getTime()) : null), (toDate != null ? new ${col.javaNative}(toDate.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", fromToOption);
+        regFTQ((fromDate != null ? new ${col.javaNative}(fromDate.getTime()) : null), (toDate != null ? new ${col.javaNative}(toDate.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #end
     }
 
@@ -712,7 +713,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param toDate The to-date of ${col.uncapitalisedJavaName}. (Nullable)
      */
     public void set${tmpJavaName}_DateFromTo(java.util.Date fromDate, java.util.Date toDate) {
-        set${tmpJavaName}_FromTo(fromDate, toDate, new org.seasar.dbflute.cbean.coption.DateFromToOption());
+        set${tmpJavaName}_FromTo(fromDate, toDate, new DateFromToOption());
     }
 #end
 #end
@@ -743,20 +744,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     /**
      * IsNull(is null). And OnlyOnceRegistered.
      */
-    public void set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DUMMY_OBJECT); }
+    public void set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DOBJ); }
 
     /**
      * IsNotNull(is not null). And OnlyOnceRegistered.
      */
-    public void set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DUMMY_OBJECT); }
+    public void set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DOBJ); }
 #end
 
-    protected void reg${tmpJavaName}(ConditionKey key, Object value) {
-        registerQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
-    }
-    protected void registerInline${tmpJavaName}(ConditionKey key, Object value) {
-        registerInlineQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
-    }
+    protected void reg${tmpJavaName}(ConditionKey k, Object v) { regQ(k, v, getCValue${tmpJavaName}(), "${col.name}"); }
     abstract protected ConditionValue getCValue${tmpJavaName}();
 #end
 #if ($table.hasOnlyOnePrimaryKey())
@@ -805,6 +801,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     //                                                                       Very Internal
     //                                                                       =============
     // Very Internal (for Suppressing Warn about 'Not Use Import')
-    protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
-    protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
+    String xCB() { return ${myConditionBeanClassName}.class.getName(); }
+    String xCQ() { return ${myConditionQueryClassName}.class.getName(); }
+    String xLSO() { return LikeSearchOption.class.getName(); }
 }

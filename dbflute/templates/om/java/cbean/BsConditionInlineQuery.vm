@@ -41,15 +41,13 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     @Override
-    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue
-                                                             , String colName, String capPropName, String uncapPropName) {
-        registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName);
+    protected void setupConditionValueAndRegisterWhereClause(ConditionKey k, Object v, ConditionValue cv, String col) {
+        regIQ(k, v, cv, col);
     }
 
     @Override
-    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue
-                                                             , String colName, String capPropName, String uncapPropName, ConditionOption option) {
-        registerInlineQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
+    protected void setupConditionValueAndRegisterWhereClause(ConditionKey k, Object v, ConditionValue cv, String col, ConditionOption op) {
+        regIQ(k, v, cv, col, op);
     }
 
     @Override
@@ -298,6 +296,6 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 #end
 
     // Very Internal (for Suppressing Warn about 'Not Use Import')
-    protected String getConditionBeanClassNameInternally() { return ${myConditionBeanClassName}.class.getName(); }
-    protected String getConditionQueryClassNameInternally() { return ${myConditionQueryClassName}.class.getName(); }
+    String xiCB() { return ${myConditionBeanClassName}.class.getName(); }
+    String xiCQ() { return ${myConditionQueryClassName}.class.getName(); }
 }
