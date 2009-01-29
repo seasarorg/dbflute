@@ -831,8 +831,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final String propertyType;
         if (isResultSetProperty(procedureColumnMetaInfo)) {
             final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
-            // This is for Java Only now (2000/01/28)
-            propertyType = grammarInfo.getGenericMapListClassName("org.seasar.dbflute.dbmeta.info.ColumnInfo", "Object");
+            propertyType = grammarInfo.getGenericMapListClassName("String", "Object");
         } else {
             final int jdbcType = procedureColumnMetaInfo.getJdbcType();
             final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
