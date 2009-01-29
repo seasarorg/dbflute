@@ -6,6 +6,7 @@ using System.Collections;
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCKey};
+using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonSqlClause};
 using ${glPackageCB};
@@ -31,16 +32,16 @@ namespace ${glPackageBaseCQ} {
         //                                                                           Query
         //                                                                           =====
 #foreach ($col in $table.columns)
-  #set ($tmpJavaName = "${col.javaName}")
-  #set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
-  #if (${col.isJavaNativeStringObject()})
+#set ($tmpJavaName = "${col.javaName}")
+#set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
+#if (${col.isJavaNativeStringObject()})
 
-        public void Set${tmpJavaName}_Equal(${col.javaNative} value) { reg${tmpJavaName}(CK_EQ, fRES(value)); }
-    #if ($database.isMakeConditionQueryEqualEmptyString())
+        public void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, fRES(value)); }
+#if ($database.isMakeConditionQueryEqualEmptyString())
         public void Set${tmpJavaName}_Equal_EmptyString() { reg${tmpJavaName}(CK_EQ, ""); }
-    #end
-    #if (${col.hasClassification()})
-      #foreach ($classificationMap in $col.ClassificationMapList)
+#end
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.ClassificationMapList)
 
         /// <summary>
         /// Set the value of ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as equal. { = }
@@ -49,15 +50,12 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
             reg${tmpJavaName}(CK_EQ, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code);
         }
-      #end
-    #end
-    #if (${col.isAvailableStringNotEqual()})
-
-        public void Set${tmpJavaName}_NotEqual(${col.javaNative} value) {
-            reg${tmpJavaName}(CK_NE, fRES(value));
-        }
-    #if (${col.hasClassification()})
-      #foreach ($classificationMap in $col.ClassificationMapList)
+#end
+#end
+#if (${col.isAvailableStringNotEqual()})
+        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, fRES(value)); }
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.ClassificationMapList)
 
         /// <summary>
         /// Set the value of ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as notEqual. { != }
@@ -66,40 +64,40 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
             reg${tmpJavaName}(CK_NE, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code);
         }
-      #end
-    #end
-    #end
-    #if (${col.isAvailableStringGreaterThan()})
-        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} value) { reg${tmpJavaName}(CK_GT, fRES(value)); }
-    #end
-    #if (${col.isAvailableStringLessThan()})
-        public void Set${tmpJavaName}_LessThan(${col.javaNative} value) { reg${tmpJavaName}(CK_LT, fRES(value)); }
-    #end
-    #if (${col.isAvailableStringGreaterEqual()})
-        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} value) { reg${tmpJavaName}(CK_GE, fRES(value)); }
-    #end
-    #if (${col.isAvailableStringLessEqual()})
-        public void Set${tmpJavaName}_LessEqual(${col.javaNative} value) { reg${tmpJavaName}(CK_LE, fRES(value)); }
-    #end
-    #if (${col.isAvailableStringPrefixSearch()})
-        public void Set${tmpJavaName}_PrefixSearch(${col.javaNative} value) { reg${tmpJavaName}(CK_PS, fRES(value)); }
-    #end
-    #if (${col.isAvailableStringInScope()})
+#end
+#end
+#end
+#if (${col.isAvailableStringGreaterThan()})
+        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} v) { reg${tmpJavaName}(CK_GT, fRES(value)); }
+#end
+#if (${col.isAvailableStringLessThan()})
+        public void Set${tmpJavaName}_LessThan(${col.javaNative} v) { reg${tmpJavaName}(CK_LT, fRES(value)); }
+#end
+#if (${col.isAvailableStringGreaterEqual()})
+        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_GE, fRES(value)); }
+#end
+#if (${col.isAvailableStringLessEqual()})
+        public void Set${tmpJavaName}_LessEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_LE, fRES(value)); }
+#end
+#if (${col.isAvailableStringPrefixSearch()})
+        public void Set${tmpJavaName}_PrefixSearch(${col.javaNative} v) { reg${tmpJavaName}(CK_PS, fRES(value)); }
+#end
+#if (${col.isAvailableStringInScope()})
         public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_INS, fRESL(cTL<${col.JavaNative}>(valueList))); }
-    #end
-    #if (${col.isAvailableStringNotInScope()})
+#end
+#if (${col.isAvailableStringNotInScope()})
         public void Set${tmpJavaName}_NotInScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(valueList))); }
-    #end
-    #if (${col.isAvailableStringLikeSearch()})
-        public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glLikeSearchOption} likeSearchOption) {
+#end
+#if (${col.isAvailableStringLikeSearch()})
+        public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glLikeSearchOption} likeSearchOption) {
             regLSQ(CK_LS, fRES(value), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
         }
-    #end
-    #if (${col.isAvailableStringNotLikeSearch()})
-        public void Set${tmpJavaName}_NotLikeSearch($col.javaNative value, ${glPackageBaseCommonCOption}.${glLikeSearchOption} likeSearchOption) {
+#end
+#if (${col.isAvailableStringNotLikeSearch()})
+        public void Set${tmpJavaName}_NotLikeSearch($col.javaNative value, ${glLikeSearchOption} likeSearchOption) {
             regLSQ(CK_NLS, fRES(value), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
         }
-    #end
+#end
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
@@ -227,7 +225,7 @@ namespace ${glPackageBaseCQ} {
 #end
   #if (${col.isJavaNativeNumberObject()})
 
-        public void Set${tmpJavaName}_Equal(${col.javaNative} value) { reg${tmpJavaName}(CK_EQ, value); }
+        public void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, v); }
     #if (${col.hasClassification()})
       #foreach ($classificationMap in $col.classificationMapList)
 
@@ -242,7 +240,7 @@ namespace ${glPackageBaseCQ} {
       #end
     #end
     #if (${col.isAvailableNumberNotEqual()})
-        public void Set${tmpJavaName}_NotEqual(${col.javaNative} value) { reg${tmpJavaName}(CK_NE, value); }
+        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, v); }
     #end
     #if (${col.hasClassification()})
       #foreach ($classificationMap in $col.classificationMapList)
@@ -258,16 +256,16 @@ namespace ${glPackageBaseCQ} {
       #end
     #end
     #if (${col.isAvailableNumberGreaterThan()})
-        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} value) { reg${tmpJavaName}(CK_GT, value); }
+        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} v) { reg${tmpJavaName}(CK_GT, v); }
     #end
     #if (${col.isAvailableNumberLessThan()})
-        public void Set${tmpJavaName}_LessThan(${col.javaNative} value) { reg${tmpJavaName}(CK_LT, value); }
+        public void Set${tmpJavaName}_LessThan(${col.javaNative} v) { reg${tmpJavaName}(CK_LT, v); }
     #end
     #if (${col.isAvailableNumberGreaterEqual()})
-        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} value) { reg${tmpJavaName}(CK_GE, value); }
+        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_GE, v); }
     #end
     #if (${col.isAvailableNumberLessEqual()})
-        public void Set${tmpJavaName}_LessEqual(${col.javaNative} value) { reg${tmpJavaName}(CK_LE, value); }
+        public void Set${tmpJavaName}_LessEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_LE, v); }
     #end
     #if (${col.isAvailableNumberInScope()})
         public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_INS, cTL<${col.JavaNative}>(valueList)); }
@@ -402,34 +400,34 @@ namespace ${glPackageBaseCQ} {
 #end
 #if (${col.isJavaNativeDateObject()})
 
-        public void Set${tmpJavaName}_Equal(${col.javaNative} value) { reg${tmpJavaName}(CK_EQ, value); }
+        public void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, v); }
 #if (${col.isAvailableDateNotEqual()})
-        public void Set${tmpJavaName}_NotEqual(${col.javaNative} value) { reg${tmpJavaName}(CK_NE, value); }
+        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, v); }
 #end
 #if (${col.isAvailableDateGreaterThan()})
-        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} value) { reg${tmpJavaName}(CK_GT, value); }
+        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} v) { reg${tmpJavaName}(CK_GT, v); }
 #end
 #if (${col.isAvailableDateLessThan()})
-        public void Set${tmpJavaName}_LessThan(${col.javaNative} value) { reg${tmpJavaName}(CK_LT, value); }
+        public void Set${tmpJavaName}_LessThan(${col.javaNative} v) { reg${tmpJavaName}(CK_LT, v); }
 #end
 #if (${col.isAvailableDateGreaterEqual()})
-        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} value) { reg${tmpJavaName}(CK_GE, value); }
+        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_GE, v); }
 #end
 #if (${col.isAvailableDateLessEqual()})
-        public void Set${tmpJavaName}_LessEqual(${col.javaNative} value) { reg${tmpJavaName}(CK_LE, value); }
+        public void Set${tmpJavaName}_LessEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_LE, v); }
 #end
 #if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
-        public void Set${tmpJavaName}_FromTo(DateTime? fromDate, DateTime? toDate, ${glPackageBaseCommonCOption}.${glFromToOption} fromToOption) {
+        public void Set${tmpJavaName}_FromTo(DateTime? fromDate, DateTime? toDate, ${glFromToOption} fromToOption) {
             registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", fromToOption);
         }
         public void Set${tmpJavaName}_DateFromTo(DateTime? fromDate, DateTime? toDate) {
-            Set${tmpJavaName}_FromTo(fromDate, toDate, new ${glPackageBaseCommonCOption}.${glDateFromToOption}());
+            Set${tmpJavaName}_FromTo(fromDate, toDate, new ${glDateFromToOption}());
         }
 #end
 #end
 #if (${col.isJavaNativeBooleanObject()})
 
-        public void Set${tmpJavaName}_Equal(${col.javaNative} value) { reg${tmpJavaName}(CK_EQ, value); }
+        public void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, v); }
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.classificationMapList)
 
@@ -445,19 +443,15 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 #if (!${col.isNotNull()} || ${col.isPrimaryKey()})
-
         public void Set${tmpJavaName}_IsNull() { reg${tmpJavaName}(CK_ISN, DUMMY_OBJECT); }
         public void Set${tmpJavaName}_IsNotNull() { reg${tmpJavaName}(CK_ISNN, DUMMY_OBJECT); }
 #end
-  
         protected void reg${tmpJavaName}(${glConditionKey} key, Object value) {
             registerQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
         }
-
         protected void registerInline${tmpJavaName}(${glConditionKey} key, Object value) {
             registerInlineQuery(key, value, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}");
         }
-
         protected abstract ${glConditionValue} getCValue${tmpJavaName}();
 #end
 
