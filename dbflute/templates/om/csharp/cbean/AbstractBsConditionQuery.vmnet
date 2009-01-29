@@ -223,11 +223,11 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 #end
-  #if (${col.isJavaNativeNumberObject()})
+#if (${col.isJavaNativeNumberObject()})
 
         public void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, v); }
-    #if (${col.hasClassification()})
-      #foreach ($classificationMap in $col.classificationMapList)
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.classificationMapList)
 
         /// <summary>
         /// Set the value of ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as equal. { = }
@@ -237,13 +237,13 @@ namespace ${glPackageBaseCQ} {
             String code = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
             reg${tmpJavaName}(CK_EQ, ${col.javaNativeRemovedCSharpNullable}.Parse(code));
         }
-      #end
-    #end
-    #if (${col.isAvailableNumberNotEqual()})
+#end
+#end
+#if (${col.isAvailableNumberNotEqual()})
         public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, v); }
-    #end
-    #if (${col.hasClassification()})
-      #foreach ($classificationMap in $col.classificationMapList)
+#end
+#if (${col.hasClassification()})
+#foreach ($classificationMap in $col.classificationMapList)
 
         /// <summary>
         /// Set the value of ${classificationMap.get('name')} of ${col.uncapitalisedJavaName} as notEqual. { != }
@@ -253,26 +253,26 @@ namespace ${glPackageBaseCQ} {
             String code = ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code;
             reg${tmpJavaName}(CK_NE, ${col.javaNativeRemovedCSharpNullable}.Parse(code));
         }
-      #end
-    #end
-    #if (${col.isAvailableNumberGreaterThan()})
+#end
+#end
+#if (${col.isAvailableNumberGreaterThan()})
         public void Set${tmpJavaName}_GreaterThan(${col.javaNative} v) { reg${tmpJavaName}(CK_GT, v); }
-    #end
-    #if (${col.isAvailableNumberLessThan()})
+#end
+#if (${col.isAvailableNumberLessThan()})
         public void Set${tmpJavaName}_LessThan(${col.javaNative} v) { reg${tmpJavaName}(CK_LT, v); }
-    #end
-    #if (${col.isAvailableNumberGreaterEqual()})
+#end
+#if (${col.isAvailableNumberGreaterEqual()})
         public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_GE, v); }
-    #end
-    #if (${col.isAvailableNumberLessEqual()})
+#end
+#if (${col.isAvailableNumberLessEqual()})
         public void Set${tmpJavaName}_LessEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_LE, v); }
-    #end
-    #if (${col.isAvailableNumberInScope()})
+#end
+#if (${col.isAvailableNumberInScope()})
         public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_INS, cTL<${col.JavaNative}>(valueList)); }
-    #end
-    #if (${col.isAvailableNumberNotInScope()})
+#end
+#if (${col.isAvailableNumberNotInScope()})
         public void Set${tmpJavaName}_NotInScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_NINS, cTL<${col.JavaNative}>(valueList)); }
-    #end
+#end
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
 #set ($relatedCQClassName = "${col.foreignKey.foreignTableExtendedConditionQueryClassName}")
