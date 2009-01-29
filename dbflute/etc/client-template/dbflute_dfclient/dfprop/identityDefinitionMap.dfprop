@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# sequenceDefinitionMap: (Default 'map:{}')
+# identityDefinitionMap: (Default 'map:{}')
 # 
 # The relation mappings between identity and column of table.
 # Basically you don't need this property because DBFlute

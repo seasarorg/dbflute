@@ -644,7 +644,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         try {
             _log.info("...Initializing identity map");
             _identityMap = extractor.extractIdentityMap();
-            _log.info("  --> size=" + _identityMap.size());
+            _log.info("  -> size=" + _identityMap.size());
         } catch (Exception ignored) {
             _log.info("DfIdentityExtractor.extractIdentityMap() threw the exception!", ignored);
         }
