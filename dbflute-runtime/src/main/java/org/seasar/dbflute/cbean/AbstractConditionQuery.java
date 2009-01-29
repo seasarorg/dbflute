@@ -61,11 +61,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected static final ConditionKey CK_ISN = ConditionKey.CK_IS_NULL;
     protected static final ConditionKey CK_ISNN = ConditionKey.CK_IS_NOT_NULL;
 
-    /** Condition value for DUMMY. */
-    protected static final ConditionValue DUMMY_CONDITION_VALUE = new ConditionValue();
-
     /** Object for DUMMY. */
-    protected static final Object DUMMY_OBJECT = new Object();
+    protected static final Object DOBJ = new Object();
 
     /** The property of condition-query. */
     protected static final String CQ_PROPERTY = "conditionQuery";
@@ -385,37 +382,35 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                                 Query
     //                                                 -----
-    protected void registerQuery(ConditionKey key, Object value, ConditionValue cvalue
-                                 , String colName, String capPropName, String uncapPropName) {
+    protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName);
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
         }
     }
-
-    protected void registerQuery(ConditionKey key, Object value, ConditionValue cvalue
-                                 , String colName, String capPropName, String uncapPropName, ConditionOption option) {
+    
+    protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String colName, ConditionOption option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
         }
     }
 
     // -----------------------------------------------------
     //                                          FromTo Query
     //                                          ------------
-    protected void registerFromToQuery(java.util.Date fromDate, java.util.Date toDate, ConditionValue cvalue
-                                 , String colName, String capPropName, String uncapPropName, FromToOption option) {
+    protected void regFTQ(java.util.Date fromDate, java.util.Date toDate, ConditionValue cvalue
+                        , String colName, FromToOption option) {
         {
             final java.util.Date filteredFromDate = option.filterFromDate(fromDate);
             final ConditionKey fromKey = option.getFromDateConditionKey();
-            if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
-                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName, capPropName, uncapPropName);
+            if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+                setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName);
             }
         }
         {
             final java.util.Date filteredToDate = option.filterToDate(toDate);
             final ConditionKey toKey = option.getToDateConditionKey();
-            if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName() + "." + uncapPropName)) {
-                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName, capPropName, uncapPropName);
+            if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+                setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName);
             }
         }
     }
@@ -427,10 +422,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                         , String value
                         , ConditionValue cvalue
                         , String colName
-                        , String capPropName
-                        , String uncapPropName
                         , LikeSearchOption option) {
-        registerLikeSearchQuery(key, value, cvalue, colName, capPropName, uncapPropName, option);
+        registerLikeSearchQuery(key, value, cvalue, colName, option);
     }
 
     @SuppressWarnings("deprecation")
@@ -438,20 +431,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                                          , String value
                                          , ConditionValue cvalue
                                          , String colName
-                                         , String capPropName
-                                         , String uncapPropName
                                          , LikeSearchOption option) {
         final String validationMsg = key.getConditionKey() + " of " + getRealAliasName() + "." + colName;
         if (!key.isValidRegistration(cvalue, value, validationMsg)) {
             return;
         }
         if (option == null) {
-            throwLikeSearchOptionNotFoundException(capPropName, value);
+            throwLikeSearchOptionNotFoundException(colName, value);
             return;// Unreachable!
         }
         if (value == null || !option.isSplit()) {
             // As Normal Condition.
-            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+            setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
             return;
         }
         // - - - - - - - - -
@@ -462,7 +453,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             // As 'and' Condition
             for (int i = 0; i < strArray.length; i++) {
                 final String currentValue = strArray[i];
-                setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, capPropName, uncapPropName, option);
+                setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
                 
                 // Callback for LikeAsOr!
                 final List<LikeSearchOption.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
@@ -485,10 +476,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             for (int i = 0; i < strArray.length; i++) {
                 final String currentValue = strArray[i];
                 if (i == 0) {
-                    setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, capPropName, uncapPropName, option);
+                    setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
                 } else {
                     getSqlClause().makeAdditionalConditionAsOrEffective();
-                    invokeSetterLikeSearch(uncapPropName, currentValue, option);
+                    invokeSetterLikeSearch(colName, currentValue, option);
                 }
             }
             
@@ -500,7 +491,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    protected void throwLikeSearchOptionNotFoundException(String capPropName, String value) {
+    protected void throwLikeSearchOptionNotFoundException(String colName, String value) {
+        DBMeta dbmeta = getDBMetaProvider().provideDBMeta(getTableDbName());
+        String capPropName = initCap(dbmeta.findPropertyName(colName));
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + getLineSeparator();
@@ -542,7 +535,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                         InScope Query
     //                                         -------------
     protected void registerInScopeQuery(ConditionKey key, String value, ConditionValue cvalue
-                                     , String colName, String capPropName, String uncapPropName, InScopeOption option) {
+                                      , String colName, InScopeOption option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             if (value != null && option.isSplit()) {
                 final String[] strArray = option.generateSplitValueArray(value);
@@ -551,9 +544,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     final String currentValue = strArray[i];
                     realValueList.add(currentValue);
                 }
-                setupConditionValueAndRegisterWhereClause(key, realValueList, cvalue, colName, capPropName, uncapPropName, option);
+                setupConditionValueAndRegisterWhereClause(key, realValueList, cvalue, colName, option);
             } else {
-                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, capPropName, uncapPropName, option);
+                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
             }
         }
     }
@@ -561,8 +554,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          Inline Query
     //                                          ------------
-    protected void registerInlineQuery(ConditionKey key, Object value, ConditionValue cvalue
-                                       , String colName, String capPropName, String uncapPropName) {
+    protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
+        DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        String propertyName = dbmeta.findPropertyName(colName);
+        String uncapPropName = initUncap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, it is necessary to use uncapPropName!
             if (isBaseQuery(this)) {
@@ -573,8 +568,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    protected void registerInlineQuery(ConditionKey key, Object value, ConditionValue cvalue
-                                       , String colName, String capPropName, String uncapPropName, ConditionOption option) {
+    protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String colName, ConditionOption option) {
+        DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        String propertyName = dbmeta.findPropertyName(colName);
+        String uncapPropName = initUncap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, it is necessary to use uncapPropName!
             if (isBaseQuery(this)) {
@@ -1553,14 +1550,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          Where Clause
     //                                          ------------
-    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue
-                                                             , String colName, String capPropName, String uncapPropName) {
+    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
+        DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        String propertyName = dbmeta.findPropertyName(colName);
+        String uncapPropName = initUncap(propertyName);
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, it is necessary to use uncapPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
     }
 
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue
-                                                             , String colName, String capPropName, String uncapPropName, ConditionOption option) {
+                                                           , String colName, ConditionOption option) {
+        DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        String propertyName = dbmeta.findPropertyName(colName);
+        String uncapPropName = initUncap(propertyName);
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, it is necessary to use uncapPropName!
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }
@@ -1936,6 +1938,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected String initCap(String str) {
         return DfStringUtil.initCap(str);
+    }
+    
+    protected String initUncap(String str) {
+        return DfStringUtil.initUncap(str);
     }
 
     protected String getLineSeparator() {
