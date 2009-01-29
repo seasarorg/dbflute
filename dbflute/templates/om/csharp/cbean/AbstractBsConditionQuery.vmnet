@@ -76,14 +76,12 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(ls))); }
 #end
 #if (${col.isAvailableStringLikeSearch()})
-        public void Set${tmpJavaName}_LikeSearch($col.javaNative v, ${glLikeSearchOption} option) {
-            regLSQ(CK_LS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", option);
-        }
+        public void Set${tmpJavaName}_LikeSearch($col.javaNative v, ${glLikeSearchOption} option)
+        { regLSQ(CK_LS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", option); }
 #end
 #if (${col.isAvailableStringNotLikeSearch()})
-        public void Set${tmpJavaName}_NotLikeSearch($col.javaNative v, ${glLikeSearchOption} option) {
-            regLSQ(CK_NLS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", option);
-        }
+        public void Set${tmpJavaName}_NotLikeSearch($col.javaNative v, ${glLikeSearchOption} option)
+        { regLSQ(CK_NLS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", option); }
 #end
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
