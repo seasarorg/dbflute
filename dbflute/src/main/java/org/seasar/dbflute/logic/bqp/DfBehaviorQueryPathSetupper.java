@@ -259,11 +259,12 @@ public class DfBehaviorQueryPathSetupper {
             String msg = "The file of base behavior was Not Found: bsbhvFile=" + bsbhvFile;
             throw new IllegalStateException(msg, e);
         }
+        StringBuilder logSb = new StringBuilder();
         final String path = getSlashPath(bsbhvFile);
         if (path.contains("/")) {
-            _log.info(path.substring(path.lastIndexOf("/") + "/".length()));
+            logSb.append(path.substring(path.lastIndexOf("/") + "/".length()));
         } else {
-            _log.info(path);
+            logSb.append(path);
         }
         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
         final String behaviorQueryPathBeginMark = getBasicProperties().getBehaviorQueryPathBeginMark();
@@ -312,13 +313,17 @@ public class DfBehaviorQueryPathSetupper {
                             definitionLineSb.append(" String PATH_").append(behaviorQueryPath);
                             definitionLineSb.append(" = \"").append(behaviorQueryPath).append("\";");
                         }
-                        _log.info(definitionLineSb);
+
+                        String tmp4log = definitionLineSb.toString();
+                        logSb.append("\n").append(tmp4log.substring(tmp4log.indexOf(" PATH_")));
+
                         definitionLineSb.append("\n");
                         sb.append(definitionLineSb);
                     }
                     done = true;
                 }
             }
+            _log.info(logSb.toString());
             if (!done) {
                 _log.info("  --> The mark of behavior query path was Not Found!");
             }

@@ -135,7 +135,6 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCustomizeDBMeta = "${glPackageBaseCustomizeEntity}.dbmeta")
     #set ($glPackageBaseSqlParameterBean = "${database.SqlParameterBeanPackage}.bsparam")
     #set ($glPackageExtendedSqlParameterBean = "${database.SqlParameterBeanPackage}.exparam")
-    #set ($glPackageArgumentBean = "${database.ArgumentBeanPackage}")
 
     ## *****************************************************************************************************************
     ##                                                                                                           Parsing

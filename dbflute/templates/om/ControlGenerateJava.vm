@@ -111,7 +111,6 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseCustomizeDBMeta = "${glPackageBaseCustomizeEntity}.dbmeta")
     #set ($glPackageBaseSqlParameterBean = "${database.SqlParameterBeanPackage}.bsparam")
     #set ($glPackageExtendedSqlParameterBean = "${database.SqlParameterBeanPackage}.exparam")
-    #set ($glPackageArgumentBean = "${database.ArgumentBeanPackage}")
 
     ## *****************************************************************************************************************
     ##                                                                                                           Parsing
@@ -180,6 +179,7 @@ targetdatabase = $targetDatabase
     $database.info("parseContainerConfig() {")
     #if ($database.isTargetContainerSeasar())
       #if ($database.isAvailableHotDeploy())
+        #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
         #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2Container}))
         $database.makeDirectory($path)
 
