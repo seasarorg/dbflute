@@ -261,6 +261,12 @@
 	  	</copy>
 	</target>
 
+	<target name="reflect-win-db2" depends="expand-dist" description="==> reflect to db2 example">
+	  	<copy todir="${dbflute.db2.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	</target>
+
 	<target name="reflect-win-msaccess" depends="expand-dist" description="==> reflect to msaccess example">
 	  	<copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
 	    	<fileset dir="${dbflute.deploy.dir}"/>
@@ -278,6 +284,9 @@
 	    	<fileset dir="${dbflute.deploy.dir}"/>
 	  	</copy>
 	  	<copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<copy todir="${dbflute.db2.example.dir}/mydbflute/dbflute-${version}">
 	    	<fileset dir="${dbflute.deploy.dir}"/>
 	  	</copy>
 	  	<copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
