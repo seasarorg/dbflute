@@ -20,7 +20,6 @@ namespace ${glPackageBaseCQ} {
 
         public override String getTableDbName() { return "${table.name}"; }
         public override String getTableSqlName() { return "${table.tableSqlName}"; }
-
 #foreach ($col in $table.columns)
 #set ($tmpJavaName = "${col.javaName}")
 #set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
@@ -71,10 +70,10 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_PrefixSearch(${col.javaNative} v) { reg${tmpJavaName}(CK_PS, fRES(v)); }
 #end
 #if (${col.isAvailableStringInScope()})
-        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_INS, fRESL(cTL<${col.JavaNative}>(valueList))); }
+        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_INS, fRESL(cTL<${col.JavaNative}>(ls))); }
 #end
 #if (${col.isAvailableStringNotInScope()})
-        public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(valueList))); }
+        public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(ls))); }
 #end
 #if (${col.isAvailableStringLikeSearch()})
         public void Set${tmpJavaName}_LikeSearch($col.javaNative v, ${glLikeSearchOption} option) {
