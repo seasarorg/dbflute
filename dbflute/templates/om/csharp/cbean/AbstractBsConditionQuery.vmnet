@@ -1,7 +1,7 @@
 #set ($myClassName = "${myAbstractBaseConditionQueryClassName}")
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
@@ -9,7 +9,6 @@ using ${glPackageBaseCommonCKey};
 using ${glPackageBaseCommonCOption};
 using ${glPackageBaseCommonCValue};
 using ${glPackageBaseCommonSqlClause};
-using ${glPackageCB};
 
 namespace ${glPackageBaseCQ} {
 
@@ -72,10 +71,10 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_PrefixSearch(${col.javaNative} v) { reg${tmpJavaName}(CK_PS, fRES(v)); }
 #end
 #if (${col.isAvailableStringInScope()})
-        public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_INS, fRESL(cTL<${col.JavaNative}>(valueList))); }
+        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_INS, fRESL(cTL<${col.JavaNative}>(valueList))); }
 #end
 #if (${col.isAvailableStringNotInScope()})
-        public void Set${tmpJavaName}_NotInScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(valueList))); }
+        public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(valueList))); }
 #end
 #if (${col.isAvailableStringLikeSearch()})
         public void Set${tmpJavaName}_LikeSearch($col.javaNative v, ${glLikeSearchOption} option) {
@@ -249,10 +248,10 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LessEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_LE, v); }
 #end
 #if (${col.isAvailableNumberInScope()})
-        public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_INS, cTL<${col.JavaNative}>(ls)); }
+        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_INS, cTL<${col.JavaNative}>(ls)); }
 #end
 #if (${col.isAvailableNumberNotInScope()})
-        public void Set${tmpJavaName}_NotInScope(System.Collections.Generic.IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_NINS, cTL<${col.JavaNative}>(ls)); }
+        public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_NINS, cTL<${col.JavaNative}>(ls)); }
 #end
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
