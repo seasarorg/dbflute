@@ -36,7 +36,7 @@ namespace ${glPackageBaseCQ} {
 #set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
 #if (${col.isJavaNativeStringObject()})
 
-        public void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, fRES(value)); }
+        public void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, fRES(v)); }
 #if ($database.isMakeConditionQueryEqualEmptyString())
         public void Set${tmpJavaName}_Equal_EmptyString() { reg${tmpJavaName}(CK_EQ, ""); }
 #end
@@ -53,7 +53,7 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 #if (${col.isAvailableStringNotEqual()})
-        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, fRES(value)); }
+        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, fRES(v)); }
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.ClassificationMapList)
 
@@ -68,19 +68,19 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 #if (${col.isAvailableStringGreaterThan()})
-        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} v) { reg${tmpJavaName}(CK_GT, fRES(value)); }
+        public void Set${tmpJavaName}_GreaterThan(${col.javaNative} v) { reg${tmpJavaName}(CK_GT, fRES(v)); }
 #end
 #if (${col.isAvailableStringLessThan()})
-        public void Set${tmpJavaName}_LessThan(${col.javaNative} v) { reg${tmpJavaName}(CK_LT, fRES(value)); }
+        public void Set${tmpJavaName}_LessThan(${col.javaNative} v) { reg${tmpJavaName}(CK_LT, fRES(v)); }
 #end
 #if (${col.isAvailableStringGreaterEqual()})
-        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_GE, fRES(value)); }
+        public void Set${tmpJavaName}_GreaterEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_GE, fRES(v)); }
 #end
 #if (${col.isAvailableStringLessEqual()})
-        public void Set${tmpJavaName}_LessEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_LE, fRES(value)); }
+        public void Set${tmpJavaName}_LessEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_LE, fRES(v)); }
 #end
 #if (${col.isAvailableStringPrefixSearch()})
-        public void Set${tmpJavaName}_PrefixSearch(${col.javaNative} v) { reg${tmpJavaName}(CK_PS, fRES(value)); }
+        public void Set${tmpJavaName}_PrefixSearch(${col.javaNative} v) { reg${tmpJavaName}(CK_PS, fRES(v)); }
 #end
 #if (${col.isAvailableStringInScope()})
         public void Set${tmpJavaName}_InScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_INS, fRESL(cTL<${col.JavaNative}>(valueList))); }
@@ -89,13 +89,13 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotInScope(System.Collections.Generic.IList<${col.JavaNative}> valueList) { reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(valueList))); }
 #end
 #if (${col.isAvailableStringLikeSearch()})
-        public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glLikeSearchOption} likeSearchOption) {
-            regLSQ(CK_LS, fRES(value), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
+        public void Set${tmpJavaName}_LikeSearch($col.javaNative value, ${glLikeSearchOption} option) {
+            regLSQ(CK_LS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", option);
         }
 #end
 #if (${col.isAvailableStringNotLikeSearch()})
-        public void Set${tmpJavaName}_NotLikeSearch($col.javaNative value, ${glLikeSearchOption} likeSearchOption) {
-            regLSQ(CK_NLS, fRES(value), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", likeSearchOption);
+        public void Set${tmpJavaName}_NotLikeSearch($col.javaNative value, ${glLikeSearchOption} option) {
+            regLSQ(CK_NLS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", option);
         }
 #end
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
@@ -417,12 +417,9 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LessEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_LE, v); }
 #end
 #if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
-        public void Set${tmpJavaName}_FromTo(DateTime? fromDate, DateTime? toDate, ${glFromToOption} fromToOption) {
-            registerFromToQuery(fromDate, toDate, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", fromToOption);
-        }
-        public void Set${tmpJavaName}_DateFromTo(DateTime? fromDate, DateTime? toDate) {
-            Set${tmpJavaName}_FromTo(fromDate, toDate, new ${glDateFromToOption}());
-        }
+        public void Set${tmpJavaName}_FromTo(DateTime? from, DateTime? to, ${glFromToOption} option)
+        { registerFromToQuery(from, to, getCValue${tmpJavaName}(), "${col.name}", "${col.javaName}", "${col.uncapitalisedJavaName}", option); }
+        public void Set${tmpJavaName}_DateFromTo(DateTime? from, DateTime? to) { Set${tmpJavaName}_FromTo(from, to, new ${glDateFromToOption}()); }
 #end
 #end
 #if (${col.isJavaNativeBooleanObject()})
