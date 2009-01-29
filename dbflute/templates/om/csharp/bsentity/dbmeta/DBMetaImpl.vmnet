@@ -19,10 +19,6 @@ using ${glPackageCB};
 #end
 namespace ${myDBMetaPackageName} {
 
-    /// <summary>
-    /// The DB meta of ${table.name}.
-    /// Author: ${database.ClassAuthor}
-    /// </summary>
     public class ${myClassName} : ${glAbstractDBMeta} {
 
         public static readonly Type ENTITY_TYPE = typeof(${myExtendedObjectClassName});

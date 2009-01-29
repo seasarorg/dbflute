@@ -211,9 +211,6 @@ namespace ${myExtendedEntityPackageName} {
 #set ($foreignTable = $foreignKey.foreignTable)
 #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKey.foreignTable.JavaName}")
 #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
-        // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        //   Foreign Property = [${foreignKey.foreignPropertyNameInitCap}]
-        // * * * * * * * * */
         protected ${foreignEntityClassName} ${foreignVariableName};
 
         /// <summary>${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignPropertyNameInitCap}'.</summary>
@@ -230,9 +227,6 @@ namespace ${myExtendedEntityPackageName} {
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameAsOne}")
-        // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        //   Foreign Property = [${referrer.refererJavaBeansRulePropertyNameInitCapAsOne}]
-        // * * * * * * * * */
         protected ${referrerEntityClassName} ${referrerVariableName};
 
         /// <summary>${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerPropertyNameInitCapAsOne}'.</summary>
@@ -256,9 +250,6 @@ namespace ${myExtendedEntityPackageName} {
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.ReferrerPropertyNameInitCap}")
-        // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        //   Referrer Property = [${referrer.referrerPropertyNameInitCap}]
-        // * * * * * * * * */
         protected IList<${referrerEntityClassName}> $referrerVariableName;
 
         /// <summary>${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerPropertyNameInitCap}'.</summary>
