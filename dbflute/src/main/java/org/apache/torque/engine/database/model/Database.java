@@ -89,7 +89,6 @@ import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefini
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.torque.DfAdditionalPrimaryKeyInitializer;
-import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.seasar.dbflute.velocity.DfGenerator;
 import org.xml.sax.Attributes;
 
@@ -392,14 +391,7 @@ public class Database {
     public String getPmbMetaDataPropertyType(String className, String propertyName) {
         assertArgumentPmbMetaDataClassName(className);
         assertArgumentPmbMetaDataPropertyName(propertyName);
-        final String columnInfoName = "org.seasar.dbflute.dbmeta.info.ColumnInfo";
-        String propertyType = getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
-        if (propertyType.contains("Map<" + columnInfoName + ", ")) {
-            if (!DfBuildProperties.getInstance().isVersionJavaOverNinety()) { // for compatible!
-                DfStringUtil.replace(propertyType, "Map<" + columnInfoName + ", ", "Map<String, ");
-            }
-        }
-        return propertyType;
+        return getPmbMetaDataPropertyNameTypeMap(className).get(propertyName);
     }
 
     public String getPmbMetaDataPropertyColumnName(String className, String propertyName) {
