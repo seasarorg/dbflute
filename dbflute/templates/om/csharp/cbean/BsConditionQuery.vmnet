@@ -14,20 +14,11 @@ namespace ${glPackageBaseCQ} {
     [System.Serializable]
     public class ${myClassName} : ${myAbstractBaseConditionQueryClassName} {
 
-        // ===============================================================================
-        //                                                                       Attribute
-        //                                                                       =========
         protected ${myConditionInlineQueryClassName} _inlineQuery;
 
-        // ===============================================================================
-        //                                                                     Constructor
-        //                                                                     ===========
         public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel)
             : base(childQuery, sqlClause, aliasName, nestLevel) {}
 
-        // ===============================================================================
-        //                                                                          Inline
-        //                                                                          ======
         public ${myConditionInlineQueryClassName} Inline() {
             if (_inlineQuery == null) {
                 _inlineQuery = new ${myConditionInlineQueryClassName}(getChildQuery(), getSqlClause(), getAliasName(), getNestLevel(), this);
@@ -43,9 +34,6 @@ namespace ${glPackageBaseCQ} {
             return inlineQuery;
         }
 
-        // ===============================================================================
-        //                                                                           Query
-        //                                                                           =====
   #foreach ($col in $table.columns)
     #set ($tmpJavaName = "${col.JavaName}")
     #set ($tmpUncapitalisedJavaName = "${col.UncapitalisedJavaName}")
@@ -325,15 +313,9 @@ namespace ${glPackageBaseCQ} {
         public ${myClassName} AddOrderBy_${tmpJavaName}_Desc() { regOBD("${col.name}");return this; }
 #end
 
-        // ===============================================================================
-        //                                                       Specified Derived OrderBy
-        //                                                       =========================
         public ${myClassName} AddSpecifiedDerivedOrderBy_Asc(String aliasName) { registerSpecifiedDerivedOrderBy_Asc(aliasName); return this; }
         public ${myClassName} AddSpecifiedDerivedOrderBy_Desc(String aliasName) { registerSpecifiedDerivedOrderBy_Desc(aliasName); return this; }
 
-        // ===============================================================================
-        //                                                                     Union Query
-        //                                                                     ===========
         public override void reflectRelationOnUnionQuery(${glConditionQuery} baseQueryAsSuper, ${glConditionQuery} unionQueryAsSuper) {
 #if ($table.hasForeignKeyOrRefererAsOne())
             ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
@@ -359,9 +341,6 @@ namespace ${glPackageBaseCQ} {
 
         }
     
-        // ===============================================================================
-        //                                                                   Foreign Query
-        //                                                                   =============
 #foreach ($fk in $table.foreignKeys)
 #set ($foreignCQClassName = "${glProjectPrefix}${fk.foreignTable.JavaName}${glConditionQueryInitialName}")
 #set ($dynamicFixedConditionArgs = "")
