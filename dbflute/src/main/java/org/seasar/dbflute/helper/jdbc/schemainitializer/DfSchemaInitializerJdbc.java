@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -195,6 +196,21 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                          Drop Table
     //                                                                          ==========
     protected void dropTable(Connection connection, List<DfTableMetaInfo> tableMetaInfoList) {
+        List<DfTableMetaInfo> viewList = new ArrayList<DfTableMetaInfo>();
+        List<DfTableMetaInfo> otherList = new ArrayList<DfTableMetaInfo>();
+        for (DfTableMetaInfo tableMetaInfo : tableMetaInfoList) {
+            if (tableMetaInfo.isTableTypeView()) {
+                viewList.add(tableMetaInfo);
+            } else {
+                otherList.add(tableMetaInfo);
+            }
+        }
+
+        // Drop view and drop others
+        final List<DfTableMetaInfo> sortedList = new ArrayList<DfTableMetaInfo>();
+        sortedList.addAll(viewList);
+        sortedList.addAll(otherList);
+
         final DfDropTableByJdbcCallback callback = new DfDropTableByJdbcCallback() {
             public String buildDropTableSql(DfTableMetaInfo metaInfo) {
                 final StringBuilder sb = new StringBuilder();
@@ -208,7 +224,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 return sb.toString();
             }
         };
-        callbackDropTableByJdbc(connection, tableMetaInfoList, callback);
+        callbackDropTableByJdbc(connection, sortedList, callback);
     }
 
     protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
