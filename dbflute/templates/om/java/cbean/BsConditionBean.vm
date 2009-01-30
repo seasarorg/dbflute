@@ -202,11 +202,11 @@ public class ${myClassName} extends AbstractConditionBean {
     public void lockWithUR() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithUR(); } }
 
     protected boolean helpIsSqlClauseDb2() {
-        return getSqlClause() instanceof ${glPackageBaseCommonSqlClause}.${glSqlClause}Db2;
+        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2;
     }
 
-    protected ${glPackageBaseCommonSqlClause}.${glSqlClause}Db2 helpGettingSqlClauseDb2() {
-        return (${glPackageBaseCommonSqlClause}.${glSqlClause}Db2)getSqlClause();
+    protected org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2 helpGettingSqlClauseDb2() {
+        return (org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2)getSqlClause();
     }
 #end
 #end
