@@ -167,6 +167,11 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             String standardPath = _outsideSqlPath.Replace("/", "."); // Replacing is required for csharp!
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
 
+            text = ReadTextFromFileSystem(standardPath, sqlFileEncoding); // at first!
+            if (text != null) {
+                return text;
+            }
+
             Assembly asm = GetType().Assembly; // In same assembly!
             String text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, asm);
             if (text != null) {
@@ -191,12 +196,6 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                     }
                 }
             }
-
-            text = ReadTextFromFileSystem(standardPath, sqlFileEncoding);
-            if (text != null) {
-                return text;
-            }
-            
             ThrowOutsideSqlNotFoundException(standardPath);
             return null;// Unreachable!
         }
