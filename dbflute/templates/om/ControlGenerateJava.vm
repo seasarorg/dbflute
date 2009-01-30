@@ -77,7 +77,6 @@ targetdatabase = $targetDatabase
     #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
     #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
     #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
-    #set ($glBehaviorCreator = "${glProjectPrefix}BehaviorCreator")
 
     ## ===================================================================================
     ##                                                                            Variable
@@ -180,6 +179,7 @@ targetdatabase = $targetDatabase
     $database.info("parseContainerConfig() {")
     #if ($database.isTargetContainerSeasar())
       #if ($database.isAvailableHotDeploy())
+        #set ($glBehaviorCreator = "${glProjectPrefix}BehaviorCreator")
         #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
         #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2Container}))
         $database.makeDirectory($path)
