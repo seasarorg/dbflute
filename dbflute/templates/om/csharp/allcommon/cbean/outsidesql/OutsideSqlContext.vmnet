@@ -322,14 +322,6 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         protected virtual String ReadTextFromFileSystem(String path, String sqlFileEncoding) {
             path = BuildFileSystemPath(path);
             if (!File.Exists(path)) {
-                if (_log.IsDebugEnabled) {
-                    String msg = "Look! Read the DEBUG message below." + GetLineSeparator();
-                    msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
-                    msg = msg + "The outsideSql was Not Found in File System!" + GetLineSeparator();
-                    msg = msg + "  path = " + path + GetLineSeparator();
-                    msg = msg + "* * * * * * * * * */";
-                    _log.Debug(msg);
-                }
                 return null;
             }
             using (Stream stream = new FileStream(path, FileMode.Open)) {
