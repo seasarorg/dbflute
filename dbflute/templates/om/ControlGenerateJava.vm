@@ -77,6 +77,7 @@ targetdatabase = $targetDatabase
     #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
     #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
     #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
+    #set ($glBehaviorCreator = "${glProjectPrefix}BehaviorCreator")
 
     ## ===================================================================================
     ##                                                                            Variable
