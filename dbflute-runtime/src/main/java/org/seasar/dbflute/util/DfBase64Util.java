@@ -21,12 +21,10 @@ package org.seasar.dbflute.util;
  */
 public class DfBase64Util {
 
-    private static final char[] ENCODE_TABLE = { 'A', 'B', 'C', 'D', 'E', 'F',
-            'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-            'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
-            'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-            't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5',
-            '6', '7', '8', '9', '+', '/' };
+    private static final char[] ENCODE_TABLE = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+            'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+            'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
+            '4', '5', '6', '7', '8', '9', '+', '/' };
 
     private static final char PAD = '=';
 
@@ -40,12 +38,6 @@ public class DfBase64Util {
         }
     }
 
-    /**
-     * Base64でエンコードします。
-     * 
-     * @param inData
-     * @return エンコードされたデータ
-     */
     public static String encode(final byte[] inData) {
         if (inData == null || inData.length == 0) {
             return "";
@@ -72,12 +64,6 @@ public class DfBase64Util {
         return new String(outData);
     }
 
-    /**
-     * Base64でエンコードされたデータをデコードします。
-     * 
-     * @param inData
-     * @return デコードされたデータ
-     */
     public static byte[] decode(final String inData) {
         int num = (inData.length() / 4) - 1;
         int lastBytes = getLastBytes(inData);
@@ -98,21 +84,15 @@ public class DfBase64Util {
         return outData;
     }
 
-    private static void encode(final byte[] inData, final int inIndex,
-            final char[] outData, final int outIndex) {
-
-        int i = ((inData[inIndex] & 0xff) << 16)
-                + ((inData[inIndex + 1] & 0xff) << 8)
-                + (inData[inIndex + 2] & 0xff);
+    private static void encode(final byte[] inData, final int inIndex, final char[] outData, final int outIndex) {
+        int i = ((inData[inIndex] & 0xff) << 16) + ((inData[inIndex + 1] & 0xff) << 8) + (inData[inIndex + 2] & 0xff);
         outData[outIndex] = ENCODE_TABLE[i >> 18];
         outData[outIndex + 1] = ENCODE_TABLE[(i >> 12) & 0x3f];
         outData[outIndex + 2] = ENCODE_TABLE[(i >> 6) & 0x3f];
         outData[outIndex + 3] = ENCODE_TABLE[i & 0x3f];
     }
 
-    private static void encode2pad(final byte[] inData, final int inIndex,
-            final char[] outData, final int outIndex) {
-
+    private static void encode2pad(final byte[] inData, final int inIndex, final char[] outData, final int outIndex) {
         int i = inData[inIndex] & 0xff;
         outData[outIndex] = ENCODE_TABLE[i >> 2];
         outData[outIndex + 1] = ENCODE_TABLE[(i << 4) & 0x3f];
@@ -120,9 +100,7 @@ public class DfBase64Util {
         outData[outIndex + 3] = PAD;
     }
 
-    private static void encode1pad(final byte[] inData, final int inIndex,
-            final char[] outData, final int outIndex) {
-
+    private static void encode1pad(final byte[] inData, final int inIndex, final char[] outData, final int outIndex) {
         int i = ((inData[inIndex] & 0xff) << 8) + (inData[inIndex + 1] & 0xff);
         outData[outIndex] = ENCODE_TABLE[i >> 10];
         outData[outIndex + 1] = ENCODE_TABLE[(i >> 4) & 0x3f];
@@ -130,9 +108,7 @@ public class DfBase64Util {
         outData[outIndex + 3] = PAD;
     }
 
-    private static void decode(final String inData, final int inIndex,
-            final byte[] outData, final int outIndex) {
-
+    private static void decode(final String inData, final int inIndex, final byte[] outData, final int outIndex) {
         byte b0 = DECODE_TABLE[inData.charAt(inIndex)];
         byte b1 = DECODE_TABLE[inData.charAt(inIndex + 1)];
         byte b2 = DECODE_TABLE[inData.charAt(inIndex + 2)];
@@ -142,17 +118,13 @@ public class DfBase64Util {
         outData[outIndex + 2] = (byte) (b2 << 6 & 0xc0 | b3 & 0x3f);
     }
 
-    private static void decode1byte(final String inData, final int inIndex,
-            final byte[] outData, final int outIndex) {
-
+    private static void decode1byte(final String inData, final int inIndex, final byte[] outData, final int outIndex) {
         byte b0 = DECODE_TABLE[inData.charAt(inIndex)];
         byte b1 = DECODE_TABLE[inData.charAt(inIndex + 1)];
         outData[outIndex] = (byte) (b0 << 2 & 0xfc | b1 >> 4 & 0x3);
     }
 
-    private static void decode2byte(final String inData, final int inIndex,
-            final byte[] outData, final int outIndex) {
-
+    private static void decode2byte(final String inData, final int inIndex, final byte[] outData, final int outIndex) {
         byte b0 = DECODE_TABLE[inData.charAt(inIndex)];
         byte b1 = DECODE_TABLE[inData.charAt(inIndex + 1)];
         byte b2 = DECODE_TABLE[inData.charAt(inIndex + 2)];
