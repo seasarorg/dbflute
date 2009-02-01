@@ -358,7 +358,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         }
 
         protected virtual String BuildFileSystemPath(String standardPath) {
-            String path = null;
+            String path = standardPath;
             String omitPathPackage = ${glDBFluteConfig}.GetInstance().OmitFileSystemPathPackage;
             if (omitPathPackage != null && omitPathPackage.Trim().Length > 0 && path.StartsWith(omitPathPackage)) {
                 path = path.Substring(omitPathPackage.Length + ".".Length); // Remove omit package.

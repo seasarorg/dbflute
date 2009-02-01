@@ -259,7 +259,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                           File System Path Resolver
     //                                                           =========================
-	public FileSystemPath FileSystemPathResolver; { // CSharp only
+	public FileSystemPath FileSystemPathResolver { // CSharp only
 	    get {
 	        return _fileSystemPathResolver;
 		}
