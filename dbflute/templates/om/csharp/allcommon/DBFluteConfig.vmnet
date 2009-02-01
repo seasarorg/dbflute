@@ -2,7 +2,7 @@
 using System;
 using System.Reflection;
 
-using ${glPackageBaseCommonOutsideSql};
+using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonJdbc};
 
 namespace ${glPackageBaseCommon} {
@@ -272,8 +272,6 @@ public class ${myClassName} {
 		}
 	}
 
-	public delegate Assembly AdditionalAssembly();
-	
     // ===================================================================================
     //                                                                      Internal Debug
     //                                                                      ==============
