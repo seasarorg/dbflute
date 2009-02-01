@@ -166,24 +166,40 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         public String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
             String standardPath = _outsideSqlPath.Replace("/", "."); // Replacing is required for csharp!
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
+            Assembly asm = GetType().Assembly; // In same assembly!
+            ${glDBFluteConfig}.AdditionalAssembly additionalAssemblyProvider = ${glDBFluteConfig}.GetInstance().AdditionalAssemblyProvider;
 
-            String text = ReadTextFromFileSystem(standardPath, sqlFileEncoding); // at first!
+            // From file system at first!
+            String text = ReadTextFromFileSystem(standardPath, sqlFileEncoding, asm);
+            if (text != null) {
+                return text;
+            }
+            if (additionalAssemblyProvider != null) {
+                Assembly additionalAssembly = additionalAssemblyProvider.Invoke();
+                if (additionalAssembly != null && additionalAssembly != asm) {
+                    text = ReadTextFromFileSystem(standardPath, sqlFileEncoding, additionalAssembly);
+                }
+            }
             if (text != null) {
                 return text;
             }
 
-            Assembly asm = GetType().Assembly; // In same assembly!
             text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, asm);
             if (text != null) {
+                if (_log.IsDebugEnable) {
+                    _log.Debug("...Searching from embedded: Found: " + asm.FullName);
+                }
                 return text;
             }
 
-            ${glDBFluteConfig}.AdditionalAssembly additionalAssemblyProvider = ${glDBFluteConfig}.GetInstance().AdditionalAssemblyProvider;
             if (additionalAssemblyProvider != null) {
                 Assembly additionalAssembly = additionalAssemblyProvider.Invoke();
                 if (additionalAssembly != null && additionalAssembly != asm) {
                     text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, additionalAssembly);
                     if (text != null) {
+                        if (_log.IsDebugEnable) {
+                            _log.Debug("...Searching from embedded: Found: " + additionalAssembly.FullName);
+                        }
                         return text;
                     }
 
@@ -192,6 +208,9 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                     String resolvedDbmsPath = ResolvePathForResultTypeAssembly(dbmsPath, asm, additionalAssembly);
                     text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, resolvedStandardPath, resolvedDbmsPath, additionalAssembly);
                     if (text != null) {
+                        if (_log.IsDebugEnable) {
+                            _log.Debug("...Searching from embedded: Found: " + resolvedStandardPath);
+                        }
                         return text;
                     }
                 }
@@ -319,9 +338,12 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                     File System
         //                                                                     ===========
-        protected virtual String ReadTextFromFileSystem(String path, String sqlFileEncoding) {
-            path = BuildFileSystemPath(path);
+        protected virtual String ReadTextFromFileSystem(String path, String sqlFileEncoding, Assembly asm) {
+            path = BuildFileSystemPath(path, asm);
             if (!File.Exists(path)) {
+                if (_log.IsDebugEnable) {
+                    _log.Debug("...Searching from file system: Not Found: " + path);
+                }
                 return null;
             }
             using (Stream stream = new FileStream(path, FileMode.Open)) {
@@ -331,7 +353,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             }
         }
 
-        protected String BuildFileSystemPath(String path) {
+        protected String BuildFileSystemPath(String path, Assembly asm) {
             String omitPathPackage = ${glDBFluteConfig}.GetInstance().OmitFileSystemPathPackage;
             if (omitPathPackage != null && omitPathPackage.Trim().Length > 0 && path.StartsWith(omitPathPackage)) {
                 path = path.Substring(omitPathPackage.Length + ".".Length); // Remove omit package.
@@ -357,7 +379,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             // For assembly resolving.
             // Contributed by someone, Thanks!
             // = = = = = = = = = =/
-            String exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            String exePath = Path.GetDirectoryName(asm.Location);
             path = Path.Combine(exePath, path);
 
             return path;
