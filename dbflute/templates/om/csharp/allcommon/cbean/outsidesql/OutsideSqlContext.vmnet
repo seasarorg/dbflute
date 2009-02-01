@@ -117,7 +117,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                        Read SQL
         //                                                                        ========
-        public String ReadFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
+        public String ReadFilteredOutsideSql(String sqlFileEncoding, String dbmsSuffix) { // Entry Point!
             String sql = ReadOutsideSql(sqlFileEncoding, dbmsSuffix);
             sql = ReplaceOutsideSqlBindCharacterOnLineComment(sql);
             return ReplaceOldStypePagingDeterminationForCompatible(sql);
@@ -126,7 +126,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         protected String ReplaceOldStypePagingDeterminationForCompatible(String sql) {
             return sql.Replace("/*IF pmb.Paging*/", "/*IF pmb.IsPaging*/");
         }
-    
+
         protected String ReplaceOutsideSqlBindCharacterOnLineComment(String sql) {
             String bindCharacter = "?";
             if (sql.IndexOf(bindCharacter) < 0) {
@@ -163,33 +163,32 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             return sb.ToString();
         }
     
-        public String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix) {
-            String standardPath = _outsideSqlPath.Replace("/", "."); // Replacing is required for csharp!
+        public String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix) { // Non Filtered
+            String standardPath = _outsideSqlPath.Replace("/", "."); // Replacing is required for CSharp!
             String dbmsPath = BuildDbmsPath(standardPath, dbmsSuffix);
             Assembly asm = GetType().Assembly; // In same assembly!
-            ${glDBFluteConfig}.AdditionalAssembly additionalAssemblyProvider = ${glDBFluteConfig}.GetInstance().AdditionalAssemblyProvider;
+            AdditionalAssembly additionalAssemblyProvider = ${glDBFluteConfig}.GetInstance().AdditionalAssemblyProvider;
 
+            // = = = = = = = = = = = = = =
             // From file system at first!
-            String text = ReadTextFromFileSystem(standardPath, sqlFileEncoding, asm);
+            // = = = = = = = = = =/
+            String fileSystemPath = BuildFileSystemPath(standardPath);
+            String text = ReadTextFromFileSystem(fileSystemPath, sqlFileEncoding);
             if (text != null) {
                 if (_log.IsDebugEnabled) {
-                    _log.Debug("...Searching from file system: (Found) " + asm.FullName);
+                    _log.Debug("...Searching from file system: (Found) " + fileSystemPath);
                 }
                 return text;
-            }
-            if (additionalAssemblyProvider != null) {
-                Assembly additionalAssembly = additionalAssemblyProvider.Invoke();
-                if (additionalAssembly != null && additionalAssembly != asm) {
-                    text = ReadTextFromFileSystem(standardPath, sqlFileEncoding, additionalAssembly);
-                }
-                if (text != null) {
-                    if (_log.IsDebugEnabled) {
-                        _log.Debug("...Searching from file system: (Found) " + additionalAssembly.FullName);
-                    }
-                    return text;
+            } else {
+                if (_log.IsDebugEnabled) {
+                    _log.Debug("...Searching from file system: (Not Found) " + fileSystemPath);
                 }
             }
 
+            // = = = = = = = = = = = = = =
+            // From embedded resource next!
+            // = = = = = = = = = =/
+            // by standard assembly
             text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, asm);
             if (text != null) {
                 if (_log.IsDebugEnabled) {
@@ -198,6 +197,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 return text;
             }
 
+            // by additional assembly
             if (additionalAssemblyProvider != null) {
                 Assembly additionalAssembly = additionalAssemblyProvider.Invoke();
                 if (additionalAssembly != null && additionalAssembly != asm) {
@@ -221,8 +221,10 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                     }
                 }
             }
+
+            // After all the outside SQL was not found!
             ThrowOutsideSqlNotFoundException(standardPath);
-            return null;// Unreachable!
+            return null; // Unreachable!
         }
         
         protected String ReadOutsideSql(String sqlFileEncoding, String dbmsSuffix
@@ -331,7 +333,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 return pckge;
             }
         }
-	
+
         protected bool IsBehaviorQueryPathEnabled {
             get {
                 if (IsProcedure) {// [DBFlute-0.8.0]
@@ -344,22 +346,19 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                     File System
         //                                                                     ===========
-        protected virtual String ReadTextFromFileSystem(String path, String sqlFileEncoding, Assembly asm) {
-            path = BuildFileSystemPath(path, asm);
-            if (!File.Exists(path)) {
-                if (_log.IsDebugEnabled) {
-                    _log.Debug("...Searching from file system: (Not Found) " + path);
-                }
+        protected virtual String ReadTextFromFileSystem(String fileSystemPath, String sqlFileEncoding) {
+            if (!File.Exists(fileSystemPath)) {
                 return null;
             }
-            using (Stream stream = new FileStream(path, FileMode.Open)) {
+            using (Stream stream = new FileStream(fileSystemPath, FileMode.Open)) {
                 using (TextReader reader = new StreamReader(stream, Encoding.GetEncoding(sqlFileEncoding))) {
                     return reader.ReadToEnd();
                 }
             }
         }
 
-        protected String BuildFileSystemPath(String path, Assembly asm) {
+        protected virtual String BuildFileSystemPath(String standardPath) {
+            String path = null;
             String omitPathPackage = ${glDBFluteConfig}.GetInstance().OmitFileSystemPathPackage;
             if (omitPathPackage != null && omitPathPackage.Trim().Length > 0 && path.StartsWith(omitPathPackage)) {
                 path = path.Substring(omitPathPackage.Length + ".".Length); // Remove omit package.
@@ -380,14 +379,10 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             if (path.EndsWith(fileSeparator + "sql")) {
                 path = path.Replace(fileSeparator + "sql", ".sql");
             }
-            
-            // = = = = = = = = = = = = = = = =
-            // For assembly resolving.
-            // Contributed by someone, Thanks!
-            // = = = = = = = = = =/
-            String exePath = Path.GetDirectoryName(asm.Location);
-            path = Path.Combine(exePath, path);
-
+            FileSystemPath resolver = ${glDBFluteConfig}.GetInstance().FileSystemPathResolver;
+            if (resolver != null) {
+                return resolver.Invoke(path, standardPath, this);
+            }
             return path;
         }
 
@@ -477,4 +472,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             set { this._autoPagingLogging = value; }
         }
     }
+
+    public delegate Assembly AdditionalAssembly();
+    public delegate String FileSystemPath(String relativePath, String standardPath, ${glOutsideSqlContext} context);
 }
