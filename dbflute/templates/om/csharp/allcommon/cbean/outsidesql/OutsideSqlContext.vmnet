@@ -172,6 +172,9 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             // From file system at first!
             String text = ReadTextFromFileSystem(standardPath, sqlFileEncoding, asm);
             if (text != null) {
+                if (_log.IsDebugEnabled) {
+                    _log.Debug("...Searching from file system: (Found) " + asm.FullName);
+                }
                 return text;
             }
             if (additionalAssemblyProvider != null) {
@@ -179,15 +182,18 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 if (additionalAssembly != null && additionalAssembly != asm) {
                     text = ReadTextFromFileSystem(standardPath, sqlFileEncoding, additionalAssembly);
                 }
-            }
-            if (text != null) {
-                return text;
+                if (text != null) {
+                    if (_log.IsDebugEnabled) {
+                        _log.Debug("...Searching from file system: (Found) " + additionalAssembly.FullName);
+                    }
+                    return text;
+                }
             }
 
             text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, asm);
             if (text != null) {
-                if (_log.IsDebugEnable) {
-                    _log.Debug("...Searching from embedded: Found: " + asm.FullName);
+                if (_log.IsDebugEnabled) {
+                    _log.Debug("...Searching from embedded: (Found) " + asm.FullName);
                 }
                 return text;
             }
@@ -197,8 +203,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                 if (additionalAssembly != null && additionalAssembly != asm) {
                     text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, standardPath, dbmsPath, additionalAssembly);
                     if (text != null) {
-                        if (_log.IsDebugEnable) {
-                            _log.Debug("...Searching from embedded: Found: " + additionalAssembly.FullName);
+                        if (_log.IsDebugEnabled) {
+                            _log.Debug("...Searching from embedded: (Found) " + additionalAssembly.FullName);
                         }
                         return text;
                     }
@@ -208,8 +214,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
                     String resolvedDbmsPath = ResolvePathForResultTypeAssembly(dbmsPath, asm, additionalAssembly);
                     text = ReadOutsideSql(sqlFileEncoding, dbmsSuffix, resolvedStandardPath, resolvedDbmsPath, additionalAssembly);
                     if (text != null) {
-                        if (_log.IsDebugEnable) {
-                            _log.Debug("...Searching from embedded: Found: " + resolvedStandardPath);
+                        if (_log.IsDebugEnabled) {
+                            _log.Debug("...Searching from embedded: (Found) " + resolvedStandardPath);
                         }
                         return text;
                     }
@@ -341,8 +347,8 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         protected virtual String ReadTextFromFileSystem(String path, String sqlFileEncoding, Assembly asm) {
             path = BuildFileSystemPath(path, asm);
             if (!File.Exists(path)) {
-                if (_log.IsDebugEnable) {
-                    _log.Debug("...Searching from file system: Not Found: " + path);
+                if (_log.IsDebugEnabled) {
+                    _log.Debug("...Searching from file system: (Not Found) " + path);
                 }
                 return null;
             }
