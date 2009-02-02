@@ -17,6 +17,7 @@ package org.seasar.dbflute.cbean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -30,17 +31,17 @@ public class ConditionBeanContext {
     private static final Log _log = LogFactory.getLog(ConditionBeanContext.class);
 
     // ===================================================================================
-    //                                                                        Thread Local
-    //                                                                        ============
-    /** The thread-local for this. */
-    private static final ThreadLocal<ConditionBean> _threadLocal = new ThreadLocal<ConditionBean>();
+    //                                                             ConditionBean on Thread
+    //                                                             =======================
+    /** The thread-local for condition-bean. */
+    private static final ThreadLocal<ConditionBean> _conditionBeanLocal = new ThreadLocal<ConditionBean>();
 
     /**
      * Get condition-bean on thread.
-     * @return Condition-bean context. (Nullable)
+     * @return Condition-bean. (Nullable)
      */
     public static ConditionBean getConditionBeanOnThread() {
-        return (ConditionBean)_threadLocal.get();
+        return (ConditionBean) _conditionBeanLocal.get();
     }
 
     /**
@@ -52,7 +53,7 @@ public class ConditionBeanContext {
             String msg = "The argument[cb] must not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _threadLocal.set(cb);
+        _conditionBeanLocal.set(cb);
     }
 
     /**
@@ -60,14 +61,55 @@ public class ConditionBeanContext {
      * @return Determination.
      */
     public static boolean isExistConditionBeanOnThread() {
-        return (_threadLocal.get() != null);
+        return (_conditionBeanLocal.get() != null);
     }
 
     /**
      * Clear condition-bean on thread.
      */
     public static void clearConditionBeanOnThread() {
-        _threadLocal.set(null);
+        _conditionBeanLocal.set(null);
+    }
+
+    // ===================================================================================
+    //                                                          EntityRowHandler on Thread
+    //                                                          ==========================
+    /** The thread-local for entity row handler. */
+    private static final ThreadLocal<EntityRowHandler<? extends Entity>> _entityRowHandlerLocal = new ThreadLocal<EntityRowHandler<? extends Entity>>();
+
+    /**
+     * Get the handler of entity row. on thread.
+     * @return The handler of entity row. (Nullable)
+     */
+    public static EntityRowHandler<? extends Entity> getEntityRowHandlerOnThread() {
+        return (EntityRowHandler<? extends Entity>) _entityRowHandlerLocal.get();
+    }
+
+    /**
+     * Set the handler of entity row on thread.
+     * @param handler The handler of entity row. (NotNull)
+     */
+    public static void setEntityRowHandlerOnThread(EntityRowHandler<? extends Entity> handler) {
+        if (handler == null) {
+            String msg = "The argument[handler] must not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        _entityRowHandlerLocal.set(handler);
+    }
+
+    /**
+     * Is existing the handler of entity row on thread?
+     * @return Determination.
+     */
+    public static boolean isExistEntityRowHandlerOnThread() {
+        return (_entityRowHandlerLocal.get() != null);
+    }
+
+    /**
+     * Clear the handler of entity row on thread.
+     */
+    public static void clearEntityRowHandlerOnThread() {
+        _entityRowHandlerLocal.set(null);
     }
 
     // ===================================================================================
@@ -94,18 +136,22 @@ public class ConditionBeanContext {
     // ===================================================================================
     //                                                                        Cool Classes
     //                                                                        ============
-	@SuppressWarnings("unused")
+    @SuppressWarnings("unused")
     public static void loadCoolClasses() {
         boolean debugEnabled = false; // If you watch the log, set this true.
         // Against the ClassLoader Headache!
         final StringBuilder sb = new StringBuilder();
         {
             final Class<?> clazz = org.seasar.dbflute.cbean.SimplePagingBean.class;
-            if (debugEnabled) { sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass()).append(getLineSeparator()); }
+            if (debugEnabled) {
+                sb.append("  ...Loading class of " + clazz.getName() + " by " + clazz.getClassLoader().getClass())
+                        .append(getLineSeparator());
+            }
         }
-		{
+        {
             Class<?> clazz = org.seasar.dbflute.AccessContext.class;
             clazz = org.seasar.dbflute.CallbackContext.class;
+            clazz = org.seasar.dbflute.cbean.EntityRowHandler.class;
             clazz = org.seasar.dbflute.cbean.coption.FromToOption.class;
             clazz = org.seasar.dbflute.cbean.coption.LikeSearchOption.class;
             clazz = org.seasar.dbflute.cbean.coption.InScopeOption.class;
@@ -116,9 +162,11 @@ public class ConditionBeanContext {
             clazz = org.seasar.dbflute.cbean.pagenavi.PageNumberLink.class;
             clazz = org.seasar.dbflute.cbean.pagenavi.PageNumberLinkSetupper.class;
             clazz = org.seasar.dbflute.jdbc.CursorHandler.class;
-            if (debugEnabled) { sb.append("  ...Loading class of ...and so on"); }
+            if (debugEnabled) {
+                sb.append("  ...Loading class of ...and so on");
+            }
         }
-        if (debugEnabled) { 
+        if (debugEnabled) {
             _log.debug("{Initialize against the ClassLoader Headache}" + getLineSeparator() + sb);
         }
     }
@@ -137,10 +185,10 @@ public class ConditionBeanContext {
         msg = msg + "Has the target record been deleted by other thread?" + getLineSeparator();
         msg = msg + "It is precondition that the record exists on your database." + getLineSeparator();
         msg = msg + getLineSeparator();
-		if (searchKey4Log != null && searchKey4Log instanceof ConditionBean) {
-		    final ConditionBean cb = (ConditionBean)searchKey4Log;
-			msg = msg + "[Display SQL]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
-		} else {
+        if (searchKey4Log != null && searchKey4Log instanceof ConditionBean) {
+            final ConditionBean cb = (ConditionBean) searchKey4Log;
+            msg = msg + "[Display SQL]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
+        } else {
             msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
         }
         msg = msg + "* * * * * * * * * */";
@@ -150,16 +198,17 @@ public class ConditionBeanContext {
     public static void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The entity was Too Many! it has been duplicated. It should be the only one! But the resultCount=" + resultCountString + getLineSeparator();
+        msg = msg + "The entity was Too Many! it has been duplicated. It should be the only one! But the resultCount="
+                + resultCountString + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + "Please confirm your search condition. Does it really select the only one?" + getLineSeparator();
         msg = msg + "Please confirm your database. Does it really exist the only one?" + getLineSeparator();
         msg = msg + getLineSeparator();
-		if (searchKey4Log != null && searchKey4Log instanceof ConditionBean) {
-		    final ConditionBean cb = (ConditionBean)searchKey4Log;
-			msg = msg + "[Display SQL]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
-		} else {
+        if (searchKey4Log != null && searchKey4Log instanceof ConditionBean) {
+            final ConditionBean cb = (ConditionBean) searchKey4Log;
+            msg = msg + "[Display SQL]" + getLineSeparator() + cb.toDisplaySql() + getLineSeparator();
+        } else {
             msg = msg + "[Search Condition]" + getLineSeparator() + searchKey4Log + getLineSeparator();
         }
         msg = msg + "* * * * * * * * * */";
@@ -173,12 +222,11 @@ public class ConditionBeanContext {
     // ===================================================================================
     //                                                                         Display SQL
     //                                                                         ===========
-	public static String convertConditionBean2DisplaySql(ConditionBean cb
-	                                                   , String logDateFormat
-	                                                   , String logTimestampFormat) {
-		final String twoWaySql = cb.getSqlClause().getClause();
-	    return SqlAnalyzer.convertTwoWaySql2DisplaySql(twoWaySql, cb, logDateFormat, logTimestampFormat);
-	}
+    public static String convertConditionBean2DisplaySql(ConditionBean cb, String logDateFormat,
+            String logTimestampFormat) {
+        final String twoWaySql = cb.getSqlClause().getClause();
+        return SqlAnalyzer.convertTwoWaySql2DisplaySql(twoWaySql, cb, logDateFormat, logTimestampFormat);
+    }
 
     // ===================================================================================
     //                                                                              Helper

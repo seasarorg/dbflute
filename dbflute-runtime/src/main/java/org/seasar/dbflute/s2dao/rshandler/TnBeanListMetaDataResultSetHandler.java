@@ -58,13 +58,29 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
     //                                                                              Handle
     //                                                                              ======
     public Object handle(ResultSet rs) throws SQLException {
+        final List<Object> list = new ArrayList<Object>();
+        mappingBean(rs, new BeanRowHandler() {
+            public void handle(Object row) throws SQLException {
+                list.add(row);
+            }
+        });
+        return list;
+    }
+
+    // ===================================================================================
+    //                                                                             Mapping
+    //                                                                             =======
+    protected static interface BeanRowHandler {
+        void handle(Object row) throws SQLException;
+    }
+
+    protected void mappingBean(ResultSet rs, BeanRowHandler handler) throws SQLException {
         // Lazy initialization because if the result is zero, the resources are unused.
         Set<String> columnNames = null; // Set<String(columnName)>
         Map<String, TnPropertyType> propertyCache = null; // Map<String(columnName), PropertyType>
         Map<String, Map<String, TnPropertyType>> relationPropertyCache = null; // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
         TnRelationRowCache relRowCache = null;
 
-        final List<Object> list = new ArrayList<Object>();
         final int relSize = getBeanMetaData().getRelationPropertyTypeSize();
         final boolean hasCB = hasConditionBean();
         final boolean skipRelationLoop;
@@ -96,7 +112,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
             // they are unnecessary to do relation loop!
             if (skipRelationLoop) {
                 postCreateRow(row);
-                list.add(row);
+                handler.handle(row);
                 continue;
             }
 
@@ -136,9 +152,8 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
                 }
             }
             postCreateRow(row);
-            list.add(row);
+            handler.handle(row);
         }
-        return list;
     }
 
     /**

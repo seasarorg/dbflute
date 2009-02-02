@@ -31,6 +31,7 @@ import org.seasar.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
+import org.seasar.dbflute.s2dao.rshandler.TnBeanCursorMetaDataResultSetHandler;
 import org.seasar.dbflute.s2dao.rshandler.TnBeanListMetaDataResultSetHandler;
 import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateDynamicCommand;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
@@ -86,6 +87,12 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         final TnRowCreatorExtension rowCreator = createInternalRowCreator(bmd);
         final TnRelationRowCreatorExtension relationRowCreator = createInternalRelationRowCreator(bmd);
         return new TnBeanListMetaDataResultSetHandler(bmd, rowCreator, relationRowCreator);
+    }
+    
+    protected TnResultSetHandler createBeanCursorMetaDataResultSetHandler(TnBeanMetaData bmd) {
+        final TnRowCreatorExtension rowCreator = createInternalRowCreator(bmd);
+        final TnRelationRowCreatorExtension relationRowCreator = createInternalRelationRowCreator(bmd);
+        return new TnBeanCursorMetaDataResultSetHandler(bmd, rowCreator, relationRowCreator);
     }
 
     protected TnResultSetHandler createObjectResultSetHandler(Class<?> objectType) {
