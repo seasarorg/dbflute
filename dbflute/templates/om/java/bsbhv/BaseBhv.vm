@@ -140,7 +140,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     //                                                                       =============
     /**
      * Select the cursor by the condition-bean. <br />
-     * Attention: It has a mapping cost and memory for relation entities is not released per row handling.
+     * Attention: It has a mapping cost from result set to entity.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @param entityRowHandler The handler of entity row of ${myExtendedObjectClassName}. (NotNull)
      */
