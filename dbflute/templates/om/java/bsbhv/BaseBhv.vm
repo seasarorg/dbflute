@@ -244,22 +244,6 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         cb.xsetupForScalarSelect();
         return new SLFunction<${myConditionBeanClassName}, RESULT>(cb, resultType);
     }
-#if ($database.isMakeDeprecated())
-
-    // ===================================================================================
-    //                                                                      Various Select
-    //                                                                      ==============
-    /**
-     * Select the list of value-label.
-     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @param valueLabelSetupper The setupper of value-label. (NotNull)
-     * @return The list of value-label. (NotNull)
-     * @deprecated Sorry! This method will be deleted at the future.
-     */
-    public List<java.util.Map<String, Object>> selectValueLabelList(${myConditionBeanClassName} cb, org.seasar.dbflute.bhv.ValueLabelSetupper<${myExtendedObjectClassName}> valueLabelSetupper) {
-        return createValueLabelList(selectList(cb), valueLabelSetupper);
-    }
-#end
 #if ($table.isUseSequence())
 
     // ===================================================================================
