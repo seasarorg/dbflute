@@ -855,11 +855,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return command;
     }
     
-    protected <ENTITY extends Entity> SelectCursorCBCommand<ENTITY> createSelectCursorCBCommand(ConditionBean cb, EntityRowHandler<ENTITY> entityRowHandler) {
+    protected <ENTITY extends Entity> SelectCursorCBCommand<ENTITY> createSelectCursorCBCommand(ConditionBean cb
+            , EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectCursorCBCommand");
         final SelectCursorCBCommand<ENTITY> command = xsetupSelectCommand(new SelectCursorCBCommand<ENTITY>());
         command.setConditionBeanType(cb.getClass());
         command.setConditionBean(cb);
+        command.setEntityType(entityType);
         command.setEntityRowHandler(entityRowHandler);
         return command;
     }

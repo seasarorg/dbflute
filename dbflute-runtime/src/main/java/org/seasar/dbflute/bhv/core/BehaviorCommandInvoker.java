@@ -646,6 +646,9 @@ public class BehaviorCommandInvoker {
         if (ConditionBeanContext.isExistConditionBeanOnThread()) {
             ConditionBeanContext.clearConditionBeanOnThread();
         }
+        if (ConditionBeanContext.isExistEntityRowHandlerOnThread()) {
+            ConditionBeanContext.clearEntityRowHandlerOnThread();
+        }
         if (InternalMapContext.isExistInternalMapContextOnThread()) {
             InternalMapContext.clearInternalMapContextOnThread();
         }
