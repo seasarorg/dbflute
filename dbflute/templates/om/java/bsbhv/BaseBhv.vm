@@ -142,11 +142,10 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * Select the cursor by the condition-bean.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @param entityRowHandler The handler of entity row of ${myExtendedObjectClassName}. (NotNull)
-     * @return The selected count.
      */
-    public int selectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler) {
-        assertCBNotNull(cb); assertObjectNotNull("entityRowHandler", entityRowHandler);
-        return delegateSelectCursor(cb);
+    public void selectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler) {
+        assertCBNotNull(cb); assertObjectNotNull("entityRowHandler<${myExtendedObjectClassName}>", entityRowHandler);
+        delegateSelectCursor(cb, entityRowHandler);
     }
 
     // ===================================================================================
@@ -714,16 +713,12 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     // -----------------------------------------------------
     //                                                Select
     //                                                ------
-    protected int delegateSelectCount(${myConditionBeanClassName} cb) {
-        return invoke(createSelectCountCBCommand(cb));
-    }
-    protected int delegateSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler) {
-        return invoke(createSelectCursorCBCommand(cb, entityRowHandler));
-    }
+    protected int delegateSelectCount(${myConditionBeanClassName} cb) { return invoke(createSelectCountCBCommand(cb)); }
+    protected void delegateSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler)
+    { invoke(createSelectCursorCBCommand(cb, entityRowHandler, ${myExtendedObjectClassName}.class)); }
     protected int doCallReadCount(ConditionBean cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
-    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) {
-        return invoke(createSelectListCBCommand(cb, ${myExtendedObjectClassName}.class));
-    }
+    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb)
+    { return invoke(createSelectListCBCommand(cb, ${myExtendedObjectClassName}.class)); }
     @SuppressWarnings("unchecked")
     protected List<Entity> doCallReadList(ConditionBean cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
 #if ($table.isUseSequence())
@@ -734,58 +729,43 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
-    protected int delegateInsert(${myExtendedObjectClassName} e) {
-        if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e));
-    }
+    protected int delegateInsert(${myExtendedObjectClassName} e)
+    { if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e)); }
     protected int doCallCreate(Entity entity) {return delegateInsert(downcast(entity)); }
-    protected int delegateUpdate(${myExtendedObjectClassName} e) {
-        if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e));
-    }
+    protected int delegateUpdate(${myExtendedObjectClassName} e)
+    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e)); }
     protected int doCallModify(Entity entity) { return delegateUpdate(downcast(entity)); }
 #if ($table.hasOptimisticLock())
-    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e) {
-        if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e));
-    }
+    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e)
+    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
 #end
-    protected int delegateDelete(${myExtendedObjectClassName} e) {
-        if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteEntityCommand(e));
-    }
+    protected int delegateDelete(${myExtendedObjectClassName} e)
+    { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteEntityCommand(e)); }
     protected int doCallRemove(Entity entity) { return delegateDelete(downcast(entity)); }
 #if ($table.hasOptimisticLock())
-    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e) {
-        if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e));
-    }
+    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e)
+    { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e)); }
 #end
 
-    protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls) {
-        if (ls.isEmpty()) { return new int[]{}; }
-        return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls)));
-    }
+    protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls))); }
     @SuppressWarnings("unchecked")
     protected int[] doCreateList(List<Entity> ls) { return delegateInsertList((List)ls); }
-    protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls) {
-        if (ls.isEmpty()) { return new int[]{}; }
-        return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls)));
-    }
+    protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
     @SuppressWarnings("unchecked")
     protected int[] doModifyList(List<Entity> ls) { return delegateUpdateList((List)ls); }
 #if ($table.hasOptimisticLock())
-    protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls) {
-        if (ls.isEmpty()) { return new int[]{}; }
-        return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls)));
-    }
+    protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
 #end
-    protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls) {
-        if (ls.isEmpty()) { return new int[]{}; }
-        return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls)));
-    }
+    protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
     @SuppressWarnings("unchecked")
     protected int[] doRemoveList(List<Entity> ls) { return delegateDeleteList((List)ls); }
 #if ($table.hasOptimisticLock())
-    protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls) {
-        if (ls.isEmpty()) { return new int[]{}; }
-        return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls)));
-    }
+    protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
 #end
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
