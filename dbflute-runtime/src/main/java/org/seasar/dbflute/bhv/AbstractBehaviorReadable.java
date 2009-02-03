@@ -36,12 +36,14 @@ import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.AbstractBehaviorCommand;
 import org.seasar.dbflute.bhv.core.command.SelectCountCBCommand;
+import org.seasar.dbflute.bhv.core.command.SelectCursorCBCommand;
 import org.seasar.dbflute.bhv.core.command.SelectListCBCommand;
 import org.seasar.dbflute.bhv.core.command.SelectNextValCommand;
 import org.seasar.dbflute.bhv.core.command.SelectScalarCBCommand;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
+import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingHandler;
@@ -850,6 +852,15 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         final SelectCountCBCommand command = xsetupSelectCommand(new SelectCountCBCommand());
         command.setConditionBeanType(cb.getClass());
         command.setConditionBean(cb);
+        return command;
+    }
+    
+    protected <ENTITY extends Entity> SelectCursorCBCommand<ENTITY> createSelectCursorCBCommand(ConditionBean cb, EntityRowHandler<ENTITY> entityRowHandler) {
+        assertBehaviorCommandInvoker("createSelectCursorCBCommand");
+        final SelectCursorCBCommand<ENTITY> command = xsetupSelectCommand(new SelectCursorCBCommand<ENTITY>());
+        command.setConditionBeanType(cb.getClass());
+        command.setConditionBean(cb);
+        command.setEntityRowHandler(entityRowHandler);
         return command;
     }
 

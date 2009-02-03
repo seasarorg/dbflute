@@ -119,7 +119,7 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
         _entityType = entityType;
     }
 
-    public void setCursorHandler(EntityRowHandler<ENTITY> cursorHandler) {
-        _entityRowHandler = cursorHandler;
+    public void setEntityRowHandler(EntityRowHandler<ENTITY> entityRowHandler) {
+        _entityRowHandler = entityRowHandler;
     }
 }
