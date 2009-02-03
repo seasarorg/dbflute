@@ -774,9 +774,9 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         filterEntityOfInsert(e);
         return invoke(createInsertEntityCommand(e));
     }
-    protected ${glInsertEntityCommand} createInsertEntityCommand(Entity entity) {
+    protected InsertEntityCommand createInsertEntityCommand(Entity entity) {
         assertBehaviorCommandInvoker("createInsertEntityCommand");
-        final ${glInsertEntityCommand} cmd = new ${glInsertEntityCommand}();
+        final InsertEntityCommand cmd = new InsertEntityCommand();
         cmd.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(cmd);
         cmd.setEntityType(entity.getClass());
