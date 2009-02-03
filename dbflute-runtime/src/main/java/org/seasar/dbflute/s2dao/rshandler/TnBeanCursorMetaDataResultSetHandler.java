@@ -18,6 +18,7 @@ package org.seasar.dbflute.s2dao.rshandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -51,10 +52,15 @@ public class TnBeanCursorMetaDataResultSetHandler extends TnBeanListMetaDataResu
             String msg = "Bean cursor handling should have condition-bean!";
             throw new IllegalStateException(msg);
         }
-        final EntityRowHandler<Object> entityRowHandler = getEntityRowHandler();
+        final EntityRowHandler<Entity> entityRowHandler = getEntityRowHandler();
         mappingBean(rs, new BeanRowHandler() {
             public void handle(Object row) throws SQLException {
-                entityRowHandler.handle(row);
+                if (!(row instanceof Entity)) {
+                    String msg = "The row object should be an entity at bean cursor handling:";
+                    msg = msg + " row=" + (row != null ? row.getClass().getName() + ":" + row : null);
+                    throw new IllegalStateException(msg);
+                }
+                entityRowHandler.handle((Entity) row);
             }
         });
         return null;
@@ -67,8 +73,10 @@ public class TnBeanCursorMetaDataResultSetHandler extends TnBeanListMetaDataResu
         return ConditionBeanContext.isExistEntityRowHandlerOnThread();
     }
 
-    @SuppressWarnings("unchecked")
-    protected EntityRowHandler<Object> getEntityRowHandler() {
-        return (EntityRowHandler<Object>) ConditionBeanContext.getEntityRowHandlerOnThread();
+    protected EntityRowHandler<Entity> getEntityRowHandler() {
+        EntityRowHandler<? extends Entity> handlerOnThread = ConditionBeanContext.getEntityRowHandlerOnThread();
+        @SuppressWarnings("unchecked")
+        EntityRowHandler<Entity> entityRowHandler = (EntityRowHandler<Entity>) handlerOnThread;
+        return entityRowHandler;
     }
 }

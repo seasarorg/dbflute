@@ -59,6 +59,9 @@
 						<source>1.5</source>
 						<target>1.5</target>
 						<encoding>UTF-8</encoding>
+						<showDeprecation>true</showDeprecation>
+						<showWarnings>true</showWarnings>
+						<compilerArgument>-g</compilerArgument>
 					</configuration>
 				</plugin>
 				<plugin>
