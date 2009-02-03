@@ -12,6 +12,7 @@ import org.seasar.dbflute.bhv.LoadReferrerOption;
 import org.seasar.dbflute.bhv.core.command.InsertEntityCommand;
 #end
 import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.ListResultBean;
 import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingHandler;
@@ -125,13 +126,27 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     //                                                                        Count Select
     //                                                                        ============
     /**
-     * Select the count of the condition-bean. {IgnorePagingCondition}
+     * Select the count by the condition-bean. {IgnorePagingCondition}
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The selected count.
      */
     public int selectCount(${myConditionBeanClassName} cb) {
         assertCBNotNull(cb);
         return delegateSelectCount(cb);
+    }
+    
+    // ===================================================================================
+    //                                                                       Cursor Select
+    //                                                                       =============
+    /**
+     * Select the cursor by the condition-bean.
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @param entityRowHandler The handler of entity row of ${myExtendedObjectClassName}. (NotNull)
+     * @return The selected count.
+     */
+    public int selectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler) {
+        assertCBNotNull(cb); assertObjectNotNull("entityRowHandler", entityRowHandler);
+        return delegateSelectCursor(cb);
     }
 
     // ===================================================================================
@@ -701,6 +716,9 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     //                                                ------
     protected int delegateSelectCount(${myConditionBeanClassName} cb) {
         return invoke(createSelectCountCBCommand(cb));
+    }
+    protected int delegateSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler) {
+        return invoke(createSelectCursorCBCommand(cb, entityRowHandler));
     }
     protected int doCallReadCount(ConditionBean cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
     protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb) {
