@@ -677,8 +677,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         return !statusList.isEmpty() ? statusList.get(0) : null;
     }
 
-    public java.util.List<${myExtendedObjectClassName}> getEntities(${glBuriDef}.${processName}_Status... statuses
-            , org.seasar.dbflute.bhv.ConditionBeanSetupper<${myConditionBeanClassName}> conditionBeanSetupper) {
+    public java.util.List<${myExtendedObjectClassName}> getEntities(org.seasar.dbflute.bhv.ConditionBeanSetupper<${myConditionBeanClassName}> conditionBeanSetupper
+                                                                  , ${glBuriDef}.${processName}_Status... statuses) {
         assertObjectNotNull("statuses", statuses);
         ${myConditionBeanClassName} cb = newMyConditionBean();
         cb.setupSelect_BuriPathData();
