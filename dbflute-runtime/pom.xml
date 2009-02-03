@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.seasar.dbflute</groupId>
 	<artifactId>dbflute-runtime</artifactId>
-	<version>0.9.1-1-SNAPSHOT</version>
+	<version>0.9.1-2-SNAPSHOT</version>
 
 	<name>DBFlute Runtime</name>
 	<description>The runtime library of DBFlute</description>
@@ -61,7 +61,6 @@
 						<encoding>UTF-8</encoding>
 						<showDeprecation>true</showDeprecation>
 						<showWarnings>true</showWarnings>
-						<compilerArgument>-g</compilerArgument>
 					</configuration>
 				</plugin>
 				<plugin>
