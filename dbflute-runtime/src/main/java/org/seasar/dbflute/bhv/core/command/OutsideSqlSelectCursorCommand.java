@@ -46,6 +46,15 @@ public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectComma
     }
 
     // ===================================================================================
+    //                                                                    Process Callback
+    //                                                                    ================
+    @Override
+    protected void setupOutsideSqlContext(OutsideSqlContext outsideSqlContext) {
+        super.setupOutsideSqlContext(outsideSqlContext);
+        outsideSqlContext.setCursorHandler(_cursorHandler);
+    }
+    
+    // ===================================================================================
     //                                                                     Extension Point
     //                                                                     ===============
     @Override
@@ -61,12 +70,6 @@ public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectComma
                 return cursorHandler.handle(rs);
             }
         };
-    }
-
-    @Override
-    protected void setupOutsideSqlContext(OutsideSqlContext outsideSqlContext) {
-        super.setupOutsideSqlContext(outsideSqlContext);
-        outsideSqlContext.setCursorHandler(_cursorHandler);
     }
 
     @Override
