@@ -66,6 +66,13 @@ public class TnBeanCursorMetaDataResultSetHandler extends TnBeanListMetaDataResu
         return null;
     }
 
+    @Override
+    protected TnRelationRowCache createRelationRowCache(int relSize) {
+        // Override for non cache.
+        // Cursor select is for save memory so it should not cache instances.
+        return new TnRelationRowNonCache(relSize);
+    }
+
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============

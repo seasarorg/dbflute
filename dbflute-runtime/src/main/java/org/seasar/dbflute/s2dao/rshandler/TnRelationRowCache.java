@@ -26,8 +26,12 @@ import java.util.Map;
  */
 public class TnRelationRowCache {
 
-    private List<Map<TnRelationKey, Object>> rowMapList;
+    /** The list of row map. */
+    private final List<Map<TnRelationKey, Object>> rowMapList;
 
+    /**
+     * @param size The size of relation.
+     */
     public TnRelationRowCache(int size) {
         rowMapList = new ArrayList<Map<TnRelationKey, Object>>();
         for (int i = 0; i < size; ++i) {
@@ -35,10 +39,24 @@ public class TnRelationRowCache {
         }
     }
 
+    protected void initializeRowMapList() {
+
+    }
+
+    /**
+     * @param relno The relation number.
+     * @param key The key of relation. (NotNull)
+     * @return The relation row. (Nullable)
+     */
     public Object getRelationRow(int relno, TnRelationKey key) {
         return getRowMap(relno).get(key);
     }
 
+    /**
+     * @param relno The relation number.
+     * @param key The key of relation. (NotNull)
+     * @param row The relation row. (Nullable)
+     */
     public void addRelationRow(int relno, TnRelationKey key, Object row) {
         getRowMap(relno).put(key, row);
     }

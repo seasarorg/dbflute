@@ -120,7 +120,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
                 relationPropertyCache = createRelationPropertyCache(columnNames);
             }
             if (relRowCache == null) {
-                relRowCache = new TnRelationRowCache(relSize);
+                relRowCache = createRelationRowCache(relSize);
             }
             for (int i = 0; i < relSize; ++i) {
                 final TnRelationPropertyType rpt = getBeanMetaData().getRelationPropertyType(i);
@@ -154,6 +154,15 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
             postCreateRow(row);
             handler.handle(row);
         }
+    }
+
+    /**
+     * Create the cache of relation row.
+     * @param relSize The size of relation.
+     * @return The cache of relation row. (NotNull)
+     */
+    protected TnRelationRowCache createRelationRowCache(int relSize) {
+        return new TnRelationRowCache(relSize);
     }
 
     /**
