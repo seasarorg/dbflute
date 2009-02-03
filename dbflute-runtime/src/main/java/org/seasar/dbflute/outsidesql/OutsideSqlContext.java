@@ -15,16 +15,17 @@
  */
 package org.seasar.dbflute.outsidesql;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.jdbc.CursorHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.util.DfResourceUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -137,6 +138,8 @@ public class OutsideSqlContext {
 
     protected Object _resultTypeSpecification;
 
+    protected CursorHandler _cursorHandler;
+    
     protected String _methodName;
     
     /** The configuration of statement. (Nullable) */
@@ -402,6 +405,14 @@ public class OutsideSqlContext {
         this._resultTypeSpecification = resultTypeSpecification;
     }
 
+    public CursorHandler getCursorHandler() {
+        return _cursorHandler;
+    }
+
+    public void setCursorHandler(CursorHandler handler) {
+        _cursorHandler = handler;
+    }
+    
     public String getMethodName() {
         return _methodName;
     }

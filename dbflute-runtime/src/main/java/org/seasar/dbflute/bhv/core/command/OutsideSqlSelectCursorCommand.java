@@ -19,8 +19,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.seasar.dbflute.jdbc.CursorHandler;
+import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
-
 
 /**
  * The behavior command for OutsideSql.selectList().
@@ -52,14 +52,26 @@ public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectComma
     protected TnResultSetHandler createOutsideSqlSelectResultSetHandler() {
         return new TnResultSetHandler() {
             public Object handle(ResultSet rs) throws SQLException {
-                return _cursorHandler.handle(rs);
+                if (!OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
+                    String msg = "The context of outside SQL should be required here!";
+                    throw new IllegalStateException(msg);
+                }
+                OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
+                CursorHandler cursorHandler = context.getCursorHandler();
+                return cursorHandler.handle(rs);
             }
         };
     }
 
     @Override
+    protected void setupOutsideSqlContext(OutsideSqlContext outsideSqlContext) {
+        super.setupOutsideSqlContext(outsideSqlContext);
+        outsideSqlContext.setCursorHandler(_cursorHandler);
+    }
+
+    @Override
     protected Object getResultTypeSpecification() {
-        return _cursorHandler;
+        return _cursorHandler.getClass();
     }
 
     // ===================================================================================
