@@ -32,6 +32,7 @@ import ${glPackageBaseCommonUtil}.${glSimpleTypeUtil};
  * public interface methods are as follows:
  *   o clearExecutionCache();
  *   o isExecutionCacheEmpty();
+ *   o getExecutionCacheSize();
  *   o injectComponentProperty(${glBehaviorCommandComponentSetup} behaviorCommand);
  *   o invoke(${glBehaviorCommand} behaviorCommand);
  * </pre>
@@ -70,6 +71,10 @@ public class ${glBehaviorCommandInvoker} {
 
     public boolean isExecutionCacheEmpty() {
         return _executionMap.isEmpty();
+    }
+
+    public int getExecutionCacheSize() {
+        return _executionMap.size();
     }
 
     // ===================================================================================

@@ -51,7 +51,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                      Unique Key
         //                                                                      ==========
-        public static String GenerateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOption} option, Object resultTypeSpecification) {
+        public static String GenerateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOption} option, Type resultTypeSpecification) {
             String pmbKey = (pmb != null ? pmb.GetType().Name : "null");
             String resultKey = (resultTypeSpecification != null ? resultTypeSpecification.ToString() : "null");
             String tableDbName = option.TableDbName;

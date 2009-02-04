@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import org.seasar.extension.jdbc.ResultSetHandler;
 
 import ${glPackageBaseCommonJdbc}.${glCursorHandler};
+import ${glPackageBaseCommonCBeanOutsidesql}.${glOutsideSqlContext};
 
 /**
  * The behavior command for OutsideSql.selectList().
@@ -31,20 +32,35 @@ public class ${glOutsideSqlSelectCursorCommand} extends ${glAbstractOutsideSqlSe
     }
 
     // ===================================================================================
+    //                                                                    Process Callback
+    //                                                                    ================
+    @Override
+    protected void setupOutsideSqlContext(${glOutsideSqlContext} outsideSqlContext) {
+        super.setupOutsideSqlContext(outsideSqlContext);
+        outsideSqlContext.setCursorHandler(_cursorHandler);
+    }
+    
+    // ===================================================================================
     //                                                                     Extension Point
     //                                                                     ===============
     @Override
     protected ResultSetHandler createOutsideSqlSelectResultSetHandler() {
         return new ResultSetHandler() {
             public Object handle(ResultSet rs) throws SQLException {
-                return _cursorHandler.handle(rs);
+                if (!${glOutsideSqlContext}.isExistOutsideSqlContextOnThread()) {
+                    String msg = "The context of outside SQL should be required here!";
+                    throw new IllegalStateException(msg);
+                }
+                ${glOutsideSqlContext} context = ${glOutsideSqlContext}.getOutsideSqlContextOnThread();
+                ${glCursorHandler} cursorHandler = context.getCursorHandler();
+                return cursorHandler.handle(rs);
             }
         };
     }
 
     @Override
     protected Object getResultTypeSpecification() {
-        return _cursorHandler;
+        return _cursorHandler.getClass();
     }
 
     // ===================================================================================

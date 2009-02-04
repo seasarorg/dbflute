@@ -33,12 +33,22 @@ public abstract class ${glAbstractOutsideSqlSelectCommand}<RESULT> extends ${glA
     //                                                                    ================
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
+        final ${glOutsideSqlContext} outsideSqlContext = createOutsideSqlContext();
+        setupOutsideSqlContext(outsideSqlContext);
+        ${glOutsideSqlContext}.setOutsideSqlContextOnThread(outsideSqlContext);
+
+        // Set up fetchNarrowingBean.
+        final Object pmb = _parameterBean;
+        final ${glOutsideSqlOption} option = _outsideSqlOption;
+        setupOutsideSqlFetchNarrowingBean(pmb, option);
+    }
+
+    protected void setupOutsideSqlContext(${glOutsideSqlContext} outsideSqlContext) {
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
         final ${glOutsideSqlOption} option = _outsideSqlOption;
         final Object resultTypeSpecification = getResultTypeSpecification();
         final boolean autoPagingLogging = (option.isAutoPaging() || option.isSourcePagingRequestTypeAuto());
-        final ${glOutsideSqlContext} outsideSqlContext = createOutsideSqlContext();
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
         outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
@@ -49,11 +59,7 @@ public abstract class ${glAbstractOutsideSqlSelectCommand}<RESULT> extends ${glA
         outsideSqlContext.setOffsetByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setLimitByCursorForcedly(option.isAutoPaging());
         outsideSqlContext.setAutoPagingLogging(autoPagingLogging); // for logging
-		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
-        ${glOutsideSqlContext}.setOutsideSqlContextOnThread(outsideSqlContext);
-
-        // Set up fetchNarrowingBean.
-        setupOutsideSqlFetchNarrowingBean(pmb, option);
+        outsideSqlContext.setupBehaviorQueryPathIfNeeds();
     }
 
     protected void setupOutsideSqlFetchNarrowingBean(Object pmb, ${glOutsideSqlOption} option) {

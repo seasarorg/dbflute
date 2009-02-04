@@ -185,9 +185,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             String path = (String)args[0];
             Object pmb = args[1];
             ${glOutsideSqlOption} option = (${glOutsideSqlOption})args[2];
-            Object resultTypeSpecification = null;
+            Type resultTypeSpecification = null;
             if (args.Length > 3) {
-                resultTypeSpecification = args[3];
+                resultTypeSpecification = args[3] is Type ? args[3] : args[3].GetType();
             }
             return ${glOutsideSqlContext}.GenerateSpecifiedOutsideSqlUniqueKey(invocation.Method.Name, path, pmb, option, resultTypeSpecification);
         }

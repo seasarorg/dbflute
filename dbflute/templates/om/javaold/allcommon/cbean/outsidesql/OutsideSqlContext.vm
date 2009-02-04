@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import ${glPackageBaseCommonDBMeta}.${glDBMeta};
 import ${glPackageBaseCommonDBMeta}.${glDBMetaProvider};
+import ${glPackageBaseCommonJdbc}.${glCursorHandler};
 import ${glPackageBaseCommonJdbc}.${glStatementConfig};
 import ${glPackageBaseCommonUtil}.${glSimpleResourceUtil};
 import ${glPackageBaseCommonUtil}.${glSimpleStringUtil};
@@ -121,6 +122,8 @@ public class ${glOutsideSqlContext} {
     protected Object _parameterBean;
 
     protected Object _resultTypeSpecification;
+
+    protected ${glCursorHandler} _cursorHandler;
 
     protected String _methodName;
     
@@ -385,6 +388,14 @@ public class ${glOutsideSqlContext} {
 
     public void setResultTypeSpecification(Object resultTypeSpecification) {
         this._resultTypeSpecification = resultTypeSpecification;
+    }
+
+    public ${glCursorHandler} getCursorHandler() {
+        return _cursorHandler;
+    }
+
+    public void setCursorHandler(${glCursorHandler} cursorHandler) {
+        this._cursorHandler = cursorHandler;
     }
 
     public String getMethodName() {
