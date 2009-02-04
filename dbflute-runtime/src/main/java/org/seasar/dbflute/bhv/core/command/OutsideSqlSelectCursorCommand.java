@@ -73,7 +73,7 @@ public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectComma
     }
 
     @Override
-    protected Object getResultTypeSpecification() {
+    protected Class<?> getResultType() {
         return _cursorHandler.getClass();
     }
 

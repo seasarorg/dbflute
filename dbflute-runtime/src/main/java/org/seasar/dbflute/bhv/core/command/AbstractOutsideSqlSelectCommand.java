@@ -61,11 +61,11 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
         final OutsideSqlOption option = _outsideSqlOption;
-        final Object resultTypeSpecification = getResultTypeSpecification();
+        final Class<?> resultType = getResultType();
         final boolean autoPagingLogging = (option.isAutoPaging() || option.isSourcePagingRequestTypeAuto());
         outsideSqlContext.setOutsideSqlPath(path);
         outsideSqlContext.setParameterBean(pmb);
-        outsideSqlContext.setResultTypeSpecification(resultTypeSpecification);
+        outsideSqlContext.setResultType(resultType);
         outsideSqlContext.setMethodName(getCommandName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
@@ -103,9 +103,8 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         final String path = _outsideSqlPath;
         final Object pmb = _parameterBean;
         final OutsideSqlOption option = _outsideSqlOption;
-        final Object resultTypeSpecification = getResultTypeSpecification();
-        return OutsideSqlContext.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option,
-                resultTypeSpecification);
+        final Class<?> resultType = getResultType();
+        return OutsideSqlContext.generateSpecifiedOutsideSqlUniqueKey(methodName, path, pmb, option, resultType);
     }
 
     public SqlExecutionCreator createSqlExecutionCreator() {
@@ -162,7 +161,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
     //                                                                     ===============
     protected abstract TnResultSetHandler createOutsideSqlSelectResultSetHandler();
 
-    protected abstract Object getResultTypeSpecification();
+    protected abstract Class<?> getResultType();
 
     // ===================================================================================
     //                                                                       Assert Helper

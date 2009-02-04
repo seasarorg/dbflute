@@ -79,7 +79,7 @@ public class OutsideSqlSelectListCommand<ENTITY> extends AbstractOutsideSqlSelec
     }
 
     @Override
-    protected Object getResultTypeSpecification() {
+    protected Class<?> getResultType() {
         return _entityType;
     }
 

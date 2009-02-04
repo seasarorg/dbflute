@@ -41,6 +41,7 @@ import org.seasar.dbflute.util.TraceViewUtil;
  * public interface methods are as follows:
  *   o clearExecutionCache();
  *   o isExecutionCacheEmpty();
+ *   o getExecutionCacheSize();
  *   o injectComponentProperty(BehaviorCommandComponentSetup behaviorCommand);
  *   o invoke(BehaviorCommand behaviorCommand);
  * </pre>
@@ -76,6 +77,10 @@ public class BehaviorCommandInvoker {
 
     public boolean isExecutionCacheEmpty() {
         return _executionMap.isEmpty();
+    }
+    
+    public int getExecutionCacheSize() {
+        return _executionMap.size();
     }
 
     // ===================================================================================
@@ -368,9 +373,8 @@ public class BehaviorCommandInvoker {
             boolean resultTypeInteger = false;
             if (behaviorCommand.isOutsideSql()) {
                 final OutsideSqlContext outsideSqlContext = getOutsideSqlContext();
-                final Object resultTypeSpecification = outsideSqlContext.getResultTypeSpecification();
-                if (resultTypeSpecification != null && resultTypeSpecification instanceof Class<?>) {
-                    final Class<?> resultType = (Class<?>)resultTypeSpecification;
+                final Class<?> resultType = outsideSqlContext.getResultType();
+                if (resultType != null) {
                     if (Integer.class.isAssignableFrom(resultType)) {
                         resultTypeInteger = true;
                     }

@@ -85,15 +85,11 @@ public class OutsideSqlContext {
     // ===================================================================================
     //                                                                          Unique Key
     //                                                                          ==========
-    public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, OutsideSqlOption option, Object resultTypeSpecification) {
+    public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, OutsideSqlOption option, Class<?> resultType) {
         final String pmbKey = (pmb != null ? pmb.getClass().getName() : "null");
         final String resultKey;
-        if (resultTypeSpecification != null) {
-            if (resultTypeSpecification instanceof Class<?>) {
-                resultKey = ((Class<?>)resultTypeSpecification).getName();
-            } else {
-                resultKey = resultTypeSpecification.toString();
-            }
+        if (resultType != null) {
+            resultKey = resultType.getName();
         } else {
             resultKey = "null";
         }
@@ -136,7 +132,7 @@ public class OutsideSqlContext {
 
     protected Object _parameterBean;
 
-    protected Object _resultTypeSpecification;
+    protected Class<?> _resultType;
 
     protected CursorHandler _cursorHandler;
     
@@ -397,12 +393,12 @@ public class OutsideSqlContext {
         this._parameterBean = parameterBean;
     }
 
-    public Object getResultTypeSpecification() {
-        return _resultTypeSpecification;
+    public Class<?> getResultType() {
+        return _resultType;
     }
 
-    public void setResultTypeSpecification(Object resultTypeSpecification) {
-        this._resultTypeSpecification = resultTypeSpecification;
+    public void setResultType(Class<?> resultType) {
+        this._resultType = resultType;
     }
 
     public CursorHandler getCursorHandler() {
