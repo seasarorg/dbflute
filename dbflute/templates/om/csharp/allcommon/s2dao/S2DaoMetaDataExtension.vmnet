@@ -343,7 +343,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             // - - - - - - - - - - - - - - - - - - - - - - -
             String sql = outsideSqlContext.ReadFilteredOutsideSql(this.SqlFileEncoding, _dbms.Suffix);
             Object pmb = outsideSqlContext.ParameterBean;
-            Object resultTypeSpecification = outsideSqlContext.ResultTypeSpecification;
+            Type resultType = outsideSqlContext.ResultType;
 
             // - - - - - - - - - - - - - - -
             // The attribute of SqlCommand.
@@ -360,7 +360,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 // - - - - - - - -
                 // EntityHandling
                 // - - - - - - - -
-                Type customizeEntityType = (Type)resultTypeSpecification;
+                Type customizeEntityType = resultType;
                 IBeanMetaData myBeanMetaData = CreateSpecifiedOutsideSqlCustomizeBeanMetaData(customizeEntityType);
                 Type retType = method.ReturnType;
                 if (retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>)))) {

@@ -95,7 +95,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
         protected Object _parameterBean;
 
-        protected Object _resultType;
+        protected Type _resultType;
 
         protected String _methodName;
         

@@ -671,7 +671,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             String path = GetOutsideSqlPath(args);
             Object pmb = GetOutsideSqlParameterBean(args);
             ${glOutsideSqlOption} option = GetOutsideSqlOption(args);
-            Type resultType = args[3];
+            Type resultType = (Type)args[3];
             bool autoPagingLogging = (option.IsAutoPaging || option.IsSourcePagingRequestTypeAuto);
             ${glOutsideSqlContext} outsideSqlContext = new ${glOutsideSqlContext}();
             outsideSqlContext.OutsideSqlPath = path;
