@@ -187,7 +187,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             ${glOutsideSqlOption} option = (${glOutsideSqlOption})args[2];
             Type resultType = null;
             if (args.Length > 3) {
-                resultType = args[3] is Type ? args[3] : args[3].GetType();
+                resultType = args[3] is Type ? (Type)args[3] : args[3].GetType();
             }
             return ${glOutsideSqlContext}.GenerateSpecifiedOutsideSqlUniqueKey(invocation.Method.Name, path, pmb, option, resultType);
         }

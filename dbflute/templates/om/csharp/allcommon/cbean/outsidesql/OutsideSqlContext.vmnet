@@ -429,7 +429,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             set { this._parameterBean = value; }
         }
 
-        public Object ResultType {
+        public Type ResultType {
             get { return _resultType; }
             set { this._resultType = value; }
         }
