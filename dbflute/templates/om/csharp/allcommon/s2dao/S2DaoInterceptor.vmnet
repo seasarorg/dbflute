@@ -185,11 +185,11 @@ namespace ${glPackageBaseCommonS2Dao} {
             String path = (String)args[0];
             Object pmb = args[1];
             ${glOutsideSqlOption} option = (${glOutsideSqlOption})args[2];
-            Type resultTypeSpecification = null;
+            Type resultType = null;
             if (args.Length > 3) {
-                resultTypeSpecification = args[3] is Type ? args[3] : args[3].GetType();
+                resultType = args[3] is Type ? args[3] : args[3].GetType();
             }
-            return ${glOutsideSqlContext}.GenerateSpecifiedOutsideSqlUniqueKey(invocation.Method.Name, path, pmb, option, resultTypeSpecification);
+            return ${glOutsideSqlContext}.GenerateSpecifiedOutsideSqlUniqueKey(invocation.Method.Name, path, pmb, option, resultType);
         }
 
         // ===============================================================================
@@ -274,9 +274,8 @@ namespace ${glPackageBaseCommonS2Dao} {
                 bool resultTypeInteger = false;
                 if (IsSpecifiedOutsideSql()) {
                     ${glOutsideSqlContext} outsideSqlContext = GetOutsideSqlContext();
-                    Object resultTypeSpecification = outsideSqlContext.ResultTypeSpecification;
-                    if (resultTypeSpecification != null && resultTypeSpecification is Type) {
-                        Type resultType = (Type)resultTypeSpecification;
+                    Type resultType = outsideSqlContext.ResultType;
+                    if (resultType != null) {
                         if (typeof(int).IsAssignableFrom(resultType)) {
                             resultTypeInteger = true;
                         }
@@ -672,12 +671,12 @@ namespace ${glPackageBaseCommonS2Dao} {
             String path = GetOutsideSqlPath(args);
             Object pmb = GetOutsideSqlParameterBean(args);
             ${glOutsideSqlOption} option = GetOutsideSqlOption(args);
-            Object resultTypeSpecification = args[3];
+            Type resultType = args[3];
             bool autoPagingLogging = (option.IsAutoPaging || option.IsSourcePagingRequestTypeAuto);
             ${glOutsideSqlContext} outsideSqlContext = new ${glOutsideSqlContext}();
             outsideSqlContext.OutsideSqlPath = path;
             outsideSqlContext.ParameterBean = pmb;
-            outsideSqlContext.ResultTypeSpecification = resultTypeSpecification;
+            outsideSqlContext.ResultType = resultType;
             outsideSqlContext.MethodName = invocation.Method.Name;
 			outsideSqlContext.StatementConfig = option.StatementConfig;
 			outsideSqlContext.TableDbName = option.TableDbName;

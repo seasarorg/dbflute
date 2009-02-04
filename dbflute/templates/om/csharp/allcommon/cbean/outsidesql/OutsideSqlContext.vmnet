@@ -51,9 +51,9 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
         // ===============================================================================
         //                                                                      Unique Key
         //                                                                      ==========
-        public static String GenerateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOption} option, Type resultTypeSpecification) {
+        public static String GenerateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, ${glOutsideSqlOption} option, Type resultType) {
             String pmbKey = (pmb != null ? pmb.GetType().Name : "null");
-            String resultKey = (resultTypeSpecification != null ? resultTypeSpecification.ToString() : "null");
+            String resultKey = (resultType != null ? resultType.ToString() : "null");
             String tableDbName = option.TableDbName;
             String generatedUniqueKey = option.GenerateUniqueKey();
             return tableDbName + ":" + methodName + "():" + path + ":" + pmbKey + ":" + generatedUniqueKey + ":" + resultKey;
@@ -95,7 +95,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
 
         protected Object _parameterBean;
 
-        protected Object _resultTypeSpecification;
+        protected Object _resultType;
 
         protected String _methodName;
         
@@ -429,9 +429,9 @@ namespace ${glPackageBaseCommonCBeanOutsidesql} {
             set { this._parameterBean = value; }
         }
 
-        public Object ResultTypeSpecification {
-            get { return _resultTypeSpecification; }
-            set { this._resultTypeSpecification = value; }
+        public Object ResultType {
+            get { return _resultType; }
+            set { this._resultType = value; }
         }
 
         public String MethodName {
