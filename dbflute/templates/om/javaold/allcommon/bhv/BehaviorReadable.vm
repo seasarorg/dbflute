@@ -109,7 +109,6 @@ public interface ${glBehaviorReadable} {
     //                                                                            Sequence
     //                                                                            ========
     /**
-     * ${database.ImplementComment}
      * @return The value of sequence. (NotNull)
      */
     public ${database.sequenceReturnType} readNextVal();
