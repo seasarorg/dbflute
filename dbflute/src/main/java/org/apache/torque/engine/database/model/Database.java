@@ -1436,10 +1436,6 @@ public class Database {
         return getProperties().getOutsideSqlProperties().getOmitFileSystemPathPackage();
     }
 
-    public boolean isSql2EntityPlainEntity() {
-        return false;
-    }
-
     public String getSql2EntityBaseEntityPackage() {
         return getProperties().getOutsideSqlProperties().getBaseEntityPackage();
     }
