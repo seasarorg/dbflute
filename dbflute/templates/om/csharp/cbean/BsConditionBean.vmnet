@@ -42,7 +42,6 @@ namespace ${glPackageBaseCB} {
 #end
         }
 
-        /// <summary>${database.ImplementComment}</summary><returns>this. (NotNull)</returns>
         public override ${glConditionBean} AddOrderBy_PK_Desc() {
 #if ($table.hasPrimaryKey())
 #foreach ($col in $table.PrimaryKey)

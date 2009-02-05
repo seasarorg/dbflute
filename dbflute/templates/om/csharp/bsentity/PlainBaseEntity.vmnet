@@ -23,12 +23,6 @@ namespace ${myBaseEntityPackageName} {
         //                                                                  Basic Override
         //                                                                  ==============
 #if ($table.hasPrimaryKey())
-        /// <summary>
-        /// ${database.OverrideComment}
-        /// If the primary-key of the other is same as this one, returns true.
-        /// </summary>
-        /// <param name="other">Other entity.</param>
-        /// <returns>Comparing result.</returns>
         public override bool Equals(Object other) {
             if (other == null) {
                 return false;
