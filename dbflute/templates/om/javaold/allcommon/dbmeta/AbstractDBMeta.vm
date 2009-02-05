@@ -540,9 +540,6 @@ public abstract class ${myClassName} implements ${glDBMeta} {
             this._traceColumnInfo = traceColumn;
         }
 
-        /**
-         * ${database.ImplementComment}
-         */
         protected void recycle() {
             this._relationList = new ArrayList<${glRelationInfo}>();
             this._relationTraceList = new ArrayList<AbstractRelationTrace>();
