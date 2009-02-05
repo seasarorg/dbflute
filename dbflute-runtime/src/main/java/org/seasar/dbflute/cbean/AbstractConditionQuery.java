@@ -1731,7 +1731,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                 Reflection Invoking
     //                                                                 ===================
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
      * @return The conditionValue. (NotNull)
      */
@@ -1745,7 +1745,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
      * @param conditionKeyName The name of the conditionKey. (NotNull)
      * @param value The value of the condition. (NotNull)
@@ -1767,7 +1767,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param columnFlexibleName The flexible name of a column allowed to contain relations. (NotNull and NotEmpty)
      * @param isAsc Is it ascend?
      */
@@ -1785,7 +1785,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param foreignPropertyName The property name of foreign. (NotNull and NotEmpty)
      * @return The conditionQuery of foreign as interface. (NotNull)
      */

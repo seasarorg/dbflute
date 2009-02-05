@@ -36,28 +36,28 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchFirst() {
         doFetchPage();
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchPage() {
         _fetchScopeSqlSuffix = " offset " + getPageStartIndex() + " limit " + getFetchSize();
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doClearFetchPageClause() {
         _fetchScopeSqlSuffix = "";
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return this. (NotNull)
      */
@@ -67,7 +67,7 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
@@ -75,7 +75,7 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
@@ -83,7 +83,7 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
@@ -91,7 +91,7 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {

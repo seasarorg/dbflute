@@ -97,7 +97,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                          Count Read
     //                                                                          ==========
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
      * @return Read count. (NotNull)
      */
@@ -110,7 +110,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                         Entity Read 
     //                                                                         ===========
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param cb Condition-bean. (NotNull)
      * @return Read entity. (Nullalble)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
@@ -126,7 +126,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @param cb Condition-bean. (NotNull)
      * @return Read entity. (NotNull)
@@ -188,7 +188,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                           List Read
     //                                                                           =========
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param cb Condition-bean.
      * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
@@ -198,7 +198,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param cb Condition-bean. (NotNull)
      * @return Read page. (NotNull)
      */
@@ -461,7 +461,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                            Sequence
     //                                                                            ========
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return The value of sequence. (NotNull)
      */
     public java.math.BigDecimal readNextVal() {
@@ -761,7 +761,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                     Delegate Method
     //                                                                     ===============
     /**
-     * The implementation.
      * @return All count.
      */
     protected int callGetCountAll() {
@@ -769,7 +768,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     /**
-     * The implementation.
      * @return All list. (NotNull)
      */
     protected List<Entity> callGetListAll() {
@@ -777,7 +775,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     /**
-     * The implementation.
      * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read count. (NotNull)
      */
@@ -788,7 +785,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected abstract int doCallReadCount(ConditionBean cb);
 
     /**
-     * The implementation.
      * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
      * @return Read list. If the select result is zero, it returns empty list. (NotNull)
      */

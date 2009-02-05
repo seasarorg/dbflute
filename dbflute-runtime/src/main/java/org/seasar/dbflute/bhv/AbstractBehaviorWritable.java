@@ -132,7 +132,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                      Create or Modify
     //                                      ----------------
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
@@ -147,7 +147,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     protected abstract void doCreateOrUpdate(Entity entity);
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
@@ -551,7 +551,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                Insert
     //                                                ------
     /**
-     * The implementation.
      * @param entity Entity that the type is entity interface. (NotNull)
      * @return Inserted count.
      */
@@ -579,7 +578,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                Update
     //                                                ------
     /**
-     * The implementation.
      * {modified only}
      * @param entity Entity that the type is entity interface. (NotNull)
      * @return Updated count.
@@ -608,7 +606,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                Delete
     //                                                ------
     /**
-     * The implementation.
      * @param entity Entity that the type is entity interface. (NotNull)
      * @return Deleted count.
      */
@@ -773,11 +770,10 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     /**
-     * The implementation.
      * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Inserted count.
      */
-    public int[] callCreateList(List<Entity> entityList) {
+    protected int[] callCreateList(List<Entity> entityList) {
         assertObjectNotNull("entityList", entityList);
         helpFilterBeforeInsertInternally(entityList);
         return doCreateList(entityList);
@@ -785,11 +781,10 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     protected abstract int[] doCreateList(List<Entity> entityList);
 
     /**
-     * The implementation.
      * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Updated count.
      */
-    public int[] callModifyList(List<Entity> entityList) {
+    protected int[] callModifyList(List<Entity> entityList) {
         assertObjectNotNull("entityList", entityList);
         helpFilterBeforeUpdateInternally(entityList);
         return doModifyList(entityList);
@@ -797,11 +792,10 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     protected abstract int[] doModifyList(List<Entity> entityList);
 
     /**
-     * The implementation.
      * @param entityList Entity list that the type is entity interface. (NotNull)
      * @return Deleted count.
      */
-    public int[] callRemoveList(List<Entity> entityList) {
+    protected int[] callRemoveList(List<Entity> entityList) {
         assertObjectNotNull("entityList", entityList);
         helpFilterBeforeDeleteInternally(entityList);
         return doRemoveList(entityList);

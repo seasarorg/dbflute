@@ -42,7 +42,7 @@ public class SqlClauseInterbase extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchFirst() {
         if (isFetchSizeSupported()) {
@@ -51,7 +51,7 @@ public class SqlClauseInterbase extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchPage() {
         if (isFetchStartIndexSupported() && isFetchSizeSupported()) {
@@ -66,14 +66,14 @@ public class SqlClauseInterbase extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doClearFetchPageClause() {
         _fetchScopeSelectHint = "";
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return this. (NotNull)
      */
@@ -83,7 +83,7 @@ public class SqlClauseInterbase extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return Select-hint. (NotNull)
      */
@@ -92,7 +92,7 @@ public class SqlClauseInterbase extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
@@ -101,7 +101,7 @@ public class SqlClauseInterbase extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return From-hint. (NotNull)
      */
@@ -110,7 +110,7 @@ public class SqlClauseInterbase extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return Sql-suffix. (NotNull)
      */

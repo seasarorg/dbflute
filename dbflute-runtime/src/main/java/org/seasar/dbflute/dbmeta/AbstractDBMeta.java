@@ -144,7 +144,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                                         Column Info
     //                                                                         ===========
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param columnFlexibleName The flexible name(IgnoreCase, IgnoreUnderscore) of the column. (NotNull, NotEmpty)
      * @return Determination.
      */
@@ -154,7 +154,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param columnFlexibleName The flexible name(IgnoreCase, IgnoreUnderscore) of the column. (NotNull, NotEmpty)
      * @return The information of the column. (NotNull)
      */ 
@@ -182,7 +182,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /**
-	 * The implementation.
+	 * {@inheritDoc}
      * @return The list of columns. (NotNull, NotEmpty)
      */
     public List<ColumnInfo> getColumnInfoList() {
@@ -260,7 +260,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                       Foreign Element
     //                                       ---------------
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return Determination. (NotNull)
      */ 
@@ -271,7 +271,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return Foreign DBMeta. (NotNull)
      */ 
@@ -280,7 +280,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return Foreign information. (NotNull)
      */ 
@@ -312,7 +312,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return The list of foreign information. (NotNull)
      */
     public List<ForeignInfo> getForeignInfoList() {
@@ -416,7 +416,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return The list of referrer information. (NotNull)
      */
     public List<ReferrerInfo> getReferrerInfoList() {
@@ -517,7 +517,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
 
         /**
-         * The implementation.
+         * {@inheritDoc}
          * @return The trace of relation as the list of relation info. (NotNull)
          */
         public List<RelationInfo> getTraceRelation() {
@@ -525,7 +525,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
 
         /**
-         * The implementation.
+         * {@inheritDoc}
          * @return The trace of column as column info. (Nullable)
          */
         public ColumnInfo getTraceColumn() {
@@ -555,9 +555,6 @@ public abstract class AbstractDBMeta implements DBMeta {
             this._traceColumnInfo = traceColumn;
         }
 
-        /**
-         * The implementation.
-         */
         protected void recycle() {
             this._relationList = new ArrayList<RelationInfo>();
             this._relationTraceList = new ArrayList<AbstractRelationTrace>();
@@ -575,7 +572,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                                          Map String
     //                                                                          ==========
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Map list string that is prepared. (NotNull)
      */
     public MapListString createMapListString() {
@@ -583,7 +580,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Map string builder that is prepared. (NotNull)
      */
     public MapStringBuilder createMapStringBuilder() {
@@ -612,7 +609,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                                       Name Handling
     //                                                                       =============
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
      * @return Determination.
      */
@@ -626,7 +623,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
      * @return DB name. (NotNull, NotEmpty)
      */
@@ -645,7 +642,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
      * @return DB name. (NotNull, NotEmpty)
      */

@@ -50,19 +50,19 @@ public class SqlClauseDerby extends AbstractSqlClause {
     //                                                                 FetchScope Override
     //                                                                 ===================
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchFirst() {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchPage() {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doClearFetchPageClause() {
     }
@@ -86,7 +86,7 @@ public class SqlClauseDerby extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return this. (NotNull)
      */
@@ -96,7 +96,7 @@ public class SqlClauseDerby extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return Select-hint. (NotNull)
      */
@@ -105,7 +105,7 @@ public class SqlClauseDerby extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
@@ -114,7 +114,7 @@ public class SqlClauseDerby extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return From-hint. (NotNull)
      */
@@ -123,7 +123,7 @@ public class SqlClauseDerby extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @return Sql-suffix. (NotNull)
      */

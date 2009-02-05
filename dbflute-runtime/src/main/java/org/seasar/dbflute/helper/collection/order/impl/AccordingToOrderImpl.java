@@ -34,7 +34,7 @@ public class AccordingToOrderImpl implements AccordingToOrder {
     //                                                                                Main
     //                                                                                ====
     /**
-     * The implementation.
+     * {@inheritDoc}
      * 
      * @param unorderedList The unordered list. (NotNull)
      * @param option The option of according-to-order. (NotNull)

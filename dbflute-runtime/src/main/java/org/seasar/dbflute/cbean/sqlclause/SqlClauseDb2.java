@@ -53,7 +53,7 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     //                                                                 FetchScope Override
     //                                                                 ===================
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchFirst() {
         if (isFetchSizeSupported()) {
@@ -62,7 +62,7 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     }
 
     /**
-     * The implementation. {Unsupported!}
+     * {@inheritDoc} {Unsupported!}
      */
     protected void doFetchPage() {
         if (isFetchSizeSupported()) {
@@ -75,7 +75,7 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     }
 
     /**
-     * The implementation. {Unsupported!}
+     * {@inheritDoc} {Unsupported!}
      */
     protected void doClearFetchPageClause() {
         _fetchFirstSqlSuffix = "";
@@ -90,7 +90,7 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
@@ -99,7 +99,7 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
@@ -107,7 +107,7 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
@@ -115,7 +115,7 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
@@ -123,7 +123,7 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {

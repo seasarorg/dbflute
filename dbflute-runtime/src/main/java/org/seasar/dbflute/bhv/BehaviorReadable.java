@@ -124,8 +124,8 @@ public interface BehaviorReadable {
     //                                                                            Sequence
     //                                                                            ========
     /**
-     * The implementation.
-     * @return The value of sequence. (NotNull)
+     * Read next value of sequence.
+     * @return The next value of sequence. (NotNull)
      */
     public java.math.BigDecimal readNextVal();
 

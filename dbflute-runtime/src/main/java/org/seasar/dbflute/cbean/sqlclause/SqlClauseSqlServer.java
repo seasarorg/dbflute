@@ -53,7 +53,7 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     //                                                                 FetchScope Override
     //                                                                 ===================
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchFirst() {
         if (isFetchSizeSupported()) {
@@ -62,7 +62,7 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchPage() {
         if (isFetchSizeSupported()) {
@@ -75,7 +75,7 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doClearFetchPageClause() {
         _fetchFirstSelectHint = "";
@@ -92,7 +92,7 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     //                                                                       Lock Override
     //                                                                       =============
     /**
-     * The implementation. {Implement}
+     * {@inheritDoc} {Implement}
      * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
@@ -104,7 +104,7 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     //                                                                       Hint Override
     //                                                                       =============
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
@@ -112,7 +112,7 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
@@ -120,7 +120,7 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
@@ -128,7 +128,7 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {

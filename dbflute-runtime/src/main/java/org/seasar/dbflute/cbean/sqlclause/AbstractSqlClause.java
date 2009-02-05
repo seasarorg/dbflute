@@ -1223,7 +1223,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                                                     Fetch Narrowing
     //                                                                     ===============
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Fetch-narrowing start-index.
      */
     public int getFetchNarrowingSkipStartIndex() {
@@ -1231,7 +1231,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Fetch-narrowing size.
      */
     public int getFetchNarrowingLoopCount() {
@@ -1239,7 +1239,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Determination.
      */
     public boolean isFetchNarrowingEffective() {

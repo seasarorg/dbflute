@@ -66,14 +66,14 @@ public class SqlClauseOracle extends AbstractSqlClause {
     //                                                                 FetchScope Override
     //                                                                 ===================
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchFirst() {
         doFetchPage();
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doFetchPage() {
         if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
@@ -95,7 +95,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      */
     protected void doClearFetchPageClause() {
         _fetchScopeSelectHint = "";
@@ -106,7 +106,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
     //                                                                       Lock Override
     //                                                                       =============
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
@@ -125,7 +125,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
     //                                                                       Hint Override
     //                                                                       =============
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
@@ -133,7 +133,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
@@ -141,7 +141,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
@@ -149,7 +149,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {

@@ -68,7 +68,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     // For SQL Comment
     // * * * * * * * *
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Determination.
      */
     public boolean isPaging() {
@@ -79,7 +79,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     // For Framework
     // * * * * * * * *
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Determination.
      */
     public boolean isCountLater() {
@@ -90,7 +90,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                        Paging Setting
     //                                        --------------
     /**
-     * The implementation.
+     * {@inheritDoc}
 	 * @param pageSize The page size per one page. (NotMinus & NotZero)
 	 * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
      */
@@ -100,7 +100,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation. {INTERNAL METHOD: Don't Invoke This!}
+     * {@inheritDoc} {INTERNAL METHOD: Don't Invoke This!}
      * @param paging Determination.
      */
     public void xsetPaging(boolean paging) {
@@ -131,7 +131,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                         Fetch Setting
     //                                         -------------
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNull)
      */
@@ -141,7 +141,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
      * @param fetchSize Fetch-size. (NotMinus & NotZero)
      * @return this. (NotNull)
@@ -152,7 +152,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
@@ -165,7 +165,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                        Fetch Property
     //                                        --------------
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Fetch-start-index.
      */
     public int getFetchStartIndex() {
@@ -173,7 +173,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Fetch-size.
      */
     public int getFetchSize() {
@@ -181,7 +181,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Fetch-page-number.
      */
     public int getFetchPageNumber() {
@@ -189,7 +189,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Page start index. 0 origin. (NotMinus)
      */
     public int getPageStartIndex() {
@@ -197,7 +197,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Page end index. 0 origin. (NotMinus)
      */
     public int getPageEndIndex() {
@@ -281,7 +281,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                                       Implementation of OrderByBean
     //                                                       =============================
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Sql component of order-by clause. (NotNull)
      */
     public OrderByClause getSqlComponentOfOrderByClause() {
@@ -289,7 +289,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return Order-by clause. (NotNull)
      */
     public String getOrderByClause() {
@@ -297,7 +297,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return this. (NotNull)
      */
     public OrderByBean clearOrderBy() {
@@ -306,7 +306,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return this. (NotNull)
      */
     public OrderByBean ignoreOrderBy() {
@@ -315,7 +315,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * The implementation.
+     * {@inheritDoc}
      * @return this. (NotNull)
      */
     public OrderByBean makeOrderByEffective() {
