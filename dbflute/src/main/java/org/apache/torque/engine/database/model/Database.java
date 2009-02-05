@@ -1687,11 +1687,11 @@ public class Database {
     //                                               Comment
     //                                               -------
     public String getOverrideComment() {
-        return "The override.";
+        return "{@inheritDoc}";
     }
 
     public String getImplementComment() {
-        return "The implementation.";
+        return "{@inheritDoc}";
     }
 
     // -----------------------------------------------------
