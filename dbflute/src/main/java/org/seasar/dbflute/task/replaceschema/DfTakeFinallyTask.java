@@ -297,11 +297,13 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             final StringBuilder sb = new StringBuilder();
             final String ln = getLineSeparator();
             sb.append(ln).append("[Final Information]");
+            if (existsError) {
+                sb.append(ln).append("  ***********");
+                sb.append(ln).append("  * Failure *");
+                sb.append(ln).append("  ***********");
+            }
             sb.append(ln).append("  ").append(line);
             sb.append(ln).append("  ").append(result.getResultMessage());
-            if (existsError) {
-                sb.append(ln).append("  *Failure");
-            }
             return sb.toString();
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
