@@ -84,7 +84,7 @@ public class TnStatementFactoryImpl implements StatementFactory {
             return ps;
         } catch (SQLException e) {
             handleSQLException(e, null);
-            return null;// Unreachable!
+            return null; // Unreachable!
         }
     }
 

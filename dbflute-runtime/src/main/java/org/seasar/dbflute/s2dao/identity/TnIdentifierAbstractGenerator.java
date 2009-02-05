@@ -69,7 +69,7 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     }
 
     protected StatementFactory createStatementFactory(DataSource ds, String sql) {
-        return new InternalIdentifierGeneratorStatementFactory();
+        return new IdentifierGeneratorStatementFactory();
     }
 
     protected void reflectIdentifier(Object bean, Object value) {
@@ -100,7 +100,7 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     // ===================================================================================
     //                                                                   Statement Factory
     //                                                                   =================
-    protected static class InternalIdentifierGeneratorStatementFactory implements StatementFactory {
+    protected static class IdentifierGeneratorStatementFactory implements StatementFactory {
         public PreparedStatement createPreparedStatement(Connection conn, String sql) {
             try {
                 return conn.prepareStatement(sql);
