@@ -189,6 +189,24 @@ public class ${myClassName} extends AbstractConditionBean {
         return query().hasUnionQueryOrUnionAllQuery();
     }
 #if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabaseOracle())
+
+    // ===================================================================================
+    //                                                                           Lock Wait
+    //                                                                           =========
+    public ConditionBean lockForUpdateNoWait()
+    { if (helpIsSqlClauseOracle()) { helpGettingSqlClauseOracle().lockForUpdateNoWait(); } return this; }
+    public ConditionBean lockForUpdateWait(int waitSec)
+    { if (helpIsSqlClauseOracle()) { helpGettingSqlClauseOracle().lockForUpdateWait(waitSec); } return this; }
+
+    protected boolean helpIsSqlClauseOracle() {
+        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
+    }
+
+    protected org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle helpGettingSqlClauseOracle() {
+        return (org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause();
+    }
+#end
 #if ($database.isDatabaseDB2())
 
     // [DBFlute-0.7.9]
