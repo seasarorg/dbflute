@@ -28,7 +28,7 @@ public class SqlClauseOracleTest extends PlainTestCase {
 
         // ## Assert ##
         log(target._lockSqlSuffix);
-        assertTrue(target._lockSqlSuffix.endsWith(" no wait"));
+        assertTrue(target._lockSqlSuffix.endsWith(" nowait"));
         assertTrue(markSet.contains("lockForUpdate"));
 
         // Should be overridden lockSqlSuffix.
@@ -60,6 +60,6 @@ public class SqlClauseOracleTest extends PlainTestCase {
         // Should be overridden lockSqlSuffix.
         target.lockForUpdateNoWait();
         log(target._lockSqlSuffix);
-        assertTrue(target._lockSqlSuffix.endsWith(" no wait"));
+        assertTrue(target._lockSqlSuffix.endsWith(" nowait"));
     }
 }

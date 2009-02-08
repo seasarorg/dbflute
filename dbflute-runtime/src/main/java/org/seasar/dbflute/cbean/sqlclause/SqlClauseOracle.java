@@ -161,7 +161,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
     //                                                                 ===================
     public SqlClause lockForUpdateNoWait() {
         lockForUpdate();
-        _lockSqlSuffix = _lockSqlSuffix + " no wait";
+        _lockSqlSuffix = _lockSqlSuffix + " nowait";
         return this;
     }
     
