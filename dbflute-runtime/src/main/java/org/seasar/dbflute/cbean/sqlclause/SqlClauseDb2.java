@@ -98,6 +98,9 @@ public class SqlClauseDb2 extends AbstractSqlClause {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                       Hint Override
+    //                                                                       =============
     /**
      * {@inheritDoc}
      * @return Select-hint. (NotNull)
@@ -132,8 +135,8 @@ public class SqlClauseDb2 extends AbstractSqlClause {
 
     // [DBFlute-0.7.9]
     // ===================================================================================
-    //                                                                      DB2 Dependency
-    //                                                                      ==============
+    //                                                                 Database Dependency
+    //                                                                 ===================
     public void lockWithRR() {
         _lockSqlSuffix = " with RR";
     }

@@ -155,4 +155,19 @@ public class SqlClauseOracle extends AbstractSqlClause {
     protected String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
+    
+    // ===================================================================================
+    //                                                                 Database Dependency
+    //                                                                 ===================
+    public SqlClause lockForUpdateNoWait() {
+        lockForUpdate();
+        _lockSqlSuffix = _lockSqlSuffix + " no wait";
+        return this;
+    }
+    
+    public SqlClause lockForUpdateWait(int waitSec) {
+        lockForUpdate();
+        _lockSqlSuffix = _lockSqlSuffix + " wait " + waitSec;
+        return this;
+    }
 }
