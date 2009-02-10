@@ -243,6 +243,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     public <RESULT> SLFunction<${myConditionBeanClassName}, RESULT> scalarSelect(Class<RESULT> resultType) {
         ${myConditionBeanClassName} cb = newMyConditionBean();
         cb.xsetupForScalarSelect();
+        cb.getSqlClause().disableSelectIndex(); // for when you use union
         return new SLFunction<${myConditionBeanClassName}, RESULT>(cb, resultType);
     }
 #if ($table.isUseSequence())
