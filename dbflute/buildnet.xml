@@ -78,7 +78,7 @@
       <format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
     </tstamp>
 
-    <delete file="etc/mark/product-is-dbflute.net-*"/>
+    <delete file="etc/mark/product-is-dbflute.net-${version}"/>
     <copy file="etc/mark/product-is-dbflute.net"
     	  tofile="etc/mark/product-is-dbflute.net-${version}"
     	  overwrite="true">
