@@ -533,7 +533,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected void handleNotFoundResult(List<File> sqlFileList) {
         if (_entityInfoMap.isEmpty() && _pmbMetaDataMap.isEmpty()) {
-            _log.warn(" ");
             _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
             _log.warn("SQL for sql2entity was Not Found!");
             _log.warn("");

@@ -544,7 +544,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         int parseSize = parseFileNameList.size();
         if (parseSize == 0) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("WARNING: No class file has been parsed.");
+            _log.info("No class file has been parsed.");
             _log.info("- - - - - - - - - -/");
             _log.info("");
             return;
@@ -569,6 +569,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         _log.info("");
         _log.info("    --> " + skipSize + " skipped (in " + parseSize + " files)");
         _log.info("- - - - - - - - - -/");
+        _log.info("");
     }
 
     // ===================================================================================
