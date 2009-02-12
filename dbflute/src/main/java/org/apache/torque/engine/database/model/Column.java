@@ -565,7 +565,7 @@ public class Column {
     public boolean isPrimaryKey() {
         return _isPrimaryKey;
     }
-    
+
     /**
      * Set if the column is a primary key or not
      * @param pk Determination.
@@ -581,7 +581,7 @@ public class Column {
     public boolean isAdditionalPrimaryKey() {
         return _additionalPrimaryKey;
     }
-    
+
     /**
      * Set if the column is an additional primary key or not
      * @param additionalPrimaryKey Determination.
@@ -986,7 +986,7 @@ public class Column {
         return sb.toString();
     }
 
-    public String getReferrerTableCommaStringWithHtmlHref() {// For SchemaHTML
+    public String getReferrerTableCommaStringWithHtmlHref() { // for SchemaHTML
         if (_referrers == null) {
             _referrers = new ArrayList<ForeignKey>(5);
         }
@@ -1000,7 +1000,13 @@ public class Column {
                 continue;
             }
             tableSet.add(name);
-            sb.append(delimiter).append("<a href=\"#" + name + "\">").append(name).append("</a>");
+            sb.append(delimiter);
+            if (fk.isAdditionalForeignKey()) {
+                sb.append("<a href=\"#" + name + "\" class=\"additionalfk\">");
+            } else {
+                sb.append("<a href=\"#" + name + "\">");
+            }
+            sb.append(name).append("</a>");
         }
         sb.delete(0, delimiter.length());
         return sb.toString();

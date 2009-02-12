@@ -967,7 +967,7 @@ public class Table {
         return sb.toString();
     }
 
-    public String getForeignTableNameCommaStringWithHtmlHref() { // For SchemaHTML
+    public String getForeignTableNameCommaStringWithHtmlHref() { // for SchemaHTML
         final StringBuilder sb = new StringBuilder();
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = _foreignKeys;
@@ -982,7 +982,13 @@ public class Table {
                 continue;
             }
             tableSet.add(name);
-            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+            sb.append(", ");
+            if (fk.isAdditionalForeignKey()) {
+                sb.append("<a href=\"#" + name + "\" class=\"additionalfk\">");
+            } else {
+                sb.append("<a href=\"#" + name + "\">");
+            }
+            sb.append(name).append("</a>");
         }
         sb.delete(0, ", ".length());
         return sb.toString();
@@ -1434,7 +1440,7 @@ public class Table {
         return sb.toString();
     }
 
-    public String getReferrerTableNameCommaStringWithHtmlHref() { // For SchemaHTML
+    public String getReferrerTableNameCommaStringWithHtmlHref() { // for SchemaHTML
         final StringBuilder sb = new StringBuilder();
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> referrerList = getReferrerList();
@@ -1449,7 +1455,13 @@ public class Table {
                 continue;
             }
             tableSet.add(name);
-            sb.append(", ").append("<a href=\"#" + name + "\">").append(name).append("</a>");
+            sb.append(", ");
+            if (fk.isAdditionalForeignKey()) {
+                sb.append("<a href=\"#" + name + "\" class=\"additionalfk\">");
+            } else {
+                sb.append("<a href=\"#" + name + "\">");
+            }
+            sb.append(name).append("</a>");
         }
         sb.delete(0, ", ".length());
         return sb.toString();

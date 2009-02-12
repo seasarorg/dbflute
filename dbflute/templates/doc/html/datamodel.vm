@@ -71,7 +71,12 @@
 	.optcell {
 		font-style: italic;
 	}
-	.additional {
+	.additionalpk {
+		font-size: 0.7em;
+		font-style: italic;
+		color: #666;
+	}
+	.additionalfk {
 		font-size: 0.7em;
 		font-style: italic;
 		color: #666;

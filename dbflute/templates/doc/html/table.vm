@@ -24,7 +24,7 @@
   </thead>
 #foreach ($col in $table.columns)
   <tr>
-    <td class="flgcell">#if ($col.isPrimaryKey())o#else &nbsp;#end</td>
+    <td class="flgcell#if ($col.isAdditionalPrimaryKey()) additionalpk#end">#if ($col.isPrimaryKey())o#else &nbsp;#end</td>
     <td class="flgcell">#if ($col.isIdentityOrSequence())o#else &nbsp;#end</td>
     <td class="flgcell">#if ($col.isUnique())o#else &nbsp;#end</td>
     <td class="flgcell">#if ($col.hasIndex())o#else &nbsp;#end</td>
