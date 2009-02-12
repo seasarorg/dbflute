@@ -1574,7 +1574,11 @@ public abstract class AbstractSqlClause implements SqlClause {
             String subQuery = filterSubQueryIndent(fromWhereClause);
             subQuery = replaceString(subQuery, aliasName + ".", "");
             subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
-            subQuery = subQuery.substring(subQuery.indexOf("where "));
+            int whereIndex = subQuery.indexOf("where ");
+            if (whereIndex < 0) {
+                return sb.toString();
+            }
+            subQuery = subQuery.substring(whereIndex);
             sb.append(" ").append(subQuery);
             return sb.toString();
         }
