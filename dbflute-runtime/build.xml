@@ -69,42 +69,4 @@
     	  overwrite="true"/>
   </target>
 
-  <!--
-  <target name="clean">
-    <delete dir="target/classes"/>
-    <mkdir dir="target/classes"/>
-  </target>
-  -->
-
-  <!--
-  <target name="copy-resources">
-    <copy todir="target/classes">
-      <fileset dir="src/main/java">
-        <exclude name="**/*.java"/>
-      </fileset>
-      <fileset dir="src/main/resources">
-        <exclude name="**/*.java"/>
-      </fileset>
-    </copy>
-  </target>
-  -->
-
-  <!--
-  <target name="compile" depends="clean, copy-resources" description="==> compiles sources">
-
-    <javac destdir="target/classes" encoding="UTF-8" debug="true">
-      <src path="src/main/java" />
-      <src path="src/main/resources" />
-      <classpath>
-        <fileset dir="lib">
-          <include name="**/*.jar" />
-        </fileset>
-      </classpath>
-      <include name="**/*"/>
-      <compilerarg value="-Xlint:deprecation" />
-      <compilerarg value="-Xlint:unchecked" />
-    </javac>
-  </target>
-  -->
-
 </project>
