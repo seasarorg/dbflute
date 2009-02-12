@@ -95,6 +95,7 @@ public class ForeignKey {
     protected DfFlexibleMap<String, String> _foreignLocalMap = new DfFlexibleMap<String, String>();
 
     private String _foreignPropertyNamePrefix;
+    private boolean _additionalForeignKey;
     private String _fixedCondition;
     private String _fixedSuffix;
     private Map<String, String> _dynamicFixedConditionMap = new LinkedHashMap<String, String>();
@@ -1190,6 +1191,14 @@ public class ForeignKey {
      */
     public Table getTable() {
         return _localTable;
+    }
+
+    public boolean isAdditionalForeignKey() {
+        return _additionalForeignKey;
+    }
+
+    public void setAdditionalForeignKey(boolean additionalForeignKey) {
+        _additionalForeignKey = additionalForeignKey;
     }
 
     public String getFixedCondition() {

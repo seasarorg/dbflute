@@ -125,6 +125,7 @@ public class DfAdditionalForeignKeyInitializer {
         fk.setName(foreignKeyname);
         fk.setForeignTableName(foreignTableName);
         fk.addReference(localColumnNameList, foreignColumnNameList);
+        fk.setAdditionalForeignKey(true);
         if (fixedCondition != null && fixedCondition.trim().length() > 0) {
             fk.setFixedCondition(fixedCondition);
         }

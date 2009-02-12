@@ -77,6 +77,7 @@ public class DfAdditionalPrimaryKeyInitializer {
             for (String columnName : columnNameList) {
                 final Column column = table.getColumn(columnName);
                 column.setPrimaryKey(true);
+                column.setAdditionalPrimaryKey(true);
             }
             showResult(primaryKeyName, table, columnNameList);
         }

@@ -100,6 +100,8 @@ public class Column {
 
     private boolean _isPrimaryKey = false;
 
+    private boolean _additionalPrimaryKey = false;
+
     private boolean _isAutoIncrement = false;
 
     private String _defaultValue;
@@ -557,6 +559,14 @@ public class Column {
     //                                           Primary Key
     //                                           -----------
     /**
+     * Return true if the column is a primary key
+     * @return Determination.
+     */
+    public boolean isPrimaryKey() {
+        return _isPrimaryKey;
+    }
+    
+    /**
      * Set if the column is a primary key or not
      * @param pk Determination.
      */
@@ -565,11 +575,19 @@ public class Column {
     }
 
     /**
-     * Return true if the column is a primary key
+     * Return true if the column is an additional primary key
      * @return Determination.
      */
-    public boolean isPrimaryKey() {
-        return _isPrimaryKey;
+    public boolean isAdditionalPrimaryKey() {
+        return _additionalPrimaryKey;
+    }
+    
+    /**
+     * Set if the column is an additional primary key or not
+     * @param additionalPrimaryKey Determination.
+     */
+    public void setAdditionalPrimaryKey(boolean additionalPrimaryKey) {
+        _additionalPrimaryKey = additionalPrimaryKey;
     }
 
     // -----------------------------------------------------
@@ -998,11 +1016,11 @@ public class Column {
     public void setSql2EntityTableName(String sql2EntityTableName) {
         _sql2EntityTableName = sql2EntityTableName;
     }
-    
+
     public String getSql2EntityJavaNative() {
         return _sql2EntityJavaNative;
     }
-    
+
     public void setSql2EntityJavaNative(String sql2EntityJavaNative) {
         _sql2EntityJavaNative = sql2EntityJavaNative;
     }
