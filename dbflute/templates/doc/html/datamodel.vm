@@ -74,12 +74,12 @@
 	.additionalpk {
 		font-size: 0.7em;
 		font-style: italic;
-		color: #666;
+		color: #228;
 	}
 	.additionalfk {
 		font-size: 0.7em;
 		font-style: italic;
-		color: #666;
+		color: #228;
 	}
 
 	/* inner table */

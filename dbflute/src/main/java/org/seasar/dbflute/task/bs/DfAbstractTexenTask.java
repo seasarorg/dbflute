@@ -541,7 +541,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             return;
         }
         List<String> parseFileNameList = DfGenerator.getInstance().getParseFileNameList();
-        if (parseFileNameList.size() == 0) {
+        int parseSize = parseFileNameList.size();
+        if (parseSize == 0) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
             _log.info("WARNING: No class file has been parsed.");
             _log.info("- - - - - - - - - -/");
@@ -549,7 +550,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             return;
         }
         List<String> skipFileNameList = DfGenerator.getInstance().getSkipFileNameList();
-        if (skipFileNameList.size() == 0) {
+        int skipSize = skipFileNameList.size();
+        if (skipSize == 0) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
             _log.info("All class files have been generated. (overrided)");
             _log.info("- - - - - - - - - -/");
@@ -560,7 +562,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         _log.info("Several class files have been skipped generating");
         _log.info("                    because they have no change.");
         _log.info("");
-        _log.info("    --> " + skipFileNameList.size() + " / " + parseFileNameList.size());
+        _log.info("    --> " + skipSize + " skipped / " + parseSize + " files");
         _log.info("- - - - - - - - - -/");
         _log.info("");
     }

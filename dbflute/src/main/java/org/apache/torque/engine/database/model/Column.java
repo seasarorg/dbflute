@@ -66,6 +66,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -877,6 +878,8 @@ public class Column {
 
     public String getForeignTableNameCommaStringWithHtmlHref() { // for SchemaHTML
         final StringBuilder sb = new StringBuilder();
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder();
+        final String delimiter = ",<br />";
         final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = getForeignKeyList();
         final int size = foreignKeyList.size();
@@ -893,15 +896,9 @@ public class Column {
                 continue;
             }
             tableSet.add(name);
-            sb.append(", ");
-            if (fk.isAdditionalForeignKey()) {
-                sb.append("<a href=\"#" + name + "\" class=\"additionalfk\">");
-            } else {
-                sb.append("<a href=\"#" + name + "\">");
-            }
-            sb.append(name).append("</a>");
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, name, delimiter));
         }
-        sb.delete(0, ", ".length());
+        sb.delete(0, delimiter.length());
         return sb.toString();
     }
 
@@ -1024,6 +1021,7 @@ public class Column {
         if (_referrers == null) {
             _referrers = new ArrayList<ForeignKey>(5);
         }
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder();
         final String delimiter = ",<br />";
         final Set<String> tableSet = new HashSet<String>();
         final StringBuffer sb = new StringBuffer();
@@ -1037,13 +1035,7 @@ public class Column {
                 continue;
             }
             tableSet.add(name);
-            sb.append(delimiter);
-            if (fk.isAdditionalForeignKey()) {
-                sb.append("<a href=\"#" + name + "\" class=\"additionalfk\">");
-            } else {
-                sb.append("<a href=\"#" + name + "\">");
-            }
-            sb.append(name).append("</a>");
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, name, delimiter));
         }
         sb.delete(0, delimiter.length());
         return sb.toString();
