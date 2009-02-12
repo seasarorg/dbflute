@@ -903,16 +903,21 @@ public class Table {
                 if (firstFK == null) {
                     firstFK = key;
                 }
-            } else {
-                // TODO: @jflute -- What's this?
-                // 
-                //System.out.println(col+" is in multiple FKs.  This is not"
-                //                   + " being handled properly.");
-                //throw new IllegalStateException("Cannot call method if " +
-                //    "column is referenced multiple times");
             }
         }
         return firstFK;
+    }
+    
+    public List<ForeignKey> getForeignKeyList(String columnName) {
+        List<ForeignKey> fkList = new ArrayList<ForeignKey>();
+        for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
+            ForeignKey key = iter.next();
+            List<String> localColumns = key.getLocalColumns();
+            if (DfStringUtil.containsIgnoreCase(columnName, localColumns)) {
+                fkList.add(key);
+            }
+        }
+        return fkList;
     }
 
     /**
@@ -979,6 +984,9 @@ public class Table {
             final ForeignKey fk = foreignKeyList.get(i);
             final String name = fk.getForeignTableName();
             if (tableSet.contains(name)) {
+                continue;
+            }
+            if (fk.hasFixedCondition()) {
                 continue;
             }
             tableSet.add(name);
@@ -1452,6 +1460,9 @@ public class Table {
             final ForeignKey fk = referrerList.get(i);
             final String name = fk.getTable().getName();
             if (tableSet.contains(name)) {
+                continue;
+            }
+            if (fk.hasFixedCondition()) {
                 continue;
             }
             tableSet.add(name);

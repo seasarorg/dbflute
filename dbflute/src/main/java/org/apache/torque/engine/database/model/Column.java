@@ -871,6 +871,40 @@ public class Column {
         return _table.getForeignKey(this._name);
     }
 
+    public List<ForeignKey> getForeignKeyList() {
+        return _table.getForeignKeyList(_name);
+    }
+
+    public String getForeignTableNameCommaStringWithHtmlHref() { // for SchemaHTML
+        final StringBuilder sb = new StringBuilder();
+        final Set<String> tableSet = new HashSet<String>();
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
+        final int size = foreignKeyList.size();
+        if (size == 0) {
+            return "&nbsp;";
+        }
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = foreignKeyList.get(i);
+            final String name = fk.getForeignTableName();
+            if (tableSet.contains(name)) {
+                continue;
+            }
+            if (fk.hasFixedCondition()) {
+                continue;
+            }
+            tableSet.add(name);
+            sb.append(", ");
+            if (fk.isAdditionalForeignKey()) {
+                sb.append("<a href=\"#" + name + "\" class=\"additionalfk\">");
+            } else {
+                sb.append("<a href=\"#" + name + "\">");
+            }
+            sb.append(name).append("</a>");
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
     /**
      * Utility method to get the related table of this column if it is a foreign
      * key or part of a foreign key
@@ -997,6 +1031,9 @@ public class Column {
             final Table reffererTable = fk.getTable();
             final String name = reffererTable.getName();
             if (tableSet.contains(name)) {
+                continue;
+            }
+            if (fk.hasFixedCondition()) {
                 continue;
             }
             tableSet.add(name);

@@ -36,7 +36,7 @@
     <td>${col.dbTypeExpression}</td>
     <td class="numcell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
     <td class="subcell">#if ($col.hasDefaultValue() && !$col.isIdentityOrSequence()) ${col.defaultValue}#else &nbsp;#end</td>
-    <td class="linkcell"><a href="#${col.foreignTableName}">${col.foreignTableName}</a>&nbsp;</td>
+    <td class="linkcell">${col.foreignTableNameCommaStringWithHtmlHref}&nbsp;</td>
     <td class="linkcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
     <td class="linkcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
     <td class="commentcell">#if ($col.hasComment()) ${col.commentForSchemaHtml}#else &nbsp;#end</td>
