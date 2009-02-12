@@ -535,16 +535,30 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         boolean skipGenerateIfSameFile = getProperties().getLittleAdjustmentProperties().isSkipGenerateIfSameFile();
         if (!skipGenerateIfSameFile) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("All files have been generated. (overrided)");
+            _log.info("All class files have been generated. (overrided)");
             _log.info("- - - - - - - - - -/");
             _log.info("");
             return;
         }
         List<String> parseFileNameList = DfGenerator.getInstance().getParseFileNameList();
+        if (parseFileNameList.size() == 0) {
+            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+            _log.info("WARNING: No class file has been parsed.");
+            _log.info("- - - - - - - - - -/");
+            _log.info("");
+            return;
+        }
         List<String> skipFileNameList = DfGenerator.getInstance().getSkipFileNameList();
+        if (skipFileNameList.size() == 0) {
+            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+            _log.info("All class files have been generated. (overrided)");
+            _log.info("- - - - - - - - - -/");
+            _log.info("");
+            return;
+        }
         _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info("Several files have skipped generating");
-        _log.info("        because they have no changing.");
+        _log.info("Several class files have been skipped generating");
+        _log.info("                    because they have no change.");
         _log.info("");
         _log.info("    --> " + skipFileNameList.size() + " / " + parseFileNameList.size());
         _log.info("- - - - - - - - - -/");
