@@ -559,12 +559,16 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             return;
         }
         _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info("Several class files have been skipped generating");
-        _log.info("                    because they have no change.");
+        if (skipSize == parseSize) {
+            _log.info("All class files have been skipped generating");
+            _log.info("                because they have no change.");
+        } else {
+            _log.info("Several class files have been skipped generating");
+            _log.info("                    because they have no change.");
+        }
         _log.info("");
-        _log.info("    --> " + skipSize + " skipped / " + parseSize + " files");
+        _log.info("    --> " + skipSize + " skipped (in " + parseSize + " files)");
         _log.info("- - - - - - - - - -/");
-        _log.info("");
     }
 
     // ===================================================================================

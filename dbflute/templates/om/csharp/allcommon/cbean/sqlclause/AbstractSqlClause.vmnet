@@ -1437,7 +1437,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
             String subQuery = filterSubQueryIndent(fromWhereClause);
             subQuery = replaceString(subQuery, aliasName + ".", "");
             subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
-            subQuery = subQuery.Substring(subQuery.IndexOf("where "));
+            int whereIndex = subQuery.IndexOf("where ");
+            if (whereIndex < 0) {
+                return sb.toString();
+            }
+            subQuery = subQuery.Substring(whereIndex);
             sb.append(" ").append(subQuery);
             return sb.toString();
         }
