@@ -1,5 +1,6 @@
 #set ( $basepath = $generator.OutputPath)
 
+    
 #foreach ($dataModel in $dataModels)
   #if ($outputFormat=="html")
     #set ( $outFile = "${dataModel.name}.html" )
@@ -10,6 +11,14 @@
   File to be created: $outFile
 
   #set ($database = $dataModel.database)
+
+  ## - - - - - - - - - - - -
+  ## Initialize properties.
+  ## - - - - - - - - - - - -
+  $database.initializeVersion(90)
+  $database.initializeAdditionalPrimaryKey()
+  $database.initializeAdditionalForeignKey()
   $database.initializeClassificationDeployment()
+
   $generator.parse("doc/$outputFormat/datamodel.vm",$outFile,"dataModel",$dataModel)
 #end
