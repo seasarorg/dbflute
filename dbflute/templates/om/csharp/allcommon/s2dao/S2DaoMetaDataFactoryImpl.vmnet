@@ -36,10 +36,10 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected readonly IDataReaderFactory _dataReaderFactory;
         protected readonly IAnnotationReaderFactory _readerFactory;
         protected IDatabaseMetaData _dbMetaData;
-        protected string _sqlFileEncoding = System.Text.Encoding.Default.WebName;
-        protected string[] _insertPrefixes;
-        protected string[] _updatePrefixes;
-        protected string[] _deletePrefixes;
+        protected String _sqlFileEncoding = "${database.sqlFileEncoding}";
+        protected String[] _insertPrefixes;
+        protected String[] _updatePrefixes;
+        protected String[] _deletePrefixes;
 		protected Map<Type, IBeanMetaData> _beanMetaDataCacheMap = new HashMap<Type, IBeanMetaData>();
 
         // ===============================================================================
@@ -139,19 +139,19 @@ namespace ${glPackageBaseCommonS2Dao} {
             set { _dbMetaData = value; }
         }
 
-        public string[] InsertPrefixes {
+        public String[] InsertPrefixes {
             set { _insertPrefixes = value; }
         }
 
-        public string[] UpdatePrefixes {
+        public String[] UpdatePrefixes {
             set { _updatePrefixes = value; }
         }
 
-        public string[] DeletePrefixes {
+        public String[] DeletePrefixes {
             set { _deletePrefixes = value; }
         }
 
-        public string SqlFileEncoding {
+        public String SqlFileEncoding {
             set { _sqlFileEncoding = value; }
         }
     }
