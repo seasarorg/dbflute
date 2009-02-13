@@ -461,6 +461,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 if (method == null) {
                     break; // End
                 }
+                if (method.DeclaringType == null) {
+                    break; // If you use WCF, it may return null. 
+                }
                 String className = method.DeclaringType.Name; // This is simple class name at CSharp.
                 String methodName = method.Name;
 
