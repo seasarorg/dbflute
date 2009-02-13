@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
+import java.io.Serializable;
 import java.util.*;
 
 #if ($table.isBuriTarget())
@@ -63,7 +64,7 @@ import ${myExtendedEntityPackageName}.*;
  * </pre>
  * @author ${database.ClassAuthor}
  */
-public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.Serializable {
+public abstract class $myClassName implements ${myEntityInterfaceName}, Serializable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -118,19 +119,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #end
     
     // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    public ${myClassName}() {
-    }
-
-    // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
     public String getTableDbName() {
         return "${table.name}";
     }
 
-    public String getTablePropertyName() {// as JavaBeansRule
+    public String getTablePropertyName() { // as JavaBeansRule
         return "${table.javaBeansRulePropertyName}";
     }
 
@@ -260,9 +255,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #set ($foreignTable = $foreignKey.foreignTable)
 #set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
 #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
-    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   Foreign Property = [${foreignKey.foreignJavaBeansRulePropertyName}]
-    // * * * * * * * * */
     public static final int ${foreignKey.foreignJavaBeansRulePropertyName}_RELNO = ${table.resolveForeignIndex($foreignKey)};
     public static final String ${foreignKey.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKey.relationKeysCommaString";
 
@@ -298,9 +290,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerJavaBeansRulePropertyNameAsOne}")
 #if (${referrer.isOneToOne()})
-    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   Foreign Property = [${referrer.referrerJavaBeansRulePropertyNameAsOne}]
-    // * * * * * * * * */
     public static final int ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveReferrerIndexAsOne($referrer)};
     public static final String ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELKEYS = "$referrer.relationKeysCommaStringForOneToOneReferrer";
     
@@ -340,9 +329,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
-    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-    //   Referrer Property = [${referrer.referrerJavaBeansRulePropertyName}]
-    // * * * * * * * * */
     /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. */
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
@@ -365,7 +351,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
 
 #end
 #end
-
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
@@ -515,11 +500,15 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         return sb.toString();
     }
 
+#set ($propertyLoopIndex = 0)
+#foreach ($col in $table.columns)
+#if ($propertyLoopIndex == 0)
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-#foreach ($col in $table.columns)
+#else
 
+#end
     /** The column annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
     public static final String ${col.javaBeansRulePropertyName}_COLUMN = "${col.name}";
 #if ($col.isJavaNativeStringClob())
@@ -555,8 +544,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, java.io.
         _modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
         this._${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
     }
+#set ($propertyLoopIndex = $propertyLoopIndex + 1)
 #end
-
 #if ($table.hasAllCommonColumn())
 #foreach ($columnName in ${database.commonColumnNameConvertionList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
