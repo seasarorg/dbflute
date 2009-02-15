@@ -1291,6 +1291,10 @@ public class Database {
     public boolean isMakeEntityTraceRelation() {
         return getProperties().getLittleAdjustmentProperties().isMakeEntityTraceRelation();
     }
+    
+    public boolean isMakeEntityS2DaoAnnotation() {
+        return getProperties().getLittleAdjustmentProperties().isMakeEntityS2DaoAnnotation();
+    }
 
     public boolean isMakeFlatExpansion() {
         return getProperties().getLittleAdjustmentProperties().isMakeFlatExpansion();

@@ -125,6 +125,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isMakeEntityTraceRelation", false);
     }
 
+    public boolean isMakeEntityS2DaoAnnotation() { // It's closet!
+        return isProperty("isMakeEntityS2DaoAnnotation", false);
+    }
+
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========

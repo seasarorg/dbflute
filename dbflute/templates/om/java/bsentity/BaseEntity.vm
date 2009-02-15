@@ -71,6 +71,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                                                          ==========
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
+#if ($database.isMakeEntityS2DaoAnnotation())
 
     /** TABLE-Annotation for S2Dao. The value is ${table.annotationTableName}. */
     public static final String TABLE = "${table.annotationTableName}";
@@ -93,6 +94,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
     /** ID-Annotation */
     public static final String ${table.assignedPropertyName}_ID = "assigned";
+#end
 #end
 #end
 
@@ -255,9 +257,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #set ($foreignTable = $foreignKey.foreignTable)
 #set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
 #set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
+#if ($database.isMakeEntityS2DaoAnnotation())
     public static final int ${foreignKey.foreignJavaBeansRulePropertyName}_RELNO = ${table.resolveForeignIndex($foreignKey)};
     public static final String ${foreignKey.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKey.relationKeysCommaString";
 
+#end
     /** ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'. */
     protected ${foreignEntityClassName} ${foreignVariableName};
 
@@ -290,9 +294,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
 #set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerJavaBeansRulePropertyNameAsOne}")
 #if (${referrer.isOneToOne()})
+#if ($database.isMakeEntityS2DaoAnnotation())
     public static final int ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveReferrerIndexAsOne($referrer)};
     public static final String ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELKEYS = "$referrer.relationKeysCommaStringForOneToOneReferrer";
-    
+
+#end
     /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. */
     protected ${referrerEntityClassName} ${referrerVariableName};
 
@@ -509,19 +515,19 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #else
 
 #end
+#if ($database.isMakeEntityS2DaoAnnotation())
     /** The column annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
     public static final String ${col.javaBeansRulePropertyName}_COLUMN = "${col.name}";
-#if ($col.isJavaNativeStringClob())
 
+#end
+#if ($col.isJavaNativeStringClob())
     /** The value type annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
     public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "dbfluteStringClobType";
 #end
 #if ($col.isJavaNativeBytesOid())
-
     /** The value type annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
     public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "dbfluteBytesOidType";
 #end
-
     /**
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($col.isCommentForJavaDocValid())
