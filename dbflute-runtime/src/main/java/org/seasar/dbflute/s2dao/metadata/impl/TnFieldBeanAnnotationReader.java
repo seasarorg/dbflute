@@ -58,8 +58,8 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnFieldBeanAnnotationReader(Class<?> beanClass_) {
-        this.beanDesc = TnBeanDescFactory.getBeanDesc(beanClass_);
+    public TnFieldBeanAnnotationReader(Class<?> beanClass) {
+        this.beanDesc = TnBeanDescFactory.getBeanDesc(beanClass);
     }
 
     // ===================================================================================

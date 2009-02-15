@@ -45,6 +45,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final Class<?> beanClass;
     protected final boolean simpleType;
     protected final TnFieldBeanAnnotationReader fieldBeanAnnotationReader;
     protected final DBMeta dbmeta;
@@ -54,6 +55,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
     //                                                                         Constructor
     //                                                                         ===========
     public TnDBMetaBeanAnnotationReader(Class<?> beanClass) {
+        this.beanClass = beanClass;
         simpleType = isSimpleType(beanClass);
         if (simpleType) {
             dbmeta = null;
@@ -214,12 +216,8 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
 
         // ValueType is for user customization so this should not be handled by DBMeta.
         String valueTypeKey = pd.getPropertyName() + VALUE_TYPE_SUFFIX;
-        return getField(valueTypeKey);
-    }
-
-    private String getField(String key) {
-        if (beanDesc.hasField(key)) {
-            Field field = beanDesc.getField(key);
+        if (beanDesc.hasField(valueTypeKey)) {
+            Field field = beanDesc.getField(valueTypeKey);
             return (String) DfReflectionUtil.getValue(field, null);
         }
         return null;
