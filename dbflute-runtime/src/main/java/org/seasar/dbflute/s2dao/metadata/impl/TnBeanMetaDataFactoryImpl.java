@@ -128,7 +128,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
     //                                                                       Assist Helper
     //                                                                       =============
     protected TnBeanAnnotationReader createBeanAnnotationReader(Class<?> beanClass) {
-        return new TnFieldBeanAnnotationReader(beanClass);
+        return new TnDBMetaBeanAnnotationReader(beanClass);
     }
 
     protected String getVersionNoPropertyName(TnBeanAnnotationReader beanAnnotationReader) {

@@ -29,6 +29,9 @@ import org.seasar.dbflute.util.DfReflectionUtil;
  */
 public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     public String TABLE = "TABLE";
 
     public String RELNO_SUFFIX = "_RELNO";
@@ -47,12 +50,21 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
 
     public String VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private TnBeanDesc beanDesc;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public TnFieldBeanAnnotationReader(Class<?> beanClass_) {
         this.beanDesc = TnBeanDescFactory.getBeanDesc(beanClass_);
     }
 
+    // ===================================================================================
+    //                                                                      Implementation
+    //                                                                      ==============
     public String getColumnAnnotation(TnPropertyDesc pd) {
         String propertyName = pd.getPropertyName();
         String columnNameKey = propertyName + COLUMN_SUFFIX;
@@ -91,7 +103,6 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
         return getField(pd.getPropertyName() + ID_SUFFIX);
     }
 
-
     public String getRelationKey(TnPropertyDesc pd) {
         String propertyName = pd.getPropertyName();
         String relkeysKey = propertyName + RELKEYS_SUFFIX;
@@ -101,7 +112,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     public int getRelationNo(TnPropertyDesc pd) {
         String relnoKey = pd.getPropertyName() + RELNO_SUFFIX;
         Field field = beanDesc.getField(relnoKey);
-        return (Integer)DfReflectionUtil.getValue(field, null);
+        return (Integer) DfReflectionUtil.getValue(field, null);
     }
 
     public boolean hasRelationNo(TnPropertyDesc pd) {

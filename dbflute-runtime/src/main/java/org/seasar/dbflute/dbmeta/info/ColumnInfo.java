@@ -33,6 +33,7 @@ public class ColumnInfo {
     protected final String propertyName;
     protected final Class<?> propertyType;
     protected final boolean primary;
+    protected final boolean autoIncrement;
     protected final Integer columnSize;
     protected final Integer columnDecimalDigits;
     protected final OptimisticLockType optimisticLockType;
@@ -40,16 +41,16 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, String propertyName
-                    , Class<?> propertyType, boolean primary, Integer columnSize, Integer columnDecimalDigits) {
-        this(dbmeta, columnDbName, columnAlias, propertyName, propertyType, primary
-           , columnSize, columnDecimalDigits
-           , OptimisticLockType.NONE);
+    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, String propertyName,
+            Class<?> propertyType, boolean primary, boolean autoIncrement, Integer columnSize,
+            Integer columnDecimalDigits) {
+        this(dbmeta, columnDbName, columnAlias, propertyName, propertyType, primary, autoIncrement, columnSize,
+                columnDecimalDigits, OptimisticLockType.NONE);
     }
 
-    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, String propertyName
-                    , Class<?> propertyType, boolean primary, Integer columnSize, Integer columnDecimalDigits
-                    , OptimisticLockType optimisticLockType) {
+    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, String propertyName,
+            Class<?> propertyType, boolean primary, boolean autoIncrement, Integer columnSize,
+            Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
         assertObjectNotNull("propertyName", propertyName);
@@ -61,6 +62,7 @@ public class ColumnInfo {
         this.propertyName = propertyName;
         this.propertyType = propertyType;
         this.primary = primary;
+        this.autoIncrement = autoIncrement;
         this.columnSize = columnSize;
         this.columnDecimalDigits = columnDecimalDigits;
         this.optimisticLockType = optimisticLockType;
@@ -70,7 +72,8 @@ public class ColumnInfo {
     //                                                                              Finder
     //                                                                              ======
     public java.lang.reflect.Method findSetter() {
-        return findMethod(dbmeta.getEntityType(), "set" + buildInitCapPropertyName(), new Class<?>[] { this.propertyType });
+        return findMethod(dbmeta.getEntityType(), "set" + buildInitCapPropertyName(),
+                new Class<?>[] { this.propertyType });
     }
 
     public java.lang.reflect.Method findGetter() {
@@ -140,7 +143,7 @@ public class ColumnInfo {
         if (obj == null || !(obj instanceof ColumnInfo)) {
             return false;
         }
-        final ColumnInfo target = (ColumnInfo)obj;
+        final ColumnInfo target = (ColumnInfo) obj;
         if (!this.dbmeta.equals(target.getDBMeta())) {
             return false;
         }
@@ -189,7 +192,7 @@ public class ColumnInfo {
      * Get the type of property for the column.
      * @return The type of property for the column. (NotNull)
      */
-	public Class<?> getPropertyType() {
+    public Class<?> getPropertyType() {
         return this.propertyType;
     }
 
@@ -199,6 +202,14 @@ public class ColumnInfo {
      */
     public boolean isPrimary() {
         return this.primary;
+    }
+    
+    /**
+     * Is the column is auto increment?
+     * @return Determination.
+     */
+    public boolean isAutoIncrement() {
+        return this.autoIncrement;
     }
 
     /**

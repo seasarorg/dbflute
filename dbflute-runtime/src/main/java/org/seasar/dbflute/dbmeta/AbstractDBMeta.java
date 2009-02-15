@@ -168,17 +168,17 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
         return columnInfo;
     }
-
+    
     protected ColumnInfo cci(String columnDbName, String columnAlias, String propertyName
-                           , Class<?> propertyType, boolean primary
-                           , Integer columnSize, Integer columnDecimalDigits) {// createColumnInfo()
-        return new ColumnInfo(this, columnDbName, columnAlias, propertyName, propertyType, primary, columnSize, columnDecimalDigits);
+            , Class<?> propertyType, boolean primary, boolean autoIncrement
+            , Integer columnSize, Integer columnDecimalDigits) { // createColumnInfo()
+        return new ColumnInfo(this, columnDbName, columnAlias, propertyName, propertyType, primary, autoIncrement, columnSize, columnDecimalDigits);
     }
 
     protected ColumnInfo cci(String columnDbName, String columnAlias, String propertyName
-                           , Class<?> propertyType, boolean primary
-                           , Integer columnSize, Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {// createColumnInfo()
-        return new ColumnInfo(this, columnDbName, columnAlias, propertyName, propertyType, primary, columnSize, columnDecimalDigits, optimisticLockType);
+           , Class<?> propertyType, boolean primary, boolean autoIncrement
+           , Integer columnSize, Integer columnDecimalDigits, OptimisticLockType optimisticLockType) { // createColumnInfo()
+        return new ColumnInfo(this, columnDbName, columnAlias, propertyName, propertyType, primary, autoIncrement, columnSize, columnDecimalDigits, optimisticLockType);
     }
 
     /**
