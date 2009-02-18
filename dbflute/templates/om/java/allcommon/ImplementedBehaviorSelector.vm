@@ -22,10 +22,8 @@ import org.springframework.context.ApplicationContext;
 import org.t2framework.lucy.Lucy;
 #end
 #if ($database.isTargetContainerGuice())
-import com.google.inject.Binding;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import com.google.inject.TypeLiteral;
 #end
 
 /**
@@ -66,7 +64,9 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     // ===================================================================================
     //                                                                           Component
     //                                                                           =========
+#if ($database.isTargetContainerSeasar() && $database.isTargetContainerSpring() && $database.isTargetContainerLucy())
     @SuppressWarnings("unchecked")
+#end
     public <COMPONENT> COMPONENT getComponent(Class<COMPONENT> componentType) {
         assertObjectNotNull("componentType", componentType);
         assertObjectNotNull("_container", _container);
@@ -92,12 +92,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 		return (COMPONENT)_container.get(initUncap(componentType.getSimpleName()));
 #end
 #if ($database.isTargetContainerGuice())
-        java.util.List<Binding<COMPONENT>> bindingList = _container.findBindingsByType(TypeLiteral.get(componentType));
-        if (bindingList.isEmpty()) {
-            String msg = "The component was not found: type=" + componentType;
-            throw new IllegalArgumentException(msg);
-        }
-		return bindingList.get(0).getProvider().get();
+		return _container.getProvider(componentType).get();
 #end
     }
 
