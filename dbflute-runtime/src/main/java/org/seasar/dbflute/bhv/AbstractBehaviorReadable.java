@@ -656,6 +656,26 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         public PK callbackReferrer_getForeignKeyValue(REFERRER_ENTITY entity);
         public void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
     }
+    
+    protected void xassArgLR(Entity entity, ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
+        assertObjectNotNull("entity(" + getDBMeta().getEntityType().getSimpleName() + ")", entity);
+        assertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
+    }
+    
+    protected void xassArgLR(List<Entity> entityList, ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
+        assertObjectNotNull("List<" + getDBMeta().getEntityType().getSimpleName() + ">", entityList);
+        assertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
+    }
+    
+    protected void xassArgLR(Entity entity, LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
+        assertObjectNotNull("entity(" + getDBMeta().getEntityType().getSimpleName() + ")", entity);
+        assertObjectNotNull("loadReferrerOption", loadReferrerOption);
+    }
+    
+    protected void xassArgLR(List<Entity> entityList, LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
+        assertObjectNotNull("List<" + getDBMeta().getEntityType().getSimpleName() + ">", entityList);
+        assertObjectNotNull("loadReferrerOption", loadReferrerOption);
+    }
 
     protected BehaviorSelector xgetBSFLR() { // getBehaviorSelectorForLoadReferrer() as Internal
         assertBehaviorSelectorNotNull("loadReferrer");
