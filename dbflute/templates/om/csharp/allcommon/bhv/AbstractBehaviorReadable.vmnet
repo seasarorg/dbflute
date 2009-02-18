@@ -237,7 +237,7 @@ namespace ${glPackageBaseCommonBhv} {
             // - - - - - - - - - - - - - -
             callback.callbackReferrer_queryForeignKeyInScope(cb, pkList);
             loadReferrerOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
-            if (!loadReferrerOption.isStopOrderByKey()) {
+            if (!loadReferrerOption.isStopOrderByKey() && pkList.Count > 1) {
                 callback.callbackReferrer_queryAddOrderByForeignKeyAsc(cb);
                 cb.SqlComponentOfOrderByClause.exchangeFirstOrderByElementForLastOne();
             }
