@@ -64,7 +64,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     // ===================================================================================
     //                                                                           Component
     //                                                                           =========
-#if ($database.isTargetContainerSeasar() && $database.isTargetContainerSpring() && $database.isTargetContainerLucy())
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerSpring() || $database.isTargetContainerLucy())
     @SuppressWarnings("unchecked")
 #end
     public <COMPONENT> COMPONENT getComponent(Class<COMPONENT> componentType) {
