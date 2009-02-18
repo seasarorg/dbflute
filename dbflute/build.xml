@@ -232,6 +232,11 @@
 	  	</copy>
 	  	<chmod dir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
 	
+	  	<copy todir="${dbflute.guice.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<chmod dir="${dbflute.guice.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+
 	  	<copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}">
 	    	<fileset dir="${dbflute.deploy.dir}"/>
 	  	</copy>
