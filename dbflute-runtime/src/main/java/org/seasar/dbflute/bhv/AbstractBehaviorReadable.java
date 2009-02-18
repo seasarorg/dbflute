@@ -578,7 +578,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         // - - - - - - - - - - - - - -
         callback.callbackReferrer_queryForeignKeyInScope(cb, pkList);
         loadReferrerOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
-        if (!loadReferrerOption.isStopOrderByKey()) {
+        if (!loadReferrerOption.isStopOrderByKey() && pkList.size() > 1) {
             callback.callbackReferrer_queryAddOrderByForeignKeyAsc(cb);
             cb.getSqlComponentOfOrderByClause().exchangeFirstOrderByElementForLastOne();
         }
@@ -678,6 +678,12 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
+    }
+    
+    protected <ELEMENT> List<ELEMENT> xnlrLs(ELEMENT element) { // newLoadReferrerList() as Internal
+        List<ELEMENT> ls = new ArrayList<ELEMENT>(1);
+        ls.add(element);
+        return ls;
     }
 
     // ===================================================================================
@@ -938,10 +944,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             throw new RuntimeException(msg, e);
         }
     }
-
-    // ----------------------------------------------------------------
-    //                                                    Assert Object
-    //                                                    -------------
+    
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
     /**
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)
