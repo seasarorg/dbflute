@@ -25,6 +25,7 @@
 	<!-- Container -->
 	<property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
 	<property name="dbflute.lucy.example.dir" value="${workspace.base}/dbflute-lucy-example"/>
+	<property name="dbflute.guice.example.dir" value="${workspace.base}/dbflute-guice-example"/>
 
 	<!-- Database -->
 	<property name="dbflute.mysql.example.dir" value="${workspace.base}/dbflute-mysql-example"/>
@@ -190,6 +191,13 @@
 	    	<fileset dir="${dbflute.deploy.dir}"/>
 	  	</copy>
 	  	<chmod dir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
+	</target>
+
+	<target name="reflect-mac-guice" depends="expand-dist" description="==> reflect to guice application">
+	  	<copy todir="${dbflute.guice.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<chmod dir="${dbflute.guice.example.dir}/mydbflute/dbflute-${version}/ant/bin" perm="ugo+rx" includes="**/*"/>
 	</target>
 
 	<target name="reflect-mac-mysql" depends="expand-dist" description="==> reflect to mysql example">
