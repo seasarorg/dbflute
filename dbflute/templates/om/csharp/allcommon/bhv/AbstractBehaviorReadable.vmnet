@@ -314,7 +314,7 @@ namespace ${glPackageBaseCommonBhv} {
             PK callbackReferrer_getForeignKeyValue(REFERRER_ENTITY entity);
             void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
         }
-
+    
         protected ${glBehaviorSelector} xgetBSFLR() { // GetBehaviorSelectorForLoadReferrer() as Internal
             AssertBehaviorSelectorNotNull("loadReferrer");
             return this.BehaviorSelector;
@@ -336,6 +336,12 @@ namespace ${glPackageBaseCommonBhv} {
                 msg = msg + "* * * * * * * * * */" + GetLineSeparator();
                 throw new SystemException(msg);
             }
+        }
+    
+        protected IList<ELEMENT> xnewLRLs<ELEMENT>(ELEMENT element) { // newLoadReferrerList() as Internal
+            System.Collections.Generic.IList<ELEMENT> ls = new System.Collections.Generic.List<ELEMENT>(1);
+            ls.Add(element);
+            return ls;
         }
 
         // ===============================================================================

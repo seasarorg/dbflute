@@ -280,8 +280,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
      */
     public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
-        xassArgLR(${myEntityVariableName}, conditionBeanSetupper);
-        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnlrLs(${myEntityVariableName}), conditionBeanSetupper);
+        xassLRArg(${myEntityVariableName}, conditionBeanSetupper);
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
     }
     /**
      * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the setupper for condition-bean of referrer. <br />
@@ -295,7 +295,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
      */
     public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
-        xassArgLR(${myEntityListVariableName}, conditionBeanSetupper);
+        xassLRArg(${myEntityListVariableName}, conditionBeanSetupper);
         load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
     }
     /**
@@ -304,8 +304,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      */
     public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
-        xassArgLR(${myEntityVariableName}, loadReferrerOption);
-        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnlrLs(${myEntityVariableName}), loadReferrerOption);
+        xassLRArg(${myEntityVariableName}, loadReferrerOption);
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
     }
     /**
      * {Refer to overload method that has an argument of condition-bean setupper.}
@@ -313,7 +313,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      */
     public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
-        xassArgLR(${myEntityListVariableName}, loadReferrerOption);
+        xassLRArg(${myEntityListVariableName}, loadReferrerOption);
         if (${myEntityListVariableName}.isEmpty()) { return; }
         final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
         helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>() {

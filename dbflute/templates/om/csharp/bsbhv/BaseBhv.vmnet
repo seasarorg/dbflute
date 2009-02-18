@@ -164,10 +164,17 @@ namespace ${glPackageExtendedBhv} {
 #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, IList<${referrerEntityClassName}>")
 #if (!${referrer.isOneToOne()})
+        public virtual void Load${referrer.referrerPropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glConditionBeanSetupper}<${referrerCBClassName}> conditionBeanSetupper) {
+            AssertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
+            Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs<${myExtendedObjectClassName}>(${myEntityVariableName}), conditionBeanSetupper);
+        }
         public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glConditionBeanSetupper}<${referrerCBClassName}> conditionBeanSetupper) {
             AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
-            if (${myEntityListVariableName}.Count == 0) { return; }
             Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+        }
+        public virtual void Load${referrer.referrerPropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+            AssertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); AssertObjectNotNull("loadReferrerOption", loadReferrerOption);
+            Load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs<${myExtendedObjectClassName}>(${myEntityVariableName}), loadReferrerOption);
         }
         public virtual void Load${referrer.referrerPropertyNameInitCap}(IList<${myExtendedObjectClassName}> ${myEntityListVariableName}, ${glLoadReferrerOption}<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
             AssertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName}); AssertObjectNotNull("loadReferrerOption", loadReferrerOption);
