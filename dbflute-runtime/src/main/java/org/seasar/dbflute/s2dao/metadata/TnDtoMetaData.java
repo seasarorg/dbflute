@@ -17,8 +17,6 @@ package org.seasar.dbflute.s2dao.metadata;
 
 import java.util.Map;
 
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
-
 /**
  * {Refers to Seasar and Extends its class}
  * @author jflute

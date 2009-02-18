@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The context of DB access.

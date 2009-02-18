@@ -15,9 +15,9 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;

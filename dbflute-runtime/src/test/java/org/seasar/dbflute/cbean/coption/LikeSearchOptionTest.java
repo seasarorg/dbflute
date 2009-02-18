@@ -1,6 +1,5 @@
 package org.seasar.dbflute.cbean.coption;
 
-import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**

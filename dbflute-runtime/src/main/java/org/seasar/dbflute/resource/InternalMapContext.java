@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute.resource;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The context of internal map.

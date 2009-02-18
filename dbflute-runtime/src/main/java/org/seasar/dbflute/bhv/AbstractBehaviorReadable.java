@@ -657,22 +657,23 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         public void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
     }
     
-    protected void xassArgLR(Entity entity, ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
+    // assertLoadReferrerArgument() as Internal
+    protected void xassLRArg(Entity entity, ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
         assertObjectNotNull("entity(" + getDBMeta().getEntityType().getSimpleName() + ")", entity);
         assertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
     }
     
-    protected void xassArgLR(List<Entity> entityList, ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
+    protected void xassLRArg(List<? extends Entity> entityList, ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
         assertObjectNotNull("List<" + getDBMeta().getEntityType().getSimpleName() + ">", entityList);
         assertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
     }
     
-    protected void xassArgLR(Entity entity, LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
+    protected void xassLRArg(Entity entity, LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
         assertObjectNotNull("entity(" + getDBMeta().getEntityType().getSimpleName() + ")", entity);
         assertObjectNotNull("loadReferrerOption", loadReferrerOption);
     }
     
-    protected void xassArgLR(List<Entity> entityList, LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
+    protected void xassLRArg(List<? extends Entity> entityList, LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
         assertObjectNotNull("List<" + getDBMeta().getEntityType().getSimpleName() + ">", entityList);
         assertObjectNotNull("loadReferrerOption", loadReferrerOption);
     }
@@ -700,7 +701,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
     
-    protected <ELEMENT> List<ELEMENT> xnlrLs(ELEMENT element) { // newLoadReferrerList() as Internal
+    protected <ELEMENT> List<ELEMENT> xnewLRLs(ELEMENT element) { // newLoadReferrerList() as Internal
         List<ELEMENT> ls = new ArrayList<ELEMENT>(1);
         ls.add(element);
         return ls;

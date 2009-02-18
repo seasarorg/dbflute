@@ -3,7 +3,6 @@ package org.seasar.dbflute.helper.mapstring.impl;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**

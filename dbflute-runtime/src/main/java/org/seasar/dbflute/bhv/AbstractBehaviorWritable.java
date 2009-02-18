@@ -15,9 +15,9 @@
  */
 package org.seasar.dbflute.bhv;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.batch.TokenFileReflectionFailure;

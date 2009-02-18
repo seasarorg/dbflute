@@ -15,11 +15,10 @@
  */
 package org.seasar.dbflute.cbean;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.lang.reflect.Method;
 
-import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.WhereClauseSimpleFilter;

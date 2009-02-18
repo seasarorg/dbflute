@@ -15,9 +15,9 @@
  */
 package org.seasar.dbflute.helper.token.file.impl;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;

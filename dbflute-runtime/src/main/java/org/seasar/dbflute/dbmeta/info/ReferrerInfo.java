@@ -16,10 +16,10 @@
 package org.seasar.dbflute.dbmeta.info;
 
 import java.util.Arrays;
-import java.util.Set;
-import java.util.Map;
-import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
 

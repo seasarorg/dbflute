@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute;
 
-import java.util.Set;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
 

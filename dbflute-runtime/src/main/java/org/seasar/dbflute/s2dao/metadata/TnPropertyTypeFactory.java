@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
  * {Refers to Seasar and Extends its class}

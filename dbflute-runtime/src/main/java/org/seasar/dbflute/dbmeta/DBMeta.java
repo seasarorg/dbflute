@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute.dbmeta;
 
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;

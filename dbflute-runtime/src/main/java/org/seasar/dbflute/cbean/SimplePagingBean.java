@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute.cbean;
 
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;

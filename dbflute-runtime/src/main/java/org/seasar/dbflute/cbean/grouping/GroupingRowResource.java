@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute.cbean.grouping;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The class of row resource for grouping making.
