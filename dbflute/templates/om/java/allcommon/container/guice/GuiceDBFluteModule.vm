@@ -1,0 +1,54 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import javax.sql.DataSource;
+
+import com.google.inject.AbstractModule;
+import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
+import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import ${glPackageExtendedBhv}.*;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glDBFluteModule} extends AbstractModule {
+
+    protected DataSource dataSource;
+
+    public DBFluteModule(DataSource dataSource) {
+        if (dataSource == null) {
+            String msg = "The argument 'dataSource' should not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        this.dataSource = dataSource;
+    }
+
+    @Override
+    protected void configure() {
+        new ${glDBFluteInitializer}(); // Initialize!
+        
+        // The components of DBFlute Runtime.
+        ${glImplementedBehaviorSelector} selector = new ${glImplementedBehaviorSelector}();
+        BehaviorCommandInvoker invoker = new BehaviorCommandInvoker();
+        ${glImplementedInvokerAssistant} assistant = new ${glImplementedInvokerAssistant}();
+        assistant.setBehaviorCommandInvoker(invoker);
+        assistant.setDataSource(dataSource);
+        invoker.setInvokerAssistant(assistant);
+        ${glImplementedCommonColumnAutoSetupper} setupper = new ${glImplementedCommonColumnAutoSetupper}();
+        
+        bind(BehaviorSelector.class).toInstance(selector);
+        bind(BehaviorCommandInvoker.class).toInstance(invoker);
+        bind(InvokerAssistant.class).toInstance(assistant);
+        bind(CommonColumnAutoSetupper.class).toInstance(setupper);
+        
+        // The components of Behavior.
+#foreach ($table in $database.tables)
+        {
+            ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
+            bhv.setBehaviorCommandInvoker(invoker); bhv.setBehaviorSelector(selector); bhv.setCommonColumnAutoSetupper(setupper);
+            bind(${table.extendedBehaviorClassName}.class).toInstance(bhv);
+        }
+#end
+    }
+}

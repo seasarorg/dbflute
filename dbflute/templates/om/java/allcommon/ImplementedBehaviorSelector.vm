@@ -21,6 +21,12 @@ import org.springframework.context.ApplicationContext;
 #if ($database.isTargetContainerLucy())
 import org.t2framework.lucy.Lucy;
 #end
+#if ($database.isTargetContainerGuice())
+import com.google.inject.Binding;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.TypeLiteral;
+#end
 
 /**
  * The implementation of behavior selector.
@@ -52,6 +58,10 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     /** The container of Lucy. */
     protected Lucy _container;
 #end
+#if ($database.isTargetContainerGuice())
+    /** The container of Guice. */
+    protected Injector _container;
+#end
 
     // ===================================================================================
     //                                                                           Component
@@ -80,6 +90,14 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #end
 #if ($database.isTargetContainerLucy())
 		return (COMPONENT)_container.get(initUncap(componentType.getSimpleName()));
+#end
+#if ($database.isTargetContainerGuice())
+        List<Binding<COMPONENT>> bindingList = _container.findBindingsByType(TypeLiteral.get(componentType));
+        if (bindingList.isEmpty()) {
+            String msg = "The component was not found: type=" + componentType;
+            throw new IllegalArgumentException(msg);
+        }
+		return bindingList.get(0).getProvider().get();
 #end
     }
 
@@ -226,6 +244,11 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #end
 #if ($database.isTargetContainerLucy())
     public void setContainer(Lucy container) {
+        this._container = container;
+    }
+#end
+#if ($database.isTargetContainerGuice())
+    public void setContainer(Injector container) {
         this._container = container;
     }
 #end

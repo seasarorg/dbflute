@@ -799,6 +799,10 @@ public class Database {
     public boolean isTargetContainerLucy() {
         return getBasicProperties().isTargetContainerLucy();
     }
+    
+    public boolean isTargetContainerGuice() {
+        return getBasicProperties().isTargetContainerGuice();
+    }
 
     // -----------------------------------------------------
     //                                             Extension

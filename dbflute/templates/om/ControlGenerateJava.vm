@@ -60,6 +60,7 @@ targetdatabase = $targetDatabase
     #set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
     #set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
     #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
+    #set ($glDBFluteModule = "${glProjectPrefix}DBFluteModule")
 
     ## ===================================================================================
     ##                                                                          Class Name
@@ -234,6 +235,11 @@ targetdatabase = $targetDatabase
         $database.info("    ${path}")
         $generator.parse("om/${glResourceDirectory}/allcommon/container/lucy/LucyDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
       #end
+    #end
+    #if ($database.isTargetContainerGuice())
+      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteModule}.${glClassFileExtension}" )
+      $database.info("    ${path}")
+      $generator.parse("om/${glResourceDirectory}/allcommon/container/guice/GuiceDBFluteModule.${glTemplateFileExtension}", $path, "", "")
     #end
     $database.info("}")
 
