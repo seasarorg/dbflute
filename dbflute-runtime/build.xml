@@ -1,7 +1,7 @@
 <project name="DBFluteRuntime" default="dist" basedir=".">
 
   <property name="version" value="0.9.2"/>
-  <property name="build.version" value="0.9.2-05-SNAPSHOT"/>
+  <property name="build.version" value="0.9.2-RC2"/>
 
   <target name="dist">
 
@@ -50,6 +50,14 @@
     	  overwrite="true"/>
     <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
     	  tofile="../dbflute-lucy-example/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+
+    <delete file="../dbflute-guice-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-guice-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-guice-example/lib/sources/dbflute-runtime-${version}-sources.jar"
     	  overwrite="true"/>
   	
     <delete file="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-*.jar"/>
