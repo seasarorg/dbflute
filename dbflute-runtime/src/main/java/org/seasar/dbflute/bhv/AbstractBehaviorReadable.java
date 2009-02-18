@@ -1000,10 +1000,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             throw new IllegalArgumentException(msg + entity);
         }
     }
-
-    // ----------------------------------------------------------------
-    //                                                    Assert String
-    //                                                    -------------
+    
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
      * @param variableName Variable name. (NotNull)
@@ -1017,10 +1017,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             throw new IllegalArgumentException(msg);
         }
     }
-
-    // ----------------------------------------------------------------
-    //                                                      Assert List
-    //                                                      -----------
+    
+    // -----------------------------------------------------
+    //                                           Assert List
+    //                                           -----------
     /**
      * Assert that the list is empty.
      * @param ls List. (NotNull)
