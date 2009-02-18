@@ -92,7 +92,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 		return (COMPONENT)_container.get(initUncap(componentType.getSimpleName()));
 #end
 #if ($database.isTargetContainerGuice())
-        List<Binding<COMPONENT>> bindingList = _container.findBindingsByType(TypeLiteral.get(componentType));
+        java.util.List<Binding<COMPONENT>> bindingList = _container.findBindingsByType(TypeLiteral.get(componentType));
         if (bindingList.isEmpty()) {
             String msg = "The component was not found: type=" + componentType;
             throw new IllegalArgumentException(msg);
@@ -248,6 +248,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     }
 #end
 #if ($database.isTargetContainerGuice())
+    @Inject
     public void setContainer(Injector container) {
         this._container = container;
     }
