@@ -92,7 +92,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 		return (COMPONENT)_container.get(initUncap(componentType.getSimpleName()));
 #end
 #if ($database.isTargetContainerGuice())
-		return _container.getProvider(componentType).get();
+		return _container.getInstance(componentType);
 #end
     }
 

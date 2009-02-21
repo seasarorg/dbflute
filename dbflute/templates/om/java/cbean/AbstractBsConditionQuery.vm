@@ -215,7 +215,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
         registerInScopeSubQuery(cb.query(), "${col.name}", "${col.foreignKey.firstForeignColumnName}", subQueryPropertyName);
     }
-    public abstract String keep${subQueryPropertyNameInitCap}(${glPackageCQ}.${relatedCQClassName} subQuery);
+    public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end
 #if (${col.hasSingleKeyReferrer()})
 #foreach ($referrer in $col.singleKeyReferrers)
@@ -795,6 +795,17 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         registerScalarSubQuery(function, cb.query(), subQueryPropertyName, operand);
     }
     public abstract String keepScalarSubQuery(${myConditionQueryClassName} subQuery);
+
+    // ===================================================================================
+    //                                                                InScopeSelf SubQuery
+    //                                                                ====================
+    public void inScopeSelf(SubQuery<${myConditionBeanClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
+        ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
+        String subQueryPropertyName = keepInScopeSelfSubQuery(cb.query()); // for saving query-value.
+        registerInScopeSubQuery(cb.query(), "${table.primaryKeyAsOne.name}", "${table.primaryKeyAsOne.name}", subQueryPropertyName);
+    }
+    public abstract String keepInScopeSelfSubQuery(${myConditionQueryClassName} subQuery);
 #end
 
     // ===================================================================================

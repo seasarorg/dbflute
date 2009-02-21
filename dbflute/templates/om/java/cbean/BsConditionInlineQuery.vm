@@ -293,8 +293,18 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     public String keepScalarSubQuery(${myConditionQueryClassName} subQuery) {
         throw new UnsupportedOperationException("ScalarSubQuery at inline() is unsupported! Sorry!");
     }
+
+    // ===================================================================================
+    //                                                                InScopeSelf SubQuery
+    //                                                                ====================
+    public String keepInScopeSelfSubQuery(${myConditionQueryClassName} subQuery) {
+        throw new UnsupportedOperationException("InScope(Self)SubQuery at inline() is unsupported! Sorry!");
+    }
 #end
 
+    // ===================================================================================
+    //                                                                       Very Internal
+    //                                                                       =============
     // Very Internal (for Suppressing Warn about 'Not Use Import')
     String xiCB() { return ${myConditionBeanClassName}.class.getName(); }
     String xiCQ() { return ${myConditionQueryClassName}.class.getName(); }

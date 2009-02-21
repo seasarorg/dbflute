@@ -445,6 +445,18 @@ namespace ${glPackageBaseCQ} {
         }
 #end
 #end
+#if ($table.hasOnlyOnePrimaryKey())
 
+        // ===============================================================================
+        //                                                            InScopeSelf SubQuery
+        //                                                            ====================
+        protected Map<String, ${myConditionQueryClassName}> _inScopeSelfSubQueryMap;
+        public Map<String, ${myConditionQueryClassName}> InScopeSelfSubQuery { get { return _inScopeSelfSubQueryMap; } }
+        public override String keepInScopeSelfSubQuery(${myConditionQueryClassName} subQuery) {
+            if (_inScopeSelfSubQueryMap == null) { _inScopeSelfSubQueryMap = new LinkedHashMap<String, ${myConditionQueryClassName}>(); }
+            String key = "subQueryMapKey" + (_inScopeSelfSubQueryMap.size() + 1);
+            _inScopeSelfSubQueryMap.put(key, subQuery); return "inScopeSelfSubQuery." + key;
+        }
+#end
     }
 }
