@@ -506,14 +506,14 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     // ===================================================================================
-    //                                                                InScopeSelf SubQuery
-    //                                                                ====================
-    protected Map<String, ${myConditionQueryClassName}> _inScopeSelfSubQueryMap;
-    public Map<String, ${myConditionQueryClassName}> getInScopeSelfSubQuery() { return _inScopeSelfSubQueryMap; }
-    public String keepInScopeSelfSubQuery(${myConditionQueryClassName} subQuery) {
-        if (_inScopeSelfSubQueryMap == null) { _inScopeSelfSubQueryMap = newLinkedHashMap(); }
-        String key = "subQueryMapKey" + (_inScopeSelfSubQueryMap.size() + 1);
-        _inScopeSelfSubQueryMap.put(key, subQuery); return "inScopeSelfSubQuery." + key;
+    //                                                             MySelf InScope SubQuery
+    //                                                             =======================
+    protected Map<String, ${myConditionQueryClassName}> _myselfInScopeSubQueryMap;
+    public Map<String, ${myConditionQueryClassName}> getMyselfInScopeSubQuery() { return _myselfInScopeSubQueryMap; }
+    public String keepMyselfInScopeSubQuery(${myConditionQueryClassName} subQuery) {
+        if (_myselfInScopeSubQueryMap == null) { _myselfInScopeSubQueryMap = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_myselfInScopeSubQueryMap.size() + 1);
+        _myselfInScopeSubQueryMap.put(key, subQuery); return "myselfInScopeSubQuery." + key;
     }
 
 #end

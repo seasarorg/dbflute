@@ -419,15 +419,15 @@ namespace ${glPackageBaseCQ} {
 #if ($table.hasOnlyOnePrimaryKey())
 
         // ===============================================================================
-        //                                                            InScopeSelf SubQuery
-        //                                                            ====================
-        public void InScopeSelf(SubQuery<${myConditionBeanClassName}> subQuery) {
+        //                                                         MySelf InScope SubQuery
+        //                                                         =======================
+        public void MyselfInScope(SubQuery<${myConditionBeanClassName}> subQuery) {
             assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
             ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); subQuery.Query(cb);
-            String subQueryPropertyName = keepInScopeSelfSubQuery(cb.Query()); // for saving query-value.
+            String subQueryPropertyName = keepMyselfInScopeSubQuery(cb.Query()); // for saving query-value.
             registerInScopeSubQuery(cb.Query(), "${table.primaryKeyAsOne.name}", "${table.primaryKeyAsOne.name}", subQueryPropertyName);
         }
-        public abstract String keepInScopeSelfSubQuery(${myConditionQueryClassName} subQuery);
+        public abstract String keepMyselfInScopeSubQuery(${myConditionQueryClassName} subQuery);
 #end
 
         public override String ToString() { return getSqlClause().getClause(); }

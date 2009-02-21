@@ -295,10 +295,10 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     // ===================================================================================
-    //                                                                InScopeSelf SubQuery
-    //                                                                ====================
-    public String keepInScopeSelfSubQuery(${myConditionQueryClassName} subQuery) {
-        throw new UnsupportedOperationException("InScope(Self)SubQuery at inline() is unsupported! Sorry!");
+    //                                                             MySelf InScope SubQuery
+    //                                                             =======================
+    public String keepMyselfInScopeSubQuery(${myConditionQueryClassName} subQuery) {
+        throw new UnsupportedOperationException("MyselfInScopeSubQuery at inline() is unsupported! Sorry!");
     }
 #end
 

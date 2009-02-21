@@ -282,10 +282,10 @@ namespace ${glPackageCIQ} {
 #if ($table.hasOnlyOnePrimaryKey())
 
         // ===============================================================================
-        //                                                            InScopeSelf SubQuery
-        //                                                            ====================
-        public override String keepInScopeSelfSubQuery(${myConditionQueryClassName} subQuery) {
-            throw new UnsupportedOperationException("InScope(Self)SubQuery at inline() is unsupported! Sorry!");
+        //                                                         Myself InScope SubQuery
+        //                                                         =======================
+        public override String keepMyselfInScopeSubQuery(${myConditionQueryClassName} subQuery) {
+            throw new UnsupportedOperationException("MyselfInScopeSubQuery at inline() is unsupported! Sorry!");
         }
 #end
     }

@@ -797,15 +797,19 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public abstract String keepScalarSubQuery(${myConditionQueryClassName} subQuery);
 
     // ===================================================================================
-    //                                                                InScopeSelf SubQuery
-    //                                                                ====================
-    public void inScopeSelf(SubQuery<${myConditionBeanClassName}> subQuery) {
+    //                                                             MySelf InScope SubQuery
+    //                                                             =======================
+    /**
+     * Myself InScope SubQuery. {mainly for CLOB and Union}
+     * @param subQuery The implementation of sub query. (NotNull)
+     */
+    public void myselfInScope(SubQuery<${myConditionBeanClassName}> subQuery) {
         assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
         ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForInScopeSubQuery(); subQuery.query(cb);
-        String subQueryPropertyName = keepInScopeSelfSubQuery(cb.query()); // for saving query-value.
+        String subQueryPropertyName = keepMyselfInScopeSubQuery(cb.query()); // for saving query-value.
         registerInScopeSubQuery(cb.query(), "${table.primaryKeyAsOne.name}", "${table.primaryKeyAsOne.name}", subQueryPropertyName);
     }
-    public abstract String keepInScopeSelfSubQuery(${myConditionQueryClassName} subQuery);
+    public abstract String keepMyselfInScopeSubQuery(${myConditionQueryClassName} subQuery);
 #end
 
     // ===================================================================================

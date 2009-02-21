@@ -448,14 +448,14 @@ namespace ${glPackageBaseCQ} {
 #if ($table.hasOnlyOnePrimaryKey())
 
         // ===============================================================================
-        //                                                            InScopeSelf SubQuery
-        //                                                            ====================
-        protected Map<String, ${myConditionQueryClassName}> _inScopeSelfSubQueryMap;
-        public Map<String, ${myConditionQueryClassName}> InScopeSelfSubQuery { get { return _inScopeSelfSubQueryMap; } }
-        public override String keepInScopeSelfSubQuery(${myConditionQueryClassName} subQuery) {
-            if (_inScopeSelfSubQueryMap == null) { _inScopeSelfSubQueryMap = new LinkedHashMap<String, ${myConditionQueryClassName}>(); }
-            String key = "subQueryMapKey" + (_inScopeSelfSubQueryMap.size() + 1);
-            _inScopeSelfSubQueryMap.put(key, subQuery); return "inScopeSelfSubQuery." + key;
+        //                                                         Myself InScope SubQuery
+        //                                                         =======================
+        protected Map<String, ${myConditionQueryClassName}> _myselfInScopeSubQueryMap;
+        public Map<String, ${myConditionQueryClassName}> MyselfInScopeSubQuery { get { return _myselfInScopeSubQueryMap; } }
+        public override String keepMyselfInScopeSubQuery(${myConditionQueryClassName} subQuery) {
+            if (_myselfInScopeSubQueryMap == null) { _myselfInScopeSubQueryMap = new LinkedHashMap<String, ${myConditionQueryClassName}>(); }
+            String key = "subQueryMapKey" + (_myselfInScopeSubQueryMap.size() + 1);
+            _myselfInScopeSubQueryMap.put(key, subQuery); return "MyselfInScopeSubQuery." + key;
         }
 #end
     }
