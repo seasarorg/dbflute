@@ -90,14 +90,14 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         try {
             final String realSchemaName = schemaName;
             columnResultSet = metaData.getColumns(null, realSchemaName, tableName, null);
-            setupColumnMetaInfo(columns, columnResultSet);
+            setupColumnMetaInfo(columns, columnResultSet, tableName);
             if (columns.isEmpty()) {
                 lowerSpare = metaData.getColumns(null, realSchemaName, tableName.toLowerCase(), null);
-                setupColumnMetaInfo(columns, lowerSpare);
+                setupColumnMetaInfo(columns, lowerSpare, tableName);
             }
             if (columns.isEmpty()) {
                 upperSpare = metaData.getColumns(null, realSchemaName, tableName.toUpperCase(), null);
-                setupColumnMetaInfo(columns, upperSpare);
+                setupColumnMetaInfo(columns, upperSpare, tableName);
             }
         } catch (SQLException e) {
             String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + tableName;
@@ -125,20 +125,21 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return columns;
     }
 
-    protected void setupColumnMetaInfo(List<DfColumnMetaInfo> columns, ResultSet columnResultSet) throws SQLException {
+    protected void setupColumnMetaInfo(List<DfColumnMetaInfo> columns, ResultSet columnResultSet, String tableName)
+            throws SQLException {
         // Column names for duplicate check
         final DfStringSet columnNameSet = DfStringSet.createAsCaseInsensitive();
-        
+
         // Duplicate objects for warning log
         final DfStringSet duplicateTableNameSet = DfStringSet.createAsCaseInsensitive();
         final DfStringSet duplicateColumnNameSet = DfStringSet.createAsCaseInsensitive();
-        
+
         while (columnResultSet.next()) {
             final String columnName = columnResultSet.getString(4);
             if (isColumnExcept(columnName)) {
                 continue;
             }
-            
+
             // Filter duplicate objects
             if (columnNameSet.contains(columnName)) {
                 duplicateTableNameSet.add(columnResultSet.getString(3));
@@ -166,14 +167,16 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             columnMetaInfo.setDefaultValue(defaultValue);
             columns.add(columnMetaInfo);
         }
-        
+
         // Show duplicate objects if exists
         if (!duplicateColumnNameSet.isEmpty()) {
-            String msg = "*[Duplicate Mete Data]:";
-            msg = msg + " tables=" + duplicateTableNameSet + " columns=" + duplicateColumnNameSet;
-            _log.warn(msg);
+            String msg = "*Duplicate mete data was found:\n";
+            msg = msg + "  specified table = " + tableName + "\n";
+            msg = msg + "  duplicate tables = " + duplicateTableNameSet + "\n";
+            msg = msg + "  duplicate columns = " + duplicateColumnNameSet;
+            _log.info(msg);
         }
-        
+
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = 
         // The duplication handling is mainly for Oracle Synonym.
         // = = = = = = = = = =/
