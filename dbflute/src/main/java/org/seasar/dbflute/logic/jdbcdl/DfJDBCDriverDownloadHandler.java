@@ -11,11 +11,7 @@ import org.seasar.dbflute.util.net.DfURLUtil;
  * @author jflute
  * @since 0.9.3 (2009/02/21 Saturday)
  */
-public class JDBCDriverDownloadHandler {
-
-    // **************
-    // @jflute Making
-    // **************
+public class DfJDBCDriverDownloadHandler {
 
     // ===================================================================================
     //                                                                          Definition
@@ -32,7 +28,7 @@ public class JDBCDriverDownloadHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public JDBCDriverDownloadHandler(DfBasicProperties basicProperties) {
+    public DfJDBCDriverDownloadHandler(DfBasicProperties basicProperties) {
         this.basicProperties = basicProperties;
     }
 
@@ -40,6 +36,13 @@ public class JDBCDriverDownloadHandler {
     //                                                                          Initialize
     //                                                                          ==========
     public void downloadJDBCDriverIfNeeds(String jdbcDriverFileName, String downloadDir) {
+        // * * * *
+        // Making
+        // * * * *
+        if (0 == 0) {
+            throw new UnsupportedOperationException("Now making");
+        }
+
         if (!needsDownload(jdbcDriverFileName, downloadDir)) {
             return;
         }
