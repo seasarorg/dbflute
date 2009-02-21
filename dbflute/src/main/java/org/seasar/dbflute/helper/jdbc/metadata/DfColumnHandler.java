@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
+import org.seasar.dbflute.helper.collection.DfStringSet;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
@@ -125,11 +126,27 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     }
 
     protected void setupColumnMetaInfo(List<DfColumnMetaInfo> columns, ResultSet columnResultSet) throws SQLException {
+        // Column names for duplicate check
+        final DfStringSet columnNameSet = DfStringSet.createAsCaseInsensitive();
+        
+        // Duplicate objects for warning log
+        final DfStringSet duplicateTableNameSet = DfStringSet.createAsCaseInsensitive();
+        final DfStringSet duplicateColumnNameSet = DfStringSet.createAsCaseInsensitive();
+        
         while (columnResultSet.next()) {
             final String columnName = columnResultSet.getString(4);
             if (isColumnExcept(columnName)) {
                 continue;
             }
+            
+            // Filter duplicate objects
+            if (columnNameSet.contains(columnName)) {
+                duplicateTableNameSet.add(columnResultSet.getString(3));
+                duplicateColumnNameSet.add(columnName);
+                continue;
+            }
+            columnNameSet.add(columnName);
+
             final Integer jdbcTypeCode = new Integer(columnResultSet.getString(5));
             final String dbTypeName = columnResultSet.getString(6);
             final Integer columnSize = new Integer(columnResultSet.getInt(7));
@@ -149,6 +166,17 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             columnMetaInfo.setDefaultValue(defaultValue);
             columns.add(columnMetaInfo);
         }
+        
+        // Show duplicate objects if exists
+        if (!duplicateColumnNameSet.isEmpty()) {
+            String msg = "*[Duplicate Mete Data]:";
+            msg = msg + " tables=" + duplicateTableNameSet + " columns=" + duplicateColumnNameSet;
+            _log.warn(msg);
+        }
+        
+        // /= = = = = = = = = = = = = = = = = = = = = = = = = = = 
+        // The duplication handling is mainly for Oracle Synonym.
+        // = = = = = = = = = =/
     }
 
     // ===================================================================================
