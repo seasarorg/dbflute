@@ -423,7 +423,7 @@ namespace ${glPackageBaseCQ} {
         //                                                         =======================
         public void MyselfInScope(SubQuery<${myConditionBeanClassName}> subQuery) {
             assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
-            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); subQuery.Query(cb);
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); subQuery.Invoke(cb);
             String subQueryPropertyName = keepMyselfInScopeSubQuery(cb.Query()); // for saving query-value.
             registerInScopeSubQuery(cb.Query(), "${table.primaryKeyAsOne.name}", "${table.primaryKeyAsOne.name}", subQueryPropertyName);
         }
