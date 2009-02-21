@@ -6,7 +6,7 @@
 
 	<!-- Version -->
 	<property name="version" value="0.9.3"/>
-	<property name="internal.version" value="${version}-SNAPSHOT"/>
+	<property name="internal.version" value="${version}"/>
 
 	<!-- Directories and Module Files -->
 	<property name="deploy.base" value="../../dbflute"/>
