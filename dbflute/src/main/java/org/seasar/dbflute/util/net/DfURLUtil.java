@@ -12,6 +12,8 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.seasar.dbflute.util.io.DfInputStreamUtil;
+
 /**
  * {Refers to S2Container and Extends it}
  * @author jflute
@@ -19,10 +21,9 @@ import java.util.Map;
  */
 public abstract class DfURLUtil {
 
-    /** プロトコルを正規化するためのマップ */
     protected static final Map<String, String> CANONICAL_PROTOCOLS = new HashMap<String, String>();
     static {
-        CANONICAL_PROTOCOLS.put("wsjar", "jar"); // WebSphereがJarファイルのために使用する固有のプロトコル
+        CANONICAL_PROTOCOLS.put("wsjar", "jar");
     }
 
     public static InputStream openStream(URL url) {
@@ -33,6 +34,17 @@ public abstract class DfURLUtil {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public static void makeFileAndClose(URL url, String outputFilename) {
+        InputStream in;
+        try {
+            in = url.openStream();
+        } catch (IOException e) {
+            String msg = DfURLUtil.class.getSimpleName() + "#copy() threw the IO exception!";
+            throw new IllegalStateException(msg, e);
+        }
+        DfInputStreamUtil.makeFileAndClose(in, outputFilename);
     }
 
     public static URLConnection openConnection(URL url) {

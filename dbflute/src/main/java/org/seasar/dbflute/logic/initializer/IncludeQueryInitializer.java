@@ -7,7 +7,6 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
-import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 
@@ -21,7 +20,7 @@ public class IncludeQueryInitializer {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(Database.class);
+    private static final Log _log = LogFactory.getLog(IncludeQueryInitializer.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -156,7 +155,7 @@ public class IncludeQueryInitializer {
     //                                                                      General Helper
     //                                                                      ==============
     public String getLineSeparator() {
-        return System.getProperty("line.separator");
+        return "\n";
     }
 
     // ===================================================================================
