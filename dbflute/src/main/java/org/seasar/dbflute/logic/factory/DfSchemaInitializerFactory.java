@@ -23,8 +23,7 @@ public class DfSchemaInitializerFactory {
     protected boolean _onceMore;
 
     public DfSchemaInitializerFactory(DataSource dataSource, DfBasicProperties basicProperties,
-            DfDatabaseProperties databaseProperties, DfReplaceSchemaProperties replaceSchemaProperties,
-            boolean onceMore) {
+            DfDatabaseProperties databaseProperties, DfReplaceSchemaProperties replaceSchemaProperties, boolean onceMore) {
         _dataSource = dataSource;
         _basicProperties = basicProperties;
         _databaseProperties = databaseProperties;
@@ -84,23 +83,19 @@ public class DfSchemaInitializerFactory {
             initializer.setSchema(_databaseProperties.getDatabaseSchema());
             return;
         }
-        
+
         // Here 'Once-More'!
         final String schema = getOnceMoreSchema();
         if (schema == null || schema.trim().length() == 0) {
             String msg = "Once More Schema should not be null or empty: schema=" + schema;
             throw new IllegalStateException(msg);
         }
-        final List<String> objectTypeList = getOnceMoreObjectTypeList();
-        final List<String> tableTargetList = getOnceMoreDropTableTargetList();
-        final List<String> tableExceptList = getOnceMoreDropTableExceptList();
-        final boolean dropAllTable = isOnceMoreDropAllTable();
         initializer.setSchema(schema);
-        initializer.setTableNameWithSchema(true);
-        initializer.setObjectTypeList(objectTypeList);
-        initializer.setTableTargetList(tableTargetList);
-        initializer.setTableExceptList(tableExceptList);
-        initializer.setDropAllTable(dropAllTable);
+        initializer.setTableNameWithSchema(true); // because it may be other schema!
+        initializer.setOnceMoreDropObjectTypeList(getOnceMoreObjectTypeList());
+        initializer.setOnceMoreDropTableTargetList(getOnceMoreDropTableTargetList());
+        initializer.setOnceMoreDropTableExceptList(getOnceMoreDropTableExceptList());
+        initializer.setOnceMoreDropDropAllTable(isOnceMoreDropAllTable());
     }
 
     protected String getOnceMoreSchema() {
@@ -110,15 +105,15 @@ public class DfSchemaInitializerFactory {
     protected List<String> getOnceMoreObjectTypeList() {
         return _replaceSchemaProperties.getOnceMoreDropObjectTypeList();
     }
-    
+
     protected List<String> getOnceMoreDropTableTargetList() {
         return _replaceSchemaProperties.getOnceMoreDropTableTargetList();
     }
-    
+
     protected List<String> getOnceMoreDropTableExceptList() {
         return _replaceSchemaProperties.getOnceMoreDropTableExceptList();
     }
-    
+
     protected boolean isOnceMoreDropAllTable() {
         return _replaceSchemaProperties.isOnceMoreDropAllTable();
     }

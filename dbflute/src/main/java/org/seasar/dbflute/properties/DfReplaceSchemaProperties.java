@@ -199,7 +199,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (obj == null) {
             obj = map.get("targetDatabaseTypeList");
             if (obj == null) {
-                return new ArrayList<String>();
+                ArrayList<String> defaultList = new ArrayList<String>();
+                defaultList.add("TABLE");
+                defaultList.add("VIEW");
+                return defaultList;
             }
         }
         if (!(obj instanceof List)) {
