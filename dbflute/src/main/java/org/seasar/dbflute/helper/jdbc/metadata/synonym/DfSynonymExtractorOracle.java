@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.helper.jdbc.metadata.DfAutoIncrementHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfIndexHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfSynonymMetaInfo;
@@ -46,6 +47,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
+    protected DfTableHandler _tableHandler = new DfTableHandler();
     protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
     protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
     protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler();
@@ -69,6 +71,11 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 String synonymName = rs.getString("SYNONYM_NAME");
                 String tableOwner = rs.getString("TABLE_OWNER");
                 String tableName = rs.getString("TABLE_NAME");
+
+                if (_tableHandler.isTableExcept(tableName)) {
+                    continue;
+                }
+
                 final DfSynonymMetaInfo info = new DfSynonymMetaInfo();
 
                 // Basic
@@ -174,12 +181,20 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
                     continue;
                 }
+                boolean firstDone = false;
                 for (int i = 0; i < foreignSynonymList.size(); i++) {
                     final String foreignSynonymName = foreignSynonymList.get(i);
-                    if (i == 0) {
-                        fk.setForeignTableName(foreignSynonymName);
+
+                    if (_tableHandler.isTableExcept(foreignSynonymName)) {
                         continue;
                     }
+
+                    if (!firstDone) {
+                        fk.setForeignTableName(foreignSynonymName);
+                        firstDone = true;
+                        continue;
+                    }
+
                     final DfForeignKeyMetaInfo additionalFK = new DfForeignKeyMetaInfo();
                     additionalFK.setForeignKeyName(fk.getForeignKeyName() + "_" + (i + 1));
                     additionalFK.setLocalTableName(synonym.getSynonymName());

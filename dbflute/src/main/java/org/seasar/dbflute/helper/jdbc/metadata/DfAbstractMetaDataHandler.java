@@ -120,7 +120,7 @@ public class DfAbstractMetaDataHandler {
      * @param tableName Table name. (NotNull)
      * @return Determination.
      */
-    protected boolean isTableExcept(final String tableName) {
+    public boolean isTableExcept(final String tableName) {
         if (tableName == null) {
             throw new NullPointerException("Argument[tableName] is required.");
         }
@@ -139,7 +139,7 @@ public class DfAbstractMetaDataHandler {
      * @param columnName Column name. (NotNull)
      * @return Determination.
      */
-    protected boolean isColumnExcept(final String columnName) {
+    public boolean isColumnExcept(final String columnName) {
         if (columnName == null) {
             throw new NullPointerException("Argument[columnName] is required.");
         }
