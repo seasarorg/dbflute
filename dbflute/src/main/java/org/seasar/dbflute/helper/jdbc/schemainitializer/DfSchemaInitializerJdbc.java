@@ -303,11 +303,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _schema = schema;
     }
 
-    public List<String> getDropTargetDatabaseTypeList() {
+    public List<String> getDropTargetObjectTypeList() {
         return _dropTargetDatabaseTypeList;
     }
 
-    public void setDropTargetDatabaseTypeList(List<String> dropTargetDatabaseTypeList) {
+    public void setDropTargetObjectTypeList(List<String> dropTargetDatabaseTypeList) {
         this._dropTargetDatabaseTypeList = dropTargetDatabaseTypeList;
     }
 

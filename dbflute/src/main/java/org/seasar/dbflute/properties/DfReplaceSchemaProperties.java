@@ -193,14 +193,17 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getOnceMoreDropDefinitionTargetDatabaseTypeList() {
+    public List<String> getOnceMoreDropDefinitionObjectTypeList() {
         final Map<String, Object> map = getOnceMoreDropDefinitionMap();
-        final Object obj = map.get("targetDatabaseTypeList");
+        Object obj = map.get("objectTypeList");
         if (obj == null) {
-            return new ArrayList<String>();
+            obj = map.get("targetDatabaseTypeList");
+            if (obj == null) {
+                return new ArrayList<String>();
+            }
         }
         if (!(obj instanceof List)) {
-            String msg = "The schema should be List<String>: targetDatabaseTypeList=" + obj + " type=" + obj.getClass();
+            String msg = "The schema should be List<String>: objectTypeList=" + obj + " type=" + obj.getClass();
             throw new IllegalStateException(msg);
         }
         return (List<String>) obj;

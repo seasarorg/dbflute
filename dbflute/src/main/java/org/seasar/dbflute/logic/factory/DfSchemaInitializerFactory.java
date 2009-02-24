@@ -89,17 +89,17 @@ public class DfSchemaInitializerFactory {
             String msg = "Once More Schema should not be null or empty: schema=" + schema;
             throw new IllegalStateException(msg);
         }
-        final List<String> targetDatabaseTypeList = getOnceMoreTargetDatabaseTypeList();
+        final List<String> dropObjectTypeList = getOnceMoreObjectTypeList();
         initializer.setSchema(schema);
         initializer.setTableNameWithSchema(true);
-        initializer.setDropTargetDatabaseTypeList(targetDatabaseTypeList);
+        initializer.setDropTargetObjectTypeList(dropObjectTypeList);
     }
 
     protected String getOnceMoreSchema() {
         return _replaceSchemaProperties.getOnceMoreDropDefinitionSchema();
     }
 
-    protected List<String> getOnceMoreTargetDatabaseTypeList() {
-        return _replaceSchemaProperties.getOnceMoreDropDefinitionTargetDatabaseTypeList();
+    protected List<String> getOnceMoreObjectTypeList() {
+        return _replaceSchemaProperties.getOnceMoreDropDefinitionObjectTypeList();
     }
 }
