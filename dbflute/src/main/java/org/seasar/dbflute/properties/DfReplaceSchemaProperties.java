@@ -213,6 +213,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     public List<String> getOnceMoreDropTableTargetList() {
         final Map<String, Object> map = getOnceMoreDropDefinitionMap();
         Object obj = map.get("tableTargetList");
+        if (obj == null) {
+            return new ArrayList<String>();
+        }
         if (!(obj instanceof List)) {
             String msg = "The schema should be List<String>: tableTargetList=" + obj + " type=" + obj.getClass();
             throw new IllegalStateException(msg);
@@ -224,6 +227,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     public List<String> getOnceMoreDropTableExceptList() {
         final Map<String, Object> map = getOnceMoreDropDefinitionMap();
         Object obj = map.get("tableExceptList");
+        if (obj == null) {
+            return new ArrayList<String>();
+        }
         if (!(obj instanceof List)) {
             String msg = "The schema should be List<String>: tableExceptList=" + obj + " type=" + obj.getClass();
             throw new IllegalStateException(msg);
@@ -237,10 +243,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (value == null) {
             value = (String) getOnceMoreDropDefinitionMap().get("isDropAllTable");
             if (value == null) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return value.equalsIgnoreCase("true");
     }
 
     // ===================================================================================
