@@ -208,7 +208,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         return (List<String>) obj;
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<String> getOnceMoreDropTableTargetList() {
         final Map<String, Object> map = getOnceMoreDropDefinitionMap();
@@ -219,7 +219,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         return (List<String>) obj;
     }
-    
+
     @SuppressWarnings("unchecked")
     public List<String> getOnceMoreDropTableExceptList() {
         final Map<String, Object> map = getOnceMoreDropDefinitionMap();
@@ -229,6 +229,18 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             throw new IllegalStateException(msg);
         }
         return (List<String>) obj;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean isOnceMoreDropAllTable() {
+        String value = (String) getOnceMoreDropDefinitionMap().get("dropAllTable");
+        if (value == null) {
+            value = (String) getOnceMoreDropDefinitionMap().get("isDropAllTable");
+            if (value == null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================

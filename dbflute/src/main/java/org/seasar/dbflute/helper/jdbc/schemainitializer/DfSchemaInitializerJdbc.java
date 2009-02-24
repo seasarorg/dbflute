@@ -62,6 +62,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected List<String> _tableExceptList;
 
+    protected boolean _dropAllTable;
+
     // ===================================================================================
     //                                                                   Initialize Schema
     //                                                                   =================
@@ -87,6 +89,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
                     @Override
                     protected List<String> getTableTargetList() {
+                        if (_dropAllTable) {
+                            return new ArrayList<String>();
+                        }
                         if (_tableTargetList != null && !_tableTargetList.isEmpty()) {
                             return _tableTargetList;
                         } else {
@@ -96,6 +101,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
                     @Override
                     protected List<String> getTableExceptList() {
+                        if (_dropAllTable) {
+                            return new ArrayList<String>();
+                        }
                         if (_tableExceptList != null && !_tableExceptList.isEmpty()) {
                             return _tableExceptList;
                         } else {
@@ -361,5 +369,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setTableExceptList(List<String> tableExceptList) {
         _tableExceptList = tableExceptList;
+    }
+
+    public boolean isDropAllTable() {
+        return _dropAllTable;
+    }
+
+    public void setDropAllTable(boolean dropAllTable) {
+        _dropAllTable = dropAllTable;
     }
 }

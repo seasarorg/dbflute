@@ -94,11 +94,13 @@ public class DfSchemaInitializerFactory {
         final List<String> objectTypeList = getOnceMoreObjectTypeList();
         final List<String> tableTargetList = getOnceMoreDropTableTargetList();
         final List<String> tableExceptList = getOnceMoreDropTableExceptList();
+        final boolean dropAllTable = isOnceMoreDropAllTable();
         initializer.setSchema(schema);
         initializer.setTableNameWithSchema(true);
         initializer.setObjectTypeList(objectTypeList);
         initializer.setTableTargetList(tableTargetList);
         initializer.setTableExceptList(tableExceptList);
+        initializer.setDropAllTable(dropAllTable);
     }
 
     protected String getOnceMoreSchema() {
@@ -115,5 +117,9 @@ public class DfSchemaInitializerFactory {
     
     protected List<String> getOnceMoreDropTableExceptList() {
         return _replaceSchemaProperties.getOnceMoreDropTableExceptList();
+    }
+    
+    protected boolean isOnceMoreDropAllTable() {
+        return _replaceSchemaProperties.isOnceMoreDropAllTable();
     }
 }
