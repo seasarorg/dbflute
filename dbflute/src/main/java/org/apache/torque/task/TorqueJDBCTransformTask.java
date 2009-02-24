@@ -743,9 +743,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             _synonymMap = extractor.extractSynonymMap();
             final Set<String> keySet = _synonymMap.keySet();
             final StringBuilder sb = new StringBuilder();
-            sb.append("[Synonym Map]");
+            sb.append(getLineSeparator()).append("[Synonym Map]");
             for (String key : keySet) {
-                sb.append(getLineSeparator()).append("  " + key + " = " + _synonymMap.get(key));
+                sb.append(getLineSeparator()).append(" " + key + " = " + _synonymMap.get(key));
             }
             _log.info(sb.toString());
         } catch (Exception ignored) {
