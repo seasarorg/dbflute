@@ -199,7 +199,34 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 if (isSkipDropForeignKey(tableMetaInfo)) {
                     continue;
                 }
-                final DfForeignKeyHandler handler = new DfForeignKeyHandler();
+                final DfForeignKeyHandler handler = new DfForeignKeyHandler() {
+                    // /= = = = = = = = = = = =
+                    // Override for once more!
+                    // = = = = = = = = = =/
+                    @Override
+                    protected List<String> getTableTargetList() {
+                        if (_onceMoreDropAllTable) {
+                            return new ArrayList<String>();
+                        }
+                        if (_onceMoreDropTableTargetList != null) {
+                            return _onceMoreDropTableTargetList;
+                        } else {
+                            return super.getTableTargetList();
+                        }
+                    }
+
+                    @Override
+                    protected List<String> getTableExceptList() {
+                        if (_onceMoreDropAllTable) {
+                            return new ArrayList<String>();
+                        }
+                        if (_onceMoreDropTableExceptList != null) {
+                            return _onceMoreDropTableExceptList;
+                        } else {
+                            return super.getTableExceptList();
+                        }
+                    }
+                };
                 final DatabaseMetaData dbMetaData = connection.getMetaData();
                 final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = handler.getForeignKeyMetaInfo(
                         dbMetaData, _schema, tableMetaInfo);
