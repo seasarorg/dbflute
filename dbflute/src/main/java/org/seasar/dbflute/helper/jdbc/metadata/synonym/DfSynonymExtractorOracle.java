@@ -76,11 +76,10 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 info.setTableOwner(tableOwner);
                 info.setTableName(tableName);
 
-                // PK, UQ, ID, FK, Index
+                // PK, ID, UQ, FK, Index
                 final DatabaseMetaData metaData = conn.getMetaData();
                 info.setPrimaryKeyNameList(getPKList(metaData, tableOwner, tableName));
                 final List<String> primaryKeyNameList = info.getPrimaryKeyNameList();
-                info.setUniqueKeyMap(getUQMap(metaData, tableOwner, tableName, primaryKeyNameList));
                 for (String primaryKeyName : primaryKeyNameList) {
                     final boolean autoIncrement = isAutoIncrement(conn, tableOwner, tableName, primaryKeyName);
                     if (autoIncrement) {
@@ -88,6 +87,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                         break;
                     }
                 }
+                info.setUniqueKeyMap(getUQMap(metaData, tableOwner, tableName, primaryKeyNameList));
                 info.setForeignKeyMetaInfoMap(getFKMap(metaData, tableOwner, tableName)); // It's tentative information at this timing!
                 info.setIndexMap(_indexHandler.getIndexMap(metaData, tableOwner, tableName, info.getUniqueKeyMap()));
                 synonymMap.put(synonymName, info);

@@ -734,17 +734,20 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                               Synonym
     //                                               -------
     protected void loadSynonymInfoIfNeeds() {
-        DfSynonymExtractor extractor = createSynonymExtractor();
+        final DfSynonymExtractor extractor = createSynonymExtractor();
         if (extractor == null) {
             return;
         }
         try {
             _log.info("...Initializing synonym map");
             _synonymMap = extractor.extractSynonymMap();
-            Set<String> keySet = _synonymMap.keySet();
+            final Set<String> keySet = _synonymMap.keySet();
+            final StringBuilder sb = new StringBuilder();
+            sb.append("[Synonym Map]");
             for (String key : keySet) {
-                _log.info(_synonymMap.get(key));
+                sb.append(getLineSeparator()).append("  " + key + " = " + _synonymMap.get(key));
             }
+            _log.info(sb.toString());
         } catch (Exception ignored) {
             _log.info("DfSynonymExtractor.extractSynonymMap() threw the exception!", ignored);
         }

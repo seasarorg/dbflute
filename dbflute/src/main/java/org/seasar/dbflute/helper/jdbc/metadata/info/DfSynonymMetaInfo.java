@@ -30,8 +30,8 @@ public class DfSynonymMetaInfo {
     protected String tableOwner;
     protected String tableName;
     protected List<String> primaryKeyNameList;
-    protected Map<String, Map<Integer, String>> uniqueKeyMap;
     protected boolean autoIncrement;
+    protected Map<String, Map<Integer, String>> uniqueKeyMap;
     protected Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap;
     protected Map<String, Map<Integer, String>> indexMap;
 
@@ -44,9 +44,9 @@ public class DfSynonymMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + synonymName + ", " + tableOwner + ", " + tableName + ", " + primaryKeyNameList + ", "
-                + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", " + autoIncrement + ", "
-                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null);
+        return "{" + synonymName + ": " + tableOwner + "." + tableName + ", " + primaryKeyNameList
+                + (autoIncrement ? ", ID" : "") + ", " + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null)
+                + ", " + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null);
     }
 
     // ===================================================================================
@@ -84,20 +84,20 @@ public class DfSynonymMetaInfo {
         this.primaryKeyNameList = primaryKeyNameList;
     }
 
-    public Map<String, Map<Integer, String>> getUniqueKeyMap() {
-        return uniqueKeyMap;
-    }
-
-    public void setUniqueKeyMap(Map<String, Map<Integer, String>> uniqueKeyMap) {
-        this.uniqueKeyMap = uniqueKeyMap;
-    }
-
     public boolean isAutoIncrement() {
         return autoIncrement;
     }
 
     public void setAutoIncrement(boolean autoIncrement) {
         this.autoIncrement = autoIncrement;
+    }
+
+    public Map<String, Map<Integer, String>> getUniqueKeyMap() {
+        return uniqueKeyMap;
+    }
+
+    public void setUniqueKeyMap(Map<String, Map<Integer, String>> uniqueKeyMap) {
+        this.uniqueKeyMap = uniqueKeyMap;
     }
 
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfoMap() {

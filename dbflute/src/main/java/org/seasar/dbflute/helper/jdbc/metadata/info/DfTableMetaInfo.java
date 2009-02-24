@@ -56,7 +56,7 @@ public class DfTableMetaInfo {
     }
     
     public boolean canHandleSynonym() {
-        return isTableTypeSynonym() && isTableTypeAlias();
+        return isTableTypeSynonym() || isTableTypeAlias();
     }
 
     // ===================================================================================
