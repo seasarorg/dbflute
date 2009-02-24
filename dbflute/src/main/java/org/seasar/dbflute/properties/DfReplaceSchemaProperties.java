@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.IllegalPropertyTypeException;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
@@ -125,8 +126,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                    Other Properties
-    //                                                                    ================
+    //                                                                             Logging
+    //                                                                             =======
     public boolean isLoggingInsertSql() {
         String value = (String) getReplaceSchemaDefinitionMap().get("loggingInsertSql");
         if (value == null) {
@@ -138,39 +139,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return value.equalsIgnoreCase("true");
     }
 
-    public boolean isAutoCommit() {
-        return analyzeBooleanProperty("isAutoCommit", true);
-    }
-
-    public boolean isRollbackOnly() {
-        return analyzeBooleanProperty("isRollbackOnly", false);
-    }
-
-    public boolean isErrorContinue() {
-        return analyzeBooleanProperty("isErrorContinue", true);
-    }
-
-    public String getSqlFileEncoding() {
-        final String sqlFileEncoding = (String) getReplaceSchemaDefinitionMap().get("sqlFileEncoding");
-        if (sqlFileEncoding != null && sqlFileEncoding.trim().length() != 0) {
-            return sqlFileEncoding;
-        } else {
-            return "UTF-8";
-        }
-    }
-
-    public String getSkipSheet() {
-        final String skipSheet = (String) getReplaceSchemaDefinitionMap().get("skipSheet");
-        if (skipSheet != null && skipSheet.trim().length() != 0) {
-            return skipSheet;
-        } else {
-            return null;
-        }
-    }
-
     // ===================================================================================
-    //                                                                           Once More
-    //                                                                           =========
+    //                                                                      Once More Drop
+    //                                                                      ==============
     @SuppressWarnings("unchecked")
     protected Map<String, Object> getOnceMoreDropDefinitionMap() {
         final Map<String, Object> map = (Map<String, Object>) getReplaceSchemaDefinitionMap().get(
@@ -256,17 +227,19 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                       One More Time
-    //                                                                       =============
+    //                                                                     Additional Drop
+    //                                                                     ===============
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getAdditionalDropMapList() {
-        final List<Map<String, Object>> list = (List<Map<String, Object>>) getReplaceSchemaDefinitionMap().get(
-                "additionalDropMapList");
-        if (list != null) {
-            return list;
-        } else {
+        Object obj = getReplaceSchemaDefinitionMap().get("additionalDropMapList");
+        if (obj == null) {
             return new ArrayList<Map<String, Object>>();
         }
+        if (!(obj instanceof List)) {
+            String msg = "The type of the property 'additionalDropMapList' should be List: " + obj;
+            throw new IllegalPropertyTypeException(msg);
+        }
+        return (List<Map<String, Object>>) obj;
     }
 
     public String getAdditionalDropSchema(Map<String, Object> additionalDropMap) {
@@ -336,6 +309,39 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             }
         }
         return value.equalsIgnoreCase("true");
+    }
+
+    // ===================================================================================
+    //                                                                               Other
+    //                                                                               =====
+    public boolean isAutoCommit() {
+        return analyzeBooleanProperty("isAutoCommit", true);
+    }
+
+    public boolean isRollbackOnly() {
+        return analyzeBooleanProperty("isRollbackOnly", false);
+    }
+
+    public boolean isErrorContinue() {
+        return analyzeBooleanProperty("isErrorContinue", true);
+    }
+
+    public String getSqlFileEncoding() {
+        final String sqlFileEncoding = (String) getReplaceSchemaDefinitionMap().get("sqlFileEncoding");
+        if (sqlFileEncoding != null && sqlFileEncoding.trim().length() != 0) {
+            return sqlFileEncoding;
+        } else {
+            return "UTF-8";
+        }
+    }
+
+    public String getSkipSheet() {
+        final String skipSheet = (String) getReplaceSchemaDefinitionMap().get("skipSheet");
+        if (skipSheet != null && skipSheet.trim().length() != 0) {
+            return skipSheet;
+        } else {
+            return null;
+        }
     }
 
     // ===================================================================================
