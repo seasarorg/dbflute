@@ -54,7 +54,7 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                     final String tableNameWithSchema = tableMetaInfo.buildTableNameWithSchema();
                     rs = stmt.executeQuery(buildMetaDataSql(primaryKeyColumnName, tableNameWithSchema));
                 } catch (SQLException ignored) {
-                    rs = retryForReservationWordTable(stmt, tableMetaInfo, primaryKeyColumnName);
+                    rs = retryForReservationWordTable(stmt, tableName, primaryKeyColumnName);
                     if (rs == null) {
                         ignoredMessage = ignored.getMessage();
                         throw e;
@@ -91,9 +91,7 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
         return "select " + primaryKeyColumnName + " from " + tableName + " where 1 = 0";
     }
 
-    protected ResultSet retryForReservationWordTable(Statement stmt, DfTableMetaInfo tableMetaInfo,
-            String primaryKeyColumnName) {
-        String tableName = tableMetaInfo.getTableName();
+    protected ResultSet retryForReservationWordTable(Statement stmt, String tableName, String primaryKeyColumnName) {
         tableName = "\"" + tableName + "\"";
         ResultSet rs = null;
         try {

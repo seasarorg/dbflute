@@ -54,6 +54,10 @@ public class DfTableMetaInfo {
     public boolean isTableTypeSynonym() {
         return _tableType != null ? _tableType.equalsIgnoreCase("SYNONYM") : false;
     }
+    
+    public boolean canHandleSynonym() {
+        return isTableTypeSynonym() && isTableTypeAlias();
+    }
 
     // ===================================================================================
     //                                                                        Name Builder

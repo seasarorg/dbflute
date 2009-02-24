@@ -38,45 +38,50 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     private static final Log _log = LogFactory.getLog(DfUniqueKeyHandler.class);
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                         Primary Key
+    //                                                                         ===========
     /**
      * Retrieves a list of the columns composing the primary key for a given table.
-     * @param metaData JDBC meta data.
+     * @param metaData JDBC meta data. (NotNull)
      * @param schemaName Schema name. (NotNull & AllowedEmpty)
      * @param tableMetaInfo The meta information of table. (NotNull)
-     * @return A list of the primary key parts for <code>tableName</code>.
+     * @return A list of the primary key parts for <code>tableName</code>. (NotNull)
+     * @throws SQLException
      */
     public List<String> getPrimaryColumnNameList(DatabaseMetaData metaData, String schemaName,
-            DfTableMetaInfo tableMetaInfo) {
+            DfTableMetaInfo tableMetaInfo) throws SQLException {
         schemaName = filterSchemaName(schemaName);
         schemaName = tableMetaInfo.selectMetaExtractingSchemaName(schemaName);
         final String tableName = tableMetaInfo.getTableName();
         return getPrimaryColumnNameList(metaData, schemaName, tableName);
     }
 
-    public List<String> getPrimaryColumnNameList(DatabaseMetaData metaData, String schemaName, String tableName) {
+    /**
+     * Retrieves a list of the columns composing the primary key for a given table.
+     * @param metaData JDBC meta data. (NotNull)
+     * @param schemaName Schema name. (NotNull & AllowedEmpty)
+     * @param tableName The name of table. (NotNull)
+     * @return A list of the primary key parts for <code>tableName</code>. (NotNull)
+     * @throws SQLException
+     */
+    public List<String> getPrimaryColumnNameList(DatabaseMetaData metaData, String schemaName, String tableName)
+            throws SQLException {
         schemaName = filterSchemaName(schemaName);
 
         final List<String> primaryKeyColumnNameList = new ArrayList<String>();
+        if (!isPrimaryKeyExtractingSupported()) {
+            return primaryKeyColumnNameList;
+        }
+        ResultSet parts = null;
         try {
-            if (!isPrimaryKeyExtractingSupported()) {
-                return primaryKeyColumnNameList;
+            parts = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName);
+            while (parts.next()) {
+                primaryKeyColumnNameList.add(getPrimaryKeyColumnNameFromDBMeta(parts));
             }
-            ResultSet parts = null;
-            try {
-                parts = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName);
-                while (parts.next()) {
-                    primaryKeyColumnNameList.add(getPrimaryKeyColumnNameFromDBMeta(parts));
-                }
-            } finally {
-                if (parts != null) {
-                    parts.close();
-                }
+        } finally {
+            if (parts != null) {
+                parts.close();
             }
-        } catch (SQLException e) {
-            String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + tableName;
-            throw new IllegalStateException(msg);
         }
         return primaryKeyColumnNameList;
     }
@@ -90,6 +95,9 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         return resultSet.getString(4);
     }
 
+    // ===================================================================================
+    //                                                                          Unique Key
+    //                                                                          ==========
     // {WEBから抜粋}
     // 
     //テーブルのインデックスと統計情報の記述を取得します。 NON_UNIQUE、TYPE、INDEX_NAME、ORDINAL_POSITION の順に並べます。
@@ -121,8 +129,12 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         if (tableMetaInfo.isTableTypeView()) {
             return new LinkedHashMap<String, Map<Integer, String>>();
         }
-
         final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMeta, schemaName, tableMetaInfo);
+        return getUniqueKeyMap(dbMeta, schemaName, tableName, primaryColumnNameList);
+    }
+
+    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, String schemaName,
+            String tableName, List<String> primaryColumnNameList) throws SQLException { // Non Primary Key Only
         final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {

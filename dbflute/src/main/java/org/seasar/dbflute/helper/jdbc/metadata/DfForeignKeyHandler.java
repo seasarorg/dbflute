@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -38,8 +39,8 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     private static final Log _log = LogFactory.getLog(DfForeignKeyHandler.class);
 
     // ===================================================================================
-    //                                                                        Meta Getting
-    //                                                                        ============
+    //                                                                         Foreign Key
+    //                                                                         ===========
     /**
      * Retrieves a list of foreign key columns for a given table.
      * @param dbMeta JDBC meta data.
@@ -52,6 +53,18 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         schemaName = filterSchemaName(schemaName);
         schemaName = tableMetaInfo.selectMetaExtractingSchemaName(schemaName);
         final String tableName = tableMetaInfo.getTableName();
+        return getForeignKeyMetaInfo(dbMeta, schemaName, tableName);
+    }
+    
+    /**
+     * Retrieves a list of foreign key columns for a given table.
+     * @param dbMeta JDBC meta data.
+     * @param tableName The name of table.
+     * @return A list of foreign keys in <code>tableName</code>.
+     * @throws SQLException
+     */
+    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String schemaName,
+            String tableName) throws SQLException {
         final Map<String, DfForeignKeyMetaInfo> fkMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
         if (!isForeignKeyExtractingSupported()) {
             return fkMap;
@@ -60,14 +73,14 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         try {
             foreignKeys = dbMeta.getImportedKeys(null, schemaName, tableName);
             while (foreignKeys.next()) {
-                String refTableName = foreignKeys.getString(3);
+                final String refTableName = foreignKeys.getString(3);
 
                 if (isTableExcept(refTableName)) {
                     continue;
                 }
 
                 String fkName = foreignKeys.getString(12);
-                if (fkName == null) {// if FK has no name - make it up (use tablename instead)
+                if (fkName == null) { // if FK has no name - make it up (use table name instead)
                     fkName = refTableName;
                 }
 
@@ -117,53 +130,5 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
             }
         }
         return filteredForeignKeyMetaInfoMap;
-    }
-
-    public static class DfForeignKeyMetaInfo {
-        protected String _foreignKeyName;
-
-        protected String _localTableName;
-
-        protected String _foreignTableName;
-
-        protected Map<String, String> _columnNameMap = new LinkedHashMap<String, String>();
-
-        public String getForeignKeyName() {
-            return _foreignKeyName;
-        }
-
-        public void setForeignKeyName(String foreignKeyName) {
-            this._foreignKeyName = foreignKeyName;
-        }
-
-        public String getLocalTableName() {
-            return _localTableName;
-        }
-
-        public void setLocalTableName(String localtableName) {
-            this._localTableName = localtableName;
-        }
-
-        public String getForeignTableName() {
-            return _foreignTableName;
-        }
-
-        public void setForeignTableName(String foreignTableName) {
-            this._foreignTableName = foreignTableName;
-        }
-
-        public Map<String, String> getColumnNameMap() {
-            return _columnNameMap;
-        }
-
-        public void putColumnNameMap(String localColumnName, String foreignColumnName) {
-            this._columnNameMap.put(localColumnName, foreignColumnName);
-        }
-
-        @Override
-        public String toString() {
-            return _foreignKeyName + "-{" + _localTableName + ":" + _foreignTableName + "--" + _columnNameMap + "}";
-        }
-
     }
 }

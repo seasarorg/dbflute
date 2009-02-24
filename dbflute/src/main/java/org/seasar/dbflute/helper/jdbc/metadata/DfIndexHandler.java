@@ -70,7 +70,11 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
         if (tableMetaInfo.isTableTypeView()) {
             return new LinkedHashMap<String, Map<Integer, String>>();
         }
+        return getIndexMap(dbMeta, schemaName, tableName, uniqueKeyMap);
+    }
 
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String schemaName, String tableName,
+            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
         final Map<String, Map<Integer, String>> indexMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {

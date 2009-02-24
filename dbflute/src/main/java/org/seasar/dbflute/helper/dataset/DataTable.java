@@ -1,6 +1,7 @@
 package org.seasar.dbflute.helper.dataset;
 
 import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -185,8 +186,13 @@ public class DataTable {
     }
 
     protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData, String schemaName) {
-        final List<String> list = new DfUniqueKeyHandler().getPrimaryColumnNameList(metaData, schemaName, tableName);
-        return new HashSet<String>(list);
+        try {
+            List<String> list = new DfUniqueKeyHandler().getPrimaryColumnNameList(metaData, schemaName, tableName);
+            return new HashSet<String>(list);
+        } catch (SQLException e) {
+            String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + tableName;
+            throw new IllegalStateException(msg);
+        }
     }
 
     // ===================================================================================

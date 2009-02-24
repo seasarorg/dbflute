@@ -78,20 +78,24 @@ import org.apache.xerces.dom.DocumentTypeImpl;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.seasar.dbflute.exception.TableNotFoundException;
 import org.seasar.dbflute.helper.jdbc.metadata.DfAutoIncrementHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfIndexHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
-import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 import org.seasar.dbflute.helper.jdbc.metadata.identity.DfIdentityExtractor;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.synonym.DfSynonymExtractor;
 import org.seasar.dbflute.logic.factory.DfDbCommentExtractorFactory;
 import org.seasar.dbflute.logic.factory.DfIdentityExtractorFactory;
+import org.seasar.dbflute.logic.factory.DfSynonymExtractorFactory;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
@@ -147,9 +151,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected Map<String, Map<String, UserColComments>> _columnCommentAllMap; // as temporary cache!
 
     // -----------------------------------------------------
-    //                                              Identity
-    //                                              --------
+    //                                      Direct Meta Data
+    //                                      ----------------
     protected Map<String, String> _identityMap;
+    protected Map<String, DfSynonymMetaInfo> _synonymMap;
 
     // ===================================================================================
     //                                                                             Execute
@@ -234,6 +239,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         if (tableList.isEmpty()) {
             throwTableNotFoundException();
         }
+
+        loadSynonymInfoIfNeeds();
 
         _databaseNode = _doc.createElement("database");
         _databaseNode.setAttribute("name", _schema);
@@ -393,7 +400,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
 
             _databaseNode.appendChild(tableElement);
-        }
+        } // End of Table Loop
+
         setupAddtionalTableIfNeeds(); // since 0.8.0
         _doc.appendChild(_databaseNode);
     }
@@ -441,14 +449,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         throw new TableNotFoundException(msg);
     }
 
-    public static class TableNotFoundException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public TableNotFoundException(String msg) {
-            super(msg);
-        }
-    }
-
     protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
         columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo));
     }
@@ -492,6 +492,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                   Meta Data Handler
     //                                                                   =================
+    // -----------------------------------------------------
+    //                                                 Table
+    //                                                 -----
     /**
      * Get all the table names in the current database that are not system tables.
      * @param dbMeta The meta data of a database. (NotNull)
@@ -545,6 +548,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
     }
 
+    // -----------------------------------------------------
+    //                                                Column
+    //                                                ------
     /**
      * Retrieves all the column names and types for a given table from
      * JDBC meta data.  It returns a List of Lists.  Each element
@@ -575,6 +581,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
     }
 
+    // -----------------------------------------------------
+    //                                           Primary Key
+    //                                           -----------
     /**
      * Retrieves a list of the columns composing the primary key for a given table.
      * @param dbMeta The meta data of a database. (NotNull)
@@ -585,9 +594,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
         final String schema = getHandlerUseSchema(tableMetaInfo);
-        return _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, schema, tableMetaInfo);
+        final List<String> primaryColumnNameList = _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, schema,
+                tableMetaInfo);
+        if (_synonymMap == null || !tableMetaInfo.canHandleSynonym() || !primaryColumnNameList.isEmpty()) {
+            return primaryColumnNameList;
+        }
+        final DfSynonymMetaInfo synonym = _synonymMap.get(tableMetaInfo.getTableName());
+        return synonym != null ? synonym.getPrimaryKeyNameList() : primaryColumnNameList;
     }
 
+    // -----------------------------------------------------
+    //                                            Unique Key
+    //                                            ----------
     /**
      * Get unique column name list.
      * @param dbMeta The meta data of a database. (NotNull)
@@ -598,23 +616,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
         final String schema = getHandlerUseSchema(tableMetaInfo);
-        return _uniqueKeyHandler.getUniqueKeyMap(dbMeta, schema, tableMetaInfo);
+        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyHandler.getUniqueKeyMap(dbMeta, schema,
+                tableMetaInfo);
+        if (_synonymMap == null || !tableMetaInfo.canHandleSynonym() || !uniqueKeyMap.isEmpty()) {
+            return uniqueKeyMap;
+        }
+        final DfSynonymMetaInfo synonym = _synonymMap.get(tableMetaInfo.getTableName());
+        return synonym != null ? synonym.getUniqueKeyMap() : uniqueKeyMap;
     }
 
-    /**
-     * Get index column name list.
-     * @param dbMeta The meta data of a database. (NotNull)
-     * @param tableMetaInfo The meta information of table. (NotNull)
-     * @param uniqueKeyMap The map of unique key. (NotNull)
-     * @return The list of index columns. (NotNull)
-     * @throws SQLException
-     */
-    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo,
-            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
-        final String schema = getHandlerUseSchema(tableMetaInfo);
-        return _indexHandler.getIndexMap(dbMeta, schema, tableMetaInfo, uniqueKeyMap);
-    }
-
+    // -----------------------------------------------------
+    //                                        Auto Increment
+    //                                        --------------
     /**
      * Get auto-increment column name.
      * @param tableMetaInfo The meta information of table from which to retrieve PK information.
@@ -625,9 +638,14 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     protected boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName)
             throws SQLException {
-        boolean autoIncrement = _autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName);
-        if (autoIncrement) {
+        if (_autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName)) {
             return true;
+        }
+        if (_synonymMap != null && tableMetaInfo.canHandleSynonym()) {
+            final DfSynonymMetaInfo synonym = _synonymMap.get(tableMetaInfo.getTableName());
+            if (synonym != null && synonym.isAutoIncrement()) {
+                return true;
+            }
         }
         if (_identityMap == null) {
             return false;
@@ -650,6 +668,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
     }
 
+    // -----------------------------------------------------
+    //                                           Foreign Key
+    //                                           -----------
     /**
      * Retrieves a list of foreign key columns for a given table.
      * @param dbMeta The meta data of a database. (NotNull)
@@ -660,7 +681,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected Map<String, DfForeignKeyMetaInfo> getForeignKeys(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
         final String schema = getHandlerUseSchema(tableMetaInfo);
-        return _foreignKeyHandler.getForeignKeyMetaInfo(dbMeta, schema, tableMetaInfo);
+        final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfo = _foreignKeyHandler.getForeignKeyMetaInfo(dbMeta,
+                schema, tableMetaInfo);
+        if (_synonymMap == null || !tableMetaInfo.canHandleSynonym() || !foreignKeyMetaInfo.isEmpty()) {
+            return foreignKeyMetaInfo;
+        }
+        final DfSynonymMetaInfo synonym = _synonymMap.get(tableMetaInfo.getTableName());
+        return synonym != null ? synonym.getForeignKeyMetaInfoMap() : foreignKeyMetaInfo;
     }
 
     protected String getHandlerUseSchema(DfTableMetaInfo tableMetaInfo) {
@@ -676,22 +703,44 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         return additionalSchemaList.contains(schema);
     }
 
-    protected DfDbCommentExtractor createDbCommentExtractor() {
-        final DfDbCommentExtractorFactory factory = createDbCommentExtractorFactory();
-        return factory.createDbCommentExtractor();
+    // -----------------------------------------------------
+    //                                                 Index
+    //                                                 -----
+    /**
+     * Get index column name list.
+     * @param dbMeta The meta data of a database. (NotNull)
+     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @param uniqueKeyMap The map of unique key. (NotNull)
+     * @return The list of index columns. (NotNull)
+     * @throws SQLException
+     */
+    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo,
+            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
+        final String schema = getHandlerUseSchema(tableMetaInfo);
+        final Map<String, Map<Integer, String>> indexMap = _indexHandler.getIndexMap(dbMeta, schema, tableMetaInfo,
+                uniqueKeyMap);
+        if (_synonymMap == null || !tableMetaInfo.canHandleSynonym() || !indexMap.isEmpty()) {
+            return indexMap;
+        }
+        final DfSynonymMetaInfo synonym = _synonymMap.get(tableMetaInfo.getTableName());
+        return synonym != null ? synonym.getIndexMap() : indexMap;
     }
 
-    protected DfDbCommentExtractorFactory createDbCommentExtractorFactory() {
-        return new DfDbCommentExtractorFactory(getBasicProperties(), getDataSource());
-    }
-
-    protected DfIdentityExtractor createIdentityExtractor() {
-        final DfIdentityExtractorFactory factory = createIdentityExtractorFactory();
-        return factory.createIdentityExtractor();
-    }
-
-    protected DfIdentityExtractorFactory createIdentityExtractorFactory() {
-        return new DfIdentityExtractorFactory(getBasicProperties(), getDataSource());
+    // -----------------------------------------------------
+    //                                               Synonym
+    //                                               -------
+    protected void loadSynonymInfoIfNeeds() {
+        DfSynonymExtractor extractor = createSynonymExtractor();
+        if (extractor == null) {
+            return;
+        }
+        try {
+            _log.info("...Initializing synonym map");
+            _synonymMap = extractor.extractSynonymMap();
+            _log.info("  -> size=" + _synonymMap.size());
+        } catch (Exception ignored) {
+            _log.info("DfSynonymExtractor.extractSynonymMap() threw the exception!", ignored);
+        }
     }
 
     // ===================================================================================
@@ -734,6 +783,36 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
             _databaseNode.appendChild(tableElement);
         }
+    }
+
+    // ===================================================================================
+    //                                                                           Extractor
+    //                                                                           =========
+    protected DfDbCommentExtractor createDbCommentExtractor() {
+        final DfDbCommentExtractorFactory factory = createDbCommentExtractorFactory();
+        return factory.createDbCommentExtractor();
+    }
+
+    protected DfDbCommentExtractorFactory createDbCommentExtractorFactory() {
+        return new DfDbCommentExtractorFactory(getBasicProperties(), getDataSource());
+    }
+
+    protected DfIdentityExtractor createIdentityExtractor() {
+        final DfIdentityExtractorFactory factory = createIdentityExtractorFactory();
+        return factory.createIdentityExtractor();
+    }
+
+    protected DfIdentityExtractorFactory createIdentityExtractorFactory() {
+        return new DfIdentityExtractorFactory(getBasicProperties(), getDataSource());
+    }
+
+    protected DfSynonymExtractor createSynonymExtractor() {
+        final DfSynonymExtractorFactory factory = creatSynonymExtractorFactory();
+        return factory.createSynonymExtractor();
+    }
+
+    protected DfSynonymExtractorFactory creatSynonymExtractorFactory() {
+        return new DfSynonymExtractorFactory(getBasicProperties(), getDataSource());
     }
 
     // ===================================================================================
