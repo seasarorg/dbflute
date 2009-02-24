@@ -62,7 +62,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             throw new IllegalStateException(e);
         }
         try {
-            Map<String, DfSynonymMetaInfo> resultMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
+            Map<String, DfSynonymMetaInfo> synonymMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
             Statement statement = conn.createStatement();
             ResultSet rs = statement.executeQuery("select * from USER_SYNONYMS");
             while (rs.next()) {
@@ -90,10 +90,10 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 }
                 info.setForeignKeyMetaInfoMap(getFKMap(metaData, tableOwner, tableName)); // It's tentative information at this timing!
                 info.setIndexMap(_indexHandler.getIndexMap(metaData, tableOwner, tableName, info.getUniqueKeyMap()));
-                resultMap.put(tableName, info);
+                synonymMap.put(synonymName, info);
             }
-            translateFKTable(resultMap); // It translates foreign key meta informations. 
-            return resultMap;
+            translateFKTable(synonymMap); // It translates foreign key meta informations. 
+            return synonymMap;
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         } finally {
@@ -142,8 +142,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
     }
 
-    protected void translateFKTable(Map<String, DfSynonymMetaInfo> resultMap) {
-        final Collection<DfSynonymMetaInfo> synonymList = resultMap.values();
+    protected void translateFKTable(Map<String, DfSynonymMetaInfo> synonymMap) {
+        final Collection<DfSynonymMetaInfo> synonymList = synonymMap.values();
         final Map<String, List<String>> tableForeignSynonymListMap = new LinkedHashMap<String, List<String>>();
         for (DfSynonymMetaInfo synonym : synonymList) {
             final String synonymName = synonym.getSynonymName();

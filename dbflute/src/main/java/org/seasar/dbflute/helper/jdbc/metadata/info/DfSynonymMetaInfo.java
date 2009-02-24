@@ -45,7 +45,8 @@ public class DfSynonymMetaInfo {
     @Override
     public String toString() {
         return "{" + synonymName + ", " + tableOwner + ", " + tableName + ", " + primaryKeyNameList + ", "
-                + uniqueKeyMap + ", " + autoIncrement + ", " + foreignKeyMetaInfoMap;
+                + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", " + autoIncrement + ", "
+                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null);
     }
 
     // ===================================================================================
