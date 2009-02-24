@@ -23,6 +23,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan.FireResult;
 import org.seasar.dbflute.logic.factory.DfSchemaInitializerFactory;
+import org.seasar.dbflute.logic.factory.DfSchemaInitializerFactory.InitializeType;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
@@ -73,12 +74,13 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         _log.info("* Initialize Schema *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        final DfSchemaInitializer initializer = createSchemaInitializer(false);
+        final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.FIRST);
         if (initializer != null) {
             initializer.initializeSchema();
         }
         _log.info("");
         initializeSchemaOnceMore();
+        initializeSchemaOneMoreTime();
     }
 
     protected void initializeSchemaOnceMore() {
@@ -98,21 +100,45 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         _log.info("* Initialize Schema Once More *");
         _log.info("*                             *");
         _log.info("* * * * * * * * * * * * * * * *");
-        final DfSchemaInitializer initializer = createSchemaInitializer(true);
+        final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.ONCE_MOCE);
         if (initializer != null) {
             initializer.initializeSchema();
         }
         _log.info("");
     }
 
-    protected DfSchemaInitializer createSchemaInitializer(boolean onceMore) {
-        final DfSchemaInitializerFactory factory = createSchemaInitializerFactory(onceMore);
+    protected void initializeSchemaOneMoreTime() {
+        final String schema = getMyProperties().getOneMoreTimeDropDefinitionSchema();
+        if (schema == null || schema.trim().length() == 0) {
+            return;
+        }
+        // /= = = = = = = = = = = = = = = = = 
+        // Unsupported at MySQL and SQLServer
+        // = = = = = = = = = =/
+        if (getBasicProperties().isDatabaseMySQL() || getBasicProperties().isDatabaseSqlServer()) {
+            String msg = "OneMoreTimeDropDefinitionSchema is unsupported at MySQL and SQLServer!";
+            throw new UnsupportedOperationException(msg);
+        }
+        _log.info("* * * * * * * * * * * * * * * * * *");
+        _log.info("*                                 *");
+        _log.info("* Initialize Schema One More Time *");
+        _log.info("*                                 *");
+        _log.info("* * * * * * * * * * * * * * * * * *");
+        final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.ONE_MORE_TIME);
+        if (initializer != null) {
+            initializer.initializeSchema();
+        }
+        _log.info("");
+    }
+
+    protected DfSchemaInitializer createSchemaInitializer(InitializeType initializeType) {
+        final DfSchemaInitializerFactory factory = createSchemaInitializerFactory(initializeType);
         return factory.createSchemaInitializer();
     }
 
-    protected DfSchemaInitializerFactory createSchemaInitializerFactory(boolean onceMore) {
+    protected DfSchemaInitializerFactory createSchemaInitializerFactory(InitializeType initializeType) {
         return new DfSchemaInitializerFactory(getDataSource(), getBasicProperties(), getDatabaseInfoProperties(),
-                getMyProperties(), onceMore);
+                getMyProperties(), initializeType);
     }
 
     // --------------------------------------------

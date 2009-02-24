@@ -20,15 +20,20 @@ public class DfSchemaInitializerFactory {
     protected DfBasicProperties _basicProperties;
     protected DfDatabaseProperties _databaseProperties;
     protected DfReplaceSchemaProperties _replaceSchemaProperties;
-    protected boolean _onceMore;
+    protected InitializeType _initializeType;
+
+    public enum InitializeType {
+        FIRST, ONCE_MOCE, ONE_MORE_TIME
+    }
 
     public DfSchemaInitializerFactory(DataSource dataSource, DfBasicProperties basicProperties,
-            DfDatabaseProperties databaseProperties, DfReplaceSchemaProperties replaceSchemaProperties, boolean onceMore) {
+            DfDatabaseProperties databaseProperties, DfReplaceSchemaProperties replaceSchemaProperties,
+            InitializeType initializeType) {
         _dataSource = dataSource;
         _basicProperties = basicProperties;
         _databaseProperties = databaseProperties;
         _replaceSchemaProperties = replaceSchemaProperties;
-        _onceMore = onceMore;
+        _initializeType = initializeType;
     }
 
     public DfSchemaInitializer createSchemaInitializer() {
@@ -79,23 +84,41 @@ public class DfSchemaInitializerFactory {
 
     protected void setupSchemaInitializerJdbcProperties(DfSchemaInitializerJdbc initializer) {
         initializer.setDataSource(_dataSource);
-        if (!_onceMore) { // Normal
+        if (_initializeType.equals(InitializeType.FIRST)) { // Normal
             initializer.setSchema(_databaseProperties.getDatabaseSchema());
             return;
         }
 
-        // Here 'Once-More'!
-        final String schema = getOnceMoreSchema();
-        if (schema == null || schema.trim().length() == 0) {
-            String msg = "Once More Schema should not be null or empty: schema=" + schema;
+        if (_initializeType.equals(InitializeType.ONCE_MOCE)) {
+            // Here 'Once-More'!
+            final String schema = getOnceMoreSchema();
+            if (schema == null || schema.trim().length() == 0) {
+                String msg = "Once More Schema should not be null or empty: schema=" + schema;
+                throw new IllegalStateException(msg);
+            }
+            initializer.setSchema(schema);
+            initializer.setTableNameWithSchema(true); // because it may be other schema!
+            initializer.setOnceMoreDropObjectTypeList(getOnceMoreObjectTypeList());
+            initializer.setOnceMoreDropTableTargetList(getOnceMoreDropTableTargetList());
+            initializer.setOnceMoreDropTableExceptList(getOnceMoreDropTableExceptList());
+            initializer.setOnceMoreDropDropAllTable(isOnceMoreDropAllTable());
+        } else if (_initializeType.equals(InitializeType.ONE_MORE_TIME)) {
+            // Here 'One-More-Time'!
+            final String schema = getOneMoreTimeSchema();
+            if (schema == null || schema.trim().length() == 0) {
+                String msg = "One More Time Schema should not be null or empty: schema=" + schema;
+                throw new IllegalStateException(msg);
+            }
+            initializer.setSchema(schema);
+            initializer.setTableNameWithSchema(true); // because it may be other schema!
+            initializer.setOnceMoreDropObjectTypeList(getOneMoreTimeObjectTypeList());
+            initializer.setOnceMoreDropTableTargetList(getOneMoreTimeDropTableTargetList());
+            initializer.setOnceMoreDropTableExceptList(getOneMoreTimeDropTableExceptList());
+            initializer.setOnceMoreDropDropAllTable(isOneMoreTimeDropAllTable());
+        } else {
+            String msg = "Unknown initialize type: " + _initializeType;
             throw new IllegalStateException(msg);
         }
-        initializer.setSchema(schema);
-        initializer.setTableNameWithSchema(true); // because it may be other schema!
-        initializer.setOnceMoreDropObjectTypeList(getOnceMoreObjectTypeList());
-        initializer.setOnceMoreDropTableTargetList(getOnceMoreDropTableTargetList());
-        initializer.setOnceMoreDropTableExceptList(getOnceMoreDropTableExceptList());
-        initializer.setOnceMoreDropDropAllTable(isOnceMoreDropAllTable());
     }
 
     protected String getOnceMoreSchema() {
@@ -116,5 +139,25 @@ public class DfSchemaInitializerFactory {
 
     protected boolean isOnceMoreDropAllTable() {
         return _replaceSchemaProperties.isOnceMoreDropAllTable();
+    }
+
+    protected String getOneMoreTimeSchema() {
+        return _replaceSchemaProperties.getOneMoreTimeDropDefinitionSchema();
+    }
+
+    protected List<String> getOneMoreTimeObjectTypeList() {
+        return _replaceSchemaProperties.getOneMoreTimeDropObjectTypeList();
+    }
+
+    protected List<String> getOneMoreTimeDropTableTargetList() {
+        return _replaceSchemaProperties.getOneMoreTimeDropTableTargetList();
+    }
+
+    protected List<String> getOneMoreTimeDropTableExceptList() {
+        return _replaceSchemaProperties.getOneMoreTimeDropTableExceptList();
+    }
+
+    protected boolean isOneMoreTimeDropAllTable() {
+        return _replaceSchemaProperties.isOneMoreTimeDropAllTable();
     }
 }
