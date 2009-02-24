@@ -170,10 +170,10 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
         // Show duplicate objects if exists
         if (!duplicateColumnNameSet.isEmpty()) {
-            String msg = "*Duplicate mete data was found:\n";
-            msg = msg + "  specified table = " + tableName + "\n";
-            msg = msg + "  duplicate tables = " + duplicateTableNameSet + "\n";
-            msg = msg + "  duplicate columns = " + duplicateColumnNameSet;
+            String msg = "*Duplicate mete data was found:";
+            msg = msg + "\n[" + tableName + "]";
+            msg = msg + "\n  duplicate tables = " + duplicateTableNameSet;
+            msg = msg + "\n  duplicate columns = " + duplicateColumnNameSet;
             _log.info(msg);
         }
 
