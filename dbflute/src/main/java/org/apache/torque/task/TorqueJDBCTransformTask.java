@@ -741,7 +741,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         try {
             _log.info("...Initializing synonym map");
             _synonymMap = extractor.extractSynonymMap();
-            _log.info("  -> size=" + _synonymMap.size());
+            Set<String> keySet = _synonymMap.keySet();
+            for (String key : keySet) {
+                _log.info("  -> " + _synonymMap.get(key));
+            }
         } catch (Exception ignored) {
             _log.info("DfSynonymExtractor.extractSynonymMap() threw the exception!", ignored);
         }

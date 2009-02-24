@@ -44,7 +44,8 @@ public class DfSynonymMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + synonymName + ", " + tableOwner + ", " + tableName + ", " + foreignKeyMetaInfoMap;
+        return "{" + synonymName + ", " + tableOwner + ", " + tableName + ", " + primaryKeyNameList + ", "
+                + uniqueKeyMap + ", " + autoIncrement + ", " + foreignKeyMetaInfoMap;
     }
 
     // ===================================================================================
@@ -53,39 +54,39 @@ public class DfSynonymMetaInfo {
     public String getSynonymName() {
         return synonymName;
     }
-    
+
     public void setSynonymName(String synonymName) {
         this.synonymName = synonymName;
     }
-    
+
     public String getTableOwner() {
         return tableOwner;
     }
-    
+
     public void setTableOwner(String tableOwner) {
         this.tableOwner = tableOwner;
     }
-    
+
     public String getTableName() {
         return tableName;
     }
-    
+
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
-    
+
     public List<String> getPrimaryKeyNameList() {
         return primaryKeyNameList;
     }
-    
+
     public void setPrimaryKeyNameList(List<String> primaryKeyNameList) {
         this.primaryKeyNameList = primaryKeyNameList;
     }
-    
+
     public Map<String, Map<Integer, String>> getUniqueKeyMap() {
         return uniqueKeyMap;
     }
-    
+
     public void setUniqueKeyMap(Map<String, Map<Integer, String>> uniqueKeyMap) {
         this.uniqueKeyMap = uniqueKeyMap;
     }
@@ -97,11 +98,11 @@ public class DfSynonymMetaInfo {
     public void setAutoIncrement(boolean autoIncrement) {
         this.autoIncrement = autoIncrement;
     }
-    
+
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfoMap() {
         return foreignKeyMetaInfoMap;
     }
-    
+
     public void setForeignKeyMetaInfoMap(Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap) {
         this.foreignKeyMetaInfoMap = foreignKeyMetaInfoMap;
     }
