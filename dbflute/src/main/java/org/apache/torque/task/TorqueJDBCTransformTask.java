@@ -1,5 +1,3 @@
-package org.apache.torque.task;
-
 /* ====================================================================
  * The Apache Software License, Version 1.1
  *
@@ -53,6 +51,7 @@ package org.apache.torque.task;
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  */
+package org.apache.torque.task;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -111,8 +110,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     private static final Log _log = LogFactory.getLog(TorqueJDBCTransformTask.class);
 
     // ===================================================================================
-    //                                                                 DataSource Override
-    //                                                                 ===================
+    //                                                                          DataSource
+    //                                                                          ==========
     protected boolean isUseDataSource() {
         return true;
     }
@@ -245,6 +244,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _databaseNode = _doc.createElement("database");
         _databaseNode.setAttribute("name", _schema);
 
+        // * * * * * *
+        // Table Loop
+        // * * * * * *
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMetaInfo tableMataInfo = tableList.get(i);
             _log.info("$ " + tableMataInfo);
@@ -311,7 +313,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 tableElement.appendChild(columnElement);
             }
 
+            // * * * * * * * * * * * * * * *
             // Foreign keys for this table.
+            // * * * * * * * * * * * * * * *
             final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = getForeignKeys(dbMetaData, tableMataInfo);
             final Set<String> foreignKeyMetaInfoKeySet = foreignKeyMetaInfoMap.keySet();
             for (String foreignKeyName : foreignKeyMetaInfoKeySet) {
@@ -331,7 +335,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 tableElement.appendChild(foreignKeyElement);
             }
 
+            // * * * * * * * * * * * * * * *
             // Unique keys for this table.
+            // * * * * * * * * * * * * * * *
             Map<String, Map<Integer, String>> uniqueMapForGettingIndex = null;
             {
                 Map<String, Map<Integer, String>> uniqueMap = null;
@@ -366,7 +372,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 }
             }
 
-            // Index for this table.
+            // * * * * * * * * * * * * * * *
+            // Indeces for this table.
+            // * * * * * * * * * * * * * * *
             {
                 Map<String, Map<Integer, String>> indexMap = null;
                 try {
@@ -556,15 +564,14 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * JDBC meta data.  It returns a List of Lists.  Each element
      * of the returned List is a List with:
      * @param dbMeta The meta data of a database. (NotNull)
-     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @param table The meta information of table. (NotNull)
      * @return The list of columns in <code>tableName</code>.
      * @throws SQLException
      */
-    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
-            throws SQLException {
-        final String schema = getHandlerUseSchema(tableMetaInfo);
-        final List<DfColumnMetaInfo> columnList = _columnHandler.getColumns(dbMeta, schema, tableMetaInfo);
-        helpColumnComments(tableMetaInfo, columnList);
+    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, DfTableMetaInfo table) throws SQLException {
+        final String schema = getHandlerUseSchema(table);
+        final List<DfColumnMetaInfo> columnList = _columnHandler.getColumns(dbMeta, schema, table);
+        helpColumnComments(table, columnList);
         return columnList;
     }
 
@@ -587,19 +594,17 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /**
      * Retrieves a list of the columns composing the primary key for a given table.
      * @param dbMeta The meta data of a database. (NotNull)
-     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @param table The meta information of table. (NotNull)
      * @return A list of the primary key parts for <code>tableName</code>.
      * @throws SQLException
      */
-    protected List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
-            throws SQLException {
-        final String schema = getHandlerUseSchema(tableMetaInfo);
-        final List<String> primaryColumnNameList = _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, schema,
-                tableMetaInfo);
-        if (_synonymMap == null || !tableMetaInfo.canHandleSynonym() || !primaryColumnNameList.isEmpty()) {
+    protected List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo table) throws SQLException {
+        final String schema = getHandlerUseSchema(table);
+        final List<String> primaryColumnNameList = _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, schema, table);
+        if (!canHandleSynonym(table) || !primaryColumnNameList.isEmpty()) {
             return primaryColumnNameList;
         }
-        final DfSynonymMetaInfo synonym = _synonymMap.get(tableMetaInfo.getTableName());
+        final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
         return synonym != null ? synonym.getPrimaryKeyNameList() : primaryColumnNameList;
     }
 
@@ -609,19 +614,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /**
      * Get unique column name list.
      * @param dbMeta The meta data of a database. (NotNull)
-     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @param table The meta information of table. (NotNull)
      * @return The list of unique columns. (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
+    protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, DfTableMetaInfo table)
             throws SQLException {
-        final String schema = getHandlerUseSchema(tableMetaInfo);
-        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyHandler.getUniqueKeyMap(dbMeta, schema,
-                tableMetaInfo);
-        if (_synonymMap == null || !tableMetaInfo.canHandleSynonym() || !uniqueKeyMap.isEmpty()) {
+        final String schema = getHandlerUseSchema(table);
+        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyHandler.getUniqueKeyMap(dbMeta, schema, table);
+        if (!canHandleSynonym(table) || !uniqueKeyMap.isEmpty()) {
             return uniqueKeyMap;
         }
-        final DfSynonymMetaInfo synonym = _synonymMap.get(tableMetaInfo.getTableName());
+        final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
         return synonym != null ? synonym.getUniqueKeyMap() : uniqueKeyMap;
     }
 
@@ -641,8 +645,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         if (_autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName)) {
             return true;
         }
-        if (_synonymMap != null && tableMetaInfo.canHandleSynonym()) {
-            final DfSynonymMetaInfo synonym = _synonymMap.get(tableMetaInfo.getTableName());
+        if (canHandleSynonym(tableMetaInfo)) {
+            final DfSynonymMetaInfo synonym = getSynonymMetaInfo(tableMetaInfo);
             if (synonym != null && synonym.isAutoIncrement()) {
                 return true;
             }
@@ -674,19 +678,19 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /**
      * Retrieves a list of foreign key columns for a given table.
      * @param dbMeta The meta data of a database. (NotNull)
-     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @param table The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    protected Map<String, DfForeignKeyMetaInfo> getForeignKeys(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
+    protected Map<String, DfForeignKeyMetaInfo> getForeignKeys(DatabaseMetaData dbMeta, DfTableMetaInfo table)
             throws SQLException {
-        final String schema = getHandlerUseSchema(tableMetaInfo);
+        final String schema = getHandlerUseSchema(table);
         final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfo = _foreignKeyHandler.getForeignKeyMetaInfo(dbMeta,
-                schema, tableMetaInfo);
-        if (_synonymMap == null || !tableMetaInfo.canHandleSynonym() || !foreignKeyMetaInfo.isEmpty()) {
+                schema, table);
+        if (!canHandleSynonym(table) || !foreignKeyMetaInfo.isEmpty()) {
             return foreignKeyMetaInfo;
         }
-        final DfSynonymMetaInfo synonym = _synonymMap.get(tableMetaInfo.getTableName());
+        final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
         return synonym != null ? synonym.getForeignKeyMetaInfoMap() : foreignKeyMetaInfo;
     }
 
@@ -709,20 +713,20 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     /**
      * Get index column name list.
      * @param dbMeta The meta data of a database. (NotNull)
-     * @param tableMetaInfo The meta information of table. (NotNull)
+     * @param table The meta information of table. (NotNull)
      * @param uniqueKeyMap The map of unique key. (NotNull)
      * @return The list of index columns. (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo,
+    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, DfTableMetaInfo table,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
-        final String schema = getHandlerUseSchema(tableMetaInfo);
-        final Map<String, Map<Integer, String>> indexMap = _indexHandler.getIndexMap(dbMeta, schema, tableMetaInfo,
+        final String schema = getHandlerUseSchema(table);
+        final Map<String, Map<Integer, String>> indexMap = _indexHandler.getIndexMap(dbMeta, schema, table,
                 uniqueKeyMap);
-        if (_synonymMap == null || !tableMetaInfo.canHandleSynonym() || !indexMap.isEmpty()) {
+        if (!canHandleSynonym(table) || !indexMap.isEmpty()) {
             return indexMap;
         }
-        final DfSynonymMetaInfo synonym = _synonymMap.get(tableMetaInfo.getTableName());
+        final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
         return synonym != null ? synonym.getIndexMap() : indexMap;
     }
 
@@ -741,6 +745,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         } catch (Exception ignored) {
             _log.info("DfSynonymExtractor.extractSynonymMap() threw the exception!", ignored);
         }
+    }
+
+    protected boolean canHandleSynonym(DfTableMetaInfo table) {
+        return _synonymMap != null && table.canHandleSynonym();
+    }
+
+    protected DfSynonymMetaInfo getSynonymMetaInfo(DfTableMetaInfo table) {
+        if (!canHandleSynonym(table)) {
+            String msg = "The table meta information should be for synonym: " + table;
+            throw new IllegalStateException(msg);
+        }
+        return _synonymMap.get(table.getTableName());
     }
 
     // ===================================================================================
