@@ -208,6 +208,28 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         return (List<String>) obj;
     }
+    
+    @SuppressWarnings("unchecked")
+    public List<String> getOnceMoreDropTableTargetList() {
+        final Map<String, Object> map = getOnceMoreDropDefinitionMap();
+        Object obj = map.get("tableTargetList");
+        if (!(obj instanceof List)) {
+            String msg = "The schema should be List<String>: tableTargetList=" + obj + " type=" + obj.getClass();
+            throw new IllegalStateException(msg);
+        }
+        return (List<String>) obj;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<String> getOnceMoreDropTableExceptList() {
+        final Map<String, Object> map = getOnceMoreDropDefinitionMap();
+        Object obj = map.get("tableExceptList");
+        if (!(obj instanceof List)) {
+            String msg = "The schema should be List<String>: tableExceptList=" + obj + " type=" + obj.getClass();
+            throw new IllegalStateException(msg);
+        }
+        return (List<String>) obj;
+    }
 
     // ===================================================================================
     //                                                                       Assist Helper

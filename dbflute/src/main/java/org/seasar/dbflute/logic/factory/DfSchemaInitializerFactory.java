@@ -84,15 +84,21 @@ public class DfSchemaInitializerFactory {
             initializer.setSchema(_databaseProperties.getDatabaseSchema());
             return;
         }
+        
+        // Here 'Once-More'!
         final String schema = getOnceMoreSchema();
         if (schema == null || schema.trim().length() == 0) {
             String msg = "Once More Schema should not be null or empty: schema=" + schema;
             throw new IllegalStateException(msg);
         }
-        final List<String> dropObjectTypeList = getOnceMoreObjectTypeList();
+        final List<String> objectTypeList = getOnceMoreObjectTypeList();
+        final List<String> tableTargetList = getOnceMoreDropTableTargetList();
+        final List<String> tableExceptList = getOnceMoreDropTableExceptList();
         initializer.setSchema(schema);
         initializer.setTableNameWithSchema(true);
-        initializer.setDropTargetObjectTypeList(dropObjectTypeList);
+        initializer.setObjectTypeList(objectTypeList);
+        initializer.setTableTargetList(tableTargetList);
+        initializer.setTableExceptList(tableExceptList);
     }
 
     protected String getOnceMoreSchema() {
@@ -101,5 +107,13 @@ public class DfSchemaInitializerFactory {
 
     protected List<String> getOnceMoreObjectTypeList() {
         return _replaceSchemaProperties.getOnceMoreDropDefinitionObjectTypeList();
+    }
+    
+    protected List<String> getOnceMoreDropTableTargetList() {
+        return _replaceSchemaProperties.getOnceMoreDropTableTargetList();
+    }
+    
+    protected List<String> getOnceMoreDropTableExceptList() {
+        return _replaceSchemaProperties.getOnceMoreDropTableExceptList();
     }
 }

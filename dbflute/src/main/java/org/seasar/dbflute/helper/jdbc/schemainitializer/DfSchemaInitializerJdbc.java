@@ -53,25 +53,53 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected boolean _tableNameWithSchema;
 
-    protected List<String> _dropTargetDatabaseTypeList;
+    // /= = = = = = = = = = = =
+    // Attribute for once more!
+    // = = = = = = = = = =/
+    protected List<String> _objectTypeList;
+
+    protected List<String> _tableTargetList;
+
+    protected List<String> _tableExceptList;
 
     // ===================================================================================
     //                                                                   Initialize Schema
     //                                                                   =================
     public void initializeSchema() {
-        Connection connection = null;
+        Connection conn = null;
         try {
-            connection = _dataSource.getConnection();
+            conn = _dataSource.getConnection();
             final List<DfTableMetaInfo> tableMetaInfoList;
             try {
-                final DatabaseMetaData dbMetaData = connection.getMetaData();
+                final DatabaseMetaData dbMetaData = conn.getMetaData();
                 final DfTableHandler tableNameHandler = new DfTableHandler() {
+                    // /= = = = = = = = = = = =
+                    // Override for once more!
+                    // = = = = = = = = = =/
                     @Override
                     protected String[] getObjectTypeStringArray() {
-                        if (_dropTargetDatabaseTypeList != null && !_dropTargetDatabaseTypeList.isEmpty()) {
-                            return _dropTargetDatabaseTypeList.toArray(new String[] {});
+                        if (_objectTypeList != null && !_objectTypeList.isEmpty()) {
+                            return _objectTypeList.toArray(new String[] {});
                         } else {
                             return super.getObjectTypeStringArray();
+                        }
+                    }
+
+                    @Override
+                    protected List<String> getTableTargetList() {
+                        if (_tableTargetList != null && !_tableTargetList.isEmpty()) {
+                            return _tableTargetList;
+                        } else {
+                            return super.getTableTargetList();
+                        }
+                    }
+
+                    @Override
+                    protected List<String> getTableExceptList() {
+                        if (_tableExceptList != null && !_tableExceptList.isEmpty()) {
+                            return _tableExceptList;
+                        } else {
+                            return super.getTableExceptList();
                         }
                     }
                 };
@@ -79,13 +107,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            truncateTableIfPossible(connection, tableMetaInfoList);
-            dropForeignKey(connection, tableMetaInfoList);
-            dropTable(connection, tableMetaInfoList);
+            truncateTableIfPossible(conn, tableMetaInfoList);
+            dropForeignKey(conn, tableMetaInfoList);
+            dropTable(conn, tableMetaInfoList);
         } catch (SQLException e) {
-            if (connection != null) {
+            if (conn != null) {
                 try {
-                    connection.close();
+                    conn.close();
                 } catch (SQLException ignored) {
                     _log.info("connection.close() threw the exception!", ignored);
                 }
@@ -303,12 +331,12 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _schema = schema;
     }
 
-    public List<String> getDropTargetObjectTypeList() {
-        return _dropTargetDatabaseTypeList;
+    public List<String> getObjectTypeList() {
+        return _objectTypeList;
     }
 
-    public void setDropTargetObjectTypeList(List<String> dropTargetDatabaseTypeList) {
-        this._dropTargetDatabaseTypeList = dropTargetDatabaseTypeList;
+    public void setObjectTypeList(List<String> objectTypeList) {
+        this._objectTypeList = objectTypeList;
     }
 
     public boolean isTableNameWithSchema() {
@@ -317,5 +345,21 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setTableNameWithSchema(boolean tableNameWithSchema) {
         this._tableNameWithSchema = tableNameWithSchema;
+    }
+
+    public List<String> getTableTargetList() {
+        return _tableTargetList;
+    }
+
+    public void setTableTargetList(List<String> tableTargetList) {
+        _tableTargetList = tableTargetList;
+    }
+
+    public List<String> getTableExceptList() {
+        return _tableExceptList;
+    }
+
+    public void setTableExceptList(List<String> tableExceptList) {
+        _tableExceptList = tableExceptList;
     }
 }
