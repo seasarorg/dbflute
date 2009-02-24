@@ -11,6 +11,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
@@ -80,7 +81,35 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         }
         _log.info("");
         initializeSchemaOnceMore();
-        initializeSchemaOneMoreTime();
+        initializeSchemaAdditional();
+    }
+
+    protected void initializeSchemaAdditional() {
+        List<Map<String, Object>> additionalDropMapList = getMyProperties().getAdditionalDropMapList();
+        if (additionalDropMapList.isEmpty()) {
+            return;
+        }
+        // /= = = = = = = = = = = = = = = = = 
+        // Unsupported at MySQL and SQLServer
+        // = = = = = = = = = =/
+        if (getBasicProperties().isDatabaseMySQL() || getBasicProperties().isDatabaseSqlServer()) {
+            String msg = "AdditionalDropDefinitionSchema is unsupported at MySQL and SQLServer!";
+            throw new UnsupportedOperationException(msg);
+        }
+        _log.info("* * * * * * * * * * * * * * * * * *");
+        _log.info("*                                 *");
+        _log.info("* Initialize Schema (Additional)  *");
+        _log.info("*                                 *");
+        _log.info("* * * * * * * * * * * * * * * * * *");
+        for (Map<String, Object> additionalDropMap : additionalDropMapList) {
+            final String additionalDropSchema = getMyProperties().getAdditionalDropSchema(additionalDropMap);
+            _log.info("{" + additionalDropSchema + "}");
+            final DfSchemaInitializer initializer = createSchemaInitializerAdditional(additionalDropMap);
+            if (initializer != null) {
+                initializer.initializeSchema();
+            }
+            _log.info("");
+        }
     }
 
     protected void initializeSchemaOnceMore() {
@@ -95,36 +124,12 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             String msg = "OnceMoreDropDefinitionSchema is unsupported at MySQL and SQLServer!";
             throw new UnsupportedOperationException(msg);
         }
-        _log.info("* * * * * * * * * * * * * * * *");
-        _log.info("*                             *");
-        _log.info("* Initialize Schema Once More *");
-        _log.info("*                             *");
-        _log.info("* * * * * * * * * * * * * * * *");
+        _log.info("* * * * * * * * * * * * * * * * *");
+        _log.info("*                               *");
+        _log.info("* Initialize Schema (Once More) *");
+        _log.info("*                               *");
+        _log.info("* * * * * * * * * * * * * * * * *");
         final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.ONCE_MOCE);
-        if (initializer != null) {
-            initializer.initializeSchema();
-        }
-        _log.info("");
-    }
-
-    protected void initializeSchemaOneMoreTime() {
-        final String schema = getMyProperties().getOneMoreTimeDropDefinitionSchema();
-        if (schema == null || schema.trim().length() == 0) {
-            return;
-        }
-        // /= = = = = = = = = = = = = = = = = 
-        // Unsupported at MySQL and SQLServer
-        // = = = = = = = = = =/
-        if (getBasicProperties().isDatabaseMySQL() || getBasicProperties().isDatabaseSqlServer()) {
-            String msg = "OneMoreTimeDropDefinitionSchema is unsupported at MySQL and SQLServer!";
-            throw new UnsupportedOperationException(msg);
-        }
-        _log.info("* * * * * * * * * * * * * * * * * *");
-        _log.info("*                                 *");
-        _log.info("* Initialize Schema One More Time *");
-        _log.info("*                                 *");
-        _log.info("* * * * * * * * * * * * * * * * * *");
-        final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.ONE_MORE_TIME);
         if (initializer != null) {
             initializer.initializeSchema();
         }
@@ -133,6 +138,12 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
     protected DfSchemaInitializer createSchemaInitializer(InitializeType initializeType) {
         final DfSchemaInitializerFactory factory = createSchemaInitializerFactory(initializeType);
+        return factory.createSchemaInitializer();
+    }
+
+    protected DfSchemaInitializer createSchemaInitializerAdditional(Map<String, Object> additionalDropMap) {
+        final DfSchemaInitializerFactory factory = createSchemaInitializerFactory(InitializeType.ADDTIONAL);
+        factory.setAdditionalDropMap(additionalDropMap);
         return factory.createSchemaInitializer();
     }
 

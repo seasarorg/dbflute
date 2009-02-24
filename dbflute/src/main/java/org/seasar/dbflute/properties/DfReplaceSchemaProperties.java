@@ -259,19 +259,18 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                       One More Time
     //                                                                       =============
     @SuppressWarnings("unchecked")
-    protected Map<String, Object> getOneMoreTimeDropDefinitionMap() {
-        final Map<String, Object> map = (Map<String, Object>) getReplaceSchemaDefinitionMap().get(
-                "oneMoreTimeDropDefinitionMap");
-        if (map != null) {
-            return map;
+    public List<Map<String, Object>> getAdditionalDropMapList() {
+        final List<Map<String, Object>> list = (List<Map<String, Object>>) getReplaceSchemaDefinitionMap().get(
+                "additionalDropMapList");
+        if (list != null) {
+            return list;
         } else {
-            return new HashMap<String, Object>();
+            return new ArrayList<Map<String, Object>>();
         }
     }
 
-    public String getOneMoreTimeDropDefinitionSchema() {
-        final Map<String, Object> map = getOneMoreTimeDropDefinitionMap();
-        final Object obj = map.get("schema");
+    public String getAdditionalDropSchema(Map<String, Object> additionalDropMap) {
+        final Object obj = additionalDropMap.get("schema");
         if (obj == null) {
             return null;
         }
@@ -283,11 +282,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getOneMoreTimeDropObjectTypeList() {
-        final Map<String, Object> map = getOneMoreTimeDropDefinitionMap();
-        Object obj = map.get("objectTypeList");
+    public List<String> getAdditionalDropObjectTypeList(Map<String, Object> additionalDropMap) {
+        Object obj = additionalDropMap.get("objectTypeList");
         if (obj == null) {
-            obj = map.get("targetDatabaseTypeList");
+            obj = additionalDropMap.get("targetDatabaseTypeList");
             if (obj == null) {
                 ArrayList<String> defaultList = new ArrayList<String>();
                 defaultList.add("TABLE");
@@ -303,9 +301,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getOneMoreTimeDropTableTargetList() {
-        final Map<String, Object> map = getOneMoreTimeDropDefinitionMap();
-        Object obj = map.get("tableTargetList");
+    public List<String> getAdditionalDropTableTargetList(Map<String, Object> additionalDropMap) {
+        Object obj = additionalDropMap.get("tableTargetList");
         if (obj == null) {
             return new ArrayList<String>();
         }
@@ -317,9 +314,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getOneMoreTimeDropTableExceptList() {
-        final Map<String, Object> map = getOneMoreTimeDropDefinitionMap();
-        Object obj = map.get("tableExceptList");
+    public List<String> getAdditionalDropTableExceptList(Map<String, Object> additionalDropMap) {
+        Object obj = additionalDropMap.get("tableExceptList");
         if (obj == null) {
             return new ArrayList<String>();
         }
@@ -331,10 +327,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     @SuppressWarnings("unchecked")
-    public boolean isOneMoreTimeDropAllTable() {
-        String value = (String) getOneMoreTimeDropDefinitionMap().get("dropAllTable");
+    public boolean isAdditionalDropAllTable(Map<String, Object> additionalDropMap) {
+        String value = (String) additionalDropMap.get("dropAllTable");
         if (value == null) {
-            value = (String) getOneMoreTimeDropDefinitionMap().get("isDropAllTable");
+            value = (String) additionalDropMap.get("isDropAllTable");
             if (value == null) {
                 return false;
             }

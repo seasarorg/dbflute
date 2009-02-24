@@ -1,6 +1,7 @@
 package org.seasar.dbflute.logic.factory;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -21,9 +22,10 @@ public class DfSchemaInitializerFactory {
     protected DfDatabaseProperties _databaseProperties;
     protected DfReplaceSchemaProperties _replaceSchemaProperties;
     protected InitializeType _initializeType;
+    protected Map<String, Object> additionalDropMap;
 
     public enum InitializeType {
-        FIRST, ONCE_MOCE, ONE_MORE_TIME
+        FIRST, ONCE_MOCE, ADDTIONAL
     }
 
     public DfSchemaInitializerFactory(DataSource dataSource, DfBasicProperties basicProperties,
@@ -93,7 +95,7 @@ public class DfSchemaInitializerFactory {
             // Here 'Once-More'!
             final String schema = getOnceMoreSchema();
             if (schema == null || schema.trim().length() == 0) {
-                String msg = "Once More Schema should not be null or empty: schema=" + schema;
+                String msg = "Once More Drop Schema should not be null or empty: schema=" + schema;
                 throw new IllegalStateException(msg);
             }
             initializer.setSchema(schema);
@@ -102,19 +104,23 @@ public class DfSchemaInitializerFactory {
             initializer.setOnceMoreDropTableTargetList(getOnceMoreDropTableTargetList());
             initializer.setOnceMoreDropTableExceptList(getOnceMoreDropTableExceptList());
             initializer.setOnceMoreDropDropAllTable(isOnceMoreDropAllTable());
-        } else if (_initializeType.equals(InitializeType.ONE_MORE_TIME)) {
-            // Here 'One-More-Time'!
-            final String schema = getOneMoreTimeSchema();
+        } else if (_initializeType.equals(InitializeType.ADDTIONAL)) {
+            // Here 'Additional'!
+            if (additionalDropMap == null) {
+                String msg = "The additional drop map should exist if the initialize type is additional!";
+                throw new IllegalStateException(msg);
+            }
+            final String schema = getAdditionalDropSchema(additionalDropMap);
             if (schema == null || schema.trim().length() == 0) {
-                String msg = "One More Time Schema should not be null or empty: schema=" + schema;
+                String msg = "Additional Drop Schema should not be null or empty: schema=" + schema;
                 throw new IllegalStateException(msg);
             }
             initializer.setSchema(schema);
             initializer.setTableNameWithSchema(true); // because it may be other schema!
-            initializer.setOnceMoreDropObjectTypeList(getOneMoreTimeObjectTypeList());
-            initializer.setOnceMoreDropTableTargetList(getOneMoreTimeDropTableTargetList());
-            initializer.setOnceMoreDropTableExceptList(getOneMoreTimeDropTableExceptList());
-            initializer.setOnceMoreDropDropAllTable(isOneMoreTimeDropAllTable());
+            initializer.setOnceMoreDropObjectTypeList(getAdditionalDropObjectTypeList(additionalDropMap));
+            initializer.setOnceMoreDropTableTargetList(getAdditionalDropTableTargetList(additionalDropMap));
+            initializer.setOnceMoreDropTableExceptList(getAdditionalDropTableExceptList(additionalDropMap));
+            initializer.setOnceMoreDropDropAllTable(isAdditionalDropAllTable(additionalDropMap));
         } else {
             String msg = "Unknown initialize type: " + _initializeType;
             throw new IllegalStateException(msg);
@@ -141,23 +147,31 @@ public class DfSchemaInitializerFactory {
         return _replaceSchemaProperties.isOnceMoreDropAllTable();
     }
 
-    protected String getOneMoreTimeSchema() {
-        return _replaceSchemaProperties.getOneMoreTimeDropDefinitionSchema();
+    protected String getAdditionalDropSchema(Map<String, Object> map) {
+        return _replaceSchemaProperties.getAdditionalDropSchema(map);
     }
 
-    protected List<String> getOneMoreTimeObjectTypeList() {
-        return _replaceSchemaProperties.getOneMoreTimeDropObjectTypeList();
+    protected List<String> getAdditionalDropObjectTypeList(Map<String, Object> map) {
+        return _replaceSchemaProperties.getAdditionalDropObjectTypeList(map);
     }
 
-    protected List<String> getOneMoreTimeDropTableTargetList() {
-        return _replaceSchemaProperties.getOneMoreTimeDropTableTargetList();
+    protected List<String> getAdditionalDropTableTargetList(Map<String, Object> map) {
+        return _replaceSchemaProperties.getAdditionalDropTableTargetList(map);
     }
 
-    protected List<String> getOneMoreTimeDropTableExceptList() {
-        return _replaceSchemaProperties.getOneMoreTimeDropTableExceptList();
+    protected List<String> getAdditionalDropTableExceptList(Map<String, Object> map) {
+        return _replaceSchemaProperties.getAdditionalDropTableExceptList(map);
     }
 
-    protected boolean isOneMoreTimeDropAllTable() {
-        return _replaceSchemaProperties.isOneMoreTimeDropAllTable();
+    protected boolean isAdditionalDropAllTable(Map<String, Object> map) {
+        return _replaceSchemaProperties.isAdditionalDropAllTable(map);
+    }
+
+    public Map<String, Object> getAdditionalDropMap() {
+        return additionalDropMap;
+    }
+
+    public void setAdditionalDropMap(Map<String, Object> additionalDropMap) {
+        this.additionalDropMap = additionalDropMap;
     }
 }
