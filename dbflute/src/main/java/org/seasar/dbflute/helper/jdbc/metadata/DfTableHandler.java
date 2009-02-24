@@ -32,12 +32,12 @@ import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
  * @author jflute
  */
 public class DfTableHandler extends DfAbstractMetaDataHandler {
-    
+
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfTableHandler.class);
-    
+
     // ===================================================================================
     //                                                                        Meta Getting
     //                                                                        ============
@@ -61,11 +61,11 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final String tableComment = resultSet.getString("REMARKS");
 
                 if (isTableExcept(tableName)) {
-                    _log.info("$ isTableExcept(" + tableName + ") == true");
+                    _log.info("$ " + tableName + " is excepted!");
                     continue;
                 }
                 if (isOracle() && tableName.startsWith("BIN$")) {
-                    _log.info("$ isTableExcept(" + tableName + ") == true {Forced because the database is Oracle!}");
+                    _log.info("$ " + tableName + " is excepted! {Forced}");
                     continue;
                 }
 

@@ -92,7 +92,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                         if (_dropAllTable) {
                             return new ArrayList<String>();
                         }
-                        if (_tableTargetList != null && !_tableTargetList.isEmpty()) {
+                        if (_tableTargetList != null) {
                             return _tableTargetList;
                         } else {
                             return super.getTableTargetList();
@@ -104,7 +104,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                         if (_dropAllTable) {
                             return new ArrayList<String>();
                         }
-                        if (_tableExceptList != null && !_tableExceptList.isEmpty()) {
+                        if (_tableExceptList != null) {
                             return _tableExceptList;
                         } else {
                             return super.getTableExceptList();
@@ -339,20 +339,24 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _schema = schema;
     }
 
-    public List<String> getObjectTypeList() {
-        return _objectTypeList;
-    }
-
-    public void setObjectTypeList(List<String> objectTypeList) {
-        this._objectTypeList = objectTypeList;
-    }
-
     public boolean isTableNameWithSchema() {
         return _tableNameWithSchema;
     }
 
     public void setTableNameWithSchema(boolean tableNameWithSchema) {
         this._tableNameWithSchema = tableNameWithSchema;
+    }
+
+    // /= = = = = = = = = = = =
+    // Attribute for once more!
+    // = = = = = = = = = =/
+
+    public List<String> getObjectTypeList() {
+        return _objectTypeList;
+    }
+
+    public void setObjectTypeList(List<String> objectTypeList) {
+        this._objectTypeList = objectTypeList;
     }
 
     public List<String> getTableTargetList() {

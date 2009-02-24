@@ -80,7 +80,7 @@ public class DfSchemaInitializerFactory {
 
     protected void setupSchemaInitializerJdbcProperties(DfSchemaInitializerJdbc initializer) {
         initializer.setDataSource(_dataSource);
-        if (!_onceMore) {// Normal
+        if (!_onceMore) { // Normal
             initializer.setSchema(_databaseProperties.getDatabaseSchema());
             return;
         }
@@ -108,7 +108,7 @@ public class DfSchemaInitializerFactory {
     }
 
     protected List<String> getOnceMoreObjectTypeList() {
-        return _replaceSchemaProperties.getOnceMoreDropDefinitionObjectTypeList();
+        return _replaceSchemaProperties.getOnceMoreDropObjectTypeList();
     }
     
     protected List<String> getOnceMoreDropTableTargetList() {

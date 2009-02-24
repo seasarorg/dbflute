@@ -193,7 +193,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getOnceMoreDropDefinitionObjectTypeList() {
+    public List<String> getOnceMoreDropObjectTypeList() {
         final Map<String, Object> map = getOnceMoreDropDefinitionMap();
         Object obj = map.get("objectTypeList");
         if (obj == null) {
