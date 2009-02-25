@@ -72,7 +72,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 String tableOwner = rs.getString("TABLE_OWNER");
                 String tableName = rs.getString("TABLE_NAME");
 
-                if (_tableHandler.isTableExcept(tableName)) {
+                if (_tableHandler.isTableExcept(synonymName)) {
                     continue;
                 }
 
