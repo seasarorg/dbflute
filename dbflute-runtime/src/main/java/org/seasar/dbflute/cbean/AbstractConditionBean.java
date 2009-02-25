@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
@@ -111,12 +112,40 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected abstract DBMetaProvider getDBMetaProvider();
 
     // ===================================================================================
-    //                                                                 Where Clause Filter
-    //                                                                 ===================
-    public void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter) {
-        this._sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
+    //                                                                     Embed Condition
+    //                                                                     ===============
+    /**
+     * Embed conditions in their variables on where clause (and 'on' clause). <br />
+     * You should not use this normally. It's a final weapon! <br />
+     * And that this method is not perfect so be attention! <br />
+     * If the same-name-columns exist in your conditions, both are embedded.
+     * @param embeddedColumnInfoSet The set of embedded target column information. (NotNull)
+     * @param quote Should the conditions value be quoted?
+     */
+    public void embedCondition(Set<ColumnInfo> embeddedColumnInfoSet, boolean quote) {
+        if (embeddedColumnInfoSet == null) {
+            String msg = "The argument[embeddedColumnInfoSet] should not be null.";
+            throw new IllegalArgumentException(msg);
+        }
+        if (quote) {
+            addWhereClauseSimpleFilter(newToEmbeddedQuotedSimpleFilter(embeddedColumnInfoSet));
+        } else {
+            addWhereClauseSimpleFilter(newToEmbeddedSimpleFilter(embeddedColumnInfoSet));
+        }
+    }
+    
+    private WhereClauseSimpleFilter newToEmbeddedQuotedSimpleFilter(Set<ColumnInfo> embeddedColumnInfoSet) {
+        return new WhereClauseSimpleFilter.WhereClauseToEmbeddedQuotedSimpleFilter(embeddedColumnInfoSet);
+    }
+    
+    private WhereClauseSimpleFilter newToEmbeddedSimpleFilter(Set<ColumnInfo> embeddedColumnInfoSet) {
+        return new WhereClauseSimpleFilter.WhereClauseToEmbeddedSimpleFilter(embeddedColumnInfoSet);
     }
 
+    private void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter) {
+        this._sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
+    }
+    
     // ===================================================================================
     //                                                                   Accept PrimaryKey
     //                                                                   =================
@@ -126,7 +155,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void acceptPrimaryKeyMapString(String primaryKeyMapString) {
         if (primaryKeyMapString == null) {
-            String msg = "The argument[primaryKeyMapString] must not be null.";
+            String msg = "The argument[primaryKeyMapString] should not be null.";
             throw new IllegalArgumentException(msg);
         }
         final String prefix = MAP_STRING_MAP_MARK + MAP_STRING_START_BRACE;
