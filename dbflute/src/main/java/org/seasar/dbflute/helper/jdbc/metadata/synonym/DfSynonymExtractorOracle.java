@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -50,7 +51,14 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     protected DfTableHandler _tableHandler = new DfTableHandler();
     protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
     protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
-    protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler();
+    protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler() {
+        @Override
+        public boolean isTableExcept(String tableName) {
+            // All foreign tables are target if the foreign table is except.
+            // Because the filtering is executed when translating foreign keys.
+            return false;
+        }
+    };
     protected DfIndexHandler _indexHandler = new DfIndexHandler();
 
     // ===================================================================================
@@ -169,25 +177,32 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             if (fkMap == null || fkMap.isEmpty()) {
                 continue;
             }
-            final Collection<DfForeignKeyMetaInfo> values = fkMap.values();
+            Set<String> fkNameSet = fkMap.keySet();
             final Map<String, DfForeignKeyMetaInfo> additionalFKMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
-            for (DfForeignKeyMetaInfo fk : values) {
+            final List<String> removedFKKeyList = new ArrayList<String>();
+            for (String fkName : fkNameSet) {
+                DfForeignKeyMetaInfo fk = fkMap.get(fkName);
+
+                // - - - - - - - - - - - - - - -
                 // Translate a local table name.
+                // - - - - - - - - - - - - - - -
                 fk.setLocalTableName(synonym.getSynonymName());
 
+                // - - - - - - - - - - - - - - - -
                 // Translate a foreign table name.
+                // - - - - - - - - - - - - - - - -
                 final String foreignTableName = fk.getForeignTableName();
+
                 final List<String> foreignSynonymList = tableForeignSynonymListMap.get(foreignTableName);
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
+                    if (_tableHandler.isTableExcept(foreignTableName)) {
+                        removedFKKeyList.add(foreignTableName);
+                    }
                     continue;
                 }
                 boolean firstDone = false;
                 for (int i = 0; i < foreignSynonymList.size(); i++) {
                     final String foreignSynonymName = foreignSynonymList.get(i);
-
-                    if (_tableHandler.isTableExcept(foreignSynonymName)) {
-                        continue;
-                    }
 
                     if (!firstDone) {
                         fk.setForeignTableName(foreignSynonymName);
@@ -204,6 +219,9 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 }
             }
             fkMap.putAll(additionalFKMap);
+            for (String removedKey : removedFKKeyList) {
+                fkMap.remove(removedKey);
+            }
         }
     }
 
