@@ -46,7 +46,9 @@ map:{
         #; LessEqual = map:{}
     }
     ; Number = map:{
-        ; NotEqual = map:{}
+        # If you don't need these operand for string,
+        # remove their comment-out mark '#'.
+        #; NotEqual = map:{}
     }
     ; Date = map:{
         ; NotEqual = map:{}
