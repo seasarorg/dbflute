@@ -90,6 +90,11 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 if (_tableHandler.isTableExcept(synonymName)) {
                     continue;
                 }
+                if (tableOwner == null || tableOwner.trim().length() == 0) {
+                    // It is possible that the synonym is for database link.
+                    // Now a synonym is for database link is unsupported here.
+                    continue;
+                }
 
                 final DfSynonymMetaInfo info = new DfSynonymMetaInfo();
 
