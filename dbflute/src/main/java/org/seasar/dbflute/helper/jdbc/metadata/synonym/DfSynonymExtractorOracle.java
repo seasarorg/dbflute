@@ -29,6 +29,8 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.metadata.DfAutoIncrementHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfIndexHandler;
@@ -43,6 +45,11 @@ import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
  * @since 0.9.3 (2009/02/24 Tuesday)
  */
 public class DfSynonymExtractorOracle implements DfSynonymExtractor {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfSynonymExtractorOracle.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -72,9 +79,9 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             throw new IllegalStateException(e);
         }
         try {
-            Map<String, DfSynonymMetaInfo> synonymMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
-            Statement statement = conn.createStatement();
-            ResultSet rs = statement.executeQuery("select * from USER_SYNONYMS");
+            final Map<String, DfSynonymMetaInfo> synonymMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
+            final Statement statement = conn.createStatement();
+            final ResultSet rs = statement.executeQuery("select * from USER_SYNONYMS");
             while (rs.next()) {
                 String synonymName = rs.getString("SYNONYM_NAME");
                 String tableOwner = rs.getString("TABLE_OWNER");
@@ -92,19 +99,25 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 info.setTableName(tableName);
 
                 // PK, ID, UQ, FK, Index
-                final DatabaseMetaData metaData = conn.getMetaData();
-                info.setPrimaryKeyNameList(getPKList(metaData, tableOwner, tableName));
-                final List<String> primaryKeyNameList = info.getPrimaryKeyNameList();
-                for (String primaryKeyName : primaryKeyNameList) {
-                    final boolean autoIncrement = isAutoIncrement(conn, tableOwner, tableName, primaryKeyName);
-                    if (autoIncrement) {
-                        info.setAutoIncrement(autoIncrement);
-                        break;
+                try {
+                    final DatabaseMetaData metaData = conn.getMetaData();
+                    info.setPrimaryKeyNameList(getPKList(metaData, tableOwner, tableName));
+                    final List<String> primaryKeyNameList = info.getPrimaryKeyNameList();
+                    for (String primaryKeyName : primaryKeyNameList) {
+                        final boolean autoIncrement = isAutoIncrement(conn, tableOwner, tableName, primaryKeyName);
+                        if (autoIncrement) {
+                            info.setAutoIncrement(autoIncrement);
+                            break;
+                        }
                     }
+                    info.setUniqueKeyMap(getUQMap(metaData, tableOwner, tableName, primaryKeyNameList));
+                    info.setForeignKeyMetaInfoMap(getFKMap(metaData, tableOwner, tableName)); // It's tentative information at this timing!
+                    final Map<String, Map<Integer, String>> uniqueKeyMap = info.getUniqueKeyMap();
+                    info.setIndexMap(_indexHandler.getIndexMap(metaData, tableOwner, tableName, uniqueKeyMap));
+                } catch (Exception continued) {
+                    _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
+                    continue;
                 }
-                info.setUniqueKeyMap(getUQMap(metaData, tableOwner, tableName, primaryKeyNameList));
-                info.setForeignKeyMetaInfoMap(getFKMap(metaData, tableOwner, tableName)); // It's tentative information at this timing!
-                info.setIndexMap(_indexHandler.getIndexMap(metaData, tableOwner, tableName, info.getUniqueKeyMap()));
                 synonymMap.put(synonymName, info);
             }
             translateFKTable(synonymMap); // It translates foreign key meta informations. 
@@ -177,11 +190,11 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             if (fkMap == null || fkMap.isEmpty()) {
                 continue;
             }
-            Set<String> fkNameSet = fkMap.keySet();
+            final Set<String> fkNameSet = fkMap.keySet();
             final Map<String, DfForeignKeyMetaInfo> additionalFKMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
             final List<String> removedFKKeyList = new ArrayList<String>();
             for (String fkName : fkNameSet) {
-                DfForeignKeyMetaInfo fk = fkMap.get(fkName);
+                final DfForeignKeyMetaInfo fk = fkMap.get(fkName);
 
                 // - - - - - - - - - - - - - - -
                 // Translate a local table name.
