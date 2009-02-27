@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.helper.jdbc.metadata.info;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +86,7 @@ public class DfSynonymMetaInfo {
     }
 
     public List<DfColumnMetaInfo> getColumnMetaInfoList() {
-        return columnMetaInfoList;
+        return columnMetaInfoList != null ? columnMetaInfoList : new ArrayList<DfColumnMetaInfo>();
     }
 
     public void setColumnMetaInfoList(List<DfColumnMetaInfo> columnMetaInfoList) {
@@ -92,7 +94,7 @@ public class DfSynonymMetaInfo {
     }
 
     public List<String> getPrimaryKeyNameList() {
-        return primaryKeyNameList;
+        return primaryKeyNameList != null ? primaryKeyNameList : new ArrayList<String>();
     }
 
     public void setPrimaryKeyNameList(List<String> primaryKeyNameList) {
@@ -108,7 +110,7 @@ public class DfSynonymMetaInfo {
     }
 
     public Map<String, Map<Integer, String>> getUniqueKeyMap() {
-        return uniqueKeyMap;
+        return uniqueKeyMap != null ? uniqueKeyMap : new HashMap<String, Map<Integer, String>>();
     }
 
     public void setUniqueKeyMap(Map<String, Map<Integer, String>> uniqueKeyMap) {
@@ -116,7 +118,7 @@ public class DfSynonymMetaInfo {
     }
 
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfoMap() {
-        return foreignKeyMetaInfoMap;
+        return foreignKeyMetaInfoMap != null ? foreignKeyMetaInfoMap : new HashMap<String, DfForeignKeyMetaInfo>();
     }
 
     public void setForeignKeyMetaInfoMap(Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap) {
@@ -124,7 +126,7 @@ public class DfSynonymMetaInfo {
     }
 
     public Map<String, Map<Integer, String>> getIndexMap() {
-        return indexMap;
+        return indexMap != null ? indexMap : new HashMap<String, Map<Integer, String>>();
     }
 
     public void setIndexMap(Map<String, Map<Integer, String>> indexMap) {
