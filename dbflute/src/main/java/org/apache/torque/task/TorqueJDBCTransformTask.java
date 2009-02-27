@@ -570,7 +570,14 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, DfTableMetaInfo table) throws SQLException {
         final String schema = getHandlerUseSchema(table);
-        final List<DfColumnMetaInfo> columnList = _columnHandler.getColumns(dbMeta, schema, table);
+        List<DfColumnMetaInfo> columnList = _columnHandler.getColumns(dbMeta, schema, table);
+        if (canHandleSynonym(table) && columnList.isEmpty()) {
+            DfSynonymMetaInfo synonymMetaInfo = getSynonymMetaInfo(table);
+            if (synonymMetaInfo.isDBLink() && synonymMetaInfo.getColumnMetaInfoList() != null) {
+                columnList = synonymMetaInfo.getColumnMetaInfoList();
+            }
+        }
+
         helpColumnComments(table, columnList);
         return columnList;
     }

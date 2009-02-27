@@ -38,6 +38,13 @@ public class DfSynonymMetaInfo {
     protected String dbLinkName;
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean isDBLink() {
+        return dbLinkName != null;
+    }
+
+    // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
