@@ -18,6 +18,7 @@ package org.seasar.dbflute.helper.jdbc.metadata.synonym;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfIndexHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
@@ -83,19 +85,34 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             final Statement statement = conn.createStatement();
             final ResultSet rs = statement.executeQuery("select * from USER_SYNONYMS");
             while (rs.next()) {
-                String synonymName = rs.getString("SYNONYM_NAME");
-                String tableOwner = rs.getString("TABLE_OWNER");
-                String tableName = rs.getString("TABLE_NAME");
+                final String synonymName = rs.getString("SYNONYM_NAME");
+                final String tableOwner = rs.getString("TABLE_OWNER");
+                final String tableName = rs.getString("TABLE_NAME");
 
                 if (_tableHandler.isTableExcept(synonymName)) {
                     continue;
                 }
                 if (tableOwner == null || tableOwner.trim().length() == 0) {
-                    // It is possible that the synonym is for database link.
-                    // Now a synonym is for database link is unsupported here.
+                    final String dbLinkName = rs.getString("DB_LINK");
+                    if (dbLinkName == null || dbLinkName.trim().length() == 0) {
+                        continue; // basically no way 
+                    }
+
+                    // = = = = = = = = = = = = 
+                    // It's a DB Link Synonym!
+                    // = = = = = = = = = = = = 
+                    try {
+                        synonymMap.put(synonymName, setupDBLinkSynonym(conn, synonymName, tableName, dbLinkName));
+                    } catch (Exception continued) {
+                        _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
+                        continue;
+                    }
                     continue;
                 }
 
+                // = = = = = = = = = = = = 
+                // It's a normal Synonym!
+                // = = = = = = = = = = = = 
                 final DfSynonymMetaInfo info = new DfSynonymMetaInfo();
 
                 // Basic
@@ -139,6 +156,24 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
     }
 
+    protected DfSynonymMetaInfo setupDBLinkSynonym(Connection conn, String synonymName, String tableName,
+            String dbLinkName) throws SQLException {
+        final DfSynonymMetaInfo info = new DfSynonymMetaInfo();
+        final List<DfColumnMetaInfo> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymName);
+        info.setColumnMetaInfoList(columnMetaInfoList);
+        final List<String> primaryKeyNameList = getDBLinkSynonymPKList(conn, tableName, dbLinkName);
+        info.setPrimaryKeyNameList(primaryKeyNameList);
+        final Map<String, Map<Integer, String>> uniqueKeyMap = getDBLinkSynonymUQMap(conn, tableName, dbLinkName);
+        info.setUniqueKeyMap(uniqueKeyMap);
+        return info;
+    }
+
+    // ===================================================================================
+    //                                                                           Meta Data
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                    For Normal Synonym
+    //                                    ------------------
     protected List<String> getPKList(DatabaseMetaData metaData, String tableOwner, String tableName) {
         try {
             return _uniqueKeyHandler.getPrimaryColumnNameList(metaData, tableOwner, tableName);
@@ -239,6 +274,132 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             fkMap.putAll(additionalFKMap);
             for (String removedKey : removedFKKeyList) {
                 fkMap.remove(removedKey);
+            }
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                   For DB Link Synonym
+    //                                   -------------------
+    protected List<DfColumnMetaInfo> getDBLinkSynonymColumns(Connection conn, String dbLinkSynonymName)
+            throws SQLException {
+        final List<DfColumnMetaInfo> columnList = new ArrayList<DfColumnMetaInfo>();
+        Statement statement = null;
+        ResultSet rs = null;
+        try {
+            statement = conn.createStatement();
+            rs = statement.executeQuery("select * from " + dbLinkSynonymName + " where 1=0");
+            final ResultSetMetaData metaData = rs.getMetaData();
+            int count = metaData.getColumnCount();
+            for (int i = 0; i < count; i++) {
+                int index = i + 1;
+                String columnName = metaData.getColumnName(index);
+                int columnType = metaData.getColumnType(index);
+                String columnTypeName = metaData.getColumnTypeName(index);
+                int precision = metaData.getPrecision(index);
+                int scale = metaData.getScale(index);
+                DfColumnMetaInfo column = new DfColumnMetaInfo();
+                column.setColumnName(columnName);
+                column.setJdbcType(columnType);
+                column.setDbTypeName(columnTypeName);
+                column.setColumnSize(precision);
+                column.setDecimalDigits(scale);
+                columnList.add(column);
+            }
+            return columnList;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ignored) {
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                }
+            }
+        }
+    }
+
+    protected List<String> getDBLinkSynonymPKList(Connection conn, String tableName, String dbLinkName)
+            throws SQLException {
+        final List<String> columnList = new ArrayList<String>();
+        StringBuilder sb = new StringBuilder();
+        sb.append("select cols.OWNER, cols.CONSTRAINT_NAME, cols.TABLE_NAME, cols.COLUMN_NAME");
+        sb.append("  from USER_CONS_COLUMNS@" + dbLinkName + " cols");
+        sb.append("    left outer join USER_CONSTRAINTS@" + dbLinkName + " cons");
+        sb.append("      on cols.CONSTRAINT_NAME = cons.CONSTRAINT_NAME");
+        sb.append(" where cols.TABLE_NAME = '" + tableName + "'");
+        sb.append("   and cons.CONSTRAINT_NAME_TYPE = 'P'");
+        sb.append(" order by cols.POSITION");
+        Statement statement = null;
+        ResultSet rs = null;
+        try {
+            statement = conn.createStatement();
+            rs = statement.executeQuery(sb.toString());
+            while (rs.next()) {
+                String columnName = rs.getString("COLUMN_NAME");
+                columnList.add(columnName);
+            }
+            return columnList;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ignored) {
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                }
+            }
+        }
+    }
+
+    protected Map<String, Map<Integer, String>> getDBLinkSynonymUQMap(Connection conn, String tableName,
+            String dbLinkName) throws SQLException {
+        final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select cols.OWNER, cols.CONSTRAINT_NAME, cols.TABLE_NAME, cols.COLUMN_NAME, cols.POSITION");
+        sb.append("  from USER_CONS_COLUMNS@" + dbLinkName + " cols");
+        sb.append("    left outer join USER_CONSTRAINTS@" + dbLinkName + " cons");
+        sb.append("      on cols.CONSTRAINT_NAME = cons.CONSTRAINT_NAME");
+        sb.append(" where cols.TABLE_NAME = '" + tableName + "'");
+        sb.append("   and cons.CONSTRAINT_NAME_TYPE = 'U'");
+        sb.append(" order by cols.CONSTRAINT_NAME, cols.POSITION");
+        Statement statement = null;
+        ResultSet rs = null;
+        try {
+            statement = conn.createStatement();
+            rs = statement.executeQuery(sb.toString());
+            while (rs.next()) {
+                final String constraintName = rs.getString("CONSTRAINT_NAME");
+                final String columnName = rs.getString("COLUMN_NAME");
+                final Integer position = rs.getInt("POSITION");
+                Map<Integer, String> uniqueElementMap = uniqueMap.get(uniqueMap);
+                if (uniqueElementMap == null) {
+                    uniqueElementMap = new LinkedHashMap<Integer, String>();
+                    uniqueMap.put(constraintName, uniqueElementMap);
+                }
+                uniqueElementMap.put(position, columnName);
+            }
+            return uniqueMap;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ignored) {
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                }
             }
         }
     }

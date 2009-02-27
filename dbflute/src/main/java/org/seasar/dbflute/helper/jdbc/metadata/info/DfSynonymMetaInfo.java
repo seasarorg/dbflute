@@ -29,24 +29,24 @@ public class DfSynonymMetaInfo {
     protected String synonymName;
     protected String tableOwner;
     protected String tableName;
+    protected List<DfColumnMetaInfo> columnMetaInfoList;
     protected List<String> primaryKeyNameList;
     protected boolean autoIncrement;
     protected Map<String, Map<Integer, String>> uniqueKeyMap;
     protected Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap;
     protected Map<String, Map<Integer, String>> indexMap;
-
-    // ===================================================================================
-    //                                                                              Accept
-    //                                                                              ======
+    protected String dbLinkName;
 
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + synonymName + ": " + tableOwner + "." + tableName + ", " + primaryKeyNameList
-                + (autoIncrement ? ", ID" : "") + ", " + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null)
-                + ", " + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + "}";
+        return "{" + synonymName + ": " + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName
+                + (columnMetaInfoList != null ? "(" + columnMetaInfoList.size() + " columns)" : "") + ", "
+                + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
+                + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
+                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + "}";
     }
 
     // ===================================================================================
@@ -74,6 +74,14 @@ public class DfSynonymMetaInfo {
 
     public void setTableName(String tableName) {
         this.tableName = tableName;
+    }
+
+    public List<DfColumnMetaInfo> getColumnMetaInfoList() {
+        return columnMetaInfoList;
+    }
+
+    public void setColumnMetaInfoList(List<DfColumnMetaInfo> columnMetaInfoList) {
+        this.columnMetaInfoList = columnMetaInfoList;
     }
 
     public List<String> getPrimaryKeyNameList() {
@@ -114,5 +122,13 @@ public class DfSynonymMetaInfo {
 
     public void setIndexMap(Map<String, Map<Integer, String>> indexMap) {
         this.indexMap = indexMap;
+    }
+
+    public String getDbLinkName() {
+        return dbLinkName;
+    }
+
+    public void setDbLinkName(String dbLinkName) {
+        this.dbLinkName = dbLinkName;
     }
 }
