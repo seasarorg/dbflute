@@ -159,12 +159,22 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     protected DfSynonymMetaInfo setupDBLinkSynonym(Connection conn, String synonymName, String tableName,
             String dbLinkName) throws SQLException {
         final DfSynonymMetaInfo info = new DfSynonymMetaInfo();
+        info.setSynonymName(synonymName);
+        info.setTableName(tableName);
+        info.setDbLinkName(dbLinkName);
         final List<DfColumnMetaInfo> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymName);
         info.setColumnMetaInfoList(columnMetaInfoList);
         final List<String> primaryKeyNameList = getDBLinkSynonymPKList(conn, tableName, dbLinkName);
         info.setPrimaryKeyNameList(primaryKeyNameList);
         final Map<String, Map<Integer, String>> uniqueKeyMap = getDBLinkSynonymUQMap(conn, tableName, dbLinkName);
         info.setUniqueKeyMap(uniqueKeyMap);
+
+        // It does not support Foreign Key of DBLink.
+        info.setForeignKeyMetaInfoMap(new LinkedHashMap<String, DfForeignKeyMetaInfo>());
+
+        // It does not support Index of DBLink.
+        info.setIndexMap(new LinkedHashMap<String, Map<Integer, String>>());
+
         return info;
     }
 
