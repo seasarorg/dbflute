@@ -88,26 +88,24 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 final String synonymName = rs.getString("SYNONYM_NAME");
                 final String tableOwner = rs.getString("TABLE_OWNER");
                 final String tableName = rs.getString("TABLE_NAME");
+                final String dbLinkName = rs.getString("DB_LINK");
 
                 if (_tableHandler.isTableExcept(synonymName)) {
                     continue;
                 }
-                if (tableOwner == null || tableOwner.trim().length() == 0) {
-                    final String dbLinkName = rs.getString("DB_LINK");
-                    if (dbLinkName == null || dbLinkName.trim().length() == 0) {
-                        continue; // basically no way 
-                    }
-
+                if (dbLinkName != null && dbLinkName.trim().length() > 0) {
                     // = = = = = = = = = = = = 
                     // It's a DB Link Synonym!
                     // = = = = = = = = = = = = 
                     try {
                         synonymMap.put(synonymName, setupDBLinkSynonym(conn, synonymName, tableName, dbLinkName));
-                        continue;
                     } catch (Exception continued) {
                         _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
-                        continue;
                     }
+                    continue;
+                }
+                if (tableOwner == null || tableOwner.trim().length() == 0) {
+                    continue; // basically no way because it may be for DB Link Synonym
                 }
 
                 // = = = = = = = = = = = = 
