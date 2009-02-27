@@ -103,11 +103,11 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                     // = = = = = = = = = = = = 
                     try {
                         synonymMap.put(synonymName, setupDBLinkSynonym(conn, synonymName, tableName, dbLinkName));
+                        continue;
                     } catch (Exception continued) {
                         _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
                         continue;
                     }
-                    continue;
                 }
 
                 // = = = = = = = = = = = = 
@@ -298,12 +298,14 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 String columnTypeName = metaData.getColumnTypeName(index);
                 int precision = metaData.getPrecision(index);
                 int scale = metaData.getScale(index);
+                int nullableType = metaData.isNullable(index);
                 DfColumnMetaInfo column = new DfColumnMetaInfo();
                 column.setColumnName(columnName);
                 column.setJdbcType(columnType);
                 column.setDbTypeName(columnTypeName);
                 column.setColumnSize(precision);
                 column.setDecimalDigits(scale);
+                column.setRequired(nullableType == ResultSetMetaData.columnNoNulls);
                 columnList.add(column);
             }
             return columnList;
@@ -332,7 +334,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         sb.append("    left outer join USER_CONSTRAINTS@" + dbLinkName + " cons");
         sb.append("      on cols.CONSTRAINT_NAME = cons.CONSTRAINT_NAME");
         sb.append(" where cols.TABLE_NAME = '" + tableName + "'");
-        sb.append("   and cons.CONSTRAINT_NAME_TYPE = 'P'");
+        sb.append("   and cons.CONSTRAINT_TYPE = 'P'");
         sb.append(" order by cols.POSITION");
         Statement statement = null;
         ResultSet rs = null;
@@ -369,7 +371,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         sb.append("    left outer join USER_CONSTRAINTS@" + dbLinkName + " cons");
         sb.append("      on cols.CONSTRAINT_NAME = cons.CONSTRAINT_NAME");
         sb.append(" where cols.TABLE_NAME = '" + tableName + "'");
-        sb.append("   and cons.CONSTRAINT_NAME_TYPE = 'U'");
+        sb.append("   and cons.CONSTRAINT_TYPE = 'U'");
         sb.append(" order by cols.CONSTRAINT_NAME, cols.POSITION");
         Statement statement = null;
         ResultSet rs = null;
