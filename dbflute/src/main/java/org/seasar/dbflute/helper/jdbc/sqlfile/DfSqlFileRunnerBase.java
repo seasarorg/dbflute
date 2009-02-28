@@ -255,24 +255,24 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     line = replaceCommentQuestionMarkIfNeeds(line);
 
                     if (inGroup) {
-                        sql = sql + line + getLineSeparator();
+                        sql = sql + line + ln();
                         continue;
                     }
-                    sql = sql + line + getLineSeparator();
+                    sql = sql + line + ln();
                 } else {
                     // * * * * * * * * * *
                     // Line for SQL Clause
                     // * * * * * * * * * *
 
                     if (inGroup) {
-                        sql = sql + line + getLineSeparator();
+                        sql = sql + line + ln();
                         continue;
                     }
 
                     final String lineConnect;
                     if (isSqlTrimAndRemoveLineSeparator()) {
                         if (existsCommentOn) {
-                            lineConnect = getLineSeparator();
+                            lineConnect = ln();
                         } else {
                             lineConnect = " ";
                         }
@@ -282,10 +282,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     if (line.indexOf("--") >= 0) {// If this line contains both SQL and comment, ...
                         // With Line Comment
                         line = replaceCommentQuestionMarkIfNeeds(line);
-                        sql = sql + lineConnect + line + getLineSeparator();
+                        sql = sql + lineConnect + line + ln();
                     } else {
                         // SQL Clause Only
-                        final String lineTerminator = isSqlTrimAndRemoveLineSeparator() ? "" : getLineSeparator();
+                        final String lineTerminator = isSqlTrimAndRemoveLineSeparator() ? "" : ln();
                         sql = sql + lineConnect + line + lineTerminator;
                     }
                 }
@@ -347,7 +347,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             }
             return false;
         }
-        _log.info("The SQL is line comment only so skip it:" + getLineSeparator() + sql);
+        _log.info("The SQL is line comment only so skip it:" + ln() + sql);
         return true;
     }
 
@@ -442,7 +442,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String getLineSeparator() {
+    protected String ln() {
         // (DBFLUTE-264)-{Java/C#}: ReplaceSchemaでOracleのストアドをCreateするとInvalid状態
         // System.getProperty("line.separator")だとOracleのストアドがInvalid状態になるので、
         // 固定で"\n"にすることにした。

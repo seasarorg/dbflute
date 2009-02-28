@@ -322,33 +322,33 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     }
                 } catch (SQLException e) {
                     if (!_runInfo.isErrorContinue()) {
-                        String msg = "Look! Read the message below." + getLineSeparator();
+                        String msg = "Look! Read the message below." + ln();
                         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *"
-                                + getLineSeparator();
-                        msg = msg + "It failed to execute the SQL!" + getLineSeparator();
-                        msg = msg + getLineSeparator();
-                        msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
-                        msg = msg + getLineSeparator();
-                        msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
-                        msg = msg + getLineSeparator();
-                        msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
-                        msg = msg + getLineSeparator();
-                        msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
-                        msg = msg + getLineSeparator();
-                        msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
-                        msg = msg + e.getMessage() + getLineSeparator();
+                                + ln();
+                        msg = msg + "It failed to execute the SQL!" + ln();
+                        msg = msg + ln();
+                        msg = msg + "[SQL File]" + ln() + _srcFile + ln();
+                        msg = msg + ln();
+                        msg = msg + "[Executed SQL]" + ln() + sql + ln();
+                        msg = msg + ln();
+                        msg = msg + "[SQLState]" + ln() + e.getSQLState() + ln();
+                        msg = msg + ln();
+                        msg = msg + "[ErrorCode]" + ln() + e.getErrorCode() + ln();
+                        msg = msg + ln();
+                        msg = msg + "[SQLException]" + ln() + e.getClass().getName() + ln();
+                        msg = msg + e.getMessage() + ln();
                         SQLException nextException = e.getNextException();
                         if (nextException != null) {
-                            msg = msg + getLineSeparator();
-                            msg = msg + "[NextException]" + getLineSeparator() + nextException.getClass().getName()
-                                    + getLineSeparator();
-                            msg = msg + nextException.getMessage() + getLineSeparator();
+                            msg = msg + ln();
+                            msg = msg + "[NextException]" + ln() + nextException.getClass().getName()
+                                    + ln();
+                            msg = msg + nextException.getMessage() + ln();
                         }
                         msg = msg + "* * * * * * * * * */";
                         throw new DfSQLExecutionFailureException(msg, e);
                     }
                     _log.warn("Failed to execute: " + sql, e);
-                    _exceptionInfoMap.put(_srcFile.getName(), e.getMessage() + getLineSeparator() + sql);
+                    _exceptionInfoMap.put(_srcFile.getName(), e.getMessage() + ln() + sql);
                 } finally {
                     if (rs != null) {
                         try {
@@ -512,7 +512,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             @Override
             protected void traceSql(String sql) {
-                log4inner.info("{SQL}" + getLineSeparator() + sql);
+                log4inner.info("{SQL}" + ln() + sql);
             }
 
             @Override

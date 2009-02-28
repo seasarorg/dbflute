@@ -104,9 +104,9 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
 
             @Override
             protected void traceSql(String sql) {
-                String msg = getLineSeparator() + "";
-                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + getLineSeparator();
-                msg = msg + sql + getLineSeparator();
+                String msg = ln() + "";
+                msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
+                msg = msg + sql + ln();
                 msg = msg + "* * * * * * * * * */";
                 _log.info(msg);
             }
@@ -114,7 +114,7 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
             @Override
             protected void traceResult(int goodSqlCount, int totalSqlCount) {
                 _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount)
-                        + getLineSeparator());
+                        + ln());
             }
 
             @Override

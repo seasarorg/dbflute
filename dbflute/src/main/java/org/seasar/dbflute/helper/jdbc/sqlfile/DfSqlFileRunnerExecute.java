@@ -75,32 +75,32 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 showContinueWarnLog(e, sql);
                 return;
             }
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "It failed to execute the SQL!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[SQLState]" + getLineSeparator() + e.getSQLState() + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[ErrorCode]" + getLineSeparator() + e.getErrorCode() + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[SQLException]" + getLineSeparator() + e.getClass().getName() + getLineSeparator();
-            msg = msg + e.getMessage() + getLineSeparator();
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "It failed to execute the SQL!" + ln();
+            msg = msg + ln();
+            msg = msg + "[SQL File]" + ln() + _srcFile + ln();
+            msg = msg + ln();
+            msg = msg + "[Executed SQL]" + ln() + sql + ln();
+            msg = msg + ln();
+            msg = msg + "[SQLState]" + ln() + e.getSQLState() + ln();
+            msg = msg + ln();
+            msg = msg + "[ErrorCode]" + ln() + e.getErrorCode() + ln();
+            msg = msg + ln();
+            msg = msg + "[SQLException]" + ln() + e.getClass().getName() + ln();
+            msg = msg + (e.getMessage() != null ? e.getMessage().trim() : null) + ln();
             SQLException nextEx = e.getNextException();
             if (nextEx != null) {
-                msg = msg + getLineSeparator();
-                msg = msg + "[NextException]" + getLineSeparator();
-                msg = msg + nextEx.getClass().getName() + getLineSeparator();
-                msg = msg + nextEx.getMessage() + getLineSeparator();
+                msg = msg + ln();
+                msg = msg + "[NextException]" + ln();
+                msg = msg + nextEx.getClass().getName() + ln();
+                msg = msg + (nextEx.getMessage() != null ? nextEx.getMessage().trim() : null) + ln();
                 SQLException nextNextEx = nextEx.getNextException();
                 if (nextNextEx != null) {
-                    msg = msg + getLineSeparator();
-                    msg = msg + "[NextNextException]" + getLineSeparator();
-                    msg = msg + nextNextEx.getClass().getName() + getLineSeparator();
-                    msg = msg + nextNextEx.getMessage() + getLineSeparator();
+                    msg = msg + ln();
+                    msg = msg + "[NextNextException]" + ln();
+                    msg = msg + nextNextEx.getClass().getName() + ln();
+                    msg = msg + (nextNextEx.getMessage() != null ? nextNextEx.getMessage().trim() : null) + ln();
                 }
             }
             msg = msg + "* * * * * * * * * */";
@@ -110,21 +110,21 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
 
     protected void showContinueWarnLog(SQLException e, String sql) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Failed to execute the SQL:").append(getLineSeparator());
-        sb.append("/* * * * * * * * * * * * * * * * * * * * * * * * * *").append(getLineSeparator());
-        sb.append(e.getMessage()).append(getLineSeparator());
+        sb.append("*Failed to execute:").append(ln());
+        sb.append("/* * * * * * * * * * * * * * * * * * * * * * * * * *").append(ln());
+        sb.append(e.getMessage() != null ? e.getMessage().trim() : null).append(ln());
         SQLException nextEx = e.getNextException();
         if (nextEx != null) {
-            sb.append("- - - - - - - - ").append(getLineSeparator());
-            sb.append(nextEx.getMessage()).append(getLineSeparator());
+            sb.append("- - - - - - - - ").append(ln());
+            sb.append(nextEx.getMessage() != null ? nextEx.getMessage().trim() : null).append(ln());
             SQLException nextNextEx = nextEx.getNextException();
             if (nextNextEx != null) {
-                sb.append("- - - - - - - - ").append(getLineSeparator());
-                sb.append(nextNextEx.getMessage()).append(getLineSeparator());
+                sb.append("- - - - - - - - ").append(ln());
+                sb.append(nextNextEx.getMessage() != null ? nextNextEx.getMessage().trim() : null).append(ln());
             }
         }
-        sb.append("= = = = = = = =").append(getLineSeparator());
-        sb.append(sql).append(getLineSeparator());
+        sb.append("= = = = = = = =").append(ln());
+        sb.append(sql).append(ln());
         sb.append("* * * * * * * * * */");
         _log.warn(sb.toString());
     }
@@ -187,18 +187,18 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     }
 
     protected void throwAssertionFailureCountNotZeroException(String sql, int resultCount) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The SQL of 'select count' returned NOT ZERO!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm your test data!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Result Count]" + getLineSeparator() + resultCount + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The SQL of 'select count' returned NOT ZERO!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your test data!" + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL File]" + ln() + _srcFile + ln();
+        msg = msg + ln();
+        msg = msg + "[Executed SQL]" + ln() + sql + ln();
+        msg = msg + ln();
+        msg = msg + "[Result Count]" + ln() + resultCount + ln();
         msg = msg + "* * * * * * * * * */";
         throw new DfAssertionFailureCountNotZeroException(msg);
     }
@@ -213,22 +213,22 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
 
     protected void throwAssertionFailureListNotZeroException(String sql, int resultCount,
             List<Map<String, String>> resultList) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The SQL of 'select count' returned NOT ZERO!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm your test data!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[SQL File]" + getLineSeparator() + _srcFile + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Executed SQL]" + getLineSeparator() + sql + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Result Count]" + getLineSeparator() + resultCount + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Result List]" + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The SQL of 'select count' returned NOT ZERO!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your test data!" + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL File]" + ln() + _srcFile + ln();
+        msg = msg + ln();
+        msg = msg + "[Executed SQL]" + ln() + sql + ln();
+        msg = msg + ln();
+        msg = msg + "[Result Count]" + ln() + resultCount + ln();
+        msg = msg + ln();
+        msg = msg + "[Result List]" + ln();
         for (Map<String, String> recordMap : resultList) {
-            msg = msg + recordMap + getLineSeparator();
+            msg = msg + recordMap + ln();
         }
         msg = msg + "* * * * * * * * * */";
         throw new DfAssertionFailureListNotZeroException(msg);
