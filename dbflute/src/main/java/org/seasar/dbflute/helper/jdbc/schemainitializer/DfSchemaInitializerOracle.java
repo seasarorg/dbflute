@@ -15,6 +15,15 @@
  */
 package org.seasar.dbflute.helper.jdbc.schemainitializer;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -24,11 +33,28 @@ import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
  */
 public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfSchemaInitializerOracle.class);
+
+    // ===================================================================================
+    //                                                                    Drop Foreign Key
+    //                                                                    ================
     @Override
     protected boolean isSkipDropForeignKey(DfTableMetaInfo tableMetaInfo) {
         return tableMetaInfo.isTableTypeSynonym();
     }
-    
+
+    // ===================================================================================
+    //                                                                          Drop Table
+    //                                                                          ==========
+    @Override
+    protected void dropTable(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        super.dropTable(conn, tableMetaInfoList);
+        dropSequence(conn);
+    }
+
     @Override
     protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
         if (metaInfo.isTableTypeSynonym()) {
@@ -36,6 +62,64 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             sb.append("drop synonym ").append(tableName);
         } else {
             super.setupDropTable(sb, metaInfo);
+        }
+    }
+
+    protected void dropSequence(Connection conn) {
+        final List<String> sequenceNameList = new ArrayList<String>();
+        Statement statement = null;
+        ResultSet rs = null;
+        try {
+            statement = conn.createStatement();
+            rs = statement.executeQuery("select * from USER_SEQUENCES");
+            while (rs.next()) {
+                final String sequenceName = rs.getString("SEQUENCE_NAME");
+                sequenceNameList.add(sequenceName);
+            }
+        } catch (SQLException continued) {
+            _log.info("*Failed to select USER_SEQUENCES:\n" + continued.getMessage());
+            return;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ignored) {
+                    _log.info("statement.close() threw the exception!", ignored);
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                    _log.info("rs.close() threw the exception!", ignored);
+                }
+            }
+        }
+        try {
+            statement = conn.createStatement();
+            for (String sequenceName : sequenceNameList) {
+                final String dropSequenceSql = "drop sequence " + sequenceName;
+                _log.info(dropSequenceSql);
+                statement.execute(dropSequenceSql);
+            }
+        } catch (SQLException e) {
+            String msg = "Failed to drop sequences: " + sequenceNameList;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ignored) {
+                    _log.info("statement.close() threw the exception!", ignored);
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                    _log.info("rs.close() threw the exception!", ignored);
+                }
+            }
         }
     }
 }

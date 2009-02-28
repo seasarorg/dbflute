@@ -190,11 +190,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         public String buildDropForeignKeySql(DfForeignKeyMetaInfo metaInfo);
     }
 
-    protected void callbackDropForeignKeyByJdbc(Connection connection, List<DfTableMetaInfo> tableMetaInfoList,
+    protected void callbackDropForeignKeyByJdbc(Connection conn, List<DfTableMetaInfo> tableMetaInfoList,
             DfDropForeignKeyByJdbcCallback callback) {
         Statement statement = null;
         try {
-            statement = connection.createStatement();
+            statement = conn.createStatement();
             for (DfTableMetaInfo tableMetaInfo : tableMetaInfoList) {
                 if (isSkipDropForeignKey(tableMetaInfo)) {
                     continue;
@@ -227,7 +227,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                         }
                     }
                 };
-                final DatabaseMetaData dbMetaData = connection.getMetaData();
+                final DatabaseMetaData dbMetaData = conn.getMetaData();
                 final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = handler.getForeignKeyMetaInfo(
                         dbMetaData, _schema, tableMetaInfo);
                 final Set<String> keySet = foreignKeyMetaInfoMap.keySet();
@@ -251,14 +251,14 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
     }
 
-    protected boolean isSkipDropForeignKey(DfTableMetaInfo tableMetaInfo) {// for sub class.
+    protected boolean isSkipDropForeignKey(DfTableMetaInfo tableMetaInfo) { // for sub class.
         return false;
     }
 
     // ===================================================================================
     //                                                                          Drop Table
     //                                                                          ==========
-    protected void dropTable(Connection connection, List<DfTableMetaInfo> tableMetaInfoList) {
+    protected void dropTable(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         List<DfTableMetaInfo> viewList = new ArrayList<DfTableMetaInfo>();
         List<DfTableMetaInfo> otherList = new ArrayList<DfTableMetaInfo>();
         for (DfTableMetaInfo tableMetaInfo : tableMetaInfoList) {
@@ -287,7 +287,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 return sb.toString();
             }
         };
-        callbackDropTableByJdbc(connection, sortedList, callback);
+        callbackDropTableByJdbc(conn, sortedList, callback);
     }
 
     protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {

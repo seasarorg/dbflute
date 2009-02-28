@@ -72,7 +72,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             _goodSqlCount++;
         } catch (SQLException e) {
             if (_runInfo.isErrorContinue()) {
-                _log.warn("Failed to execute: " + sql, e);
+                showContinueWarnLog(e, sql);
                 return;
             }
             String msg = "Look! Read the message below." + getLineSeparator();
@@ -106,6 +106,27 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             msg = msg + "* * * * * * * * * */";
             throw new DfSQLExecutionFailureException(msg, e);
         }
+    }
+
+    protected void showContinueWarnLog(SQLException e, String sql) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Failed to execute the SQL:").append(getLineSeparator());
+        sb.append("/* * * * * * * * * * * * * * * * * * * * * * * * * *").append(getLineSeparator());
+        sb.append(e.getMessage()).append(getLineSeparator());
+        SQLException nextEx = e.getNextException();
+        if (nextEx != null) {
+            sb.append("- - - - - - - - ").append(getLineSeparator());
+            sb.append(nextEx.getMessage()).append(getLineSeparator());
+            SQLException nextNextEx = nextEx.getNextException();
+            if (nextNextEx != null) {
+                sb.append("- - - - - - - - ").append(getLineSeparator());
+                sb.append(nextNextEx.getMessage()).append(getLineSeparator());
+            }
+        }
+        sb.append("= = = = = = = =").append(getLineSeparator());
+        sb.append(sql).append(getLineSeparator());
+        sb.append("* * * * * * * * * */");
+        _log.warn(sb.toString());
     }
 
     protected boolean isValidAssertSql() {
