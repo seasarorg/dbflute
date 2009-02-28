@@ -300,9 +300,9 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             sb.append(ln).append("  ").append(line);
             sb.append(ln).append("  ").append(result.getResultMessage());
             if (existsError) {
-                sb.append(ln).append("  * * * * * * * * *");
-                sb.append(ln).append("  * F A I L U R E *");
-                sb.append(ln).append("  * * * * * * * * *");
+                sb.append(ln).append("    * * * * * *");
+                sb.append(ln).append("    * Failure *");
+                sb.append(ln).append("    * * * * * *");
             }
             return sb.toString();
         } catch (UnsupportedEncodingException e) {
