@@ -5,47 +5,78 @@
 # 
 # o dataLoadingType (NotRequired - Default 'ut')
 # o isLoggingInsertSql (NotRequired - Default 'true')
+# o sqlFileEncoding (NotRequired - Default 'UTF-8')
 # o skipSheet (NotRequired - Default '')
 # o filterVariablesMap (NotRequired - Default 'map:{}')
+# o additionalDropMapList (NotRequired - Default 'list:{}')
 # 
 # Example:
 # map:{
 #     ; dataLoadingType = ut
 #     ; isLoggingInsertSql = true
+#     ; sqlFileEncoding = UTF-8
 #     ; skipSheet = P.+
 #     ; filterVariablesMap = map:{abc=AAA}
+#     ; additionalDropMapList = list:{
+#         ; map:{
+#             ; schema = NEXTEXAMPLEDB
+#             ; objectTypeList = list:{TABLE;VIEW}
+#             ; dropAllTable = true
+#         }
+#     }
 # }
 #
 # *The line that starts with '#' means comment-out.
 #
 map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	# o dataLoadingType (NotRequired - Default 'ut')
-	#  The type of data loading.
-	#  If the value is 'ut', the target is './playsql/data/ut/...'.
-	#
+    # o dataLoadingType (NotRequired - Default 'ut')
+    #  The type of data loading.
+    #  If the value is 'ut', the target is './playsql/data/ut/...'.
+    #
     ; dataLoadingType = ut
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	# o isLoggingInsertSql (NotRequired - Default 'true')
-	#  Does it show insert values on log?
-	#
+    # o isLoggingInsertSql (NotRequired - Default 'true')
+    #  Does it show insert values on log?
+    #
     ; isLoggingInsertSql = true
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	# o skipSheet (NotRequired - Default '')
-	#  You can specify the skip sheet by regular expression
-	#
+    # o sqlFileEncoding (NotRequired - Default 'UTF-8')
+    #  The encoding of SQL(DDL) file for Replace Schema.
+    #  Basically you don't need this.
+    #
+    #; sqlFileEncoding = UTF-8
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o skipSheet (NotRequired - Default '')
+    #  You can specify the skip sheet by regular expression
+    #
     #; skipSheet = P.+
     # - - - - - - - - - -/
     
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	# o filterVariablesMap (NotRequired - Default 'map:{}')
+    # o filterVariablesMap (NotRequired - Default 'map:{}')
     # You can specify the filter variables for DDL.
     # 
     #; filterVariablesMap = map:{abc=AAA}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o additionalDropMapList (NotRequired - Default 'list:{}')
+    # You can drop additional other schemas.
+    # 
+    #; additionalDropMapList = list:{
+    #    ; map:{
+    #        ; schema = NEXTEXAMPLEDB
+    #        ; objectTypeList = list:{TABLE;VIEW}
+    #        ; dropAllTable = true
+    #    }
+    #}
     # - - - - - - - - - -/
 }
 # ----------------/
