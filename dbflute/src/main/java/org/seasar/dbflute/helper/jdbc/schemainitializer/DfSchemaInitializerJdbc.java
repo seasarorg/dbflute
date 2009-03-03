@@ -64,6 +64,15 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected boolean _onceMoreDropAllTable;
 
+    // /= = = = = = = = = = = = =
+    // Detail execution handling!
+    // = = = = = = = = = =/
+    protected boolean _suppressTruncateTable;
+
+    protected boolean _suppressDropForeignKey;
+
+    protected boolean _suppressDropTable;
+
     // ===================================================================================
     //                                                                   Initialize Schema
     //                                                                   =================
@@ -115,9 +124,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            truncateTableIfPossible(conn, tableMetaInfoList);
-            dropForeignKey(conn, tableMetaInfoList);
-            dropTable(conn, tableMetaInfoList);
+            executeObject(conn, tableMetaInfoList);
         } catch (SQLException e) {
             if (conn != null) {
                 try {
@@ -126,6 +133,18 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     _log.info("connection.close() threw the exception!", ignored);
                 }
             }
+        }
+    }
+
+    protected void executeObject(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        if (!_suppressTruncateTable) {
+            truncateTableIfPossible(conn, tableMetaInfoList);
+        }
+        if (!_suppressDropForeignKey) {
+            dropForeignKey(conn, tableMetaInfoList);
+        }
+        if (!_suppressDropTable) {
+            dropTable(conn, tableMetaInfoList);
         }
     }
 
@@ -392,5 +411,33 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setOnceMoreDropDropAllTable(boolean onceMoreDropAllTable) {
         _onceMoreDropAllTable = onceMoreDropAllTable;
+    }
+
+    // /= = = = = = = = = = = = =
+    // Detail execution handling!
+    // = = = = = = = = = =/
+
+    public boolean isSuppressTruncateTable() {
+        return _suppressTruncateTable;
+    }
+
+    public void setSuppressTruncateTable(boolean suppressTruncateTable) {
+        this._suppressTruncateTable = suppressTruncateTable;
+    }
+
+    public boolean isSuppressDropForeignKey() {
+        return _suppressDropForeignKey;
+    }
+
+    public void setSuppressDropForeignKey(boolean suppressDropForeignKey) {
+        this._suppressDropForeignKey = suppressDropForeignKey;
+    }
+
+    public boolean isSuppressDropTable() {
+        return _suppressDropTable;
+    }
+
+    public void setSuppressDropTable(boolean suppressDropTable) {
+        this._suppressDropTable = suppressDropTable;
     }
 }

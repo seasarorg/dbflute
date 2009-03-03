@@ -19,21 +19,53 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.helper.jdbc.generatedsql.DfGeneratedSqlExecutor;
 import org.seasar.dbflute.helper.jdbc.generatedsql.DfGeneratedSqlExecutorImpl;
+import org.seasar.dbflute.helper.jdbc.generatedsql.DfGeneratedSqlExecutor.DfGeneratedSqlExecuteOption;
 
 /**
  * The schema initializer for SqlServer.
  * @author jflute
  */
 public class DfSchemaInitializerSqlServer implements DfSchemaInitializer {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected DataSource _dataSource;
 
-    public void setDataSource(DataSource dataSource) {
-        _dataSource = dataSource;
-    }
+    // /= = = = = = = = = = = = =
+    // Detail execution handling!
+    // = = = = = = = = = =/
+    protected boolean _suppressTruncateTable;
 
+    protected boolean _suppressDropForeignKey;
+
+    protected boolean _suppressDropTable;
+
+    // ===================================================================================
+    //                                                                   Initialize Schema
+    //                                                                   =================
     public void initializeSchema() {
         dropForeignKey();
         dropTable();
+    }
+
+    protected void executeObject() {
+        if (!_suppressTruncateTable) {
+            truncateTableIfPossible();
+        }
+        if (!_suppressDropForeignKey) {
+            dropForeignKey();
+        }
+        if (!_suppressDropTable) {
+            dropTable();
+        }
+    }
+
+    protected void truncateTableIfPossible() {
+        final DfGeneratedSqlExecutor generatedSqlExecutor = createGeneratedSqlExecutor();
+        final DfGeneratedSqlExecuteOption option = new DfGeneratedSqlExecuteOption();
+        option.setErrorContinue(true);
+        generatedSqlExecutor.execute(getDropTableSql(), "sql", option);
     }
 
     protected void dropForeignKey() {
@@ -50,6 +82,18 @@ public class DfSchemaInitializerSqlServer implements DfSchemaInitializer {
         final DfGeneratedSqlExecutorImpl generatedSqlExecutorImpl = new DfGeneratedSqlExecutorImpl();
         generatedSqlExecutorImpl.setDataSource(_dataSource);
         return generatedSqlExecutorImpl;
+    }
+
+    protected String getTruncateTableSql() {
+        final String lineSeparator = System.getProperty("line.separator");
+        final StringBuilder sb = new StringBuilder();
+        sb.append("select 'TRUNCATE TABLE ' + name as sql");
+        sb.append(lineSeparator);
+        sb.append("  from sysobjects");
+        sb.append(lineSeparator);
+        sb.append(" where type = 'U'");
+        sb.append(lineSeparator);
+        return sb.toString();
     }
 
     protected String getDropForeignKeySql() {
@@ -76,5 +120,40 @@ public class DfSchemaInitializerSqlServer implements DfSchemaInitializer {
         sb.append(" where type = 'U'");
         sb.append(lineSeparator);
         return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setDataSource(DataSource dataSource) {
+        _dataSource = dataSource;
+    }
+
+    // /= = = = = = = = = = = = =
+    // Detail execution handling!
+    // = = = = = = = = = =/
+
+    public boolean isSuppressTruncateTable() {
+        return _suppressTruncateTable;
+    }
+
+    public void setSuppressTruncateTable(boolean suppressTruncateTable) {
+        this._suppressTruncateTable = suppressTruncateTable;
+    }
+
+    public boolean isSuppressDropForeignKey() {
+        return _suppressDropForeignKey;
+    }
+
+    public void setSuppressDropForeignKey(boolean suppressDropForeignKey) {
+        this._suppressDropForeignKey = suppressDropForeignKey;
+    }
+
+    public boolean isSuppressDropTable() {
+        return _suppressDropTable;
+    }
+
+    public void setSuppressDropTable(boolean suppressDropTable) {
+        this._suppressDropTable = suppressDropTable;
     }
 }

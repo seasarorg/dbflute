@@ -60,10 +60,22 @@ public class DfSchemaInitializerFactory {
         return initializer;
     }
 
+    protected void setupDetailExecutionHandling(DfSchemaInitializerMySQL initializer) {
+        initializer.setSuppressTruncateTable(_replaceSchemaProperties.isSuppressTruncateTable());
+        initializer.setSuppressDropForeignKey(_replaceSchemaProperties.isSuppressDropForeignKey());
+        initializer.setSuppressDropTable(_replaceSchemaProperties.isSuppressDropTable());
+    }
+
     protected DfSchemaInitializer createSchemaInitializerSqlServer() {
         final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
         initializer.setDataSource(_dataSource);
         return initializer;
+    }
+
+    protected void setupDetailExecutionHandling(DfSchemaInitializerSqlServer initializer) {
+        initializer.setSuppressTruncateTable(_replaceSchemaProperties.isSuppressTruncateTable());
+        initializer.setSuppressDropForeignKey(_replaceSchemaProperties.isSuppressDropForeignKey());
+        initializer.setSuppressDropTable(_replaceSchemaProperties.isSuppressDropTable());
     }
 
     protected DfSchemaInitializer createSchemaInitializerOracle() {
@@ -86,6 +98,7 @@ public class DfSchemaInitializerFactory {
 
     protected void setupSchemaInitializerJdbcProperties(DfSchemaInitializerJdbc initializer) {
         initializer.setDataSource(_dataSource);
+        setupDetailExecutionHandling(initializer);
         if (_initializeType.equals(InitializeType.FIRST)) { // Normal
             initializer.setSchema(_databaseProperties.getDatabaseSchema());
             return;
@@ -125,6 +138,12 @@ public class DfSchemaInitializerFactory {
             String msg = "Unknown initialize type: " + _initializeType;
             throw new IllegalStateException(msg);
         }
+    }
+
+    protected void setupDetailExecutionHandling(DfSchemaInitializerJdbc initializer) {
+        initializer.setSuppressTruncateTable(_replaceSchemaProperties.isSuppressTruncateTable());
+        initializer.setSuppressDropForeignKey(_replaceSchemaProperties.isSuppressDropForeignKey());
+        initializer.setSuppressDropTable(_replaceSchemaProperties.isSuppressDropTable());
     }
 
     protected String getOnceMoreSchema() {

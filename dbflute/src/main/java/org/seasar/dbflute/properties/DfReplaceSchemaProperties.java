@@ -314,16 +314,28 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                               Other
     //                                                                               =====
-    public boolean isAutoCommit() {
+    public boolean isAutoCommit() { // It's closet!
         return analyzeBooleanProperty("isAutoCommit", true);
     }
 
-    public boolean isRollbackOnly() {
+    public boolean isRollbackOnly() { // It's closet!
         return analyzeBooleanProperty("isRollbackOnly", false);
     }
 
-    public boolean isErrorContinue() {
+    public boolean isErrorContinue() { // It's closet!
         return analyzeBooleanProperty("isErrorContinue", true);
+    }
+    
+    public boolean isSuppressTruncateTable() { // It's closet!
+        return analyzeBooleanProperty("isSuppressTruncateTable", false);
+    }
+    
+    public boolean isSuppressDropForeignKey() { // It's closet!
+        return analyzeBooleanProperty("isSuppressDropForeignKey", false);
+    }
+    
+    public boolean isSuppressDropTable() { // It's closet!
+        return analyzeBooleanProperty("isSuppressDropTable", false);
     }
 
     public String getSqlFileEncoding() {

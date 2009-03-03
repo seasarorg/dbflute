@@ -32,13 +32,32 @@ public class DfSchemaInitializerMySQL implements DfSchemaInitializer {
     //                                                                           =========
     protected DataSource _dataSource;
 
+    // /= = = = = = = = = = = = =
+    // Detail execution handling!
+    // = = = = = = = = = =/
+    protected boolean _suppressTruncateTable;
+
+    protected boolean _suppressDropForeignKey;
+
+    protected boolean _suppressDropTable;
+    
     // ===================================================================================
     //                                                                   Initialize Schema
     //                                                                   =================
     public void initializeSchema() {
-        truncateTableIfPossible();
-        dropForeignKey();
-        dropTable();
+        executeObject();
+    }
+
+    protected void executeObject() {
+        if (!_suppressTruncateTable) {
+            truncateTableIfPossible();
+        }
+        if (!_suppressDropForeignKey) {
+            dropForeignKey();
+        }
+        if (!_suppressDropTable) {
+            dropTable();
+        }
     }
 
     // -----------------------------------------------------
@@ -133,5 +152,33 @@ public class DfSchemaInitializerMySQL implements DfSchemaInitializer {
     //                                                                            ========
     public void setDataSource(DataSource dataSource) {
         _dataSource = dataSource;
+    }
+
+    // /= = = = = = = = = = = = =
+    // Detail execution handling!
+    // = = = = = = = = = =/
+
+    public boolean isSuppressTruncateTable() {
+        return _suppressTruncateTable;
+    }
+
+    public void setSuppressTruncateTable(boolean suppressTruncateTable) {
+        this._suppressTruncateTable = suppressTruncateTable;
+    }
+
+    public boolean isSuppressDropForeignKey() {
+        return _suppressDropForeignKey;
+    }
+
+    public void setSuppressDropForeignKey(boolean suppressDropForeignKey) {
+        this._suppressDropForeignKey = suppressDropForeignKey;
+    }
+
+    public boolean isSuppressDropTable() {
+        return _suppressDropTable;
+    }
+
+    public void setSuppressDropTable(boolean suppressDropTable) {
+        this._suppressDropTable = suppressDropTable;
     }
 }
