@@ -44,20 +44,19 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
+    protected String _schema;
 
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public Map<String, String> extractTableComment(Set<String> tableSet) {
-        Map<String, String> resultMap = new LinkedHashMap<String, String>();
+    public Map<String, UserTabComments> extractTableComment(Set<String> tableSet) {
+        Map<String, UserTabComments> resultMap = new LinkedHashMap<String, UserTabComments>();
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();
             final List<UserTabComments> userTabCommentsList = selectUserTabComments(conn, tableSet);
             for (UserTabComments userTabComments : userTabCommentsList) {
-                final String tableName = userTabComments.getTableName();
-                final String comments = userTabComments.getComments();
-                resultMap.put(tableName, comments);
+                resultMap.put(userTabComments.getTableName(), userTabComments);
             }
             return resultMap;
         } catch (SQLException e) {
@@ -106,11 +105,12 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
     }
 
     protected List<UserTabComments> selectUserTabComments(Connection conn, Set<String> tableSet) {
-        final String sql = "select * from USER_TAB_COMMENTS order by TABLE_NAME asc";
+        final String sql = "select * from ALL_TAB_COMMENTS where OWNER = '" + _schema + "' order by TABLE_NAME asc";
         Statement statement = null;
         ResultSet rs = null;
         try {
             statement = conn.createStatement();
+            _log.info("...Executing helper SQL:" + ln() + sql);
             rs = statement.executeQuery(sql);
             final List<UserTabComments> resultList = new ArrayList<UserTabComments>();
             while (rs.next()) {
@@ -146,7 +146,8 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
     }
 
     protected List<UserColComments> selectUserColComments(Connection conn, Set<String> tableSet) {
-        final String sql = "select * from USER_COL_COMMENTS order by TABLE_NAME asc, COLUMN_NAME asc";
+        final String sql = "select * from ALL_COL_COMMENTS where OWNER ='" + _schema + "'"
+                + " order by TABLE_NAME asc, COLUMN_NAME asc";
         Statement statement = null;
         ResultSet rs = null;
         try {
@@ -187,25 +188,11 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
         }
     }
 
-    protected static class UserTabComments {
-        protected String tableName;
-        protected String comments;
-
-        public String getTableName() {
-            return tableName;
-        }
-
-        public void setTableName(String tableName) {
-            this.tableName = tableName;
-        }
-
-        public String getComments() {
-            return comments;
-        }
-
-        public void setComments(String comments) {
-            this.comments = comments;
-        }
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return "\n";
     }
 
     // ===================================================================================
@@ -213,5 +200,13 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
     //                                                                            ========
     public void setDataSource(DataSource dataSource) {
         _dataSource = dataSource;
+    }
+
+    public String getSchema() {
+        return _schema;
+    }
+
+    public void setSchema(String schema) {
+        this._schema = schema;
     }
 }

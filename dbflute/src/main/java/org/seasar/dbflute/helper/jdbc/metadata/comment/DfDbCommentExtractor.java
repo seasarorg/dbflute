@@ -23,14 +23,43 @@ import java.util.Set;
  */
 public interface DfDbCommentExtractor {
 
-    public Map<String, String> extractTableComment(Set<String> tableSet);
+    public Map<String, UserTabComments> extractTableComment(Set<String> tableSet);
 
     public Map<String, Map<String, UserColComments>> extractColumnComment(Set<String> tableSet);
+
+    public static class UserTabComments {
+        protected String tableName;
+        protected String comments;
+
+        public boolean hasComments() {
+            return comments != null && comments.trim().length() > 0;
+        }
+
+        public String getTableName() {
+            return tableName;
+        }
+
+        public void setTableName(String tableName) {
+            this.tableName = tableName;
+        }
+
+        public String getComments() {
+            return comments;
+        }
+
+        public void setComments(String comments) {
+            this.comments = comments;
+        }
+    }
 
     public static class UserColComments {
         protected String tableName;
         protected String columnName;
         protected String comments;
+
+        public boolean hasComments() {
+            return comments != null && comments.trim().length() > 0;
+        }
 
         public String getTableName() {
             return tableName;

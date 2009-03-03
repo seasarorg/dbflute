@@ -87,6 +87,7 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
 import org.seasar.dbflute.helper.jdbc.metadata.identity.DfIdentityExtractor;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
@@ -257,6 +258,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         // Load synonym information for merging additional meta data if it needs.
         loadSynonymInfoIfNeeds();
+
+        // This should be after loading synonyms so it is executed at this timing!
+        helpSynonymTableComments(tableList);
 
         // Create database node. (The beginning of schema XML!)
         _databaseNode = _doc.createElement("database");
@@ -526,8 +530,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
         final List<DfTableMetaInfo> tableList = _tableHandler.getTableList(dbMeta, _schema);
+        helpTableComments(tableList, _schema);
         resolveAdditionalSchema(dbMeta, tableList);
-        helpTableComments(tableList);
         return tableList;
     }
 
@@ -542,21 +546,24 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                     metaInfo.setTableSchema(additionalSchema);
                 }
             }
+            helpTableComments(tableList, additionalSchema);
             tableList.addAll(additionalTableList);
         }
     }
 
-    protected void helpTableComments(List<DfTableMetaInfo> tableList) {
-        final DfDbCommentExtractor extractor = createDbCommentExtractor();
+    protected void helpTableComments(List<DfTableMetaInfo> tableList, String schema) {
+        final DfDbCommentExtractor extractor = createDbCommentExtractor(schema);
         if (extractor != null) {
             final Set<String> tableSet = new HashSet<String>();
-            for (DfTableMetaInfo metaInfo : tableList) {
-                tableSet.add(metaInfo.getTableName());
+            for (DfTableMetaInfo table : tableList) {
+                tableSet.add(table.getTableName());
             }
             try {
-                final Map<String, String> tableCommentMap = extractor.extractTableComment(tableSet);
-                for (DfTableMetaInfo metaInfo : tableList) {
-                    metaInfo.acceptTableComment(tableCommentMap);
+                final Map<String, UserTabComments> tableCommentMap = extractor.extractTableComment(tableSet);
+                for (DfTableMetaInfo table : tableList) {
+                    table.acceptTableComment(tableCommentMap);
+
+                    // *Synonym Helping is after loading synonyms.
                 }
             } catch (RuntimeException ignored) {
                 _log.debug("Failed to extract table comments: extractor=" + extractor, ignored);
@@ -567,6 +574,17 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 }
             } catch (RuntimeException ignored) {
                 _log.debug("Failed to extract column comments: extractor=" + extractor, ignored);
+            }
+        }
+    }
+
+    protected void helpSynonymTableComments(List<DfTableMetaInfo> tableList) { // should be executed after loading synonyms
+        for (DfTableMetaInfo table : tableList) {
+            if (canHandleSynonym(table) && !table.hasTableComment()) {
+                DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
+                if (synonym != null && synonym.hasTableComment()) {
+                    table.setTableComment(synonym.getTableComment());
+                }
             }
         }
     }
@@ -597,15 +615,27 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         return columnList;
     }
 
-    protected void helpColumnComments(DfTableMetaInfo tableInfo, List<DfColumnMetaInfo> columnList) {
+    protected void helpColumnComments(DfTableMetaInfo table, List<DfColumnMetaInfo> columnList) {
         if (_columnCommentAllMap != null) {
-            final String tableName = tableInfo.getTableName();
+            final String tableName = table.getTableName();
             final Map<String, UserColComments> columnCommentMap = _columnCommentAllMap.get(tableName);
-            if (columnCommentMap == null) {
-                return;
+            for (DfColumnMetaInfo column : columnList) {
+                column.acceptColumnComment(columnCommentMap);
             }
-            for (DfColumnMetaInfo metaInfo : columnList) {
-                metaInfo.acceptColumnComment(columnCommentMap);
+        }
+        helpSynonymColumnComments(table, columnList);
+    }
+
+    protected void helpSynonymColumnComments(DfTableMetaInfo table, List<DfColumnMetaInfo> columnList) {
+        for (DfColumnMetaInfo column : columnList) {
+            if (canHandleSynonym(table) && !column.hasColumnComment()) {
+                DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
+                if (synonym != null && synonym.hasColumnCommentMap()) {
+                    UserColComments userColComments = synonym.getColumnCommentMap().get(column.getColumnName());
+                    if (userColComments != null && userColComments.hasComments()) {
+                        column.setColumnComment(userColComments.getComments());
+                    }
+                }
             }
         }
     }
@@ -832,13 +862,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                           Extractor
     //                                                                           =========
-    protected DfDbCommentExtractor createDbCommentExtractor() {
-        final DfDbCommentExtractorFactory factory = createDbCommentExtractorFactory();
+    protected DfDbCommentExtractor createDbCommentExtractor(String schema) {
+        final DfDbCommentExtractorFactory factory = createDbCommentExtractorFactory(schema);
         return factory.createDbCommentExtractor();
     }
 
-    protected DfDbCommentExtractorFactory createDbCommentExtractorFactory() {
-        return new DfDbCommentExtractorFactory(getBasicProperties(), getDataSource());
+    protected DfDbCommentExtractorFactory createDbCommentExtractorFactory(String schema) {
+        return new DfDbCommentExtractorFactory(getBasicProperties(), getDataSource(), schema);
     }
 
     protected DfIdentityExtractor createIdentityExtractor() {
@@ -856,9 +886,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected DfSynonymExtractorFactory createSynonymExtractorFactory() {
+        // The schema to extract is only main schema.
         // The synonym extractor may need the set collection for reference table check.
-        return new DfSynonymExtractorFactory(getBasicProperties(), getDatabaseProperties(), getDataSource(),
-                _refTableCheckSet);
+        return new DfSynonymExtractorFactory(getBasicProperties(), getDataSource(), _schema, _refTableCheckSet);
     }
 
     // ===================================================================================

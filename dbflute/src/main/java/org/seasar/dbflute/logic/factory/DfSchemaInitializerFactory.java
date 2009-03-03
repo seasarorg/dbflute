@@ -81,7 +81,6 @@ public class DfSchemaInitializerFactory {
     protected DfSchemaInitializer createSchemaInitializerOracle() {
         final DfSchemaInitializerOracle initializer = new DfSchemaInitializerOracle();
         setupSchemaInitializerJdbcProperties(initializer);
-        initializer.setDifferentUserSchema(_databaseProperties.isDifferentUserSchema());
         return initializer;
     }
 

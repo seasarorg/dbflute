@@ -39,11 +39,6 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     private static final Log _log = LogFactory.getLog(DfSchemaInitializerOracle.class);
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected boolean _differentUserSchema;
-
-    // ===================================================================================
     //                                                                    Drop Foreign Key
     //                                                                    ================
     @Override
@@ -72,12 +67,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
 
     protected void dropSequence(Connection conn) {
         final List<String> sequenceNameList = new ArrayList<String>();
-        final String metaDataSql;
-        if (_differentUserSchema) {
-            metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + _schema + "'";
-        } else {
-            metaDataSql = "select * from USER_SEQUENCES";
-        }
+        final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + _schema + "'";
         Statement statement = null;
         ResultSet rs = null;
         try {
@@ -136,20 +126,5 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
                 }
             }
         }
-    }
-
-    protected String ln() {
-        return "\n";
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public boolean isDifferentUserSchema() {
-        return _differentUserSchema;
-    }
-
-    public void setDifferentUserSchema(boolean differentUserSchema) {
-        this._differentUserSchema = differentUserSchema;
     }
 }

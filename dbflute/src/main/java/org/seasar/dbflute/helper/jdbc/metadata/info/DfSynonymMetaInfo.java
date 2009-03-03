@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
+
 /**
  * @author jflute
  */
@@ -38,12 +40,22 @@ public class DfSynonymMetaInfo {
     protected Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap;
     protected Map<String, Map<Integer, String>> indexMap;
     protected String dbLinkName;
+    protected String tableComment;
+    protected Map<String, UserColComments> columnCommentMap;
 
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
     public boolean isDBLink() {
         return dbLinkName != null;
+    }
+
+    public boolean hasTableComment() {
+        return tableComment != null && tableComment.trim().length() > 0;
+    }
+
+    public boolean hasColumnCommentMap() {
+        return columnCommentMap != null && !columnCommentMap.isEmpty();
     }
 
     // ===================================================================================
@@ -139,5 +151,21 @@ public class DfSynonymMetaInfo {
 
     public void setDbLinkName(String dbLinkName) {
         this.dbLinkName = dbLinkName;
+    }
+
+    public String getTableComment() {
+        return tableComment;
+    }
+
+    public void setTableComment(String tableComment) {
+        this.tableComment = tableComment;
+    }
+
+    public Map<String, UserColComments> getColumnCommentMap() {
+        return columnCommentMap;
+    }
+
+    public void setColumnCommentMap(Map<String, UserColComments> columnCommentMap) {
+        this.columnCommentMap = columnCommentMap;
     }
 }

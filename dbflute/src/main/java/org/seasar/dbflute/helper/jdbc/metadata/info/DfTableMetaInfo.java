@@ -17,6 +17,8 @@ package org.seasar.dbflute.helper.jdbc.metadata.info;
 
 import java.util.Map;
 
+import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
+
 /**
  * @author jflute
  * @since 0.7.0 (2008/04/18 Friday)
@@ -54,9 +56,13 @@ public class DfTableMetaInfo {
     public boolean isTableTypeSynonym() {
         return _tableType != null ? _tableType.equalsIgnoreCase("SYNONYM") : false;
     }
-    
+
     public boolean canHandleSynonym() {
         return isTableTypeSynonym() || isTableTypeAlias();
+    }
+
+    public boolean hasTableComment() {
+        return _tableComment != null && _tableComment.trim().length() > 0;
     }
 
     // ===================================================================================
@@ -81,13 +87,16 @@ public class DfTableMetaInfo {
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    public void acceptTableComment(Map<String, String> tableCommentMap) {
-        final String comment = tableCommentMap.get(_tableName);
-        if (comment != null && comment.trim().length() > 0) {
-            _tableComment = comment;
+    public void acceptTableComment(Map<String, UserTabComments> tableCommentMap) {
+        if (tableCommentMap == null) {
+            return;
+        }
+        final UserTabComments userTabComments = tableCommentMap.get(_tableName);
+        if (userTabComments != null && userTabComments.hasComments()) {
+            _tableComment = userTabComments.getComments();
         }
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

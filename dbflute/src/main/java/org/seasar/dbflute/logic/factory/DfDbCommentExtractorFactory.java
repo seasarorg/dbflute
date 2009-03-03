@@ -14,14 +14,17 @@ public class DfDbCommentExtractorFactory {
 
     protected DfBasicProperties _basicProperties;
     protected DataSource _dataSource;
+    protected String _schema;
 
     /**
      * @param basicProperties The basic properties. (NotNull)
      * @param dataSource The data source. (NotNull)
+     * @param schema The schema to extract. (NotNull)
      */
-    public DfDbCommentExtractorFactory(DfBasicProperties basicProperties, DataSource dataSource) {
+    public DfDbCommentExtractorFactory(DfBasicProperties basicProperties, DataSource dataSource, String schema) {
         _basicProperties = basicProperties;
         _dataSource = dataSource;
+        _schema = schema;
     }
 
     /**
@@ -31,6 +34,7 @@ public class DfDbCommentExtractorFactory {
         if (_basicProperties.isDatabaseOracle()) {
             final DfDbCommentExtractorOracle extractor = new DfDbCommentExtractorOracle();
             extractor.setDataSource(_dataSource);
+            extractor.setSchema(_schema);
             return extractor;
         }
         return null;

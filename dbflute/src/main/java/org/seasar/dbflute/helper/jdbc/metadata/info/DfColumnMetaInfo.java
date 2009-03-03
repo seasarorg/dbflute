@@ -39,9 +39,19 @@ public class DfColumnMetaInfo {
     protected String sql2entityJavaNative;
 
     // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean hasColumnComment() {
+        return columnComment != null && columnComment.trim().length() > 0;
+    }
+
+    // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
     public void acceptColumnComment(Map<String, UserColComments> columnCommentMap) {
+        if (columnCommentMap == null) {
+            return;
+        }
         final UserColComments userColComments = columnCommentMap.get(columnName);
         if (userColComments == null) {
             return;

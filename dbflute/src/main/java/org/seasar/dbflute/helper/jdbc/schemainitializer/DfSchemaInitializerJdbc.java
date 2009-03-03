@@ -375,6 +375,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     }
 
     // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return "\n";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public void setDataSource(DataSource dataSource) {

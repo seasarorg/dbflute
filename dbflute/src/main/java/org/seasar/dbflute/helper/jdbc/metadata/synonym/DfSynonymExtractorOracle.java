@@ -24,6 +24,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,9 @@ import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfIndexHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
+import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorOracle;
+import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfSynonymMetaInfo;
@@ -58,7 +62,6 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     //                                                                           =========
     protected DataSource _dataSource;
     protected String _schema;
-    protected boolean _differentUserSchema;
     protected Set<String> _refTableCheckSet;
 
     protected DfTableHandler _tableHandler = new DfTableHandler();
@@ -84,12 +87,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
-        final String sql;
-        if (_differentUserSchema) {
-            sql = "select * from ALL_SYNONYMS where OWNER = '" + _schema + "'";
-        } else {
-            sql = "select * from USER_SYNONYMS";
-        }
+        final String sql = "select * from ALL_SYNONYMS where OWNER = '" + _schema + "'";
         Statement statement = null;
         ResultSet rs = null;
         try {
@@ -154,6 +152,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 synonymMap.put(synonymName, info);
             }
             translateFKTable(synonymMap); // It translates foreign key meta informations. 
+            setupTableColumnComment(synonymMap);
             return synonymMap;
         } catch (SQLException e) {
             throw new IllegalStateException(e);
@@ -322,6 +321,55 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
     }
 
+    protected void setupTableColumnComment(Map<String, DfSynonymMetaInfo> synonymMap) {
+        final Map<String, Set<String>> ownerTabSetMap = new LinkedHashMap<String, Set<String>>();
+        for (DfSynonymMetaInfo synonym : synonymMap.values()) {
+            String tableOwner = synonym.getTableOwner();
+            Set<String> tableSet = ownerTabSetMap.get(tableOwner);
+            if (tableSet == null) {
+                tableSet = new LinkedHashSet<String>();
+                ownerTabSetMap.put(tableOwner, tableSet);
+            }
+            tableSet.add(synonym.getTableName());
+        }
+        final Map<String, Map<String, UserTabComments>> ownerTabCommentMap = new LinkedHashMap<String, Map<String, UserTabComments>>();
+        final Map<String, Map<String, Map<String, UserColComments>>> ownerTabColCommentMap = new LinkedHashMap<String, Map<String, Map<String, UserColComments>>>();
+        final Set<String> ownerSet = ownerTabSetMap.keySet();
+        for (String owner : ownerSet) {
+            final Set<String> tableSet = ownerTabSetMap.get(owner);
+            final DfDbCommentExtractorOracle extractor = createDbCommentExtractor(owner);
+            final Map<String, UserTabComments> tabCommentMap = extractor.extractTableComment(tableSet);
+            final Map<String, Map<String, UserColComments>> tabColCommentMap = extractor.extractColumnComment(tableSet);
+            ownerTabCommentMap.put(owner, tabCommentMap);
+            ownerTabColCommentMap.put(owner, tabColCommentMap);
+        }
+        for (DfSynonymMetaInfo synonym : synonymMap.values()) {
+            final String owner = synonym.getTableOwner();
+            final String tableName = synonym.getTableName();
+            final Map<String, UserTabComments> tableCommentMap = ownerTabCommentMap.get(owner);
+            if (tableCommentMap != null) {
+                final UserTabComments userTabComments = tableCommentMap.get(tableName);
+                if (userTabComments != null && userTabComments.hasComments()) {
+                    synonym.setTableComment(userTabComments.getComments());
+                }
+            }
+            final Map<String, Map<String, UserColComments>> tabColCommentMap = ownerTabColCommentMap.get(owner);
+            if (tabColCommentMap != null) {
+                final Map<String, UserColComments> colCommentMap = tabColCommentMap.get(tableName);
+                if (colCommentMap != null && !colCommentMap.isEmpty()) {
+                    synonym.setColumnCommentMap(colCommentMap);
+                }
+            }
+        }
+    }
+
+    protected DfDbCommentExtractorOracle createDbCommentExtractor(String schema) {
+        final DfDbCommentExtractorOracle extractor = new DfDbCommentExtractorOracle();
+        extractor.setDataSource(_dataSource);
+        extractor.setSchema(schema);
+        return extractor;
+    }
+
     // -----------------------------------------------------
     //                                   For DB Link Synonym
     //                                   -------------------
@@ -467,14 +515,6 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
 
     public void setSchema(String schema) {
         this._schema = schema;
-    }
-
-    public boolean isDifferentUserSchema() {
-        return _differentUserSchema;
-    }
-
-    public void setDifferentUserSchema(boolean differentUserSchema) {
-        this._differentUserSchema = differentUserSchema;
     }
 
     public Set<String> getRefTableCheckSet() {
