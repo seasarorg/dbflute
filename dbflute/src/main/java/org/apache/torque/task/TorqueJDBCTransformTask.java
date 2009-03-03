@@ -546,7 +546,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                     metaInfo.setTableSchema(additionalSchema);
                 }
             }
-            helpTableComments(tableList, additionalSchema);
+            helpTableComments(additionalTableList, additionalSchema);
             tableList.addAll(additionalTableList);
         }
     }
