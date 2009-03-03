@@ -246,6 +246,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         inGroup = false;
                         sql = removeTerminater4ToolIfNeeds(sql);// [DBFLUTE-309]
                         addSqlToList(sqlList, sql);
+
+                        // End Point of SQL!
+                        existsCommentOn = false;
                         sql = "";
                         continue;
                     }
@@ -302,9 +305,15 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     }
                     if (!delimiterChanger.isDelimiterChanger(sql)) {
                         addSqlToList(sqlList, sql);
+
+                        // End Point of SQL!
+                        existsCommentOn = false;
                         sql = "";
                     } else {
                         _runInfo.setDelimiter(delimiterChanger.getNewDelimiter(sql, _runInfo.getDelimiter()));
+
+                        // End Point of SQL!
+                        existsCommentOn = false;
                         sql = "";
                     }
                 }
@@ -429,14 +438,14 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
      * @return Determination.
      */
     protected boolean isSqlTrimAndRemoveLineSeparator() {
-        return false;// as Default
+        return false; // as Default
     }
 
     /**
      * @return Determination.
      */
     protected boolean isHandlingCommentOnLineSeparator() {
-        return false;// as Default
+        return false; // as Default
     }
 
     // ===================================================================================

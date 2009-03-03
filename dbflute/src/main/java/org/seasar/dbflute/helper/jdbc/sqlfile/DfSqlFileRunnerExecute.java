@@ -112,6 +112,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         StringBuilder sb = new StringBuilder();
         sb.append("*Failed to execute:").append(ln());
         sb.append("/* * * * * * * * * * * * * * * * * * * * * * * * * *").append(ln());
+        sb.append(e.getClass().getName()).append(ln());
         sb.append(e.getMessage() != null ? e.getMessage().trim() : null).append(ln());
         SQLException nextEx = e.getNextException();
         if (nextEx != null) {

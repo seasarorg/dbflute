@@ -72,18 +72,18 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
 
     protected void dropSequence(Connection conn) {
         final List<String> sequenceNameList = new ArrayList<String>();
-        final String sql;
+        final String metaDataSql;
         if (_differentUserSchema) {
-            sql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + _schema + "'";
+            metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + _schema + "'";
         } else {
-            sql = "select * from USER_SEQUENCES";
+            metaDataSql = "select * from USER_SEQUENCES";
         }
         Statement statement = null;
         ResultSet rs = null;
         try {
             statement = conn.createStatement();
-            _log.info("...Executing helper SQL:" + ln() + sql);
-            rs = statement.executeQuery(sql);
+            _log.info("...Executing helper SQL:" + ln() + metaDataSql);
+            rs = statement.executeQuery(metaDataSql);
             while (rs.next()) {
                 final String sequenceName = rs.getString("SEQUENCE_NAME");
                 sequenceNameList.add(sequenceName);
@@ -91,8 +91,8 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
         } catch (SQLException continued) {
             String msg = "*Failed to the SQL:" + ln();
             msg = msg + (continued.getMessage() != null ? continued.getMessage() : null) + ln();
-            msg = msg + sql;
-            _log.info(sql);
+            msg = msg + metaDataSql;
+            _log.info(metaDataSql);
             return;
         } finally {
             if (statement != null) {
@@ -113,7 +113,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
         try {
             statement = conn.createStatement();
             for (String sequenceName : sequenceNameList) {
-                final String dropSequenceSql = "drop sequence " + sequenceName;
+                final String dropSequenceSql = "drop sequence " + _schema + "." + sequenceName;
                 _log.info(dropSequenceSql);
                 statement.execute(dropSequenceSql);
             }
