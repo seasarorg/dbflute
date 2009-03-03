@@ -67,7 +67,8 @@ public class DfSynonymMetaInfo {
                 + (columnMetaInfoList != null ? "(" + columnMetaInfoList.size() + " columns)" : "") + ", "
                 + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
                 + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
-                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + "}";
+                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + ", " + tableComment
+                + "}";
     }
 
     // ===================================================================================
