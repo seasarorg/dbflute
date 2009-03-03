@@ -65,7 +65,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return propString;
     }
 
-    protected String getOldStyleEnvironmentType() {// Old Style!
+    protected String getOldStyleEnvironmentType() { // Old Style!
         final String propString = (String) getReplaceSchemaDefinitionMap().get("environmentType");
         if (propString == null) {
             return "ut";
@@ -113,16 +113,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             }
         }
         return sql;
-    }
-
-    // ===================================================================================
-    //                                                                      Callback Class
-    //                                                                      ==============
-    /**
-     * @return The process command of call-back for before-take-finally. (Nullable)
-     */
-    public String getBeforeTakeFinally() {
-        return (String) getReplaceSchemaDefinitionMap().get("beforeTakeFinally");
     }
 
     // ===================================================================================
@@ -251,6 +241,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                      Once More Drop
     //                                                                      ==============
+    // It's closet and old style! 
     @SuppressWarnings("unchecked")
     protected Map<String, Object> getOnceMoreDropDefinitionMap() {
         final Map<String, Object> map = (Map<String, Object>) getReplaceSchemaDefinitionMap().get(
@@ -334,7 +325,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         return value.equalsIgnoreCase("true");
     }
-    
+
     // ===================================================================================
     //                                                                        Other Closet
     //                                                                        ============
@@ -349,17 +340,24 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     public boolean isErrorContinue() { // It's closet!
         return analyzeBooleanProperty("isErrorContinue", true);
     }
-    
+
     public boolean isSuppressTruncateTable() { // It's closet!
         return analyzeBooleanProperty("isSuppressTruncateTable", false);
     }
-    
+
     public boolean isSuppressDropForeignKey() { // It's closet!
         return analyzeBooleanProperty("isSuppressDropForeignKey", false);
     }
-    
+
     public boolean isSuppressDropTable() { // It's closet!
         return analyzeBooleanProperty("isSuppressDropTable", false);
+    }
+
+    /**
+     * @return The process command of call-back for before-take-finally. (Nullable)
+     */
+    public String getBeforeTakeFinally() { // It's closet!
+        return (String) getReplaceSchemaDefinitionMap().get("beforeTakeFinally");
     }
 
     // ===================================================================================
