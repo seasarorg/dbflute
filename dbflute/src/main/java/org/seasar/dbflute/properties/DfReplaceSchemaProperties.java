@@ -237,6 +237,43 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         return value.equalsIgnoreCase("true");
     }
+    
+    // ===================================================================================
+    //                                                        Suppress Initializing Schema
+    //                                                        ============================
+    public boolean isSuppressTruncateTable() {
+        return analyzeBooleanProperty("isSuppressTruncateTable", false);
+    }
+    
+    public boolean isSuppressDropForeignKey() {
+        return analyzeBooleanProperty("isSuppressDropForeignKey", false);
+    }
+    
+    public boolean isSuppressDropTable() {
+        return analyzeBooleanProperty("isSuppressDropTable", false);
+    }
+
+    // ===================================================================================
+    //                                                                        Other Closet
+    //                                                                        ============
+    public boolean isAutoCommit() { // It's closet! No useful!
+        return analyzeBooleanProperty("isAutoCommit", true);
+    }
+
+    public boolean isRollbackOnly() { // It's closet! No useful!
+        return analyzeBooleanProperty("isRollbackOnly", false);
+    }
+
+    public boolean isErrorContinue() { // It's closet!
+        return analyzeBooleanProperty("isErrorContinue", true);
+    }
+
+    /**
+     * @return The process command of call-back for before-take-finally. (Nullable)
+     */
+    public String getBeforeTakeFinally() { // It's closet!
+        return (String) getReplaceSchemaDefinitionMap().get("beforeTakeFinally");
+    }
 
     // ===================================================================================
     //                                                                      Once More Drop
@@ -324,40 +361,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             }
         }
         return value.equalsIgnoreCase("true");
-    }
-
-    // ===================================================================================
-    //                                                                        Other Closet
-    //                                                                        ============
-    public boolean isAutoCommit() { // It's closet!
-        return analyzeBooleanProperty("isAutoCommit", true);
-    }
-
-    public boolean isRollbackOnly() { // It's closet!
-        return analyzeBooleanProperty("isRollbackOnly", false);
-    }
-
-    public boolean isErrorContinue() { // It's closet!
-        return analyzeBooleanProperty("isErrorContinue", true);
-    }
-
-    public boolean isSuppressTruncateTable() { // It's closet!
-        return analyzeBooleanProperty("isSuppressTruncateTable", false);
-    }
-
-    public boolean isSuppressDropForeignKey() { // It's closet!
-        return analyzeBooleanProperty("isSuppressDropForeignKey", false);
-    }
-
-    public boolean isSuppressDropTable() { // It's closet!
-        return analyzeBooleanProperty("isSuppressDropTable", false);
-    }
-
-    /**
-     * @return The process command of call-back for before-take-finally. (Nullable)
-     */
-    public String getBeforeTakeFinally() { // It's closet!
-        return (String) getReplaceSchemaDefinitionMap().get("beforeTakeFinally");
     }
 
     // ===================================================================================

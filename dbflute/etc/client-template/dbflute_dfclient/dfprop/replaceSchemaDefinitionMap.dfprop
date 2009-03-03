@@ -9,6 +9,9 @@
 # o skipSheet (NotRequired - Default '')
 # o filterVariablesMap (NotRequired - Default 'map:{}')
 # o additionalDropMapList (NotRequired - Default 'list:{}')
+# o isSuppressTruncateTable (NotRequired - Default 'false')
+# o isSuppressDropForeignKey (NotRequired - Default 'false')
+# o isSuppressDropTable (NotRequired - Default 'false')
 # 
 # Example:
 # map:{
@@ -24,6 +27,9 @@
 #             ; dropAllTable = true
 #         }
 #     }
+#     ; isSuppressTruncateTable = true
+#     ; isSuppressDropForeignKey = true
+#     ; isSuppressDropTable = true
 # }
 #
 # *The line that starts with '#' means comment-out.
@@ -77,6 +83,27 @@ map:{
     #        ; dropAllTable = true
     #    }
     #}
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isSuppressTruncateTable (NotRequired - Default 'false')
+    # You can suppress truncating tables at initializing schema.
+    # 
+    #; isSuppressTruncateTable = true
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isSuppressDropForeignKey (NotRequired - Default 'false')
+    # You can suppress droping foreign keys at initializing schema.
+    # 
+    #; isSuppressDropForeignKey = true
+    # - - - - - - - - - -/
+    
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isSuppressDropTable (NotRequired - Default 'false')
+    # You can suppress droping tables at initializing schema.
+    # 
+    #; isSuppressDropTable = true
     # - - - - - - - - - -/
 }
 # ----------------/
