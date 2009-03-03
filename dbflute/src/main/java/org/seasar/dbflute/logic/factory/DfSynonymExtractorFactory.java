@@ -2,6 +2,7 @@ package org.seasar.dbflute.logic.factory;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.helper.collection.DfStringSet;
 import org.seasar.dbflute.helper.jdbc.metadata.synonym.DfSynonymExtractor;
 import org.seasar.dbflute.helper.jdbc.metadata.synonym.DfSynonymExtractorOracle;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -16,6 +17,7 @@ public class DfSynonymExtractorFactory {
     protected DfBasicProperties _basicProperties;
     protected DfDatabaseProperties _databaseProperties;
     protected DataSource _dataSource;
+    protected DfStringSet _refTableCheckSet;
 
     /**
      * @param basicProperties The basic properties. (NotNull)
@@ -23,10 +25,11 @@ public class DfSynonymExtractorFactory {
      * @param dataSource The data source. (NotNull)
      */
     public DfSynonymExtractorFactory(DfBasicProperties basicProperties, DfDatabaseProperties databaseProperties,
-            DataSource dataSource) {
+            DataSource dataSource, DfStringSet refTableCheckSet) {
         _basicProperties = basicProperties;
         _databaseProperties = databaseProperties;
         _dataSource = dataSource;
+        _refTableCheckSet = refTableCheckSet;
     }
 
     /**
@@ -38,6 +41,7 @@ public class DfSynonymExtractorFactory {
             extractor.setDataSource(_dataSource);
             extractor.setSchema(_databaseProperties.getDatabaseSchema());
             extractor.setDifferentUserSchema(_databaseProperties.isDifferentUserSchema());
+            extractor.setRefTableCheckSet(_refTableCheckSet);
             return extractor;
         }
         return null;

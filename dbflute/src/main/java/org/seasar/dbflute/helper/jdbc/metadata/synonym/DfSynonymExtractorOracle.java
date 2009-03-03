@@ -59,6 +59,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     protected DataSource _dataSource;
     protected String _schema;
     protected boolean _differentUserSchema;
+    protected Set<String> _refTableCheckSet;
+
     protected DfTableHandler _tableHandler = new DfTableHandler();
     protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
     protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
@@ -282,6 +284,9 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                     if (_tableHandler.isTableExcept(foreignTableName)) {
                         removedFKKeyList.add(foreignTableName);
                     }
+                    if (_refTableCheckSet != null && !_refTableCheckSet.contains(foreignTableName)) {
+                        removedFKKeyList.add(foreignTableName);
+                    }
                     continue;
                 }
                 boolean firstDone = false;
@@ -462,5 +467,13 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
 
     public void setDifferentUserSchema(boolean differentUserSchema) {
         this._differentUserSchema = differentUserSchema;
+    }
+
+    public Set<String> getRefTableCheckSet() {
+        return _refTableCheckSet;
+    }
+
+    public void setRefTableCheckSet(Set<String> refTableCheckSet) {
+        this._refTableCheckSet = refTableCheckSet;
     }
 }

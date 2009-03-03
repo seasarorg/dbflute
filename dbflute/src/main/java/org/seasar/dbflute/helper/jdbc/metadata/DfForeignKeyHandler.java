@@ -39,6 +39,11 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     private static final Log _log = LogFactory.getLog(DfForeignKeyHandler.class);
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected Set<String> _refTableCheckSet;
+
+    // ===================================================================================
     //                                                                         Foreign Key
     //                                                                         ===========
     /**
@@ -55,7 +60,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         final String tableName = tableMetaInfo.getTableName();
         return getForeignKeyMetaInfo(dbMeta, schemaName, tableName);
     }
-    
+
     /**
      * Retrieves a list of foreign key columns for a given table.
      * @param dbMeta JDBC meta data.
@@ -76,6 +81,9 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 final String refTableName = foreignKeys.getString(3);
 
                 if (isTableExcept(refTableName)) {
+                    continue;
+                }
+                if (_refTableCheckSet != null && !_refTableCheckSet.contains(refTableName)) {
                     continue;
                 }
 
@@ -130,5 +138,16 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
             }
         }
         return filteredForeignKeyMetaInfoMap;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public Set<String> getRefTableCheckSet() {
+        return _refTableCheckSet;
+    }
+
+    public void setRefTableCheckSet(Set<String> refTableCheckSet) {
+        this._refTableCheckSet = refTableCheckSet;
     }
 }

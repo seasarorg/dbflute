@@ -78,6 +78,7 @@ import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.seasar.dbflute.exception.TableNotFoundException;
+import org.seasar.dbflute.helper.collection.DfStringSet;
 import org.seasar.dbflute.helper.jdbc.metadata.DfAutoIncrementHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
@@ -154,6 +155,11 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                      ----------------
     protected Map<String, String> _identityMap;
     protected Map<String, DfSynonymMetaInfo> _synonymMap;
+
+    // -----------------------------------------------------
+    //                                          Check Object
+    //                                          ------------
+    protected DfStringSet _refTableCheckSet;
 
     // ===================================================================================
     //                                                                             Execute
@@ -239,8 +245,20 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             throwTableNotFoundException();
         }
 
+        // Initialize the set collection for reference table check.
+        // This should be executed before handling foreign keys.
+        _refTableCheckSet = DfStringSet.createAsCaseInsensitive();
+        for (DfTableMetaInfo tableMetaInfo : tableList) {
+            _refTableCheckSet.add(tableMetaInfo.getTableName());
+        }
+
+        // The handler of foreign keys needs the set collection for reference table check.
+        _foreignKeyHandler.setRefTableCheckSet(_refTableCheckSet);
+
+        // Load synonym information for merging additional meta data if it needs.
         loadSynonymInfoIfNeeds();
 
+        // Create database node. (The beginning of schema XML!)
         _databaseNode = _doc.createElement("database");
         _databaseNode.setAttribute("name", _schema);
 
@@ -841,7 +859,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected DfSynonymExtractorFactory createSynonymExtractorFactory() {
-        return new DfSynonymExtractorFactory(getBasicProperties(), getDatabaseProperties(), getDataSource());
+        // The synonym extractor may need the set collection for reference table check.
+        return new DfSynonymExtractorFactory(getBasicProperties(), getDatabaseProperties(), getDataSource(),
+                _refTableCheckSet);
     }
 
     // ===================================================================================
