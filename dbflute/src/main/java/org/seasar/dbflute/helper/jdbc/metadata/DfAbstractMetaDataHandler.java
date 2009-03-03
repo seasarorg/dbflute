@@ -151,4 +151,11 @@ public class DfAbstractMetaDataHandler {
     protected boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
     }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return "\n";
+    }
 }

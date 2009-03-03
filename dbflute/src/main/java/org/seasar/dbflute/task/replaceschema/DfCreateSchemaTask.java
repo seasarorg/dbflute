@@ -206,7 +206,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         try {
             final FileOutputStream fos = new FileOutputStream(file);
             bw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
-            bw.write(resultMessage + getLineSeparator() + result.isExistsError());
+            bw.write(resultMessage + ln() + result.isExistsError());
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         } catch (FileNotFoundException e) {

@@ -74,22 +74,24 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         if (!isForeignKeyExtractingSupported()) {
             return fkMap;
         }
+        final Map<String, String> exceptedFKKeyMap = new LinkedHashMap<String, String>();
         ResultSet foreignKeys = null;
         try {
             foreignKeys = dbMeta.getImportedKeys(null, schemaName, tableName);
             while (foreignKeys.next()) {
                 final String refTableName = foreignKeys.getString(3);
-
-                if (isTableExcept(refTableName)) {
-                    continue;
-                }
-                if (_refTableCheckSet != null && !_refTableCheckSet.contains(refTableName)) {
-                    continue;
-                }
-
                 String fkName = foreignKeys.getString(12);
                 if (fkName == null) { // if FK has no name - make it up (use table name instead)
                     fkName = refTableName;
+                }
+
+                if (isTableExcept(refTableName)) {
+                    exceptedFKKeyMap.put(fkName, refTableName);
+                    continue;
+                }
+                if (_refTableCheckSet != null && !_refTableCheckSet.contains(refTableName)) {
+                    exceptedFKKeyMap.put(fkName, refTableName);
+                    continue;
                 }
 
                 final String localColumnName = foreignKeys.getString(8);
@@ -113,7 +115,17 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 foreignKeys.close();
             }
         }
-
+        if (!exceptedFKKeyMap.isEmpty()) {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("...Excepting foreign keys from the table:").append(ln()).append("[Excepted Foreign Key]");
+            final Set<String> exceptedFKKeySet = exceptedFKKeyMap.keySet();
+            for (String exceptedKey : exceptedFKKeySet) {
+                sb.append(ln()).append(" ").append(exceptedKey);
+                sb.append(" (").append(tableName).append(" to ");
+                sb.append(exceptedFKKeyMap.get(exceptedKey)).append(")");
+            }
+            _log.info(sb.toString());
+        }
         return filterSameForeignKeyMetaInfo(fkMap);
     }
 

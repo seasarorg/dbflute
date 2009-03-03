@@ -104,7 +104,7 @@ public abstract class DfAbstractTask extends Task {
             long after = getTaskAfterTimeMillis();
             if (isValidTaskEndInformation()) {
                 StringBuilder sb = new StringBuilder();
-                String ln = getLineSeparator();
+                String ln = ln();
                 sb.append(ln);
                 sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
                 sb.append(ln).append("[Task End]: " + getPerformanceView(after - before));
@@ -268,7 +268,7 @@ public abstract class DfAbstractTask extends Task {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String getLineSeparator() {
+    protected String ln() {
         return "\n";
     }
 

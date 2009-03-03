@@ -232,8 +232,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ dbMetaData.toString(): " + dbMetaData.toString());
         _log.info("$ dbMetaData.getMaxRowSize(): " + dbMetaData.getMaxRowSize());
         _log.info("$ ");
-        logObjectTypes();
-        logAdditionalSchemas();
+        _log.info(getObjectTypeLogString());
+        _log.info(getAdditionalSchemaLogString());
         _log.info("$ ");
         _log.info("$ ...Getting tables");
         final List<DfTableMetaInfo> tableList = getTableNames(dbMetaData);
@@ -432,15 +432,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _doc.appendChild(_databaseNode);
     }
 
-    protected void logAdditionalSchemas() {
-        final List<String> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
-        if (additionalSchemaList.isEmpty()) {
-            return;
-        }
-        _log.info("$ Additional Schemas: " + additionalSchemaList);
-    }
-
-    protected void logObjectTypes() {
+    protected String getObjectTypeLogString() {
         final List<String> objectTypeTargetList = getDatabaseProperties().getObjectTypeTargetList();
         String typeString = "";
         int i = 0;
@@ -452,25 +444,30 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
             ++i;
         }
-        _log.info("$ Object Types: {" + typeString + "}");
+        return "$ Object Types: {" + typeString + "}";
+    }
+
+    protected String getAdditionalSchemaLogString() {
+        final List<String> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
+        return "$ Additional Schemas: " + additionalSchemaList;
     }
 
     protected void throwTableNotFoundException() {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The tables was was Not Found in the schema!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the database connection settings." + getLineSeparator();
-        msg = msg + "If you've not created the schema yet, please create it." + getLineSeparator();
-        msg = msg + "You can create easily by using replace-schema." + getLineSeparator();
-        msg = msg + "Set up ./playsql/replace-schema.sql and execute ReplaceSchema task." + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Connection Settings]" + getLineSeparator();
-        msg = msg + " driver = " + _driver + getLineSeparator();
-        msg = msg + " url    = " + _url + getLineSeparator();
-        msg = msg + " schema = " + _schema + getLineSeparator();
-        msg = msg + " user   = " + _userId + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The tables was was Not Found in the schema!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the database connection settings." + ln();
+        msg = msg + "If you've not created the schema yet, please create it." + ln();
+        msg = msg + "You can create easily by using replace-schema." + ln();
+        msg = msg + "Set up ./playsql/replace-schema.sql and execute ReplaceSchema task." + ln();
+        msg = msg + ln();
+        msg = msg + "[Connection Settings]" + ln();
+        msg = msg + " driver = " + _driver + ln();
+        msg = msg + " url    = " + _url + ln();
+        msg = msg + " schema = " + _schema + ln();
+        msg = msg + " user   = " + _userId + ln();
         msg = msg + "* * * * * * * * * */";
         throw new TableNotFoundException(msg);
     }
@@ -764,13 +761,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             return;
         }
         try {
-            _log.info("...Initializing synonym map");
+            _log.info("...Loading synonyms");
             _synonymMap = extractor.extractSynonymMap();
             final Set<String> keySet = _synonymMap.keySet();
             final StringBuilder sb = new StringBuilder();
-            sb.append(getLineSeparator()).append("[Synonym Map]");
+            sb.append("Finished loading synonyms").append(ln()).append("[Synonym Map]");
             for (String key : keySet) {
-                sb.append(getLineSeparator()).append(" " + key + " = " + _synonymMap.get(key));
+                sb.append(ln()).append(" " + key + " = " + _synonymMap.get(key));
             }
             _log.info(sb.toString());
         } catch (Exception ignored) {

@@ -261,7 +261,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             if (line == null) {
                 break;
             }
-            sb.append(line + getLineSeparator());
+            sb.append(line + ln());
         }
         _log.info(sb.toString().trim());
     }
@@ -295,7 +295,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             final String line2 = br.readLine();
             final boolean existsError = isLine2True(line2) || result.isExistsError();
             final StringBuilder sb = new StringBuilder();
-            final String ln = getLineSeparator();
+            final String ln = ln();
             sb.append(ln).append("[Final Information]");
             sb.append(ln).append("  ").append(line);
             sb.append(ln).append("  ").append(result.getResultMessage());

@@ -265,7 +265,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             }
             final Set<String> fkNameSet = fkMap.keySet();
             final Map<String, DfForeignKeyMetaInfo> additionalFKMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
-            final List<String> removedFKKeyList = new ArrayList<String>();
+            final Map<String, String> removedFKKeyMap = new LinkedHashMap<String, String>();
             for (String fkName : fkNameSet) {
                 final DfForeignKeyMetaInfo fk = fkMap.get(fkName);
 
@@ -282,10 +282,9 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 final List<String> foreignSynonymList = tableForeignSynonymListMap.get(foreignTableName);
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
                     if (_tableHandler.isTableExcept(foreignTableName)) {
-                        removedFKKeyList.add(foreignTableName);
-                    }
-                    if (_refTableCheckSet != null && !_refTableCheckSet.contains(foreignTableName)) {
-                        removedFKKeyList.add(foreignTableName);
+                        removedFKKeyMap.put(fkName, foreignTableName);
+                    } else if (_refTableCheckSet != null && !_refTableCheckSet.contains(foreignTableName)) {
+                        removedFKKeyMap.put(fkName, foreignTableName);
                     }
                     continue;
                 }
@@ -308,8 +307,17 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 }
             }
             fkMap.putAll(additionalFKMap);
-            for (String removedKey : removedFKKeyList) {
-                fkMap.remove(removedKey);
+            if (!removedFKKeyMap.isEmpty()) {
+                final StringBuilder sb = new StringBuilder();
+                sb.append("...Excepting foreign keys from the synonym:").append(ln()).append("[Excepted Foreign Key]");
+                final Set<String> removedFKKeySet = removedFKKeyMap.keySet();
+                for (String removedKey : removedFKKeySet) {
+                    sb.append(ln()).append(" ").append(removedKey);
+                    sb.append(" (").append(synonym.getSynonymName()).append(" to ");
+                    sb.append(removedFKKeyMap.get(removedKey)).append(")");
+                    fkMap.remove(removedKey);
+                }
+                _log.info(sb.toString());
             }
         }
     }
