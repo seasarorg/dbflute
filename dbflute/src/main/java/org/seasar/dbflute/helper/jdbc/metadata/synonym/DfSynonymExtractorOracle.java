@@ -324,7 +324,10 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     protected void setupTableColumnComment(Map<String, DfSynonymMetaInfo> synonymMap) {
         final Map<String, Set<String>> ownerTabSetMap = new LinkedHashMap<String, Set<String>>();
         for (DfSynonymMetaInfo synonym : synonymMap.values()) {
-            String tableOwner = synonym.getTableOwner();
+            final String tableOwner = synonym.getTableOwner();
+            if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
+                continue;
+            }
             Set<String> tableSet = ownerTabSetMap.get(tableOwner);
             if (tableSet == null) {
                 tableSet = new LinkedHashSet<String>();
