@@ -57,6 +57,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
+    protected String _schema;
+    protected boolean _differentUserSchema;
     protected DfTableHandler _tableHandler = new DfTableHandler();
     protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
     protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
@@ -80,10 +82,19 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
+        final String sql;
+        if (_differentUserSchema) {
+            sql = "select * from ALL_SYNONYMS where OWNER = '" + _schema + "'";
+        } else {
+            sql = "select * from USER_SYNONYMS";
+        }
+        Statement statement = null;
+        ResultSet rs = null;
         try {
             final Map<String, DfSynonymMetaInfo> synonymMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
-            final Statement statement = conn.createStatement();
-            final ResultSet rs = statement.executeQuery("select * from USER_SYNONYMS");
+            statement = conn.createStatement();
+            _log.info("...Executing helper SQL:" + ln() + sql);
+            rs = statement.executeQuery(sql);
             while (rs.next()) {
                 final String synonymName = rs.getString("SYNONYM_NAME");
                 final String tableOwner = rs.getString("TABLE_OWNER");
@@ -145,6 +156,18 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ignored) {
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                }
+            }
             if (conn != null) {
                 try {
                     conn.close();
@@ -414,10 +437,30 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
     }
 
+    protected String ln() {
+        return "\n";
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public void setDataSource(DataSource dataSource) {
         _dataSource = dataSource;
+    }
+
+    public String getSchema() {
+        return _schema;
+    }
+
+    public void setSchema(String schema) {
+        this._schema = schema;
+    }
+
+    public boolean isDifferentUserSchema() {
+        return _differentUserSchema;
+    }
+
+    public void setDifferentUserSchema(boolean differentUserSchema) {
+        this._differentUserSchema = differentUserSchema;
     }
 }

@@ -415,7 +415,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void logAdditionalSchemas() {
-        final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
+        final List<String> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
         if (additionalSchemaList.isEmpty()) {
             return;
         }
@@ -423,7 +423,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void logObjectTypes() {
-        final List<String> objectTypeTargetList = getDatabaseInfoProperties().getObjectTypeTargetList();
+        final List<String> objectTypeTargetList = getDatabaseProperties().getObjectTypeTargetList();
         String typeString = "";
         int i = 0;
         for (String objectType : objectTypeTargetList) {
@@ -518,7 +518,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMetaInfo> tableList)
             throws SQLException {
-        final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
+        final List<String> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
         for (String additionalSchema : additionalSchemaList) {
             final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, additionalSchema);
             for (DfTableMetaInfo metaInfo : additionalTableList) {
@@ -710,7 +710,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         if (schema == null || schema.trim().length() == 0) {
             return false;
         }
-        final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
+        final List<String> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
         return additionalSchemaList.contains(schema);
     }
 
@@ -836,12 +836,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected DfSynonymExtractor createSynonymExtractor() {
-        final DfSynonymExtractorFactory factory = creatSynonymExtractorFactory();
+        final DfSynonymExtractorFactory factory = createSynonymExtractorFactory();
         return factory.createSynonymExtractor();
     }
 
-    protected DfSynonymExtractorFactory creatSynonymExtractorFactory() {
-        return new DfSynonymExtractorFactory(getBasicProperties(), getDataSource());
+    protected DfSynonymExtractorFactory createSynonymExtractorFactory() {
+        return new DfSynonymExtractorFactory(getBasicProperties(), getDatabaseProperties(), getDataSource());
     }
 
     // ===================================================================================

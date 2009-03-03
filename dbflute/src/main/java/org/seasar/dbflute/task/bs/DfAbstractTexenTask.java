@@ -22,8 +22,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +43,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
+import org.seasar.dbflute.logic.scmconn.CurrentSchemaConnector;
 import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -176,7 +175,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     protected void initializeDatabaseInfo() {
         _driver = getDatabaseInfoProperties().getDatabaseDriver();
-        _url = getDatabaseInfoProperties().getDatabaseUri();
+        _url = getDatabaseInfoProperties().getDatabaseUrl();
         _userId = getDatabaseInfoProperties().getDatabaseUser();
         _schema = getDatabaseInfoProperties().getDatabaseSchema();
         _password = getDatabaseInfoProperties().getDatabasePassword();
@@ -382,23 +381,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     protected void connectSchema() {
-        if (getBasicProperties().isDatabaseDB2() && _schema != null) {
-            final Statement statement;
-            try {
-                statement = getDataSource().getConnection().createStatement();
-            } catch (SQLException e) {
-                _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
-                return;
-            }
-            final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
-            try {
-                _log.info("...Executing command: " + sql);
-                statement.execute(sql);
-            } catch (SQLException e) {
-                _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
-                return;
-            }
-        }
+        CurrentSchemaConnector connector = new CurrentSchemaConnector(getDataSource(), _schema, getBasicProperties());
+        connector.connectSchema();
     }
 
     // -----------------------------------------------------

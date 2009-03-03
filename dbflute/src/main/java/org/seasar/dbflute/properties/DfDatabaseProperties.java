@@ -36,8 +36,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return _databaseInfo.getDatabaseDriver();
     }
 
-    public String getDatabaseUri() {
-        return _databaseInfo.getDatabaseUri();
+    public String getDatabaseUrl() {
+        return _databaseInfo.getDatabaseUrl();
     }
 
     public String getDatabaseSchema() {
@@ -50,6 +50,12 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
 
     public String getDatabasePassword() {
         return _databaseInfo.getDatabasePassword();
+    }
+
+    public boolean isDifferentUserSchema() {
+        final String databaseUser = getDatabaseUser();
+        final String databaseSchema = getDatabaseSchema();
+        return !databaseUser.equalsIgnoreCase(databaseSchema);
     }
 
     // -----------------------------------------------------
@@ -189,7 +195,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             return stringProp("torque.database.driver");
         }
 
-        public String getDatabaseUri() {
+        public String getDatabaseUrl() {
             initializeDatabaseInfoMap();
             final String key = KEY_URL;
             final String databaseInfoElement = getDatabaseInfoElement(key);
@@ -339,7 +345,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             throw new RuntimeException(e);
         }
         try {
-            return DriverManager.getConnection(getDatabaseUri(), getDatabaseUser(), getDatabasePassword());
+            return DriverManager.getConnection(getDatabaseUrl(), getDatabaseUser(), getDatabasePassword());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

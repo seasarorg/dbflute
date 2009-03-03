@@ -16,8 +16,6 @@
 package org.seasar.dbflute.task.bs;
 
 import java.io.File;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Properties;
 
@@ -30,6 +28,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
+import org.seasar.dbflute.logic.scmconn.CurrentSchemaConnector;
 import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -115,7 +114,8 @@ public abstract class DfAbstractTask extends Task {
                 sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
                 sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
                 sb.append(ln);
-                sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + DfEnvironmentType.getInstance().getEnvironmentType() + "}");
+                sb.append(ln).append(
+                        "  DBFLUTE_ENVIRONMENT_TYPE: {" + DfEnvironmentType.getInstance().getEnvironmentType() + "}");
                 sb.append(ln).append("    driver = " + _driver);
                 sb.append(ln).append("    url    = " + _url);
                 sb.append(ln).append("    schema = " + _schema);
@@ -162,12 +162,12 @@ public abstract class DfAbstractTask extends Task {
     }
 
     protected void initializeDatabaseInfo() {
-        _driver = getDatabaseInfoProperties().getDatabaseDriver();
-        _url = getDatabaseInfoProperties().getDatabaseUri();
-        _userId = getDatabaseInfoProperties().getDatabaseUser();
-        _schema = getDatabaseInfoProperties().getDatabaseSchema();
-        _password = getDatabaseInfoProperties().getDatabasePassword();
-        _connectionProperties = getDatabaseInfoProperties().getDatabaseConnectionProperties();
+        _driver = getDatabaseProperties().getDatabaseDriver();
+        _url = getDatabaseProperties().getDatabaseUrl();
+        _userId = getDatabaseProperties().getDatabaseUser();
+        _schema = getDatabaseProperties().getDatabaseSchema();
+        _password = getDatabaseProperties().getDatabasePassword();
+        _connectionProperties = getDatabaseProperties().getDatabaseConnectionProperties();
     }
 
     abstract protected void doExecute();
@@ -231,39 +231,8 @@ public abstract class DfAbstractTask extends Task {
     }
 
     protected void connectSchema() {
-        if (getBasicProperties().isDatabaseDB2() && _schema != null) {
-            final Statement statement;
-            try {
-                statement = getDataSource().getConnection().createStatement();
-            } catch (SQLException e) {
-                _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
-                return;
-            }
-            final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
-            try {
-                _log.info("...Executing command: " + sql);
-                statement.execute(sql);
-            } catch (SQLException e) {
-                _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
-                return;
-            }
-        } else if (getBasicProperties().isDatabaseOracle() && _schema != null) {
-            final Statement statement;
-            try {
-                statement = getDataSource().getConnection().createStatement();
-            } catch (SQLException e) {
-                _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
-                return;
-            }
-            final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + _schema.trim();
-            try {
-                _log.info("...Executing command: " + sql);
-                statement.execute(sql);
-            } catch (SQLException e) {
-                _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
-                return;
-            }
-        }
+        CurrentSchemaConnector connector = new CurrentSchemaConnector(getDataSource(), _schema, getBasicProperties());
+        connector.connectSchema();
     }
 
     public void setContextProperties(String file) {
@@ -279,7 +248,7 @@ public abstract class DfAbstractTask extends Task {
         return getProperties().getBasicProperties();
     }
 
-    protected DfDatabaseProperties getDatabaseInfoProperties() {
+    protected DfDatabaseProperties getDatabaseProperties() {
         return getProperties().getDatabaseProperties();
     }
 

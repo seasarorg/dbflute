@@ -39,6 +39,11 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     private static final Log _log = LogFactory.getLog(DfSchemaInitializerOracle.class);
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _differentUserSchema;
+
+    // ===================================================================================
     //                                                                    Drop Foreign Key
     //                                                                    ================
     @Override
@@ -67,17 +72,27 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
 
     protected void dropSequence(Connection conn) {
         final List<String> sequenceNameList = new ArrayList<String>();
+        final String sql;
+        if (_differentUserSchema) {
+            sql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + _schema + "'";
+        } else {
+            sql = "select * from USER_SEQUENCES";
+        }
         Statement statement = null;
         ResultSet rs = null;
         try {
             statement = conn.createStatement();
-            rs = statement.executeQuery("select * from USER_SEQUENCES");
+            _log.info("...Executing helper SQL:" + ln() + sql);
+            rs = statement.executeQuery(sql);
             while (rs.next()) {
                 final String sequenceName = rs.getString("SEQUENCE_NAME");
                 sequenceNameList.add(sequenceName);
             }
         } catch (SQLException continued) {
-            _log.info("*Failed to select USER_SEQUENCES:\n" + continued.getMessage());
+            String msg = "*Failed to the SQL:" + ln();
+            msg = msg + (continued.getMessage() != null ? continued.getMessage() : null) + ln();
+            msg = msg + sql;
+            _log.info(sql);
             return;
         } finally {
             if (statement != null) {
@@ -121,5 +136,20 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
                 }
             }
         }
+    }
+
+    protected String ln() {
+        return "\n";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isDifferentUserSchema() {
+        return _differentUserSchema;
+    }
+
+    public void setDifferentUserSchema(boolean differentUserSchema) {
+        this._differentUserSchema = differentUserSchema;
     }
 }

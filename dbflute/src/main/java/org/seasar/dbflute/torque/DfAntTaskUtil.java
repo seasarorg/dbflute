@@ -111,7 +111,10 @@ public final class DfAntTaskUtil {
         msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Database Properties]" + getLineSeparator();
-        msg = msg + "driver = " + getDatabaseInfoProperties().getDatabaseDriver() + getLineSeparator();
+        msg = msg + "driver = " + getDatabaseProperties().getDatabaseDriver() + getLineSeparator();
+        msg = msg + "url    = " + getDatabaseProperties().getDatabaseUrl() + getLineSeparator();
+        msg = msg + "schema = " + getDatabaseProperties().getDatabaseSchema() + getLineSeparator();
+        msg = msg + "user   = " + getDatabaseProperties().getDatabaseUser() + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Runtime Exception]" + getLineSeparator();
         msg = msg + "exception class   = " + e.getClass() + getLineSeparator();
@@ -130,7 +133,10 @@ public final class DfAntTaskUtil {
         msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Database Properties]" + getLineSeparator();
-        msg = msg + "driver = " + getDatabaseInfoProperties().getDatabaseDriver() + getLineSeparator();
+        msg = msg + "driver = " + getDatabaseProperties().getDatabaseDriver() + getLineSeparator();
+        msg = msg + "url    = " + getDatabaseProperties().getDatabaseUrl() + getLineSeparator();
+        msg = msg + "schema = " + getDatabaseProperties().getDatabaseSchema() + getLineSeparator();
+        msg = msg + "user   = " + getDatabaseProperties().getDatabaseUser() + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Error]" + getLineSeparator();
         msg = msg + "error class   = " + e.getClass() + getLineSeparator();
@@ -168,7 +174,7 @@ public final class DfAntTaskUtil {
         return getProperties().getBasicProperties();
     }
 
-    protected static DfDatabaseProperties getDatabaseInfoProperties() {
+    protected static DfDatabaseProperties getDatabaseProperties() {
         return getProperties().getDatabaseProperties();
     }
 
