@@ -45,8 +45,7 @@ public class DfSchemaInitializerSqlServer implements DfSchemaInitializer {
     //                                                                   Initialize Schema
     //                                                                   =================
     public void initializeSchema() {
-        dropForeignKey();
-        dropTable();
+        executeObject();
     }
 
     protected void executeObject() {
