@@ -64,7 +64,7 @@ public class DfSchemaInitializerSqlServer implements DfSchemaInitializer {
         final DfGeneratedSqlExecutor generatedSqlExecutor = createGeneratedSqlExecutor();
         final DfGeneratedSqlExecuteOption option = new DfGeneratedSqlExecuteOption();
         option.setErrorContinue(true);
-        generatedSqlExecutor.execute(getDropTableSql(), "sql", option);
+        generatedSqlExecutor.execute(getTruncateTableSql(), "sql", option);
     }
 
     protected void dropForeignKey() {
