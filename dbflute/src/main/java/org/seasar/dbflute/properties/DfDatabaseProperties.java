@@ -17,6 +17,14 @@ import java.util.Set;
 public final class DfDatabaseProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String OBJECT_TYPE_TABLE = "TABLE";
+    protected static final String OBJECT_TYPE_VIEW = "VIEW";
+    protected static final String OBJECT_TYPE_SYNONYM = "SYNONYM";
+    protected static final String OBJECT_TYPE_ALIAS = "ALIAS";
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
@@ -72,10 +80,20 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return getVairousList("objectTypeTargetList", getDatabaseTypeList());
     }
 
+    public boolean hasObjectTypeSynonym() {
+        List<String> objectTypeList = getObjectTypeTargetList();
+        for (String objectType : objectTypeList) {
+            if (OBJECT_TYPE_SYNONYM.equalsIgnoreCase(objectType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected List<String> getDatabaseTypeList() { // Old Style
         final List<Object> defaultList = new ArrayList<Object>();
-        defaultList.add("TABLE");
-        defaultList.add("VIEW");
+        defaultList.add(OBJECT_TYPE_TABLE);
+        defaultList.add(OBJECT_TYPE_VIEW);
         final List<String> resultList = new ArrayList<String>();
         final List<Object> listProp = listProp("torque.database.type.list", defaultList);
         for (Object object : listProp) {

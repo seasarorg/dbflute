@@ -888,7 +888,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected DfSynonymExtractorFactory createSynonymExtractorFactory() {
         // The schema to extract is only main schema.
         // The synonym extractor may need the set collection for reference table check.
-        return new DfSynonymExtractorFactory(getBasicProperties(), getDataSource(), _schema, _refTableCheckSet);
+        return new DfSynonymExtractorFactory(getBasicProperties(), getDatabaseProperties(), getDataSource(), _schema,
+                _refTableCheckSet);
     }
 
     // ===================================================================================
