@@ -40,6 +40,8 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
+import org.seasar.dbflute.exception.TableDataRegistrationFailureException;
+import org.seasar.dbflute.exception.TableNotFoundException;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.dataset.DataColumn;
 import org.seasar.dbflute.helper.dataset.DataRow;
@@ -726,22 +728,6 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                 }
             };
             return createdState.toString();
-        }
-    }
-
-    protected static class TableNotFoundException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public TableNotFoundException(String msg) {
-            super(msg);
-        }
-    }
-
-    protected static class TableDataRegistrationFailureException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public TableDataRegistrationFailureException(String msg, SQLException e) {
-            super(msg, e);
         }
     }
 
