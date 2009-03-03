@@ -247,6 +247,22 @@ public abstract class DfAbstractTask extends Task {
                 _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
                 return;
             }
+        } else if (getBasicProperties().isDatabaseOracle() && _schema != null) {
+            final Statement statement;
+            try {
+                statement = getDataSource().getConnection().createStatement();
+            } catch (SQLException e) {
+                _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
+                return;
+            }
+            final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + _schema.trim();
+            try {
+                _log.info("...Executing command: " + sql);
+                statement.execute(sql);
+            } catch (SQLException e) {
+                _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
+                return;
+            }
         }
     }
 
