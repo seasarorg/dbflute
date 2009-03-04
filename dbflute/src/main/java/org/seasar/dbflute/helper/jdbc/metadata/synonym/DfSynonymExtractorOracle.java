@@ -323,13 +323,19 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
     }
 
+    /**
+     * Judge where it is sequence synonym or not. <br />
+     * This does not support DB link synonym.
+     * @param synonymMap The map of synonym. (NotNull)
+     * @param conn The connection to database. (NotNull)
+     */
     protected void judgeSequenceSynonym(Map<String, DfSynonymMetaInfo> synonymMap, Connection conn) {
-        final Map<String, Set<String>> ownerTabSetMap = createOwnerTableSetMap(synonymMap);
-        if (ownerTabSetMap.isEmpty()) {
+        final Set<String> ownerSet = createOwnerSet(synonymMap);
+        if (ownerSet.isEmpty()) {
             return;
         }
         final StringBuilder sb = new StringBuilder();
-        for (String owner : ownerTabSetMap.keySet()) {
+        for (String owner : ownerSet) {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
@@ -344,8 +350,9 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             _log.info("...Executing helper SQL:" + ln() + metaDataSql);
             rs = statement.executeQuery(metaDataSql);
             while (rs.next()) {
+                final String sequenceOwner = rs.getString("SEQUENCE_OWNER");
                 final String sequenceName = rs.getString("SEQUENCE_NAME");
-                sequenceNameSet.add(sequenceName);
+                sequenceNameSet.add(sequenceOwner + "." + sequenceName);
             }
         } catch (SQLException continued) {
             String msg = "*Failed to the SQL:" + ln();
@@ -369,14 +376,36 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 }
             }
         }
-        for (String synonymName : synonymMap.keySet()) {
-            final DfSynonymMetaInfo synonym = synonymMap.get(synonymName);
-            if (sequenceNameSet.contains(synonym.getSynonymName())) {
+        for (String synonymKey : synonymMap.keySet()) {
+            final DfSynonymMetaInfo synonym = synonymMap.get(synonymKey);
+            if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
+                continue;
+            }
+            final String tableOwner = synonym.getTableOwner();
+            final String synonymName = synonym.getSynonymName();
+            if (sequenceNameSet.contains(tableOwner + "." + synonymName)) {
                 synonym.setSequenceSynonym(true);
             }
         }
     }
 
+    protected Set<String> createOwnerSet(Map<String, DfSynonymMetaInfo> synonymMap) {
+        final Set<String> ownerSet = new LinkedHashSet<String>();
+        for (DfSynonymMetaInfo synonym : synonymMap.values()) {
+            if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
+                continue;
+            }
+            final String owner = synonym.getTableOwner();
+            ownerSet.add(owner);
+        }
+        return ownerSet;
+    }
+
+    /**
+     * Set up table and column comment. <br />
+     * This does not support DB link synonym.
+     * @param synonymMap The map of synonym. (NotNull)
+     */
     protected void setupTableColumnComment(Map<String, DfSynonymMetaInfo> synonymMap) {
         final Map<String, Set<String>> ownerTabSetMap = createOwnerTableSetMap(synonymMap);
         final Map<String, Map<String, UserTabComments>> ownerTabCommentMap = new LinkedHashMap<String, Map<String, UserTabComments>>();

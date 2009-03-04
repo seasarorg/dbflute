@@ -271,6 +271,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         // * * * * * *
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMetaInfo tableMataInfo = tableList.get(i);
+            if (tableMataInfo.isOutOfGenerateTarget()) {
+                _log.info("$ " + tableMataInfo.getTableName() + " is out of generate target!");
+                continue;
+            }
             _log.info("$ " + tableMataInfo);
 
             final Element tableElement = _doc.createElement("table");
