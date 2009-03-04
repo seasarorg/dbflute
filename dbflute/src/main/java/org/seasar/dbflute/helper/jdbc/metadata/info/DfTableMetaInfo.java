@@ -38,6 +38,8 @@ public class DfTableMetaInfo {
 
     protected boolean _existSameNameTable;
 
+    protected boolean _outOfGenerateTarget;
+
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
@@ -98,6 +100,31 @@ public class DfTableMetaInfo {
     }
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof DfTableMetaInfo) {
+            return getTableName().equals(((DfTableMetaInfo) obj).getTableName());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return getTableName().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        if (_tableSchema != null && _tableSchema.trim().length() != 0) {
+            return _tableSchema + "." + _tableName + "(" + _tableType + "): " + _tableComment;
+        } else {
+            return _tableName + "(" + _tableType + "): " + _tableComment;
+        }
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getTableName() {
@@ -140,28 +167,11 @@ public class DfTableMetaInfo {
         this._existSameNameTable = existSameNameTable;
     }
 
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    @Override
-    public boolean equals(Object obj) {
-        if (obj != null && obj instanceof DfTableMetaInfo) {
-            return getTableName().equals(((DfTableMetaInfo) obj).getTableName());
-        }
-        return false;
+    public boolean isOutOfGenerateTarget() {
+        return _outOfGenerateTarget;
     }
 
-    @Override
-    public int hashCode() {
-        return getTableName().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        if (_tableSchema != null && _tableSchema.trim().length() != 0) {
-            return _tableSchema + "." + _tableName + "(" + _tableType + "): " + _tableComment;
-        } else {
-            return _tableName + "(" + _tableType + "): " + _tableComment;
-        }
+    public void setOutOfGenerateTarget(boolean outOfGenerateTarget) {
+        this._outOfGenerateTarget = outOfGenerateTarget;
     }
 }

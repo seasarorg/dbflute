@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -152,6 +153,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 synonymMap.put(synonymName, info);
             }
             translateFKTable(synonymMap); // It translates foreign key meta informations. 
+            judgeSequenceSynonym(synonymMap, conn);
             setupTableColumnComment(synonymMap);
             return synonymMap;
         } catch (SQLException e) {
@@ -321,20 +323,64 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
     }
 
+    protected void judgeSequenceSynonym(Map<String, DfSynonymMetaInfo> synonymMap, Connection conn) {
+        final Set<String> sequenceNameSet = new HashSet<String>();
+        final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + _schema + "'";
+        Statement statement = null;
+        ResultSet rs = null;
+        try {
+            statement = conn.createStatement();
+            _log.info("...Executing helper SQL:" + ln() + metaDataSql);
+            rs = statement.executeQuery(metaDataSql);
+            while (rs.next()) {
+                final String sequenceName = rs.getString("SEQUENCE_NAME");
+                sequenceNameSet.add(sequenceName);
+            }
+        } catch (SQLException continued) {
+            String msg = "*Failed to the SQL:" + ln();
+            msg = msg + (continued.getMessage() != null ? continued.getMessage() : null) + ln();
+            msg = msg + metaDataSql;
+            _log.info(metaDataSql);
+            return;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ignored) {
+                    _log.info("statement.close() threw the exception!", ignored);
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                    _log.info("rs.close() threw the exception!", ignored);
+                }
+            }
+        }
+        for (String synonymName : synonymMap.keySet()) {
+            final DfSynonymMetaInfo synonym = synonymMap.get(synonymName);
+            if (sequenceNameSet.contains(synonym.getSynonymName())) {
+                synonym.setSequenceSynonym(true);
+            }
+        }
+    }
+
     protected void setupTableColumnComment(Map<String, DfSynonymMetaInfo> synonymMap) {
         final Map<String, Set<String>> ownerTabSetMap = new LinkedHashMap<String, Set<String>>();
         for (DfSynonymMetaInfo synonym : synonymMap.values()) {
-            final String tableOwner = synonym.getTableOwner();
+            final String owner = synonym.getTableOwner();
             if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
                 continue;
             }
-            Set<String> tableSet = ownerTabSetMap.get(tableOwner);
+            Set<String> tableSet = ownerTabSetMap.get(owner);
             if (tableSet == null) {
                 tableSet = new LinkedHashSet<String>();
-                ownerTabSetMap.put(tableOwner, tableSet);
+                ownerTabSetMap.put(owner, tableSet);
             }
             tableSet.add(synonym.getTableName());
         }
+
         final Map<String, Map<String, UserTabComments>> ownerTabCommentMap = new LinkedHashMap<String, Map<String, UserTabComments>>();
         final Map<String, Map<String, Map<String, UserColComments>>> ownerTabColCommentMap = new LinkedHashMap<String, Map<String, Map<String, UserColComments>>>();
         final Set<String> ownerSet = ownerTabSetMap.keySet();
@@ -346,6 +392,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             ownerTabCommentMap.put(owner, tabCommentMap);
             ownerTabColCommentMap.put(owner, tabColCommentMap);
         }
+
         for (DfSynonymMetaInfo synonym : synonymMap.values()) {
             final String owner = synonym.getTableOwner();
             final String tableName = synonym.getTableName();

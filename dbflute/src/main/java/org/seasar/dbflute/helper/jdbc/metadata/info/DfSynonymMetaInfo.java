@@ -42,6 +42,7 @@ public class DfSynonymMetaInfo {
     protected String dbLinkName;
     protected String tableComment;
     protected Map<String, UserColComments> columnCommentMap;
+    protected boolean sequenceSynonym;
 
     // ===================================================================================
     //                                                                       Determination
@@ -168,5 +169,13 @@ public class DfSynonymMetaInfo {
 
     public void setColumnCommentMap(Map<String, UserColComments> columnCommentMap) {
         this.columnCommentMap = columnCommentMap;
+    }
+
+    public boolean isSequenceSynonym() {
+        return sequenceSynonym;
+    }
+
+    public void setSequenceSynonym(boolean sequenceSynonym) {
+        this.sequenceSynonym = sequenceSynonym;
     }
 }

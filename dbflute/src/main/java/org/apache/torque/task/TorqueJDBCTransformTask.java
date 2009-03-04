@@ -260,7 +260,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         loadSynonymInfoIfNeeds();
 
         // This should be after loading synonyms so it is executed at this timing!
-        helpSynonymTableComments(tableList);
+        processSynonymTable(tableList);
 
         // Create database node. (The beginning of schema XML!)
         _databaseNode = _doc.createElement("database");
@@ -563,7 +563,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 for (DfTableMetaInfo table : tableList) {
                     table.acceptTableComment(tableCommentMap);
 
-                    // *Synonym Helping is after loading synonyms.
+                    // *Synonym Processing is after loading synonyms.
                 }
             } catch (RuntimeException ignored) {
                 _log.debug("Failed to extract table comments: extractor=" + extractor, ignored);
@@ -578,7 +578,32 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
     }
 
-    protected void helpSynonymTableComments(List<DfTableMetaInfo> tableList) { // should be executed after loading synonyms
+    // /= = = = = = = = = = = = = = = = = = = = = = = =
+    // These should be executed after loading synonyms
+    // = = = = = = = = = =/
+
+    /**
+     * Process helper execution about synonym table. <br />
+     * This should be executed after loading synonyms!
+     * @param tableList The list of meta information of table. (NotNull)
+     */
+    protected void processSynonymTable(List<DfTableMetaInfo> tableList) {
+        judgeSequenceSynonym(tableList);
+        helpSynonymTableComments(tableList);
+    }
+
+    protected void judgeSequenceSynonym(List<DfTableMetaInfo> tableList) {
+        for (DfTableMetaInfo table : tableList) {
+            if (canHandleSynonym(table)) {
+                DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
+                if (synonym != null && synonym.isSequenceSynonym()) {
+                    table.setOutOfGenerateTarget(true);
+                }
+            }
+        }
+    }
+
+    protected void helpSynonymTableComments(List<DfTableMetaInfo> tableList) {
         for (DfTableMetaInfo table : tableList) {
             if (canHandleSynonym(table) && !table.hasTableComment()) {
                 DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
