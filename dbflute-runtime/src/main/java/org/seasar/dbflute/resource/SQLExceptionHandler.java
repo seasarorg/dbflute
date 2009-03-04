@@ -29,14 +29,14 @@ import org.seasar.dbflute.util.DfSystemUtil;
  * @author jflute
  */
 public class SQLExceptionHandler {
-    
+
     /**
      * @param e The instance of SQLException. (NotNull)
      */
     public void handleSQLException(SQLException e) {
         handleSQLException(e, null, false);
     }
-    
+
     /**
      * @param e The instance of SQLException. (NotNull)
      * @param statement The instance of statement. (Nullable)
@@ -78,19 +78,19 @@ public class SQLExceptionHandler {
         msg = msg + "[ErrorCode]" + ln() + e.getErrorCode() + ln();
         msg = msg + ln();
         msg = msg + "[SQLException]" + ln() + e.getClass().getName() + ln();
-        msg = msg + e.getMessage() + ln();
+        msg = msg + extractMessage(e) + ln();
         SQLException nextEx = e.getNextException();
         if (nextEx != null) {
             msg = msg + ln();
             msg = msg + "[NextException]" + ln();
             msg = msg + nextEx.getClass().getName() + ln();
-            msg = msg + nextEx.getMessage() + ln();
+            msg = msg + extractMessage(nextEx) + ln();
             SQLException nextNextEx = nextEx.getNextException();
             if (nextNextEx != null) {
                 msg = msg + ln();
                 msg = msg + "[NextNextException]" + ln();
                 msg = msg + nextNextEx.getClass().getName() + ln();
-                msg = msg + nextNextEx.getMessage() + ln();
+                msg = msg + extractMessage(nextNextEx) + ln();
             }
         }
         Object invokeName = extractBehaviorInvokeName();
@@ -145,19 +145,19 @@ public class SQLExceptionHandler {
         msg = msg + "[ErrorCode]" + ln() + e.getErrorCode() + ln();
         msg = msg + ln();
         msg = msg + "[SQLException]" + ln() + e.getClass().getName() + ln();
-        msg = msg + e.getMessage() + ln();
+        msg = msg + extractMessage(e) + ln();
         SQLException nextEx = e.getNextException();
         if (nextEx != null) {
             msg = msg + ln();
             msg = msg + "[NextException]" + ln();
             msg = msg + nextEx.getClass().getName() + ln();
-            msg = msg + nextEx.getMessage() + ln();
+            msg = msg + extractMessage(nextEx) + ln();
             SQLException nextNextEx = nextEx.getNextException();
             if (nextNextEx != null) {
                 msg = msg + ln();
                 msg = msg + "[NextNextException]" + ln();
                 msg = msg + nextNextEx.getClass().getName() + ln();
-                msg = msg + nextNextEx.getMessage() + ln();
+                msg = msg + extractMessage(nextNextEx) + ln();
             }
         }
         Object invokeName = extractBehaviorInvokeName();
@@ -197,6 +197,13 @@ public class SQLExceptionHandler {
         }
         msg = msg + "* * * * * * * * * */";
         throw new SQLFailureException(msg, e);
+    }
+
+    protected String extractMessage(SQLException e) {
+        String message = e.getMessage();
+
+        // Because a message of Oracle contains a line separator.
+        return message != null ? message.trim() : message;
     }
 
     protected String extractSQLState(SQLException e) {

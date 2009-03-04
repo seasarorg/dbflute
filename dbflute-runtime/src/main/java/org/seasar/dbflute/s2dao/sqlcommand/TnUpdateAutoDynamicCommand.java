@@ -21,6 +21,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.XLog;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -32,28 +33,29 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateAutoHandler;
  */
 public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** The result for no update as normal execution. */
     private static final Integer NO_UPDATE = new Integer(1);
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     private TnBeanMetaData beanMetaData;
+    private DBMeta targetDBMeta;
     private String[] propertyNames;
     private boolean optimisticLockHandling;
     private boolean versionNoAutoIncrementOnMemory;
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnUpdateAutoDynamicCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) {
@@ -80,7 +82,8 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     }
 
     protected TnUpdateAutoHandler createInternalUpdateAutoHandler(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
-        TnUpdateAutoHandler handler = new TnUpdateAutoHandler(getDataSource(), getStatementFactory(), bmd, propertyTypes);
+        TnUpdateAutoHandler handler = new TnUpdateAutoHandler(getDataSource(), getStatementFactory(), bmd,
+                propertyTypes);
         handler.setOptimisticLockHandling(optimisticLockHandling); // [DBFlute-0.8.0]
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
         return handler;
@@ -112,7 +115,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 
     protected String createNoUpdateLogMessage(final Object bean, final TnBeanMetaData bmd) {
         final StringBuffer sb = new StringBuffer();
-        sb.append("skip UPDATE: table=").append(bmd.getTableName());
+        sb.append("skip UPDATE: table=").append(targetDBMeta.getTableSqlName());
         final int size = bmd.getPrimaryKeySize();
         for (int i = 0; i < size; i++) {
             if (i == 0) {
@@ -140,12 +143,12 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
      */
     protected String createUpdateSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes, Object bean) {
         if (bmd.getPrimaryKeySize() == 0) {
-            String msg = "The table '" + bmd.getTableName() + "' does not have primary keys!";
+            String msg = "The table '" + targetDBMeta.getTableSqlName() + "' does not have primary keys!";
             throw new IllegalStateException(msg);
         }
         final StringBuilder sb = new StringBuilder(100);
         sb.append("update ");
-        sb.append(bmd.getTableName());
+        sb.append(targetDBMeta.getTableSqlName());
         sb.append(" set ");
         final String versionNoPropertyName = bmd.getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; ++i) {
@@ -183,6 +186,10 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         return sb.toString();
     }
 
+    protected void setupVersionNoAutoIncrementOnQuery(StringBuilder sb, String columnName) {
+        sb.append(columnName).append(" = ").append(columnName).append(" + 1");
+    }
+
     // ===================================================================================
     //                                                                  Execute Status Log
     //                                                                  ==================
@@ -197,24 +204,20 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    protected boolean isVersionNoAutoIncrementOnMemory() {
-        return versionNoAutoIncrementOnMemory;
-    }
-
-    public void setVersionNoAutoIncrementOnMemory(boolean versionNoAutoIncrementOnMemory) {
-        this.versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
-    }
-    
-    protected void setupVersionNoAutoIncrementOnQuery(StringBuilder sb, String columnName) {
-        sb.append(columnName).append(" = ").append(columnName).append(" + 1");
-    }
-
     public TnBeanMetaData getBeanMetaData() {
         return beanMetaData;
     }
 
     public void setBeanMetaData(TnBeanMetaData beanMetaData) {
         this.beanMetaData = beanMetaData;
+    }
+
+    public DBMeta getTargetDBMeta() {
+        return targetDBMeta;
+    }
+
+    public void setTargetDBMeta(DBMeta targetDBMeta) {
+        this.targetDBMeta = targetDBMeta;
     }
 
     public String[] getPropertyNames() {
@@ -227,5 +230,13 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 
     public void setOptimisticLockHandling(boolean optimisticLockHandling) {
         this.optimisticLockHandling = optimisticLockHandling;
+    }
+
+    protected boolean isVersionNoAutoIncrementOnMemory() {
+        return versionNoAutoIncrementOnMemory;
+    }
+
+    public void setVersionNoAutoIncrementOnMemory(boolean versionNoAutoIncrementOnMemory) {
+        this.versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
     }
 }

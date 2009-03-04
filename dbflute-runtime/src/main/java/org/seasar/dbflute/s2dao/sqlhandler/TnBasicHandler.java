@@ -93,7 +93,7 @@ public class TnBasicHandler {
         if (valueType != null) {
             return valueType;
         }
-        String msg = "Unknown type：argType=" + argType + " args=" + arg;
+        String msg = "Unknown type: argType=" + argType + " args=" + arg;
         throw new IllegalStateException(msg);
     }
 

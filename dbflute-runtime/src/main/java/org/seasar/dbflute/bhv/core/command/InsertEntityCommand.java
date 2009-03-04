@@ -24,7 +24,6 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlcommand.TnInsertAutoDynamicCommand;
 
-
 /**
  * @author jflute
  */
@@ -61,10 +60,11 @@ public class InsertEntityCommand extends AbstractEntityCommand {
 
     protected TnInsertAutoDynamicCommand createInsertAutoDynamicCommand(TnBeanMetaData bmd, String[] propertyNames) {
         final TnInsertAutoDynamicCommand cmd = new TnInsertAutoDynamicCommand();
-        cmd.setBeanMetaData(bmd);
         cmd.setDataSource(_dataSource);
-        cmd.setPropertyNames(propertyNames);
         cmd.setStatementFactory(_statementFactory);
+        cmd.setBeanMetaData(bmd);
+        cmd.setTargetDBMeta(findDBMeta());
+        cmd.setPropertyNames(propertyNames);
         return cmd;
     }
 
@@ -89,6 +89,6 @@ public class InsertEntityCommand extends AbstractEntityCommand {
         }
         columnValuesSb.delete(0, ", ".length()).insert(0, "(").append(")");
         final String sql = "insert into " + dbmeta.getTableSqlName() + columnDefSb + " values" + columnValuesSb;
-        return createUpdateDynamicCommand(new String[]{"dto"}, new Class<?>[]{ _entityType }, sql);
+        return createUpdateDynamicCommand(new String[] { "dto" }, new Class<?>[] { _entityType }, sql);
     }
 }

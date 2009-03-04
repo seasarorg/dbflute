@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
@@ -29,37 +30,38 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnDeleteBatchAutoHandler;
  */
 public class TnDeleteBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnDeleteBatchAutoStaticCommand(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData, String[] propertyNames, boolean optimisticLockHandling) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames, optimisticLockHandling, false);
+    public TnDeleteBatchAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling) {
+        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling, false);
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-	@Override
+    @Override
     protected TnAbstractAutoHandler createAutoHandler() {
         return createBatchAutoHandler();
     }
 
-	@Override
+    @Override
     protected TnAbstractBatchAutoHandler createBatchAutoHandler() {
         return newInternalBatchAutoHandler();
     }
 
     protected TnDeleteBatchAutoHandler newInternalBatchAutoHandler() {
-        return new TnDeleteBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+        return new TnDeleteBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(),
+                getPropertyTypes());
     }
 
-	@Override
+    @Override
     protected void setupSql() {
         setupDeleteSql();
     }
 
-	@Override
+    @Override
     protected void setupPropertyTypes(String[] propertyNames) {
         setupDeletePropertyTypes(propertyNames);
     }

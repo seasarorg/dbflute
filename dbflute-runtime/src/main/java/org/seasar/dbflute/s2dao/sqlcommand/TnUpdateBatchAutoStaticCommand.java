@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
@@ -29,24 +30,25 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateBatchAutoHandler;
  */
 public class TnUpdateBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnUpdateBatchAutoStaticCommand(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            String[] propertyNames, boolean optimisticLockHandling, boolean versionNoAutoIncrementOnMemory) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames, optimisticLockHandling, versionNoAutoIncrementOnMemory);
+    public TnUpdateBatchAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
+            boolean versionNoAutoIncrementOnMemory) {
+        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling,
+                versionNoAutoIncrementOnMemory);
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-	@Override
+    @Override
     protected TnAbstractAutoHandler createAutoHandler() {
         return createBatchAutoHandler();
     }
 
-	@Override
+    @Override
     protected TnAbstractBatchAutoHandler createBatchAutoHandler() {
         TnUpdateBatchAutoHandler handler = newInternalBatchAutoHandler();
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
@@ -54,15 +56,16 @@ public class TnUpdateBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCom
     }
 
     protected TnUpdateBatchAutoHandler newInternalBatchAutoHandler() {
-        return new TnUpdateBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+        return new TnUpdateBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(),
+                getPropertyTypes());
     }
 
-	@Override
+    @Override
     protected void setupSql() {
         setupUpdateSql();
     }
 
-	@Override
+    @Override
     protected void setupPropertyTypes(String[] propertyNames) {
         setupUpdatePropertyTypes(propertyNames);
     }

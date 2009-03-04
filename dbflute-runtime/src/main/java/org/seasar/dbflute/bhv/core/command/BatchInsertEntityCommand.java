@@ -17,9 +17,9 @@ package org.seasar.dbflute.bhv.core.command;
 
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlcommand.TnInsertBatchAutoStaticCommand;
-
 
 /**
  * @author jflute
@@ -51,7 +51,9 @@ public class BatchInsertEntityCommand extends AbstractListEntityCommand {
         return createInsertBatchAutoStaticCommand(bmd, propertyNames);
     }
 
-    protected TnInsertBatchAutoStaticCommand createInsertBatchAutoStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        return new TnInsertBatchAutoStaticCommand(_dataSource, _statementFactory, bmd, propertyNames);
+    protected TnInsertBatchAutoStaticCommand createInsertBatchAutoStaticCommand(TnBeanMetaData bmd,
+            String[] propertyNames) {
+        final DBMeta dbmeta = findDBMeta();
+        return new TnInsertBatchAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames);
     }
 }

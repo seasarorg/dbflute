@@ -21,6 +21,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.bhv.core.SqlExecution;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -36,10 +37,11 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected DataSource dataSource;
-    protected StatementFactory statementFactory;
-    protected TnBeanMetaData beanMetaData;
-    protected String[] propertyNames;
+    private DataSource dataSource;
+    private StatementFactory statementFactory;
+    private TnBeanMetaData beanMetaData;
+    private DBMeta targetDBMeta;
+    private String[] propertyNames;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -55,8 +57,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
         final TnBeanMetaData bmd = getBeanMetaData();
         final TnPropertyType[] propertyTypes = createInsertPropertyTypes(bmd, bean, getPropertyNames());
         final String sql = createInsertSql(bmd, propertyTypes);
-        final TnInsertAutoHandler handler = new TnInsertAutoHandler(getDataSource(), getStatementFactory(),
-                bmd, propertyTypes);
+        final TnInsertAutoHandler handler = createInsertAutoHandler(bmd, propertyTypes);
         handler.setSql(sql);
         handler.setLoggingMessageSqlArgs(args);
         final int rows = handler.execute(args);
@@ -66,7 +67,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
     protected String createInsertSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
         StringBuffer buf = new StringBuffer(100);
         buf.append("insert into ");
-        buf.append(bmd.getTableName());
+        buf.append(targetDBMeta.getTableSqlName());
         buf.append(" (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             TnPropertyType pt = propertyTypes[i];
@@ -85,6 +86,10 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
         }
         buf.append(")");
         return buf.toString();
+    }
+
+    protected TnInsertAutoHandler createInsertAutoHandler(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
+        return new TnInsertAutoHandler(dataSource, statementFactory, bmd, propertyTypes);
     }
 
     protected TnPropertyType[] createInsertPropertyTypes(TnBeanMetaData bmd, Object bean, String[] propertyNames) {
@@ -147,6 +152,14 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
 
     public void setBeanMetaData(TnBeanMetaData beanMetaData) {
         this.beanMetaData = beanMetaData;
+    }
+
+    public DBMeta getTargetDBMeta() {
+        return targetDBMeta;
+    }
+
+    public void setTargetDBMeta(DBMeta targetDBMeta) {
+        this.targetDBMeta = targetDBMeta;
     }
 
     protected String[] getPropertyNames() {

@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
@@ -27,16 +28,17 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractBatchAutoHandler;
  */
 public abstract class TnAbstractBatchAutoStaticCommand extends TnAbstractAutoStaticCommand {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractBatchAutoStaticCommand(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            String[] propertyNames, boolean optimisticLockHandling, boolean versionNoAutoIncrementOnMemory) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames, optimisticLockHandling, versionNoAutoIncrementOnMemory);
+    public TnAbstractBatchAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
+            boolean versionNoAutoIncrementOnMemory) {
+        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, optimisticLockHandling,
+                versionNoAutoIncrementOnMemory);
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
     @Override
@@ -44,8 +46,8 @@ public abstract class TnAbstractBatchAutoStaticCommand extends TnAbstractAutoSta
         final TnAbstractBatchAutoHandler handler = createBatchAutoHandler();
         handler.setOptimisticLockHandling(optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
-		handler.setSql(getSql());
-		// The logging message SQL of procedure is unnecessary.
+        handler.setSql(getSql());
+        // The logging message SQL of procedure is unnecessary.
         // handler.setLoggingMessageSqlArgs(args);
         return handler.executeBatch(args);
     }

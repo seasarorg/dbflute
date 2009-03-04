@@ -17,6 +17,7 @@ package org.seasar.dbflute.bhv.core.command;
 
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateBatchAutoStaticCommand;
 
@@ -52,8 +53,9 @@ public class BatchUpdateEntityCommand extends AbstractListEntityCommand {
     }
 
     protected TnUpdateBatchAutoStaticCommand createUpdateBatchAutoStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        boolean opt = isOptimisticLockHandling();
-        return new TnUpdateBatchAutoStaticCommand(_dataSource, _statementFactory, bmd, propertyNames, opt, opt);
+        final DBMeta dbmeta = findDBMeta();
+        final boolean opt = isOptimisticLockHandling();
+        return new TnUpdateBatchAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmeta, propertyNames, opt, opt);
     }
 
     protected boolean isOptimisticLockHandling() {

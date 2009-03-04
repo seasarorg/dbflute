@@ -17,9 +17,9 @@ package org.seasar.dbflute.bhv.core.command;
 
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlcommand.TnDeleteAutoStaticCommand;
-
 
 /**
  * @author jflute
@@ -52,7 +52,9 @@ public class DeleteEntityCommand extends AbstractEntityCommand {
     }
 
     protected TnDeleteAutoStaticCommand createDeleteAutoStaticCommand(TnBeanMetaData bmd, String[] propertyNames) {
-        return new TnDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, propertyNames, isOptimisticLockHandling());
+        final DBMeta dbmata = findDBMeta();
+        final boolean opt = isOptimisticLockHandling();
+        return new TnDeleteAutoStaticCommand(_dataSource, _statementFactory, bmd, dbmata, propertyNames, opt);
     }
 
     protected boolean isOptimisticLockHandling() {

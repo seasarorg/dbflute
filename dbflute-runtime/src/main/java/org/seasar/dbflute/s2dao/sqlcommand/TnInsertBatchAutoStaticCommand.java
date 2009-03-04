@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
@@ -29,34 +30,34 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnInsertBatchAutoHandler;
  */
 public class TnInsertBatchAutoStaticCommand extends TnAbstractBatchAutoStaticCommand {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnInsertBatchAutoStaticCommand(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            String[] propertyNames) {
-        super(dataSource, statementFactory, beanMetaData, propertyNames, false, false);
+    public TnInsertBatchAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames) {
+        super(dataSource, statementFactory, beanMetaData, targetDBMeta, propertyNames, false, false);
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-	@Override
+    @Override
     protected TnAbstractAutoHandler createAutoHandler() {
         return createBatchAutoHandler();
     }
 
-	@Override
+    @Override
     protected TnAbstractBatchAutoHandler createBatchAutoHandler() {
-        return new TnInsertBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(), getPropertyTypes());
+        return new TnInsertBatchAutoHandler(getDataSource(), getStatementFactory(), getBeanMetaData(),
+                getPropertyTypes());
     }
 
-	@Override
+    @Override
     protected void setupSql() {
         setupInsertSql();
     }
 
-	@Override
+    @Override
     protected void setupPropertyTypes(String[] propertyNames) {
         setupInsertPropertyTypes(propertyNames);
     }

@@ -54,6 +54,7 @@ public class UpdateEntityCommand extends AbstractEntityCommand {
     protected TnUpdateModifiedOnlyCommand createUpdateModifiedOnlyCommand(TnBeanMetaData bmd, String[] propertyNames) {
         final TnUpdateModifiedOnlyCommand cmd = new TnUpdateModifiedOnlyCommand(_dataSource, _statementFactory);
         cmd.setBeanMetaData(bmd);// Extension Point!
+        cmd.setTargetDBMeta(findDBMeta());
         cmd.setPropertyNames(propertyNames);
         cmd.setOptimisticLockHandling(isOptimisticLockHandling());
         cmd.setVersionNoAutoIncrementOnMemory(isOptimisticLockHandling());

@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
@@ -34,27 +35,29 @@ import org.seasar.dbflute.s2dao.sqlhandler.TnAbstractAutoHandler;
  */
 public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticCommand {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    private DBMeta targetDBMeta;
     private TnPropertyType[] propertyTypes;
     protected boolean optimisticLockHandling;
     protected boolean versionNoAutoIncrementOnMemory;
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractAutoStaticCommand(DataSource dataSource
-            , StatementFactory statementFactory, TnBeanMetaData beanMetaData, String[] propertyNames
-            , boolean optimisticLockHandling, boolean versionNoAutoIncrementOnMemory) {
+    public TnAbstractAutoStaticCommand(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, DBMeta targetDBMeta, String[] propertyNames, boolean optimisticLockHandling,
+            boolean versionNoAutoIncrementOnMemory) {
         super(dataSource, statementFactory, beanMetaData);
+        this.targetDBMeta = targetDBMeta;
         this.optimisticLockHandling = optimisticLockHandling;
         this.versionNoAutoIncrementOnMemory = versionNoAutoIncrementOnMemory;
         setupPropertyTypes(propertyNames);
         setupSql();
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
     public Object execute(Object[] args) { // NOT for Batch. Batch should override.
@@ -126,10 +129,9 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
     protected abstract void setupSql();
 
     protected void setupInsertSql() {
-        TnBeanMetaData bmd = getBeanMetaData();
         StringBuilder sb = new StringBuilder(100);
         sb.append("insert into ");
-        sb.append(bmd.getTableName());
+        sb.append(targetDBMeta.getTableSqlName());
         sb.append(" (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             TnPropertyType pt = propertyTypes[i];
@@ -155,7 +157,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         checkPrimaryKey();
         StringBuilder sb = new StringBuilder(100);
         sb.append("update ");
-        sb.append(getBeanMetaData().getTableName());
+        sb.append(targetDBMeta.getTableSqlName());
         sb.append(" set ");
         String versionNoPropertyName = getBeanMetaData().getVersionNoPropertyName();
         for (int i = 0; i < propertyTypes.length; ++i) {
@@ -175,7 +177,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         checkPrimaryKey();
         final StringBuilder sb = new StringBuilder(100);
         sb.append("delete from ");
-        sb.append(getBeanMetaData().getTableName());
+        sb.append(targetDBMeta.getTableSqlName());
         setupUpdateWhere(sb);
         setSql(sb.toString());
     }
