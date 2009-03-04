@@ -334,15 +334,15 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         if (ownerSet.isEmpty()) {
             return;
         }
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder inSb = new StringBuilder();
         for (String owner : ownerSet) {
-            if (sb.length() > 0) {
-                sb.append(", ");
+            if (inSb.length() > 0) {
+                inSb.append(", ");
             }
-            sb.append("'").append(owner).append("'");
+            inSb.append("'").append(owner).append("'");
         }
         final Set<String> sequenceNameSet = new HashSet<String>();
-        final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER in (" + sb.toString() + ")";
+        final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER in (" + inSb.toString() + ")";
         Statement statement = null;
         ResultSet rs = null;
         try {
@@ -376,14 +376,17 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 }
             }
         }
+        final StringBuilder logSb = new StringBuilder();
+        logSb.append("...Judging sequence synonym: ");
+        logSb.append(ln()).append("[Sequence Synonym]");
         for (String synonymKey : synonymMap.keySet()) {
             final DfSynonymMetaInfo synonym = synonymMap.get(synonymKey);
             if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
                 continue;
             }
-            final String tableOwner = synonym.getTableOwner();
-            final String synonymName = synonym.getSynonymName();
-            if (sequenceNameSet.contains(tableOwner + "." + synonymName)) {
+            final String name = synonym.getTableOwner() + "." + synonym.getSynonymName();
+            if (sequenceNameSet.contains(name)) {
+                logSb.append(" " + name);
                 synonym.setSequenceSynonym(true);
             }
         }

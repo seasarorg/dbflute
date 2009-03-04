@@ -64,7 +64,7 @@ map:{
     #
     #; skipSheet = P.+
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o filterVariablesMap (NotRequired - Default 'map:{}')
     # You can specify the filter variables for DDL.
@@ -84,24 +84,24 @@ map:{
     #    }
     #}
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressTruncateTable (NotRequired - Default 'false')
     # You can suppress truncating tables at initializing schema.
     # 
     #; isSuppressTruncateTable = true
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropForeignKey (NotRequired - Default 'false')
-    # You can suppress droping foreign keys at initializing schema.
+    # You can suppress dropping foreign keys at initializing schema.
     # 
     #; isSuppressDropForeignKey = true
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropTable (NotRequired - Default 'false')
-    # You can suppress droping tables at initializing schema.
+    # You can suppress dropping tables at initializing schema.
     # 
     #; isSuppressDropTable = true
     # - - - - - - - - - -/
