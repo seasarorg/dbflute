@@ -88,19 +88,19 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             msg = msg + "[ErrorCode]" + ln() + e.getErrorCode() + ln();
             msg = msg + ln();
             msg = msg + "[SQLException]" + ln() + e.getClass().getName() + ln();
-            msg = msg + (e.getMessage() != null ? e.getMessage().trim() : null) + ln();
+            msg = msg + extractMessage(e) + ln();
             SQLException nextEx = e.getNextException();
             if (nextEx != null) {
                 msg = msg + ln();
                 msg = msg + "[NextException]" + ln();
                 msg = msg + nextEx.getClass().getName() + ln();
-                msg = msg + (nextEx.getMessage() != null ? nextEx.getMessage().trim() : null) + ln();
+                msg = msg + extractMessage(nextEx) + ln();
                 SQLException nextNextEx = nextEx.getNextException();
                 if (nextNextEx != null) {
                     msg = msg + ln();
                     msg = msg + "[NextNextException]" + ln();
                     msg = msg + nextNextEx.getClass().getName() + ln();
-                    msg = msg + (nextNextEx.getMessage() != null ? nextNextEx.getMessage().trim() : null) + ln();
+                    msg = msg + extractMessage(nextNextEx) + ln();
                 }
             }
             msg = msg + "* * * * * * * * * */";
@@ -112,15 +112,15 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         StringBuilder sb = new StringBuilder();
         sb.append("*Failed to execute:").append(e.getClass().getName()).append(ln());
         sb.append("/* * * * * * * * * * * * * * * * * * * * * * * * * *").append(ln());
-        sb.append(e.getMessage() != null ? e.getMessage().trim() : null).append(ln());
+        sb.append(extractMessage(e)).append(ln());
         SQLException nextEx = e.getNextException();
         if (nextEx != null) {
             sb.append("- - - - - - - - ").append(ln());
-            sb.append(nextEx.getMessage() != null ? nextEx.getMessage().trim() : null).append(ln());
+            sb.append(extractMessage(nextEx)).append(ln());
             SQLException nextNextEx = nextEx.getNextException();
             if (nextNextEx != null) {
                 sb.append("- - - - - - - - ").append(ln());
-                sb.append(nextNextEx.getMessage() != null ? nextNextEx.getMessage().trim() : null).append(ln());
+                sb.append(extractMessage(nextNextEx)).append(ln());
             }
         }
         sb.append("= = = = = = = =").append(ln());
@@ -129,8 +129,15 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         _log.warn(sb.toString());
     }
 
+    protected String extractMessage(SQLException e) {
+        String message = e.getMessage();
+        
+        // Because a message of Oracle contains a line separator.
+        return message != null ? message.trim() : message;
+    }
+
     protected boolean isValidAssertSql() {
-        return false;// as default!
+        return false; // as default!
     }
 
     protected boolean isAssertCountZero(String sql) {
