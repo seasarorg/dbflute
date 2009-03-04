@@ -40,9 +40,9 @@ public class DfSynonymMetaInfo {
     protected Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap;
     protected Map<String, Map<Integer, String>> indexMap;
     protected String dbLinkName;
+    protected boolean sequenceSynonym;
     protected String tableComment;
     protected Map<String, UserColComments> columnCommentMap;
-    protected boolean sequenceSynonym;
 
     // ===================================================================================
     //                                                                       Determination
@@ -68,8 +68,8 @@ public class DfSynonymMetaInfo {
                 + (columnMetaInfoList != null ? "(" + columnMetaInfoList.size() + " columns)" : "") + ", "
                 + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
                 + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
-                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + ", " + tableComment
-                + "}";
+                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null)
+                + (sequenceSynonym ? ", SEQ" : ", ") + tableComment + "}";
     }
 
     // ===================================================================================
@@ -155,6 +155,14 @@ public class DfSynonymMetaInfo {
         this.dbLinkName = dbLinkName;
     }
 
+    public boolean isSequenceSynonym() {
+        return sequenceSynonym;
+    }
+
+    public void setSequenceSynonym(boolean sequenceSynonym) {
+        this.sequenceSynonym = sequenceSynonym;
+    }
+
     public String getTableComment() {
         return tableComment;
     }
@@ -169,13 +177,5 @@ public class DfSynonymMetaInfo {
 
     public void setColumnCommentMap(Map<String, UserColComments> columnCommentMap) {
         this.columnCommentMap = columnCommentMap;
-    }
-
-    public boolean isSequenceSynonym() {
-        return sequenceSynonym;
-    }
-
-    public void setSequenceSynonym(boolean sequenceSynonym) {
-        this.sequenceSynonym = sequenceSynonym;
     }
 }
