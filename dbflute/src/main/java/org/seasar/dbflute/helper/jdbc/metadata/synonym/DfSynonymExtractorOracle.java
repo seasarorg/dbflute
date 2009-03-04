@@ -385,7 +385,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
                 continue;
             }
-            final String name = synonym.getTableOwner() + "." + synonym.getSynonymName();
+            final String name = synonym.getTableOwner() + "." + synonym.getTableName();
             if (sequenceNameSet.contains(name)) {
                 exists = true;
                 logSb.append(ln()).append(" " + name);
