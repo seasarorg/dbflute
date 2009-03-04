@@ -324,8 +324,19 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     }
 
     protected void judgeSequenceSynonym(Map<String, DfSynonymMetaInfo> synonymMap, Connection conn) {
+        final Map<String, Set<String>> ownerTabSetMap = createOwnerTableSetMap(synonymMap);
+        if (ownerTabSetMap.isEmpty()) {
+            return;
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (String owner : ownerTabSetMap.keySet()) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("'").append(owner).append("'");
+        }
         final Set<String> sequenceNameSet = new HashSet<String>();
-        final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + _schema + "'";
+        final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER in (" + sb.toString() + ")";
         Statement statement = null;
         ResultSet rs = null;
         try {
@@ -367,20 +378,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     }
 
     protected void setupTableColumnComment(Map<String, DfSynonymMetaInfo> synonymMap) {
-        final Map<String, Set<String>> ownerTabSetMap = new LinkedHashMap<String, Set<String>>();
-        for (DfSynonymMetaInfo synonym : synonymMap.values()) {
-            final String owner = synonym.getTableOwner();
-            if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
-                continue;
-            }
-            Set<String> tableSet = ownerTabSetMap.get(owner);
-            if (tableSet == null) {
-                tableSet = new LinkedHashSet<String>();
-                ownerTabSetMap.put(owner, tableSet);
-            }
-            tableSet.add(synonym.getTableName());
-        }
-
+        final Map<String, Set<String>> ownerTabSetMap = createOwnerTableSetMap(synonymMap);
         final Map<String, Map<String, UserTabComments>> ownerTabCommentMap = new LinkedHashMap<String, Map<String, UserTabComments>>();
         final Map<String, Map<String, Map<String, UserColComments>>> ownerTabColCommentMap = new LinkedHashMap<String, Map<String, Map<String, UserColComments>>>();
         final Set<String> ownerSet = ownerTabSetMap.keySet();
@@ -418,6 +416,23 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         extractor.setDataSource(_dataSource);
         extractor.setSchema(schema);
         return extractor;
+    }
+
+    protected Map<String, Set<String>> createOwnerTableSetMap(Map<String, DfSynonymMetaInfo> synonymMap) {
+        final Map<String, Set<String>> ownerTabSetMap = new LinkedHashMap<String, Set<String>>();
+        for (DfSynonymMetaInfo synonym : synonymMap.values()) {
+            final String owner = synonym.getTableOwner();
+            if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
+                continue;
+            }
+            Set<String> tableSet = ownerTabSetMap.get(owner);
+            if (tableSet == null) {
+                tableSet = new LinkedHashSet<String>();
+                ownerTabSetMap.put(owner, tableSet);
+            }
+            tableSet.add(synonym.getTableName());
+        }
+        return ownerTabSetMap;
     }
 
     // -----------------------------------------------------

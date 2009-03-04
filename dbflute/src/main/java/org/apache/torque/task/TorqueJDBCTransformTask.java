@@ -395,7 +395,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             }
 
             // * * * * * * * * * * * * * * *
-            // Indeces for this table.
+            // Indexes for this table.
             // * * * * * * * * * * * * * * *
             {
                 Map<String, Map<Integer, String>> indexMap = null;
