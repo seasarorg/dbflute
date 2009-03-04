@@ -94,7 +94,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         try {
             final Map<String, DfSynonymMetaInfo> synonymMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
             statement = conn.createStatement();
-            _log.info("...Executing helper SQL:" + ln() + sql);
+            _log.info(sql);
             rs = statement.executeQuery(sql);
             while (rs.next()) {
                 final String synonymName = rs.getString("SYNONYM_NAME");
@@ -347,7 +347,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         ResultSet rs = null;
         try {
             statement = conn.createStatement();
-            _log.info("...Executing helper SQL:" + ln() + metaDataSql);
+            _log.info(metaDataSql);
             rs = statement.executeQuery(metaDataSql);
             while (rs.next()) {
                 final String sequenceOwner = rs.getString("SEQUENCE_OWNER");
@@ -379,6 +379,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         final StringBuilder logSb = new StringBuilder();
         logSb.append("...Judging sequence synonym: ");
         logSb.append(ln()).append("[Sequence Synonym]");
+        boolean exists = false;
         for (String synonymKey : synonymMap.keySet()) {
             final DfSynonymMetaInfo synonym = synonymMap.get(synonymKey);
             if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
@@ -386,9 +387,13 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             }
             final String name = synonym.getTableOwner() + "." + synonym.getSynonymName();
             if (sequenceNameSet.contains(name)) {
-                logSb.append(" " + name);
+                exists = true;
+                logSb.append(ln()).append(" " + name);
                 synonym.setSequenceSynonym(true);
             }
+        }
+        if (exists) {
+            _log.info(logSb.toString());
         }
     }
 

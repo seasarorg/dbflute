@@ -89,21 +89,21 @@ map:{
     # o isSuppressTruncateTable (NotRequired - Default 'false')
     # You can suppress truncating tables at initializing schema.
     # 
-    #; isSuppressTruncateTable = true
+    #; isSuppressTruncateTable = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropForeignKey (NotRequired - Default 'false')
     # You can suppress dropping foreign keys at initializing schema.
     # 
-    #; isSuppressDropForeignKey = true
+    #; isSuppressDropForeignKey = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropTable (NotRequired - Default 'false')
     # You can suppress dropping tables at initializing schema.
     # 
-    #; isSuppressDropTable = true
+    #; isSuppressDropTable = false
     # - - - - - - - - - -/
 }
 # ----------------/

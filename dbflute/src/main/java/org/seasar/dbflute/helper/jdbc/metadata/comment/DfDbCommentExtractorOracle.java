@@ -110,7 +110,7 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
         ResultSet rs = null;
         try {
             statement = conn.createStatement();
-            _log.info("...Executing helper SQL:" + ln() + sql);
+            _log.info(sql);
             rs = statement.executeQuery(sql);
             final List<UserTabComments> resultList = new ArrayList<UserTabComments>();
             while (rs.next()) {
@@ -152,6 +152,7 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
         ResultSet rs = null;
         try {
             statement = conn.createStatement();
+            _log.info(sql);
             rs = statement.executeQuery(sql);
             final List<UserColComments> resultList = new ArrayList<UserColComments>();
             while (rs.next()) {
