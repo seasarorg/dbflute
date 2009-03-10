@@ -429,8 +429,9 @@ public class Table {
         }
         sb.append(", nameLength=").append(getName().length());
         sb.append(", columnCount=").append(getColumns().length);
-        if (_comment != null && _comment.trim().length() > 0) {
-            sb.append(", comment=").append(_comment);
+        String comment = getComment();
+        if (comment != null && comment.trim().length() > 0) {
+            sb.append(", comment=").append(comment);
         }
         return sb.toString();
     }
