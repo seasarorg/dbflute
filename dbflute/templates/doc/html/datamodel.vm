@@ -121,7 +121,7 @@
 #if ($database.isAliasDelimiterInDbCommentValid())
         <td class="aliascell">${table.alias}</td>
 #end
-        <td><a href="#${table.name}">${table.name}</a></td>
+        <td><a href="#${table.name}" title="${table.toolTipTitle}">${table.name}</a></td>
         <td>${table.type}</td>
         <td class="subcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
         <td class="subcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>

@@ -345,22 +345,32 @@ public class Table {
     // -----------------------------------------------------
     //                                          Table Schema
     //                                          ------------
-    // Schema名を直接利用することは許さないためCommentOut。
-    // 基本的には自動生成時のSchema名なので本番とは食い違う可能性がある。
-    // PostgreSQLなどの複数Schema対応時にのみの利用であり、必ず別のMethodを経由して利用する。
-    // 
-    //    /**
-    //     * Get the schema of the Table
-    //     */
-    //    public String getSchema() {
-    //        return _schema;
-    //    }
+    // Basically unused because the schema may be for test environment.
+    ///**
+    // * Get the schema of the Table
+    // */
+    //public String getSchema() {
+    //    return _schema;
+    //}
 
     /**
      * Set the schema of the Table
      */
     public void setSchema(String schema) {
         this._schema = schema;
+    }
+
+    public boolean isAdditionalSchema() {
+        if (_schema == null || _schema.trim().length() == 0) {
+            return false;
+        }
+        final List<String> schemaList = getProperties().getDatabaseProperties().getAdditionalSchemaList();
+        for (String additionalSchema : schemaList) {
+            if (additionalSchema.equalsIgnoreCase(_schema)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // -----------------------------------------------------
@@ -409,6 +419,14 @@ public class Table {
     //                                ----------------------
     public String getBasicInfoDispString() {
         return getAliasExpression() + getName() + " that the type is " + getType();
+    }
+
+    public String getToolTipTitle() {
+        if (isAdditionalSchema()) {
+            return "type=" + _type + " schema=" + _schema;
+        } else {
+            return "type=" + _type;
+        }
     }
 
     // -----------------------------------------------------
@@ -908,7 +926,7 @@ public class Table {
         }
         return firstFK;
     }
-    
+
     public List<ForeignKey> getForeignKeyList(String columnName) {
         List<ForeignKey> fkList = new ArrayList<ForeignKey>();
         for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
