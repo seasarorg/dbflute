@@ -415,18 +415,24 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                                Basic Info Disp String
-    //                                ----------------------
+    //                                        Display String
+    //                                        --------------
     public String getBasicInfoDispString() {
         return getAliasExpression() + getName() + " that the type is " + getType();
     }
 
     public String getToolTipTitle() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("type=").append(_type);
         if (isAdditionalSchema()) {
-            return "type=" + _type + " schema=" + _schema;
-        } else {
-            return "type=" + _type;
+            sb.append(", schema=").append(_schema);
         }
+        sb.append(", nameLength=").append(getName().length());
+        sb.append(", columnCount=").append(getColumns().length);
+        if (_comment != null && _comment.trim().length() > 0) {
+            sb.append(", comment=").append(_comment);
+        }
+        return sb.toString();
     }
 
     // -----------------------------------------------------
