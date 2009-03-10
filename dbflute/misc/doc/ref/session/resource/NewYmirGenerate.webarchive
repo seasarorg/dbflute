@@ -1,0 +1,292 @@
+bplist00�_WebMainResource�	
+^WebResourceURL_WebResourceTextEncodingName_WebResourceMIMEType_WebResourceData_WebResourceFrameName_Bhttp://localhost:8080/dbflute-ymir-example/member/search/list.htmlUUTF-8Ytext/htmlO7<html><head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>SYSTEM NOTIFICATION</title>
+  </head><body onload="document.getElementById('skipButton').focus()">
+<h1>SYSTEM NOTIFICATION</h1>
+<form method="post" action="/dbflute-ymir-example/member/search/list.html">
+<p>テンプレート/member/search/list.htmlの変更を検出しました。テンプレートに関連する以下のクラスを追加・更新します。
+追加・更新したくないものについてはチェックを外して下さい。</p>
+<p>クラスのプロパティ型、Pageの親クラス、Dtoに対応するEntityクラスには以下のものを指定することができます。</p>
+<ul>
+  <li>プリミティブ型（例：boolean）</li>
+  <li>パッケージ名つきクラス名（例：com.example.dto.AaaDto）</li>
+  <li>空文字列（java.lang.Objectを指定したのと同じになります）</li>
+  <li>Genericタイプを指定した型名（例：java.util.List&lt;java.lang.String>）</li>
+  <li>パッケージ名を省略したクラス名。パッケージ名が指定されなかった場合は以下の規則にしたがってクラスが見つかるまで探索します。
+    <ol>
+      <li>パッケージ名として「java.lang」「java.util」「net.skirnir.freyja.render.html」を補完</li>
+      <li>所属クラス（Pageの親クラスについてはPage、Dtoに対応するEntityクラスについてはDto、プロパティ型についてはプロパティを持つクラス）のパッケージ、その親パッケージ、…を補完</li>
+      <li>ルートパッケージ以下のクラスのうち名前が同じもの（複数ある場合は最初に見つかったもの）</li>
+    </ol>
+  </li>
+</ul>
+<p>Pageの親クラスには存在しないクラスを指定することもできます。その場合は空のクラスが生成されます。</p>
+
+<p>自動生成を行なう場合は「OK」ボタンを、今回は自動生成を行なわない場合は「今回はスキップ」ボタンを、今回は自動生成を行なわずに今後もこのテンプレートを自動生成の対象外にする場合は「常にスキップ」ボタンを押して下さい。</p>
+<p><input type="submit" value=" OK ">
+  <input id="skipButton" type="submit" name="__ymir__button_skip" value="今回はスキップ">
+  <input id="skipButton" type="submit" name="__ymir__button_always_skip" value="常にスキップ"></p>
+  
+  <div>
+  <p><strong>更新されるクラス：</strong></p>
+  <ul>
+    <li>
+      <input type="checkbox" name="__ymir__apply" value="com.example.dbflute.ymir.web.member.search.ListPage" checked="checked">
+      <span>com.example.dbflute.ymir.web.member.search.ListPage</span>
+      
+      <span>  親クラス：<input type="text" name="__ymir__superclassName_com.example.dbflute.ymir.web.member.search.ListPage" size="48" value="com.example.dbflute.ymir.web.PageBase"></span>
+      
+      <table>
+        <tbody><tr>
+          <th align="right" nowrap="nowrap">
+            conditionFormプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.search.ListPage/conditionForm" value="com.example.dbflute.ymir.dto.member.search.ConditionFormDto">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            memberNameプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.search.ListPage/memberName" value="String">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            purchaseProductNameプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.search.ListPage/purchaseProductName" value="String">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            memberStatusCodeプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.search.ListPage/memberStatusCode" value="String">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            memberStatusSelectTagプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.search.ListPage/memberStatusSelectTag" value="net.skirnir.freyja.render.html.SelectTag">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            unpaidプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.search.ListPage/unpaid" value="boolean">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            formalizedDateFromプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.search.ListPage/formalizedDateFrom" value="java.util.Date">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            formalizedDateToプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.search.ListPage/formalizedDateTo" value="java.util.Date">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            memberItemsプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.search.ListPage/memberItems" value="java.util.List&lt;com.example.dbflute.ymir.dto.member.search.MemberDto>">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            selectedIdプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.search.ListPage/selectedId" value="String">
+          </td>
+        </tr>
+      </tbody></table>
+      <table>
+        <tbody><tr>
+          <td colspan="2">通常のパラメータかボタン名か判別できなかったパラメータ：</td>
+        </tr>
+        <tr>
+          <th align="right" nowrap="nowrap">
+            editパラメータ
+          </th>
+          <td align="left" nowrap="nowrap">
+            <input type="radio" name="__ymir__parameterRole_com.example.dbflute.ymir.web.member.search.ListPage/edit" value="PARAMETER"> 通常のパラメータ  
+            <input type="radio" checked="checked" name="__ymir__parameterRole_com.example.dbflute.ymir.web.member.search.ListPage/edit" value="BUTTON"> ボタン名
+          </td>
+        </tr>
+      </tbody></table>
+    </li><li>
+      <input type="checkbox" name="__ymir__apply" value="com.example.dbflute.ymir.dto.member.search.ConditionFormDto" checked="checked">
+      
+      <input size="48" name="__ymir__className_com.example.dbflute.ymir.dto.member.search.ConditionFormDto" value="com.example.dbflute.ymir.dto.member.search.ConditionFormDto">
+      
+      <span>  対応するEntityクラス：<input type="text" name="__ymir__converter_pairTypeName_com.example.dbflute.ymir.dto.member.search.ConditionFormDto" size="48" value=""></span>
+      <table>
+        <tbody><tr>
+          <th align="right" nowrap="nowrap">
+            memberNameプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            <span>（PageクラスのmemberNameプロパティと同じ型）</span>
+            
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            purchaseProductNameプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            <span>（PageクラスのpurchaseProductNameプロパティと同じ型）</span>
+            
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            memberStatusCodeプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            <span>（PageクラスのmemberStatusCodeプロパティと同じ型）</span>
+            
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            unpaidプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            <span>（Pageクラスのunpaidプロパティと同じ型）</span>
+            
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            formalizedDateFromプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            <span>（PageクラスのformalizedDateFromプロパティと同じ型）</span>
+            
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            formalizedDateToプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            <span>（PageクラスのformalizedDateToプロパティと同じ型）</span>
+            
+          </td>
+        </tr>
+      </tbody></table>
+      
+    </li><li>
+      <input type="checkbox" name="__ymir__apply" value="com.example.dbflute.ymir.dto.member.search.MemberDto" checked="checked">
+      
+      <input size="48" name="__ymir__className_com.example.dbflute.ymir.dto.member.search.MemberDto" value="com.example.dbflute.ymir.dto.member.search.MemberDto">
+      
+      <span>  対応するEntityクラス：<input type="text" name="__ymir__converter_pairTypeName_com.example.dbflute.ymir.dto.member.search.MemberDto" size="48" value="com.example.dbflute.ymir.dbflute.exentity.Member"></span>
+      <table>
+        <tbody><tr>
+          <th align="right" nowrap="nowrap">
+            memberIdプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.dto.member.search.MemberDto/memberId" value="String">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            memberNameプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.dto.member.search.MemberDto/memberName" value="String">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            memberStatusNameプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.dto.member.search.MemberDto/memberStatusName" value="String">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            formalizedDatetimeプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.dto.member.search.MemberDto/formalizedDatetime" value="java.util.Date">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            updateDatetimeプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.dto.member.search.MemberDto/updateDatetime" value="java.util.Date">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            editableプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.dto.member.search.MemberDto/editable" value="boolean">
+          </td>
+        </tr><tr>
+          <th align="right" nowrap="nowrap">
+            purchaseLinkVisibleプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.dto.member.search.MemberDto/purchaseLinkVisible" value="boolean">
+          </td>
+        </tr>
+      </tbody></table>
+      
+    </li><li>
+      <input type="checkbox" name="__ymir__apply" value="com.example.dbflute.ymir.web.member.purchase.ListPage" checked="checked">
+      <span>com.example.dbflute.ymir.web.member.purchase.ListPage</span>
+      
+      <span>  親クラス：<input type="text" name="__ymir__superclassName_com.example.dbflute.ymir.web.member.purchase.ListPage" size="48" value="com.example.dbflute.ymir.web.PageBase"></span>
+      
+      <table>
+        <tbody><tr>
+          <th align="right" nowrap="nowrap">
+            memberIdプロパティ
+          </th>
+          <td align="left" nowrap="nowrap">
+            
+            <input type="text" size="48" name="__ymir__propertyType_com.example.dbflute.ymir.web.member.purchase.ListPage/memberId" value="Integer">
+          </td>
+        </tr>
+      </tbody></table>
+      
+    </li>
+  </ul>
+  </div>
+  <input type="hidden" name="current" value="3"><input type="hidden" name="paging" value="">
+  <input type="hidden" name="__ymir__task" value="updateClasses">
+  <input type="hidden" name="__ymir__subTask" value="update">
+  <input type="hidden" name="__ymir__method" value="GET">
+  <input type="submit" value=" OK ">
+  <input type="submit" name="__ymir__button_skip" value="今回はスキップ">
+  <input id="skipButton" type="submit" name="__ymir__button_always_skip" value="常にスキップ"><p></p>
+</form>
+  
+
+</body></html>P    ( 7 U k } � � � �7�                           7�
