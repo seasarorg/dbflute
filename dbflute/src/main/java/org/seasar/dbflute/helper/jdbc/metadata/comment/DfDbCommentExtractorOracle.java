@@ -146,7 +146,7 @@ public class DfDbCommentExtractorOracle implements DfDbCommentExtractor {
     }
 
     protected List<UserColComments> selectUserColComments(Connection conn, Set<String> tableSet) {
-        final String sql = "select * from ALL_COL_COMMENTS where OWNER ='" + _schema + "'"
+        final String sql = "select * from ALL_COL_COMMENTS where OWNER = '" + _schema + "'"
                 + " order by TABLE_NAME asc, COLUMN_NAME asc";
         Statement statement = null;
         ResultSet rs = null;
