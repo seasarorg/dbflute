@@ -18,6 +18,8 @@ package org.seasar.dbflute.resource;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -194,12 +196,15 @@ public class ResourceContext {
         }
         return resourceParameter;
     }
-    
-    public static java.util.Date getAccessDate() {
+
+    // -----------------------------------------------------
+    //                                           Access Date
+    //                                           -----------
+    public static Date getAccessDate() {
         return AccessContext.getAccessDateOnThread();
     }
     
-    public static java.sql.Timestamp getAccessTimestamp() {
+    public static Timestamp getAccessTimestamp() {
         return AccessContext.getAccessTimestampOnThread();
     }
 
