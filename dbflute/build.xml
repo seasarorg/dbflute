@@ -5,7 +5,7 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="0.9.4-SNAPSHOT"/>
+	<property name="version" value="0.9.4"/>
 	<property name="internal.version" value="${version}-SNAPSHOT"/>
 
 	<!-- Directories and Module Files -->
