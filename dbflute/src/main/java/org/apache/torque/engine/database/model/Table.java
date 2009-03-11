@@ -427,12 +427,9 @@ public class Table {
         if (isAdditionalSchema()) {
             sb.append(", schema=").append(_schema);
         }
+        sb.append(", primaryKey={").append(getPrimaryKeyNameCommaString()).append("}");
         sb.append(", nameLength=").append(getName().length());
         sb.append(", columnCount=").append(getColumns().length);
-        String comment = getComment();
-        if (comment != null && comment.trim().length() > 0) {
-            sb.append(", comment=").append(comment);
-        }
         return sb.toString();
     }
 
