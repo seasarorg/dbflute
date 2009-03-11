@@ -16,8 +16,6 @@
 package org.seasar.dbflute.s2dao.sqlcommand;
 
 import java.lang.reflect.Method;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +28,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
@@ -144,11 +143,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
             if (dbmeta.hasUpdateDate()) {
                 ColumnInfo columnInfo = dbmeta.getUpdateDateColumnInfo();
                 Method setter = columnInfo.findSetter();
-                if (Timestamp.class.isAssignableFrom(columnInfo.getPropertyType())) {
-                    setter.invoke(entity, new Timestamp(System.currentTimeMillis()));
-                } else {
-                    setter.invoke(entity, new Date());
-                }
+                setter.invoke(entity, ResourceContext.getAccessTimestamp());
                 String columnName = columnInfo.getColumnDbName();
                 columnParameterMap.put(columnName, "/*entity." + columnInfo.getPropertyName() + "*/null");
             }

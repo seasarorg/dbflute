@@ -20,7 +20,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -28,6 +27,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -137,7 +137,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         for (int i = 0; i < propertyTypes.length; ++i) {
             TnPropertyType pt = propertyTypes[i];
             if (pt.getPropertyName().equalsIgnoreCase(timestampPropertyName)) {
-                setTimestamp(new Timestamp(new Date().getTime()));
+                setTimestamp(ResourceContext.getAccessTimestamp());
                 varList.add(getTimestamp());
             } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
                 setVersionNo(new Integer(0));
@@ -160,7 +160,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         for (int i = 0; i < propertyTypes.length; ++i) {
             TnPropertyType pt = propertyTypes[i];
             if (pt.getPropertyName().equalsIgnoreCase(timestampPropertyName)) {
-                setTimestamp(new Timestamp(new Date().getTime()));
+                setTimestamp(ResourceContext.getAccessTimestamp());
                 varList.add(getTimestamp());
             } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
                 if (!isVersionNoAutoIncrementOnMemory()) {

@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,7 +86,7 @@ public class AccessContext {
                 return accessUser;
             }
         }
-        return "Anonymous";// as Default
+        return "Anonymous"; // as Default
     }
 
     /**
@@ -103,7 +105,7 @@ public class AccessContext {
                 return accessProcess;
             }
         }
-        return "Anonymous";// as Default
+        return "Anonymous"; // as Default
     }
 
     /**
@@ -122,7 +124,7 @@ public class AccessContext {
                 return accessModule;
             }
         }
-        return "Anonymous";// as Default
+        return "Anonymous"; // as Default
     }
 
     /**
@@ -133,7 +135,7 @@ public class AccessContext {
      * </p>
      * @return Access date. (NotNull)
      */
-    public static java.util.Date getAccessDateOnThread() {
+    public static Date getAccessDateOnThread() {
         if (isExistAccessContextOnThread()) {
             final AccessContext userContextOnThread = getAccessContextOnThread();
             final java.util.Date accessDate = userContextOnThread.getAccessDate();
@@ -144,21 +146,21 @@ public class AccessContext {
                 return userContextOnThread.getAccessDateProvider().getAccessDate();
             }
         }
-        return new java.util.Date();// as Default
+        return new Date(); // as Default
     }
 
     /**
-     * Get access timestamp on thread.
+     * Get access time-stamp on thread.
      * <p>
-     * If it can't get access timestamp from access-context, 
+     * If it can't get access time-stamp from access-context, 
      * returns application current time as default value!
      * </p>
-     * @return Access timestamp. (NotNull)
+     * @return Access time-stamp. (NotNull)
      */
-    public static java.sql.Timestamp getAccessTimestampOnThread() {
+    public static Timestamp getAccessTimestampOnThread() {
         if (isExistAccessContextOnThread()) {
             final AccessContext userContextOnThread = getAccessContextOnThread();
-            final java.sql.Timestamp accessTimestamp = userContextOnThread.getAccessTimestamp();
+            final Timestamp accessTimestamp = userContextOnThread.getAccessTimestamp();
             if (accessTimestamp != null) {
                 return accessTimestamp;
             }
@@ -166,7 +168,7 @@ public class AccessContext {
                 return userContextOnThread.getAccessTimestampProvider().getAccessTimestamp();
             }
         }
-        return new java.sql.Timestamp(System.currentTimeMillis());// as Default
+        return new Timestamp(System.currentTimeMillis()); // as Default
     }
 
     /**
@@ -186,7 +188,7 @@ public class AccessContext {
                 return accessValueMap.get(key);
             }
         }
-        return null;// as Default
+        return null; // as Default
     }
 
     // ===================================================================================

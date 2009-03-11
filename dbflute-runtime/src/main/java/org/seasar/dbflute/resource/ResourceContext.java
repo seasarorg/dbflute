@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasar.dbflute.AccessContext;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
@@ -192,6 +193,14 @@ public class ResourceContext {
             return null;
         }
         return resourceParameter;
+    }
+    
+    public static java.util.Date getAccessDate() {
+        return AccessContext.getAccessDateOnThread();
+    }
+    
+    public static java.sql.Timestamp getAccessTimestamp() {
+        return AccessContext.getAccessTimestampOnThread();
     }
 
     // -----------------------------------------------------

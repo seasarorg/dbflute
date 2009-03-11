@@ -31,7 +31,6 @@ import org.seasar.dbflute.helper.stacktrace.impl.InvokeNameExtractorImpl;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.TraceViewUtil;
 
@@ -147,12 +146,12 @@ public class BehaviorCommandInvoker {
             if (execution == null) {
                 long beforeCmd = 0;
                 if (isLogEnabled()) {
-                    beforeCmd = System.currentTimeMillis();
+                    beforeCmd = systemTime();
                 }
                 SqlExecutionCreator creator = behaviorCommand.createSqlExecutionCreator();
                 execution = getSqlExecution(key, creator);
                 if (isLogEnabled()) {
-                    final long afterCmd = System.currentTimeMillis();
+                    final long afterCmd = systemTime();
                     if (beforeCmd != afterCmd) {
                         logSqlExecution(behaviorCommand, execution, beforeCmd, afterCmd);
                     }
@@ -166,7 +165,7 @@ public class BehaviorCommandInvoker {
 
         long before = 0;
         if (isLogEnabled()) {
-            before = System.currentTimeMillis();
+            before = systemTime();
         }
 
         Object ret = null;
@@ -180,7 +179,7 @@ public class BehaviorCommandInvoker {
         assertRetType(retType, ret);
 
         if (isLogEnabled()) {
-            final long after = System.currentTimeMillis();
+            final long after = systemTime();
             logReturn(behaviorCommand, retType, ret, before, after);
         }
 
@@ -206,7 +205,11 @@ public class BehaviorCommandInvoker {
         resourceContext.setResourceParameter(_invokerAssistant.assistResourceParameter());
         ResourceContext.setResourceContextOnThread(resourceContext);
     }
-
+    
+    protected long systemTime() {
+        return System.currentTimeMillis(); // for calculating performance
+    }
+    
     // ===================================================================================
     //                                                                       SQL Execution
     //                                                                       =============
@@ -715,13 +718,6 @@ public class BehaviorCommandInvoker {
             String msg = "The attribute 'invokerAssistant' should not be null!";
             throw new IllegalStateException(msg);
         }
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String getLineSeparator() {
-        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================
