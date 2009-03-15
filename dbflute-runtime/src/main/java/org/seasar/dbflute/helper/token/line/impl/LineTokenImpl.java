@@ -52,7 +52,13 @@ public class LineTokenImpl implements LineToken {
             i = j + delimiter.length();
             j = lineString.indexOf(delimiter, i);
         }
-        list.add(filterHandlingEmptyAsNull(lineString.substring(i), lineTokenizingOption));
+        String lastElement = lineString.substring(i);
+        if (lineTokenizingOption.isTrimDoubleQuotation()) {
+            if (lastElement.length() > 1 && lastElement.startsWith("\"") && lastElement.endsWith("\"")) {
+                lastElement = lastElement.substring(1, lastElement.length() - 1);
+            }
+        }
+        list.add(filterHandlingEmptyAsNull(lastElement, lineTokenizingOption));
         return list;
     }
 
@@ -74,13 +80,15 @@ public class LineTokenImpl implements LineToken {
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();
         assertObjectNotNull("lineMakingOption.getDelimiter()", delimiter);
-        return createLineString(valueList, delimiter, lineMakingOption.isQuoteByDoubleQuotation(), lineMakingOption.isTrimSpace());
+        return createLineString(valueList, delimiter, lineMakingOption.isQuoteByDoubleQuotation(), lineMakingOption
+                .isTrimSpace());
     }
 
-    protected String createLineString(List<String> valueList, String delimiter, boolean quoteByDoubleQuotation, boolean trimSpace) {
+    protected String createLineString(List<String> valueList, String delimiter, boolean quoteByDoubleQuotation,
+            boolean trimSpace) {
         final StringBuffer sb = new StringBuffer();
-        for (final Iterator<String> ite = valueList.iterator(); ite.hasNext(); ) {
-            String value = (String)ite.next();
+        for (final Iterator<String> ite = valueList.iterator(); ite.hasNext();) {
+            String value = (String) ite.next();
             value = (value != null ? value : "");
             if (trimSpace) {
                 value = value.trim();
@@ -123,7 +131,7 @@ public class LineTokenImpl implements LineToken {
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);
         assertObjectNotNull(variableName, value);
-        if (value.trim().length() ==0) {
+        if (value.trim().length() == 0) {
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }

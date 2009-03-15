@@ -38,25 +38,25 @@ import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
  */
 public class FileTokenImpl implements FileToken {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Line-token for help. */
     protected final LineToken _lineToken = new LineTokenImpl();
 
-    // =====================================================================================
-    //                                                                                  Main
-    //                                                                                  ====
+    // ===================================================================================
+    //                                                                            Tokenize
+    //                                                                            ========
     /**
      * Tokenize token-file data of a specified file.
-     * 
      * @param filename File name. (NotNull)
      * @param fileTokenizingCallback File-tokenizing callback. (NotNull)
      * @param fileTokenizingOption File-tokenizing option. (NotNull and Required{encoding and delimiter})
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void tokenize(String filename, FileTokenizingCallback fileTokenizingCallback, FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void tokenize(String filename, FileTokenizingCallback fileTokenizingCallback,
+            FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
         assertStringNotNullAndNotTrimmedEmpty("filename", filename);
 
         java.io.FileInputStream fis = null;
@@ -77,7 +77,6 @@ public class FileTokenImpl implements FileToken {
         }
     }
 
-
     /**
      * Tokenize token-file data of a specified file.
      * <pre>
@@ -90,7 +89,8 @@ public class FileTokenImpl implements FileToken {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void tokenize(java.io.InputStream inputStream, FileTokenizingCallback fileTokenizingCallback, FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void tokenize(java.io.InputStream inputStream, FileTokenizingCallback fileTokenizingCallback,
+            FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException {
         assertObjectNotNull("inputStream", inputStream);
         assertObjectNotNull("fileTokenizingCallback", fileTokenizingCallback);
         assertObjectNotNull("fileTokenizingOption", fileTokenizingOption);
@@ -143,7 +143,7 @@ public class FileTokenImpl implements FileToken {
                 final ValueLineInfo valueLineInfo = arrangeValueList(rowString, delimiter);
                 final List<String> ls = valueLineInfo.getValueList();
                 if (valueLineInfo.isContinueNextLine()) {
-                    preContinueString = (String)ls.remove(ls.size() - 1);
+                    preContinueString = (String) ls.remove(ls.size() - 1);
                     temporaryValueList.addAll(ls);
                     continue;
                 }
@@ -154,8 +154,8 @@ public class FileTokenImpl implements FileToken {
                     fileTokenizingRowResource.setFirstLineInfo(fileTokenizingHeaderInfo);
 
                     if (fileTokenizingOption.isHandleEmptyAsNull()) {
-                        for (final Iterator<String> ite = temporaryValueList.iterator(); ite.hasNext(); ) {
-                            final String value = (String)ite.next();
+                        for (final Iterator<String> ite = temporaryValueList.iterator(); ite.hasNext();) {
+                            final String value = (String) ite.next();
                             if ("".equals(value)) {
                                 filteredValueList.add(null);
                             } else {
@@ -199,12 +199,12 @@ public class FileTokenImpl implements FileToken {
         final List<String> valueList = new ArrayList<String>();
 
         // Don't use split!
-        //        final String[] values = lineString.split(delimiter);
+        //final String[] values = lineString.split(delimiter);
         final LineTokenizingOption tokenizingOption = new LineTokenizingOption();
         tokenizingOption.setDelimiter(delimiter);
         final List<String> list = _lineToken.tokenize(lineString, tokenizingOption);
-        final String[] values = (String[])list.toArray(new String[list.size()]);
-        for (int i=0; i < values.length; i++) {
+        final String[] values = (String[]) list.toArray(new String[list.size()]);
+        for (int i = 0; i < values.length; i++) {
             valueList.add(values[i]);
         }
         return arrangeValueList(valueList, delimiter);
@@ -215,7 +215,7 @@ public class FileTokenImpl implements FileToken {
         final ArrayList<String> resultList = new ArrayList<String>();
         String preString = "";
         for (int i = 0; i < valueList.size(); i++) {
-            final String value = (String)valueList.get(i);
+            final String value = (String) valueList.get(i);
             if (value == null) {
                 continue;
             }
@@ -328,7 +328,7 @@ public class FileTokenImpl implements FileToken {
     protected FileTokenizingHeaderInfo analyzeHeaderInfo(String delimiter, final String lineString) {
         final java.util.List<String> columnNameList = new ArrayList<String>();
         final String[] values = lineString.split(delimiter);
-        for (int i=0; i < values.length; i++) {
+        for (int i = 0; i < values.length; i++) {
             final String value = values[i].trim();// Trimming is Header Only!;
             if (value.startsWith("\"") && value.endsWith("\"")) {
                 columnNameList.add(value.substring(1, value.length() - 1));
@@ -364,16 +364,19 @@ public class FileTokenImpl implements FileToken {
         }
     }
 
+    // ===================================================================================
+    //                                                                                Make
+    //                                                                                ====
     /**
      * Make token-file from specified row resources.
-     * 
      * @param filename File name. (NotNull)
      * @param fileMakingCallback File-making callback. (NotNull)
      * @param fileMakingOption File-making option. (NotNull and Required{encoding and delimiter})
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void make(String filename, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void make(String filename, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption)
+            throws java.io.FileNotFoundException, java.io.IOException {
         assertStringNotNullAndNotTrimmedEmpty("filename", filename);
 
         java.io.FileOutputStream fos = null;
@@ -403,7 +406,8 @@ public class FileTokenImpl implements FileToken {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void make(java.io.OutputStream outputStream, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void make(java.io.OutputStream outputStream, FileMakingCallback fileMakingCallback,
+            FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
         assertObjectNotNull("outputStream", outputStream);
         assertObjectNotNull("fileMakingCallback", fileMakingCallback);
         assertObjectNotNull("fileMakingOption", fileMakingOption);
@@ -453,7 +457,8 @@ public class FileTokenImpl implements FileToken {
                 } else {
                     final java.util.LinkedHashMap<String, String> nameValueMap = rowResource.getNameValueMap();
                     if (!headerDone) {
-                        final java.util.List<String> columnNameList = new java.util.ArrayList<String>(nameValueMap.keySet());
+                        final java.util.List<String> columnNameList = new java.util.ArrayList<String>(nameValueMap
+                                .keySet());
                         final LineMakingOption lineMakingOption = new LineMakingOption();
                         lineMakingOption.setDelimiter(delimiter);
                         lineMakingOption.trimSpace();// Trimming is Header Only!
@@ -485,10 +490,10 @@ public class FileTokenImpl implements FileToken {
             }
         }
     }
-
-    // ----------------------------------------------------------------
-    //                                                    Assert Object
-    //                                                    -------------
+    
+    // -----------------------------------------------------
+    //                                         Assert Object
+    //                                         -------------
     /**
      * Assert that the object is not null.
      * 
@@ -507,9 +512,9 @@ public class FileTokenImpl implements FileToken {
         }
     }
 
-    // ----------------------------------------------------------------
-    //                                                    Assert String
-    //                                                    -------------
+    // -----------------------------------------------------
+    //                                         Assert String
+    //                                         -------------
     /**
      * Assert that the entity is not null and not trimmed empty.
      * 
@@ -519,7 +524,7 @@ public class FileTokenImpl implements FileToken {
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);
         assertObjectNotNull(variableName, value);
-        if (value.trim().length() ==0) {
+        if (value.trim().length() == 0) {
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
