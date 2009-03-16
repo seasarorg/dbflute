@@ -35,6 +35,7 @@ import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuildingResu
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfTokenUtil;
+import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
  * @author jflute
@@ -395,6 +396,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         if (value.endsWith("\"")) {
             value = value.substring(0, value.length() - 1);
         }
+        value = DfStringUtil.replace(value, "\"\"", "\"");
         return value;
     }
 
