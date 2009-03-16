@@ -60,6 +60,14 @@
     	  tofile="../dbflute-guice-example/lib/sources/dbflute-runtime-${version}-sources.jar"
     	  overwrite="true"/>
   	
+    <delete file="../dbflute-slim3-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-slim3-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-slim3-example/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+  	
     <delete file="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-*.jar"/>
     <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
     	  tofile="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${version}.jar"
