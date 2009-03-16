@@ -22,6 +22,7 @@ import java.util.List;
 import org.seasar.dbflute.helper.token.line.LineMakingOption;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -37,29 +38,34 @@ public class LineTokenImpl implements LineToken {
         int i = 0;
         int j = lineString.indexOf(delimiter);
         for (int h = 0; j >= 0; h++) {
-            final String pureValue = lineString.substring(i, j);
+            String value = lineString.substring(i, j);
             if (lineTokenizingOption.isTrimDoubleQuotation()) {
-                final String before = pureValue;
-                if (before.length() > 1 && before.startsWith("\"") && before.endsWith("\"")) {
-                    final String after = before.substring(1, before.length() - 1);
-                    list.add(filterHandlingEmptyAsNull(after, lineTokenizingOption));
-                } else {
-                    list.add(filterHandlingEmptyAsNull(before, lineTokenizingOption));
-                }
-            } else {
-                list.add(filterHandlingEmptyAsNull(pureValue, lineTokenizingOption));
+                value = removeDoubleQuotation(value);
             }
+            list.add(filterHandlingEmptyAsNull(value, lineTokenizingOption));
             i = j + delimiter.length();
             j = lineString.indexOf(delimiter, i);
         }
         String lastElement = lineString.substring(i);
         if (lineTokenizingOption.isTrimDoubleQuotation()) {
-            if (lastElement.length() > 1 && lastElement.startsWith("\"") && lastElement.endsWith("\"")) {
-                lastElement = lastElement.substring(1, lastElement.length() - 1);
-            }
+            lastElement = removeDoubleQuotation(lastElement);
         }
         list.add(filterHandlingEmptyAsNull(lastElement, lineTokenizingOption));
         return list;
+    }
+
+    protected String removeDoubleQuotation(String value) {
+        if (!value.startsWith("\"") && !value.endsWith("\"")) {
+            return value;
+        }
+        if (value.startsWith("\"")) {
+            value = value.substring(1);
+        }
+        if (value.endsWith("\"")) {
+            value = value.substring(0, value.length() - 1);
+        }
+        value = DfStringUtil.replace(value, "\"\"", "\"");
+        return value;
     }
 
     protected String filterHandlingEmptyAsNull(String target, LineTokenizingOption lineTokenizingOption) {
@@ -94,6 +100,7 @@ public class LineTokenImpl implements LineToken {
                 value = value.trim();
             }
             if (quoteByDoubleQuotation) {
+                value = DfStringUtil.replace(value, "\"", "\"\"");
                 sb.append(delimiter).append("\"").append(value).append("\"");
             } else {
                 sb.append(delimiter).append(value);
