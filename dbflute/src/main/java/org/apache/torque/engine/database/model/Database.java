@@ -247,7 +247,7 @@ public class Database {
             // check schema integrity
             // if idMethod="autoincrement", make sure a column is
             // specified as autoIncrement="true"
-            // FIXME: Handle idMethod="native" via DB adapter.
+            // F I X M E: Handle idMethod="native" via DB adapter.
             // [Unused on DBFlute]
             // if (currTable.getIdMethod().equals("autoincrement")) {
             //     Column[] columns = currTable.getColumns();
@@ -802,6 +802,10 @@ public class Database {
     
     public boolean isTargetContainerGuice() {
         return getBasicProperties().isTargetContainerGuice();
+    }
+    
+    public boolean isTargetContainerSlim3() {
+        return getBasicProperties().isTargetContainerSlim3();
     }
 
     // -----------------------------------------------------

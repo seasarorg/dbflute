@@ -25,6 +25,9 @@ import org.t2framework.lucy.Lucy;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 #end
+#if ($database.isTargetContainerSlim3())
+import org.slim3.container.S3Container;
+#end
 
 /**
  * The implementation of behavior selector.
@@ -60,6 +63,10 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     /** The container of Guice. */
     protected Injector _container;
 #end
+#if ($database.isTargetContainerSlim3())
+    /** The container of Slim3. */
+    protected S3Container _container;
+#end
 
     // ===================================================================================
     //                                                                           Component
@@ -93,6 +100,9 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #end
 #if ($database.isTargetContainerGuice())
 		return _container.getInstance(componentType);
+#end
+#if ($database.isTargetContainerSlim3())
+		return _container.lookup(componentType.getSimpleName());
 #end
     }
 
@@ -245,6 +255,11 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
 #if ($database.isTargetContainerGuice())
     @Inject
     public void setContainer(Injector container) {
+        this._container = container;
+    }
+#end
+#if ($database.isTargetContainerSlim3())
+    public void setContainer(S3Container container) {
         this._container = container;
     }
 #end

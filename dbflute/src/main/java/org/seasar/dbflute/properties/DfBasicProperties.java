@@ -214,11 +214,17 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isTargetContainerGuice() {
         return getTargetContainerName().trim().equalsIgnoreCase("guice");
     }
+    
+    public boolean isTargetContainerSlim3() {
+        return getTargetContainerName().trim().equalsIgnoreCase("slim3");
+    }
 
     protected void checkContainer(String containerName) {
         containerName = containerName.toLowerCase();
-        if (!containerName.equals("seasar") && !containerName.equals("spring") && !containerName.equals("lucy") && !containerName.equals("guice")) {
-            String msg = "The targetContainer should be 'seasar' or 'spring' or 'lucy' or 'guice':";
+        if (!containerName.equals("seasar") && !containerName.equals("spring")
+                && !containerName.equals("lucy") && !containerName.equals("guice")
+                && !containerName.equals("slim3")) {
+            String msg = "The targetContainer should be 'seasar' or 'spring' or 'lucy' or 'guice' or 'slim3':";
             msg = msg + " targetContainer=" + containerName;
             throw new IllegalStateException(msg);
         }
