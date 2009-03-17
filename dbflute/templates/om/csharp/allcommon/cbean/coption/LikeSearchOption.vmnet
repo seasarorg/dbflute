@@ -48,7 +48,9 @@ public class ${myClassName} : ${glSimpleStringOption} {
     }
     
     protected virtual void DoLikeAutoEscape() {
+#if (!$database.isDatabaseMSAccess())
         Escape();
+#end
     }
 
     // ===================================================================================
