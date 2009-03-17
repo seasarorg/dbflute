@@ -53,7 +53,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected static final ConditionKey CK_GT = ConditionKey.CK_GREATER_THAN;
     protected static final ConditionKey CK_LE = ConditionKey.CK_LESS_EQUAL;
     protected static final ConditionKey CK_LT = ConditionKey.CK_LESS_THAN;
-    protected static final ConditionKey CK_PS = ConditionKey.CK_PREFIX_SEARCH; // [Future]: Not Used and Deleted at the future!
     protected static final ConditionKey CK_INS = ConditionKey.CK_IN_SCOPE;
     protected static final ConditionKey CK_NINS = ConditionKey.CK_NOT_IN_SCOPE;
     protected static final ConditionKey CK_LS = ConditionKey.CK_LIKE_SEARCH;
