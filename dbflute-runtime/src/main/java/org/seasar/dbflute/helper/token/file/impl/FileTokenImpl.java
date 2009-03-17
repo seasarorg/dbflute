@@ -220,7 +220,7 @@ public class FileTokenImpl implements FileToken {
             if (value == null) {
                 continue;
             }
-            if (i == valueList.size() - 1) {// The last loop
+            if (i == valueList.size() - 1) { // The last loop
                 if (preString.equals("")) {
                     if (isFrontQOnly(value)) {
                         valueLineInfo.setContinueNextLine(true);
@@ -295,15 +295,19 @@ public class FileTokenImpl implements FileToken {
     }
 
     protected boolean isNotBothQ(final String value) {
-        return !value.startsWith("\"") && !value.endsWith("\"");
+        return !isQQ(value) && !value.startsWith("\"") && !(value.endsWith("\"") && !value.endsWith("\"\""));
     }
 
     protected boolean isRearQOnly(final String value) {
-        return !value.startsWith("\"") && value.endsWith("\"");
+        return !isQQ(value) && !value.startsWith("\"") && (value.endsWith("\"") && !value.endsWith("\"\""));
     }
 
     protected boolean isFrontQOnly(final String value) {
-        return value.startsWith("\"") && !value.endsWith("\"");
+        return !isQQ(value) && value.startsWith("\"") && !(value.endsWith("\"") && !value.endsWith("\"\""));
+    }
+
+    protected boolean isQQ(final String value) {
+        return value.equals("\"\"");
     }
 
     protected String removeDoubleQuotation(String value) {
@@ -472,8 +476,10 @@ public class FileTokenImpl implements FileToken {
                 }
                 final LineMakingOption lineMakingOption = new LineMakingOption();
                 lineMakingOption.setDelimiter(delimiter);
-                if (!fileMakingOption.isGoodByeDoubleQuotation()) {
-                    lineMakingOption.quoteByDoubleQuotation();
+                if (fileMakingOption.isQuoteMinimally()) {
+                    lineMakingOption.quoteMinimally();
+                } else {
+                    lineMakingOption.quoteAll();
                 }
                 final String lineString = _lineToken.make(valueList, lineMakingOption);
                 writer.write(lineString + lineSeparator);
@@ -492,7 +498,7 @@ public class FileTokenImpl implements FileToken {
             }
         }
     }
-    
+
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------

@@ -24,7 +24,7 @@ public class FileTokenImplTest extends PlainTestCase {
         FileTokenImpl impl = new FileTokenImpl();
         String first = "\"a\",\"b\",\"cc\",\"d\",\"e\"";
         String second = "\"a\",\"b\",\"c\"\"c\",\"d\",\"e\"";
-        String third = "\"a\",\"b\",\"c\"\"\"\"c\",\"d\",\"e\"";
+        String third = "\"a\",\"b,b\",\"c\"\",c\",\"d\n\",\"e\"";
         String all = first + getLineSeparator() + second + getLineSeparator() + third;
         ByteArrayInputStream inputStream = new ByteArrayInputStream(all.getBytes("UTF-8"));
 
@@ -50,9 +50,9 @@ public class FileTokenImplTest extends PlainTestCase {
                     assertEquals("e", valueList.get(4));
                 } else if (index == 2) {
                     assertEquals("a", valueList.get(0));
-                    assertEquals("b", valueList.get(1));
-                    assertEquals("c\"\"c", valueList.get(2));
-                    assertEquals("d", valueList.get(3));
+                    assertEquals("b,b", valueList.get(1));
+                    assertEquals("c\",c", valueList.get(2));
+                    assertEquals("d\n", valueList.get(3));
                     assertEquals("e", valueList.get(4));
                 }
                 ++index;
@@ -89,9 +89,9 @@ public class FileTokenImplTest extends PlainTestCase {
                     valueList.add("e");
                 } else if (index == 2) {
                     valueList.add("a");
-                    valueList.add("b");
-                    valueList.add("c\"\"c");
-                    valueList.add("d");
+                    valueList.add("b,b");
+                    valueList.add("c\",c");
+                    valueList.add("d\n");
                     valueList.add("e");
                 }
                 rowResource.setValueList(valueList);
@@ -106,10 +106,11 @@ public class FileTokenImplTest extends PlainTestCase {
         String[] split = actual.split("\n");
         assertEquals("\"a\",\"b\",\"cc\",\"d\",\"e\"", split[0]);
         assertEquals("\"a\",\"b\",\"c\"\"c\",\"d\",\"e\"", split[1]);
-        assertEquals("\"a\",\"b\",\"c\"\"\"\"c\",\"d\",\"e\"", split[2]);
+        assertEquals("\"a\",\"b,b\",\"c\"\",c\",\"d", split[2]);
+        assertEquals("\",\"e\"", split[3]);
     }
 
-    public void test_make_goodByeDoubleQuotation() throws Exception {
+    public void test_make_quoteMinimally() throws Exception {
         // ## Arrange ##
         FileTokenImpl impl = new FileTokenImpl();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -138,23 +139,24 @@ public class FileTokenImplTest extends PlainTestCase {
                     valueList.add("e");
                 } else if (index == 2) {
                     valueList.add("a");
-                    valueList.add("b");
-                    valueList.add("c\"\"c");
-                    valueList.add("d");
+                    valueList.add("b,b");
+                    valueList.add("c\",c");
+                    valueList.add("d\n");
                     valueList.add("e");
                 }
                 rowResource.setValueList(valueList);
                 ++index;
                 return rowResource;
             }
-        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf().goodByeDoubleQuotation());
+        }, new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf().quoteMinimally());
 
         // ## Assert ##
         String actual = outputStream.toString();
         log(actual);
         String[] split = actual.split("\n");
         assertEquals("a,b,cc,d,e", split[0]);
-        assertEquals("a,b,c\"c,d,e", split[1]);
-        assertEquals("a,b,c\"\"c,d,e", split[2]);
+        assertEquals("a,b,\"c\"\"c\",d,e", split[1]);
+        assertEquals("a,\"b,b\",\"c\"\",c\",\"d", split[2]);
+        assertEquals("\",e", split[3]);
     }
 }

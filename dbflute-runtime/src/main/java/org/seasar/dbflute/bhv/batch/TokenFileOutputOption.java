@@ -60,8 +60,8 @@ public class TokenFileOutputOption {
         return this;
     }
 
-    public TokenFileOutputOption goodByeDoubleQuotation() {
-        _fileMakingOption.goodByeDoubleQuotation();
+    public TokenFileOutputOption quoteMinimally() {
+        _fileMakingOption.quoteMinimally();
         return this;
     }
 
@@ -92,8 +92,8 @@ public class TokenFileOutputOption {
         _fileMakingOption.setLineSeparator(lineSeparator);
     }
 
-    public boolean isGoodByeDoubleQuotation() {
-        return _fileMakingOption.isGoodByeDoubleQuotation();
+    public boolean isQuoteMinimally() {
+        return _fileMakingOption.isQuoteMinimally();
     }
 
     public FileMakingOption getFileMakingOption() {

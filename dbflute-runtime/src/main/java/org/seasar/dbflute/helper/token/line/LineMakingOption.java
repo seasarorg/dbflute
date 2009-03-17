@@ -20,12 +20,20 @@ package org.seasar.dbflute.helper.token.line;
  */
 public class LineMakingOption {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _delimiter;
 
-    protected boolean _quoteByDoubleQuotation;
+    protected boolean _quoteAll;
+
+    protected boolean _quoteMinimally;
 
     protected boolean _trimSpace;
 
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
     public LineMakingOption delimitateByComma() {
         _delimiter = ",";
         return this;
@@ -36,6 +44,26 @@ public class LineMakingOption {
         return this;
     }
 
+    public LineMakingOption quoteAll() {
+        _quoteAll = true;
+        _quoteMinimally = false;
+        return this;
+    }
+
+    public LineMakingOption quoteMinimally() {
+        _quoteMinimally = true;
+        _quoteAll = false;
+        return this;
+    }
+
+    public LineMakingOption trimSpace() {
+        _trimSpace = true;
+        return this;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getDelimiter() {
         return _delimiter;
     }
@@ -44,18 +72,12 @@ public class LineMakingOption {
         _delimiter = delimiter;
     }
 
-    public LineMakingOption quoteByDoubleQuotation() {
-        _quoteByDoubleQuotation = true;
-        return this;
+    public boolean isQuoteAll() {
+        return _quoteAll;
     }
 
-    public boolean isQuoteByDoubleQuotation() {
-        return _quoteByDoubleQuotation;
-    }
-
-    public LineMakingOption trimSpace() {
-        _trimSpace = true;
-        return this;
+    public boolean isQuoteMinimally() {
+        return _quoteMinimally;
     }
 
     public boolean isTrimSpace() {

@@ -53,12 +53,12 @@ public class LineTokenImplTest extends PlainTestCase {
         assertEquals("e", list.get(4));
     }
 
-    public void test_make_quoteByDoubleQuotation_basic() {
+    public void test_make_quoteAll_basic() {
         // ## Arrange ##
         LineTokenImpl impl = new LineTokenImpl();
         LineMakingOption option = new LineMakingOption();
         option.delimitateByComma();
-        option.quoteByDoubleQuotation();
+        option.quoteAll();
         List<String> valueList = new ArrayList<String>();
         valueList.add("a");
         valueList.add("b");
@@ -74,12 +74,12 @@ public class LineTokenImplTest extends PlainTestCase {
         assertEquals("\"a\",\"b\",\"cc\",\"d\",\"e\"", line);
     }
 
-    public void test_make_quoteByDoubleQuotation_escape() {
+    public void test_make_quoteAll_escape() {
         // ## Arrange ##
         LineTokenImpl impl = new LineTokenImpl();
         LineMakingOption option = new LineMakingOption();
         option.delimitateByComma();
-        option.quoteByDoubleQuotation();
+        option.quoteAll();
         List<String> valueList = new ArrayList<String>();
         valueList.add("a");
         valueList.add("b");
@@ -93,5 +93,26 @@ public class LineTokenImplTest extends PlainTestCase {
         // ## Assert ##
         log(line);
         assertEquals("\"a\",\"b\",\"c\"\"c\",\"d\",\"e\"", line);
+    }
+
+    public void test_make_quoteMinimally_escape() {
+        // ## Arrange ##
+        LineTokenImpl impl = new LineTokenImpl();
+        LineMakingOption option = new LineMakingOption();
+        option.delimitateByComma();
+        option.quoteMinimally();
+        List<String> valueList = new ArrayList<String>();
+        valueList.add("a");
+        valueList.add("b");
+        valueList.add("c\"c");
+        valueList.add("d,d");
+        valueList.add("e");
+
+        // ## Act ##
+        String line = impl.make(valueList, option);
+
+        // ## Assert ##
+        log(line);
+        assertEquals("a,b,\"c\"\"c\",\"d,d\",e", line);
     }
 }

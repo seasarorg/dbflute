@@ -20,9 +20,9 @@ package org.seasar.dbflute.helper.token.file;
  */
 public class FileMakingOption {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Encoding. (Required) */
     protected String _encoding;
 
@@ -32,15 +32,15 @@ public class FileMakingOption {
     /** Line separator. (NotRequired) */
     protected String _lineSeparator;
 
-    /** Good bye double quotation. (NotRequired) */
-    protected boolean _goodByeDoubleQuotation;
+    /** Quote minimally. (NotRequired) */
+    protected boolean _quoteMinimally;
 
     /** File-making header information. (NotRequired) */
     protected FileMakingHeaderInfo _fileMakingHeaderInfo;
 
-    // =====================================================================================
-    //                                                                           Easy-to-Use
-    //                                                                           ===========
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
     public FileMakingOption delimitateByComma() {
         _delimiter = ",";
         return this;
@@ -71,14 +71,14 @@ public class FileMakingOption {
         return this;
     }
 
-    public FileMakingOption goodByeDoubleQuotation() {
-        _goodByeDoubleQuotation = true;
+    public FileMakingOption quoteMinimally() {
+        _quoteMinimally = true;
         return this;
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getEncoding() {
         return _encoding;
     }
@@ -103,8 +103,8 @@ public class FileMakingOption {
         _lineSeparator = lineSeparator;
     }
 
-    public boolean isGoodByeDoubleQuotation() {
-        return _goodByeDoubleQuotation;
+    public boolean isQuoteMinimally() {
+        return _quoteMinimally;
     }
 
     public FileMakingHeaderInfo getFileMakingHeaderInfo() {
@@ -114,5 +114,4 @@ public class FileMakingOption {
     public void setFileMakingHeaderInfo(FileMakingHeaderInfo fileMakingHeaderInfo) {
         _fileMakingHeaderInfo = fileMakingHeaderInfo;
     }
-
 }

@@ -86,12 +86,12 @@ public class LineTokenImpl implements LineToken {
         assertObjectNotNull("lineMakingOption", lineMakingOption);
         final String delimiter = lineMakingOption.getDelimiter();
         assertObjectNotNull("lineMakingOption.getDelimiter()", delimiter);
-        return createLineString(valueList, delimiter, lineMakingOption.isQuoteByDoubleQuotation(), lineMakingOption
-                .isTrimSpace());
+        return createLineString(valueList, delimiter, lineMakingOption.isQuoteAll(), lineMakingOption
+                .isQuoteMinimally(), lineMakingOption.isTrimSpace());
     }
 
-    protected String createLineString(List<String> valueList, String delimiter, boolean quoteByDoubleQuotation,
-            boolean trimSpace) {
+    protected String createLineString(List<String> valueList, String delimiter, boolean quoteAll,
+            boolean quoteMinimamlly, boolean trimSpace) {
         final StringBuffer sb = new StringBuffer();
         for (final Iterator<String> ite = valueList.iterator(); ite.hasNext();) {
             String value = (String) ite.next();
@@ -99,7 +99,10 @@ public class LineTokenImpl implements LineToken {
             if (trimSpace) {
                 value = value.trim();
             }
-            if (quoteByDoubleQuotation) {
+            if (quoteAll) {
+                value = DfStringUtil.replace(value, "\"", "\"\"");
+                sb.append(delimiter).append("\"").append(value).append("\"");
+            } else if (quoteMinimamlly && needsQuote(value, delimiter)) {
                 value = DfStringUtil.replace(value, "\"", "\"\"");
                 sb.append(delimiter).append("\"").append(value).append("\"");
             } else {
@@ -108,6 +111,10 @@ public class LineTokenImpl implements LineToken {
         }
         sb.delete(0, delimiter.length());
         return sb.toString();
+    }
+
+    protected boolean needsQuote(String value, String delimiter) {
+        return value.contains("\"") || value.contains("\r") || value.contains("\n") || value.contains(delimiter);
     }
 
     // ===================================================================================
