@@ -76,8 +76,12 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(ls))); }
 #end
 #if (${col.isAvailableStringLikeSearch()})
-        public void Set${tmpJavaName}_LikeSearch($col.javaNative v, ${glLikeSearchOption} option)
-        { regLSQ(CK_LS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", option); }
+        public void Set${tmpJavaName}_LikeSearch($col.javaNative v, ${glLikeSearchOption} option) {
+#if ($database.isDatabaseMSAccess())
+        if (option != null) { option.NotEscape(); }
+#end
+            regLSQ(CK_LS, fRES(v), getCValue${tmpJavaName}(), "${col.name}", option);
+        }
 #end
 #if (${col.isAvailableStringNotLikeSearch()})
         public void Set${tmpJavaName}_NotLikeSearch($col.javaNative v, ${glLikeSearchOption} option)

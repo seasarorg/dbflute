@@ -189,6 +189,9 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param likeSearchOption The option of like-search. (NotNull)
      */
     public void set${tmpJavaName}_LikeSearch(${col.javaNative} ${tmpUncapitalisedJavaName}, LikeSearchOption likeSearchOption) {
+#if ($database.isDatabaseMSAccess())
+        if (likeSearchOption != null) { likeSearchOption.notEscape(); } // because MS-Access does not support
+#end
         regLSQ(CK_LS, fRES(${tmpUncapitalisedJavaName}), getCValue${tmpJavaName}(), "${col.name}", likeSearchOption);
     }
 #end
