@@ -169,15 +169,4 @@
 -->
   </target>
 
-  <target name="reflect-win-sqlserver" depends="expand-dist" description="==> reflect to sqlserver example">
-    <copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  </target>
-
-  <target name="reflect-win-others" depends="expand-dist" description="==> reflect to other examples">
-    <copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}">
-      <fileset dir="${dbflute.deploy.dir}"/>
-    </copy>
-  </target>
 </project>

@@ -34,6 +34,7 @@
 	<property name="dbflute.oracle.example.dir" value="${workspace.base}/dbflute-oracle-example"/>
 	<property name="dbflute.sqlserver.example.dir" value="${workspace.base}/dbflute-sqlserver-example"/>
 	<property name="dbflute.db2.example.dir" value="${workspace.base}/dbflute-db2-example"/>
+	<property name="dbflute.sqlserver.example.dir" value="${workspace.base}/dbflute-db2-example"/>
 	<property name="dbflute.msaccess.example.dir" value="${workspace.base}/dbflute-msaccess-example"/>
 	<property name="dbflute.multipledb.example.dir" value="${workspace.base}/dbflute-multipledb-example"/>
 		
@@ -293,6 +294,12 @@
 	  	</copy>
 	</target>
 
+	<target name="reflect-win-sqlserver" depends="expand-dist" description="==> reflect to sqlserver example">
+	  	<copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	</target>
+
 	<target name="reflect-win-msaccess" depends="expand-dist" description="==> reflect to msaccess example">
 	  	<copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
 	    	<fileset dir="${dbflute.deploy.dir}"/>
@@ -313,6 +320,9 @@
 	    	<fileset dir="${dbflute.deploy.dir}"/>
 	  	</copy>
 	  	<copy todir="${dbflute.db2.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	  	<copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}">
 	    	<fileset dir="${dbflute.deploy.dir}"/>
 	  	</copy>
 	  	<copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}">
