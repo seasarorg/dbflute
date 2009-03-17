@@ -239,11 +239,9 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
     }
 
     private String buildSql4Log(String tableName, List<String> columnNameList, final List<Object> bindParameters) {
-        String columnNameString = columnNameList.toString();
-        columnNameString = columnNameString.substring(1, columnNameString.length() - 1);
         String bindParameterString = bindParameters.toString();
         bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
-        return "insert into " + tableName + " (" + columnNameString + ") values(" + bindParameterString + ")";
+        return tableName + ":{" + bindParameterString + "}";
     }
 
     protected Map<String, String> getTargetConvertColumnNameKeyToLowerMap(FirstLineInfo firstLineInfo) {
