@@ -15,16 +15,12 @@
  */
 package org.seasar.dbflute.cbean.coption;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
 import org.seasar.dbflute.resource.ResourceContext;
 
 /**
- * The class of like-search-option.
+ * The option of like search.
  * @author jflute
  */
 public class LikeSearchOption extends SimpleStringOption {
@@ -42,7 +38,6 @@ public class LikeSearchOption extends SimpleStringOption {
     protected String _like;
     protected String _escape;
     protected boolean _asOrSplit;
-    protected List<LikeAsOrCallback> _likeAsOrCallbackList;
 
     // ===================================================================================
     //                                                                         Rear Option
@@ -55,67 +50,41 @@ public class LikeSearchOption extends SimpleStringOption {
     }
 
     // ===================================================================================
-    //                                                                                AsOr
-    //                                                                                ====
-    /** @deprecated */
-    public static interface LikeAsOrCallback {
-        public String getAdditionalTargetPropertyName();
-        public String filterValue(String currentValue);
-        public LikeSearchOption filterOption(LikeSearchOption optionDeepCopyWithoutCallback);
-    }
-
-	/** @deprecated */
-    public static abstract class DefaultLikeAsOrCallback implements LikeAsOrCallback {
-        public String filterValue(String currentValue) {
-            return currentValue;
-        }
-        public LikeSearchOption filterOption(LikeSearchOption optionDeepCopyWithoutCallback) {
-            return optionDeepCopyWithoutCallback;
-        }
-    }
-
-    public boolean hasLikeAsOrCallback() {
-        return _likeAsOrCallbackList != null && !_likeAsOrCallbackList.isEmpty();
-    }
-	
-    public List<LikeAsOrCallback> getLikeAsOrCallbackList() {
-		if (_likeAsOrCallbackList == null) {
-		    _likeAsOrCallbackList = new ArrayList<LikeAsOrCallback>();
-		}
-        return _likeAsOrCallbackList;
-    }
-
-	/** 
-     * @param likeAsOrCallback Callback.
-     * @deprecated
-     */
-    public void addLikeAsOrCallback(LikeAsOrCallback likeAsOrCallback) {
-        getLikeAsOrCallbackList().add(likeAsOrCallback);
-    }
-
-    public void clearLikeAsOrCallback() {
-        getLikeAsOrCallbackList().clear();
-    }
-
-    // ===================================================================================
     //                                                                                Like
     //                                                                                ====
     public LikeSearchOption likePrefix() {
         _like = LIKE_PREFIX;
+        doLikeAutoEscape();
         return this;
     }
+
     public LikeSearchOption likeSuffix() {
         _like = LIKE_SUFFIX;
+        doLikeAutoEscape();
         return this;
     }
+
     public LikeSearchOption likeContain() {
         _like = LIKE_CONTAIN;
+        doLikeAutoEscape();
         return this;
+    }
+
+    protected void doLikeAutoEscape() {
+        escape();
     }
 
     // ===================================================================================
     //                                                                              Escape
     //                                                                              ======
+    /**
+     * Escape like search by PipeLine '|'.
+     * @return The option of like search. (NotNull)
+     */
+    public LikeSearchOption escape() {
+        return escapeByPipeLine();
+    }
+
     public LikeSearchOption escapeByPipeLine() {
         _escape = "|";
         return this;
@@ -136,66 +105,71 @@ public class LikeSearchOption extends SimpleStringOption {
         return this;
     }
 
+    public LikeSearchOption notEscape() {
+        _escape = null;
+        return this;
+    }
+
     // ===================================================================================
     //                                                                               Split
     //                                                                               =====
     public LikeSearchOption splitBySpace() {
-        return (LikeSearchOption)doSplitBySpace();
+        return (LikeSearchOption) doSplitBySpace();
     }
 
     public LikeSearchOption splitBySpace(int splitLimitCount) {
-        return (LikeSearchOption)doSplitBySpace(splitLimitCount);
+        return (LikeSearchOption) doSplitBySpace(splitLimitCount);
     }
 
     public LikeSearchOption splitBySpaceContainsDoubleByte() {
-        return (LikeSearchOption)doSplitBySpaceContainsDoubleByte();
+        return (LikeSearchOption) doSplitBySpaceContainsDoubleByte();
     }
 
     public LikeSearchOption splitBySpaceContainsDoubleByte(int splitLimitCount) {
-        return (LikeSearchOption)doSplitBySpaceContainsDoubleByte(splitLimitCount);
+        return (LikeSearchOption) doSplitBySpaceContainsDoubleByte(splitLimitCount);
     }
 
     public LikeSearchOption splitByPipeLine() {
-        return (LikeSearchOption)doSplitByPipeLine();
+        return (LikeSearchOption) doSplitByPipeLine();
     }
 
     public LikeSearchOption splitByPipeLine(int splitLimitCount) {
-        return (LikeSearchOption)doSplitByPipeLine(splitLimitCount);
+        return (LikeSearchOption) doSplitByPipeLine(splitLimitCount);
     }
-	
-	public LikeSearchOption asOrSplit() {
-	    _asOrSplit = true;
-		return this;
-	}
-	
-	public boolean isAsOrSplit() {
-	    return _asOrSplit;
-	}
+
+    public LikeSearchOption asOrSplit() {
+        _asOrSplit = true;
+        return this;
+    }
+
+    public boolean isAsOrSplit() {
+        return _asOrSplit;
+    }
 
     // ===================================================================================
     //                                                                 To Upper/Lower Case
     //                                                                 ===================
     public LikeSearchOption toUpperCase() {
-        return (LikeSearchOption)doToUpperCase();
+        return (LikeSearchOption) doToUpperCase();
     }
 
     public LikeSearchOption toLowerCase() {
-        return (LikeSearchOption)doToLowerCase();
+        return (LikeSearchOption) doToLowerCase();
     }
 
     // ===================================================================================
     //                                                                      To Single Byte
     //                                                                      ==============
     public LikeSearchOption toSingleByteSpace() {
-        return (LikeSearchOption)doToSingleByteSpace();
+        return (LikeSearchOption) doToSingleByteSpace();
     }
 
     public LikeSearchOption toSingleByteAlphabetNumber() {
-        return (LikeSearchOption)doToSingleByteAlphabetNumber();
+        return (LikeSearchOption) doToSingleByteAlphabetNumber();
     }
 
     public LikeSearchOption toSingleByteAlphabetNumberMark() {
-        return (LikeSearchOption)doToSingleByteAlphabetNumberMark();
+        return (LikeSearchOption) doToSingleByteAlphabetNumberMark();
     }
 
     // ===================================================================================
@@ -242,22 +216,7 @@ public class LikeSearchOption extends SimpleStringOption {
     }
 
     protected boolean isCurrentDBDef(DBDef currentDBDef) {
-	    return ResourceContext.isCurrentDBDef(currentDBDef);
-    }
-
-    // ===================================================================================
-    //                                                                            DeepCopy
-    //                                                                            ========
-    public Object createDeepCopy() {
-        final LikeSearchOption deepCopy = (LikeSearchOption)super.createDeepCopy();
-        deepCopy._like = _like;
-        deepCopy._escape = _escape;
-		if (hasLikeAsOrCallback()) {
-            for (Iterator<LikeAsOrCallback> ite = _likeAsOrCallbackList.iterator(); ite.hasNext(); ) {
-                deepCopy.addLikeAsOrCallback((LikeAsOrCallback)ite.next());
-            }
-		}
-        return deepCopy;
+        return ResourceContext.isCurrentDBDef(currentDBDef);
     }
 
     protected SimpleStringOption newDeepCopyInstance() {
@@ -269,6 +228,6 @@ public class LikeSearchOption extends SimpleStringOption {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "like=" + _like + ", escape=" + _escape + ", split=" + isSplit() + ", asOrSplit = " + _asOrSplit;  
+        return "like=" + _like + ", escape=" + _escape + ", split=" + isSplit() + ", asOrSplit = " + _asOrSplit;
     }
 }

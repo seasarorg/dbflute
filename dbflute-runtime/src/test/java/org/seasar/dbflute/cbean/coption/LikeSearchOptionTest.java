@@ -11,10 +11,29 @@ public class LikeSearchOptionTest extends PlainTestCase {
     // ===================================================================================
     //                                                                         Rear Option
     //                                                                         ===========
-    /**
-     * 後ろ(Rear)のOptionを取得するメソッド。主にはescape処理である。<br />
-     * 基本的には内部メソッドではあるが、単なるユーティリティとしても利用可能である。
-     */
+    public void test_autoEscape_default() {
+        // ## Arrange ##
+        final LikeSearchOption option = new LikeSearchOption();
+
+        // ## Act ##
+        final String rearOption = option.getRearOption();
+
+        // ## Assert ##
+        assertEquals("", rearOption.trim());
+    }
+
+    public void test_autoEscape_likeXxx() {
+        // ## Arrange ##
+        final LikeSearchOption option = new LikeSearchOption();
+        option.likeContain();
+
+        // ## Act ##
+        final String rearOption = option.getRearOption();
+
+        // ## Assert ##
+        assertEquals("escape '|'", rearOption.trim());
+    }
+
     public void test_getRearOption() {
         // ## Arrange ##
         final LikeSearchOption option = new LikeSearchOption();
@@ -25,6 +44,18 @@ public class LikeSearchOptionTest extends PlainTestCase {
 
         // ## Assert ##
         assertEquals("escape '|'", rearOption.trim());
+    }
+
+    public void test_autoEscape_likeXxx_escapeBySlash() {
+        // ## Arrange ##
+        final LikeSearchOption option = new LikeSearchOption();
+        option.likeContain().escapeBySlash();
+
+        // ## Act ##
+        final String rearOption = option.getRearOption();
+
+        // ## Assert ##
+        assertEquals("escape '/'", rearOption.trim());
     }
 
     // ===================================================================================

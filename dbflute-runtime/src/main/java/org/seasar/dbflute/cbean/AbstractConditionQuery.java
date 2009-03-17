@@ -53,7 +53,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected static final ConditionKey CK_GT = ConditionKey.CK_GREATER_THAN;
     protected static final ConditionKey CK_LE = ConditionKey.CK_LESS_EQUAL;
     protected static final ConditionKey CK_LT = ConditionKey.CK_LESS_THAN;
-    protected static final ConditionKey CK_PS = ConditionKey.CK_PREFIX_SEARCH;
+    protected static final ConditionKey CK_PS = ConditionKey.CK_PREFIX_SEARCH; // [Future]: Not Used and Deleted at the future!
     protected static final ConditionKey CK_INS = ConditionKey.CK_IN_SCOPE;
     protected static final ConditionKey CK_NINS = ConditionKey.CK_NOT_IN_SCOPE;
     protected static final ConditionKey CK_LS = ConditionKey.CK_LIKE_SEARCH;
@@ -454,22 +454,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             for (int i = 0; i < strArray.length; i++) {
                 final String currentValue = strArray[i];
                 setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
-                
-                // Callback for LikeAsOr!
-                final List<LikeSearchOption.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
-                if (!callbackList.isEmpty()) {
-                    getSqlClause().makeAdditionalConditionAsOrEffective();
-                    for (Iterator<LikeSearchOption.LikeAsOrCallback> ite = callbackList.iterator(); ite.hasNext();) {
-                        final LikeSearchOption.LikeAsOrCallback likeAsOrCallback = (LikeSearchOption.LikeAsOrCallback) ite.next();
-                        final String additionalTargetPropertyName = likeAsOrCallback.getAdditionalTargetPropertyName();
-                        final String filteredValue = likeAsOrCallback.filterValue(currentValue);
-                        final LikeSearchOption optionDeepCopy = (LikeSearchOption) option.createDeepCopy();
-                        optionDeepCopy.clearLikeAsOrCallback();
-                        final LikeSearchOption filteredOption = likeAsOrCallback.filterOption(optionDeepCopy);
-                        invokeSetterLikeSearch(additionalTargetPropertyName, filteredValue, filteredOption);
-                    }
-                    getSqlClause().ignoreAdditionalConditionAsOr();
-                }
             }
         } else {
             // As 'or' Condition
@@ -482,11 +466,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     invokeSetterLikeSearch(colName, currentValue, option);
                 }
             }
-            
-            // @jflute -- Callback for LikeAsOr!
-            // final List<LikeSearchOption.LikeAsOrCallback> callbackList = option.getLikeAsOrCallbackList();
-            // ...
-            
             getSqlClause().ignoreAdditionalConditionAsOr();
         }
     }
@@ -1868,6 +1847,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      */
     private String filterRemoveEmptyString(String value) {
         return ((value != null && !"".equals(value)) ? value : null);
+    }
+    
+    /**
+     * create the option of like search as prefix search.
+     * @return The option of like search as prefix search. (NotNull)
+     */
+    protected LikeSearchOption cLSOP() {
+        return new LikeSearchOption().likePrefix();
     }
     
     /**
