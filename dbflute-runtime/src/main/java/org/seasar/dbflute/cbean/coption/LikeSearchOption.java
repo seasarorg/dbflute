@@ -193,7 +193,7 @@ public class LikeSearchOption extends SimpleStringOption {
         value = super.generateRealValue(value);
 
         // Escape
-        if (_escape != null && _escape.trim().length() != 0) {
+        if (_escape != null && _escape.trim().length() != 0 && !isCurrentDBDef(DBDef.MSAccess)) {
             String tmp = replace(value, _escape, _escape + _escape);
             tmp = replace(tmp, "%", _escape + "%");
             tmp = replace(tmp, "_", _escape + "_");
