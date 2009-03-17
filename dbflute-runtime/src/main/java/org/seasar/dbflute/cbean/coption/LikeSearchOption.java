@@ -46,6 +46,9 @@ public class LikeSearchOption extends SimpleStringOption {
         if (_escape == null || _escape.trim().length() == 0) {
             return "";
         }
+        if (isCurrentDBDef(DBDef.MSAccess)) {
+            return ""; // because it does not support escape.
+        }
         return " escape '" + _escape + "'";
     }
 
@@ -71,9 +74,6 @@ public class LikeSearchOption extends SimpleStringOption {
     }
 
     protected void doLikeAutoEscape() {
-        if (isCurrentDBDef(DBDef.MSAccess)) {
-            return; // because it does not support escape.
-        }
         escape();
     }
 
