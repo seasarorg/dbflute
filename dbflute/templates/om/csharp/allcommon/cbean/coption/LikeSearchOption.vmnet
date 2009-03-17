@@ -20,10 +20,12 @@ public class ${myClassName} : ${glSimpleStringOption} {
     //                                                                         Rear Option
     //                                                                         ===========
     public override String getRearOption() {
+#if (!$database.isDatabaseMSAccess())
         if (_escape == null || _escape.Trim().Length == 0) {
             return "";
         }
         return " escape '" + _escape + "'";
+#end
     }
 
     // ===================================================================================
@@ -48,9 +50,7 @@ public class ${myClassName} : ${glSimpleStringOption} {
     }
     
     protected virtual void DoLikeAutoEscape() {
-#if (!$database.isDatabaseMSAccess())
         Escape();
-#end
     }
 
     // ===================================================================================
@@ -111,6 +111,7 @@ public class ${myClassName} : ${glSimpleStringOption} {
     public override String generateRealValue(String value) {
         value = base.generateRealValue(value);
 
+#if (!$database.isDatabaseMSAccess())
         // Escape
         if (_escape != null && _escape.Trim().Length != 0) {
             String tmp = replaceString(value, _escape, _escape + _escape);
@@ -122,6 +123,7 @@ public class ${myClassName} : ${glSimpleStringOption} {
 #end
             value = tmp;
         }
+#end
         String wildCard = "${database.wildCard}";
         if (_like == null || _like.Trim().Length == 0) {
             return value;
