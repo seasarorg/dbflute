@@ -44,6 +44,7 @@ map:{
         #; LessThan = map:{}
         #; GreaterEqual = map:{}
         #; LessEqual = map:{}
+        #; PrefixSearch = map:{}
     }
     ; Number = map:{
         # If you don't need these operand for string,

@@ -154,11 +154,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableStringPrefixSearch()})
 
     /**
-     * PrefixSearch(like 'xxx%'). And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * PrefixSearch(like 'xxx%' escape ...). And NullOrEmptyIgnored, OnlyOnceRegistered.
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as prefixSearch.
      */
     public void set${tmpJavaName}_PrefixSearch(${col.javaNative} ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_PS, fRES(${tmpUncapitalisedJavaName}));
+        set${tmpJavaName}_LikeSearch(${tmpUncapitalisedJavaName}, cLSOP());
     }
 #end
 #if (${col.isAvailableStringInScope()})

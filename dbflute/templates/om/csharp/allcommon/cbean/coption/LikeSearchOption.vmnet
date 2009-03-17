@@ -31,20 +31,33 @@ public class ${myClassName} : ${glSimpleStringOption} {
     //                                                                                ====
     public ${myClassName} LikePrefix() {
         _like = LIKE_PREFIX;
+        DoLikeAutoEscape();
         return this;
     }
+
     public ${myClassName} LikeSuffix() {
         _like = LIKE_SUFFIX;
+        DoLikeAutoEscape();
         return this;
     }
+
     public ${myClassName} LikeContain() {
         _like = LIKE_CONTAIN;
+        DoLikeAutoEscape();
         return this;
+    }
+    
+    protected virtual void DoLikeAutoEscape() {
+        Escape();
     }
 
     // ===================================================================================
     //                                                                              Escape
     //                                                                              ======
+    public ${myClassName} Escape() {
+        return EscapeByPipeLine();
+    }
+
     public ${myClassName} EscapeByPipeLine() {
         _escape = "|";
         return this;
@@ -62,6 +75,11 @@ public class ${myClassName} : ${glSimpleStringOption} {
 
     public ${myClassName} EscapeByBackSlash() {
         _escape = "\\";
+        return this;
+    }
+
+    public ${myClassName} NotEscape() {
+        _escape = null;
         return this;
     }
 

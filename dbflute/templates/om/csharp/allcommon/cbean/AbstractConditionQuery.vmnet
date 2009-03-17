@@ -27,7 +27,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected static readonly ${glConditionKey} CK_GT = ${glConditionKey}.CK_GREATER_THAN;
     protected static readonly ${glConditionKey} CK_LE = ${glConditionKey}.CK_LESS_EQUAL;
     protected static readonly ${glConditionKey} CK_LT = ${glConditionKey}.CK_LESS_THAN;
-    protected static readonly ${glConditionKey} CK_PS = ${glConditionKey}.CK_PREFIX_SEARCH;
+    protected static readonly ${glConditionKey} CK_PS = ${glConditionKey}.CK_PREFIX_SEARCH; // [Future]: Not Used and Deleted at the future!
     protected static readonly ${glConditionKey} CK_INS = ${glConditionKey}.CK_IN_SCOPE;
     protected static readonly ${glConditionKey} CK_NINS = ${glConditionKey}.CK_NOT_IN_SCOPE;
     protected static readonly ${glConditionKey} CK_LS = ${glConditionKey}.CK_LIKE_SEARCH;
@@ -995,6 +995,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     private String filterRemoveEmptyString(String value) {
         return ((value != null && !"".Equals(value)) ? value : null);
+    }
+    
+    protected ${glLikeSearchOption} cLSOP() {
+        return new ${glLikeSearchOption}().LikePrefix();
     }
 
     protected System.Collections.IList cTL<PROPERTY_TYPE>(System.Collections.Generic.ICollection<PROPERTY_TYPE> col) {
