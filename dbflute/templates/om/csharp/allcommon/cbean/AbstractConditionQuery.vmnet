@@ -305,6 +305,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             throwLikeSearchOptionNotFoundException(colName, value);
             return;// Unreachable!
         }
+        if (xsuppressEscape()) {
+            option.NotEscape();
+        }
         if (value == null || !option.isSplit()) {
             // As Normal Condition.
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
@@ -314,6 +317,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         // Use splitByXxx().
         // - - - - - - - - -
         throw new UnsupportedOperationException("The method 'splitByXxx()' have been unsupported yet!");
+    }
+    
+    protected virtual bool xsuppressEscape() { // for override
+        return false; // as default
     }
 
     protected void throwLikeSearchOptionNotFoundException(String colName, String value) {
