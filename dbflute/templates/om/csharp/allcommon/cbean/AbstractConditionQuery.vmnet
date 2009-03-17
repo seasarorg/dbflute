@@ -27,7 +27,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected static readonly ${glConditionKey} CK_GT = ${glConditionKey}.CK_GREATER_THAN;
     protected static readonly ${glConditionKey} CK_LE = ${glConditionKey}.CK_LESS_EQUAL;
     protected static readonly ${glConditionKey} CK_LT = ${glConditionKey}.CK_LESS_THAN;
-    protected static readonly ${glConditionKey} CK_PS = ${glConditionKey}.CK_PREFIX_SEARCH; // [Future]: Not Used and Deleted at the future!
     protected static readonly ${glConditionKey} CK_INS = ${glConditionKey}.CK_IN_SCOPE;
     protected static readonly ${glConditionKey} CK_NINS = ${glConditionKey}.CK_NOT_IN_SCOPE;
     protected static readonly ${glConditionKey} CK_LS = ${glConditionKey}.CK_LIKE_SEARCH;
