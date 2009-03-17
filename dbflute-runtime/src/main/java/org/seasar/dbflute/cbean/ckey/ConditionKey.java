@@ -50,9 +50,6 @@ public abstract class ConditionKey {
     /** The condition key of lessEqual. */
     public static final ConditionKey CK_LESS_EQUAL = new ConditionKeyLessEqual();
 
-    /** The condition key of prefixSearch. */
-    public static final ConditionKey CK_PREFIX_SEARCH = new ConditionKeyPrefixSearch();
-
     /** The condition key of inScope. */
     public static final ConditionKey CK_IN_SCOPE = new ConditionKeyInScope();
 

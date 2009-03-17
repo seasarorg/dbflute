@@ -71,6 +71,9 @@ public class LikeSearchOption extends SimpleStringOption {
     }
 
     protected void doLikeAutoEscape() {
+        if (isCurrentDBDef(DBDef.MSAccess)) {
+            return; // because it does not support escape.
+        }
         escape();
     }
 
