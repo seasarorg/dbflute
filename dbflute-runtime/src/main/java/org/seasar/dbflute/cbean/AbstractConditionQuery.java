@@ -439,6 +439,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throwLikeSearchOptionNotFoundException(colName, value);
             return;// Unreachable!
         }
+        if (xsuppressEscape()) {
+            option.notEscape();
+        }
         if (value == null || !option.isSplit()) {
             // As Normal Condition.
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
@@ -467,6 +470,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
             getSqlClause().ignoreAdditionalConditionAsOr();
         }
+    }
+    
+    protected boolean xsuppressEscape() { // for override
+        return false; // as default
     }
 
     protected void throwLikeSearchOptionNotFoundException(String colName, String value) {
