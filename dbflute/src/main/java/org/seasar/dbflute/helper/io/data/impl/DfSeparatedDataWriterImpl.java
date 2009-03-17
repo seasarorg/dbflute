@@ -74,7 +74,6 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
     //                                                                                ====
     /**
      * Write data from separated-file.
-     * 
      * @param notFoundColumnMap Not found column map. (NotNUl)
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
@@ -134,8 +133,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                     if (preContinueString.equals("")) {
                         realLineString = lineString;
                     } else {
-                        final String lineSeparator = System.getProperty("line.separator");
-                        realLineString = preContinueString + lineSeparator + lineString;
+                        realLineString = preContinueString + "\n" + lineString;
                     }
                     final ValueLineInfo valueLineInfo = arrangeValueList(realLineString, _delimiter);
                     final List<String> ls = valueLineInfo.getValueList();
@@ -186,9 +184,9 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                             final String simpleName = e.getClass().getSimpleName();
                             final StringBuilder sb = new StringBuilder();
                             sb.append("The statement threw ").append(simpleName).append("! The detail is as follows:");
-                            sb.append(getLineSeparator()).append("  Message    = ");
+                            sb.append(ln()).append("  Message    = ");
                             sb.append(e.getMessage());
-                            sb.append(getLineSeparator()).append("  Parameters = ");
+                            sb.append(ln()).append("  Parameters = ");
                             sb.append(sqlBuildingResult.getColumnValueMap());
                             _log.warn(sb);
                             continue;
@@ -300,7 +298,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
             if (value == null) {
                 continue;
             }
-            if (i == valueList.size() - 1) {// The last loop
+            if (i == valueList.size() - 1) { // The last loop
                 if (preString.equals("")) {
                     if (isFrontQOnly(value)) {
                         valueLineInfo.setContinueNextLine(true);
@@ -375,15 +373,19 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
     }
 
     protected boolean isNotBothQ(final String value) {
-        return !value.startsWith("\"") && !value.endsWith("\"");
+        return !isQQ(value) && !value.startsWith("\"") && !(value.endsWith("\"") && !value.endsWith("\"\""));
     }
 
     protected boolean isRearQOnly(final String value) {
-        return !value.startsWith("\"") && value.endsWith("\"");
+        return !isQQ(value) && !value.startsWith("\"") && (value.endsWith("\"") && !value.endsWith("\"\""));
     }
 
     protected boolean isFrontQOnly(final String value) {
-        return value.startsWith("\"") && !value.endsWith("\"");
+        return !isQQ(value) && value.startsWith("\"") && !(value.endsWith("\"") && !value.endsWith("\"\""));
+    }
+
+    protected boolean isQQ(final String value) {
+        return value.equals("\"\"");
     }
 
     protected String removeDoubleQuotation(String value) {
@@ -513,11 +515,10 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
     //                                                                              ======
     /**
      * Get the value of line separator.
-     * 
      * @return The value of line separator. (NotNull)
      */
-    protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+    protected String ln() {
+        return "\n";
     }
 
     // ===================================================================================
