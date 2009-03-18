@@ -58,9 +58,6 @@ public class ConditionKeyNotInScope extends ConditionKey {
      * @param value Condition value. (NotNull)
      */
     protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
-        if (value.getNotInScope() == null) {
-            return;
-        }
         conditionList.add(buildBindClause(columnName, value.getNotInScopeLocation(), "('a1', 'a2')"));
     }
 

@@ -59,9 +59,6 @@ public class ConditionKeyInScope extends ConditionKey {
      * @param value Condition value. (NotNull)
      */
     protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
-        if (value.getInScope() == null) {
-            return;
-        }
         conditionList.add(buildBindClause(columnName, value.getInScopeLocation(), "('a1', 'a2')"));
     }
 
