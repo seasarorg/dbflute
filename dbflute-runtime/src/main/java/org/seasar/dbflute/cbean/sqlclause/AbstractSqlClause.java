@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -1015,6 +1016,15 @@ public abstract class AbstractSqlClause implements SqlClause {
                 return caseWhen + ", " + orderByElementClause;
             }
         };
+    }
+    
+    public void addManualOrderToPreviousOrderByElement(ManumalOrderInfo manumalOrderInfo) {
+        assertObjectNotNull("manumalOrderInfo", manumalOrderInfo);
+        if (hasUnionQuery()) {
+            String msg = "Manual Order with Union is unsupported: " + manumalOrderInfo.getManualValueList();
+            throw new UnsupportedOperationException(msg);
+        }
+        _orderByClause.addManualOrderByElement(manumalOrderInfo);
     }
 
     // ===================================================================================

@@ -30,6 +30,7 @@ import org.seasar.dbflute.cbean.coption.FromToOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.cbean.sqlclause.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
@@ -426,7 +427,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             final int beginIndex = inScopeLimit*index;
             final int endPoint = beginIndex + inScopeLimit;
             final int endIndex = inScopeLimit < remainderSize ? endPoint : valueSize;
-            valueList.add(value.subList(beginIndex, endIndex));
+            valueList.add(new ArrayList<Object>(value.subList(beginIndex, endIndex)));
             remainderSize = value.size() - endPoint;
             ++index;
         } while (remainderSize > 0);
@@ -1618,12 +1619,30 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
-    public void withNullsFirst() {// is User Public!
+    /**
+     * Order with the keyword 'nulls first'.
+     */
+    public void withNullsFirst() { // is User Public!
         getSqlClause().addNullsFirstToPreviousOrderBy();
     }
     
-    public void withNullsLast() {// is User Public!
+    /**
+     * Order with the keyword 'nulls last'.
+     */
+    public void withNullsLast() { // is User Public!
         getSqlClause().addNullsLastToPreviousOrderBy();
+    }
+    
+    /**
+     * Order with the list of manual value. <br />
+     * This with Union is unsupported!
+     * @param manualValueList The list of manual value. (NotNull)
+     */
+    public void withManualOrder(List<? extends Object> manualValueList) { // is User Public!
+        assertObjectNotNull("withManualOrder(manualValueList)", manualValueList);
+        ManumalOrderInfo manumalOrderInfo = new ManumalOrderInfo();
+        manumalOrderInfo.setManualValueList(manualValueList);
+        getSqlClause().addManualOrderToPreviousOrderByElement(manumalOrderInfo);
     }
 
     protected void registerSpecifiedDerivedOrderBy_Asc(String aliasName) {
@@ -1837,6 +1856,22 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         try {
             return cq.getClass().getMethod(methodName, argTypes);
         } catch (NoSuchMethodException e) {
+            if (argTypes != null && argTypes.length == 1) {
+                Class<?> argType = argTypes[0];
+                if (List.class.isAssignableFrom(argType)) {
+                    try {
+                        return cq.getClass().getMethod(methodName, new Class<?>[]{Collection.class});
+                    } catch (NoSuchMethodException ignored) {
+                    }
+                }
+                Class<?>[] infs = argType.getInterfaces();
+                for (Class<?> inf : infs) {
+                    try {
+                        return cq.getClass().getMethod(methodName, new Class<?>[]{inf});
+                    } catch (NoSuchMethodException ignored) {
+                    }
+                }
+            }
             String msg = "The method is not existing:";
             msg = msg + " methodName=" + methodName;
             msg = msg + " argTypes=" + convertObjectArrayToStringView(argTypes);

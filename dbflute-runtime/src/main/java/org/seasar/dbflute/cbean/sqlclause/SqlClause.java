@@ -20,6 +20,7 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.OrderByClause.ManumalOrderInfo;
 
 /**
  * The interface of SQL clause.
@@ -251,6 +252,8 @@ public interface SqlClause {
 
     public void addNullsLastToPreviousOrderBy();
 
+    public void addManualOrderToPreviousOrderByElement(ManumalOrderInfo manumalOrderInfo);
+    
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====

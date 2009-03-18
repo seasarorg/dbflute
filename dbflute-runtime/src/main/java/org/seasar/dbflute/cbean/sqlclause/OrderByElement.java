@@ -16,6 +16,7 @@
 package org.seasar.dbflute.cbean.sqlclause;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -45,12 +46,15 @@ public class OrderByElement implements Serializable {
 
     /** The value of ascDesc. */
     protected String _ascDesc = "asc";
-	
-	/** The setupper of order-by nulls. */
-	protected OrderByClause.OrderByNullsSetupper _orderByNullsSetupper;
-	
-	/** Is nulls ordered first? */
-	protected boolean _nullsFirst;
+
+    /** The set-upper of order-by nulls. */
+    protected OrderByClause.OrderByNullsSetupper _orderByNullsSetupper;
+
+    /** Is nulls ordered first? */
+    protected boolean _nullsFirst;
+
+    /** The information of manual order. */
+    protected OrderByClause.ManumalOrderInfo _manualOrderInfo;
 
     // =====================================================================================
     //                                                                          Manipulation
@@ -115,12 +119,17 @@ public class OrderByElement implements Serializable {
             throw new IllegalStateException(msg);
         }
         final StringBuilder sb = new StringBuilder();
-        sb.append(getColumnFullName()).append(" ").append(_ascDesc);
-		if (_orderByNullsSetupper != null) {
-		    return _orderByNullsSetupper.setup(getColumnFullName(), sb.toString(), _nullsFirst);
-		} else {
+        if (_manualOrderInfo != null && _manualOrderInfo.hasManualValueList()) {
+            setupManualOrderClause(sb, getColumnFullName());
             return sb.toString();
-		}
+        } else {
+            sb.append(getColumnFullName()).append(" ").append(_ascDesc);
+            if (_orderByNullsSetupper != null) {
+                return _orderByNullsSetupper.setup(getColumnFullName(), sb.toString(), _nullsFirst);
+            } else {
+                return sb.toString();
+            }
+        }
     }
 
     public String getElementClause(Map<String, String> selectClauseRealColumnAliasMap) {
@@ -132,62 +141,83 @@ public class OrderByElement implements Serializable {
             String msg = "The attribute[ascDesc] should not be null.";
             throw new IllegalStateException(msg);
         }
-        final StringBuilder sb = new StringBuilder();
         final String columnAlias = selectClauseRealColumnAliasMap.get(getColumnFullName());
         if (columnAlias == null || columnAlias.trim().length() == 0) {
-		    throwOrderByColumnNotFoundException(getColumnFullName(), selectClauseRealColumnAliasMap);
+            throwOrderByColumnNotFoundException(getColumnFullName(), selectClauseRealColumnAliasMap);
         }
-        sb.append(columnAlias).append(" ").append(_ascDesc);
-		if (_orderByNullsSetupper != null) {
-		    return _orderByNullsSetupper.setup(columnAlias, sb.toString(), _nullsFirst);
-		} else {
+        final StringBuilder sb = new StringBuilder();
+        if (_manualOrderInfo != null && _manualOrderInfo.hasManualValueList()) {
+            setupManualOrderClause(sb, columnAlias);
             return sb.toString();
-		}
+        } else {
+            sb.append(columnAlias).append(" ").append(_ascDesc);
+            if (_orderByNullsSetupper != null) {
+                return _orderByNullsSetupper.setup(columnAlias, sb.toString(), _nullsFirst);
+            } else {
+                return sb.toString();
+            }
+        }
     }
 
-    protected void throwOrderByColumnNotFoundException(String columnName, Map<String, String> selectClauseRealColumnAliasMap) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The column for order-by was Not Found in select-clause!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "If you use 'union()' or 'unionAll()', Check your condition-bean!" + getLineSeparator();
-        msg = msg + "Order-by for union can use only columns on select-clause." + getLineSeparator();
-        msg = msg + "So the rule when using union is little difference from the one when NOT using." + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    [before (x)]" + getLineSeparator();
-        msg = msg + "    AaaCB cb = new AaaCB();" + getLineSeparator();
-        msg = msg + "    cb.query().setXxx...();" + getLineSeparator();
-        msg = msg + "    {" + getLineSeparator();
-        msg = msg + "        AaaCB unionCB = new AaaCB();" + getLineSeparator();
-        msg = msg + "        unionCB.query().setXxx...();" + getLineSeparator();
-        msg = msg + "        cb.union(unionCB.query());" + getLineSeparator();
-        msg = msg + "    }" + getLineSeparator();
-        msg = msg + "    cb.query().queryBbb().addOrderBy_BbbName_Asc();// *NG!" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [after (o)]" + getLineSeparator();
-        msg = msg + "    AaaCB cb = new AaaCB();" + getLineSeparator();
-        msg = msg + "    cb.setupSelect_Bbb();// *Point!" + getLineSeparator();
-        msg = msg + "    cb.query().setXxx...();" + getLineSeparator();
-        msg = msg + "    {" + getLineSeparator();
-        msg = msg + "        AaaCB unionCB = new AaaCB();" + getLineSeparator();
-        msg = msg + "        unionCB.query().setXxx...();" + getLineSeparator();
-        msg = msg + "        cb.union(unionCB.query());" + getLineSeparator();
-        msg = msg + "    }" + getLineSeparator();
-        msg = msg + "    cb.query().queryBbb().addOrderBy_BbbName_Asc();// *OK!" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "Or else if you DON'T use 'union()' or 'unionAll()', This is the Framework Exception!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Target Column]" + getLineSeparator();
-		msg = msg + columnName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Internal Object]" + getLineSeparator();
-		msg = msg + "selectClauseRealColumnAliasMap=" + selectClauseRealColumnAliasMap + getLineSeparator();
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+    protected void setupManualOrderClause(StringBuilder sb, String columnAlias) {
+        final List<? extends Object> manualValueList = _manualOrderInfo.getManualValueList();
+        sb.append(ln()).append("   case").append(ln());
+        int index = 0;
+        for (Object value : manualValueList) {
+            final String q = (value instanceof Number) ? "" : "'";
+            sb.append("     when ");
+            sb.append(columnAlias).append(" = ").append(q).append(value).append(q);
+            sb.append(" then ").append(index).append(ln());
+            ++index;
+        }
+        sb.append("     else ").append(index).append(ln());
+        sb.append("   end ").append(_ascDesc);
+    }
+
+    protected void throwOrderByColumnNotFoundException(String columnName,
+            Map<String, String> selectClauseRealColumnAliasMap) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The column for order-by was Not Found in select-clause!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "If you use 'union()' or 'unionAll()', Check your condition-bean!" + ln();
+        msg = msg + "Order-by for union can use only columns on select-clause." + ln();
+        msg = msg + "So the rule when using union is little difference from the one when NOT using." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    [before (x)]" + ln();
+        msg = msg + "    AaaCB cb = new AaaCB();" + ln();
+        msg = msg + "    cb.query().setXxx...();" + ln();
+        msg = msg + "    cb.union(new UnionQuery<AaaCB>() {" + ln();
+        msg = msg + "        public void query(AaaCB unionCB) {" + ln();
+        msg = msg + "            unionCB.query().setXxx...();" + ln();
+        msg = msg + "        }" + ln();
+        msg = msg + "    }" + ln();
+        msg = msg + "    cb.query().queryBbb().addOrderBy_BbbName_Asc();// *NG!" + ln();
+        msg = msg + "    " + ln();
+        msg = msg + "    [after (o)]" + ln();
+        msg = msg + "    AaaCB cb = new AaaCB();" + ln();
+        msg = msg + "    cb.setupSelect_Bbb();// *Point!" + ln();
+        msg = msg + "    cb.query().setXxx...();" + ln();
+        msg = msg + "    cb.union(new UnionQuery<AaaCB>() {" + ln();
+        msg = msg + "        public void query(AaaCB unionCB) {" + ln();
+        msg = msg + "            unionCB.query().setXxx...();" + ln();
+        msg = msg + "        }" + ln();
+        msg = msg + "    }" + ln();
+        msg = msg + "    cb.query().queryBbb().addOrderBy_BbbName_Asc();// *OK!" + ln();
+        msg = msg + "    " + ln();
+        msg = msg + "Or else if you DON'T use 'union()' or 'unionAll()', This is the Framework Exception!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Target Column]" + ln();
+        msg = msg + columnName + ln();
+        msg = msg + ln();
+        msg = msg + "[Internal Object]" + ln();
+        msg = msg + "selectClauseRealColumnAliasMap=" + selectClauseRealColumnAliasMap + ln();
+        msg = msg + "* * * * * * * * * */" + ln();
         throw new IllegalStateException(msg);
     }
 
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 
@@ -214,35 +244,49 @@ public class OrderByElement implements Serializable {
     public String getAliasName() {
         return _aliasName;
     }
+
     public String getColumnName() {
         return _columnName;
     }
+
     public String getRegisteredAliasName() {
         return _registeredAliasName;
     }
+
     public String getRegisteredColumnName() {
         return _registeredColumnName;
     }
+
     public String getAscDesc() {
         return _ascDesc;
     }
+
     public void setAliasName(String value) {
         _aliasName = value;
     }
+
     public void setColumnName(String value) {
         _columnName = value;
     }
+
     public void setRegisteredAliasName(String value) {
         _registeredAliasName = value;
     }
+
     public void setRegisteredColumnName(String value) {
         _registeredColumnName = value;
     }
+
     public void setAscDesc(String value) {
         _ascDesc = value;
     }
+
     public void setOrderByNullsSetupper(OrderByClause.OrderByNullsSetupper value, boolean nullsFirst) {
         _orderByNullsSetupper = value;
-		_nullsFirst = nullsFirst;
+        _nullsFirst = nullsFirst;
+    }
+
+    public void setManumalOrderInfo(OrderByClause.ManumalOrderInfo manualOrderInfo) {
+        _manualOrderInfo = manualOrderInfo;
     }
 }

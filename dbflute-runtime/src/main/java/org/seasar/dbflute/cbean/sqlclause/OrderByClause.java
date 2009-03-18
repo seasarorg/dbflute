@@ -64,7 +64,7 @@ public class OrderByClause implements Serializable {
     }
 
     public void reverseAll() {
-        for (Iterator<OrderByElement> ite = _orderByList.iterator(); ite.hasNext(); ) {
+        for (Iterator<OrderByElement> ite = _orderByList.iterator(); ite.hasNext();) {
             ite.next().reverse();
         }
     }
@@ -77,26 +77,50 @@ public class OrderByClause implements Serializable {
             _orderByList.set(_orderByList.size() - 1, first);
         }
     }
-	
-	public void addNullsFirstToPreviousOrderByElement(OrderByNullsSetupper filter) {
-	    if (_orderByList.isEmpty()) {
-		    return;
-		}
-		final OrderByElement last = _orderByList.get(_orderByList.size() - 1);
-		last.setOrderByNullsSetupper(filter, true);
-	}
-	
-	public void addNullsLastToPreviousOrderByElement(OrderByNullsSetupper filter) {
-	    if (_orderByList.isEmpty()) {
-		    return;
-		}
-		final OrderByElement last = _orderByList.get(_orderByList.size() - 1);
-		last.setOrderByNullsSetupper(filter, false);
-	}
-	
-	public static interface OrderByNullsSetupper {
+
+    public void addNullsFirstToPreviousOrderByElement(OrderByNullsSetupper filter) {
+        if (_orderByList.isEmpty()) {
+            return;
+        }
+        final OrderByElement last = _orderByList.get(_orderByList.size() - 1);
+        last.setOrderByNullsSetupper(filter, true);
+    }
+
+    public void addNullsLastToPreviousOrderByElement(OrderByNullsSetupper filter) {
+        if (_orderByList.isEmpty()) {
+            return;
+        }
+        final OrderByElement last = _orderByList.get(_orderByList.size() - 1);
+        last.setOrderByNullsSetupper(filter, false);
+    }
+
+    public static interface OrderByNullsSetupper {
         public String setup(String columnName, String orderByElementClause, boolean nullsFirst);
-	}
+    }
+
+    public void addManualOrderByElement(ManumalOrderInfo manumalOrderInfo) {
+        if (_orderByList.isEmpty()) {
+            return;
+        }
+        final OrderByElement last = _orderByList.get(_orderByList.size() - 1);
+        last.setManumalOrderInfo(manumalOrderInfo);
+    }
+
+    public static class ManumalOrderInfo {
+        protected List<? extends Object> manualValueList;
+
+        public boolean hasManualValueList() {
+            return manualValueList != null && !manualValueList.isEmpty();
+        }
+
+        public List<? extends Object> getManualValueList() {
+            return manualValueList;
+        }
+
+        public void setManualValueList(List<? extends Object> manualValueList) {
+            this.manualValueList = manualValueList;
+        }
+    }
 
     // =====================================================================================
     //                                                                   Order-By Expression
@@ -106,7 +130,7 @@ public class OrderByClause implements Serializable {
     }
 
     public String getOrderByClause() {
-	    return getOrderByClause(null);
+        return getOrderByClause(null);
     }
 
     public String getOrderByClause(Map<String, String> selectClauseRealColumnAliasMap) {
@@ -115,14 +139,14 @@ public class OrderByClause implements Serializable {
         }
         final StringBuffer sb = new StringBuffer();
         final String delimiter = ", ";
-        for (final Iterator<OrderByElement> ite = _orderByList.iterator(); ite.hasNext(); ) {
+        for (final Iterator<OrderByElement> ite = _orderByList.iterator(); ite.hasNext();) {
             final OrderByElement element = ite.next();
             sb.append(delimiter);
-			if (selectClauseRealColumnAliasMap != null) {
-			    sb.append(element.getElementClause(selectClauseRealColumnAliasMap));
-			} else {
-			    sb.append(element.getElementClause());
-			}
+            if (selectClauseRealColumnAliasMap != null) {
+                sb.append(element.getElementClause(selectClauseRealColumnAliasMap));
+            } else {
+                sb.append(element.getElementClause());
+            }
         }
         sb.delete(0, delimiter.length()).insert(0, "order by ");
         return sb.toString();
@@ -140,9 +164,9 @@ public class OrderByClause implements Serializable {
             return false;
         }
         int count = 0;
-        for (final Iterator<String> ite = orderByList.iterator(); ite.hasNext(); ) {
+        for (final Iterator<String> ite = orderByList.iterator(); ite.hasNext();) {
             final String columnFullName = ite.next();
-            final OrderByElement element = (OrderByElement)_orderByList.get(count);
+            final OrderByElement element = (OrderByElement) _orderByList.get(count);
             if (!element.getColumnFullName().equals(columnFullName)) {
                 return false;
             }
@@ -159,7 +183,7 @@ public class OrderByClause implements Serializable {
             String msg = "This order-by clause is empty: " + toString();
             throw new IllegalStateException(msg);
         }
-        final OrderByElement element = (OrderByElement)_orderByList.get(0);
+        final OrderByElement element = (OrderByElement) _orderByList.get(0);
         return element.isAsc();
     }
 
@@ -172,7 +196,7 @@ public class OrderByClause implements Serializable {
             String msg = "This order-by clause is empty: " + toString();
             throw new RuntimeException(msg);
         }
-        OrderByElement element = (OrderByElement)_orderByList.get(0);
+        OrderByElement element = (OrderByElement) _orderByList.get(0);
         String actualAliasName = element.getAliasName();
         if (actualAliasName != null && expectedAliasName != null) {
             return actualAliasName.equalsIgnoreCase(expectedAliasName);
@@ -190,7 +214,7 @@ public class OrderByClause implements Serializable {
             String msg = "This order-by clause is empty: " + toString();
             throw new RuntimeException(msg);
         }
-        OrderByElement element = (OrderByElement)_orderByList.get(0);
+        OrderByElement element = (OrderByElement) _orderByList.get(0);
         String actualColumnName = element.getColumnName();
         if (actualColumnName != null && expectedColumnName != null) {
             return actualColumnName.equalsIgnoreCase(expectedColumnName);
@@ -208,7 +232,7 @@ public class OrderByClause implements Serializable {
             String msg = "This order-by clause is empty: " + toString();
             throw new RuntimeException(msg);
         }
-        OrderByElement element = (OrderByElement)_orderByList.get(0);
+        OrderByElement element = (OrderByElement) _orderByList.get(0);
         String actualAliasName = element.getRegisteredAliasName();
         if (actualAliasName != null && expectedAliasName != null) {
             return actualAliasName.equalsIgnoreCase(expectedAliasName);
@@ -226,7 +250,7 @@ public class OrderByClause implements Serializable {
             String msg = "This order-by clause is empty: " + toString();
             throw new RuntimeException(msg);
         }
-        OrderByElement element = (OrderByElement)_orderByList.get(0);
+        OrderByElement element = (OrderByElement) _orderByList.get(0);
         String actualColumnName = element.getRegisteredColumnName();
         if (actualColumnName != null && expectedColumnName != null) {
             return actualColumnName.equalsIgnoreCase(expectedColumnName);
