@@ -1643,6 +1643,14 @@ public abstract class AbstractSqlClause implements SqlClause {
         _selectClauseType = _previousSelectClauseType != null ? _previousSelectClauseType : DEFAULT_SELECT_CLAUSE_TYPE;
     }
 
+    // [DBFlute-0.9.4]
+    // ===================================================================================
+    //                                                                       InScope Limit
+    //                                                                       =============
+    public int getInScopeLimit() {
+        return 0; // as default
+    }
+    
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============

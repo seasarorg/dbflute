@@ -27,7 +27,6 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
-import org.seasar.dbflute.cbean.coption.InScopeOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
@@ -394,6 +393,47 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // -----------------------------------------------------
+    //                                         InScope Query
+    //                                         -------------
+    protected void regINS(ConditionKey key, List<?> value, ConditionValue cvalue, String colName) {
+        final int inScopeLimit = getSqlClause().getInScopeLimit();
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+            if (inScopeLimit > 0 && value.size() > inScopeLimit) {
+                // As 'or' Condition
+                final List<List<?>> valueList = splitInScopeValue(value, inScopeLimit);
+                for (int i = 0; i < valueList.size(); i++) {
+                    final List<?> currentValue = valueList.get(i);
+                    if (i == 0) {
+                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
+                    } else {
+                        getSqlClause().makeAdditionalConditionAsOrEffective();
+                        invokeQuery(colName, key.getConditionKey(), currentValue);
+                    }
+                }
+                getSqlClause().ignoreAdditionalConditionAsOr();
+            } else {
+                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
+            }
+        }
+    }
+    
+    static List<List<?>> splitInScopeValue(List<?> value, int inScopeLimit) {
+        final List<List<?>> valueList = new ArrayList<List<?>>();
+        final int valueSize = value.size();
+        int index = 0;
+        int remainderSize = valueSize - inScopeLimit;
+        do {
+            final int beginIndex = inScopeLimit*index;
+            final int endPoint = beginIndex + inScopeLimit;
+            final int endIndex = inScopeLimit < remainderSize ? endPoint : valueSize;
+            valueList.add(value.subList(beginIndex, endIndex));
+            remainderSize = value.size() - endPoint;
+            ++index;
+        } while (remainderSize > 0);
+        return valueList;
+    }
+    
+    // -----------------------------------------------------
     //                                          FromTo Query
     //                                          ------------
     protected void regFTQ(java.util.Date fromDate, java.util.Date toDate, ConditionValue cvalue
@@ -513,26 +553,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e.getCause());
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                         InScope Query
-    //                                         -------------
-    protected void registerInScopeQuery(ConditionKey key, String value, ConditionValue cvalue
-                                      , String colName, InScopeOption option) {
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            if (value != null && option.isSplit()) {
-                final String[] strArray = option.generateSplitValueArray(value);
-                final List<String> realValueList = new ArrayList<String>();
-                for (int i=0; i < strArray.length; i++) {
-                    final String currentValue = strArray[i];
-                    realValueList.add(currentValue);
-                }
-                setupConditionValueAndRegisterWhereClause(key, realValueList, cvalue, colName, option);
-            } else {
-                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
-            }
         }
     }
 

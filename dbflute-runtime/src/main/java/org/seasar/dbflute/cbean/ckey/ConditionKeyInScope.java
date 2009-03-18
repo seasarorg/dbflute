@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute.cbean.ckey;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.List;
+
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.InScopeOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -26,9 +26,6 @@ import org.seasar.dbflute.cbean.cvalue.ConditionValue;
  * @author jflute
  */
 public class ConditionKeyInScope extends ConditionKey {
-
-    /** Log-instance. */
-    private static final Log _log = LogFactory.getLog(ConditionKeyInScope.class);
 
     /**
      * Constructor.
@@ -49,19 +46,8 @@ public class ConditionKeyInScope extends ConditionKey {
         if (value == null) {
             return false;
         }
-        if (value instanceof java.util.List && ((java.util.List<?>)value).isEmpty()) {
+        if (value instanceof List && ((List<?>) value).isEmpty()) {
             return false;
-        }
-        if (value instanceof java.util.List) {
-            if (conditionValue.hasInScope()) {
-                if (conditionValue.equalInScope(((java.util.List<?>)value))) {
-                    _log.debug("The value has already registered at " + callerName + ": value=" + value);
-                    return false;
-                } else {
-                    conditionValue.overrideInScope(((java.util.List<?>)value));
-                    return false;
-                }
-            }
         }
         return true;
     }
@@ -72,7 +58,7 @@ public class ConditionKeyInScope extends ConditionKey {
      * @param columnName Column name. (NotNull)
      * @param value Condition value. (NotNull)
      */
-    protected void doAddWhereClause(java.util.List<String> conditionList, String columnName, ConditionValue value) {
+    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
         if (value.getInScope() == null) {
             return;
         }
@@ -86,7 +72,8 @@ public class ConditionKeyInScope extends ConditionKey {
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doAddWhereClause(java.util.List<String> conditionList, String columnName, ConditionValue value, ConditionOption option) {
+    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+            ConditionOption option) {
         if (option == null) {
             String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
             throw new IllegalArgumentException(msg);
@@ -105,7 +92,7 @@ public class ConditionKeyInScope extends ConditionKey {
      * @param location Location. (NotNull)
      */
     protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location) {
-        conditionValue.setInScope((java.util.List<?>)value).setInScopeLocation(location);
+        conditionValue.setInScope((List<?>) value).setInScopeLocation(location);
     }
 
     /**
@@ -115,7 +102,8 @@ public class ConditionKeyInScope extends ConditionKey {
      * @param location Location. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location, ConditionOption option) {
-        conditionValue.setInScope((java.util.List<?>)value, (InScopeOption)option).setInScopeLocation(location);
+    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
+            ConditionOption option) {
+        throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }

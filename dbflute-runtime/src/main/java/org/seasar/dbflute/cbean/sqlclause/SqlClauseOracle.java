@@ -170,4 +170,13 @@ public class SqlClauseOracle extends AbstractSqlClause {
         _lockSqlSuffix = _lockSqlSuffix + " wait " + waitSec;
         return this;
     }
+
+    // [DBFlute-0.9.4]
+    // ===================================================================================
+    //                                                                       InScope Limit
+    //                                                                       =============
+    @Override
+    public int getInScopeLimit() {
+        return 1000;
+    }
 }

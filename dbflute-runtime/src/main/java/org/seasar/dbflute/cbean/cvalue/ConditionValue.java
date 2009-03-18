@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.seasar.dbflute.cbean.coption.InScopeOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -466,20 +465,26 @@ public class ConditionValue {
     //                                                                            In Scope
     //                                                                            ========
     /** The value of inScope. */
-    protected List<?> _inScope;
+    protected List<List<?>> _inScope;
 
-    protected InScopeOption _inScopeOption;
+    /** The value of inScope for spare. */
+    protected List<List<?>> _inScope4Spare;
 
     /**
      * Get the value of inScope.
      * @return The value of inScope. (Nullable)
      */
-    @SuppressWarnings("unchecked")
     public List<?> getInScope() {
-        if (_inScopeOption != null) {
-            return filterValue(_inScopeOption.generateRealValueList((List<String>)_inScope));
+        if (_inScope == null) {
+            return null;
         }
-        return filterValue(_inScope);
+        if (_inScope.isEmpty() && !_inScope4Spare.isEmpty()) {
+            for (int index = 0; index < _inScope4Spare.size(); index++) {
+                _inScope.add(_inScope4Spare.get(index));
+            }
+        }
+        final List<?> inScopeValue = _inScope.remove(0);
+        return filterValue(inScopeValue);
     }
 
     /**
@@ -488,40 +493,17 @@ public class ConditionValue {
      * @return this. (NotNull)
      */
     public ConditionValue setInScope(List<?> value) {
-        _inScope = value;
-        return this;
-    }
-
-    public ConditionValue setInScope(List<?> value, InScopeOption option) {
-        _inScope = value;
-        _inScopeOption = option;
-        return this;
-    }
-
-    /**
-     * Does it has the value of inScope?
-     * @return Determination. (NotNull)
-     */
-    public boolean hasInScope() {
-        return _inScope != null;
-    }
-
-    /**
-     * Does the value equal the value of inScope?
-     * @param value The value of inScope. (Nullable)
-     * @return Determination. (NotNull)
-     */
-    public boolean equalInScope(List<?> value) {
-        return hasInScope() ? _inScope.equals(value) : value == null;
-    }
-
-    /**
-     * Override the value of inScope.
-     * @param value The value of inScope. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue overrideInScope(List<?> value) {
-        _inScope = value;
+        if (_inScope == null) {
+            _inScope = new ArrayList<List<?>>();
+            _inScope4Spare = new ArrayList<List<?>>();
+        }
+        if (_inScope.isEmpty() && !_inScope4Spare.isEmpty()) {
+            for (int index = 0; index < _inScope4Spare.size(); index++) {
+                _inScope.add(_inScope4Spare.get(index));
+            }
+        }
+        _inScope.add(value);
+        _inScope4Spare.add(value);
         return this;
     }
 
@@ -550,14 +532,26 @@ public class ConditionValue {
     //                                                                        Not In Scope
     //                                                                        ============
     /** The value of notInScope. */
-    protected List<?> _notInScope;
+    protected List<List<?>> _notInScope;
+
+    /** The value of notInScope for spare. */
+    protected List<List<?>> _notInScope4Spare;
 
     /**
      * Get the value of notInScope.
      * @return The value of notInScope. (Nullable)
      */
     public List<?> getNotInScope() {
-        return filterValue(_notInScope);
+        if (_notInScope == null) {
+            return null;
+        }
+        if (_notInScope.isEmpty() && !_notInScope4Spare.isEmpty()) {
+            for (int index = 0; index < _notInScope4Spare.size(); index++) {
+                _notInScope.add(_notInScope4Spare.get(index));
+            }
+        }
+        final List<?> notInScopeValue = _notInScope.remove(0);
+        return filterValue(notInScopeValue);
     }
 
     /**
@@ -566,38 +560,21 @@ public class ConditionValue {
      * @return this. (NotNull)
      */
     public ConditionValue setNotInScope(List<?> value) {
-        _notInScope = value;
+        if (_notInScope == null) {
+            _notInScope = new ArrayList<List<?>>();
+            _notInScope4Spare = new ArrayList<List<?>>();
+        }
+        if (_notInScope.isEmpty() && !_notInScope4Spare.isEmpty()) {
+            for (int index = 0; index < _notInScope4Spare.size(); index++) {
+                _notInScope.add(_notInScope4Spare.get(index));
+            }
+        }
+        _notInScope.add(value);
+        _notInScope4Spare.add(value);
         return this;
     }
 
-    /**
-     * Does it has the value of inNotScope?
-     * @return Determination. (NotNull)
-     */
-    public boolean hasNotInScope() {
-        return _notInScope != null;
-    }
-
-    /**
-     * Does the value equal the value of inNotScope?
-     * @param value The value of inNotScope. (Nullable)
-     * @return Determination. (NotNull)
-     */
-    public boolean equalNotInScope(List<?> value) {
-        return hasNotInScope() ? _notInScope.equals(value) : value == null;
-    }
-
-    /**
-     * Override the value of inNotScope.
-     * @param value The value of inNotScope. (Nullable)
-     * @return this. (NotNull)
-     */
-    public ConditionValue overrideNotInScope(List<?> value) {
-        _notInScope = value;
-        return this;
-    }
-
-    /** Location of notInScope. */
+    /** Location of InScope. */
     protected String _notInScopeLocation;
 
     /**
@@ -636,12 +613,12 @@ public class ConditionValue {
             return null;
         }
         if (_likeSearch.isEmpty() && !_likeSearch4Spare.isEmpty()) {
-            for (int index=0; index < _likeSearch4Spare.size(); index++) {
+            for (int index = 0; index < _likeSearch4Spare.size(); index++) {
                 _likeSearch.add(_likeSearch4Spare.get(index));
             }
         }
         final LikeSearchValue likeSearchValue = _likeSearch.remove(0);
-        return (String)filterValue(likeSearchValue.generateRealValue());
+        return (String) filterValue(likeSearchValue.generateRealValue());
     }
 
     /**
@@ -653,10 +630,10 @@ public class ConditionValue {
     public ConditionValue setLikeSearch(String value, LikeSearchOption option) {
         if (_likeSearch == null) {
             _likeSearch = new ArrayList<LikeSearchValue>();
-            _likeSearch4Spare= new ArrayList<LikeSearchValue>();
+            _likeSearch4Spare = new ArrayList<LikeSearchValue>();
         }
         if (_likeSearch.isEmpty() && !_likeSearch4Spare.isEmpty()) {
-            for (int index=0; index < _likeSearch4Spare.size(); index++) {
+            for (int index = 0; index < _likeSearch4Spare.size(); index++) {
                 _likeSearch.add(_likeSearch4Spare.get(index));
             }
         }
@@ -690,16 +667,20 @@ public class ConditionValue {
     protected static class LikeSearchValue {
         protected String _value;
         protected LikeSearchOption _option;
+
         public LikeSearchValue(String value, LikeSearchOption option) {
             _value = value;
             _option = option;
         }
+
         public String getValue() {
             return _value;
         }
+
         public LikeSearchOption getOption() {
             return _option;
         }
+
         public String generateRealValue() {
             if (_option == null) {
                 return _value;
@@ -726,12 +707,12 @@ public class ConditionValue {
             return null;
         }
         if (_notLikeSearch.isEmpty() && !_notLikeSearch4Spare.isEmpty()) {
-            for (int index=0; index < _notLikeSearch4Spare.size(); index++) {
+            for (int index = 0; index < _notLikeSearch4Spare.size(); index++) {
                 _notLikeSearch.add(_notLikeSearch4Spare.get(index));
             }
         }
         final NotLikeSearchValue notLikeSearchValue = _notLikeSearch.remove(0);
-        return (String)filterValue(notLikeSearchValue.generateRealValue());
+        return (String) filterValue(notLikeSearchValue.generateRealValue());
     }
 
     /**
@@ -743,10 +724,10 @@ public class ConditionValue {
     public ConditionValue setNotLikeSearch(String value, LikeSearchOption option) {
         if (_notLikeSearch == null) {
             _notLikeSearch = new ArrayList<NotLikeSearchValue>();
-            _notLikeSearch4Spare= new ArrayList<NotLikeSearchValue>();
+            _notLikeSearch4Spare = new ArrayList<NotLikeSearchValue>();
         }
         if (_notLikeSearch.isEmpty() && !_notLikeSearch4Spare.isEmpty()) {
-            for (int index=0; index < _notLikeSearch4Spare.size(); index++) {
+            for (int index = 0; index < _notLikeSearch4Spare.size(); index++) {
                 _notLikeSearch.add(_notLikeSearch4Spare.get(index));
             }
         }
@@ -780,16 +761,20 @@ public class ConditionValue {
     protected static class NotLikeSearchValue {
         protected String _value;
         protected LikeSearchOption _option;
+
         public NotLikeSearchValue(String value, LikeSearchOption option) {
             _value = value;
             _option = option;
         }
+
         public String getValue() {
             return _value;
         }
+
         public LikeSearchOption getOption() {
             return _option;
         }
+
         public String generateRealValue() {
             if (_option == null) {
                 return _value;
@@ -941,7 +926,7 @@ public class ConditionValue {
             return valueList;
         }
         final List<Object> resultList = new ArrayList<Object>();
-        for (Iterator<?> ite = valueList.iterator(); ite.hasNext(); ) {
+        for (Iterator<?> ite = valueList.iterator(); ite.hasNext();) {
             Object value = ite.next();
             resultList.add(filterValue(value));
         }

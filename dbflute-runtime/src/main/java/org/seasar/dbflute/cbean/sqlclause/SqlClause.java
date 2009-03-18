@@ -92,7 +92,7 @@ public interface SqlClause {
      *         (Nullable: Null means select index is disabled.)
      */
     public Map<String, String> getSelectIndexReverseMap();
-    
+
     /**
      * Disable select index.
      */
@@ -507,4 +507,14 @@ public interface SqlClause {
     public static enum SelectClauseType {
         COLUMNS, COUNT, MAX, MIN, SUM, AVG
     }
+
+    // [DBFlute-0.9.4]
+    // ===================================================================================
+    //                                                                       InScope Limit
+    //                                                                       =============
+    /**
+     * Get the limit of inScope.
+     * @return The limit of inScope. (If it's zero or minus, it means no limit)
+     */
+    public int getInScopeLimit();
 }
