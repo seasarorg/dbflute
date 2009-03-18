@@ -168,7 +168,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope.
      */
     public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        reg${tmpJavaName}(CK_INS, cTL(${tmpUncapitalisedJavaName}List));
+        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #if (${col.isAvailableStringNotInScope()})
@@ -178,7 +178,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope.
      */
     public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        reg${tmpJavaName}(CK_NINS, cTL(${tmpUncapitalisedJavaName}List));
+        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #if (${col.isAvailableStringLikeSearch()})
@@ -456,7 +456,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope.
      */
     public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        reg${tmpJavaName}(CK_INS, cTL(${tmpUncapitalisedJavaName}List));
+        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #if (${col.isAvailableNumberNotInScope()})
@@ -466,7 +466,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as notInScope.
      */
     public void set${tmpJavaName}_NotInScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
-        reg${tmpJavaName}(CK_NINS, cTL(${tmpUncapitalisedJavaName}List));
+        regINS(CK_NINS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
     }
 #end
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
