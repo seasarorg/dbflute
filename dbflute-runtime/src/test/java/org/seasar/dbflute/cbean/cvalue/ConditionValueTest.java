@@ -27,9 +27,9 @@ public class ConditionValueTest extends TestCase {
         value2.add("e");
         value2.add("f");
         List<String> value3 = new ArrayList<String>();
-        value2.add("g");
-        value2.add("h");
-        value2.add("i");
+        value3.add("g");
+        value3.add("h");
+        value3.add("i");
 
         // ## Act ##
         cv.setInScope(value1);
