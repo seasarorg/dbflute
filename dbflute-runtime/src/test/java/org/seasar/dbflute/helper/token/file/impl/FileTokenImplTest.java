@@ -22,8 +22,8 @@ public class FileTokenImplTest extends PlainTestCase {
     public void test_tokenize() throws Exception {
         // ## Arrange ##
         FileTokenImpl impl = new FileTokenImpl();
-        String first = "\"a\",\"b\",\"cc\",\"d\",\"e\"";
-        String second = "\"a\",\"b\",\"c\"\"c\",\"d\",\"e\"";
+        String first = "\"a\",\"b\",\"cc\",\"\"\"\",\"e\"";
+        String second = "\"a\",\"\",\"c\"\"c\",\"d\"\"\",\"e\"";
         String third = "\"a\",\"b,b\",\"c\"\",c\",\"d\n\",\"e\"";
         String all = first + getLineSeparator() + second + getLineSeparator() + third;
         ByteArrayInputStream inputStream = new ByteArrayInputStream(all.getBytes("UTF-8"));
@@ -40,13 +40,13 @@ public class FileTokenImplTest extends PlainTestCase {
                     assertEquals("a", valueList.get(0));
                     assertEquals("b", valueList.get(1));
                     assertEquals("cc", valueList.get(2));
-                    assertEquals("d", valueList.get(3));
+                    assertEquals("\"", valueList.get(3));
                     assertEquals("e", valueList.get(4));
                 } else if (index == 1) {
                     assertEquals("a", valueList.get(0));
-                    assertEquals("b", valueList.get(1));
+                    assertEquals("", valueList.get(1));
                     assertEquals("c\"c", valueList.get(2));
-                    assertEquals("d", valueList.get(3));
+                    assertEquals("d\"", valueList.get(3));
                     assertEquals("e", valueList.get(4));
                 } else if (index == 2) {
                     assertEquals("a", valueList.get(0));
@@ -83,9 +83,9 @@ public class FileTokenImplTest extends PlainTestCase {
                     valueList.add("e");
                 } else if (index == 1) {
                     valueList.add("a");
-                    valueList.add("b");
+                    valueList.add("\"");
                     valueList.add("c\"c");
-                    valueList.add("d");
+                    valueList.add("d\"");
                     valueList.add("e");
                 } else if (index == 2) {
                     valueList.add("a");
@@ -105,7 +105,7 @@ public class FileTokenImplTest extends PlainTestCase {
         log(actual);
         String[] split = actual.split("\n");
         assertEquals("\"a\",\"b\",\"cc\",\"d\",\"e\"", split[0]);
-        assertEquals("\"a\",\"b\",\"c\"\"c\",\"d\",\"e\"", split[1]);
+        assertEquals("\"a\",\"\"\"\",\"c\"\"c\",\"d\"\"\",\"e\"", split[1]);
         assertEquals("\"a\",\"b,b\",\"c\"\",c\",\"d", split[2]);
         assertEquals("\",\"e\"", split[3]);
     }
