@@ -398,7 +398,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                 break;
             }
         }
-        return count > 0 && (count % 2) == 0;
+        return count > 0 && (count % 2) == 1;
     }
 
     protected String removeDoubleQuotation(String value) {
