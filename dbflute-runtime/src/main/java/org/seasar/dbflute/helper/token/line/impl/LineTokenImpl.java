@@ -38,34 +38,14 @@ public class LineTokenImpl implements LineToken {
         int i = 0;
         int j = lineString.indexOf(delimiter);
         for (int h = 0; j >= 0; h++) {
-            String value = lineString.substring(i, j);
-            if (lineTokenizingOption.isTrimDoubleQuotation()) {
-                value = removeDoubleQuotation(value);
-            }
+            final String value = lineString.substring(i, j);
             list.add(filterHandlingEmptyAsNull(value, lineTokenizingOption));
             i = j + delimiter.length();
             j = lineString.indexOf(delimiter, i);
         }
-        String lastElement = lineString.substring(i);
-        if (lineTokenizingOption.isTrimDoubleQuotation()) {
-            lastElement = removeDoubleQuotation(lastElement);
-        }
+        final String lastElement = lineString.substring(i);
         list.add(filterHandlingEmptyAsNull(lastElement, lineTokenizingOption));
         return list;
-    }
-
-    protected String removeDoubleQuotation(String value) {
-        if (!value.startsWith("\"") && !value.endsWith("\"")) {
-            return value;
-        }
-        if (value.startsWith("\"")) {
-            value = value.substring(1);
-        }
-        if (value.endsWith("\"")) {
-            value = value.substring(0, value.length() - 1);
-        }
-        value = DfStringUtil.replace(value, "\"\"", "\"");
-        return value;
     }
 
     protected String filterHandlingEmptyAsNull(String target, LineTokenizingOption lineTokenizingOption) {

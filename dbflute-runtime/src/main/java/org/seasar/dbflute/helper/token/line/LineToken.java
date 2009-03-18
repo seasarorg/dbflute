@@ -15,12 +15,14 @@
  */
 package org.seasar.dbflute.helper.token.line;
 
+import java.util.List;
+
 /**
  * @author jflute
  */
 public interface LineToken {
 
-    public java.util.List<String> tokenize(String lineString, LineTokenizingOption lineTokenizingOption);
+    public List<String> tokenize(String lineString, LineTokenizingOption lineTokenizingOption);
 
-    public String make(java.util.List<String> valueList, LineMakingOption lineMakingOption);
+    public String make(List<String> valueList, LineMakingOption lineMakingOption);
 }

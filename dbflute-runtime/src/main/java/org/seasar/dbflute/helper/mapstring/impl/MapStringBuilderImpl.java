@@ -29,6 +29,9 @@ import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
  */
 public class MapStringBuilderImpl implements MapStringBuilder {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected List<String> _columnNameList;
 
     protected String _msMapMark;
@@ -41,40 +44,9 @@ public class MapStringBuilderImpl implements MapStringBuilder {
 
     protected String _msEqual;
 
-    protected boolean _trimDoubleQuotation;
-
-    public void setColumnNames(String[] columnNames) {
-        _columnNameList = Arrays.asList(columnNames);
-    }
-
-    public void setColumnNameList(List<String> columnNameList) {
-        _columnNameList = columnNameList;
-    }
-
-    public void setMsMapMark(String value) {
-        _msMapMark = value;
-    }
-
-    public void setMsStartBrace(String value) {
-        _msStartBrace = value;
-    }
-
-    public void setMsEndBrace(String value) {
-        _msEndBrace = value;
-    }
-
-    public void setMsDelimiter(String value) {
-        _msDelimiter = value;
-    }
-
-    public void setMsEqual(String value) {
-        _msEqual = value;
-    }
-
-    public void trimDoubleQuotation() {
-        _trimDoubleQuotation = true;
-    }
-
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     public String buildByDelimiter(String values, String delimiter) {
         if (values == null) {
             String msg = "The argument[values] should not be null.";
@@ -91,13 +63,13 @@ public class MapStringBuilderImpl implements MapStringBuilder {
 
         final StringBuffer sb = new StringBuffer();
         sb.append(_msMapMark).append(_msStartBrace);
-        for (int i = 0; i < _columnNameList.size(); i++ ) {
+        for (int i = 0; i < _columnNameList.size(); i++) {
             sb.append(_columnNameList.get(i)).append(_msEqual).append(valueList.get(i)).append(_msDelimiter);
         }
 
         sb.delete(sb.length() - _msDelimiter.length(), sb.length());
         sb.append(_msEndBrace);
-        return sb.toString(); 
+        return sb.toString();
     }
 
     public String buildFromList(List<String> valueList) {
@@ -110,22 +82,19 @@ public class MapStringBuilderImpl implements MapStringBuilder {
 
         final StringBuffer sb = new StringBuffer();
         sb.append(_msMapMark).append(_msStartBrace);
-        for (int i = 0; i < _columnNameList.size(); i++ ) {
+        for (int i = 0; i < _columnNameList.size(); i++) {
             sb.append(_columnNameList.get(i)).append(_msEqual).append(valueList.get(i)).append(_msDelimiter);
         }
 
         sb.delete(sb.length() - _msDelimiter.length(), sb.length());
         sb.append(_msEndBrace);
-        return sb.toString(); 
+        return sb.toString();
     }
 
     protected List<String> tokenize(String value, String delimiter) {
         final LineToken lineToken = new LineTokenImpl();
         final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
         lineTokenizingOption.setDelimiter(delimiter);
-        if (_trimDoubleQuotation) {
-            lineTokenizingOption.trimDoubleQuotation();
-        }
         return lineToken.tokenize(value, lineTokenizingOption);
     }
 
@@ -162,7 +131,8 @@ public class MapStringBuilderImpl implements MapStringBuilder {
 
     protected void assertColumnValueList(List<String> columnNameList, List<String> valueList) {
         if (columnNameList.size() != valueList.size()) {
-            String msg = "The length of columnNameList and valueList are difference. (" + columnNameList.size() + ", " + valueList.size() + ")";
+            String msg = "The length of columnNameList and valueList are difference. (" + columnNameList.size() + ", "
+                    + valueList.size() + ")";
             msg = msg + " columnNameList=" + columnNameList;
             msg = msg + " valueList=" + valueList;
             throw new DifferentDelimiterCountException(msg, columnNameList, valueList);
@@ -191,5 +161,36 @@ public class MapStringBuilderImpl implements MapStringBuilder {
             }
         }
         return buf.toString();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setColumnNames(String[] columnNames) {
+        _columnNameList = Arrays.asList(columnNames);
+    }
+
+    public void setColumnNameList(List<String> columnNameList) {
+        _columnNameList = columnNameList;
+    }
+
+    public void setMsMapMark(String value) {
+        _msMapMark = value;
+    }
+
+    public void setMsStartBrace(String value) {
+        _msStartBrace = value;
+    }
+
+    public void setMsEndBrace(String value) {
+        _msEndBrace = value;
+    }
+
+    public void setMsDelimiter(String value) {
+        _msDelimiter = value;
+    }
+
+    public void setMsEqual(String value) {
+        _msEqual = value;
     }
 }

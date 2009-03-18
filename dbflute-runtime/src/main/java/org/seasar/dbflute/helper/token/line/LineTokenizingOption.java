@@ -20,18 +20,17 @@ package org.seasar.dbflute.helper.token.line;
  */
 public class LineTokenizingOption {
 
-    // =====================================================================================
-    //                                                                             Attribute
-    //                                                                             =========
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _delimiter;
-
-    protected boolean _trimDoubleQuotation;
 
     protected boolean _handleEmtpyAsNull;
 
-    // =====================================================================================
-    //                                                                           Easy-to-Use
-    //                                                                           ===========
+
+    // ===================================================================================
+    //                                                                         Easy-to-Use
+    //                                                                         ===========
     public LineTokenizingOption delimitateByComma() {
         _delimiter = ",";
         return this;
@@ -42,29 +41,20 @@ public class LineTokenizingOption {
         return this;
     }
 
-    public LineTokenizingOption trimDoubleQuotation() {
-        _trimDoubleQuotation = true;
-        return this;
-    }
-
     public LineTokenizingOption handleEmtpyAsNull() {
         _handleEmtpyAsNull = true;
         return this;
     }
 
-    // =====================================================================================
-    //                                                                              Accessor
-    //                                                                              ========
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getDelimiter() {
         return _delimiter;
     }
 
     public void setDelimiter(String delimiter) {
         _delimiter = delimiter;
-    }
-
-    public boolean isTrimDoubleQuotation() {
-        return _trimDoubleQuotation;
     }
 
     public boolean isHandleEmtpyAsNull() {
