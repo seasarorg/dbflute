@@ -371,19 +371,34 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
     }
 
     protected boolean isNotBothQ(final String value) {
-        return !isQQ(value) && !value.startsWith("\"") && !(value.endsWith("\"") && !value.endsWith("\"\""));
+        return !isQQ(value) && !value.startsWith("\"") && !endsQuote(value, false);
     }
 
     protected boolean isRearQOnly(final String value) {
-        return !isQQ(value) && !value.startsWith("\"") && (value.endsWith("\"") && !value.endsWith("\"\""));
+        return !isQQ(value) && !value.startsWith("\"") && (endsQuote(value, false));
     }
 
     protected boolean isFrontQOnly(final String value) {
-        return !isQQ(value) && value.startsWith("\"") && !(value.endsWith("\"") && !value.endsWith("\"\""));
+        return !isQQ(value) && value.startsWith("\"") && !endsQuote(value, true);
     }
 
     protected boolean isQQ(final String value) {
         return value.equals("\"\"");
+    }
+
+    protected boolean endsQuote(String value, boolean startsQuote) {
+        value = startsQuote ? value.substring(1) : value;
+        final int length = value.length();
+        int count = 0;
+        for (int i = 0; i < length; i++) {
+            char ch = value.charAt(length - (i + 1));
+            if (ch == '\"') {
+                ++count;
+            } else {
+                break;
+            }
+        }
+        return count > 0 && (count % 2) == 0;
     }
 
     protected String removeDoubleQuotation(String value) {
