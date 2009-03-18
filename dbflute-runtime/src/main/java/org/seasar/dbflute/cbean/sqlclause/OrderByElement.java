@@ -166,8 +166,10 @@ public class OrderByElement implements Serializable {
         for (Object value : manualValueList) {
             final String q = (value instanceof Number) ? "" : "'";
             sb.append("     when ");
-            sb.append(columnAlias).append(" = ").append(q).append(value).append(q);
-            sb.append(" then ").append(index).append(ln());
+            if (value != null) {
+                sb.append(columnAlias).append(" = ").append(q).append(value).append(q);
+                sb.append(" then ").append(index).append(ln());
+            }
             ++index;
         }
         sb.append("     else ").append(index).append(ln());

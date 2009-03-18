@@ -118,7 +118,17 @@ public class OrderByClause implements Serializable {
         }
 
         public void setManualValueList(List<? extends Object> manualValueList) {
-            this.manualValueList = manualValueList;
+            if (manualValueList == null) {
+                this.manualValueList = null;
+                return;
+            }
+            List<Object> list = new ArrayList<Object>();
+            for (Object value : manualValueList) {
+                if (value != null) {
+                    list.add(value);
+                }
+            }
+            this.manualValueList = list;
         }
     }
 

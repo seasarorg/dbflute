@@ -138,7 +138,7 @@ public class FileTokenImpl implements FileToken {
                 if (preContinueString.equals("")) {
                     rowString = lineString;
                 } else {
-                    final String lineSeparator = System.getProperty("line.separator");
+                    final String lineSeparator = "\n";
                     rowString = preContinueString + lineSeparator + lineString;
                 }
                 final ValueLineInfo valueLineInfo = arrangeValueList(rowString, delimiter);
@@ -425,7 +425,7 @@ public class FileTokenImpl implements FileToken {
         if (fileMakingOption.getLineSeparator() != null && !fileMakingOption.getLineSeparator().equals("")) {
             lineSeparator = fileMakingOption.getLineSeparator();
         } else {
-            lineSeparator = System.getProperty("line.separator");// Default!
+            lineSeparator = "\n"; // Default!
         }
 
         java.io.BufferedOutputStream bos = null;
