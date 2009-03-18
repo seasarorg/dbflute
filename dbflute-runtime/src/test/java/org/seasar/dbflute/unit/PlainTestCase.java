@@ -27,7 +27,7 @@ public abstract class PlainTestCase extends TestCase {
     protected void log(Object msg) {
         _log.debug(msg);
     }
-    
+
     protected Date currentDate() {
         return new Date();
     }
@@ -37,6 +37,6 @@ public abstract class PlainTestCase extends TestCase {
     }
 
     protected static String getLineSeparator() {
-        return System.getProperty("line.separator");
+        return "\n";
     }
 }

@@ -3,7 +3,9 @@ package org.seasar.dbflute.helper.token.file.impl;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
@@ -29,6 +31,7 @@ public class FileTokenImplTest extends PlainTestCase {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(all.getBytes("UTF-8"));
 
         // ## Act ##
+        final Set<String> markSet = new HashSet<String>();
         impl.tokenize(inputStream, new FileTokenizingCallback() {
             int index = 0;
 
@@ -54,10 +57,50 @@ public class FileTokenImplTest extends PlainTestCase {
                     assertEquals("c\",c", valueList.get(2));
                     assertEquals("d\n", valueList.get(3));
                     assertEquals("e", valueList.get(4));
+                    markSet.add("done");
                 }
                 ++index;
             }
         }, new FileTokenizingOption().beginFirstLine().delimitateByComma().encodeAsUTF8());
+        assertTrue(markSet.contains("done"));
+    }
+
+    public void test_tokenize_plus() throws Exception {
+        // ## Arrange ##
+        FileTokenImpl impl = new FileTokenImpl();
+        String first = "1001\t1\tabc";
+        String second = "1002\t\t\"abc\"";
+        String third = "1003\t3\t\"a\"\"bc\"";
+        String all = first + getLineSeparator() + second + getLineSeparator() + third;
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(all.getBytes("UTF-8"));
+
+        // ## Act ##
+        final Set<String> markSet = new HashSet<String>();
+        impl.tokenize(inputStream, new FileTokenizingCallback() {
+            int index = 0;
+
+            public void handleRowResource(FileTokenizingRowResource fileTokenizingRowResource) {
+                // ## Assert ##
+                List<String> valueList = fileTokenizingRowResource.getValueList();
+                log(valueList);
+                if (index == 0) {
+                    assertEquals("1001", valueList.get(0));
+                    assertEquals("1", valueList.get(1));
+                    assertEquals("abc", valueList.get(2));
+                } else if (index == 1) {
+                    assertEquals("1002", valueList.get(0));
+                    assertEquals("", valueList.get(1));
+                    assertEquals("abc", valueList.get(2));
+                } else if (index == 2) {
+                    assertEquals("1003", valueList.get(0));
+                    assertEquals("3", valueList.get(1));
+                    assertEquals("a\"bc", valueList.get(2));
+                    markSet.add("done");
+                }
+                ++index;
+            }
+        }, new FileTokenizingOption().beginFirstLine().delimitateByTab().encodeAsUTF8());
+        assertTrue(markSet.contains("done"));
     }
 
     public void test_make() throws Exception {

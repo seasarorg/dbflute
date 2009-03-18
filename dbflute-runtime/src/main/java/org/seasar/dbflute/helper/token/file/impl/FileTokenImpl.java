@@ -322,7 +322,7 @@ public class FileTokenImpl implements FileToken {
                 break;
             }
         }
-        return count > 0 && (count % 2) == 0;
+        return count > 0 && (count % 2) == 1;
     }
 
     protected String removeDoubleQuotation(String value) {
