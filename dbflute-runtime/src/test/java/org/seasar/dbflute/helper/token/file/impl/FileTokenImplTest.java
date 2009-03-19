@@ -24,7 +24,7 @@ public class FileTokenImplTest extends PlainTestCase {
     public void test_tokenize() throws Exception {
         // ## Arrange ##
         FileTokenImpl impl = new FileTokenImpl();
-        String first = "\"a\",\"b\",\"cc\",\"\"\"\",\"e\"";
+        String first = "\"a\",\"b,\",\"cc\",\"\"\"\",\"e\n,\n,\n\"\",,\"";
         String second = "\"a\",\"\",\"c\"\"c\",\"d\"\"\",\"e\"";
         String third = "\"a\",\"b,b\",\"c\"\",c\",\"d\n\",\"e\"";
         String all = first + getLineSeparator() + second + getLineSeparator() + third;
@@ -41,10 +41,10 @@ public class FileTokenImplTest extends PlainTestCase {
                 log(valueList);
                 if (index == 0) {
                     assertEquals("a", valueList.get(0));
-                    assertEquals("b", valueList.get(1));
+                    assertEquals("b,", valueList.get(1));
                     assertEquals("cc", valueList.get(2));
                     assertEquals("\"", valueList.get(3));
-                    assertEquals("e", valueList.get(4));
+                    assertEquals("e\n,\n,\n\",,", valueList.get(4));
                 } else if (index == 1) {
                     assertEquals("a", valueList.get(0));
                     assertEquals("", valueList.get(1));

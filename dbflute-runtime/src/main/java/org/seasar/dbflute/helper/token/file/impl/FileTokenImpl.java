@@ -237,11 +237,7 @@ public class FileTokenImpl implements FileToken {
                         break;
                     }
                 } else {
-                    if (isFrontQOnly(value)) {
-                        valueLineInfo.setContinueNextLine(true);
-                        resultList.add(connectPreString(preString, delimiter, value));
-                        break;
-                    } else if (isRearQOnly(value)) {
+                    if (isRearQOnly(value)) {
                         resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
                         break;
                     } else if (isNotBothQ(value)) {
@@ -268,10 +264,7 @@ public class FileTokenImpl implements FileToken {
                     resultList.add(removeDoubleQuotation(value));
                 }
             } else {
-                if (isFrontQOnly(value)) {
-                    preString = connectPreString(preString, delimiter, value);
-                    continue;
-                } else if (isRearQOnly(value)) {
+                if (isRearQOnly(value)) {
                     resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
                 } else if (isNotBothQ(value)) {
                     preString = connectPreString(preString, delimiter, value);
@@ -303,6 +296,7 @@ public class FileTokenImpl implements FileToken {
     }
 
     protected boolean isFrontQOnly(final String value) {
+        System.out.println("value=" + value);
         return !isQQ(value) && value.startsWith("\"") && !endsQuote(value, true);
     }
 
