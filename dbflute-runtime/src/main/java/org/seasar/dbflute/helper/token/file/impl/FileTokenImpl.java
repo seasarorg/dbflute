@@ -225,30 +225,22 @@ public class FileTokenImpl implements FileToken {
                     if (isFrontQOnly(value)) {
                         valueLineInfo.setContinueNextLine(true);
                         resultList.add(value);
-                        break;
                     } else if (isRearQOnly(value)) {
                         resultList.add(value);
-                        break;
                     } else if (isNotBothQ(value)) {
                         resultList.add(value);
-                        break;
                     } else {
                         resultList.add(removeDoubleQuotation(value));
-                        break;
                     }
                 } else {
-                    if (isRearQOnly(value)) {
+                    if (endsQuote(value, false)) {
                         resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
-                        break;
-                    } else if (isNotBothQ(value)) {
+                    } else {
                         valueLineInfo.setContinueNextLine(true);
                         resultList.add(connectPreString(preString, delimiter, value));
-                        break;
-                    } else {
-                        resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
-                        break;
                     }
                 }
+                break; // because it's the last loop
             }
 
             if (preString.equals("")) {
@@ -264,13 +256,11 @@ public class FileTokenImpl implements FileToken {
                     resultList.add(removeDoubleQuotation(value));
                 }
             } else {
-                if (isRearQOnly(value)) {
+                if (endsQuote(value, false)) {
                     resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
-                } else if (isNotBothQ(value)) {
+                } else {
                     preString = connectPreString(preString, delimiter, value);
                     continue;
-                } else {
-                    resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
                 }
             }
             preString = "";
@@ -292,11 +282,10 @@ public class FileTokenImpl implements FileToken {
     }
 
     protected boolean isRearQOnly(final String value) {
-        return !isQQ(value) && !value.startsWith("\"") && (endsQuote(value, false));
+        return !isQQ(value) && !value.startsWith("\"") && endsQuote(value, false);
     }
 
     protected boolean isFrontQOnly(final String value) {
-        System.out.println("value=" + value);
         return !isQQ(value) && value.startsWith("\"") && !endsQuote(value, true);
     }
 
