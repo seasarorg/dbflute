@@ -313,11 +313,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                         break;
                     }
                 } else {
-                    if (isFrontQOnly(value)) {
-                        valueLineInfo.setContinueNextLine(true);
-                        resultList.add(connectPreString(preString, delimiter, value));
-                        break;
-                    } else if (isRearQOnly(value)) {
+                    if (isRearQOnly(value)) {
                         resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
                         break;
                     } else if (isNotBothQ(value)) {
@@ -344,10 +340,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                     resultList.add(removeDoubleQuotation(value));
                 }
             } else {
-                if (isFrontQOnly(value)) {
-                    preString = connectPreString(preString, delimiter, value);
-                    continue;
-                } else if (isRearQOnly(value)) {
+                if (isRearQOnly(value)) {
                     resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
                 } else if (isNotBothQ(value)) {
                     preString = connectPreString(preString, delimiter, value);
