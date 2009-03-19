@@ -301,30 +301,22 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                     if (isFrontQOnly(value)) {
                         valueLineInfo.setContinueNextLine(true);
                         resultList.add(value);
-                        break;
                     } else if (isRearQOnly(value)) {
                         resultList.add(value);
-                        break;
                     } else if (isNotBothQ(value)) {
                         resultList.add(value);
-                        break;
                     } else {
                         resultList.add(removeDoubleQuotation(value));
-                        break;
                     }
                 } else {
-                    if (isRearQOnly(value)) {
+                    if (endsQuote(value, false)) {
                         resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
-                        break;
-                    } else if (isNotBothQ(value)) {
+                    } else {
                         valueLineInfo.setContinueNextLine(true);
                         resultList.add(connectPreString(preString, delimiter, value));
-                        break;
-                    } else {
-                        resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
-                        break;
                     }
                 }
+                break; // because it's the last loop
             }
 
             if (preString.equals("")) {
@@ -340,13 +332,11 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                     resultList.add(removeDoubleQuotation(value));
                 }
             } else {
-                if (isRearQOnly(value)) {
+                if (endsQuote(value, false)) {
                     resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
-                } else if (isNotBothQ(value)) {
+                } else {
                     preString = connectPreString(preString, delimiter, value);
                     continue;
-                } else {
-                    resultList.add(removeDoubleQuotation(connectPreString(preString, delimiter, value)));
                 }
             }
             preString = "";
