@@ -34,6 +34,7 @@ import org.seasar.dbflute.cbean.sqlclause.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.TraceViewUtil;
@@ -401,9 +402,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             if (inScopeLimit > 0 && value.size() > inScopeLimit) {
                 // As 'or' Condition
-                final List<List<?>> valueList = splitInScopeValue(value, inScopeLimit);
+                @SuppressWarnings("unchecked")
+                final List<Object> objectList = (List<Object>)value;
+                final List<List<Object>> valueList = DfCollectionUtil.splitByLimit(objectList, inScopeLimit);
                 for (int i = 0; i < valueList.size(); i++) {
-                    final List<?> currentValue = valueList.get(i);
+                    final List<Object> currentValue = valueList.get(i);
                     if (i == 0) {
                         setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
                     } else {
@@ -416,22 +419,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
             }
         }
-    }
-    
-    static List<List<?>> splitInScopeValue(List<?> value, int inScopeLimit) {
-        final List<List<?>> valueList = new ArrayList<List<?>>();
-        final int valueSize = value.size();
-        int index = 0;
-        int remainderSize = valueSize - inScopeLimit;
-        do {
-            final int beginIndex = inScopeLimit*index;
-            final int endPoint = beginIndex + inScopeLimit;
-            final int endIndex = inScopeLimit < remainderSize ? endPoint : valueSize;
-            valueList.add(new ArrayList<Object>(value.subList(beginIndex, endIndex)));
-            remainderSize = value.size() - endPoint;
-            ++index;
-        } while (remainderSize > 0);
-        return valueList;
     }
     
     // -----------------------------------------------------
