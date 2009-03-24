@@ -34,7 +34,7 @@ public class AccessContext {
 
     /**
      * Get access-context on thread.
-     * @return The context of DB access.. (Nullable)
+     * @return The context of DB access. (Nullable)
      */
     public static AccessContext getAccessContextOnThread() {
         return (AccessContext) _threadLocal.get();
@@ -42,7 +42,7 @@ public class AccessContext {
 
     /**
      * Set access-context on thread.
-     * @param accessContext The context of DB access.. (NotNull)
+     * @param accessContext The context of DB access. (NotNull)
      */
     public static void setAccessContextOnThread(AccessContext accessContext) {
         if (accessContext == null) {
@@ -72,11 +72,8 @@ public class AccessContext {
     //                                                                  ==================
     /**
      * Get access user on thread.
-     * <p>
-     * If it can't get access user from access-context, 
-     * returns 'Anonymous' as default value!
-     * </p>
      * @return Access user. (NotNull)
+     * @exception IllegalStateException When it couldn't get access user.
      */
     public static String getAccessUserOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -86,16 +83,19 @@ public class AccessContext {
                 return accessUser;
             }
         }
-        return "Anonymous"; // as Default
+        String msg;
+        if (isExistAccessContextOnThread()) {
+            msg = "The access user was not found in AccessContext on thread: " + getAccessContextOnThread();
+        } else {
+            msg = "The AccessContext was not found on thread!";
+        }
+        throw new IllegalStateException(msg);
     }
 
     /**
      * Get access process on thread.
-     * <p>
-     * If it can't get access process from access-context, 
-     * returns 'Anonymous' as default value!
-     * </p>
      * @return Access process. (NotNull)
+     * @exception IllegalStateException When it couldn't get access process.
      */
     public static String getAccessProcessOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -105,16 +105,19 @@ public class AccessContext {
                 return accessProcess;
             }
         }
-        return "Anonymous"; // as Default
+        String msg;
+        if (isExistAccessContextOnThread()) {
+            msg = "The access process was not found in AccessContext on thread: " + getAccessContextOnThread();
+        } else {
+            msg = "The AccessContext was not found on thread!";
+        }
+        throw new IllegalStateException(msg);
     }
 
     /**
      * Get access module on thread.
-     * <p>
-     * If it can't get access module from access-context, 
-     * returns 'Anonymous' as default value!
-     * </p>
      * @return Access module. (NotNull)
+     * @exception IllegalStateException When it couldn't get access module.
      */
     public static String getAccessModuleOnThread() {
         if (isExistAccessContextOnThread()) {
@@ -124,15 +127,18 @@ public class AccessContext {
                 return accessModule;
             }
         }
-        return "Anonymous"; // as Default
+        String msg;
+        if (isExistAccessContextOnThread()) {
+            msg = "The access module was not found in AccessContext on thread: " + getAccessContextOnThread();
+        } else {
+            msg = "The AccessContext was not found on thread!";
+        }
+        throw new IllegalStateException(msg);
     }
 
     /**
-     * Get access date on thread.
-     * <p>
-     * If it can't get access date from access-context, 
-     * returns application current time as default value!
-     * </p>
+     * Get access date on thread. <br />
+     * If it couldn't get access date from access-context, it returns application current date!
      * @return Access date. (NotNull)
      */
     public static Date getAccessDateOnThread() {
@@ -146,15 +152,12 @@ public class AccessContext {
                 return userContextOnThread.getAccessDateProvider().getAccessDate();
             }
         }
-        return new Date(); // as Default
+        return new Date();
     }
 
     /**
-     * Get access time-stamp on thread.
-     * <p>
-     * If it can't get access time-stamp from access-context, 
-     * returns application current time as default value!
-     * </p>
+     * Get access time-stamp on thread. <br />
+     * If it couldn't get access time-stamp from access-context, it returns application current time-stamp!
      * @return Access time-stamp. (NotNull)
      */
     public static Timestamp getAccessTimestampOnThread() {
@@ -168,17 +171,14 @@ public class AccessContext {
                 return userContextOnThread.getAccessTimestampProvider().getAccessTimestamp();
             }
         }
-        return new Timestamp(System.currentTimeMillis()); // as Default
+        return new Timestamp(System.currentTimeMillis());
     }
 
     /**
      * Get access value on thread.
-     * <p>
-     * If it can't get access value from access-context, 
-     * returns null as default value!
-     * </p>
      * @param key Key. (NotNull)
-     * @return Access value. (Nullable)
+     * @return Access value. (Nullable: If the key has null value, it returns null)
+     * @exception IllegalStateException When it couldn't get access value.
      */
     public static Object getAccessValueOnThread(String key) {
         if (isExistAccessContextOnThread()) {
@@ -188,7 +188,14 @@ public class AccessContext {
                 return accessValueMap.get(key);
             }
         }
-        return null; // as Default
+        String msg;
+        if (isExistAccessContextOnThread()) {
+            msg = "The access value was not found in AccessContext on thread:";
+            msg = msg + " key=" + key + " " + getAccessContextOnThread();
+        } else {
+            msg = "The AccessContext was not found on thread: key=" + key;
+        }
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================
@@ -202,6 +209,16 @@ public class AccessContext {
     protected java.sql.Timestamp accessTimestamp;
     protected AccessTimestampProvider accessTimestampProvider;
     protected Map<String, Object> accessValueMap;
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + accessUser + ", " + accessProcess + ", " + accessModule + ", " + accessDate + ", "
+                + accessDateProvider + ", " + accessTimestamp + ", " + accessTimestampProvider + ", " + accessValueMap
+                + "}";
+    }
 
     // ===================================================================================
     //                                                                            Accessor
