@@ -8,6 +8,7 @@ namespace ${glPackageBaseCommon} {
     public class ${glAccessContext} {
 
         private static LocalDataStoreSlot _accessContextSlot = Thread.AllocateDataSlot();
+        private static bool _defaultValid = false;
 
         public static ${glAccessContext} GetAccessContextOnThread() {
             return (${glAccessContext})Thread.GetData(_accessContextSlot);
@@ -37,7 +38,13 @@ namespace ${glPackageBaseCommon} {
                     return accessUser;
                 }
             }
-            return "Anonymous";// as Default
+            String msg;
+            if (IsExistAccessContextOnThread()) {
+                msg = "The access user was not found in AccessContext on thread: " + GetAccessContextOnThread();
+            } else {
+                msg = "The AccessContext was not found on thread!";
+            }
+            throw new SystemException(msg);
 		}
 		
 		public static String GetAccessProcessOnThread() {
@@ -48,7 +55,13 @@ namespace ${glPackageBaseCommon} {
                     return accessProcess;
                 }
             }
-            return "Anonymous";// as Default
+            String msg;
+            if (IsExistAccessContextOnThread()) {
+                msg = "The access process was not found in AccessContext on thread: " + GetAccessContextOnThread();
+            } else {
+                msg = "The AccessContext was not found on thread!";
+            }
+            throw new SystemException(msg);
 		}
 		
 		public static String GetAccessModuleOnThread() {
@@ -59,7 +72,13 @@ namespace ${glPackageBaseCommon} {
                     return accessModule;
                 }
             }
-            return "Anonymous";// as Default
+            String msg;
+            if (IsExistAccessContextOnThread()) {
+                msg = "The access module was not found in AccessContext on thread: " + GetAccessContextOnThread();
+            } else {
+                msg = "The AccessContext was not found on thread!";
+            }
+            throw new SystemException(msg);
 		}
 		
 		public static DateTime? GetAccessTimestampOnThread() {
@@ -70,7 +89,7 @@ namespace ${glPackageBaseCommon} {
                     return accessTimestamp;
                 }
             }
-            return DateTime.Now;// as Default
+            return DateTime.Now; // as Default
 		}
 
 		public static Object GetAccessValueOnThread(String key) {
@@ -81,7 +100,14 @@ namespace ${glPackageBaseCommon} {
                     return accessValueMap[key];
                 }
             }
-            return null;// as Default
+            String msg;
+            if (IsExistAccessContextOnThread()) {
+                msg = "The access value was not found in AccessContext on thread:";
+                msg = msg + " key=" + key + " " + GetAccessContextOnThread();
+            } else {
+                msg = "The AccessContext was not found on thread: key=" + key;
+            }
+            throw new SystemException(msg);
 		}
 		
         protected String _accessUser;
