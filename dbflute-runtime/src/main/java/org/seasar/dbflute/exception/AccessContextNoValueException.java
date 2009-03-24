@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the outside-sql is not found.
+ * The exception of when the access context on thread has no value.
  * @author jflute
  */
-public class OutsideSqlNotFoundException extends RuntimeException {
+public class AccessContextNoValueException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class OutsideSqlNotFoundException extends RuntimeException {
      * Constructor.
      * @param msg Exception message.
      */
-    public OutsideSqlNotFoundException(String msg) {
+    public AccessContextNoValueException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class OutsideSqlNotFoundException extends RuntimeException {
      * @param msg Exception message.
      * @param cause Throwable.
      */
-    public OutsideSqlNotFoundException(String msg, Throwable cause) {
+    public AccessContextNoValueException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

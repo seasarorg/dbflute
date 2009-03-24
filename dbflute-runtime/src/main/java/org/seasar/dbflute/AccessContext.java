@@ -20,6 +20,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.seasar.dbflute.exception.AccessContextNoValueException;
+import org.seasar.dbflute.exception.AccessContextNotFoundException;
+import org.seasar.dbflute.util.DfSystemUtil;
+
 /**
  * The context of DB access.
  * @author jflute
@@ -83,13 +87,13 @@ public class AccessContext {
                 return accessUser;
             }
         }
-        String msg;
+        String methodName = "getAccessUserOnThread()";
         if (isExistAccessContextOnThread()) {
-            msg = "The access user was not found in AccessContext on thread: " + getAccessContextOnThread();
+            throwAccessContextNoValueException(methodName, "AccessUser", "user");
         } else {
-            msg = "The AccessContext was not found on thread!";
+            throwAccessContextNotFoundException(methodName);
         }
-        throw new IllegalStateException(msg);
+        return null; // Unreachable!
     }
 
     /**
@@ -105,13 +109,13 @@ public class AccessContext {
                 return accessProcess;
             }
         }
-        String msg;
+        String methodName = "getAccessProcessOnThread()";
         if (isExistAccessContextOnThread()) {
-            msg = "The access process was not found in AccessContext on thread: " + getAccessContextOnThread();
+            throwAccessContextNoValueException(methodName, "AccessProcess", "process");
         } else {
-            msg = "The AccessContext was not found on thread!";
+            throwAccessContextNotFoundException(methodName);
         }
-        throw new IllegalStateException(msg);
+        return null; // Unreachable!
     }
 
     /**
@@ -127,13 +131,13 @@ public class AccessContext {
                 return accessModule;
             }
         }
-        String msg;
+        String methodName = "getAccessModuleOnThread()";
         if (isExistAccessContextOnThread()) {
-            msg = "The access module was not found in AccessContext on thread: " + getAccessContextOnThread();
+            throwAccessContextNoValueException(methodName, "AccessModule", "module");
         } else {
-            msg = "The AccessContext was not found on thread!";
+            throwAccessContextNotFoundException(methodName);
         }
-        throw new IllegalStateException(msg);
+        return null; // Unreachable!
     }
 
     /**
@@ -188,14 +192,61 @@ public class AccessContext {
                 return accessValueMap.get(key);
             }
         }
-        String msg;
+        String methodName = "getAccessValueOnThread(\"" + key + "\")";
         if (isExistAccessContextOnThread()) {
-            msg = "The access value was not found in AccessContext on thread:";
-            msg = msg + " key=" + key + " " + getAccessContextOnThread();
+            throwAccessContextNoValueException(methodName, "AccessValue", "value");
         } else {
-            msg = "The AccessContext was not found on thread: key=" + key;
+            throwAccessContextNotFoundException(methodName);
         }
-        throw new IllegalStateException(msg);
+        return null; // Unreachable!
+    }
+
+    protected static void throwAccessContextNotFoundException(String methodName) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The access context was Not Found on thread!" + ln();
+        msg = msg + "{When you used AccessContext." + methodName + "}" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please set up the access context before DB access(using common column auto set-up)." + ln();
+        msg = msg + "You should set up it at your application's interceptor or filter." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    try {" + ln();
+        msg = msg + "        AccessContext context = new AccessContext();" + ln();
+        msg = msg + "        context.setAccessTimestamp(accessTimestamp);" + ln();
+        msg = msg + "        context.setAccessUser(accessUser);" + ln();
+        msg = msg + "        context.setAccessProcess(accessProcess);" + ln();
+        msg = msg + "        AccessContext.setAccessContextOnThread(context);" + ln();
+        msg = msg + "        return invocation.proceed();" + ln();
+        msg = msg + "    } finally {" + ln();
+        msg = msg + "        AccessContext.clearAccessContextOnThread();" + ln();
+        msg = msg + "    }" + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new AccessContextNotFoundException(msg);
+    }
+
+    protected static void throwAccessContextNoValueException(String methodName, String capPropName, String aliasName) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Failed to get the access " + aliasName + " in access context on thread!" + ln();
+        msg = msg + "{When you used AccessContext." + methodName + "}" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please set up the value before DB access(using common column auto set-up)." + ln();
+        msg = msg + "You should set up it at your application's interceptor or filter." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    AccessContext context = new AccessContext();" + ln();
+        msg = msg + "    context.set" + capPropName + "(...);" + ln();
+        msg = msg + "    AccessContext.setAccessContextOnThread(context);" + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new AccessContextNoValueException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected static String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

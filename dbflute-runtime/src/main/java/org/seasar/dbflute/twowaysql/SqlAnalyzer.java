@@ -149,20 +149,20 @@ public class SqlAnalyzer {
     }
 
     protected void throwIfCommentConditionNotFoundException() {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The condition of IF comment was Not Found!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the IF comment expression." + getLineSeparator();
-        msg = msg + "It may exist the IF comment that DOESN'T have a condition." + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    before (x) -- /*IF*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
-        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[IF Comment Expression]" + getLineSeparator() + tokenizer.getToken() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The condition of IF comment was Not Found!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the IF comment expression." + ln();
+        msg = msg + "It may exist the IF comment that DOESN'T have a condition." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    before (x) -- /*IF*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + ln();
+        msg = msg + "[IF Comment Expression]" + ln() + tokenizer.getToken() + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IfCommentConditionNotFoundException(msg);
     }
@@ -186,18 +186,18 @@ public class SqlAnalyzer {
     }
 
     protected void throwEndCommentNotFoundException() {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The end comment was Not Found!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the parameter comment logic." + getLineSeparator();
-        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
-        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The end comment was Not Found!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the parameter comment logic." + ln();
+        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
+        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new EndCommentNotFoundException(msg);
     }
@@ -281,7 +281,7 @@ public class SqlAnalyzer {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 

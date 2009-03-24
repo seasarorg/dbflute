@@ -3,6 +3,8 @@ package org.seasar.dbflute;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import org.seasar.dbflute.exception.AccessContextNoValueException;
+import org.seasar.dbflute.exception.AccessContextNotFoundException;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -21,7 +23,7 @@ public class AccessContextTest extends PlainTestCase {
         super.tearDown();
         AccessContext.clearAccessContextOnThread();
     }
-    
+
     public void test_getValue_whenAccessContextExists_Tx() throws Exception {
         // ## Arrange ##
         AccessContext accessContext = new AccessContext();
@@ -34,7 +36,7 @@ public class AccessContextTest extends PlainTestCase {
         accessContext.setAccessTimestamp(currentTimestamp);
         accessContext.registerAccessValue("foo", "bar");
         AccessContext.setAccessContextOnThread(accessContext);
-        
+
         // ## Act & Assert ##
         assertEquals("accessUser", AccessContext.getAccessUserOnThread());
         assertEquals("accessProcess", AccessContext.getAccessProcessOnThread());
@@ -44,25 +46,25 @@ public class AccessContextTest extends PlainTestCase {
         assertEquals("bar", AccessContext.getAccessValueOnThread("foo"));
     }
 
-    public void test_getValue_whenAccessContextNotExists_Tx() throws Exception {
+    public void test_getValue_whenAccessContextNotFound_Tx() throws Exception {
         try {
             AccessContext.getAccessUserOnThread();
             fail();
-        } catch (IllegalStateException e) {
+        } catch (AccessContextNotFoundException e) {
             // OK
             log(e.getMessage());
         }
         try {
             AccessContext.getAccessProcessOnThread();
             fail();
-        } catch (IllegalStateException e) {
+        } catch (AccessContextNotFoundException e) {
             // OK
             log(e.getMessage());
         }
         try {
             AccessContext.getAccessModuleOnThread();
             fail();
-        } catch (IllegalStateException e) {
+        } catch (AccessContextNotFoundException e) {
             // OK
             log(e.getMessage());
         }
@@ -71,32 +73,32 @@ public class AccessContextTest extends PlainTestCase {
         try {
             AccessContext.getAccessValueOnThread("foo");
             fail();
-        } catch (IllegalStateException e) {
+        } catch (AccessContextNotFoundException e) {
             // OK
             log(e.getMessage());
         }
     }
-    
+
     public void test_getValue_whenAccessContextEmpty_Tx() throws Exception {
         AccessContext.setAccessContextOnThread(new AccessContext());
         try {
             AccessContext.getAccessUserOnThread();
             fail();
-        } catch (IllegalStateException e) {
+        } catch (AccessContextNoValueException e) {
             // OK
             log(e.getMessage());
         }
         try {
             AccessContext.getAccessProcessOnThread();
             fail();
-        } catch (IllegalStateException e) {
+        } catch (AccessContextNoValueException e) {
             // OK
             log(e.getMessage());
         }
         try {
             AccessContext.getAccessModuleOnThread();
             fail();
-        } catch (IllegalStateException e) {
+        } catch (AccessContextNoValueException e) {
             // OK
             log(e.getMessage());
         }
@@ -105,7 +107,7 @@ public class AccessContextTest extends PlainTestCase {
         try {
             AccessContext.getAccessValueOnThread("foo");
             fail();
-        } catch (IllegalStateException e) {
+        } catch (AccessContextNoValueException e) {
             // OK
             log(e.getMessage());
         }
