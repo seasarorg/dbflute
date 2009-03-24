@@ -27,6 +27,7 @@ import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnInsertAutoHandler;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -77,7 +78,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
             }
             buf.append(columnName);
         }
-        buf.append(") values (");
+        buf.append(")").append(getLineSeparator()).append(" values (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             if (i > 0) {
                 buf.append(", ");
@@ -127,6 +128,13 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
         return propertyTypes;
     }
 
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return DfSystemUtil.getLineSeparator();
+    }
+    
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

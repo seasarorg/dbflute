@@ -26,6 +26,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateAutoHandler;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -170,11 +171,11 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
             }
             sb.append(columnName).append(" = ?");
         }
-        sb.append(" where ");
-        for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
+        sb.append(getLineSeparator()).append(" where ");
+        for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) { // never zero loop
             sb.append(bmd.getPrimaryKey(i)).append(" = ? and ");
         }
-        sb.setLength(sb.length() - 5);
+        sb.setLength(sb.length() - 5); // for deleting extra ' and '
         if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
             TnPropertyType pt = bmd.getVersionNoPropertyType();
             sb.append(" and ").append(pt.getColumnName()).append(" = ?");
@@ -201,6 +202,13 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         return XLog.isLogEnabled();
     }
 
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String getLineSeparator() {
+        return DfSystemUtil.getLineSeparator();
+    }
+    
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
