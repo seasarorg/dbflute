@@ -25,6 +25,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -359,7 +360,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
-            final Class<?> columnType = getColumnType(columnMetaInfo);
+            final Class<?> columnType = getColumnType4Judgement(columnMetaInfo);
             if (columnType != null && !java.util.Date.class.isAssignableFrom(columnType)) {
                 return false;
             }
@@ -418,7 +419,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
-            final Class<?> columnType = getColumnType(columnMetaInfo);
+            final Class<?> columnType = getColumnType4Judgement(columnMetaInfo);
             if (columnType != null && !Boolean.class.isAssignableFrom(columnType)) {
                 return false;
             }
@@ -472,7 +473,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
-            final Class<?> columnType = getColumnType(columnMetaInfo);
+            final Class<?> columnType = getColumnType4Judgement(columnMetaInfo);
             if (columnType != null && !Number.class.isAssignableFrom(columnType)) {
                 return false;
             }
@@ -526,7 +527,7 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
      * @param columnMetaInfo The meta information of column. (NotNull)
      * @return The type of column. (Nullable: However Basically NotNull)
      */
-    protected Class<?> getColumnType(DfColumnMetaInfo columnMetaInfo) {
+    protected Class<?> getColumnType4Judgement(DfColumnMetaInfo columnMetaInfo) { // by original way
         final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
         final int columnSize = columnMetaInfo.getColumnSize();
         final int decimalDigits = columnMetaInfo.getDecimalDigits();
@@ -539,9 +540,17 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             try {
                 clazz = Class.forName(fullName);
             } catch (ClassNotFoundException ignored) {
-                String msg = "The java native class was not found:";
-                msg = msg + " torqueType=" + torqueType + " javaNativeString=" + javaNativeString;
-                _log.warn(msg);
+                // Only Date and Boolean and Number
+                final int jdbcType = columnMetaInfo.getJdbcType();
+                if (jdbcType == Types.TIMESTAMP || jdbcType == Types.DATE) {
+                    return Date.class;
+                } else if (jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
+                    return Boolean.class;
+                } else if (jdbcType == Types.NUMERIC || jdbcType == Types.INTEGER || jdbcType == Types.SMALLINT
+                        || jdbcType == Types.FLOAT || jdbcType == Types.DECIMAL || jdbcType == Types.REAL
+                        || jdbcType == Types.TINYINT) {
+                    return Number.class;
+                }
             }
         }
         return clazz;

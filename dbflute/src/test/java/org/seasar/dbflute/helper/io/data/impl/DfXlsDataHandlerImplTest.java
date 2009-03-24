@@ -69,7 +69,7 @@ public class DfXlsDataHandlerImplTest extends DfDBFluteTestCase {
         // ## Arrange ##
         final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl() {
             @Override
-            protected Class<?> getColumnType(DfColumnMetaInfo columnMetaInfo) {
+            protected Class<?> getColumnType4Judgement(DfColumnMetaInfo columnMetaInfo) {
                 return BigDecimal.class;
             }
         };
