@@ -528,8 +528,23 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
      */
     protected Class<?> getColumnType(DfColumnMetaInfo columnMetaInfo) {
         final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
-        final Class<?> columnType = TypeMap.findJavaNativeClass(torqueType);
-        return columnType;
+        final int columnSize = columnMetaInfo.getColumnSize();
+        final int decimalDigits = columnMetaInfo.getDecimalDigits();
+        final String javaNativeString = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName(javaNativeString);
+        } catch (ClassNotFoundException e) {
+            final String fullName = "java.lang." + javaNativeString;
+            try {
+                clazz = Class.forName(fullName);
+            } catch (ClassNotFoundException ignored) {
+                String msg = "The java native class was not found:";
+                msg = msg + " torqueType=" + torqueType + " javaNativeString=" + javaNativeString;
+                _log.warn(msg);
+            }
+        }
+        return clazz;
     }
 
     // ===================================================================================

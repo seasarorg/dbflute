@@ -351,21 +351,6 @@ public class TypeMap {
     // -----------------------------------------------------
     //                                           Java Native
     //                                           -----------
-    public static Class<?> findJavaNativeClass(String torqueType) {
-        final String javaTypeString = getJavaNativeString(torqueType);
-        Class<?> clazz = null;
-        try {
-            clazz = Class.forName(javaTypeString);
-        } catch (ClassNotFoundException e) {
-            final String fullName = "java.lang." + javaTypeString;
-            try {
-                clazz = Class.forName(fullName);
-            } catch (ClassNotFoundException e1) {
-            }
-        }
-        return clazz;
-    }
-
     public static String findJavaNativeString(String torqueType, Integer columnSize, Integer decimalDigits) {
         final String javaType = getJavaNativeString(torqueType);
         if (isAutoMappingTargetType(torqueType) && javaType.equalsIgnoreCase("$$AutoMapping$$")) {
