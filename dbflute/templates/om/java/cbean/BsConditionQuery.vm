@@ -62,7 +62,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
     protected ConditionValue _${tmpUncapitalisedJavaName};
     public ConditionValue get${tmpJavaName}() {
-        if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = new ConditionValue(); }
+        if (_${tmpUncapitalisedJavaName} == null) { _${tmpUncapitalisedJavaName} = nCV(); }
         return _${tmpUncapitalisedJavaName};
     }
     protected ConditionValue getCValue${tmpJavaName}() { return get${tmpJavaName}(); }
