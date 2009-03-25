@@ -303,6 +303,20 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         }
     }
 
+    @Override
+    protected boolean isNullValue(Object value) {
+        if (value == null) {
+            return true;
+        }
+
+        // Because separated value!
+        if (!(value instanceof String)) {
+            return false;
+        }
+        String str = (String) value;
+        return str.length() == 0 || str.equals("\"\"");
+    }
+
     // ===================================================================================
     //                                                                    Column Meta Info
     //                                                                    ================

@@ -85,7 +85,7 @@ public abstract class DfAbsractDataWriter {
     //                                            ----------
     protected boolean processNull(String columnName, Object value, PreparedStatement statement, int bindCount,
             DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
-        if (value != null) {
+        if (!isNullValue(value)) {
             return false;
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
@@ -111,6 +111,10 @@ public abstract class DfAbsractDataWriter {
             }
         }
         return true;
+    }
+    
+    protected boolean isNullValue(Object value) {
+        return value == null;
     }
 
     // -----------------------------------------------------

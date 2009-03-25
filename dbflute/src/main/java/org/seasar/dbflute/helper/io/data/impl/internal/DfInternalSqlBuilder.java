@@ -102,8 +102,6 @@ public class DfInternalSqlBuilder {
             } else {
                 Object value = columnValueMap.get(columnName);
                 if (hasConvertValue(columnName)) {
-                    // Convertのキー値はTrimしたものを前提とする。
-                    // (MapString側のキー値がTrimされるため)
                     final Map<String, String> convertValueMapping = findConvertValueMapping(columnName);
                     value = (value != null && (value instanceof String)) ? ((String) value).trim() : value;
                     if (convertValueMapping.containsKey(value)) {
