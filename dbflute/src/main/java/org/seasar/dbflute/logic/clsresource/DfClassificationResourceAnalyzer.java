@@ -12,9 +12,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.token.DfLineToken;
-import org.seasar.dbflute.helper.token.DfLineTokenImpl;
-import org.seasar.dbflute.helper.token.DfLineTokenizingOption;
+import org.seasar.dbflute.helper.token.line.LineToken;
+import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
+import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.properties.bean.DfClassificationElement;
 import org.seasar.dbflute.properties.bean.DfClassificationTop;
 import org.seasar.dbflute.util.DfNameHintUtil;
@@ -334,8 +334,8 @@ public class DfClassificationResourceAnalyzer {
     }
 
     protected java.util.List<String> tokenize(String value, String delimiter) {
-        final DfLineToken lineToken = new DfLineTokenImpl();
-        final DfLineTokenizingOption lineTokenizingOption = new DfLineTokenizingOption();
+        final LineToken lineToken = new LineTokenImpl();
+        final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
         lineTokenizingOption.setDelimiter(delimiter);
         return lineToken.tokenize(value, lineTokenizingOption);
     }
