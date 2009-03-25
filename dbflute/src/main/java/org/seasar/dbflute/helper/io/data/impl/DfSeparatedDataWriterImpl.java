@@ -303,6 +303,9 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         }
     }
 
+    // ===================================================================================
+    //                                                                    Process per Type
+    //                                                                    ================
     @Override
     protected boolean isNullValue(Object value) {
         if (value == null) {

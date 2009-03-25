@@ -174,7 +174,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         if (overTableColumnMap.isEmpty()) {
             return;
         }
-        log("...Creating data csv template(over 65000): tables=" + overTableColumnMap.size());
+        _log.info("...Creating data csv template(over 65000): tables=" + overTableColumnMap.size());
         final Map<String, List<Map<String, String>>> overDumpDataMap = dumpResult.getOverDumpDataMap();
         final FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf();
         final File csvDir = getDataCsvTemplateDir();
@@ -187,7 +187,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             final String csvFilePath = csvDir.getPath() + "/" + tableName + ".csv";
             final List<String> columnNameList = overTableColumnMap.get(tableName);
             final List<Map<String, String>> recordList = overDumpDataMap.get(tableName);
-            log("    " + tableName + "(" + recordList.size() + ")");
+            _log.info("    " + tableName + "(" + recordList.size() + ")");
             try {
                 option.headerInfo(columnNameList);
                 final Iterator<Map<String, String>> recordListIterator = recordList.iterator();
