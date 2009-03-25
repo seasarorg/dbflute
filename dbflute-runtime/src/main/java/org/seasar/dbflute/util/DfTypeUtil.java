@@ -622,7 +622,8 @@ public class DfTypeUtil {
             cal.set(Calendar.MINUTE, 0);
             cal.set(Calendar.SECOND, 0);
             cal.set(Calendar.MILLISECOND, 0);
-            return new java.sql.Date(cal.getTimeInMillis());
+            long time = cal.getTimeInMillis();
+            return new java.sql.Date(time);
         }
         return null;
     }

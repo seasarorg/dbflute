@@ -1,16 +1,18 @@
 package org.seasar.dbflute.cbean.cvalue;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
  * 
  * @author jflute
  * @since 0.9.4 (2009/03/18 Wednesday)
  */
-public class ConditionValueTest extends TestCase {
+public class ConditionValueTest extends PlainTestCase {
 
     // ===================================================================================
     //                                                                            In Scope
@@ -74,5 +76,30 @@ public class ConditionValueTest extends TestCase {
         assertEquals(value2, cv.getNotInScope());
         assertEquals(value1, cv.getNotInScope());
         assertEquals(value2, cv.getNotInScope());
+    }
+
+    // ===================================================================================
+    //                                                                              Filter
+    //                                                                              ======
+    public void test_filterValue_Object() {
+        // ## Arrange ##
+        ConditionValue cv = new ConditionValue();
+        Date currentDate = currentDate();
+        Timestamp currentTimestamp = currentTimestamp();
+
+        // ## Act & Assert ##
+        assertEquals(java.sql.Date.class, cv.filterValue(currentDate).getClass());
+        assertEquals(java.sql.Timestamp.class, cv.filterValue(currentTimestamp).getClass());
+    }
+
+    public void test_filterValue_Object_enableUtilDateToTimestamp() {
+        // ## Arrange ##
+        ConditionValue cv = new ConditionValue().enableUtilDateToTimestamp();
+        Date currentDate = currentDate();
+        Timestamp currentTimestamp = currentTimestamp();
+
+        // ## Act & Assert ##
+        assertEquals(java.sql.Timestamp.class, cv.filterValue(currentDate).getClass());
+        assertEquals(java.sql.Timestamp.class, cv.filterValue(currentTimestamp).getClass());
     }
 }

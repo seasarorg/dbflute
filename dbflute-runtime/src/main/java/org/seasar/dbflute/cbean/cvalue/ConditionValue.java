@@ -23,10 +23,15 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * Condition-value.
+ * The value of condition.
  * @author jflute
  */
 public class ConditionValue {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _utilDateToTimestamp;
 
     // ===================================================================================
     //                                                                               Equal
@@ -890,6 +895,14 @@ public class ConditionValue {
     }
 
     // =====================================================================================
+    //                                                                                Option
+    //                                                                                ======
+    public ConditionValue enableUtilDateToTimestamp() {
+        _utilDateToTimestamp = true;
+        return this;
+    }
+
+    // =====================================================================================
     //                                                                                Filter
     //                                                                                ======
     /**
@@ -908,11 +921,17 @@ public class ConditionValue {
         if (value instanceof java.sql.Timestamp) {
             return value;
         }
-        if (value instanceof java.util.Date || value instanceof java.util.Calendar) {
-            return DfTypeUtil.toSqlDate(value);
-        } else {
-            return value;
+        if (value instanceof java.util.Date) {
+            if (_utilDateToTimestamp) {
+                return DfTypeUtil.toTimestamp(value);
+            } else {
+                return DfTypeUtil.toSqlDate(value);
+            }
         }
+        if (value instanceof java.util.Calendar) {
+            return DfTypeUtil.toTimestamp(value);
+        }
+        return value;
     }
 
     /**

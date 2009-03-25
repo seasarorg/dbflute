@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.cbean.ckey;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -60,10 +62,7 @@ public class ConditionKeyIsNotNull extends ConditionKey {
      * @param columnName Column name. (NotNull)
      * @param value Condition value. (NotNull)
      */
-    protected void doAddWhereClause(java.util.List<String> conditionList, String columnName, ConditionValue value) {
-        if (value.getIsNotNull() == null) {
-            return;
-        }
+    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
         conditionList.add(buildClauseWithoutValue(columnName));
     }
 
@@ -75,7 +74,7 @@ public class ConditionKeyIsNotNull extends ConditionKey {
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doAddWhereClause(java.util.List<String> conditionList, String columnName, ConditionValue value, ConditionOption option) {
+    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value, ConditionOption option) {
         throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
     }
 

@@ -46,7 +46,7 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2008-12-30 12:34:56.000", DfTypeUtil.format(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
     }
 
-    public void test_toSqlDate() {
+    public void test_toSqlDate_basic() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56.789");

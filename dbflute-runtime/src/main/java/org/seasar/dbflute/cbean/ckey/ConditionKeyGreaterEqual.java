@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.cbean.ckey;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -39,7 +41,6 @@ public class ConditionKeyGreaterEqual extends ConditionKey {
 
     /**
      * Is valid registration?
-     * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
      * @param callerName Caller name. (NotNull)
@@ -63,33 +64,27 @@ public class ConditionKeyGreaterEqual extends ConditionKey {
 
     /**
      * This method implements super#doAddWhereClause().
-     * 
      * @param conditionList Condition list. (NotNull)
      * @param columnName Column name. (NotNull)
      * @param value Condition value. (NotNull)
      */
-    protected void doAddWhereClause(java.util.List<String> conditionList, String columnName, ConditionValue value) {
-        if (value.getGreaterEqual() == null) {
-            return;
-        }
+    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
         conditionList.add(buildBindClause(columnName, value.getGreaterEqualLocation()));
     }
 
     /**
      * This method implements super#doAddWhereClause().
-     * 
      * @param conditionList Condition list. (NotNull)
      * @param columnName Column name. (NotNull)
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doAddWhereClause(java.util.List<String> conditionList, String columnName, ConditionValue value, ConditionOption option) {
+    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value, ConditionOption option) {
         throw new UnsupportedOperationException("doAddWhereClause that has ConditionOption is unsupported!!!");
     }
 
     /**
      * This method implements super#doSetupConditionValue().
-     * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
      * @param location Location. (NotNull)
@@ -100,7 +95,6 @@ public class ConditionKeyGreaterEqual extends ConditionKey {
 
     /**
      * This method implements super#doSetupConditionValue().
-     * 
      * @param conditionValue Condition value. (NotNull)
      * @param value Value. (NotNull)
      * @param location Location. (NotNull)
