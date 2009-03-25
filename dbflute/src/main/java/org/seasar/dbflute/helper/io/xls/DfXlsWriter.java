@@ -20,7 +20,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.Time;
 import java.util.Date;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -55,6 +54,8 @@ public class DfXlsWriter implements DataSetConstants {
 
     protected HSSFCellStyle base64Style;
 
+    protected boolean dateStyleValid = true;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -72,6 +73,18 @@ public class DfXlsWriter implements DataSetConstants {
         } catch (FileNotFoundException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    /**
+     * Disable data style for cell type.
+     * @return this.
+     */
+    public DfXlsWriter disableDateStyle() {
+        dateStyleValid = false;
+        return this;
     }
 
     // ===================================================================================
@@ -122,18 +135,13 @@ public class DfXlsWriter implements DataSetConstants {
     }
 
     protected void setValue(HSSFCell cell, Object value) {
-        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // HSSFRichTextString is not supported at current version of POI.
-        // - - - - - - - - - -/
         if (value instanceof Number) {
             cell.setCellValue(createRichTextString(value.toString()));
-        } else if (value instanceof Time) {
-            cell.setCellValue((Time) value);
-            // Time type don't use date style!
-            //cell.setCellStyle(dateStyle);
         } else if (value instanceof Date) {
             cell.setCellValue((Date) value);
-            cell.setCellStyle(dateStyle);
+            if (dateStyleValid) {
+                cell.setCellStyle(dateStyle);
+            }
         } else if (value instanceof byte[]) {
             cell.setCellValue(createRichTextString(DfBase64Util.encode((byte[]) value)));
             cell.setCellStyle(base64Style);
