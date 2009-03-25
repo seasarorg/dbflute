@@ -41,8 +41,8 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
-import org.seasar.dbflute.helper.collection.DfStringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
@@ -234,7 +234,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         _goodSqlCount++;
                         alreadyIncrementGoodSqlCount = true;
                         
-                        final DfStringKeyMap<String> columnJavaNativeMap = createColumnJavaNativeMap(sql);
+                        final StringKeyMap<String> columnJavaNativeMap = createColumnJavaNativeMap(sql);
                         final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = new LinkedHashMap<String, DfColumnMetaInfo>();
                         final ResultSetMetaData md = rs.getMetaData();
                         for (int i = 1; i <= md.getColumnCount(); i++) {
@@ -360,9 +360,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 }
             }
             
-            protected DfStringKeyMap<String> createColumnJavaNativeMap(String sql) {
+            protected StringKeyMap<String> createColumnJavaNativeMap(String sql) {
                 final List<String> entityPropertyTypeList = getEntityPropertyTypeList(sql);
-                final DfStringKeyMap<String> columnJavaNativeMap = DfStringKeyMap.createAsFlexible();
+                final StringKeyMap<String> columnJavaNativeMap = StringKeyMap.createAsFlexible();
                 for (String element : entityPropertyTypeList) {
                     final String nameDelimiter = " ";
                     final int nameDelimiterLength = nameDelimiter.length();

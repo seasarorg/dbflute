@@ -78,7 +78,7 @@ import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.seasar.dbflute.exception.TableNotFoundException;
-import org.seasar.dbflute.helper.collection.DfStringSet;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.metadata.DfAutoIncrementHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
@@ -160,7 +160,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // -----------------------------------------------------
     //                                          Check Object
     //                                          ------------
-    protected DfStringSet _refTableCheckSet;
+    protected StringSet _refTableCheckSet;
 
     // ===================================================================================
     //                                                                             Execute
@@ -248,7 +248,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         // Initialize the set collection for reference table check.
         // This should be executed before handling foreign keys.
-        _refTableCheckSet = DfStringSet.createAsCaseInsensitive();
+        _refTableCheckSet = StringSet.createAsCaseInsensitive();
         for (DfTableMetaInfo tableMetaInfo : tableList) {
             _refTableCheckSet.add(tableMetaInfo.getTableName());
         }

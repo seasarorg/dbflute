@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.helper.collection.impl.DfMapListStringImpl;
+import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 
 /**
  * @author jflute
@@ -80,7 +80,7 @@ public class DfListStringFileReader {
         if (sb.toString().trim().length() == 0) {
             return new ArrayList<Object>();
         }
-        final DfMapListStringImpl mapListString = new DfMapListStringImpl();
+        final MapListStringImpl mapListString = new MapListStringImpl();
         return mapListString.generateList(sb.toString());
     }
 

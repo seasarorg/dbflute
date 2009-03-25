@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.collection.impl.DfMapListStringImpl;
+import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 
 /**
  * @author jflute
@@ -85,7 +85,7 @@ public class DfMapStringFileReader {
         if (sb.toString().trim().length() == 0) {
             return new LinkedHashMap<String, Object>();
         }
-        final DfMapListStringImpl mapListString = new DfMapListStringImpl();
+        final MapListStringImpl mapListString = new MapListStringImpl();
         return mapListString.generateMap(sb.toString());
     }
 

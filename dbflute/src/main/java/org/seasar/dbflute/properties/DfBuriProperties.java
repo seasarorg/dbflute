@@ -11,7 +11,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
-import org.seasar.dbflute.helper.collection.DfStringKeyMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.util.basic.DfStringUtil;
 
 /**
@@ -165,7 +165,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
 
     protected Map<String, List<String>> getTargetProcessMap() {
         if (_tableProcessMap == null) {
-            _tableProcessMap = DfStringKeyMap.createAsFlexible();
+            _tableProcessMap = StringKeyMap.createAsFlexible();
             final Map<String, Object> buriPropertyAsMap = getBuriPropertyAsMap("tableProcessMap");
             if (buriPropertyAsMap != null) {
                 final Set<String> tableNameSet = buriPropertyAsMap.keySet();
@@ -206,7 +206,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                              Buri Table Information
     //                                                              ======================
-    protected Map<String, String> _tableJavaNameCaseInsensitiveMap = DfStringKeyMap.createAsCaseInsensitive();
+    protected Map<String, String> _tableJavaNameCaseInsensitiveMap = StringKeyMap.createAsCaseInsensitive();
     {
         putTableJavaNameMap("BuriPath"); // 1
         putTableJavaNameMap("BuriData"); // 2
@@ -245,7 +245,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                             Buri Column Information
     //                                                             =======================
-    protected Map<String, String> _columnJavaNameCaseInsensitiveMap = DfStringKeyMap.createAsCaseInsensitive();
+    protected Map<String, String> _columnJavaNameCaseInsensitiveMap = StringKeyMap.createAsCaseInsensitive();
     {
         putColumnJavaNameMap("StateId");
         putColumnJavaNameMap("PathId");

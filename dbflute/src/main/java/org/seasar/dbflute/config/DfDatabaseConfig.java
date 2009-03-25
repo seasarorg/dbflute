@@ -19,8 +19,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.collection.DfMapListString;
-import org.seasar.dbflute.helper.collection.impl.DfMapListStringImpl;
+import org.seasar.dbflute.helper.mapstring.MapListString;
+import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 
 /**
  * @author jflute
@@ -53,7 +53,7 @@ public class DfDatabaseConfig {
      * @return Database base-info. (NotNull)
      */
     public Map<String, Map<String, String>> analyzeDatabaseBaseInfo() {
-        final DfMapListString mapListString = new DfMapListStringImpl();
+        final MapListString mapListString = new MapListStringImpl();
         mapListString.setDelimiter(";");
         final Map<String, Object> map = mapListString.generateMap(_databaseBaseInfo);
         final Map<String, Map<String, String>> realMap = new LinkedHashMap<String, Map<String, String>>();

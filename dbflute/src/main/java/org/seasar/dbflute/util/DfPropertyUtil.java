@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.collection.DfMapListString;
-import org.seasar.dbflute.helper.collection.impl.DfMapListStringImpl;
+import org.seasar.dbflute.helper.mapstring.MapListString;
+import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 
 public class DfPropertyUtil {
 
@@ -70,23 +70,23 @@ public class DfPropertyUtil {
     }
 
     public static List<Object> listProp(Properties prop, String key) {
-        final DfMapListString mapListString = new DfMapListStringImpl();
+        final MapListString mapListString = new MapListStringImpl();
         return mapListString.generateList(stringProp(prop, key));
     }
 
     public static List<Object> listProp(Properties prop, String key, String delimiter) {
-        final DfMapListString mapListString = new DfMapListStringImpl();
+        final MapListString mapListString = new MapListStringImpl();
         mapListString.setDelimiter(delimiter);
         return mapListString.generateList(stringProp(prop, key));
     }
 
     public static Map<String, Object> mapProp(Properties prop, String key) {
-        final DfMapListString mapListString = new DfMapListStringImpl();
+        final MapListString mapListString = new MapListStringImpl();
         return mapListString.generateMap(stringProp(prop, key));
     }
 
     public static Map<String, Object> mapProp(Properties prop, String key, String delimiter) {
-        final DfMapListString mapListString = new DfMapListStringImpl();
+        final MapListString mapListString = new MapListStringImpl();
         mapListString.setDelimiter(delimiter);
         return mapListString.generateMap(stringProp(prop, key));
     }

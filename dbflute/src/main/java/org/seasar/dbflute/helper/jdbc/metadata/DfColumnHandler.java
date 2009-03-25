@@ -27,7 +27,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
-import org.seasar.dbflute.helper.collection.DfStringSet;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
@@ -128,11 +128,11 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     protected void setupColumnMetaInfo(List<DfColumnMetaInfo> columns, ResultSet columnResultSet, String tableName)
             throws SQLException {
         // Column names for duplicate check
-        final DfStringSet columnNameSet = DfStringSet.createAsCaseInsensitive();
+        final StringSet columnNameSet = StringSet.createAsCaseInsensitive();
 
         // Duplicate objects for warning log
-        final DfStringSet duplicateTableNameSet = DfStringSet.createAsCaseInsensitive();
-        final DfStringSet duplicateColumnNameSet = DfStringSet.createAsCaseInsensitive();
+        final StringSet duplicateTableNameSet = StringSet.createAsCaseInsensitive();
+        final StringSet duplicateColumnNameSet = StringSet.createAsCaseInsensitive();
 
         while (columnResultSet.next()) {
             final String columnName = columnResultSet.getString(4);

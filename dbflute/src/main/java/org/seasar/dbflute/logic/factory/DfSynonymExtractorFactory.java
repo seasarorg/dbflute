@@ -2,7 +2,7 @@ package org.seasar.dbflute.logic.factory;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.collection.DfStringSet;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.metadata.synonym.DfSynonymExtractor;
 import org.seasar.dbflute.helper.jdbc.metadata.synonym.DfSynonymExtractorOracle;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -18,7 +18,7 @@ public class DfSynonymExtractorFactory {
     protected DfDatabaseProperties _databaseProperties;
     protected DataSource _dataSource;
     protected String _schema;
-    protected DfStringSet _refTableCheckSet;
+    protected StringSet _refTableCheckSet;
 
     /**
      * @param basicProperties The basic properties. (NotNull)
@@ -27,7 +27,7 @@ public class DfSynonymExtractorFactory {
      * @param schema The schema to extract. (NotNull)
      */
     public DfSynonymExtractorFactory(DfBasicProperties basicProperties, DfDatabaseProperties databaseProperties,
-            DataSource dataSource, String schema, DfStringSet refTableCheckSet) {
+            DataSource dataSource, String schema, StringSet refTableCheckSet) {
         _basicProperties = basicProperties;
         _databaseProperties = databaseProperties;
         _schema = schema;
