@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.Time;
 import java.util.Date;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -126,6 +127,10 @@ public class DfXlsWriter implements DataSetConstants {
         // - - - - - - - - - -/
         if (value instanceof Number) {
             cell.setCellValue(createRichTextString(value.toString()));
+        } else if (value instanceof Time) {
+            cell.setCellValue((Time) value);
+            // Time type don't use date style!
+            //cell.setCellStyle(dateStyle);
         } else if (value instanceof Date) {
             cell.setCellValue((Date) value);
             cell.setCellStyle(dateStyle);
