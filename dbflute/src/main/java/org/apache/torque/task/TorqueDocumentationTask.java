@@ -72,7 +72,6 @@ import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
-import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileToken;
@@ -166,11 +165,16 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final Integer limit = getDataXlsTemplateRecordLimit();
         final File xlsFile = getDataXlsTemplateFile();
         final DumpResult dumpResult = xlsHandler.dumpToXls(tableColumnMap, limit, xlsFile);
+        dumpDataCsvTemplate(dumpResult);
+    }
+
+    protected void dumpDataCsvTemplate(DumpResult dumpResult) {
         final Map<String, List<String>> overTableColumnMap = dumpResult.getOverTableColumnMap();
         if (overTableColumnMap.isEmpty()) {
             return;
         }
         final Map<String, List<Map<String, String>>> overDumpDataMap = dumpResult.getOverDumpDataMap();
+        final FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf();
         final File csvDir = getDataCsvTemplateDir();
         final FileToken fileToken = new FileTokenImpl();
         final Set<String> tableNameSet = overTableColumnMap.keySet();
@@ -179,10 +183,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             final List<String> columnNameList = overTableColumnMap.get(tableName);
             final List<Map<String, String>> recordlist = overDumpDataMap.get(tableName);
             try {
-                final FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf();
-                final FileMakingHeaderInfo fileMakingHeaderInfo = new FileMakingHeaderInfo();
-                fileMakingHeaderInfo.setColumnNameList(columnNameList);
-                option.setFileMakingHeaderInfo(fileMakingHeaderInfo);
+                option.headerInfo(columnNameList);
                 for (final Map<String, String> recordMap : recordlist) {
                     fileToken.make(csvFilePath, new FileMakingCallback() {
                         public FileMakingRowResource getRowResource() {
