@@ -4,13 +4,13 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import junit.framework.TestCase;
+import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute
  * @since 0.9.0 (2009/01/19 Monday)
  */
-public class DfTypeUtilTest extends TestCase {
+public class DfTypeUtilTest extends PlainTestCase {
 
     public void test_toDateFlexibly() {
         // ## Arrange ##
@@ -44,6 +44,28 @@ public class DfTypeUtilTest extends TestCase {
         assertEquals("2008/12/30", DfTypeUtil.format(timestamp, "yyyy/MM/dd"));
         assertEquals("2008-12-30", DfTypeUtil.format(timestamp, "yyyy-MM-dd"));
         assertEquals("2008-12-30 12:34:56.000", DfTypeUtil.format(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
+    }
+
+    public void test_toSqlDate() {
+        // ## Arrange ##
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56.789");
+
+        // ## Act & Assert ##
+        assertNull(DfTypeUtil.toSqlDate(null));
+        assertNull(DfTypeUtil.toSqlDate(""));
+        assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toSqlDate(date)));
+    }
+
+    public void test_toTime() {
+        // ## Arrange ##
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56.789");
+
+        // ## Act & Assert ##
+        assertNull(DfTypeUtil.toTime(null));
+        assertNull(DfTypeUtil.toTime(""));
+        assertEquals("1970/01/01 12:34:56.789", f.format(DfTypeUtil.toTime(date)));
     }
 
     public void test_toTimestampFlexibly() {

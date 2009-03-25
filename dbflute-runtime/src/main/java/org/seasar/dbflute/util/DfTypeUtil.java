@@ -616,7 +616,13 @@ public class DfTypeUtil {
             throw new ToSqlDateParseException(msg, e);
         }
         if (date != null) {
-            return new java.sql.Date(date.getTime());
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            return new java.sql.Date(cal.getTimeInMillis());
         }
         return null;
     }
@@ -878,10 +884,22 @@ public class DfTypeUtil {
             return null;
         } else if (o instanceof String) {
             return toTime((String) o, pattern);
+        } else if (o instanceof Date) {
+            Date date = (Date) o;
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            cal.set(Calendar.YEAR, 1970);
+            cal.set(Calendar.MONTH, Calendar.JANUARY);
+            cal.set(Calendar.DATE, 1);
+            return new Time(cal.getTimeInMillis());
         } else if (o instanceof Time) {
             return (Time) o;
         } else if (o instanceof Calendar) {
-            return new Time(((Calendar) o).getTime().getTime());
+            Calendar cal = (Calendar) o;
+            cal.set(Calendar.YEAR, 1970);
+            cal.set(Calendar.MONTH, Calendar.JANUARY);
+            cal.set(Calendar.DATE, 1);
+            return new Time(cal.getTimeInMillis());
         } else {
             return toTime(o.toString(), pattern);
         }
@@ -912,7 +930,7 @@ public class DfTypeUtil {
         try {
             return new Time(sdf.parse(s).getTime());
         } catch (ParseException e) {
-            String msg = "Failed to parse the string to time-stamp flexibly: ";
+            String msg = "Failed to parse the string to time: ";
             msg = msg + " string=" + s + " pattern=" + pattern + " locale=" + locale;
             throw new ToTimeParseException(msg, e);
         }

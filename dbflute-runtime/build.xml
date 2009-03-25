@@ -1,7 +1,7 @@
 <project name="DBFluteRuntime" default="dist" basedir=".">
 
   <property name="version" value="0.9.4"/>
-  <property name="build.version" value="0.9.4-33-SNAPSHOT"/>
+  <property name="build.version" value="0.9.4-34-SNAPSHOT"/>
 
   <target name="dist">
 
@@ -32,11 +32,11 @@
     <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
     	  tofile="../dbflute/lib/forCompile/dbflute-runtime.jar"
     	  overwrite="true"/>
-    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute/lib/forExecute/dbflute-runtime.jar"
-    	  overwrite="true"/>
     <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
     	  tofile="../dbflute/lib/forCompile/sources/dbflute-runtime-sources.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute/lib/forExecute/dbflute-runtime.jar"
     	  overwrite="true"/>
 
     <delete file="../javatest/lib/dbflute-runtime-*.jar"/>
