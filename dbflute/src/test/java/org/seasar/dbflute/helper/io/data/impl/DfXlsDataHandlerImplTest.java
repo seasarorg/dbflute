@@ -50,6 +50,21 @@ public class DfXlsDataHandlerImplTest extends DfDBFluteTestCase {
         assertTrue(impl.isNotNullNotString(new Date()));
         assertTrue(impl.isNotNullNotString(new Timestamp(System.currentTimeMillis())));
     }
+    
+    // -----------------------------------------------------
+    //                                                  Time
+    //                                                  ----
+    @Test
+    public void test_isTimeValue() {
+        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl();
+        assertTrue(impl.isTimeValue("12:34:56"));
+        assertTrue(impl.isTimeValue("23:42:35"));
+        assertTrue(impl.isTimeValue("03:42:35"));
+        assertTrue(impl.isTimeValue("3:42:35"));
+        assertTrue(impl.isTimeValue("01:00:00"));
+        assertTrue(impl.isTimeValue("00:00:00"));
+        assertFalse(impl.isTimeValue("2007/12/12 12:34:56"));
+    }
 
     // -----------------------------------------------------
     //                                             Timestamp
