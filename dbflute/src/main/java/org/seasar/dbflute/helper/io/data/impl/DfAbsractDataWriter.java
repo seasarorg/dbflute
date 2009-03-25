@@ -364,6 +364,8 @@ public abstract class DfAbsractDataWriter {
                 final int jdbcType = columnMetaInfo.getJdbcType();
                 if (jdbcType == Types.TIMESTAMP || jdbcType == Types.DATE) {
                     return Date.class;
+                } else if (jdbcType == Types.TIME) {
+                    return Time.class;
                 } else if (jdbcType == Types.BIT || jdbcType == Types.BOOLEAN) {
                     return Boolean.class;
                 } else if (jdbcType == Types.NUMERIC || jdbcType == Types.INTEGER || jdbcType == Types.SMALLINT
