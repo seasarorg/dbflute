@@ -3,6 +3,7 @@ package org.seasar.dbflute.unit;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -13,18 +14,22 @@ import org.seasar.dbflute.util.io.DfResourceUtil;
 /**
  * @author jflute
  */
-public abstract class DfDBFluteTestCase {
+public abstract class PlainTestCase {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfDBFluteTestCase.class);
+    private static final Log _log = LogFactory.getLog(PlainTestCase.class);
 
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
+    //                                                                      General Helper
+    //                                                                      ==============
     protected void log(Object msg) {
         _log.debug(msg);
+    }
+
+    protected Date currentDate() {
+        return new Date();
     }
 
     protected Timestamp currentTimestamp() {
@@ -32,9 +37,12 @@ public abstract class DfDBFluteTestCase {
     }
 
     protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+        return "\n";
     }
 
+    // ===================================================================================
+    //                                                                           IO Helper
+    //                                                                           =========
     protected String getCanonicalPath() {
         final File buildDir = DfResourceUtil.getBuildDir(this.getClass());
         final String canonicalPath;

@@ -5,9 +5,9 @@ import static org.junit.Assert.assertEquals;
 import java.util.Properties;
 
 import org.junit.Test;
-import org.seasar.dbflute.unit.DfDBFluteTestCase;
+import org.seasar.dbflute.unit.PlainTestCase;
 
-public class DfBasicPropertiesTest extends DfDBFluteTestCase {
+public class DfBasicPropertiesTest extends PlainTestCase {
 
     @Test
     public void test_conditionBeanPackage() {

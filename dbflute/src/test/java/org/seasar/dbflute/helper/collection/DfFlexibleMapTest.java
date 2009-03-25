@@ -1,10 +1,14 @@
-package org.seasar.dbflute.helper.flexiblename;
+package org.seasar.dbflute.helper.collection;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.unit.PlainTestCase;
 
-public class DfFlexibleNameMapTest {
+/**
+ * @author jflute
+ * @since 0.9.4 (2009/03/25 Wednesday)
+ */
+public class DfFlexibleMapTest extends PlainTestCase {
 
     @Test
     public void test_Basic() {
@@ -28,7 +32,7 @@ public class DfFlexibleNameMapTest {
         Assert.assertEquals("aaa", map.get("rTime"));
         Assert.assertEquals("aaa", map.get("RTime"));
         
-        // {Ruser}
+        // {R_USER}
         Assert.assertTrue(map.containsKey("R_USER"));
         Assert.assertTrue(map.containsKey("RUSER"));
         Assert.assertTrue(map.containsKey("rUser"));

@@ -5,13 +5,13 @@ import static org.junit.Assert.assertEquals;
 import java.util.Properties;
 
 import org.junit.Test;
-import org.seasar.dbflute.unit.DfDBFluteTestCase;
+import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute
  * @since 0.8.3 (2008/11/17 Monday)
  */
-public class DfOutsideSqlPropertiesTest extends DfDBFluteTestCase {
+public class DfOutsideSqlPropertiesTest extends PlainTestCase {
 
     @Test
     public void test_resolveSqlPackageFileSeparatorWithFlatDirectory_contains() {

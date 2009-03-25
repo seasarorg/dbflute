@@ -18,13 +18,13 @@ import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
-import org.seasar.dbflute.unit.DfDBFluteTestCase;
+import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute
  * @since 0.8.3 (2008/10/29 Wednesday)
  */
-public class DfDumpDataXlsHandlerTest extends DfDBFluteTestCase {
+public class DfDumpDataXlsHandlerTest extends PlainTestCase {
 
     @Test
     public void test_transferToXls() throws IOException {

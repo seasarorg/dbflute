@@ -15,9 +15,9 @@ import java.util.regex.PatternSyntaxException;
 import org.junit.Test;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.unit.DfDBFluteTestCase;
+import org.seasar.dbflute.unit.PlainTestCase;
 
-public class DfXlsDataHandlerImplTest extends DfDBFluteTestCase {
+public class DfXlsDataHandlerImplTest extends PlainTestCase {
 
     // ===================================================================================
     //                                                                               Write

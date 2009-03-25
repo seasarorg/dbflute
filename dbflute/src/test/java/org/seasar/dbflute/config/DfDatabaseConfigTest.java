@@ -5,9 +5,9 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.unit.DfDBFluteTestCase;
+import org.seasar.dbflute.unit.PlainTestCase;
 
-public class DfDatabaseConfigTest extends DfDBFluteTestCase {
+public class DfDatabaseConfigTest extends PlainTestCase {
 
     public DfDatabaseConfigTest() {
     }

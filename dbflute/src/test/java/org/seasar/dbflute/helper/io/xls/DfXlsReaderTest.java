@@ -20,14 +20,14 @@ import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetterTest;
-import org.seasar.dbflute.unit.DfDBFluteTestCase;
+import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.io.DfResourceUtil;
 
 /**
  * @author jflute
  * @since 0.7.9 (2008/08/24 Monday)
  */
-public class DfXlsReaderTest extends DfDBFluteTestCase {
+public class DfXlsReaderTest extends PlainTestCase {
 
     @Test
     public void test_read() throws IOException {
