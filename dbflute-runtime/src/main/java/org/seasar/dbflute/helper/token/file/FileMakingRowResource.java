@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+
 /**
  * @author jflute
  */
@@ -23,37 +26,35 @@ public class FileMakingRowResource {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected java.util.List<String> _valueList;
+    protected List<String> _valueList;
 
-    protected java.util.LinkedHashMap<String, String> _nameValueMap;
+    protected LinkedHashMap<String, String> _nameValueMap;
 
     // =====================================================================================
     //                                                                              Accessor
     //                                                                              ========
-    public java.util.List<String> getValueList() {
+    public List<String> getValueList() {
         return _valueList;
     }
 
     /**
      * Set the list of value. {Priority One}
-     * 
      * @param valueList The list of value. (NotNull and NotEmpty)
      */
-    public void setValueList(java.util.List<String> valueList) {
+    public void setValueList(List<String> valueList) {
         this._valueList = valueList;
     }
 
-    public java.util.LinkedHashMap<String, String> getNameValueMap() {
+    public LinkedHashMap<String, String> getNameValueMap() {
         return _nameValueMap;
     }
 
     /**
      * Set the map of name and value. {Priority Two} <br />
      * If valueList is set, This nameValueMap is ignored.
-     * 
      * @param nameValueMap The map of name and value. (NotNull and NotEmpty)
      */
-    public void setNameValueMap(java.util.LinkedHashMap<String, String> nameValueMap) {
+    public void setNameValueMap(LinkedHashMap<String, String> nameValueMap) {
         this._nameValueMap = nameValueMap;
     }
 }

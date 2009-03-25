@@ -76,6 +76,11 @@ public class FileMakingOption {
         return this;
     }
 
+    public FileMakingOption headerInfo(FileMakingHeaderInfo headerInfo) {
+        _fileMakingHeaderInfo = headerInfo;
+        return this;
+    }
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

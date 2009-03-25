@@ -22,8 +22,24 @@ import java.util.List;
  */
 public class FileMakingHeaderInfo {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected List<String> columnNameList = new java.util.ArrayList<String>();
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public FileMakingHeaderInfo() {
+    }
+
+    public FileMakingHeaderInfo(List<String> columnNameList) {
+        this.columnNameList = columnNameList;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public List<String> getColumnNameList() {
         return columnNameList;
     }
