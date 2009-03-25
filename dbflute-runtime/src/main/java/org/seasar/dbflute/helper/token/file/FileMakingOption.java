@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.helper.token.file;
 
+import java.util.List;
+
 /**
  * @author jflute
  */
@@ -76,8 +78,10 @@ public class FileMakingOption {
         return this;
     }
 
-    public FileMakingOption headerInfo(FileMakingHeaderInfo headerInfo) {
-        _fileMakingHeaderInfo = headerInfo;
+    public FileMakingOption headerInfo(List<String> columnNameList) {
+        final FileMakingHeaderInfo fileMakingHeaderInfo = new FileMakingHeaderInfo();
+        fileMakingHeaderInfo.setColumnNameList(columnNameList);
+        _fileMakingHeaderInfo = fileMakingHeaderInfo;
         return this;
     }
 
