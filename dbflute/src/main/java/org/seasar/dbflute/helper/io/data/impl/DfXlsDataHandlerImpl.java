@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -195,6 +196,14 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
                             }
 
                             // - - - - - - - - - - - - - - 
+                            // Against Time Headache
+                            // - - - - - - - - - - - - - -
+                            if (processTime(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
+                            }
+
+                            // - - - - - - - - - - - - - - 
                             // Against Timestamp Headache
                             // - - - - - - - - - - - - - -
                             if (processTimestamp(columnName, value, ps, bindCount, columnMetaInfoMap)) {
@@ -301,7 +310,9 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
         if (!isNotNullNotString(obj)) {
             return false;
         }
-        if (obj instanceof Timestamp) {
+        if (obj instanceof Time) {
+            statement.setTime(bindCount, (Time) obj);
+        } else if (obj instanceof Timestamp) {
             statement.setTimestamp(bindCount, (Timestamp) obj);
         } else if (obj instanceof BigDecimal) {
             statement.setBigDecimal(bindCount, (BigDecimal) obj);
@@ -348,6 +359,57 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             }
         }
         return true;
+    }
+
+    // -----------------------------------------------------
+    //                                                  Time
+    //                                                  ----
+    protected boolean processTime(String columnName, String value, PreparedStatement ps, int bindCount,
+            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        if (value == null) {
+            return false;
+        }
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo != null) {
+            final Class<?> columnType = getColumnType4Judgement(columnMetaInfo);
+            if (columnType != null && !java.sql.Time.class.isAssignableFrom(columnType)) {
+                return false;
+            }
+        }
+        value = filterTimeValue(value);
+        if (!isTimeValue(value)) {
+            return false;
+        }
+        final Time timeValue = getTimeValue(columnName, value);
+        ps.setTime(bindCount, timeValue);
+        return true;
+    }
+
+    protected String filterTimeValue(String value) {
+        value = value.trim();
+        return value;
+    }
+
+    protected boolean isTimeValue(String value) {
+        if (value == null) {
+            return false;
+        }
+        try {
+            Time.valueOf(value);
+            return true;
+        } catch (RuntimeException e) {
+        }
+        return false;
+    }
+
+    protected Time getTimeValue(String columnName, String value) {
+        try {
+            return Time.valueOf(value);
+        } catch (RuntimeException e) {
+            String msg = "The value cannot be convert to time:";
+            msg = msg + " columnName=" + columnName + " value=" + value;
+            throw new IllegalStateException(msg, e);
+        }
     }
 
     // -----------------------------------------------------
