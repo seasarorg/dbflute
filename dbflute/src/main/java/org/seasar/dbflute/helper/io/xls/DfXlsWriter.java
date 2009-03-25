@@ -135,6 +135,9 @@ public class DfXlsWriter implements DataSetConstants {
     }
 
     protected void setValue(HSSFCell cell, Object value) {
+        if (stringCellType) {
+            cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+        }
         if (value instanceof Number) {
             cell.setCellValue(createRichTextString(value.toString()));
         } else if (value instanceof Date) {
@@ -147,9 +150,6 @@ public class DfXlsWriter implements DataSetConstants {
             cell.setCellValue(((Boolean) value).booleanValue());
         } else {
             cell.setCellValue(createRichTextString(DfStringUtil.toString(value, null)));
-        }
-        if (stringCellType) {
-            cell.setCellType(HSSFCell.CELL_TYPE_STRING);
         }
     }
 
