@@ -61,7 +61,6 @@ public class DfDumpDataXlsHandler {
         final Map<String, List<Map<String, String>>> overDumpDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
 
         final Set<String> tableNameSet = dumpDataMap.keySet();
-        final DfXlsWriter writer = new DfXlsWriter(xlsFile).disableDateStyle();
         // If the Apache POI version is 2.5, this is necessary to handle Japanese. 
         // writer.setCellEncoding(CellEncoding.ENCODING_UTF_16); // for Japanese
         final DataSet dataSet = new DataSet();
@@ -89,6 +88,9 @@ public class DfDumpDataXlsHandler {
             }
             dataSet.addTable(dataTable);
         }
+
+        // The xls file should have all string cell type for replace-schema. 
+        final DfXlsWriter writer = new DfXlsWriter(xlsFile).stringCellType();
         writer.write(dataSet);
 
         DumpResult dumpResult = new DumpResult();

@@ -54,7 +54,7 @@ public class DfXlsWriter implements DataSetConstants {
 
     protected HSSFCellStyle base64Style;
 
-    protected boolean dateStyleValid = true;
+    protected boolean stringCellType;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -79,11 +79,11 @@ public class DfXlsWriter implements DataSetConstants {
     //                                                                              Option
     //                                                                              ======
     /**
-     * Disable data style for cell type.
+     * Enable string types of all cells.
      * @return this.
      */
-    public DfXlsWriter disableDateStyle() {
-        dateStyleValid = false;
+    public DfXlsWriter stringCellType() {
+        stringCellType = true;
         return this;
     }
 
@@ -139,9 +139,7 @@ public class DfXlsWriter implements DataSetConstants {
             cell.setCellValue(createRichTextString(value.toString()));
         } else if (value instanceof Date) {
             cell.setCellValue((Date) value);
-            if (dateStyleValid) {
-                cell.setCellStyle(dateStyle);
-            }
+            cell.setCellStyle(dateStyle);
         } else if (value instanceof byte[]) {
             cell.setCellValue(createRichTextString(DfBase64Util.encode((byte[]) value)));
             cell.setCellStyle(base64Style);
@@ -149,6 +147,9 @@ public class DfXlsWriter implements DataSetConstants {
             cell.setCellValue(((Boolean) value).booleanValue());
         } else {
             cell.setCellValue(createRichTextString(DfStringUtil.toString(value, null)));
+        }
+        if (stringCellType) {
+            cell.setCellType(HSSFCell.CELL_TYPE_STRING);
         }
     }
 
