@@ -58,6 +58,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,6 +174,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         if (overTableColumnMap.isEmpty()) {
             return;
         }
+        log("...Creating data csv template(over 65000): tables=" + overTableColumnMap.size());
         final Map<String, List<Map<String, String>>> overDumpDataMap = dumpResult.getOverDumpDataMap();
         final FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf();
         final File csvDir = getDataCsvTemplateDir();
@@ -181,20 +183,24 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         for (final String tableName : tableNameSet) {
             final String csvFilePath = csvDir.getPath() + "/" + tableName + ".csv";
             final List<String> columnNameList = overTableColumnMap.get(tableName);
-            final List<Map<String, String>> recordlist = overDumpDataMap.get(tableName);
+            final List<Map<String, String>> recordList = overDumpDataMap.get(tableName);
+            log("    " + tableName + "(" + recordList.size() + ")");
             try {
                 option.headerInfo(columnNameList);
-                for (final Map<String, String> recordMap : recordlist) {
-                    fileToken.make(csvFilePath, new FileMakingCallback() {
-                        public FileMakingRowResource getRowResource() {
-                            final FileMakingRowResource resource = new FileMakingRowResource();
-                            final LinkedHashMap<String, String> nameValueMap = new LinkedHashMap<String, String>();
-                            nameValueMap.putAll(recordMap);
-                            resource.setNameValueMap(nameValueMap);
-                            return resource;
+                final Iterator<Map<String, String>> recordListIterator = recordList.iterator();
+                fileToken.make(csvFilePath, new FileMakingCallback() {
+                    public FileMakingRowResource getRowResource() {
+                        if (!recordListIterator.hasNext()) {
+                            return null;
                         }
-                    }, option);
-                }
+                        final Map<String, String> recordMap = recordListIterator.next();
+                        final FileMakingRowResource resource = new FileMakingRowResource();
+                        final LinkedHashMap<String, String> nameValueMap = new LinkedHashMap<String, String>();
+                        nameValueMap.putAll(recordMap);
+                        resource.setNameValueMap(nameValueMap);
+                        return resource;
+                    }
+                }, option);
             } catch (FileNotFoundException e) {
                 String msg = "Failed to dump CSV file: table=" + tableName + " csv=" + csvFilePath;
                 throw new IllegalStateException(msg, e);
