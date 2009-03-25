@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 
 /**
@@ -18,7 +19,7 @@ public class DfInternalSqlBuilder {
     //                                                                           Attribute
     //                                                                           =========
     protected String _tableName;
-    protected Map<String, DfColumnMetaInfo> _columnMap;
+    protected DfFlexibleMap<String, DfColumnMetaInfo> _columnMap;
     protected List<String> _columnNameList;
     protected List<String> _valueList;
     protected Map<String, Set<String>> _notFoundColumnMap;
@@ -75,7 +76,12 @@ public class DfInternalSqlBuilder {
                 throw new RuntimeException("valueList.get(columnCount) threw the exception: valueList=" + _valueList
                         + " columnCount=" + columnCount, e);
             }
-            columnValueMap.put(columnName, value);
+            if (!_columnMap.isEmpty() && _columnMap.containsKey(columnName)) {
+                String realDbName = _columnMap.get(columnName).getColumnName();
+                columnValueMap.put(realDbName, value);
+            } else {
+                columnValueMap.put(columnName, value);
+            }
         }
         return columnValueMap;
     }
@@ -89,10 +95,8 @@ public class DfInternalSqlBuilder {
                 sbValues.append(", ").append("?");
                 if (defaultValue.equalsIgnoreCase("sysdate")) {
                     final Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-                    sqlBuildingResult.addBindParameters(currentTimestamp);
                     sqlBuildingResult.addColumnValue(columnName, currentTimestamp);
                 } else {
-                    sqlBuildingResult.addBindParameters(defaultValue);
                     sqlBuildingResult.addColumnValue(columnName, defaultValue);
                 }
             } else {
@@ -106,16 +110,8 @@ public class DfInternalSqlBuilder {
                         value = convertValueMapping.get(value);
                     }
                 }
-                // nullだったり空文字だったらnullとして登録する。
-                // (空白文字のみの場合はそれ自体を値として扱う)
-                if (value == null || (value instanceof String && ((String) value).length() == 0)) {
-                    sbValues.append(", ").append("null");
-                    sqlBuildingResult.addColumnValue(columnName, null);
-                } else {
-                    sbValues.append(", ?");
-                    sqlBuildingResult.addBindParameters(value);
-                    sqlBuildingResult.addColumnValue(columnName, value);
-                }
+                sbValues.append(", ?");
+                sqlBuildingResult.addColumnValue(columnName, value);
             }
         }
         sbValues.delete(0, ", ".length()).insert(0, " values(").append(")");
@@ -165,11 +161,11 @@ public class DfInternalSqlBuilder {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public Map<String, DfColumnMetaInfo> getColumnMap() {
+    public DfFlexibleMap<String, DfColumnMetaInfo> getColumnMap() {
         return _columnMap;
     }
 
-    public void setColumnMap(Map<String, DfColumnMetaInfo> columnMap) {
+    public void setColumnMap(DfFlexibleMap<String, DfColumnMetaInfo> columnMap) {
         this._columnMap = columnMap;
     }
 

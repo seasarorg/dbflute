@@ -15,11 +15,12 @@
  */
 package org.seasar.dbflute.helper.io.data.impl;
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +30,10 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataWriter;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuilder;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuildingResult;
-import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfTokenUtil;
 import org.seasar.dbflute.util.basic.DfStringUtil;
@@ -40,7 +41,7 @@ import org.seasar.dbflute.util.basic.DfStringUtil;
 /**
  * @author jflute
  */
-public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
+public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements DfSeparatedDataWriter {
 
     // ===================================================================================
     //                                                                          Definition
@@ -69,9 +70,12 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
 
     protected Map<String, String> _defaultValueMap;
 
+    /** The cache map of meta info. The key is table name. */
+    protected Map<String, DfFlexibleMap<String, DfColumnMetaInfo>> _metaInfoCacheMap = new HashMap<String, DfFlexibleMap<String, DfColumnMetaInfo>>();
+
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                               Write
+    //                                                                               =====
     /**
      * Write data from separated-file.
      * @param notFoundColumnMap Not found column map. (NotNUl)
@@ -91,8 +95,8 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         if (tableName.indexOf("-") >= 0) {
             tableName = tableName.substring(tableName.indexOf("-") + "-".length());
         }
-        final Map<String, DfColumnMetaInfo> columnMap = getColumnMap(tableName, _dataSource);
-        if (columnMap.isEmpty()) {
+        final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(_dataSource, tableName);
+        if (columnMetaInfoMap.isEmpty()) {
             String msg = "The tableName[" + tableName + "] was not found: filename=" + _filename;
             throw new IllegalStateException(msg);
         }
@@ -156,7 +160,7 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
 
                     final DfInternalSqlBuilder sqlBuilder = new DfInternalSqlBuilder();
                     sqlBuilder.setTableName(tableName);
-                    sqlBuilder.setColumnMap(columnMap);
+                    sqlBuilder.setColumnMap(columnMetaInfoMap);
                     sqlBuilder.setColumnNameList(columnNameList);
                     sqlBuilder.setValueList(valueList);
                     sqlBuilder.setNotFoundColumnMap(notFoundColumnMap);
@@ -165,20 +169,81 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                     sqlBuilder.setConvertValueMap(_convertValueMap);
                     sqlBuilder.setDefaultValueMap(_defaultValueMap);
                     final DfInternalSqlBuildingResult sqlBuildingResult = sqlBuilder.buildSql();
-                    PreparedStatement statement = null;
+                    PreparedStatement ps = null;
                     try {
                         final String sql = sqlBuildingResult.getSql();
-                        final List<Object> bindParameters = sqlBuildingResult.getBindParameters();
+                        final Map<String, Object> columnValueMap = sqlBuildingResult.getColumnValueMap();
                         if (_loggingInsertSql) {
-                            _log.info(buildSql4Log(tableName, columnNameList, bindParameters));
+                            _log.info(buildSql4Log(tableName, columnNameList, columnValueMap.values()));
                         }
-                        statement = _dataSource.getConnection().prepareStatement(sql);
+                        ps = _dataSource.getConnection().prepareStatement(sql);
                         int bindCount = 1;
-                        for (Object object : bindParameters) {
-                            statement.setObject(bindCount, object);
+                        for (String columnName : columnValueMap.keySet()) {
+                            final Object obj = columnValueMap.get(columnName);
+
+                            // If the value is not null and the value has the own type except string,
+                            // It registers the value to statement by the type.
+                            if (processNotNullNotString(columnName, obj, ps, bindCount)) {
+                                bindCount++;
+                                continue;
+                            }
+
+                            // - - - - - - - - - - - - - - 
+                            // Against Null Headache
+                            // - - - - - - - - - - - - - -
+                            if (processNull(columnName, obj, ps, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
+                            }
+
+                            // * * * * * * * * * * * * * * * *
+                            //       Here String Only
+                            // * * * * * * * * * * * * * * * *
+                            String value = (String) obj;
+
+                            // - - - - - - - - - - - - - - - - - - -
+                            // Remove double quotation if it exists.
+                            // - - - - - - - - - - - - - - - - - - -
+                            if (value != null && value.length() > 1 && value.startsWith("\"") && value.endsWith("\"")) {
+                                value = removeDoubleQuotation(value);
+                            }
+
+                            // - - - - - - - - - - - - - - 
+                            // Against Time Headache
+                            // - - - - - - - - - - - - - -
+                            if (processTime(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
+                            }
+
+                            // - - - - - - - - - - - - - - 
+                            // Against Timestamp Headache
+                            // - - - - - - - - - - - - - -
+                            if (processTimestamp(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
+                            }
+
+                            // - - - - - - - - - - - - - - 
+                            // Against Boolean Headache
+                            // - - - - - - - - - - - - - -
+                            if (processBoolean(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
+                            }
+
+                            // - - - - - - - - - - - - - - 
+                            // Against Number Headache
+                            // - - - - - - - - - - - - - -
+                            if (processNumber(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
+                            }
+
+                            ps.setString(bindCount, value);
                             bindCount++;
                         }
-                        statement.execute();
+                        ps.execute();
                     } catch (SQLException e) {
                         if (_errorContinue) {
                             final String simpleName = e.getClass().getSimpleName();
@@ -194,9 +259,9 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
                             throw e;
                         }
                     } finally {
-                        if (statement != null) {
+                        if (ps != null) {
                             try {
-                                statement.close();
+                                ps.close();
                             } catch (SQLException ignored) {
                                 _log.info("statement.close() threw the exception!", ignored);
                             }
@@ -213,13 +278,13 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
             throw e;
         } catch (SQLException e) {
             String msg = "SQLException: filename=" + _filename + " encoding=" + _encoding;
-            msg = msg + " columnSet=" + columnMap.keySet() + " columnNameList=" + columnNameList + " lineString="
-                    + lineString + " defaultValueMap=" + _defaultValueMap;
+            msg = msg + " columnNameList=" + columnNameList + " lineString=" + lineString + " defaultValueMap="
+                    + _defaultValueMap;
             throw new RuntimeException(msg, e);
         } catch (RuntimeException e) {
             String msg = "RuntimeException: filename=" + _filename + " encoding=" + _encoding;
-            msg = msg + " columnSet=" + columnMap.keySet() + " columnNameList=" + columnNameList + " lineString="
-                    + lineString + " defaultValueMap=" + _defaultValueMap;
+            msg = msg + " columnNameList=" + columnNameList + " lineString=" + lineString + " defaultValueMap="
+                    + _defaultValueMap;
             throw new RuntimeException(msg, e);
         } finally {
             try {
@@ -238,12 +303,69 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         }
     }
 
-    private String buildSql4Log(String tableName, List<String> columnNameList, final List<Object> bindParameters) {
+    // ===================================================================================
+    //                                                                    Column Meta Info
+    //                                                                    ================
+    protected DfFlexibleMap<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
+        if (_metaInfoCacheMap.containsKey(tableName)) {
+            return _metaInfoCacheMap.get(tableName);
+        }
+        final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleMap<String, DfColumnMetaInfo>();
+        try {
+            final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
+            final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumns(metaData, _schemaName,
+                    tableName);
+            for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
+                columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
+            }
+            _metaInfoCacheMap.put(tableName, columnMetaInfoMap);
+            return columnMetaInfoMap;
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                    Column Name List
+    //                                                                    ================
+    protected FirstLineInfo getColumnNameList(String delimiter, final String lineString) {
+        List<String> columnNameList;
+        columnNameList = new ArrayList<String>();
+        final String[] values = lineString.split(delimiter);
+        int count = 0;
+        boolean quotated = false;
+        for (String value : values) {
+            if (count == 0) {
+                if (value != null && value.startsWith("\"") && value.endsWith("\"")) {
+                    quotated = true;
+                }
+            }
+            addValueToList(columnNameList, value);
+            count++;
+        }
+        final FirstLineInfo firstLineInformation = new FirstLineInfo();
+        firstLineInformation.setColumnNameList(columnNameList);
+        firstLineInformation.setQuotated(quotated);
+        return firstLineInformation;
+    }
+
+    protected void addValueToList(List<String> ls, String value) {
+        if (value != null && value.startsWith("\"") && value.endsWith("\"")) {
+            ls.add(value.substring(1, value.length() - 1));
+        } else {
+            ls.add(value != null ? value : "");
+        }
+    }
+
+    protected String buildSql4Log(String tableName, List<String> columnNameList, final Collection<Object> bindParameters) {
         String bindParameterString = bindParameters.toString();
         bindParameterString = bindParameterString.substring(1, bindParameterString.length() - 1);
         return tableName + ":{" + bindParameterString + "}";
     }
 
+    // ===================================================================================
+    //                                                                       Convert Value
+    //                                                                       =============
     protected Map<String, String> getTargetConvertColumnNameKeyToLowerMap(FirstLineInfo firstLineInfo) {
         final Map<String, String> resultMap = new LinkedHashMap<String, String>();
         final Set<String> keySet = _convertValueMap.keySet();
@@ -257,6 +379,9 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         return resultMap;
     }
 
+    // ===================================================================================
+    //                                                                       Default Value
+    //                                                                       =============
     /**
      * @param firstLineInfo The information of first line. (NotNull)
      * @return The map of additional default column names these are to-lower. {to-lower column name : column name} (NotNull)
@@ -274,6 +399,9 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         return resultMap;
     }
 
+    // ===================================================================================
+    //                                                                          Value List
+    //                                                                          ==========
     protected ValueLineInfo arrangeValueList(final String lineString, String delimiter) {
         final List<String> valueList = new ArrayList<String>();
 
@@ -455,49 +583,6 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
         }
     }
 
-    protected FirstLineInfo getColumnNameList(String delimiter, final String lineString) {
-        List<String> columnNameList;
-        columnNameList = new ArrayList<String>();
-        final String[] values = lineString.split(delimiter);
-        int count = 0;
-        boolean quotated = false;
-        for (String value : values) {
-            if (count == 0) {
-                if (value != null && value.startsWith("\"") && value.endsWith("\"")) {
-                    quotated = true;
-                }
-            }
-            addValueToList(columnNameList, value);
-            count++;
-        }
-        final FirstLineInfo firstLineInformation = new FirstLineInfo();
-        firstLineInformation.setColumnNameList(columnNameList);
-        firstLineInformation.setQuotated(quotated);
-        return firstLineInformation;
-    }
-
-    protected Map<String, DfColumnMetaInfo> getColumnMap(String tableName, DataSource dataSource) {
-        final Connection connection;
-        final DatabaseMetaData metaData;
-        try {
-            connection = dataSource.getConnection();
-            metaData = connection.getMetaData();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        final Map<String, DfColumnMetaInfo> columnMetaMap = new DfColumnHandler().getColumnMetaMap(metaData,
-                _schemaName, tableName);
-        return columnMetaMap;
-    }
-
-    protected void addValueToList(List<String> ls, String value) {
-        if (value != null && value.startsWith("\"") && value.endsWith("\"")) {
-            ls.add(value.substring(1, value.length() - 1));
-        } else {
-            ls.add(value != null ? value : "");
-        }
-    }
-
     protected boolean isDifferentColumnValueCount(List<String> columnNameList,
             Map<String, String> appendDefaultColumnNameToLowerMap, List<String> valueList, String lineString) {
         if (valueList.size() < columnNameList.size() - appendDefaultColumnNameToLowerMap.size()) {
@@ -507,8 +592,8 @@ public class DfSeparatedDataWriterImpl implements DfSeparatedDataWriter {
     }
 
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
+    //                                                                      General Helper
+    //                                                                      ==============
     /**
      * Get the value of line separator.
      * @return The value of line separator. (NotNull)
