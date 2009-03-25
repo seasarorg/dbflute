@@ -43,6 +43,11 @@ public class DfDumpDataExtractor {
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
+    /**
+     * Extract data.
+     * @param tableColumnMap The map of table and column. (NotNull)
+     * @param limit The limit of records. (If it's minus value, extracts all records.)
+     */
     public Map<String, List<Map<String, String>>> extractData(Map<String, List<String>> tableColumnMap, int limit) {
         final Map<String, List<Map<String, String>>> dumpDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
         try {

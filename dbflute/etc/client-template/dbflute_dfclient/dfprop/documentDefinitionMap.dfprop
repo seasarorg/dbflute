@@ -36,9 +36,10 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dataXlsTemplateRecordLimit (NotRequired - Default '')
+    # o dataXlsTemplateRecordLimit (NotRequired - Default 'null')
     #  Does it output Data Excel Template?
     #  If it's yes, you should specify the limit of output records.
+    #  If this property is minus value, it outputs all records.
     # 
     #; dataXlsTemplateRecordLimit = 10
     # - - - - - - - - - -/

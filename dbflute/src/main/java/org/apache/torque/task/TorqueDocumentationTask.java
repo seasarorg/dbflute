@@ -55,6 +55,8 @@ package org.apache.torque.task;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -69,7 +71,14 @@ import org.apache.torque.engine.database.model.Table;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.token.file.FileMakingCallback;
+import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;
+import org.seasar.dbflute.helper.token.file.FileMakingOption;
+import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
+import org.seasar.dbflute.helper.token.file.FileToken;
+import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
 import org.seasar.dbflute.logic.dumpdata.DfDumpDataXlsHandler;
+import org.seasar.dbflute.logic.dumpdata.DfDumpDataXlsHandler.DumpResult;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -119,7 +128,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("* Data Xls Template *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        final DfDumpDataXlsHandler xlsHandler = new DfDumpDataXlsHandler(getDataSource());
         final Map<String, List<String>> tableColumnMap = new LinkedHashMap<String, List<String>>();
         final DfAdditionalTableProperties tableProperties = getProperties().getAdditionalTableProperties();
         final Map<String, Object> additionalTableMap = tableProperties.getAdditionalTableMap();
@@ -149,8 +157,51 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             }
         }
         _log.info("...Creating data xls template: tables=" + tableColumnMap.size());
-        xlsHandler.dumpToXls(tableColumnMap, getDataXlsTemplateRecordLimit(), getDataXlsTemplateFile());
+        dumpDataXlsTemplate(tableColumnMap);
         _log.info("");
+    }
+
+    protected void dumpDataXlsTemplate(Map<String, List<String>> tableColumnMap) {
+        final DfDumpDataXlsHandler xlsHandler = new DfDumpDataXlsHandler(getDataSource());
+        final Integer limit = getDataXlsTemplateRecordLimit();
+        final File xlsFile = getDataXlsTemplateFile();
+        final DumpResult dumpResult = xlsHandler.dumpToXls(tableColumnMap, limit, xlsFile);
+        final Map<String, List<String>> overTableColumnMap = dumpResult.getOverTableColumnMap();
+        if (overTableColumnMap.isEmpty()) {
+            return;
+        }
+        final Map<String, List<Map<String, String>>> overDumpDataMap = dumpResult.getOverDumpDataMap();
+        final File csvDir = getDataCsvTemplateDir();
+        final FileToken fileToken = new FileTokenImpl();
+        final Set<String> tableNameSet = overTableColumnMap.keySet();
+        for (final String tableName : tableNameSet) {
+            final String csvFilePath = csvDir.getPath() + "/" + tableName + ".csv";
+            final List<String> columnNameList = overTableColumnMap.get(tableName);
+            final List<Map<String, String>> recordlist = overDumpDataMap.get(tableName);
+            try {
+                final FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf();
+                final FileMakingHeaderInfo fileMakingHeaderInfo = new FileMakingHeaderInfo();
+                fileMakingHeaderInfo.setColumnNameList(columnNameList);
+                option.setFileMakingHeaderInfo(fileMakingHeaderInfo);
+                for (final Map<String, String> recordMap : recordlist) {
+                    fileToken.make(csvFilePath, new FileMakingCallback() {
+                        public FileMakingRowResource getRowResource() {
+                            final FileMakingRowResource resource = new FileMakingRowResource();
+                            final LinkedHashMap<String, String> nameValueMap = new LinkedHashMap<String, String>();
+                            nameValueMap.putAll(recordMap);
+                            resource.setNameValueMap(nameValueMap);
+                            return resource;
+                        }
+                    }, option);
+                }
+            } catch (FileNotFoundException e) {
+                String msg = "Failed to dump CSV file: table=" + tableName + " csv=" + csvFilePath;
+                throw new IllegalStateException(msg, e);
+            } catch (IOException e) {
+                String msg = "Failed to dump CSV file: table=" + tableName + " csv=" + csvFilePath;
+                throw new IllegalStateException(msg, e);
+            }
+        }
     }
 
     // ===================================================================================
@@ -181,6 +232,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
     protected File getDataXlsTemplateFile() {
         return getDocumentProperties().getDataXlsTemplateFile();
+    }
+
+    protected File getDataCsvTemplateDir() {
+        return getDocumentProperties().getDataCsvTemplateDir();
     }
 
     protected DfFlexibleMap<String, Object> getCommonColumnMap() {

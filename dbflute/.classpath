@@ -15,6 +15,6 @@
 	<classpathentry kind="lib" path="lib/forCompile/commons-collections-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/commons-lang-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/poi-3.2-FINAL-20081019.jar"/>
-	<classpathentry kind="lib" path="lib/forCompile/dbflute-runtime-0.9.4.jar"/>
+	<classpathentry kind="lib" path="lib/forCompile/dbflute-runtime.jar" sourcepath="lib/forCompile/sources/dbflute-runtime-sources.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

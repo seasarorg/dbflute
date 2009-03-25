@@ -1,6 +1,7 @@
 package org.seasar.dbflute.logic.dumpdata;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,20 +40,26 @@ public class DfDumpDataXlsHandler {
      * @param tableColumnMap The map of table and column. (NotNull)
      * @param limit The limit of extracted record.
      * @param xlsFile The file of xls. (NotNull)
+     * @return The result of dump. (NotNull)
      */
-    public void dumpToXls(Map<String, List<String>> tableColumnMap, int limit, File xlsFile) {
+    public DumpResult dumpToXls(Map<String, List<String>> tableColumnMap, int limit, File xlsFile) {
         final DfDumpDataExtractor extractor = new DfDumpDataExtractor(_dataSource);
         final Map<String, List<Map<String, String>>> dumpDataMap = extractor.extractData(tableColumnMap, limit);
-        transferToXls(tableColumnMap, dumpDataMap, xlsFile);
+        return transferToXls(tableColumnMap, dumpDataMap, xlsFile);
     }
 
     /**
      * Transfer data to xls. {Stateless}
      * @param dumpDataMap The map of dump data. (NotNull)
      * @param xlsFile The file of xls. (NotNull)
+     * @return The result of dump. (NotNull)
      */
-    protected void transferToXls(Map<String, List<String>> tableColumnMap,
+    protected DumpResult transferToXls(Map<String, List<String>> tableColumnMap,
             Map<String, List<Map<String, String>>> dumpDataMap, File xlsFile) {
+
+        final Map<String, List<String>> overTableColumnMap = new LinkedHashMap<String, List<String>>();
+        final Map<String, List<Map<String, String>>> overDumpDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
+
         final Set<String> tableNameSet = dumpDataMap.keySet();
         final DfXlsWriter writer = new DfXlsWriter(xlsFile);
         // If the Apache POI version is 2.5, this is necessary to handle Japanese. 
@@ -67,6 +74,11 @@ public class DfDumpDataXlsHandler {
                 ++columnIndex;
             }
             final List<Map<String, String>> recordList = dumpDataMap.get(tableName);
+            if (recordList.size() > 65000) { // against Excel limit!
+                overTableColumnMap.put(tableName, columnNameList);
+                overDumpDataMap.put(tableName, recordList);
+                continue;
+            }
             for (Map<String, String> recordMap : recordList) {
                 final Set<String> columnNameSet = recordMap.keySet();
                 final DataRow dataRow = dataTable.addRow();
@@ -78,5 +90,31 @@ public class DfDumpDataXlsHandler {
             dataSet.addTable(dataTable);
         }
         writer.write(dataSet);
+
+        DumpResult dumpResult = new DumpResult();
+        dumpResult.setOverTableColumnMap(overTableColumnMap);
+        dumpResult.setOverDumpDataMap(overDumpDataMap);
+        return dumpResult;
+    }
+
+    public static class DumpResult {
+        protected Map<String, List<String>> overTableColumnMap;
+        protected Map<String, List<Map<String, String>>> overDumpDataMap;
+
+        public Map<String, List<String>> getOverTableColumnMap() {
+            return overTableColumnMap;
+        }
+
+        public void setOverTableColumnMap(Map<String, List<String>> overTableColumnMap) {
+            this.overTableColumnMap = overTableColumnMap;
+        }
+
+        public Map<String, List<Map<String, String>>> getOverDumpDataMap() {
+            return overDumpDataMap;
+        }
+
+        public void setOverDumpDataMap(Map<String, List<Map<String, String>>> overDumpDataMap) {
+            this.overDumpDataMap = overDumpDataMap;
+        }
     }
 }

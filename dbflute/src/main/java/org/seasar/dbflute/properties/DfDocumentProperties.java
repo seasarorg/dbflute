@@ -175,4 +175,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         final File xlsFile = new File("./output/doc/data-xls-template.xls");
         return xlsFile;
     }
+    
+    public File getDataCsvTemplateDir() {
+        final File xlsFile = new File("./output/doc/csvdata");
+        return xlsFile;
+    }
 }
