@@ -390,6 +390,12 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
 
     protected String filterTimeValue(String value) {
         value = value.trim();
+        if (value.indexOf(":") == 1 && value.lastIndexOf(":") == 4) {
+            value = "0" + value;
+        }
+        if (value.indexOf(":") == 2 && value.lastIndexOf(":") == 5 && value.indexOf(".") == 8) {
+            value = value.substring(0, 8);
+        }
         return value;
     }
 
