@@ -2,7 +2,7 @@ package org.seasar.dbflute.helper.dataset.types;
 
 import java.math.BigDecimal;
 
-import org.seasar.dbflute.util.basic.DfBigDecimalUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * Data Table. {Refer to S2Container}
@@ -15,7 +15,7 @@ public class BigDecimalType extends ObjectType {
     }
 
     public Object convert(Object value, String formatPattern) {
-        return DfBigDecimalUtil.toBigDecimal(value, formatPattern);
+        return DfTypeUtil.toBigDecimal(value, formatPattern);
     }
 
     public Class<?> getType() {
