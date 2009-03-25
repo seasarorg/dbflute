@@ -58,6 +58,7 @@ import org.seasar.dbflute.helper.io.text.DfMapStringFileReader;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -314,6 +315,8 @@ public class DfXlsDataHandlerImpl implements DfXlsDataHandler {
             statement.setTime(bindCount, (Time) obj);
         } else if (obj instanceof Timestamp) {
             statement.setTimestamp(bindCount, (Timestamp) obj);
+        } else if (obj instanceof Date) {
+            statement.setDate(bindCount, DfTypeUtil.toSqlDate((Date) obj));
         } else if (obj instanceof BigDecimal) {
             statement.setBigDecimal(bindCount, (BigDecimal) obj);
         } else if (obj instanceof Boolean) {
