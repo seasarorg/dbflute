@@ -29,7 +29,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -100,8 +99,8 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private static Map<Class<?>, ValueType> types = new HashMap<Class<?>, ValueType>();
-    private static Map<String, ValueType> pluginValueTypeMap = new HashMap<String, ValueType>();
+    private static Map<Class<?>, ValueType> types = new ConcurrentHashMap<Class<?>, ValueType>();
+    private static Map<String, ValueType> pluginValueTypeMap = new ConcurrentHashMap<String, ValueType>();
     private static Method isEnumMethod;
 
     private static Constructor<?> enumDefaultValueTypeConstructor;

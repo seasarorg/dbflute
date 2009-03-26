@@ -88,18 +88,18 @@ public class ConditionValueTest extends PlainTestCase {
         Timestamp currentTimestamp = currentTimestamp();
 
         // ## Act & Assert ##
-        assertEquals(java.sql.Date.class, cv.filterValue(currentDate).getClass());
+        assertEquals(java.util.Date.class, cv.filterValue(currentDate).getClass());
         assertEquals(java.sql.Timestamp.class, cv.filterValue(currentTimestamp).getClass());
     }
 
     public void test_filterValue_Object_enableUtilDateToTimestamp() {
         // ## Arrange ##
-        ConditionValue cv = new ConditionValue().enableUtilDateToTimestamp();
+        ConditionValue cv = new ConditionValue().enableUtilDateToSqlDate();
         Date currentDate = currentDate();
         Timestamp currentTimestamp = currentTimestamp();
 
         // ## Act & Assert ##
-        assertEquals(java.sql.Timestamp.class, cv.filterValue(currentDate).getClass());
+        assertEquals(java.sql.Date.class, cv.filterValue(currentDate).getClass());
         assertEquals(java.sql.Timestamp.class, cv.filterValue(currentTimestamp).getClass());
     }
 }

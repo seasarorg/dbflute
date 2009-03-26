@@ -31,7 +31,7 @@ public class ConditionValue {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean _utilDateToTimestamp;
+    protected boolean _utilDateToSqlDate;
 
     // ===================================================================================
     //                                                                               Equal
@@ -897,8 +897,8 @@ public class ConditionValue {
     // =====================================================================================
     //                                                                                Option
     //                                                                                ======
-    public ConditionValue enableUtilDateToTimestamp() {
-        _utilDateToTimestamp = true;
+    public ConditionValue enableUtilDateToSqlDate() {
+        _utilDateToSqlDate = true;
         return this;
     }
 
@@ -922,10 +922,10 @@ public class ConditionValue {
             return value;
         }
         if (value instanceof java.util.Date) {
-            if (_utilDateToTimestamp) {
-                return DfTypeUtil.toTimestamp(value);
-            } else {
+            if (_utilDateToSqlDate) {
                 return DfTypeUtil.toSqlDate(value);
+            } else {
+                return value;
             }
         }
         if (value instanceof java.util.Calendar) {
