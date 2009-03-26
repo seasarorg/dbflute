@@ -3,6 +3,7 @@
 #
 # If you want to change mappings from default mappings,
 # you can specify your original mappings.
+# But it is possible that unanticipated problems occurs, so be careful!
 #
 # About '$$AutoMapping$$':
 # If the database is Oracle, they often use this.
@@ -14,7 +15,7 @@
 # Example:
 # map:{
 #     ; INTEGER = java.lang.Integer
-#     ; TIMESTAMP = java.util.Date
+#     ; BIGINT = java.lang.Long
 # }
 #
 # *The line that starts with '#' means comment-out.
