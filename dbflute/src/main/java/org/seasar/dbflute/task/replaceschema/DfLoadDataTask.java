@@ -68,7 +68,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                               Separated Data
     //                               --------------
     protected void writeDbFromSeparatedFileAsCommonData(String typeName, String delimter) {
-        writeDbFromSeparatedFile(typeName, delimter, getCommonDataDirectoryPath("tsv"), "common");
+        writeDbFromSeparatedFile(typeName, delimter, getCommonDataDirectoryPath(typeName), "common");
     }
 
     protected void writeDbFromSeparatedFileAsAdditionalData(String typeName, String delimter) {
