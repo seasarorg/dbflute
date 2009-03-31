@@ -276,6 +276,12 @@
 	<!--                                     R E F L E C T I O N  F O R  W I N D O W S -->
 	<!--                                     ========================================= -->
 
+	<target name="reflect-win-basic" depends="expand-dist" description="==> reflect to basic example">
+	  	<copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}">
+	    	<fileset dir="${dbflute.deploy.dir}"/>
+	  	</copy>
+	</target>
+
 	<target name="reflect-win-oracle" depends="expand-dist" description="==> reflect to oracle example">
 	  	<copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}">
 	    	<fileset dir="${dbflute.deploy.dir}"/>

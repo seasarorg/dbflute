@@ -53,10 +53,11 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     //                                                                           Attribute
     //                                                                           =========
     protected final DfRunnerInformation _runInfo;
+    protected DataSource _dataSource;
+    protected File _srcFile;
+    protected DfSqlFileRunnerResult _result = new DfSqlFileRunnerResult(); // is an empty result as default
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
-    protected File _srcFile;
-    protected DataSource _dataSource;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -66,22 +67,16 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         _dataSource = dataSource;
     }
 
-    public void setSrc(File src) {
+    public void prepare(File src) {
         this._srcFile = src;
-    }
-
-    public int getGoodSqlCount() {
-        return _goodSqlCount;
-    }
-
-    public int getTotalSqlCount() {
-        return _totalSqlCount;
+        _result = new DfSqlFileRunnerResult();
+        _result.setSrcFile(src);
     }
 
     // ===================================================================================
     //                                                                     Run Transaction
     //                                                                     ===============
-    public void runTransaction() {
+    public DfSqlFileRunnerResult runTransaction() {
         _goodSqlCount = 0;
         _totalSqlCount = 0;
         if (_srcFile == null) {
@@ -152,6 +147,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             }
         }
         traceResult(_goodSqlCount, _totalSqlCount);
+        _result.setGoodSqlCount(_goodSqlCount);
+        _result.setTotalSqlCount(_totalSqlCount);
+        return _result;
     }
 
     protected boolean isTargetSql(String sql) {
@@ -525,4 +523,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public DfSqlFileRunnerResult getResult() {
+        return _result;
+    }
 }

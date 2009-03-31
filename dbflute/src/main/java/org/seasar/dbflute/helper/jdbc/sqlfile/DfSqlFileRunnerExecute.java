@@ -73,6 +73,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         } catch (SQLException e) {
             if (_runInfo.isErrorContinue()) {
                 showContinueWarnLog(e, sql);
+                _result.addErrorContinuedSql(e, sql);
                 return;
             }
             String msg = "Look! Read the message below." + ln();
@@ -110,8 +111,10 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
 
     protected void showContinueWarnLog(SQLException e, String sql) {
         StringBuilder sb = new StringBuilder();
-        sb.append("*Failed to execute:").append(e.getClass().getName()).append(ln());
+        sb.append("*Failure: ").append(e.getClass().getName()).append(ln());
         sb.append("/* * * * * * * * * * * * * * * * * * * * * * * * * *").append(ln());
+        sb.append(sql).append(ln());
+        sb.append("= = = = = = = =").append(ln());
         sb.append(extractMessage(e)).append(ln());
         SQLException nextEx = e.getNextException();
         if (nextEx != null) {
@@ -123,15 +126,13 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 sb.append(extractMessage(nextNextEx)).append(ln());
             }
         }
-        sb.append("= = = = = = = =").append(ln());
-        sb.append(sql).append(ln());
         sb.append("* * * * * * * * * */");
         _log.warn(sb.toString());
     }
 
     protected String extractMessage(SQLException e) {
         String message = e.getMessage();
-        
+
         // Because a message of Oracle contains a line separator.
         return message != null ? message.trim() : message;
     }

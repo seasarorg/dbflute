@@ -17,21 +17,36 @@ package org.seasar.dbflute.helper.jdbc.sqlfile;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerResult.ErrorContinuedSql;
+import org.seasar.dbflute.helper.token.line.LineToken;
+import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
+import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 
 /**
  * @author jflute
  */
 public class DfSqlFileFireMan {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log instance. */
     private static Log _log = LogFactory.getLog(DfSqlFileFireMan.class);
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private String _executorName;
 
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
     /**
      * Load the SQL files and then execute them.
      * @return The result about firing SQL. (NotNull)
@@ -50,18 +65,59 @@ public class DfSqlFileFireMan {
                     _log.info("{SQL File}: " + file);
                 }
 
-                runner.setSrc(file);
-                runner.runTransaction();
+                runner.prepare(file);
+                final DfSqlFileRunnerResult runnerResult = runner.runTransaction();
+                fireResult.addRunnerResult(runnerResult);
 
-                goodSqlCount = goodSqlCount + runner.getGoodSqlCount();
-                totalSqlCount = totalSqlCount + runner.getTotalSqlCount();
+                goodSqlCount = goodSqlCount + runnerResult.getGoodSqlCount();
+                totalSqlCount = totalSqlCount + runnerResult.getTotalSqlCount();
             }
-            String title = _executorName != null ? _executorName : "Fired SQL";
-            String msg = "{" + title + "}: success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount);
-            msg = msg + " (in " + fileList.size() + " files)";
-            _log.info(msg);
-            fireResult.setResultMessage(msg);
+            final String title = _executorName != null ? _executorName : "Fired SQL";
+
+            // Result Message
+            final StringBuilder resultSb = new StringBuilder();
+            resultSb.append("{").append(title).append("}: success=").append(goodSqlCount).append(" failure=").append(
+                    (totalSqlCount - goodSqlCount)).append(" (in ").append(fileList.size()).append(" files)");
+            _log.info(resultSb.toString());
+            fireResult.setResultMessage(resultSb.toString());
+
+            // Exists Error
             fireResult.setExistsError(totalSqlCount > goodSqlCount);
+
+            // Detail Message
+            final StringBuilder detailSb = new StringBuilder();
+            final List<DfSqlFileRunnerResult> runnerResultList = fireResult.getRunnerResultList();
+            for (DfSqlFileRunnerResult currentResult : runnerResultList) {
+                final List<ErrorContinuedSql> errorContinuedSqlList = currentResult.getErrorContinuedSqlList();
+                final String fileName = currentResult.getSrcFile().getName();
+                if (detailSb.length() > 0) {
+                    detailSb.append(ln());
+                }
+                detailSb.append(errorContinuedSqlList.isEmpty() ? "o " : "x ").append(fileName);
+                for (ErrorContinuedSql errorContinuedSql : errorContinuedSqlList) {
+                    detailSb.append(ln()).append("  ").append(errorContinuedSql.getSql());
+                    final SQLException sqlEx = errorContinuedSql.getSqlEx();
+                    String message = sqlEx.getMessage();
+                    if (sqlEx != null && message != null) {
+                        message = message.trim();
+                        final LineToken lineToken = new LineTokenImpl();
+                        final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
+                        lineTokenizingOption.setDelimiter(ln());
+                        final List<String> tokenizedList = lineToken.tokenize(message, lineTokenizingOption);
+                        int elementIndex = 0;
+                        for (String element : tokenizedList) {
+                            if (elementIndex == 0) {
+                                detailSb.append(ln()).append("    --> ").append(element);
+                            } else {
+                                detailSb.append(ln()).append("        ").append(element);
+                            }
+                            ++elementIndex;
+                        }
+                    }
+                }
+            }
+            fireResult.setDetailMessage(detailSb.toString());
+
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -74,7 +130,9 @@ public class DfSqlFileFireMan {
 
     public static class FireResult {
         protected String resultMessage;
+        protected String detailMessage;
         protected boolean existsError;
+        protected List<DfSqlFileRunnerResult> runnerResultList = new ArrayList<DfSqlFileRunnerResult>();
 
         public String getResultMessage() {
             return resultMessage;
@@ -84,6 +142,14 @@ public class DfSqlFileFireMan {
             this.resultMessage = resultMessage;
         }
 
+        public String getDetailMessage() {
+            return detailMessage;
+        }
+
+        public void setDetailMessage(String detailMessage) {
+            this.detailMessage = detailMessage;
+        }
+
         public boolean isExistsError() {
             return existsError;
         }
@@ -91,8 +157,26 @@ public class DfSqlFileFireMan {
         public void setExistsError(boolean existsError) {
             this.existsError = existsError;
         }
+
+        public List<DfSqlFileRunnerResult> getRunnerResultList() {
+            return runnerResultList;
+        }
+
+        public void addRunnerResult(DfSqlFileRunnerResult runnerResult) {
+            this.runnerResultList.add(runnerResult);
+        }
     }
 
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return "\n";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getExecutorName() {
         return _executorName;
     }

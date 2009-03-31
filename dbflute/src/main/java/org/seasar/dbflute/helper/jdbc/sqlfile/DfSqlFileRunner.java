@@ -22,11 +22,7 @@ import java.io.File;
  */
 public interface DfSqlFileRunner {
 
-    public void setSrc(File src);
+    void prepare(File src);
 
-    public void runTransaction();
-
-    public int getGoodSqlCount();
-
-    public int getTotalSqlCount();
+    DfSqlFileRunnerResult runTransaction();
 }

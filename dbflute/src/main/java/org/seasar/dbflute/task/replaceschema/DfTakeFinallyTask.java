@@ -23,6 +23,9 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan.FireResult;
+import org.seasar.dbflute.helper.token.line.LineToken;
+import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
+import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 
 public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
@@ -279,6 +282,10 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         return buildFinalInformation(takeFinallyResult);
     }
 
+    /**
+     * @param result The fire result for take-finally. (NotNull)
+     * @return The final information. (Nullable)
+     */
     protected String buildFinalInformation(FireResult result) {
         final File file = new File(DfCreateSchemaTask.LOG_PATH);
         if (!file.exists()) {
@@ -288,17 +295,50 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         try {
             final FileInputStream fis = new FileInputStream(file);
             br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+            
+            // - - - - - - - - - - - -
+            // line1: resultMessage
+            // line2: existsError
+            // line3-x: detailMessage
+            // - - - - - - - - - - - -
             final String line = br.readLine();
             if (line == null) {
                 return null;
             }
             final String line2 = br.readLine();
             final boolean existsError = isLine2True(line2) || result.isExistsError();
+            List<String> detailList = new ArrayList<String>();
+            if (line2 != null) {
+                while (true) {
+                    String line3 = br.readLine();
+                    if (line3 == null) {
+                        break;
+                    }
+                    detailList.add(line3);
+                }
+            }
+
             final StringBuilder sb = new StringBuilder();
             final String ln = ln();
+
             sb.append(ln).append("[Final Information]");
-            sb.append(ln).append("  ").append(line);
-            sb.append(ln).append("  ").append(result.getResultMessage());
+
+            // Create Schema
+            sb.append(ln).append(" ").append(line);
+            for (String detail : detailList) {
+                sb.append(ln).append("  ").append(detail);
+            }
+
+            // Take Finally
+            sb.append(ln).append(" ").append(result.getResultMessage());
+            final String detailMessage = result.getDetailMessage();
+            final LineToken lineToken = new LineTokenImpl();
+            final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
+            lineTokenizingOption.setDelimiter(ln);
+            final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
+            for (String tokenizedElement : tokenizedList) {
+                sb.append(ln).append("  ").append(tokenizedElement);
+            }
             if (existsError) {
                 sb.append(ln).append("    * * * * * *");
                 sb.append(ln).append("    * Failure *");
