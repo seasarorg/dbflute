@@ -113,6 +113,9 @@ public class DfSqlFileFireMan {
                             }
                             ++elementIndex;
                         }
+                        detailSb.append(ln());
+                        detailSb.append("        (SQLState=").append(sqlEx.getSQLState()).append(" ErrorCode=").append(
+                                sqlEx.getErrorCode()).append(")");
                     }
                 }
             }

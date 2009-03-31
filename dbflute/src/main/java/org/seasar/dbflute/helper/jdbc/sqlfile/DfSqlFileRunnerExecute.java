@@ -114,16 +114,20 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         sb.append("*Failure: ").append(e.getClass().getName()).append(ln());
         sb.append("/* * * * * * * * * * * * * * * * * * * * * * * * * *").append(ln());
         sb.append(sql).append(ln());
+        e.getSQLState();
         sb.append("= = = = = = = =").append(ln());
         sb.append(extractMessage(e)).append(ln());
+        buildAdditionalErrorInfo(sb, e).append(ln());
         SQLException nextEx = e.getNextException();
         if (nextEx != null) {
             sb.append("- - - - - - - - ").append(ln());
             sb.append(extractMessage(nextEx)).append(ln());
+            buildAdditionalErrorInfo(sb, nextEx).append(ln());
             SQLException nextNextEx = nextEx.getNextException();
             if (nextNextEx != null) {
                 sb.append("- - - - - - - - ").append(ln());
                 sb.append(extractMessage(nextNextEx)).append(ln());
+                buildAdditionalErrorInfo(sb, nextNextEx).append(ln());
             }
         }
         sb.append("* * * * * * * * * */");
@@ -135,6 +139,11 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
 
         // Because a message of Oracle contains a line separator.
         return message != null ? message.trim() : message;
+    }
+
+    protected StringBuilder buildAdditionalErrorInfo(StringBuilder sb, SQLException e) {
+        sb.append("(SQLState=").append(e.getSQLState()).append(" ErrorCode=").append(e.getErrorCode()).append(")");
+        return sb;
     }
 
     protected boolean isValidAssertSql() {
