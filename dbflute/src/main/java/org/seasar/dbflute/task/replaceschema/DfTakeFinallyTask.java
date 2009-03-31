@@ -279,7 +279,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
     @Override
     protected String getFinalInformation() {
-        return buildFinalInformation(takeFinallyResult);
+        return buildFinalInformation(takeFinallyResult); // The argument cannot be null!
     }
 
     /**
@@ -295,7 +295,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         try {
             final FileInputStream fis = new FileInputStream(file);
             br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
-            
+
             // - - - - - - - - - - - -
             // line1: resultMessage
             // line2: existsError
@@ -306,7 +306,6 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
                 return null;
             }
             final String line2 = br.readLine();
-            final boolean existsError = isLine2True(line2) || result.isExistsError();
             List<String> detailList = new ArrayList<String>();
             if (line2 != null) {
                 while (true) {
@@ -330,15 +329,21 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             }
 
             // Take Finally
+            sb.append(ln);
             sb.append(ln).append(" ").append(result.getResultMessage());
             final String detailMessage = result.getDetailMessage();
-            final LineToken lineToken = new LineTokenImpl();
-            final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
-            lineTokenizingOption.setDelimiter(ln);
-            final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
-            for (String tokenizedElement : tokenizedList) {
-                sb.append(ln).append("  ").append(tokenizedElement);
+            if (detailMessage != null && detailMessage.trim().length() > 0) {
+                final LineToken lineToken = new LineTokenImpl();
+                final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
+                lineTokenizingOption.setDelimiter(ln);
+                final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
+                for (String tokenizedElement : tokenizedList) {
+                    sb.append(ln).append("  ").append(tokenizedElement);
+                }
             }
+
+            // Exists Error
+            final boolean existsError = isLine2True(line2) || result.isExistsError();
             if (existsError) {
                 sb.append(ln).append("    * * * * * *");
                 sb.append(ln).append("    * Failure *");
