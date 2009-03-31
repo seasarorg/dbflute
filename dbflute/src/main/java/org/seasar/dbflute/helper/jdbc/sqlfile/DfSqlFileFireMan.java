@@ -95,7 +95,8 @@ public class DfSqlFileFireMan {
                 }
                 detailSb.append(errorContinuedSqlList.isEmpty() ? "o " : "x ").append(fileName);
                 for (ErrorContinuedSql errorContinuedSql : errorContinuedSqlList) {
-                    detailSb.append(ln()).append("  ").append(errorContinuedSql.getSql());
+                    final String sql = errorContinuedSql.getSql();
+                    detailSb.append(ln()).append(sql);
                     final SQLException sqlEx = errorContinuedSql.getSqlEx();
                     String message = sqlEx.getMessage();
                     if (sqlEx != null && message != null) {
@@ -107,14 +108,14 @@ public class DfSqlFileFireMan {
                         int elementIndex = 0;
                         for (String element : tokenizedList) {
                             if (elementIndex == 0) {
-                                detailSb.append(ln()).append("    --> ").append(element);
+                                detailSb.append(ln()).append(" >> ").append(element);
                             } else {
-                                detailSb.append(ln()).append("        ").append(element);
+                                detailSb.append(ln()).append("    ").append(element);
                             }
                             ++elementIndex;
                         }
                         detailSb.append(ln());
-                        detailSb.append("        (SQLState=").append(sqlEx.getSQLState()).append(" ErrorCode=").append(
+                        detailSb.append("    (SQLState=").append(sqlEx.getSQLState()).append(" ErrorCode=").append(
                                 sqlEx.getErrorCode()).append(")");
                     }
                 }
