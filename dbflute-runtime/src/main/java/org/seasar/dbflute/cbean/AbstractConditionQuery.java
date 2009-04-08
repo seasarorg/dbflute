@@ -755,57 +755,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwSpecifyDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The specified the column for derived-referrer was Invalid!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();
-        msg = msg + " (If your function is count(), the target column should be primary key.)" + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Wrong]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-        msg = msg + "            // *No! It's empty!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Wrong]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-        msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
-        msg = msg + "            subCB.specify().columnPurchaseCount(); // *No! It's duplicated!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Good!]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-        msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Function Method]" + getLineSeparator() + xconvertFunctionToMethod(function) + getLineSeparator();
-        msg = msg + "[Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new SpecifyDerivedReferrerInvalidColumnSpecificationException(msg);
-    }
-
-    public static class SpecifyDerivedReferrerInvalidColumnSpecificationException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public SpecifyDerivedReferrerInvalidColumnSpecificationException(String msg) {
-            super(msg);
-        }
+        ConditionBeanContext.throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
     }
 
     protected void assertSpecifyDerivedReferrerColumnType(String function, ConditionQuery subQuery, String deriveColumnName) {
@@ -819,30 +769,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The type of the specified the column unmatched with the function!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "You should confirm the list as follow:" + getLineSeparator();
-        msg = msg + "    count() : String, Number, Date *with distinct same" + getLineSeparator();
-        msg = msg + "    max()   : String, Number, Date" + getLineSeparator();
-        msg = msg + "    min()   : String, Number, Date" + getLineSeparator();
-        msg = msg + "    sum()   : Number" + getLineSeparator();
-        msg = msg + "    avg()   : Number" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Function]" + getLineSeparator() + function + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new SpecifyDerivedReferrerUnmatchedColumnTypeException(msg);
-    }
-
-    public static class SpecifyDerivedReferrerUnmatchedColumnTypeException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public SpecifyDerivedReferrerUnmatchedColumnTypeException(String msg) {
-            super(msg);
-        }
+        ConditionBeanContext.throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
     }
 
     // [DBFlute-0.8.8.1]
@@ -919,56 +846,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwQueryDerivedReferrerInvalidColumnSpecificationException(String function) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The specified the column for derived-referrer was Invalid!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();
-        msg = msg + " (If your function is count(), the target column should be primary key.)" + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Wrong]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-        msg = msg + "            // *No! It's empty!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }).greaterEqual(123);" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Wrong]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-        msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
-        msg = msg + "            subCB.specify().columnPurchaseCount(); // *No! It's duplicated!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }).greaterEqual(123);" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Good!]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-        msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }).greaterEqual(123);" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Function Method]" + getLineSeparator() + xconvertFunctionToMethod(function) + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new QueryDerivedReferrerInvalidColumnSpecificationException(msg);
-    }
-
-    public static class QueryDerivedReferrerInvalidColumnSpecificationException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public QueryDerivedReferrerInvalidColumnSpecificationException(String msg) {
-            super(msg);
-        }
+        ConditionBeanContext.throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
     }
 
     protected void assertQueryDerivedReferrerColumnType(String function, ConditionQuery subQuery, String deriveColumnName, Object value) {
@@ -1000,32 +878,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType, Object value) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The type of the specified the column unmatched with the function or the parameter!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "You should confirm the list as follow:" + getLineSeparator();
-        msg = msg + "    count() : String, Number, Date *with distinct same" + getLineSeparator();
-        msg = msg + "    max()   : String, Number, Date" + getLineSeparator();
-        msg = msg + "    min()   : String, Number, Date" + getLineSeparator();
-        msg = msg + "    sum()   : Number" + getLineSeparator();
-        msg = msg + "    avg()   : Number" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Function Method]" + getLineSeparator() + xconvertFunctionToMethod(function) + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Parameter Type]" + getLineSeparator() + (value != null ? value.getClass() : null) + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new QueryDerivedReferrerUnmatchedColumnTypeException(msg);
-    }
-
-    public static class QueryDerivedReferrerUnmatchedColumnTypeException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public QueryDerivedReferrerUnmatchedColumnTypeException(String msg) {
-            super(msg);
-        }
+        ConditionBeanContext.throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
     }
 
     public static class QDRFunction<CB extends ConditionBean> { // Internal
@@ -1313,56 +1166,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwScalarSubQueryInvalidColumnSpecificationException(String function) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The specified the column for derived-referrer was Invalid!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();
-        msg = msg + " (If your function is count(), the target column should be primary key.)" + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Wrong]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
-        msg = msg + "            // *No! It's empty!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    });" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Wrong]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
-        msg = msg + "            subCB.specify().columnMemberBirthday();" + getLineSeparator();
-        msg = msg + "            subCB.specify().columnMemberName(); // *No! It's duplicated!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    });" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Good!]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
-        msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    });" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Function Method]" + getLineSeparator() + xconvertFunctionToMethod(function) + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new ScalarSubQueryInvalidColumnSpecificationException(msg);
-    }
-
-    public static class ScalarSubQueryInvalidColumnSpecificationException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public ScalarSubQueryInvalidColumnSpecificationException(String msg) {
-            super(msg);
-        }
+        ConditionBeanContext.throwScalarSubQueryInvalidColumnSpecificationException(function);
     }
 
     protected void assertScalarSubQueryColumnType(String function, ConditionQuery subQuery, String deriveColumnName) {
@@ -1376,29 +1180,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The type of the specified the column unmatched with the function!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "You should confirm the list as follow:" + getLineSeparator();
-        msg = msg + "    max()   : String, Number, Date" + getLineSeparator();
-        msg = msg + "    min()   : String, Number, Date" + getLineSeparator();
-        msg = msg + "    sum()   : Number" + getLineSeparator();
-        msg = msg + "    avg()   : Number" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Function Method]" + getLineSeparator() + xconvertFunctionToMethod(function) + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new ScalarSubQueryUnmatchedColumnTypeException(msg);
-    }
-
-    public static class ScalarSubQueryUnmatchedColumnTypeException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public ScalarSubQueryUnmatchedColumnTypeException(String msg) {
-            super(msg);
-        }
+        ConditionBeanContext.throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
     }
 
     public static class SSQFunction<CB extends ConditionBean> { // Internal
@@ -1545,20 +1327,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    protected String xconvertFunctionToMethod(String function) {
-        if (function != null && function.contains("(")) { // For example 'count(distinct'
-            int index = function.indexOf("(");
-            String front = function.substring(0, index);
-            if (function.length() > front.length() + "(".length()) {
-                String rear = function.substring(index + "(".length());
-                function = front + initCap(rear);
-            } else {
-                function = front;
-            }
-        }
-        return function + "()";
-    }
-
     // -----------------------------------------------------
     //                                          Where Clause
     //                                          ------------
@@ -1666,46 +1434,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwSpecifiedDerivedOrderByAliasNameNotFoundException(String aliasName) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The aliasName was Not Found in specified alias names." + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "You should specified an alias name that is the same as one in specify-derived-referrer." + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Wrong]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-        msg = msg + "            subCB.specify().specifyProduct().columnProductName(); // *No!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
-        msg = msg + "    cb.query().addSpecifiedDerivedOrderBy_Desc(\"WRONG_NAME_DATETIME\");" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + "    " + getLineSeparator();
-        msg = msg + "    [Good!]" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-        msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-        msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
-        msg = msg + "    cb.query().addSpecifiedDerivedOrderBy_Desc(\"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Not Found Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
-        throw new SpecifiedDerivedOrderByAliasNameNotFoundException(msg);
-    }
-
-    public static class SpecifiedDerivedOrderByAliasNameNotFoundException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public SpecifiedDerivedOrderByAliasNameNotFoundException(String msg) {
-            super(msg);
-        }
+        ConditionBeanContext.throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
     }
 
     protected void registerOrderBy(String columnName, boolean ascOrDesc) {

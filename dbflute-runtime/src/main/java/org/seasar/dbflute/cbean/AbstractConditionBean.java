@@ -639,132 +639,19 @@ public abstract class AbstractConditionBean implements ConditionBean {
         protected abstract String getTableDbName();
         
         protected void throwSpecifyColumnNotSetupSelectColumnException(String columnName) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "You specified the column that had Not been Set up!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "You should call setupSelect_[ForeignTable]() before calling specify[ForeignTable]().column[TargetColumn]()." + getLineSeparator();
-            msg = msg + "  For example:" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Wrong]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.specify().specifyMemberStatus().columnMemberStatusName(); // *No!" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Good!]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.setupSelect_MemberStatus(); // *Point!" + getLineSeparator();
-            msg = msg + "    cb.specify().specifyMemberStatus().columnMemberStatusName();" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[ConditionBean]" + getLineSeparator() + _baseCB.getClass().getName() + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Specified Column]" + getLineSeparator() + getTableDbName() + "." + columnName + getLineSeparator();
-            msg = msg + "* * * * * * * * * */";
-            throw new SpecifyColumnNotSetupSelectColumnException(msg);
+            ConditionBeanContext.throwSpecifyColumnNotSetupSelectColumnException(_baseCB, getTableDbName(), columnName);
         }
 
         protected void throwDerivedReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "You specified a foreign table column in spite of derived-referrer!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "You should specified a local table column at condition-bean for derived-referrer." + getLineSeparator();
-            msg = msg + "  For example(for SpecifyDerivedReferrer):" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Wrong]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-            msg = msg + "            subCB.specify().specifyProduct().columnProductName(); // *No!" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Good!]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-            msg = msg + "            subCB.specify().columnPurchaseDatetime();// *Point!" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
-            msg = msg + "* * * * * * * * * */";
-            throw new DerivedReferrerInvalidForeignSpecificationException(msg);
+            ConditionBeanContext.throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName);
         }
 
         protected void throwScalarSelectInvalidForeignSpecificationException(String foreignPropertyName) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "You specified a foreign table column in spite of scalar select!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "You should specified a local table column at condition-bean for scalar select." + getLineSeparator();
-            msg = msg + "  For example:" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Wrong]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    memberBhv.scalarSelect(Integer.class).max(new ScalarSelect<MemberCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
-            msg = msg + "            cb.specify().specifyMemberStatus().columnDisplayOrder(); // *No!" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    });" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Good!]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarSelect() {" + getLineSeparator();
-            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
-            msg = msg + "            cb.specify().columnMemberBirthday(); // *Point!" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    });" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
-            msg = msg + "* * * * * * * * * */";
-            throw new ScalarSelectInvalidForeignSpecificationException(msg);
+            ConditionBeanContext.throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName);
         }
 
         protected void throwScalarSubQueryInvalidForeignSpecificationException(String foreignPropertyName) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "You specified a foreign table column in spite of derived-query!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "You should specified a local table column at condition-bean for derived-query." + getLineSeparator();
-            msg = msg + "  For example:" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Wrong]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
-            msg = msg + "            subCB.specify().specifyMemberStatusName().columnDisplayOrder(); // *No!" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    });" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Good!]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
-            msg = msg + "            subCB.specify().columnMemberBirthday();// *Point!" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    });" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Specified Foreign Property]" + getLineSeparator() + foreignPropertyName + getLineSeparator();
-            msg = msg + "* * * * * * * * * */";
-            throw new ScalarSubQueryInvalidForeignSpecificationException(msg);
+            ConditionBeanContext.throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName);
         }
 
         protected String getLineSeparator() {
@@ -777,34 +664,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
         public CQ qy(); 
     }
     
-    public static class SpecifyColumnNotSetupSelectColumnException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public SpecifyColumnNotSetupSelectColumnException(String msg) {
-            super(msg);
-        }
-    }
-    
-    public static class DerivedReferrerInvalidForeignSpecificationException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public DerivedReferrerInvalidForeignSpecificationException(String msg) {
-            super(msg);
-        }
-    }
-    
-    public static class ScalarSubQueryInvalidForeignSpecificationException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public ScalarSubQueryInvalidForeignSpecificationException(String msg) {
-            super(msg);
-        }
-    }
-    
-    public static class ScalarSelectInvalidForeignSpecificationException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public ScalarSelectInvalidForeignSpecificationException(String msg) {
-            super(msg);
-        }
-    }
-
+    /**
+     * The function of specify derived-referrer.
+     * @param <REFERRER_CB> The condition-bean type of referrer.
+     * @param <LOCAL_CQ> The condition-query type of local.
+     */
     public static class RAFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> {
         protected ConditionBean _baseCB;
         protected LOCAL_CQ _localCQ;
@@ -931,7 +795,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
         protected void assertAliasName(String aliasName) {
             if (aliasName == null || aliasName.trim().length() == 0) {
-                throwDerivedReferrerInvalidAliasNameException();
+                throwSpecifyDerivedReferrerInvalidAliasNameException();
             }
             String tableDbName = _baseCB.getTableDbName();
             DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
@@ -948,106 +812,25 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 }
             }
             if (!existsSetterMethod) {
-                throwDerivedReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
+                throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
             }
         }
 
-        protected void throwDerivedReferrerInvalidAliasNameException() {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The alias name for derived-referrer was Invalid!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "You should set valid alias name. {NotNull, NotEmpty}" + getLineSeparator();
-            msg = msg + "  For example:" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Wrong]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-            msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, null); // *No! {null, \"\", \"   \"} are NG!" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Good!]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-            msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\"); // *Point!" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Local Table]" + getLineSeparator() + _localCQ.getTableDbName() + getLineSeparator();
-            msg = msg + "* * * * * * * * * */";
-            throw new DerivedReferrerInvalidAliasNameException(msg);
+        protected void throwSpecifyDerivedReferrerInvalidAliasNameException() {
+            ConditionBeanContext.throwSpecifyDerivedReferrerInvalidAliasNameException(_localCQ);
         }
 
-        protected void throwDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "A property for derived-referrer was Not Found in the entity!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "You should implement a property(setter and getter) in the entity." + getLineSeparator();
-            msg = msg + "Or you should confirm whether the alias name has typo or not." + getLineSeparator();
-            msg = msg + "  For example:" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [ConditionBean Invoking]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-            msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
-            msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Extended Entity]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    // At the entity of Purchase..." + getLineSeparator();
-            msg = msg + "    protected Date _latestPurchaseDatetime;" + getLineSeparator();
-            msg = msg + "    public Date getLatestPurchaseDatetime() {" + getLineSeparator();
-            msg = msg + "        return _latestPurchaseDatetime;" + getLineSeparator();
-            msg = msg + "    }" + getLineSeparator();
-            msg = msg + "    public void setLatestPurchaseDatetime(Date latestPurchaseDatetime) {" + getLineSeparator();
-            msg = msg + "        _latestPurchaseDatetime = latestPurchaseDatetime;" + getLineSeparator();
-            msg = msg + "    }" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Target Entity]" + getLineSeparator() + entityType + getLineSeparator();
-            msg = msg + "* * * * * * * * * */";
-            throw new DerivedReferrerEntityPropertyNotFoundException(msg);
+        protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
+            ConditionBeanContext.throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, entityType);
         }
+        
         protected String replaceString(String text, String fromText, String toText) {
             return DfStringUtil.replace(text, fromText, toText);
-        }
-        protected String getLineSeparator() {
-            return DfSystemUtil.getLineSeparator();
         }
     }
 
     public static interface RAQSetupper<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> {
         public void setup(String function, SubQuery<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
-    }
-    
-    public static class DerivedReferrerInvalidAliasNameException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public DerivedReferrerInvalidAliasNameException(String msg) {
-            super(msg);
-        }
-    }
-    
-    public static class DerivedReferrerEntityPropertyNotFoundException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-        public DerivedReferrerEntityPropertyNotFoundException(String msg) {
-            super(msg);
-        }
     }
 
     // =====================================================================================
@@ -1154,32 +937,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
     
     protected void throwSetupSelectAfterUnionException(String className, String foreignPropertyName) {
-        String methodName = "setupSelect_" + initCap(foreignPropertyName) + "()";
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "You should NOT call " + methodName + " after calling union()!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + methodName + " should be called before calling union()." + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-        msg = msg + "    " + className + " cb = new " + className + "();" + getLineSeparator();
-        msg = msg + "    cb." + methodName + "; // You should call here!" + getLineSeparator();
-        msg = msg + "    cb.query().setXxx...;" + getLineSeparator();
-        msg = msg + "    cb.union(new UnionQuery<" + className + ">() {" + getLineSeparator();
-        msg = msg + "        public void query(" + className + " unionCB) {" + getLineSeparator();
-        msg = msg + "            unionCB.query().setXxx...;" + getLineSeparator();
-        msg = msg + "        }" + getLineSeparator();
-        msg = msg + "    });" + getLineSeparator();
-        msg = msg + "    // You should not call setupSelect after calling union()!" + getLineSeparator();
-        msg = msg + "    // cb." + methodName + ";" + getLineSeparator();
-        msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[SetupSelect Method]" + getLineSeparator() + methodName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[ConditionBean SQL]" + getLineSeparator() + toDisplaySql() + getLineSeparator();
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
-        throw new IllegalStateException(msg);
+        ConditionBeanContext.throwSetupSelectAfterUnionException(className, foreignPropertyName, toDisplaySql());
     }
     
     // ===================================================================================
