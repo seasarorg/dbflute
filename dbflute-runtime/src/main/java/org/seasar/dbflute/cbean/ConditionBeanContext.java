@@ -19,6 +19,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.exception.DerivedReferrerInvalidForeignSpecificationException;
+import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
+import org.seasar.dbflute.exception.EntityDuplicatedException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.QueryDerivedReferrerUnmatchedColumnTypeException;
 import org.seasar.dbflute.exception.ScalarSelectInvalidForeignSpecificationException;
@@ -210,7 +212,7 @@ public class ConditionBeanContext {
             msg = msg + "[Search Condition]" + ln() + searchKey4Log + ln();
         }
         msg = msg + "* * * * * * * * * */";
-        throw new org.seasar.dbflute.exception.EntityAlreadyDeletedException(msg);
+        throw new EntityAlreadyDeletedException(msg);
     }
 
     public static void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
@@ -231,9 +233,9 @@ public class ConditionBeanContext {
         }
         msg = msg + "* * * * * * * * * */";
         if (cause != null) {
-            throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg, cause);
+            throw new EntityDuplicatedException(msg, cause);
         } else {
-            throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
+            throw new EntityDuplicatedException(msg);
         }
     }
     

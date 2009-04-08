@@ -513,7 +513,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             getSqlClause().ignoreAdditionalConditionAsOr();
         }
     }
-    
+
     protected boolean xsuppressEscape() { // for override
         return false; // as default
     }
@@ -533,7 +533,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + "* * * * * * * * * */" + getLineSeparator();
         throw new RequiredOptionNotFoundException(msg);
     }
-        
+
     protected void invokeSetterLikeSearch(String columnFlexibleName, Object value, LikeSearchOption option) {
         if (value == null) {
             return;
