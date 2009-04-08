@@ -122,6 +122,45 @@ public class SqlAnalyzerTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
+    public void test_parse_BEGIN_that_has_nested_IFIF_all_false() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.memberId != null*/";
+        sql = sql + "and AAA /*IF false*/and BBB /*IF false*/and BBB-CCC/*END*//*END*/ /*IF false*/and CCC/*END*/";
+        sql = sql + "/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx: " + ctx);
+        assertEquals("", ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_that_has_nested_IFIF_formal_use() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.memberId != null*//*IF true*/and AAA/*END*//*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberId(3);
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx: " + ctx);
+        assertEquals("where AAA", ctx.getSql());
+    }
+
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
