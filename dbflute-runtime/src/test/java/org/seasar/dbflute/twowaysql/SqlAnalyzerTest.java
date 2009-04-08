@@ -69,6 +69,52 @@ public class SqlAnalyzerTest extends PlainTestCase {
         assertEquals(expected, ctx.getSql());
     }
 
+    public void test_parse_BEGIN_that_has_nested_IF() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where" + ln();
+        sql = sql + "/*IF pmb.memberId != null*/" + ln();
+        sql = sql + "and AAA /*IF true*/and BBB/*END*/ /*IF true*/and CCC/*END*/" + ln();
+        sql = sql + "/*END*/" + ln();
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberId(3);
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log(ln() + ctx.getSql());
+        String expected = "where" + ln() + "AAA BBB and CCC" + ln() + ln();
+        assertEquals(expected, ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_that_has_nested_IFIF() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where" + ln();
+        sql = sql + "/*IF pmb.memberId != null*/" + ln();
+        sql = sql + "and AAA /*IF true*/and BBB /*IF true*/and BBB-CCC/*END*//*END*/ /*IF true*/and CCC/*END*/" + ln();
+        sql = sql + "/*END*/" + ln();
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberId(3);
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log(ln() + ctx.getSql());
+        String expected = "where" + ln() + "AAA BBB BBB-CCC and CCC" + ln() + ln();
+        assertEquals(expected, ctx.getSql());
+    }
+
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
