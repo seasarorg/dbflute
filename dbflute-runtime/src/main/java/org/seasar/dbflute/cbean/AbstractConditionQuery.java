@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
+import org.seasar.dbflute.cbean.ckey.ConditionKeyInScope;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
@@ -402,7 +403,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final int inScopeLimit = getSqlClause().getInScopeLimit();
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             if (inScopeLimit > 0 && value.size() > inScopeLimit) {
-                // As 'or' Condition
+                // If the key is for inScope, it should be split as 'or'.
+                // (If the key is for notInScope, it should be split as 'and'.)
+                final boolean asOr = isConditionKeyInScope(key);
+                
+                // Split the condition!
                 @SuppressWarnings("unchecked")
                 final List<Object> objectList = (List<Object>)value;
                 final List<List<Object>> valueList = DfCollectionUtil.splitByLimit(objectList, inScopeLimit);
@@ -411,15 +416,23 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     if (i == 0) {
                         setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
                     } else {
-                        getSqlClause().makeAdditionalConditionAsOrEffective();
+                        if (asOr) { // As 'or' Condition
+                            getSqlClause().makeAdditionalConditionAsOrEffective();
+                        }
                         invokeQuery(colName, key.getConditionKey(), currentValue);
                     }
                 }
-                getSqlClause().ignoreAdditionalConditionAsOr();
+                if (asOr) {
+                    getSqlClause().ignoreAdditionalConditionAsOr();
+                }
             } else {
                 setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
             }
         }
+    }
+
+    static boolean isConditionKeyInScope(ConditionKey key) { // default scope for test 
+        return ConditionKeyInScope.class.isAssignableFrom(key.getClass());
     }
     
     // -----------------------------------------------------
