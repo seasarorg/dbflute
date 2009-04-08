@@ -39,8 +39,13 @@ public class CommandContextCreator {
     // ===================================================================================
     //                                                                              Create
     //                                                                              ======
+    /**
+     * Create the command context as root context.
+     * @param args The array of arguments. (Nullable)
+     * @return The command context as root context. (NotNull)
+     */
     public CommandContext createCommandContext(Object[] args) {
-        final CommandContext ctx = new CommandContextImpl();
+        final CommandContext ctx = CommandContextImpl.createCommandContextImplAsRoot();
         if (args != null) {
             for (int i = 0; i < args.length; ++i) {
                 Class<?> argType = null;

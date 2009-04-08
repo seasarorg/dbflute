@@ -28,7 +28,7 @@ public class BeginNode extends ContainerNode {
 
     @Override
     public void accept(CommandContext ctx) {
-        CommandContext childCtx = new CommandContextImpl(ctx);
+        CommandContext childCtx = CommandContextImpl.createCommandContextImplAsBeginChild(ctx);
         super.accept(childCtx);
         if (childCtx.isEnabled()) {
             ctx.addSql(childCtx.getSql(), childCtx.getBindVariables(), childCtx.getBindVariableTypes());

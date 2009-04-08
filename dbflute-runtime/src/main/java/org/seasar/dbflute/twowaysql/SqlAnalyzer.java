@@ -91,28 +91,27 @@ public class SqlAnalyzer {
     protected void parseSql() {
         String sql = tokenizer.getToken();
         if (isElseMode()) {
-            sql = MyStringUtil.replace(sql, "--", "");
+            sql = replaceString(sql, "--", "");
         }
         Node node = peek();
         if ((node instanceof IfNode || node instanceof ElseNode) && node.getChildSize() == 0) {
-
             SqlTokenizer st = new SqlTokenizer(sql);
             st.skipWhitespace();
             String token = st.skipToken();
             st.skipWhitespace();
-            if (sql.startsWith(",")) {
+            if (sql.startsWith(",")) { // is prefix
                 if (sql.startsWith(", ")) {
-                    node.addChild(new PrefixSqlNode(", ", sql.substring(2)));
+                    node.addChild(createPrefixSqlNode(", ", sql.substring(2)));
                 } else {
-                    node.addChild(new PrefixSqlNode(",", sql.substring(1)));
+                    node.addChild(createPrefixSqlNode(",", sql.substring(1)));
                 }
-            } else if ("AND".equalsIgnoreCase(token) || "OR".equalsIgnoreCase(token)) {
-                node.addChild(new PrefixSqlNode(st.getBefore(), st.getAfter()));
-            } else {
-                node.addChild(new SqlNode(sql));
+            } else if ("AND".equalsIgnoreCase(token) || "OR".equalsIgnoreCase(token)) { // is prefix
+                node.addChild(createPrefixSqlNode(st.getBefore(), st.getAfter()));
+            } else { // is not prefix
+                node.addChild(createSqlNodeIfElseChildNode(sql));
             }
         } else {
-            node.addChild(new SqlNode(sql));
+            node.addChild(createSqlNode(sql));
         }
     }
 
@@ -133,13 +132,13 @@ public class SqlAnalyzer {
             // [UnderReview]: Should I resolve bind character on scope comment(normal comment)?
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             String before = tokenizer.getBefore();
-            peek().addChild(new SqlNode(before.substring(before.lastIndexOf("/*"))));
+            peek().addChild(createSqlNode(before.substring(before.lastIndexOf("/*"))));
         }
     }
 
     protected void parseIf() {
         final String condition = tokenizer.getToken().substring(2).trim();
-        if (MyStringUtil.isEmpty(condition)) {
+        if (DfStringUtil.isEmpty(condition)) {
             throwIfCommentConditionNotFoundException();
         }
         final ContainerNode ifNode = createIfNode(condition);
@@ -278,6 +277,18 @@ public class SqlAnalyzer {
         return new IfNode(expr, specifiedSql);
     }
 
+    protected SqlNode createSqlNode(String sql) {
+        return new SqlNode(sql);
+    }
+
+    protected SqlNode createSqlNodeIfElseChildNode(String sql) {
+        return new SqlNode(sql, true);
+    }
+
+    protected PrefixSqlNode createPrefixSqlNode(String prefix, String sql) {
+        return new PrefixSqlNode(prefix, sql);
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
@@ -287,29 +298,6 @@ public class SqlAnalyzer {
 
     protected final String replaceString(String text, String fromText, String toText) {
         return DfStringUtil.replace(text, fromText, toText);
-    }
-
-    // -----------------------------------------------------
-    //                                            StringUtil
-    //                                            ----------
-    protected static class MyStringUtil {
-
-        public static final String[] EMPTY_STRINGS = new String[0];
-
-        private MyStringUtil() {
-        }
-
-        public static final boolean isEmpty(String text) {
-            return text == null || text.length() == 0;
-        }
-
-        public static final String replace(String text, String fromText, String toText) {
-            return DfStringUtil.replace(text, fromText, toText);
-        }
-
-        public static String[] split(String str, String delimiter) {
-            return DfStringUtil.split(str, delimiter);
-        }
     }
 
     // ===================================================================================

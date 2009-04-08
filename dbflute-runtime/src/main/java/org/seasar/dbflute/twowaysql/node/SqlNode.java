@@ -26,6 +26,7 @@ public class SqlNode extends AbstractNode {
     //                                                                           Attribute
     //                                                                           =========
     private String sql;
+    private boolean ifelseChildNode;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -34,11 +35,21 @@ public class SqlNode extends AbstractNode {
         this.sql = sql;
     }
 
+    public SqlNode(String sql, boolean ifelseChildNode) {
+        this.sql = sql;
+        this.ifelseChildNode = ifelseChildNode;
+    }
+
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
         ctx.addSql(sql);
+
+        if (ifelseChildNode && isBeginChildContextAndValidCoondition(ctx, sql)) {
+            // It does not skipped actually but it has not already needed to skip.
+            ctx.setAlreadySkippedPrefix(true);
+        }
     }
 
     // ===================================================================================

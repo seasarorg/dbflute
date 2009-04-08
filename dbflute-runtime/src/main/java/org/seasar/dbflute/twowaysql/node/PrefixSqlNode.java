@@ -18,6 +18,7 @@ package org.seasar.dbflute.twowaysql.node;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 
 /**
+ * The if-else child node of prefix SQL.
  * @author jflute
  */
 public class PrefixSqlNode extends AbstractNode {
@@ -26,7 +27,6 @@ public class PrefixSqlNode extends AbstractNode {
     //                                                                           Attribute
     //                                                                           =========
     private String prefix;
-
     private String sql;
 
     // ===================================================================================
@@ -41,8 +41,10 @@ public class PrefixSqlNode extends AbstractNode {
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        if (ctx.isEnabled()) {
+        if (ctx.isEnabled() || ctx.isAlreadySkippedPrefix()) {
             ctx.addSql(prefix);
+        } else if (isBeginChildContextAndValidCoondition(ctx, sql)) {
+            ctx.setAlreadySkippedPrefix(true);
         }
         ctx.addSql(sql);
     }

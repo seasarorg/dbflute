@@ -12,11 +12,8 @@ import org.seasar.dbflute.unit.PlainTestCase;
 public class SqlAnalyzerTest extends PlainTestCase {
 
     // ===================================================================================
-    //                                                                               Parse
-    //                                                                               =====
-    // -----------------------------------------------------
-    //                                            IF comment
-    //                                            ----------
+    //                                                                          IF comment
+    //                                                                          ==========
     public void test_parse_IF_true() {
         // ## Arrange ##
         String sql = "/*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END*/";
@@ -30,7 +27,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         pmb.setMemberName("foo");
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log("ctx: " + ctx);
+        log("ctx:" + ctx);
         assertEquals("and member.MEMBER_NAME = 'TEST'", ctx.getSql());
     }
 
@@ -47,14 +44,17 @@ public class SqlAnalyzerTest extends PlainTestCase {
         pmb.setMemberName(null);
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log("ctx: " + ctx);
+        log("ctx:" + ctx);
         assertEquals("", ctx.getSql().trim());
     }
 
+    // ===================================================================================
+    //                                                                       BEGIN comment
+    //                                                                       =============
     // -----------------------------------------------------
-    //                                         BEGIN comment
-    //                                         -------------
-    public void test_parse_BEGIN() {
+    //                                                 Basic
+    //                                                 -----
+    public void test_parse_BEGIN_for_where_all_true() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
         sql = sql + " /*IF pmb.memberId != null*/member.MEMBER_ID = 3/*END*/";
@@ -71,17 +71,36 @@ public class SqlAnalyzerTest extends PlainTestCase {
         pmb.setMemberName("foo");
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log("ctx: " + ctx);
+        log("ctx:" + ctx);
         String expected = "where member.MEMBER_ID = 3 and member.MEMBER_NAME = 'TEST'";
         assertEquals(expected, ctx.getSql());
     }
 
-    public void test_parse_BEGIN_that_has_nested_IF() {
+    public void test_parse_BEGIN_for_where_all_false() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
-        sql = sql + " /*IF pmb.memberId != null*/";
-        sql = sql + "and AAA /*IF true*/and BBB/*END*/ /*IF true*/and CCC/*END*/";
+        sql = sql + " /*IF pmb.memberId != null*/member.MEMBER_ID = 3/*END*/";
+        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END*/";
         sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "";
+        assertEquals(expected, ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_for_select_all_true() {
+        // ## Arrange ##
+        String sql = "select /*BEGIN*/";
+        sql = sql + "/*IF pmb.memberId != null*/member.MEMBER_ID as c1/*END*/";
+        sql = sql + "/*IF pmb.memberName != null*/, member.MEMBER_NAME as c2/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
@@ -94,16 +113,44 @@ public class SqlAnalyzerTest extends PlainTestCase {
         pmb.setMemberName("foo");
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log("ctx: " + ctx);
-        String expected = "where AAA BBB and CCC";
+        log("ctx:" + ctx);
+        String expected = "select member.MEMBER_ID as c1, member.MEMBER_NAME as c2";
         assertEquals(expected, ctx.getSql());
     }
 
-    public void test_parse_BEGIN_that_has_nested_IFIF() {
+    public void test_parse_BEGIN_for_select_all_false() {
+        // ## Arrange ##
+        String sql = "select /*BEGIN*/";
+        sql = sql + "/*IF pmb.memberId != null*/member.MEMBER_ID as c1/*END*/";
+        sql = sql + "/*IF pmb.memberName != null*/, member.MEMBER_NAME as c2/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "select ";
+        assertEquals(expected, ctx.getSql());
+    }
+
+    // -----------------------------------------------------
+    //                                                Nested
+    //                                                ------
+    public void test_parse_BEGIN_that_has_nested_IFIF_root_has_and() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
-        sql = sql + " /*IF pmb.memberId != null*/";
-        sql = sql + "and AAA /*IF true*/and BBB /*IF true*/and BBB-CCC/*END*//*END*/ /*IF true*/and CCC/*END*/";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberId != null*/";
+        sql = sql + "FIXED";
+        sql = sql + "/*END*/";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberName != null*/";
+        sql = sql + "and AAA /*IF true*/and BBB /*IF true*/and CCC/*END*//*END*/ /*IF true*/and DDD/*END*/";
         sql = sql + "/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
@@ -113,20 +160,70 @@ public class SqlAnalyzerTest extends PlainTestCase {
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
-        pmb.setMemberId(3);
         pmb.setMemberName("foo");
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log("ctx: " + ctx);
-        String expected = "where AAA BBB BBB-CCC and CCC";
+        log("ctx:" + ctx);
+        String expected = "where  AAA and BBB and CCC and DDD";
         assertEquals(expected, ctx.getSql());
     }
 
+    public void test_parse_BEGIN_that_has_nested_IFIF_root_has_no_and() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberName != null*/";
+        sql = sql + "AAA /*IF true*/and BBB /*IF true*/and CCC/*END*//*END*/ /*IF true*/and DDD/*END*/";
+        sql = sql + "/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "where AAA and BBB and CCC and DDD";
+        assertEquals(expected, ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_where_upperCase_that_has_nested_IFIF_root_has_and() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/WHERE";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberId != null*/";
+        sql = sql + "FIXED";
+        sql = sql + "/*END*/";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberName != null*/";
+        sql = sql + "and AAA /*IF true*/and BBB /*IF true*/and CCC/*END*//*END*/ /*IF true*/and DDD/*END*/";
+        sql = sql + "/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+        
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "WHERE  AAA and BBB and CCC and DDD";
+        assertEquals(expected, ctx.getSql());
+    }
+    
     public void test_parse_BEGIN_that_has_nested_IFIF_all_false() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
-        sql = sql + " /*IF pmb.memberId != null*/";
-        sql = sql + "and AAA /*IF false*/and BBB /*IF false*/and BBB-CCC/*END*//*END*/ /*IF false*/and CCC/*END*/";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberId != null*/";
+        sql = sql + "AAA /*IF false*/and BBB /*IF false*/and CCC/*END*//*END*/ /*IF false*/and DDD/*END*/";
         sql = sql + "/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
@@ -138,14 +235,17 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SimpleMemberPmb pmb = new SimpleMemberPmb();
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log("ctx: " + ctx);
+        log("ctx:" + ctx);
         assertEquals("", ctx.getSql());
     }
 
-    public void test_parse_BEGIN_that_has_nested_IFIF_formal_use() {
+    public void test_parse_BEGIN_that_has_nested_IFIF_formal_use_but_basically_nonsense() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
-        sql = sql + " /*IF pmb.memberId != null*//*IF true*/and AAA/*END*//*END*/";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberId != null*//*IF true*/and AAA/*END*//*END*/";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberName != null*/and BBB/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
@@ -155,10 +255,11 @@ public class SqlAnalyzerTest extends PlainTestCase {
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
         pmb.setMemberId(3);
+        pmb.setMemberName("foo");
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log("ctx: " + ctx);
-        assertEquals("where AAA", ctx.getSql());
+        log("ctx:" + ctx);
+        assertEquals("where AAA and BBB", ctx.getSql());
     }
 
     // ===================================================================================

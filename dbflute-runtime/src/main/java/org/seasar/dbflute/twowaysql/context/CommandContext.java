@@ -20,25 +20,31 @@ package org.seasar.dbflute.twowaysql.context;
  */
 public interface CommandContext {
 
-    public Object getArg(String name);
+    Object getArg(String name);
 
-    public Class<?> getArgType(String name);
+    Class<?> getArgType(String name);
 
-    public void addArg(String name, Object arg, Class<?> argType);
+    void addArg(String name, Object arg, Class<?> argType);
 
-    public String getSql();
+    String getSql();
 
-    public Object[] getBindVariables();
+    Object[] getBindVariables();
 
-    public Class<?>[] getBindVariableTypes();
+    Class<?>[] getBindVariableTypes();
 
-    public CommandContext addSql(String sql);
+    CommandContext addSql(String sql);
 
-    public CommandContext addSql(String sql, Object bindVariable, Class<?> bindVariableType);
+    CommandContext addSql(String sql, Object bindVariable, Class<?> bindVariableType);
 
-    public CommandContext addSql(String sql, Object[] bindVariables, Class<?>[] bindVariableTypes);
+    CommandContext addSql(String sql, Object[] bindVariables, Class<?>[] bindVariableTypes);
 
-    public boolean isEnabled();
+    boolean isEnabled();
 
-    public void setEnabled(boolean enabled);
+    void setEnabled(boolean enabled);
+
+    boolean isBeginChildContext();
+
+    boolean isAlreadySkippedPrefix();
+
+    void setAlreadySkippedPrefix(boolean alreadySkippedPrefix);
 }

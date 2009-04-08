@@ -18,6 +18,8 @@ package org.seasar.dbflute.twowaysql.node;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.twowaysql.context.CommandContext;
+
 /**
  * @author jflute
  */
@@ -38,5 +40,9 @@ public abstract class AbstractNode implements Node {
 
     public void addChild(Node node) {
         children.add(node);
+    }
+
+    protected boolean isBeginChildContextAndValidCoondition(CommandContext ctx, String sql) {
+        return ctx.isBeginChildContext() && sql != null && sql.trim().length() > 0;
     }
 }

@@ -28,20 +28,29 @@ import org.seasar.dbflute.twowaysql.context.CommandContextPropertyAccessor;
  * @author jflute
  */
 public class CommandContextImpl implements CommandContext {
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The arguments. it should be allowed null value. */
     private StringKeyMap<Object> args = StringKeyMap.createAsCaseInsensitive();
-    
+
     /** The types of argument. it should be allowed null value. */
     private StringKeyMap<Class<?>> argTypes = StringKeyMap.createAsCaseInsensitive();
-    
-    private StringBuffer sqlBuf = new StringBuffer(100);
+
+    private StringBuilder sqlSb = new StringBuilder(100);
     private List<Object> bindVariables = new ArrayList<Object>();
     private List<Class<?>> bindVariableTypes = new ArrayList<Class<?>>();
+
+    // /- - - - - - - - - - - - - - - - - -
+    // When this is the root context,
+    // these boolean values are immutable.
+    // - - - - - - - - - -/  
+
     private boolean enabled = true;
+    private boolean beginChild;
+    private boolean alreadySkippedPrefix;
+
     private CommandContext parent;
 
     static {
@@ -51,12 +60,41 @@ public class CommandContextImpl implements CommandContext {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public CommandContextImpl() {
+    /**
+     * Constructor for root context.
+     */
+    private CommandContextImpl() {
     }
 
-    public CommandContextImpl(CommandContext parent) {
+    /**
+     * Constructor for child context.
+     * @param parent The parent context. (NotNull)
+     */
+    private CommandContextImpl(CommandContext parent) {
         this.parent = parent;
         enabled = false;
+    }
+
+    /**
+     * Create the implementation of command context as root.
+     * @return The implementation of command context as root. (NotNull)
+     */
+    public static CommandContextImpl createCommandContextImplAsRoot() {
+        return new CommandContextImpl();
+    }
+
+    /**
+     * Create the implementation of command context as begin-child.
+     * @param parent The parent context. (NotNull)
+     * @return The implementation of command context as begin-child. (NotNull)
+     */
+    public static CommandContextImpl createCommandContextImplAsBeginChild(CommandContext parent) {
+        return new CommandContextImpl(parent).asBeginChild();
+    }
+
+    private CommandContextImpl asBeginChild() {
+        beginChild = true;
+        return this;
     }
 
     // ===================================================================================
@@ -96,7 +134,7 @@ public class CommandContextImpl implements CommandContext {
     }
 
     public String getSql() {
-        return sqlBuf.toString();
+        return sqlSb.toString();
     }
 
     public Object[] getBindVariables() {
@@ -108,19 +146,19 @@ public class CommandContextImpl implements CommandContext {
     }
 
     public CommandContext addSql(String sql) {
-        sqlBuf.append(sql);
+        sqlSb.append(sql);
         return this;
     }
 
     public CommandContext addSql(String sql, Object bindVariable, Class<?> bindVariableType) {
-        sqlBuf.append(sql);
+        sqlSb.append(sql);
         bindVariables.add(bindVariable);
         bindVariableTypes.add(bindVariableType);
         return this;
     }
 
     public CommandContext addSql(String sql, Object[] bindVariables, Class<?>[] bindVariableTypes) {
-        sqlBuf.append(sql);
+        sqlSb.append(sql);
         for (int i = 0; i < bindVariables.length; ++i) {
             this.bindVariables.add(bindVariables[i]);
             this.bindVariableTypes.add(bindVariableTypes[i]);
@@ -133,17 +171,36 @@ public class CommandContextImpl implements CommandContext {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + sqlBuf + ", " + enabled + "}";
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        sb.append(sqlSb).append(", ");
+        sb.append(enabled).append(", ");
+        sb.append(alreadySkippedPrefix).append(", ");
+        sb.append("parent=").append(parent);
+        sb.append("}@").append(Integer.toHexString(hashCode()));
+        return sb.toString();
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public boolean isEnabled() {
         return enabled;
     }
-    
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isBeginChildContext() {
+        return beginChild;
+    }
+
+    public boolean isAlreadySkippedPrefix() {
+        return alreadySkippedPrefix;
+    }
+
+    public void setAlreadySkippedPrefix(boolean alreadySkippedPrefix) {
+        this.alreadySkippedPrefix = alreadySkippedPrefix;
     }
 }
