@@ -36,7 +36,7 @@ public abstract class PlainTestCase extends TestCase {
         return new Timestamp(System.currentTimeMillis());
     }
 
-    protected static String getLineSeparator() {
+    protected static String ln() {
         return "\n";
     }
 }

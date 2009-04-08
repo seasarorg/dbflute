@@ -77,9 +77,9 @@ public class MapListStringImplTest extends PlainTestCase {
     protected void showGeneratedMap(Map<String, Object> generatedMap) {
         final String targetString = generatedMap.toString();
         final StringBuilder sb = new StringBuilder();
-        sb.append(getLineSeparator());
-        sb.append("/* * * * * * * * * * * * * * * * * * * * * * * * * * * ").append(getLineSeparator());
-        sb.append(targetString).append(getLineSeparator());
+        sb.append(ln());
+        sb.append("/* * * * * * * * * * * * * * * * * * * * * * * * * * * ").append(ln());
+        sb.append(targetString).append(ln());
         sb.append("* * * * * * * * * */");
         log(sb);
     }

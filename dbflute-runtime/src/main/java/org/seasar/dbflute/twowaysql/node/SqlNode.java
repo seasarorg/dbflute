@@ -22,18 +22,29 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
  */
 public class SqlNode extends AbstractNode {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private String sql;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public SqlNode(String sql) {
         this.sql = sql;
     }
 
-    public String getSql() {
-        return sql;
-    }
-
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
     public void accept(CommandContext ctx) {
         ctx.addSql(sql);
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getSql() {
+        return sql;
+    }
 }

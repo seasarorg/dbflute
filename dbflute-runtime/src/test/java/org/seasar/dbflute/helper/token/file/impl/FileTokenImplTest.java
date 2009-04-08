@@ -27,7 +27,7 @@ public class FileTokenImplTest extends PlainTestCase {
         String first = "\"a\",\"b,\",\"cc\",\"\"\"\",\"e\n,\n,\n\"\",,\"";
         String second = "\"a\",\"\",\"c\"\"c\",\"d\"\"\",\"e\"";
         String third = "\"a\",\"b,b\",\"c\"\",c\",\"d\n\",\"e\"";
-        String all = first + getLineSeparator() + second + getLineSeparator() + third;
+        String all = first + ln() + second + ln() + third;
         ByteArrayInputStream inputStream = new ByteArrayInputStream(all.getBytes("UTF-8"));
 
         // ## Act ##
@@ -71,7 +71,7 @@ public class FileTokenImplTest extends PlainTestCase {
         String first = "1001\t1\tabc";
         String second = "1002\t\t\"abc\"";
         String third = "1003\t3\t\"a\"\"bc\"";
-        String all = first + getLineSeparator() + second + getLineSeparator() + third;
+        String all = first + ln() + second + ln() + third;
         ByteArrayInputStream inputStream = new ByteArrayInputStream(all.getBytes("UTF-8"));
 
         // ## Act ##

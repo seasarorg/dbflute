@@ -22,23 +22,24 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
  */
 public class PrefixSqlNode extends AbstractNode {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private String prefix;
 
     private String sql;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public PrefixSqlNode(String prefix, String sql) {
         this.prefix = prefix;
         this.sql = sql;
     }
 
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
     public void accept(CommandContext ctx) {
         if (ctx.isEnabled()) {
             ctx.addSql(prefix);
@@ -46,4 +47,14 @@ public class PrefixSqlNode extends AbstractNode {
         ctx.addSql(sql);
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public String getSql() {
+        return sql;
+    }
 }
