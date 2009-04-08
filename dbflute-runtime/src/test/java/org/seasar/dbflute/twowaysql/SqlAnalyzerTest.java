@@ -14,6 +14,9 @@ public class SqlAnalyzerTest extends PlainTestCase {
     // ===================================================================================
     //                                                                               Parse
     //                                                                               =====
+    // -----------------------------------------------------
+    //                                            IF comment
+    //                                            ----------
     public void test_parse_IF_true() {
         // ## Arrange ##
         String sql = "/*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END*/";
@@ -27,7 +30,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         pmb.setMemberName("foo");
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log(ctx.getSql());
+        log("ctx: " + ctx);
         assertEquals("and member.MEMBER_NAME = 'TEST'", ctx.getSql());
     }
 
@@ -44,14 +47,18 @@ public class SqlAnalyzerTest extends PlainTestCase {
         pmb.setMemberName(null);
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
+        log("ctx: " + ctx);
         assertEquals("", ctx.getSql().trim());
     }
 
+    // -----------------------------------------------------
+    //                                         BEGIN comment
+    //                                         -------------
     public void test_parse_BEGIN() {
         // ## Arrange ##
-        String sql = "/*BEGIN*/where" + ln();
-        sql = sql + "/*IF pmb.memberId != null*/member.MEMBER_ID = 3/*END*/" + ln();
-        sql = sql + "/*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END*/" + ln();
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.memberId != null*/member.MEMBER_ID = 3/*END*/";
+        sql = sql + " /*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
@@ -64,17 +71,17 @@ public class SqlAnalyzerTest extends PlainTestCase {
         pmb.setMemberName("foo");
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log(ln() + ctx.getSql());
-        String expected = "where" + ln() + "member.MEMBER_ID = 3" + ln() + "and member.MEMBER_NAME = 'TEST'" + ln();
+        log("ctx: " + ctx);
+        String expected = "where member.MEMBER_ID = 3 and member.MEMBER_NAME = 'TEST'";
         assertEquals(expected, ctx.getSql());
     }
 
     public void test_parse_BEGIN_that_has_nested_IF() {
         // ## Arrange ##
-        String sql = "/*BEGIN*/where" + ln();
-        sql = sql + "/*IF pmb.memberId != null*/" + ln();
-        sql = sql + "and AAA /*IF true*/and BBB/*END*/ /*IF true*/and CCC/*END*/" + ln();
-        sql = sql + "/*END*/" + ln();
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.memberId != null*/";
+        sql = sql + "and AAA /*IF true*/and BBB/*END*/ /*IF true*/and CCC/*END*/";
+        sql = sql + "/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
@@ -87,17 +94,17 @@ public class SqlAnalyzerTest extends PlainTestCase {
         pmb.setMemberName("foo");
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log(ln() + ctx.getSql());
-        String expected = "where" + ln() + "AAA BBB and CCC" + ln() + ln();
+        log("ctx: " + ctx);
+        String expected = "where AAA BBB and CCC";
         assertEquals(expected, ctx.getSql());
     }
 
     public void test_parse_BEGIN_that_has_nested_IFIF() {
         // ## Arrange ##
-        String sql = "/*BEGIN*/where" + ln();
-        sql = sql + "/*IF pmb.memberId != null*/" + ln();
-        sql = sql + "and AAA /*IF true*/and BBB /*IF true*/and BBB-CCC/*END*//*END*/ /*IF true*/and CCC/*END*/" + ln();
-        sql = sql + "/*END*/" + ln();
+        String sql = "/*BEGIN*/where";
+        sql = sql + " /*IF pmb.memberId != null*/";
+        sql = sql + "and AAA /*IF true*/and BBB /*IF true*/and BBB-CCC/*END*//*END*/ /*IF true*/and CCC/*END*/";
+        sql = sql + "/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
@@ -110,8 +117,8 @@ public class SqlAnalyzerTest extends PlainTestCase {
         pmb.setMemberName("foo");
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
-        log(ln() + ctx.getSql());
-        String expected = "where" + ln() + "AAA BBB BBB-CCC and CCC" + ln() + ln();
+        log("ctx: " + ctx);
+        String expected = "where AAA BBB BBB-CCC and CCC";
         assertEquals(expected, ctx.getSql());
     }
 

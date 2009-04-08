@@ -128,10 +128,21 @@ public class CommandContextImpl implements CommandContext {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + sqlBuf + ", " + enabled + "}";
+    }
+    
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public boolean isEnabled() {
         return enabled;
     }
-
+    
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
