@@ -755,19 +755,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwSpecifyDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
-        String method = xconvertFunctionToMethod(function);
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The specified the column for derived-referrer was Invalid!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();
+        msg = msg + " (If your function is count(), the target column should be primary key.)" + getLineSeparator();
         msg = msg + "  For example:" + getLineSeparator();
         msg = msg + "    " + getLineSeparator();
         msg = msg + "    [Wrong]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            // *No! It's empty!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
@@ -777,7 +777,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + "    [Wrong]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseCount(); // *No! It's duplicated!" + getLineSeparator();
@@ -788,13 +788,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + "    [Good!]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.specify().derivePurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
         msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + getLineSeparator();
         msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
         msg = msg + getLineSeparator();
+        msg = msg + "[Function Method]" + getLineSeparator() + xconvertFunctionToMethod(function) + getLineSeparator();
         msg = msg + "[Alias Name]" + getLineSeparator() + aliasName + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         throw new SpecifyDerivedReferrerInvalidColumnSpecificationException(msg);
@@ -918,19 +919,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwQueryDerivedReferrerInvalidColumnSpecificationException(String function) {
-        String method = xconvertFunctionToMethod(function);
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
         msg = msg + "The specified the column for derived-referrer was Invalid!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();
+        msg = msg + " (If your function is count(), the target column should be primary key.)" + getLineSeparator();
         msg = msg + "  For example:" + getLineSeparator();
         msg = msg + "    " + getLineSeparator();
         msg = msg + "    [Wrong]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalarPurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            // *No! It's empty!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
@@ -940,7 +941,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + "    [Wrong]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalarPurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseDatetime();" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseCount(); // *No! It's duplicated!" + getLineSeparator();
@@ -951,13 +952,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + "    [Good!]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalarPurchaseList()." + method + "(new SubQuery<PurchaseCB>() {" + getLineSeparator();
+        msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + getLineSeparator();
         msg = msg + "        public void query(PurchaseCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
         msg = msg + "    }).greaterEqual(123);" + getLineSeparator();
         msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
         msg = msg + getLineSeparator();
+        msg = msg + "[Function Method]" + getLineSeparator() + xconvertFunctionToMethod(function) + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         throw new QueryDerivedReferrerInvalidColumnSpecificationException(msg);
     }
@@ -1010,7 +1012,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + "    sum()   : Number" + getLineSeparator();
         msg = msg + "    avg()   : Number" + getLineSeparator();
         msg = msg + getLineSeparator();
-        msg = msg + "[Function]" + getLineSeparator() + function + getLineSeparator();
+        msg = msg + "[Function Method]" + getLineSeparator() + xconvertFunctionToMethod(function) + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + getLineSeparator();
         msg = msg + getLineSeparator();
@@ -1317,12 +1319,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
         msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();
+        msg = msg + " (If your function is count(), the target column should be primary key.)" + getLineSeparator();
         msg = msg + "  For example:" + getLineSeparator();
         msg = msg + "    " + getLineSeparator();
         msg = msg + "    [Wrong]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalar_Equal()." + function + "(new SubQuery<MemberCB>() {" + getLineSeparator();
+        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + getLineSeparator();
         msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
         msg = msg + "            // *No! It's empty!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
@@ -1332,7 +1335,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + "    [Wrong]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalar_Equal()." + function + "(new SubQuery<MemberCB>() {" + getLineSeparator();
+        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + getLineSeparator();
         msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnMemberBirthday();" + getLineSeparator();
         msg = msg + "            subCB.specify().columnMemberName(); // *No! It's duplicated!" + getLineSeparator();
@@ -1343,12 +1346,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + "    [Good!]" + getLineSeparator();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
         msg = msg + "    MemberCB cb = new MemberCB();" + getLineSeparator();
-        msg = msg + "    cb.query().scalar_Equal()." + function + "(new SubQuery<MemberCB>() {" + getLineSeparator();
+        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + getLineSeparator();
         msg = msg + "        public void query(MemberCB subCB) {" + getLineSeparator();
         msg = msg + "            subCB.specify().columnPurchaseDatetime(); // *Point!" + getLineSeparator();
         msg = msg + "        }" + getLineSeparator();
         msg = msg + "    });" + getLineSeparator();
         msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
+        msg = msg + getLineSeparator();
+        msg = msg + "[Function Method]" + getLineSeparator() + xconvertFunctionToMethod(function) + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         throw new ScalarSubQueryInvalidColumnSpecificationException(msg);
     }
@@ -1382,7 +1387,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + "    sum()   : Number" + getLineSeparator();
         msg = msg + "    avg()   : Number" + getLineSeparator();
         msg = msg + getLineSeparator();
-        msg = msg + "[Function]" + getLineSeparator() + function + getLineSeparator();
+        msg = msg + "[Function Method]" + getLineSeparator() + xconvertFunctionToMethod(function) + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Derive Column]" + getLineSeparator() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
@@ -1551,7 +1556,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 function = front;
             }
         }
-        return function;
+        return function + "()";
     }
 
     // -----------------------------------------------------

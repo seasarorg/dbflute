@@ -826,10 +826,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
          * <pre>
          * cb.specify().derivePurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
          *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchaseDatetime(); // *Point! (Basically PK)
+         *         subCB.specify().columnPurchaseId(); // *Point! (Basically PK)
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
-         * }, \"LATEST_PURCHASE_DATETIME\");
+         * }, \"PAID_PURCHASE_COUNT\");
          * </pre> 
          * @param subQuery The sub query of referrer. (NotNull)
          * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
@@ -844,10 +844,10 @@ public abstract class AbstractConditionBean implements ConditionBean {
          * <pre>
          * cb.specify().derivePurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
          *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchaseDatetime(); // *Point!
+         *         subCB.specify().columnProductId(); // *Point!
          *         subCB.query().setPaymentCompleteFlg_Equal_True();
          *     }
-         * }, \"LATEST_PURCHASE_DATETIME\");
+         * }, \"PAID_PURCHASE_PRODUCT_KIND_COUNT\");
          * </pre> 
          * @param subQuery The sub query of referrer. (NotNull)
          * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
