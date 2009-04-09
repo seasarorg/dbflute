@@ -26,19 +26,23 @@ import org.seasar.dbflute.util.DfOgnlUtil;
  */
 public class ParenBindVariableNode extends AbstractNode {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private String expression;
-
     private Object parsedExpression;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public ParenBindVariableNode(String expression) {
         this.expression = expression;
         this.parsedExpression = DfOgnlUtil.parseExpression(expression);
     }
 
-    public String getExpression() {
-        return expression;
-    }
-
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
     public void accept(CommandContext ctx) {
         Object var = DfOgnlUtil.getValue(parsedExpression, ctx);
         if (var instanceof List) {
@@ -50,7 +54,6 @@ public class ParenBindVariableNode extends AbstractNode {
         } else {
             ctx.addSql("?", var, var.getClass());
         }
-
     }
 
     private void bindArray(CommandContext ctx, Object array) {
@@ -71,5 +74,12 @@ public class ParenBindVariableNode extends AbstractNode {
             ctx.addSql(", ?", Array.get(array, i), clazz);
         }
         ctx.addSql(")");
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public String getExpression() {
+        return expression;
     }
 }

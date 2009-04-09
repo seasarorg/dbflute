@@ -22,11 +22,11 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
  */
 public interface Node {
 
-    public int getChildSize();
+    int getChildSize();
 
-    public Node getChild(int index);
+    Node getChild(int index);
 
-    public void addChild(Node node);
+    void addChild(Node node);
 
-    public void accept(CommandContext ctx);
+    void accept(CommandContext ctx);
 }

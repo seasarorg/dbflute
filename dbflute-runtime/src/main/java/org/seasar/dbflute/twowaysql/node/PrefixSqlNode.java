@@ -44,6 +44,8 @@ public class PrefixSqlNode extends AbstractNode {
         if (ctx.isEnabled() || ctx.isAlreadySkippedPrefix()) {
             ctx.addSql(prefix);
         } else if (isBeginChildContextAndValidCoondition(ctx, sql)) {
+            // To skip prefix should be done only once
+            // so it marks that a prefix already skipped.
             ctx.setAlreadySkippedPrefix(true);
         }
         ctx.addSql(sql);

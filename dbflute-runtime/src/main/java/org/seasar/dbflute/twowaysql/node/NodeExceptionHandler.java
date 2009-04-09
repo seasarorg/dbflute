@@ -26,26 +26,24 @@ public class NodeExceptionHandler {
 
     public static void throwBindOrEmbeddedParameterNullValueException(String expression, Class<?> targetType,
             String specifiedSql, boolean bind) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The value of " + (bind ? "bind variable" : "embedded value") + " was Null!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Is it within the scope of your assumption?" + getLineSeparator();
-        msg = msg + "If the answer is YES, please confirm your application logic about the parameter."
-                + getLineSeparator();
-        msg = msg + "If the answer is NO, please confirm the logic of parameter comment(especially IF comment)."
-                + getLineSeparator();
-        msg = msg + "  --> For example:" + getLineSeparator();
-        msg = msg + "        before (x) -- XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
-        msg = msg + "        after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator()
-                + expression + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Parameter Property Type]" + getLineSeparator() + targetType + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The value of " + (bind ? "bind variable" : "embedded value") + " was Null!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Is it within the scope of your assumption?" + ln();
+        msg = msg + "If the answer is YES, please confirm your application logic about the parameter." + ln();
+        msg = msg + "If the answer is NO, please confirm the logic of parameter comment(especially IF comment)." + ln();
+        msg = msg + "  --> For example:" + ln();
+        msg = msg + "        before (x) -- XXX_ID = /*pmb.xxxId*/3" + ln();
+        msg = msg + "        after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + ln();
+        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + ln() + expression
+                + ln();
+        msg = msg + ln();
+        msg = msg + "[Parameter Property Type]" + ln() + targetType + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         if (bind) {
             throw new BindVariableParameterNullValueException(msg);
@@ -56,64 +54,59 @@ public class NodeExceptionHandler {
 
     public static void throwBindOrEmbeddedParameterEmptyListException(String expression, String specifiedSql,
             boolean bind) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was empty!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm your application logic." + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    before (x):" + getLineSeparator();
-        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + getLineSeparator();
-        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);"
-                + getLineSeparator();
-        msg = msg + "    after  (o):" + getLineSeparator();
-        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + getLineSeparator();
-        msg = msg + "      xxxIdList.add(3);" + getLineSeparator();
-        msg = msg + "      xxxIdList.add(7);" + getLineSeparator();
-        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);"
-                + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator()
-                + expression + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was empty!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your application logic." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    before (x):" + ln();
+        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
+        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
+        msg = msg + "    after  (o):" + ln();
+        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
+        msg = msg + "      xxxIdList.add(3);" + ln();
+        msg = msg + "      xxxIdList.add(7);" + ln();
+        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
+        msg = msg + ln();
+        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + ln() + expression
+                + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IllegalArgumentException(msg);
     }
 
     public static void throwBindOrEmbeddedParameterNullOnlyListException(String expression, String specifiedSql,
             boolean bind) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was 'Null Only List'!"
-                + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm your application logic." + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    before (x):" + getLineSeparator();
-        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + getLineSeparator();
-        msg = msg + "      xxxIdList.add(null);" + getLineSeparator();
-        msg = msg + "      xxxIdList.add(null);" + getLineSeparator();
-        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);"
-                + getLineSeparator();
-        msg = msg + "    after  (o):" + getLineSeparator();
-        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + getLineSeparator();
-        msg = msg + "      xxxIdList.add(3);" + getLineSeparator();
-        msg = msg + "      xxxIdList.add(7);" + getLineSeparator();
-        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);"
-                + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator()
-                + expression + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The list of " + (bind ? "bind variable" : "embedded value") + " was 'Null Only List'!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your application logic." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    before (x):" + ln();
+        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
+        msg = msg + "      xxxIdList.add(null);" + ln();
+        msg = msg + "      xxxIdList.add(null);" + ln();
+        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
+        msg = msg + "    after  (o):" + ln();
+        msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
+        msg = msg + "      xxxIdList.add(3);" + ln();
+        msg = msg + "      xxxIdList.add(7);" + ln();
+        msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
+        msg = msg + ln();
+        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + ln() + expression
+                + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IllegalArgumentException(msg);
     }
 
-    protected static String getLineSeparator() {
+    protected static String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 }

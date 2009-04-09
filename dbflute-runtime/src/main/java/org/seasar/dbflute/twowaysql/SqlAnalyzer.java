@@ -108,7 +108,7 @@ public class SqlAnalyzer {
             } else if ("AND".equalsIgnoreCase(token) || "OR".equalsIgnoreCase(token)) { // is prefix
                 node.addChild(createPrefixSqlNode(st.getBefore(), st.getAfter()));
             } else { // is not prefix
-                node.addChild(createSqlNodeIfElseChildNode(sql));
+                node.addChild(createSqlNodeAsIfElseChildNode(sql));
             }
         } else {
             node.addChild(createSqlNode(sql));
@@ -278,11 +278,11 @@ public class SqlAnalyzer {
     }
 
     protected SqlNode createSqlNode(String sql) {
-        return new SqlNode(sql);
+        return SqlNode.createSqlNode(sql);
     }
 
-    protected SqlNode createSqlNodeIfElseChildNode(String sql) {
-        return new SqlNode(sql, true);
+    protected SqlNode createSqlNodeAsIfElseChildNode(String sql) {
+        return SqlNode.createSqlNodeAsIfElseChild(sql);
     }
 
     protected PrefixSqlNode createPrefixSqlNode(String prefix, String sql) {

@@ -31,13 +31,21 @@ public class SqlNode extends AbstractNode {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SqlNode(String sql) {
+    private SqlNode(String sql) {
         this.sql = sql;
     }
 
-    public SqlNode(String sql, boolean ifelseChildNode) {
-        this.sql = sql;
-        this.ifelseChildNode = ifelseChildNode;
+    public static SqlNode createSqlNode(String sql) {
+        return new SqlNode(sql);
+    }
+
+    public static SqlNode createSqlNodeAsIfElseChild(String sql) {
+        return new SqlNode(sql).asIfElseChild();
+    }
+
+    private SqlNode asIfElseChild() {
+        ifelseChildNode = true;
+        return this;
     }
 
     // ===================================================================================

@@ -34,11 +34,17 @@ import org.seasar.dbflute.util.DfSystemUtil;
  */
 public class ValueAndTypeSetupper {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _expression;
     protected String[] _names;
     protected String _specifiedSql;
     protected boolean _bind;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public ValueAndTypeSetupper(String expression, String[] names, String specifiedSql, boolean bind) {
         this._expression = expression;
         this._names = names;
@@ -46,7 +52,10 @@ public class ValueAndTypeSetupper {
         this._bind = bind;
     }
 
-    protected void setupValueAndType(ValueAndType valueAndType) {
+    // ===================================================================================
+    //                                                                              Set up
+    //                                                                              ======
+    public void setupValueAndType(ValueAndType valueAndType) {
         Object value = valueAndType.getTargetValue();
         Class<?> clazz = valueAndType.getTargetType();
 
@@ -139,17 +148,17 @@ public class ValueAndTypeSetupper {
 
     // for OutsideSql
     protected void throwLikeSearchOptionNotFoundException(Object resourceBean, String currentName) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm your method call:" + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your method call:" + ln();
         final String beanName = resourceBean.getClass().getSimpleName();
         final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
-        msg = msg + "    " + beanName + "." + methodName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Target ParameterBean]" + getLineSeparator() + resourceBean + getLineSeparator();
+        msg = msg + "    " + beanName + "." + methodName + ln();
+        msg = msg + ln();
+        msg = msg + "[Target ParameterBean]" + ln() + resourceBean + ln();
         msg = msg + "* * * * * * * * * */";
         throw new RequiredOptionNotFoundException(msg);
     }
@@ -157,30 +166,28 @@ public class ValueAndTypeSetupper {
     // for OutsideSql
     protected void throwOutsideSqlLikeSearchOptionSplitUnsupportedException(LikeSearchOption option,
             Object resourceBean, String currentName) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The splitByXxx() of LikeSearchOption is unsupported at OutsideSql!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm your method call:" + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    before (x):" + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The splitByXxx() of LikeSearchOption is unsupported at OutsideSql!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your method call:" + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    before (x):" + ln();
         final String beanName = resourceBean.getClass().getSimpleName();
         final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
-        msg = msg + "      " + beanName + " pmb = new " + beanName + "();" + getLineSeparator();
-        msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();"
-                + getLineSeparator();
-        msg = msg + "      likeSearchOption.splitBySpace(); // *No! Don't invoke this!" + getLineSeparator();
-        msg = msg + "      pmb." + methodName + getLineSeparator();
-        msg = msg + "    after  (o):" + getLineSeparator();
-        msg = msg + "      " + beanName + " pmb = new " + beanName + "();" + getLineSeparator();
-        msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();"
-                + getLineSeparator();
-        msg = msg + "      pmb." + methodName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Target LikeSearchOption]" + getLineSeparator() + option + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Target ParameterBean]" + getLineSeparator() + resourceBean + getLineSeparator();
+        msg = msg + "      " + beanName + " pmb = new " + beanName + "();" + ln();
+        msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();" + ln();
+        msg = msg + "      likeSearchOption.splitBySpace(); // *No! Don't invoke this!" + ln();
+        msg = msg + "      pmb." + methodName + ln();
+        msg = msg + "    after  (o):" + ln();
+        msg = msg + "      " + beanName + " pmb = new " + beanName + "();" + ln();
+        msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();" + ln();
+        msg = msg + "      pmb." + methodName + ln();
+        msg = msg + ln();
+        msg = msg + "[Target LikeSearchOption]" + ln() + option + ln();
+        msg = msg + ln();
+        msg = msg + "[Target ParameterBean]" + ln() + resourceBean + ln();
         msg = msg + "* * * * * * * * * */";
         throw new UnsupportedOperationException(msg);
     }
@@ -197,29 +204,25 @@ public class ValueAndTypeSetupper {
 
     protected void throwPropertyHandlingFailureException(Class<?> beanType, Object beanValue, String currentName,
             String expression, String specifiedSql, boolean bind, Exception e) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The handlig of the property was failed!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "This is the Framework Exception!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator()
-                + expression + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Bean Type]" + getLineSeparator() + beanType + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Bean Value]" + getLineSeparator() + beanValue + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Property Name]" + getLineSeparator() + currentName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The handlig of the property was failed!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "This is the Framework Exception!" + ln();
+        msg = msg + ln();
+        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + ln() + expression
+                + ln();
+        msg = msg + ln();
+        msg = msg + "[Bean Type]" + ln() + beanType + ln();
+        msg = msg + ln();
+        msg = msg + "[Bean Value]" + ln() + beanValue + ln();
+        msg = msg + ln();
+        msg = msg + "[Property Name]" + ln() + currentName + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IllegalStateException(msg, e);
-    }
-
-    protected String initCap(String name) {
-        return DfStringUtil.initCap(name);
     }
 
     protected Object invokeGetter(Method method, Object target) {
@@ -236,22 +239,22 @@ public class ValueAndTypeSetupper {
 
     protected void throwBindOrEmbeddedCommentNotFoundPropertyException(String expression, Class<?> targetType,
             String notFoundProperty, String specifiedSql, boolean bind) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The property on the " + (bind ? "bind variable" : "embedded value") + " comment was Not Found!"
-                + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the existence of your property on your arguments." + getLineSeparator();
-        msg = msg + "Abd has the property had misspelling?" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + getLineSeparator()
-                + expression + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[NotFound Property]" + getLineSeparator() + (targetType != null ? targetType.getName() + "#" : "")
-                + notFoundProperty + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Specified SQL]" + getLineSeparator() + specifiedSql + getLineSeparator();
+                + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the existence of your property on your arguments." + ln();
+        msg = msg + "Abd has the property had misspelling?" + ln();
+        msg = msg + ln();
+        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + ln() + expression
+                + ln();
+        msg = msg + ln();
+        msg = msg + "[NotFound Property]" + ln() + (targetType != null ? targetType.getName() + "#" : "")
+                + notFoundProperty + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         if (bind) {
             throw new BindVariableCommentNotFoundPropertyException(msg);
@@ -260,7 +263,14 @@ public class ValueAndTypeSetupper {
         }
     }
 
-    protected String getLineSeparator() {
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String initCap(String name) {
+        return DfStringUtil.initCap(name);
+    }
+
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 }

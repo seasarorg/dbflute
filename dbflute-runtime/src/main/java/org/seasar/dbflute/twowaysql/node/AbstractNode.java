@@ -25,11 +25,20 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
  */
 public abstract class AbstractNode implements Node {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private List<Node> children = new ArrayList<Node>();
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public AbstractNode() {
     }
 
+    // ===================================================================================
+    //                                                                      Child Handling
+    //                                                                      ==============
     public int getChildSize() {
         return children.size();
     }

@@ -26,12 +26,18 @@ import org.seasar.dbflute.util.DfStringUtil;
  */
 public class BindVariableNode extends AbstractNode {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _expression;
     protected String _testValue;
     protected String[] _names;
     protected String _specifiedSql;
     protected boolean _blockNullParameter;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public BindVariableNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
         this._expression = expression;
         this._testValue = testValue;
@@ -40,6 +46,9 @@ public class BindVariableNode extends AbstractNode {
         this._blockNullParameter = blockNullParameter;
     }
 
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
     public void accept(CommandContext ctx) {
         final Object value = ctx.getArg(_names[0]);
         final Class<?> clazz = ctx.getArgType(_names[0]);

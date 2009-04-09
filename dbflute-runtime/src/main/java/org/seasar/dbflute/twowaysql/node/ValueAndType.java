@@ -20,10 +20,16 @@ package org.seasar.dbflute.twowaysql.node;
  */
 public class ValueAndType {
 
-    public Object _targetValue;
-    public Class<?> _targetType;
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected Object _targetValue;
+    protected Class<?> _targetType;
     protected String _rearOption;
 
+    // ===================================================================================
+    //                                                                         Rear Option
+    //                                                                         ===========
     public boolean isValidRearOption() {
         return _targetValue != null && _rearOption != null && _rearOption.trim().length() > 0;
     }
@@ -32,6 +38,9 @@ public class ValueAndType {
         return " " + _rearOption.trim() + " ";
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public Object getTargetValue() {
         return _targetValue;
     }

@@ -22,9 +22,15 @@ import org.seasar.dbflute.twowaysql.context.CommandContext;
  */
 public class ElseNode extends ContainerNode {
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public ElseNode() {
     }
 
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
     public void accept(CommandContext ctx) {
         super.accept(ctx);
         ctx.setEnabled(true);

@@ -23,9 +23,15 @@ import org.seasar.dbflute.twowaysql.context.impl.CommandContextImpl;
  */
 public class BeginNode extends ContainerNode {
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public BeginNode() {
     }
 
+    // ===================================================================================
+    //                                                                              Accept
+    //                                                                              ======
     @Override
     public void accept(CommandContext ctx) {
         CommandContext childCtx = CommandContextImpl.createCommandContextImplAsBeginChild(ctx);
