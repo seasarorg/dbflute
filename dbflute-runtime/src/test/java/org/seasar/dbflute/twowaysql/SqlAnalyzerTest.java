@@ -301,8 +301,8 @@ public class SqlAnalyzerTest extends PlainTestCase {
     }
 
     // -----------------------------------------------------
-    //                                       Where UpperCase
-    //                                       ---------------
+    //                                             UpperCase
+    //                                             ---------
     public void test_parse_BEGIN_where_upperCase_that_has_nested_IFIF_root_has_and() {
         // ## Arrange ##
         String sql = "/*BEGIN*/WHERE";
@@ -312,7 +312,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         sql = sql + "/*END*/";
         sql = sql + " ";
         sql = sql + "/*IF pmb.memberName != null*/";
-        sql = sql + "and AAA /*IF true*/and BBB /*IF true*/and CCC/*END*//*END*/ /*IF true*/and DDD/*END*/";
+        sql = sql + "AND AAA /*IF true*/AND BBB /*IF true*/AND CCC/*END*//*END*/ /*IF true*/AND DDD/*END*/";
         sql = sql + "/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
@@ -326,7 +326,37 @@ public class SqlAnalyzerTest extends PlainTestCase {
         CommandContext ctx = createCtx(pmb);
         rootNode.accept(ctx);
         log("ctx:" + ctx);
-        String expected = "WHERE  AAA and BBB and CCC and DDD";
+        String expected = "WHERE  AAA AND BBB AND CCC AND DDD";
+        assertEquals(expected, ctx.getSql());
+    }
+    
+    // -----------------------------------------------------
+    //                                                    OR
+    //                                                    --
+    public void test_parse_BEGIN_where_upperCase_that_has_nested_IFIF_root_has_or() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberId != null*/";
+        sql = sql + "FIXED";
+        sql = sql + "/*END*/";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberName != null*/";
+        sql = sql + "or AAA /*IF true*/and BBB /*IF true*/OR CCC/*END*//*END*/ /*IF true*/or DDD/*END*/";
+        sql = sql + "/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+        
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+        String expected = "where  AAA and BBB OR CCC or DDD";
         assertEquals(expected, ctx.getSql());
     }
 
