@@ -104,4 +104,14 @@
     	  overwrite="true"/>
   </target>
 
+  <target name="reflect-mac-basic">
+    <delete file="../dbflute-basic-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-basic-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-basic-example/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+  </target>
+		
 </project>
