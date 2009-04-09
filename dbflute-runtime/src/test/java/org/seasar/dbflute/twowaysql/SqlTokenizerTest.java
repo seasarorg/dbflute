@@ -4,7 +4,7 @@ import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute
- * @since 0.9.5 (2009/04/08)
+ * @since 0.9.5 (2009/04/08 Wednesday)
  */
 public class SqlTokenizerTest extends PlainTestCase {
 
