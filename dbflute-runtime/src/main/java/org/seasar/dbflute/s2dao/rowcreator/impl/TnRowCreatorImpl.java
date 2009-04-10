@@ -132,7 +132,7 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
             } else if (columnNames.contains(pt.getPropertyName())) {
                 proprertyCache.put(pt.getPropertyName(), pt);
             } else {
-                String possibleName = DfStringUtil.fromPropertyNameToColumnName(pt.getPropertyName());
+                String possibleName = DfStringUtil.decamelizePropertyName(pt.getPropertyName());
                 if (columnNames.contains(possibleName)) {
                     proprertyCache.put(possibleName, pt);
                 }

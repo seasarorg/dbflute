@@ -18,6 +18,8 @@ package org.seasar.dbflute.util;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -131,6 +133,17 @@ public class DfResourceUtil {
         }
     }
 
+    public static void makeFileAndClose(URL url, String outputFilename) {
+        InputStream in;
+        try {
+            in = url.openStream();
+        } catch (IOException e) {
+            String msg = url.getClass().getSimpleName() + "#openStream() threw the IO exception!";
+            throw new IllegalStateException(msg, e);
+        }
+        DfResourceUtil.makeFileAndClose(in, outputFilename);
+    }
+
     // ===================================================================================
     //                                                                     Resource Stream
     //                                                                     ===============
@@ -199,18 +212,27 @@ public class DfResourceUtil {
     // ===================================================================================
     //                                                                InputStream Handling
     //                                                                ====================
-    public static void close(InputStream is) {
-        if (is == null) {
-            return;
+    public static void makeFileAndClose(InputStream in, String outputFilename) {
+        final byte[] bytes = toBytesAndClose(in);
+        final File outputFile = new File(outputFilename);
+        final FileOutputStream fileOutputStream;
+        try {
+            fileOutputStream = new FileOutputStream(outputFile, false);
+        } catch (FileNotFoundException e) {
+            String msg = "new FileOutputStream(outputFile, false) threw the " + e.getClass().getSimpleName();
+            msg = msg + ": outputFilename=" + outputFilename;
+            throw new IllegalStateException(msg, e);
         }
         try {
-            is.close();
+            fileOutputStream.write(bytes);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            String msg = "fileOutputStream.write(toBytes) threw the " + e.getClass().getSimpleName();
+            msg = msg + ": outputFilename=" + outputFilename;
+            throw new IllegalStateException(msg, e);
         }
     }
 
-    public static final byte[] getBytes(InputStream is) {
+    public static final byte[] toBytesAndClose(InputStream is) {
         byte[] bytes = null;
         byte[] buf = new byte[8192];
         try {
@@ -228,6 +250,17 @@ public class DfResourceUtil {
             }
         }
         return bytes;
+    }
+
+    public static void close(InputStream is) {
+        if (is == null) {
+            return;
+        }
+        try {
+            is.close();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public static final void copy(InputStream is, OutputStream os) {

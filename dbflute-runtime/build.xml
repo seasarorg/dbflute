@@ -1,7 +1,7 @@
 <project name="DBFluteRuntime" default="dist" basedir=".">
 
   <property name="version" value="0.9.5"/>
-  <property name="build.version" value="0.9.4.1-RC1"/>
+  <property name="build.version" value="0.9.4.1-01-SNAPSHOT"/>
 
   <target name="dist">
 
@@ -105,6 +105,25 @@
   </target>
 
   <target name="reflect-mac-basic">
+    <delete file="../dbflute/lib/forCompile/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute/lib/forCompile/dbflute-runtime.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute/lib/forCompile/sources/dbflute-runtime-sources.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute/lib/forExecute/dbflute-runtime.jar"
+    	  overwrite="true"/>
+
+    <delete file="../javatest/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../javatest/lib/dbflute-runtime.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../javatest/lib/sources/dbflute-runtime-sources.jar"
+    	  overwrite="true"/>
+
     <delete file="../dbflute-basic-example/lib/dbflute-runtime-*.jar"/>
     <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
     	  tofile="../dbflute-basic-example/lib/dbflute-runtime-${version}.jar"

@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.util;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Time;
@@ -1127,6 +1128,21 @@ public class DfTypeUtil {
         Calendar localCalendar = Calendar.getInstance();
         localCalendar.setTimeInMillis(calendar.getTimeInMillis());
         return localCalendar;
+    }
+
+    // -----------------------------------------------------
+    //                                                Binary
+    //                                                ------
+    public static byte[] toBinary(String o, String encoding) {
+        if (o == null) {
+            return null;
+        }
+        try {
+            return o.getBytes(encoding);
+        } catch (UnsupportedEncodingException e) {
+            String msg = "The encoding is invalid: encoding=" + encoding + " o=" + o;
+            throw new IllegalStateException(msg);
+        }
     }
 
     // ===================================================================================

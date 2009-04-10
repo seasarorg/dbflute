@@ -26,7 +26,7 @@ import java.util.StringTokenizer;
 public class DfStringUtil {
 
     protected static final String[] EMPTY_STRINGS = new String[0];
-    
+
     // ===================================================================================
     //                                                                               Empty
     //                                                                               =====
@@ -37,7 +37,7 @@ public class DfStringUtil {
     public static final boolean isNotEmpty(final String text) {
         return !isEmpty(text);
     }
-    
+
     // ===================================================================================
     //                                                                             Replace
     //                                                                             =======
@@ -80,71 +80,157 @@ public class DfStringUtil {
     }
 
     // ===================================================================================
+    //                                                                       Basic Convert
+    //                                                                       =============
+    public static final String rtrim(String text) {
+        return rtrim(text, null);
+    }
+
+    public static final String rtrim(String text, String trimText) {
+        if (text == null)
+            return null;
+        if (trimText == null)
+            trimText = " ";
+        int pos;
+        for (pos = text.length() - 1; pos >= 0 && trimText.indexOf(text.charAt(pos)) >= 0; pos--)
+            ;
+        return text.substring(0, pos + 1);
+    }
+
+    // ===================================================================================
     //                                                                     Initial Convert
     //                                                                     ===============
     public static String initCap(String str) {
-        assertObjectNotNull("str", str);
+        if (str == null) {
+            return null;
+        }
+        if (str.length() == 0) {
+            return str;
+        }
+        if (str.length() == 1) {
+            return str.toUpperCase();
+        }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
+    public static String initCapAfterTrimming(String str) {
+        if (str == null) {
+            return null;
+        }
+        str = str.trim();
+        return initCap(str);
+    }
+
     public static String initUncap(String str) {
-        assertObjectNotNull("str", str);
+        if (str == null) {
+            return null;
+        }
+        if (str.length() == 0) {
+            return str;
+        }
+        if (str.length() == 1) {
+            return str.toUpperCase();
+        }
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
 
     // ===================================================================================
     //                                                                      Naming Convert
     //                                                                      ==============
-    public static String fromPropertyNameToColumnName(String propertyName) {
-        return decamelize(propertyName);
-    }
-
-    public static String fromEntityNameToTableName(String entityName) {
-        return decamelize(entityName);
-    }
-
-    protected static String decamelize(String s) {
+    public static String decamelizePropertyName(String s) {
         if (s == null) {
             return null;
         }
         if (s.length() == 1) {
             return s.toUpperCase();
         }
-        StringBuffer buf = new StringBuffer(40);
+        StringBuilder sb = new StringBuilder(40);
         int pos = 0;
         for (int i = 1; i < s.length(); ++i) {
             if (Character.isUpperCase(s.charAt(i))) {
-                if (buf.length() != 0) {
-                    buf.append('_');
+                if (sb.length() != 0) {
+                    sb.append('_');
                 }
-                buf.append(s.substring(pos, i).toUpperCase());
+                sb.append(s.substring(pos, i).toUpperCase());
                 pos = i;
             }
         }
-        if (buf.length() != 0) {
-            buf.append('_');
+        if (sb.length() != 0) {
+            sb.append('_');
         }
-        buf.append(s.substring(pos, s.length()).toUpperCase());
-        return buf.toString();
+        sb.append(s.substring(pos, s.length()).toUpperCase());
+        return sb.toString();
+    }
+    
+    public static String decapitalizePropertyName(String propertyName) {
+        if (propertyName == null || propertyName.length() == 0) {
+            return propertyName;
+        }
+        if (propertyName.length() > 1 && Character.isUpperCase(propertyName.charAt(1))
+                && Character.isUpperCase(propertyName.charAt(0))) {
+            return propertyName;
+        }
+        char chars[] = propertyName.toCharArray();
+        chars[0] = Character.toLowerCase(chars[0]);
+        return new String(chars);
     }
 
     // ===================================================================================
-    //                                                                       Assert Helper
+    //                                                                       Extract Scope
     //                                                                       =============
-    /**
-     * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
-     */
-    protected static void assertObjectNotNull(String variableName, Object value) {
-        if (variableName == null) {
-            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
-            throw new IllegalArgumentException(msg);
+    public static String extractFirstScope(String targetStr, String beginMark, String endMark) {
+        if (targetStr == null || beginMark == null || endMark == null) {
+            return null;
         }
-        if (value == null) {
-            String msg = "The value should not be null: variableName=" + variableName;
-            throw new IllegalArgumentException(msg);
+        final String ret;
+        {
+            String tmp = targetStr;
+            final int startIndex = tmp.indexOf(beginMark);
+            if (startIndex < 0) {
+                return null;
+            }
+            tmp = tmp.substring(startIndex + beginMark.length());
+            if (tmp.indexOf(endMark) < 0) {
+                return null;
+            }
+            ret = tmp.substring(0, tmp.indexOf(endMark)).trim();
         }
+        return ret;
+    }
+
+    public static List<String> extractAllScope(String targetStr, String beginMark, String endMark) {
+        if (targetStr == null || beginMark == null || endMark == null) {
+            return new ArrayList<String>();
+        }
+        final List<String> resultList = new ArrayList<String>();
+        String tmp = targetStr;
+        while (true) {
+            final int startIndex = tmp.indexOf(beginMark);
+            if (startIndex < 0) {
+                break;
+            }
+            tmp = tmp.substring(startIndex + beginMark.length());
+            if (tmp.indexOf(endMark) < 0) {
+                break;
+            }
+            resultList.add(tmp.substring(0, tmp.indexOf(endMark)).trim());
+            tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
+        }
+        return resultList;
+    }
+
+    // ===================================================================================
+    //                                                                         List String
+    //                                                                         ===========
+    public static boolean containsIgnoreCase(String target, List<String> strList) {
+        if (target == null || strList == null) {
+            return false;
+        }
+        for (String str : strList) {
+            if (target.equalsIgnoreCase(str)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
