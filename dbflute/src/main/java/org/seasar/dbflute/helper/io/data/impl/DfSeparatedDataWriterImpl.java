@@ -35,7 +35,6 @@ import org.seasar.dbflute.helper.io.data.DfSeparatedDataWriter;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuilder;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuildingResult;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.util.DfTokenUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -423,8 +422,8 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         final List<String> valueList = new ArrayList<String>();
 
         // Don't use split!
-        //        final String[] values = lineString.split(delimiter);
-        final String[] values = DfTokenUtil.tokenToArgs(lineString, delimiter);
+        //final String[] values = lineString.split(delimiter);
+        final String[] values = tokenToArgs(lineString, delimiter);
 
         for (String value : values) {
             valueList.add(value);
@@ -432,6 +431,24 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         return arrangeValueList(valueList, delimiter);
     }
 
+    protected static String[] tokenToArgs(String value, String delimiter) {
+        List<String> list = tokenToList(value, delimiter);
+        return (String[]) list.toArray(new String[list.size()]);
+    }
+
+    protected static List<String> tokenToList(String value, String delimiter) {
+        List<String> list = new ArrayList<String>();
+        int i = 0;
+        int j = value.indexOf(delimiter);
+        for (int h = 0; j >= 0; h++) {
+            list.add(value.substring(i, j));
+            i = j + 1;
+            j = value.indexOf(delimiter, i);
+        }
+        list.add(value.substring(i));
+        return list;
+    }
+    
     protected ValueLineInfo arrangeValueList(List<String> valueList, String delimiter) {
         final ValueLineInfo valueLineInfo = new ValueLineInfo();
         final ArrayList<String> resultList = new ArrayList<String>();
