@@ -257,9 +257,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                                 columnName = md.getColumnName(i);
                             }
                             if (columnName == null || columnName.trim().length() == 0) {
-                                final String lineSeparator = System.getProperty("line.separator");
-                                String msg = "The columnName is invalid: columnName=" + columnName + lineSeparator;
-                                msg = msg + "ResultSetMetaData returned invalid value." + lineSeparator;
+                                final String ln = ln();
+                                String msg = "The columnName is invalid: columnName=" + columnName + ln;
+                                msg = msg + "ResultSetMetaData returned invalid value." + ln;
                                 msg = msg + "sql=" + sql;
                                 throw new IllegalArgumentException(msg);
                             }
@@ -324,8 +324,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 } catch (SQLException e) {
                     if (!_runInfo.isErrorContinue()) {
                         String msg = "Look! Read the message below." + ln();
-                        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *"
-                                + ln();
+                        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
                         msg = msg + "It failed to execute the SQL!" + ln();
                         msg = msg + ln();
                         msg = msg + "[SQL File]" + ln() + _srcFile + ln();
@@ -341,8 +340,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         SQLException nextException = e.getNextException();
                         if (nextException != null) {
                             msg = msg + ln();
-                            msg = msg + "[NextException]" + ln() + nextException.getClass().getName()
-                                    + ln();
+                            msg = msg + "[NextException]" + ln() + nextException.getClass().getName() + ln();
                             msg = msg + nextException.getMessage() + ln();
                         }
                         msg = msg + "* * * * * * * * * */";
@@ -412,14 +410,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 {
                     final String delimiter = "extends";
                     final int idx = classDefinition.indexOf(delimiter);
-                    if (idx < 0) {
-                        String className = classDefinition;
+                    {
+                        String className = (idx >= 0) ? classDefinition.substring(0, idx) : classDefinition;
+                        className = className.trim();
                         className = resolveObjectNameIfNeeds(className, _srcFile);
                         pmbMetaData.setClassName(className);
-                    } else {
-                        String className = classDefinition.substring(0, idx).trim();
-                        className = resolveObjectNameIfNeeds(className, _srcFile);
-                        pmbMetaData.setClassName(className);
+                    }
+                    if (idx >= 0) {
                         final String superClassName = classDefinition.substring(idx + delimiter.length()).trim();
                         pmbMetaData.setSuperClassName(superClassName);
                         resolveSuperClassSimplePagingBean(pmbMetaData);

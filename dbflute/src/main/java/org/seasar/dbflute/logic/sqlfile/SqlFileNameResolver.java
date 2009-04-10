@@ -14,8 +14,8 @@ public class SqlFileNameResolver {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String ENTITY_MARK = "$entity";
-    public static final String PMB_MARK = "$pmb";
+    public static final String ENTITY_MARK = "df:entity";
+    public static final String PMB_MARK = "df:pmb";
 
     // ===================================================================================
     //                                                                             Resolve
