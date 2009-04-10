@@ -3,7 +3,7 @@
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D I S T R I B U T I O N                        -->
   <!-- ================================================================ -->
-  <property name="version" value="0.8.8.8"/>
+  <property name="version" value="0.8.8.9"/>
   <property name="internal.version" value="${version}"/>
   <property name="deploy.base" value="../../dbflute.net"/>
   <property name="workspace.base" value=".."/>
