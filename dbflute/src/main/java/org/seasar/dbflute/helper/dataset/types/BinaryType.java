@@ -2,7 +2,7 @@ package org.seasar.dbflute.helper.dataset.types;
 
 import java.util.Arrays;
 
-import org.seasar.dbflute.util.basic.DfBinaryUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * Data Table. {Refer to S2Container}
@@ -17,7 +17,7 @@ public class BinaryType extends ObjectType {
     }
 
     public Object convert(Object value, String formatPattern) {
-        return DfBinaryUtil.toBinary(value);
+        return DfTypeUtil.toBinary(value);
     }
 
     protected boolean doEquals(Object arg1, Object arg2) {

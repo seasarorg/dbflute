@@ -79,7 +79,6 @@ import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.basic.DfJavaBeansUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -550,7 +549,7 @@ public class Table {
      * Get variable name to use in Java sources (= uncapitalised java name)
      */
     public String getJavaBeansRulePropertyName() {
-        return DfJavaBeansUtil.decapitalizePropertyName(getJavaName());
+        return DfStringUtil.decapitalizePropertyName(getJavaName());
     }
 
     // -----------------------------------------------------

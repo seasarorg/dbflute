@@ -73,7 +73,6 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.basic.DfJavaBeansUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -379,7 +378,7 @@ public class Column {
      * Get variable name to use in Java sources (= uncapitalised java name)
      */
     public String getJavaBeansRulePropertyName() {
-        return DfJavaBeansUtil.decapitalizePropertyName(getJavaName());
+        return DfStringUtil.decapitalizePropertyName(getJavaName());
     }
 
     public String getJavaBeansRulePropertyNameInitCap() {
