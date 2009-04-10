@@ -1,6 +1,6 @@
 package org.seasar.dbflute.helper.dataset.types;
 
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * Data Table. {Refer to S2Container}
@@ -20,7 +20,7 @@ public class StringType extends ObjectType {
     }
 
     public Object convert(Object value, String formatPattern) {
-        String s = DfStringUtil.toString(value, formatPattern);
+        String s = DfTypeUtil.toString(value, formatPattern);
         if (s != null && trim) {
             s = s.trim();
         }

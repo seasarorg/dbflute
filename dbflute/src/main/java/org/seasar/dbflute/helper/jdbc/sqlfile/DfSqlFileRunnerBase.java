@@ -36,7 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

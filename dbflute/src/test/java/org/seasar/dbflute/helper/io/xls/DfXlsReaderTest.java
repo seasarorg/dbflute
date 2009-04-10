@@ -21,7 +21,7 @@ import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetterTest;
 import org.seasar.dbflute.unit.PlainTestCase;
-import org.seasar.dbflute.util.io.DfResourceUtil;
+import org.seasar.dbflute.util.DfResourceUtil;
 
 /**
  * @author jflute

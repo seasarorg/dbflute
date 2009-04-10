@@ -78,8 +78,8 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.basic.DfJavaBeansUtil;
-import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.xml.sax.Attributes;
 
 /**

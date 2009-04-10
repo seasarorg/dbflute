@@ -72,8 +72,8 @@ import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.basic.DfJavaBeansUtil;
-import org.seasar.dbflute.util.basic.DfStringUtil;
 import org.xml.sax.Attributes;
 
 /**

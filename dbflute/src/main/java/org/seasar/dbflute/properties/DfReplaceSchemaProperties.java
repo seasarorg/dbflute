@@ -10,7 +10,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.IllegalPropertyTypeException;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

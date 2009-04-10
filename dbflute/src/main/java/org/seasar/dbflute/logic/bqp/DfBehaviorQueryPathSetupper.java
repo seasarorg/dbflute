@@ -42,7 +42,7 @@ import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

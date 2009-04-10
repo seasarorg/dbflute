@@ -36,7 +36,7 @@ import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuilder;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuildingResult;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfTokenUtil;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

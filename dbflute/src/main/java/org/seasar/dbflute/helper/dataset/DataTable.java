@@ -16,7 +16,7 @@ import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfUniqueKeyHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * {Refers to S2Container and Extends it}

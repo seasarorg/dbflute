@@ -60,6 +60,7 @@ import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
+import org.seasar.dbflute.logic.sqlfile.SqlFileNameResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -67,7 +68,7 @@ import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -286,8 +287,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         }
 
                         // for Customize Entity
-                        final String entityName = getEntityName(sql);
+                        String entityName = getEntityName(sql);
                         if (entityName != null) {
+                            entityName = resolveObjectNameIfNeeds(entityName, _srcFile);
                             _entityInfoMap.put(entityName, columnJdbcTypeMap);
                             if (isCursor(sql)) {
                                 _cursorInfoMap.put(entityName, new Object());
@@ -412,9 +414,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     final String delimiter = "extends";
                     final int idx = classDefinition.indexOf(delimiter);
                     if (idx < 0) {
-                        pmbMetaData.setClassName(classDefinition);
+                        String className = resolveObjectNameIfNeeds(classDefinition, _srcFile);
+                        pmbMetaData.setClassName(className);
                     } else {
-                        final String className = classDefinition.substring(0, idx).trim();
+                        String className = classDefinition.substring(0, idx).trim();
+                        className = resolveObjectNameIfNeeds(classDefinition, _srcFile);
                         pmbMetaData.setClassName(className);
                         final String superClassName = classDefinition.substring(idx + delimiter.length()).trim();
                         pmbMetaData.setSuperClassName(superClassName);
@@ -632,11 +636,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String getStringBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-        return DfStringUtil.getStringBetweenBeginEndMark(targetStr, beginMark, endMark);
+        return DfStringUtil.extractFirstScope(targetStr, beginMark, endMark);
     }
 
     protected List<String> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-        return DfStringUtil.getListBetweenBeginEndMark(targetStr, beginMark, endMark);
+        return DfStringUtil.extractAllScope(targetStr, beginMark, endMark);
     }
 
     protected String removeBlockComment(final String sql) {
@@ -645,6 +649,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected String removeLineComment(final String sql) {
         return DfSqlStringUtil.removeLineComment(sql); // With removing CR
+    }
+    
+    protected String resolveObjectNameIfNeeds(String className, File file) {
+        return new SqlFileNameResolver().resolveObjectNameIfNeeds(className, file.getName());
     }
 
     // ===================================================================================

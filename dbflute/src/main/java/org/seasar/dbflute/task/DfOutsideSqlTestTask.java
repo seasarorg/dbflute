@@ -26,7 +26,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.task.bs.DfAbstractInvokeSqlDirectoryTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -146,7 +146,7 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
             }
 
             protected List<String> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-                return DfStringUtil.getListBetweenBeginEndMark(targetStr, beginMark, endMark);
+                return DfStringUtil.extractAllScope(targetStr, beginMark, endMark);
             }
         };
     }

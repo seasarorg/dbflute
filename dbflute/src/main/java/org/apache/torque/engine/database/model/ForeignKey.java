@@ -69,7 +69,7 @@ import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.torque.DfTorqueColumnListToStringUtil;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.xml.sax.Attributes;
 
 /**

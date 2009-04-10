@@ -19,7 +19,7 @@ import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

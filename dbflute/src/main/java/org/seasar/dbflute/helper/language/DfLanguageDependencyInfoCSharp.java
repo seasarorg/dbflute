@@ -25,7 +25,7 @@ import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDiconCSharp;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultCSharp;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute

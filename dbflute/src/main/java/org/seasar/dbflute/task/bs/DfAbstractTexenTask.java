@@ -49,7 +49,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
 import org.seasar.dbflute.torque.DfAntTaskUtil;
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.velocity.DfGenerator;
 
 /**

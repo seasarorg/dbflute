@@ -33,8 +33,8 @@ import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataSetConstants;
 import org.seasar.dbflute.helper.dataset.DataTable;
-import org.seasar.dbflute.util.basic.DfStringUtil;
-import org.seasar.dbflute.util.crypto.DfBase64Util;
+import org.seasar.dbflute.util.DfBase64Util;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -149,7 +149,7 @@ public class DfXlsWriter implements DataSetConstants {
         } else if (value instanceof Boolean) {
             cell.setCellValue(((Boolean) value).booleanValue());
         } else {
-            cell.setCellValue(createRichTextString(DfStringUtil.toString(value, null)));
+            cell.setCellValue(createRichTextString(DfTypeUtil.toString(value, null)));
         }
     }
 

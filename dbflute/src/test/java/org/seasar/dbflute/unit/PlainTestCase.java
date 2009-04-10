@@ -9,7 +9,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
-import org.seasar.dbflute.util.io.DfResourceUtil;
+import org.seasar.dbflute.util.DfResourceUtil;
 
 /**
  * @author jflute

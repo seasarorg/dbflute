@@ -3,7 +3,7 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.util.basic.DfStringUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
