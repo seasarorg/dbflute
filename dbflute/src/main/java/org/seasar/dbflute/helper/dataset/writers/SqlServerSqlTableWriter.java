@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.dataset.DataTable;
-import org.seasar.dbflute.util.jdbc.DfConnectionUtil;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -61,7 +60,7 @@ public class SqlServerSqlTableWriter extends SqlTableWriter {
         }
         final Connection conn = getConnection(getDataSource());
         try {
-            final Statement stmt = DfConnectionUtil.createStatement(conn);
+            final Statement stmt = createStatement(conn);
             try {
                 stmt.execute(sql);
             } catch (SQLException e) {
@@ -75,7 +74,7 @@ public class SqlServerSqlTableWriter extends SqlTableWriter {
                 }
             }
         } finally {
-            DfConnectionUtil.close(conn);
+            close(conn);
         }
     }
 
@@ -121,6 +120,24 @@ public class SqlServerSqlTableWriter extends SqlTableWriter {
             return dataSource.getConnection();
         }
         catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static Statement createStatement(Connection conn) {
+        try {
+            return conn.createStatement();
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static void close(Connection conn) {
+        if (conn == null)
+            return;
+        try {
+            conn.close();
+        } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }

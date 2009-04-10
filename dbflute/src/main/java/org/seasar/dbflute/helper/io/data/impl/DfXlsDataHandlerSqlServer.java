@@ -27,7 +27,6 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.dataset.DataTable;
-import org.seasar.dbflute.util.jdbc.DfConnectionUtil;
 
 /**
  * @author jflute
@@ -116,7 +115,7 @@ public class DfXlsDataHandlerSqlServer extends DfXlsDataHandlerImpl {
         }
         final Connection conn = getConnection(dataSource);
         try {
-            final Statement stmt = DfConnectionUtil.createStatement(conn);
+            final Statement stmt = createStatement(conn);
             try {
                 stmt.execute(sql);
             } catch (SQLException e) {
@@ -130,15 +129,32 @@ public class DfXlsDataHandlerSqlServer extends DfXlsDataHandlerImpl {
                 }
             }
         } finally {
-            DfConnectionUtil.close(conn);
+            close(conn);
         }
     }
 
     private static Connection getConnection(DataSource dataSource) {
         try {
             return dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
         }
-        catch (SQLException e) {
+    }
+
+    private static Statement createStatement(Connection conn) {
+        try {
+            return conn.createStatement();
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static void close(Connection conn) {
+        if (conn == null)
+            return;
+        try {
+            conn.close();
+        } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }

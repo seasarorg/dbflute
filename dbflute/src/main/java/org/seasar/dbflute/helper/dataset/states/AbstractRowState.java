@@ -14,7 +14,6 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.dataset.DataRow;
-import org.seasar.dbflute.util.jdbc.DfConnectionUtil;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -38,7 +37,7 @@ public abstract class AbstractRowState implements RowState {
         final String tableName = row.getTable().getTableName();
         final Connection conn = getConnection(dataSource);
         try {
-            final PreparedStatement ps = DfConnectionUtil.prepareStatement(conn, sql);
+            final PreparedStatement ps = prepareStatement(conn, sql);
             try {
                 _log.info(getSql4Log(tableName, Arrays.asList(args)));
                 bindArgs(ps, args, argTypes);
@@ -55,7 +54,7 @@ public abstract class AbstractRowState implements RowState {
                 }
             }
         } finally {
-            DfConnectionUtil.close(conn);
+            close(conn);
         }
     }
 
@@ -159,6 +158,24 @@ public abstract class AbstractRowState implements RowState {
             return dataSource.getConnection();
         }
         catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static PreparedStatement prepareStatement(Connection conn, String sql) {
+        try {
+            return conn.prepareStatement(sql);
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static void close(Connection conn) {
+        if (conn == null)
+            return;
+        try {
+            conn.close();
+        } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }
