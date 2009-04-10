@@ -17,7 +17,10 @@ public class BinaryType extends ObjectType {
     }
 
     public Object convert(Object value, String formatPattern) {
-        return DfTypeUtil.toBinary(value);
+        if (value != null && value instanceof String) {
+            return DfTypeUtil.toBinary((String) value, "UTF-8");
+        }
+        return value;
     }
 
     protected boolean doEquals(Object arg1, Object arg2) {

@@ -5,7 +5,7 @@ import java.io.FileFilter;
 import java.net.URL;
 
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.util.net.DfURLUtil;
+import org.seasar.dbflute.util.DfResourceUtil;
 
 /**
  * @author jflute
@@ -48,8 +48,8 @@ public class DfJDBCDriverDownloadHandler {
         }
         final String urlString = urlBase + "/" + jdbcDriverFileName;
         final String outputFileName = downloadDir + "/" + jdbcDriverFileName;
-        final URL url = DfURLUtil.create(urlString);
-        DfURLUtil.makeFileAndClose(url, outputFileName);
+        final URL url = DfResourceUtil.createURL(urlString);
+        DfResourceUtil.makeFileAndClose(url, outputFileName);
     }
 
     protected boolean needsDownload(String jdbcDriverFileName, String downloadDir) {
