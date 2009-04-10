@@ -322,7 +322,7 @@ namespace ${myExtendedEntityPackageName} {
 #if (!${col.isJavaNativeNumberObject()})
             if (_${col.uncapitalisedJavaName} != null) { result = (31*result) + _${col.uncapitalisedJavaName}.GetHashCode(); }
 #else
-            result = result + _${col.uncapitalisedJavaName}.GetHashCode();
+            result = (31*result) + _${col.uncapitalisedJavaName}.GetHashCode();
 #end
 #end
             return result;
@@ -344,7 +344,7 @@ namespace ${myExtendedEntityPackageName} {
 #if (!${col.isJavaNativeNumberObject()})
             if (_${col.uncapitalisedJavaName} != null) { result = (31*result) + _${col.uncapitalisedJavaName}.GetHashCode(); }
 #else
-            result = result + _${col.uncapitalisedJavaName}.GetHashCode();
+            result = (31*result) + _${col.uncapitalisedJavaName}.GetHashCode();
 #end
 #end
             return result;
