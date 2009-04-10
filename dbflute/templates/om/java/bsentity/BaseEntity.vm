@@ -450,7 +450,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
     /**
      * Calculates hash-code from primary-key.
-     * @return Hash-code from primary-keys.
+     * @return Hash-code from primary-key.
      */
     public int hashCode() {
         int result = 17;
@@ -481,7 +481,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
     /**
      * Calculates hash-code from all columns.
-     * @return Hash-code from all-columns.
+     * @return Hash-code from all columns.
      */
     public int hashCode() {
         int result = 17;
@@ -493,7 +493,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
 
     /**
-     * @return The view string of columns. (NotNull)
+     * @return The view string of all columns. (NotNull)
      */
     public String toString() {
         String delimiter = ",";
