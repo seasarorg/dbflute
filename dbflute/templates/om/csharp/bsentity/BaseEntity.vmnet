@@ -320,7 +320,7 @@ namespace ${myExtendedEntityPackageName} {
             int result = 17;
 #foreach ($col in $table.primaryKey)
 #if (!${col.isJavaNativeNumberObject()})
-            if (_${col.uncapitalisedJavaName} != null) { result = result + _${col.uncapitalisedJavaName}.GetHashCode(); }
+            if (_${col.uncapitalisedJavaName} != null) { result = (31*result) + _${col.uncapitalisedJavaName}.GetHashCode(); }
 #else
             result = result + _${col.uncapitalisedJavaName}.GetHashCode();
 #end
@@ -342,7 +342,7 @@ namespace ${myExtendedEntityPackageName} {
             int result = 17;
 #foreach ($col in $table.Columns)
 #if (!${col.isJavaNativeNumberObject()})
-            if (_${col.uncapitalisedJavaName} != null) { result = result + _${col.uncapitalisedJavaName}.GetHashCode(); }
+            if (_${col.uncapitalisedJavaName} != null) { result = (31*result) + _${col.uncapitalisedJavaName}.GetHashCode(); }
 #else
             result = result + _${col.uncapitalisedJavaName}.GetHashCode();
 #end

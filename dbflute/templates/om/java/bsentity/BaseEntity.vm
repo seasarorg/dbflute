@@ -455,7 +455,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     public int hashCode() {
         int result = 17;
 #foreach ($col in $table.primaryKey)
-        if (this.get${col.JavaName}() != null) { result = result + get${col.JavaName}().hashCode(); }
+        if (get${col.JavaName}() != null) { result = (31*result) + get${col.JavaName}().hashCode(); }
 #end
         return result;
     }
@@ -486,7 +486,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     public int hashCode() {
         int result = 17;
 #foreach ($col in $table.columns)
-        if (this.get${col.javaName}() != null) { result = result + this.get${col.javaName}().hashCode(); }
+        if (get${col.javaName}() != null) { result = (31*result) + get${col.javaName}().hashCode(); }
 #end
         return result;
     }
