@@ -11,7 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.util.jdbc.DfConnectionUtil;
-import org.seasar.dbflute.util.jdbc.DfDataSourceUtil;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -60,7 +59,7 @@ public class SqlServerSqlTableWriter extends SqlTableWriter {
         if (_log.isDebugEnabled()) {
             _log.debug(sql);
         }
-        final Connection conn = DfDataSourceUtil.getConnection(getDataSource());
+        final Connection conn = getConnection(getDataSource());
         try {
             final Statement stmt = DfConnectionUtil.createStatement(conn);
             try {
@@ -82,7 +81,7 @@ public class SqlServerSqlTableWriter extends SqlTableWriter {
 
     private boolean hasIdentityColumn(final DataTable dataTable) {
         final String sql = "SELECT IDENT_CURRENT ('" + dataTable.getTableName() + "') AS IDENT_CURRENT";
-        final Connection conn = DfDataSourceUtil.getConnection(getDataSource());
+        final Connection conn = getConnection(getDataSource());
         Statement stmt = null;
         ResultSet rs = null;
         try {
@@ -114,6 +113,15 @@ public class SqlServerSqlTableWriter extends SqlTableWriter {
                 } catch (SQLException ignored) {
                 }
             }
+        }
+    }
+
+    private static Connection getConnection(DataSource dataSource) {
+        try {
+            return dataSource.getConnection();
+        }
+        catch (SQLException e) {
+            throw new IllegalStateException(e);
         }
     }
 }

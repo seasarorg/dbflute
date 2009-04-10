@@ -1,6 +1,7 @@
 package org.seasar.dbflute.helper.dataset.writers;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
@@ -8,7 +9,6 @@ import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.helper.dataset.states.RowState;
 import org.seasar.dbflute.util.jdbc.DfConnectionUtil;
-import org.seasar.dbflute.util.jdbc.DfDataSourceUtil;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -45,11 +45,20 @@ public class SqlTableWriter implements TableWriter {
     }
 
     private void setupMetaData(DataTable table) {
-        Connection con = DfDataSourceUtil.getConnection(dataSource);
+        Connection con = getConnection(dataSource);
         try {
             table.setupMetaData(DfConnectionUtil.getMetaData(con), _schemaName);
         } finally {
             DfConnectionUtil.close(con);
+        }
+    }
+
+    private static Connection getConnection(DataSource dataSource) {
+        try {
+            return dataSource.getConnection();
+        }
+        catch (SQLException e) {
+            throw new IllegalStateException(e);
         }
     }
 }

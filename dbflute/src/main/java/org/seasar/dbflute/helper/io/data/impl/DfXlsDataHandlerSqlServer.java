@@ -28,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.util.jdbc.DfConnectionUtil;
-import org.seasar.dbflute.util.jdbc.DfDataSourceUtil;
 
 /**
  * @author jflute
@@ -67,7 +66,7 @@ public class DfXlsDataHandlerSqlServer extends DfXlsDataHandlerImpl {
     //                                                                            ========
     private boolean hasIdentityColumn(DataSource dataSource, final DataTable dataTable) {
         final String sql = "SELECT IDENT_CURRENT ('" + dataTable.getTableName() + "') AS IDENT_CURRENT";
-        final Connection conn = DfDataSourceUtil.getConnection(dataSource);
+        final Connection conn = getConnection(dataSource);
         Statement stmt = null;
         ResultSet rs = null;
         try {
@@ -115,7 +114,7 @@ public class DfXlsDataHandlerSqlServer extends DfXlsDataHandlerImpl {
         if (_loggingInsertSql) {
             _log.info(sql);
         }
-        final Connection conn = DfDataSourceUtil.getConnection(dataSource);
+        final Connection conn = getConnection(dataSource);
         try {
             final Statement stmt = DfConnectionUtil.createStatement(conn);
             try {
@@ -132,6 +131,15 @@ public class DfXlsDataHandlerSqlServer extends DfXlsDataHandlerImpl {
             }
         } finally {
             DfConnectionUtil.close(conn);
+        }
+    }
+
+    private static Connection getConnection(DataSource dataSource) {
+        try {
+            return dataSource.getConnection();
+        }
+        catch (SQLException e) {
+            throw new IllegalStateException(e);
         }
     }
 }

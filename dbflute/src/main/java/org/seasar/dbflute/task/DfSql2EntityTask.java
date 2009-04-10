@@ -308,15 +308,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         if (parameterBeanMetaData != null) {
                             final String parameterBeanMetaDataKey = parameterBeanMetaData.getClassName();
                             if (_pmbMetaDataMap.containsKey(parameterBeanMetaDataKey)) {
-                                final String lineSeparator = System.getProperty("line.separator");
-                                String msg = "Waning!" + lineSeparator;
-                                msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
-                                msg = msg + "The meta data of parameter-bean already bean registered." + lineSeparator;
-                                msg = msg + "It overrides the old one by NEW parameter-bean: name="
-                                        + parameterBeanMetaDataKey + lineSeparator;
-                                msg = msg + "- - - - - - - - - - -" + lineSeparator;
-                                msg = msg + " sql=" + sql + lineSeparator;
-                                msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
+                                final String ln = getLineSeparator();
+                                String msg = "Waning!" + ln;
+                                msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;
+                                msg = msg + "The meta data of parameter-bean already bean registered." + ln;
+                                msg = msg + "It overrides the old one by NEW parameter-bean: name=" + parameterBeanMetaDataKey + ln;
+                                msg = msg + "- - - - - - - - - - -" + ln;
+                                msg = msg + " sql=" + sql + ln;
+                                msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;
                                 innerLog.warn(msg);
                             }
                             _pmbMetaDataMap.put(parameterBeanMetaDataKey, parameterBeanMetaData);
@@ -414,11 +413,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     final String delimiter = "extends";
                     final int idx = classDefinition.indexOf(delimiter);
                     if (idx < 0) {
-                        String className = resolveObjectNameIfNeeds(classDefinition, _srcFile);
+                        String className = classDefinition;
+                        className = resolveObjectNameIfNeeds(className, _srcFile);
                         pmbMetaData.setClassName(className);
                     } else {
                         String className = classDefinition.substring(0, idx).trim();
-                        className = resolveObjectNameIfNeeds(classDefinition, _srcFile);
+                        className = resolveObjectNameIfNeeds(className, _srcFile);
                         pmbMetaData.setClassName(className);
                         final String superClassName = classDefinition.substring(idx + delimiter.length()).trim();
                         pmbMetaData.setSuperClassName(superClassName);
