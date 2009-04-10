@@ -289,7 +289,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         // for Customize Entity
                         String entityName = getEntityName(sql);
                         if (entityName != null) {
-                            entityName = resolveObjectNameIfNeeds(entityName, _srcFile);
+                            entityName = resolveEntityNameIfNeeds(entityName, _srcFile);
                             _entityInfoMap.put(entityName, columnJdbcTypeMap);
                             if (isCursor(sql)) {
                                 _cursorInfoMap.put(entityName, new Object());
@@ -413,7 +413,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     {
                         String className = (idx >= 0) ? classDefinition.substring(0, idx) : classDefinition;
                         className = className.trim();
-                        className = resolveObjectNameIfNeeds(className, _srcFile);
+                        className = resolvePmbNameIfNeeds(className, _srcFile);
                         pmbMetaData.setClassName(className);
                     }
                     if (idx >= 0) {
@@ -648,8 +648,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return DfSqlStringUtil.removeLineComment(sql); // With removing CR
     }
     
-    protected String resolveObjectNameIfNeeds(String className, File file) {
-        return new SqlFileNameResolver().resolveObjectNameIfNeeds(className, file.getName());
+    protected String resolveEntityNameIfNeeds(String className, File file) {
+        return new SqlFileNameResolver().resolveEntityNameIfNeeds(className, file.getName());
+    }
+    
+    protected String resolvePmbNameIfNeeds(String className, File file) {
+        return new SqlFileNameResolver().resolvePmbNameIfNeeds(className, file.getName());
     }
 
     // ===================================================================================

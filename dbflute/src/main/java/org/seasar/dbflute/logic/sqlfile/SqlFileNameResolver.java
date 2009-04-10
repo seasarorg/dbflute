@@ -20,12 +20,23 @@ public class SqlFileNameResolver {
     // ===================================================================================
     //                                                                             Resolve
     //                                                                             =======
-    public String resolveObjectNameIfNeeds(String className, String fileName) {
+    public String resolveEntityNameIfNeeds(String className, String fileName) {
+        return resolveObjectNameIfNeeds(className, fileName, ENTITY_MARK, "");
+    }
+
+    public String resolvePmbNameIfNeeds(String className, String fileName) {
+        return resolveObjectNameIfNeeds(className, fileName, PMB_MARK, "Pmb");
+    }
+
+    protected String resolveObjectNameIfNeeds(String className, String fileName, String mark, String suffix) {
         if (className == null || className.trim().length() == 0) {
             String msg = "The argument[className] should not be null or empty: " + className;
             throw new IllegalArgumentException(msg);
         }
-        if (!className.equalsIgnoreCase(ENTITY_MARK) && !className.equalsIgnoreCase(PMB_MARK)) {
+        if (!className.equalsIgnoreCase(mark)) {
+            if (className.contains(":") || className.contains(";")) {
+                throwIllegalAutoNamingClassNameException(className, fileName, mark);
+            }
             return className;
         }
         if (fileName == null || fileName.trim().length() == 0) {
@@ -78,9 +89,51 @@ public class SqlFileNameResolver {
         for (Character c : charList) {
             sb.append(c);
         }
-        if (className.equalsIgnoreCase(PMB_MARK)) {
-            sb.append("Pmb");
-        }
+        sb.append(suffix);
         return DfStringUtil.initCap(sb.toString());
+    }
+
+    protected void throwIllegalAutoNamingClassNameException(String className, String fileName, String mark) {
+        final boolean entity = ENTITY_MARK.equalsIgnoreCase(mark);
+        final String targetName = entity ? "customize-entity" : "parameter-bean";
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The className for auto-naming(for " + targetName + ") is invalid." + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Your className contained colon or semicolon but it was not auto-naming mark." + ln();
+        msg = msg + "The auto-naming marks are '" + mark + "'." + ln();
+        msg = msg + "  For example(@SQL):" + ln();
+        msg = msg + "    - - - - - - - - - - - -" + ln();
+        if (entity) {
+            msg = msg + "    -- #" + mark + "#" + ln();
+        } else {
+            msg = msg + "    -- !" + mark + "!" + ln();
+            msg = msg + "    -- !!Integer memberId!!" + ln();
+            msg = msg + "    -- !!String memberName!!" + ln();
+            msg = msg + "    -- ..." + ln();
+        }
+        msg = msg + "    " + ln();
+        msg = msg + "    select * from ..." + ln();
+        msg = msg + "    - - - - - - - - - - - -" + ln();
+        msg = msg + "Confirm your auto-naming class definition if you want to use auto-naming." + ln();
+        msg = msg + ln();
+        msg = msg + "[Wrong Class Name]" + ln() + className + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL File]" + ln() + fileName + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new IllegalAutoNamingClassNameException(msg);
+    }
+
+    protected String ln() {
+        return "\n";
+    }
+
+    public static class IllegalAutoNamingClassNameException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public IllegalAutoNamingClassNameException(String msg) {
+            super(msg);
+        }
     }
 }

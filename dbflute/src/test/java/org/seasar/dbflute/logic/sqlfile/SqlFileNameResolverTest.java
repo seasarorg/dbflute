@@ -23,7 +23,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolveEntityNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -38,7 +38,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_selectSimpleMember_oracle.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolveEntityNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -53,7 +53,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_SimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolveEntityNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -68,7 +68,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_SelectSimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolveEntityNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -83,7 +83,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_selectsimplemember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolveEntityNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -98,7 +98,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "foo/bar/MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolveEntityNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -113,7 +113,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "foo\\bar\\MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolveEntityNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -128,7 +128,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            resolver.resolveObjectNameIfNeeds(className, "Mem_selectSimpleMember.sql");
+            resolver.resolveEntityNameIfNeeds(className, "Mem_selectSimpleMember.sql");
 
             // ## Assert ##
             fail();
@@ -139,7 +139,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            resolver.resolveObjectNameIfNeeds(className, "selectSimpleMember.sql");
+            resolver.resolveEntityNameIfNeeds(className, "selectSimpleMember.sql");
 
             // ## Assert ##
             fail();
@@ -157,7 +157,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            resolver.resolveObjectNameIfNeeds(className, "MemberBhv_selectSimpleMember");
+            resolver.resolveEntityNameIfNeeds(className, "MemberBhv_selectSimpleMember");
 
             // ## Assert ##
             fail();
@@ -168,7 +168,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            resolver.resolveObjectNameIfNeeds(className, "MemberBhv_selectSimpleMember");
+            resolver.resolveEntityNameIfNeeds(className, "MemberBhv_selectSimpleMember");
 
             // ## Assert ##
             fail();
@@ -189,7 +189,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolvePmbNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -204,7 +204,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_selectSimpleMember_oracle.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolvePmbNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -219,7 +219,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_SimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolvePmbNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -234,7 +234,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_SelectSimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolvePmbNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -249,7 +249,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_selectsimplemember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolvePmbNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -264,7 +264,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "foo/bar/MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolvePmbNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -279,7 +279,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "foo\\bar\\MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolvePmbNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
@@ -294,7 +294,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            resolver.resolveObjectNameIfNeeds(className, "Mem_selectSimpleMember.sql");
+            resolver.resolvePmbNameIfNeeds(className, "Mem_selectSimpleMember.sql");
 
             // ## Assert ##
             fail();
@@ -305,7 +305,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            resolver.resolveObjectNameIfNeeds(className, "selectSimpleMember.sql");
+            resolver.resolvePmbNameIfNeeds(className, "selectSimpleMember.sql");
 
             // ## Assert ##
             fail();
@@ -323,7 +323,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            resolver.resolveObjectNameIfNeeds(className, "MemberBhv_selectSimpleMember");
+            resolver.resolvePmbNameIfNeeds(className, "MemberBhv_selectSimpleMember");
 
             // ## Assert ##
             fail();
@@ -334,7 +334,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
 
         // ## Act ##
         try {
-            resolver.resolveObjectNameIfNeeds(className, "MemberBhv_selectSimpleMember");
+            resolver.resolvePmbNameIfNeeds(className, "MemberBhv_selectSimpleMember");
 
             // ## Assert ##
             fail();
@@ -355,7 +355,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String fileName = "MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
-        String actual = resolver.resolveObjectNameIfNeeds(className, fileName);
+        String actual = resolver.resolveEntityNameIfNeeds(className, fileName);
 
         // ## Assert ##
         log(actual);
