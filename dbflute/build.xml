@@ -5,7 +5,7 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="0.9.4"/>
+	<property name="version" value="0.9.4.1"/>
 	<property name="internal.version" value="${version}-RC2"/>
 
 	<!-- Directories and Module Files -->
@@ -103,10 +103,14 @@
 	  	<jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
 	  	<delete file="${dbflute.zip.dirfile}"/>
 	  	
-	  	<copy filtering="" file="etc/client-template/_project.bat" tofile="etc/client-template/dbflute_dfclient/_project.bat">
+	  	<copy overwrite="true"
+	  		  file="etc/client-template/_project.bat"
+	  		  tofile="etc/client-template/dbflute_dfclient/_project.bat">
 			<filterset><filter token="dbflute.version" value="${internal.version}" /></filterset>
 	  	</copy>
-	  	<copy filtering="" file="etc/client-template/_project.sh" tofile="etc/client-template/dbflute_dfclient/_project.sh">
+	  	<copy overwrite="true"
+		      file="etc/client-template/_project.sh"
+	  		  tofile="etc/client-template/dbflute_dfclient/_project.sh">
 			<filterset><filter token="dbflute.version" value="${internal.version}" /></filterset>
 	  	</copy>
 	  	<delete file="etc/client-template/dbflute_dfclient.zip"/>
@@ -119,7 +123,9 @@
 	  	</tstamp>
 	
 	  	<delete file="etc/mark/product-is-dbflute-${version}"/>
-	  	<copy filtering="" file="etc/mark/product-is-dbflute" tofile="etc/mark/product-is-dbflute-${version}">
+	  	<copy overwrite="true" 
+	  		  file="etc/mark/product-is-dbflute"
+	  		  tofile="etc/mark/product-is-dbflute-${version}">
 			<filterset>
 				<filter token="version" value="${internal.version}" />
 		 		<filter token="datetime" value="${now.date}" />
