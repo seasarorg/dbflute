@@ -5,7 +5,7 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="0.9.4.1"/>
+	<property name="version" value="0.9.4"/>
 	<property name="internal.version" value="${version}-RC2"/>
 
 	<!-- Directories and Module Files -->
@@ -103,6 +103,12 @@
 	  	<jar jarfile="${dbflute.jar.dirfile}" basedir="target/classes"></jar>
 	  	<delete file="${dbflute.zip.dirfile}"/>
 	  	
+	  	<copy filtering="" file="etc/client-template/_project.bat" tofile="etc/client-template/dbflute_dfclient/_project.bat">
+			<filterset><filter token="dbflute.version" value="${internal.version}" /></filterset>
+	  	</copy>
+	  	<copy filtering="" file="etc/client-template/_project.sh" tofile="etc/client-template/dbflute_dfclient/_project.sh">
+			<filterset><filter token="dbflute.version" value="${internal.version}" /></filterset>
+	  	</copy>
 	  	<delete file="etc/client-template/dbflute_dfclient.zip"/>
 	  	<zip zipfile="etc/client-template/dbflute_dfclient.zip">
 	      	<zipfileset prefix="dbflute_dfclient" dir="etc/client-template/dbflute_dfclient"/>
@@ -119,7 +125,7 @@
 		 		<filter token="datetime" value="${now.date}" />
 			</filterset>
 	  	</copy>
-	
+
 	  	<zip zipfile="${dbflute.zip.dirfile}">
 	      	<zipfileset prefix="etc/cmd" dir="etc/cmd">
 	          	<include name="*.cmd"/>
