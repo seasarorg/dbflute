@@ -10,13 +10,15 @@
 
 	<!-- Directories and Module Files -->
 	<property name="deploy.base" value="../../dbflute"/>
-	<property name="workspace.base" value=".."/>
+	<property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
+
 	<property name="dbflute.dist" value="dist"/>
 	<property name="dbflute.jar.file" value="dbflute.jar"/>
 	<property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
 	<property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
 	<property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
-	<property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
+	
+	<property name="workspace.base" value=".."/>
 	<property name="dbflute.runtime.dir" value="${workspace.base}/dbflute-runtime"/>
 
 	<!-- Basic -->

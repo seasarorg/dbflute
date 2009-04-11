@@ -5,15 +5,17 @@
   <!-- ================================================================ -->
   <property name="version" value="0.8.8.9"/>
   <property name="internal.version" value="${version}"/>
+
   <property name="deploy.base" value="../../dbflute.net"/>
-  <property name="workspace.base" value=".."/>
+  <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
 
   <property name="dbflute.dist" value="dist/net"/>
   <property name="dbflute.jar.file" value="dbflute.jar"/>
   <property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
   <property name="dbflute.zip.file" value="dbflute.net-${version}.zip"/>
   <property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
-  <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
+
+  <property name="workspace.base" value=".."/>
   <property name="dbflute.www.download.dir" value="${workspace.base}/dbflute-www/download"/>
   <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
   <property name="dbflute.noracle.example.dir" value="${workspace.base}/dbflute-noracle-example"/>
