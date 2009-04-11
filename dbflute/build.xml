@@ -20,6 +20,7 @@
 	<property name="dbflute.runtime.dir" value="${workspace.base}/dbflute-runtime"/>
 
 	<!-- Basic -->
+	<property name="dbflute.www.download.dir" value="${workspace.base}/dbflute-www/download"/>
 	<property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
 
 	<!-- Container -->
@@ -176,6 +177,13 @@
 	  	</zip>
 	</target>
 
+	<target name="stage">
+	  	<copy overwrite="true" 
+	  		  file="${dbflute.zip.dirfile}"
+	  		  tofile="${dbflute.www.download.dir}/dbflute/dbflute-${internal.version}.zip">
+	  	</copy>
+	</target>
+	
 	<target name="expand-dist">
 	  	<delete dir="${dbflute.deploy.dir}"/>
 	  	<unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>

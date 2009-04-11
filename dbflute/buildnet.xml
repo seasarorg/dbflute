@@ -14,6 +14,7 @@
   <property name="dbflute.zip.file" value="dbflute.net-${version}.zip"/>
   <property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
   <property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
+  <property name="dbflute.www.download.dir" value="${workspace.base}/dbflute-www/download"/>
   <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
   <property name="dbflute.noracle.example.dir" value="${workspace.base}/dbflute-noracle-example"/>
 
@@ -142,6 +143,13 @@
             <include name="product-is-dbflute.net-${version}"/>
         </zipfileset>
     </zip>
+  </target>
+
+  <target name="stage">
+    <copy overwrite="true" 
+	      file="${dbflute.zip.dirfile}"
+	      tofile="${dbflute.www.download.dir}/dbflute/dbflute-${internal.version}.zip">
+    </copy>
   </target>
 
   <target name="expand-dist">
