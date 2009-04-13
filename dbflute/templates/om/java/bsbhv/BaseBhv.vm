@@ -665,6 +665,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #foreach ($processName in $table.tableProcessForMethodNameList)
 
     public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
+        assertEntityNotNull(${myEntityVariableName});
         String processPath = ${glBuriDef}.BuriProcess.${processName}.path();
         Object userData = getUserData_${processName}(${myEntityVariableName}, action);
         _buriAutoSelectProcessor.toNextStatusAction(processPath, ${myEntityVariableName}, userData, action.code());
@@ -676,6 +677,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     }
 
     public ${glBuriDef}.${processName}_Status getStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
         java.util.List<BuriPathData> buriPathDataList = xgetCurrentPathDataList(${myEntityVariableName});
         java.util.List<${glBuriDef}.${processName}_Status> statusList = new java.util.ArrayList<${glBuriDef}.${processName}_Status>();
         if (buriPathDataList.isEmpty()) { return null; }
