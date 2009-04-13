@@ -139,6 +139,6 @@ public class ${glBuriDef} {
 #end
 
     public static interface BuriUserDataProvider {
-        Object provide(String processPath, Entity entity, BuriAction action);
+        Object provide(BuriProcess process, Entity entity, BuriAction action);
     }
 }
