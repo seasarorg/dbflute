@@ -47,7 +47,6 @@ public class ${glBuriDef} {
         String code();
         BuriProcess process();
     }
-
 #foreach ($packageName in $database.getBuriPackageList())
 #set ($count = 0)
 #set ($processList = $database.getBuriProcessList($packageName))

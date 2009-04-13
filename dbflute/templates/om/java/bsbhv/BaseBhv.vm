@@ -671,7 +671,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     }
 
     protected Object getUserData_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
-        return _buriUserDataProvider != null ? _buriUserDataProvider.provide(${glBuriDef}.BuriProcess.${processName}, ${myEntityVariableName}, action) : null;
+        if (_buriUserDataProvider == null) { return null; }
+        return _buriUserDataProvider.provide(${glBuriDef}.BuriProcess.${processName}, ${myEntityVariableName}, action);
     }
 
     public ${glBuriDef}.${processName}_Status getStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
