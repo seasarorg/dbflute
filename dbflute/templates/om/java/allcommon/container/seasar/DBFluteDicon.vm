@@ -11,7 +11,7 @@
     <include path="${includePath}"/>
 #end
 #if ($database.isUseBuri())
-    <include path="buri/dicon/buriSimple.dicon"/>
+    <include path="buri/dicon/buriBase.dicon"/>
 #end
 
     <!-- The components of DBFlute Runtime. -->

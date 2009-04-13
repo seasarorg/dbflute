@@ -653,14 +653,25 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         return selectList(cb);
     }
 
-    protected org.escafe.buri.engine.processor.SimpleBuriProcessor _simpleBuriProcessor;
-    public void setSimpleBuriProcessor(org.escafe.buri.engine.processor.SimpleBuriProcessor simpleBuriProcessor) {
-        _simpleBuriProcessor = simpleBuriProcessor;
+    protected org.escafe.buri.engine.processor.BuriAutoSelectProcessor _buriAutoSelectProcessor;
+    public void setBuriAutoSelectProcessor(org.escafe.buri.engine.processor.BuriAutoSelectProcessor buriAutoSelectProcessor) {
+        _buriAutoSelectProcessor = buriAutoSelectProcessor;
+    }
+
+    protected ${glBuriDef}.BuriUserDataProvider _buriUserDataProvider;
+    public void setBuriUserDataProvider(${glBuriDef}.BuriUserDataProvider buriUserDataProvider) {
+        _buriUserDataProvider = buriUserDataProvider;
     }
 #foreach ($processName in $table.tableProcessForMethodNameList)
 
     public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
-        _simpleBuriProcessor.toNextStatusAction(${glBuriDef}.${processName}_Status.basePath(), ${myEntityVariableName}, action.code());
+        String processPath = ${glBuriDef}.${processName}.path();
+        Object userData = getUserData_${processName}(${myEntityVariableName}, action);
+        _buriAutoSelectProcessor.toNextStatusAction(processPath, ${myEntityVariableName}, userData, action.code());
+    }
+
+    protected Object getUserData_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
+        return _buriUserDataProvider != null ? _buriUserDataProvider.provide(${glBuriDef}.${processName}, ${myEntityVariableName}, action) : null;
     }
 
     public ${glBuriDef}.${processName}_Status getStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
@@ -686,7 +697,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         conditionBeanSetupper.setup(cb);
         java.util.List<String> pathNameList = new java.util.ArrayList<String>();
         for (${glBuriDef}.${processName}_Status status : statuses) {
-            pathNameList.add(status.fullPath());
+            pathNameList.add(status.path());
         }
         cb.query().queryBuriPathData().setPathName_InScope(pathNameList);
         return selectList(cb);

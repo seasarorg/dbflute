@@ -1,20 +1,58 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+
+import org.seasar.dbflute.Entity;
 
 /**
  * The definition of Buri.
  * @author ${database.ClassAuthor}
  */
 public class ${glBuriDef} {
+
+    public static enum BuriProcess {
+#set ($count = 0)
+#foreach ($packageName in $database.getBuriPackageList())
+#set ($processList = $database.getBuriProcessList($packageName))
+#foreach ($processName in $processList)
+#if ($count != 0)
+        ,
+#end
+        ${packageName}_${processName}("${packageName}_${processName}")
+#end
+#end
+        private String _path;
+        private BuriProcess(String path) {
+            _path = path;
+        }
+        public String path() {
+            return _path;
+        }
+        @Override
+        public String toString() {
+            return path();
+        }
+    }
+
+    public static interface BuriStatus {
+        String code();
+        String path();
+        BuriProcess process();
+    }
+
+    public static interface BuriAction {
+        String code();
+        BuriProcess process();
+    }
+
 #foreach ($packageName in $database.getBuriPackageList())
 #set ($count = 0)
 #set ($processList = $database.getBuriProcessList($packageName))
 #foreach ($processName in $processList)
 #set ($statusList = $database.getBuriStatusList($packageName, $processName))
 
-    public enum ${packageName}_${processName}_Status {
+    public enum ${packageName}_${processName}_Status implements BuriStatus {
 #set ($count = 0)
 #foreach ($statusName in $statusList)
 #if ($count != 0)
@@ -33,11 +71,11 @@ public class ${glBuriDef} {
         public String code() {
             return _code;
         }
-        public String fullPath() {
+        public String path() {
             return basePath() + "." + _code;
         }
-        public static String basePath() {
-            return "${packageName}.${processName}";
+        public BuriProcess process() {
+            return BuriProcess.${packageName}_${processName};
         }
         public static ${packageName}_${processName}_Status codeOf(Object code) {
             if (code == null) { return null; }
@@ -51,14 +89,14 @@ public class ${glBuriDef} {
         }
         @Override
         public String toString() {
-            return fullPath();
+            return path();
         }
     }
 #end
 #foreach ($processName in $processList)
 #set ($actionList = $database.getBuriActionList($packageName, $processName))
 
-    public enum ${packageName}_${processName}_Action {
+    public enum ${packageName}_${processName}_Action implements BuriAction {
 #set ($count = 0)
 #foreach ($actionName in $actionList)
 #if ($count != 0)
@@ -77,11 +115,8 @@ public class ${glBuriDef} {
         public String code() {
             return _code;
         }
-        public String fullPath() {
-            return basePath() + "." + _code;
-        }
-        private static String basePath() {
-            return "${packageName}.${processName}";
+        public BuriProcess process() {
+            return BuriProcess.${packageName}_${processName};
         }
         public static ${packageName}_${processName}_Action codeOf(Object code) {
             if (code == null) { return null; }
@@ -95,9 +130,13 @@ public class ${glBuriDef} {
         }
         @Override
         public String toString() {
-            return fullPath();
+            return basePath() + ":" + code();
         }
     }
 #end
 #end
+
+    public static interface BuriUserDataProvider {
+        Object provide(String processPath, Entity entity, BuriAction action);
+    }
 }
