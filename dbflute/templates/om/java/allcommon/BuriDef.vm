@@ -20,8 +20,10 @@ public class ${glBuriDef} {
         ,
 #end
         ${packageName}_${processName}("${packageName}_${processName}")
+#set ($count = $count + 1)
 #end
 #end
+        ;
         private String _path;
         private BuriProcess(String path) {
             _path = path;
@@ -72,7 +74,7 @@ public class ${glBuriDef} {
             return _code;
         }
         public String path() {
-            return basePath() + "." + _code;
+            return process().path() + "." + _code;
         }
         public BuriProcess process() {
             return BuriProcess.${packageName}_${processName};
@@ -130,7 +132,7 @@ public class ${glBuriDef} {
         }
         @Override
         public String toString() {
-            return basePath() + ":" + code();
+            return process().path() + ":" + code();
         }
     }
 #end
