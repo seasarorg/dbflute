@@ -19,7 +19,7 @@ public class ${glBuriDef} {
 #if ($count != 0)
         ,
 #end
-        ${packageName}_${processName}("${packageName}_${processName}")
+        ${packageName}_${processName}("${packageName}.${processName}")
 #set ($count = $count + 1)
 #end
 #end
