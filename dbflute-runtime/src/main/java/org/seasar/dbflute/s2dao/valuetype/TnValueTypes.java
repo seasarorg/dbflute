@@ -31,6 +31,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.jdbc.ValueType;
@@ -55,6 +56,7 @@ import org.seasar.dbflute.s2dao.valuetype.registered.SqlDateType;
 import org.seasar.dbflute.s2dao.valuetype.registered.StringType;
 import org.seasar.dbflute.s2dao.valuetype.registered.TimeType;
 import org.seasar.dbflute.s2dao.valuetype.registered.TimestampType;
+import org.seasar.dbflute.s2dao.valuetype.registered.UUIDType;
 import org.seasar.dbflute.s2dao.valuetype.registered.UserDefineType;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
@@ -84,6 +86,7 @@ public class TnValueTypes {
     public final static ValueType BINARY = new BinaryType();
     public final static ValueType BINARY_STREAM = new BinaryStreamType();
     public final static ValueType BOOLEAN = new BooleanType();
+    public final static ValueType UUID = new UUIDType();
     public final static ValueType OBJECT = new ObjectType();
 
     // Plug-in
@@ -136,6 +139,7 @@ public class TnValueTypes {
         registerValueType(InputStream.class, BINARY_STREAM);
         registerValueType(boolean.class, BOOLEAN);
         registerValueType(Boolean.class, BOOLEAN);
+        registerValueType(UUID.class, UUID);
         // registerValueType(Object.class, OBJECT);
         try {
             isEnumMethod = Class.class.getMethod("isEnum", (Class[]) null);
