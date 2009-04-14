@@ -246,6 +246,10 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     public boolean isOracleStringClob(final String dbTypeName) {
         return isOracle() && "clob".equalsIgnoreCase(dbTypeName);
     }
+    
+    public boolean isUUID(final String dbTypeName) {
+        return "uuid".equalsIgnoreCase(dbTypeName);
+    }
 
     public boolean isPostgreSQLBytesOid(final String dbTypeName) {
         return isPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);

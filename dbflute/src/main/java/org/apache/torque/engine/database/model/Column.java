@@ -1166,14 +1166,6 @@ public class Column {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeStringList());
     }
 
-    public boolean isTorqueTypeClob() {// as Pinpoint
-        return "CLOB".equals(getTorqueType());
-    }
-
-    public boolean isJavaNativeBooleanObject() {
-        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBooleanList());
-    }
-
     public boolean isJavaNativeNumberObject() {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeNumberList());
     }
@@ -1182,38 +1174,12 @@ public class Column {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeDateList());
     }
 
-    public boolean isTorqueTypeDate() {// as Pinpoint
-        return "DATE".equals(getTorqueType());
-    }
-
-    public boolean isTorqueTypeTime() {// as Pinpoint
-        return "TIME".equals(getTorqueType());
-    }
-
-    public boolean isTorqueTypeTimestamp() {// as Pinpoint
-        return "TIMESTAMP".equals(getTorqueType());
+    public boolean isJavaNativeBooleanObject() {
+        return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBooleanList());
     }
 
     public boolean isJavaNativeBinaryObject() {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBinaryList());
-    }
-
-    public boolean isTorqueTypeBlob() {// as Pinpoint
-        return "BLOB".equals(getTorqueType());
-    }
-
-    protected boolean containsAsEndsWith(String str, List<Object> ls) {
-        for (Object current : ls) {
-            final String currentString = (String) current;
-            if (str.endsWith(currentString)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isJavaNativeCSharpNullable() {
-        return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
     }
 
     public boolean isJavaNativeStringClob() {
@@ -1230,6 +1196,52 @@ public class Column {
             return false;
         }
         return new DfColumnHandler().isPostgreSQLBytesOid(dbTypeName);
+    }
+
+    public boolean isJavaNativeUUIDObject() {
+        if (isJavaNativeStringObject() || isJavaNativeNumberObject() || isJavaNativeDateObject()
+                || isJavaNativeBooleanObject() || isJavaNativeBinaryObject()) {
+            return false;
+        }
+        final String dbTypeName = getDbType();
+        if (dbTypeName == null) {
+            return false;
+        }
+        return new DfColumnHandler().isUUID(dbTypeName);
+    }
+
+    public boolean isJavaNativeCSharpNullable() {
+        return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
+    }
+
+    public boolean isTorqueTypeClob() {// as Pinpoint
+        return "CLOB".equals(getTorqueType());
+    }
+
+    public boolean isTorqueTypeDate() {// as Pinpoint
+        return "DATE".equals(getTorqueType());
+    }
+
+    public boolean isTorqueTypeTime() {// as Pinpoint
+        return "TIME".equals(getTorqueType());
+    }
+
+    public boolean isTorqueTypeTimestamp() {// as Pinpoint
+        return "TIMESTAMP".equals(getTorqueType());
+    }
+
+    public boolean isTorqueTypeBlob() {// as Pinpoint
+        return "BLOB".equals(getTorqueType());
+    }
+
+    protected boolean containsAsEndsWith(String str, List<Object> ls) {
+        for (Object current : ls) {
+            final String currentString = (String) current;
+            if (str.endsWith(currentString)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================

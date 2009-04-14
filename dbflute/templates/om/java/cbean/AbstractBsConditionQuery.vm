@@ -739,6 +739,16 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 #end
 #end
+#if (${col.isJavaNativeUUIDObject()})
+
+    /**
+     * Equal(=). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
+     */
+    public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
+    }
+#end
 #if (!${col.isNotNull()} || ${col.isPrimaryKey()})
 
     /**
