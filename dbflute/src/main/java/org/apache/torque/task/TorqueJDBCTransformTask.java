@@ -463,7 +463,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected void throwTableNotFoundException() {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The tables was was Not Found in the schema!" + ln();
+        msg = msg + "A table was NOT FOUND in the schema!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm the database connection settings." + ln();
