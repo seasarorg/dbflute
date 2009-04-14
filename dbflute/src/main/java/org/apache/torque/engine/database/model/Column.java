@@ -1182,6 +1182,18 @@ public class Column {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBinaryList());
     }
 
+    public boolean isJavaNativeUUIDObject() {
+        if (isJavaNativeStringObject() || isJavaNativeNumberObject() || isJavaNativeDateObject()
+                || isJavaNativeBooleanObject() || isJavaNativeBinaryObject()) {
+            return false;
+        }
+        final String dbTypeName = getDbType();
+        if (dbTypeName == null) {
+            return false;
+        }
+        return new DfColumnHandler().isUUID(dbTypeName);
+    }
+
     public boolean isJavaNativeStringClob() {
         final String dbTypeName = getDbType();
         if (dbTypeName == null) {
@@ -1196,18 +1208,6 @@ public class Column {
             return false;
         }
         return new DfColumnHandler().isPostgreSQLBytesOid(dbTypeName);
-    }
-
-    public boolean isJavaNativeUUIDObject() {
-        if (isJavaNativeStringObject() || isJavaNativeNumberObject() || isJavaNativeDateObject()
-                || isJavaNativeBooleanObject() || isJavaNativeBinaryObject()) {
-            return false;
-        }
-        final String dbTypeName = getDbType();
-        if (dbTypeName == null) {
-            return false;
-        }
-        return new DfColumnHandler().isUUID(dbTypeName);
     }
 
     public boolean isJavaNativeCSharpNullable() {

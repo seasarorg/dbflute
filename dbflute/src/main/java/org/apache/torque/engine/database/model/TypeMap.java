@@ -268,7 +268,7 @@ public class TypeMap {
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.DATE), DATE);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIME), TIME);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIMESTAMP), TIMESTAMP);
-        // UUID has not been supported yet on JDBC.
+        // [UUID Headache]: UUID has not been supported yet on JDBC.
         //_jdbcTypeToTorqueTypeMap.put(new Integer(Types.UUID), UUID);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.ARRAY), ARRAY);
 

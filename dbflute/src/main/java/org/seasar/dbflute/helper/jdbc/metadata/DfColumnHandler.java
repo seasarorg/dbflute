@@ -230,13 +230,21 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         } else if (dbTypeName.toLowerCase().contains("clob")) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.CLOB);
             return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("uuid")) {
-            // The reason why UUID type has not been supported yet on JDBC.
+        } else if (getBasicProperties().isTargetLanguageJava() && dbTypeName.toLowerCase().contains("uuid")) {
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+            // This is for Java only because the type has not been checked yet on C#.
+            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+            // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
             return TypeMap.UUID;
         } else {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
             return torqueType;
         }
+    }
+
+    public boolean isUUID(final String dbTypeName) {
+        return "uuid".equalsIgnoreCase(dbTypeName);
     }
 
     public boolean isOracleCompatibleDate(final int jdbcType, final String dbTypeName) {
@@ -245,10 +253,6 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
     public boolean isOracleStringClob(final String dbTypeName) {
         return isOracle() && "clob".equalsIgnoreCase(dbTypeName);
-    }
-    
-    public boolean isUUID(final String dbTypeName) {
-        return "uuid".equalsIgnoreCase(dbTypeName);
     }
 
     public boolean isPostgreSQLBytesOid(final String dbTypeName) {
