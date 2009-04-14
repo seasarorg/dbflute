@@ -230,6 +230,9 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         } else if (dbTypeName.toLowerCase().contains("clob")) {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.CLOB);
             return torqueType;
+        } else if (dbTypeName.toLowerCase().contains("uuid")) {
+            // The reason why UUID type has not been supported yet on JDBC.
+            return TypeMap.UUID;
         } else {
             final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
             return torqueType;

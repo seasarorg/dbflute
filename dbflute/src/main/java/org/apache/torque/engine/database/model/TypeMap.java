@@ -99,9 +99,11 @@ import org.seasar.dbflute.properties.DfBasicProperties;
  * TIME          | java.sql.Time        | DateTime?     |
  * TIMESTAMP     | java.sql.Timestamp   | DateTime?     |
  * ARRAY         | java.lang.String     | String        |
+ * UUID          | java.util.UUID       | (Pending)     |
  * ------------------------------------------------------
  * </pre>
  * ARRAY type is basically unsupported but it's defined for user's extension.
+ * UUID type is supported as special handling.
  * @author Modified by jflute
  */
 public class TypeMap {
@@ -138,6 +140,7 @@ public class TypeMap {
     public static final String TIME = "TIME";
     public static final String TIMESTAMP = "TIMESTAMP";
     public static final String ARRAY = "ARRAY";
+    public static final String UUID = "UUID";
     public static final String BOOLEANCHAR = "BOOLEANCHAR";
     public static final String BOOLEANINT = "BOOLEANINT";
     private static final String[] TEXT_TYPES = { CHAR, VARCHAR, LONGVARCHAR, CLOB, DATE, TIME, TIMESTAMP, BOOLEANCHAR };
@@ -169,6 +172,7 @@ public class TypeMap {
     public static final String TIME_NATIVE_TYPE = "java.sql.Time";
     public static final String TIMESTAMP_NATIVE_TYPE = "java.sql.Timestamp";
     public static final String ARRAY_NATIVE_TYPE = "String";
+    public static final String UUID_NATIVE_TYPE = "java.util.UUID";
     public static final String BOOLEANCHAR_NATIVE_TYPE = "Boolean";
     public static final String BOOLEANINT_NATIVE_TYPE = "Boolean";
 
@@ -237,6 +241,7 @@ public class TypeMap {
         _torqueTypeToJavaNativeMap.put(TIME, initializeJavaNative(TIME, TIME_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(TIMESTAMP, initializeJavaNative(TIMESTAMP, TIMESTAMP_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(ARRAY, initializeJavaNative(ARRAY, ARRAY_NATIVE_TYPE));
+        _torqueTypeToJavaNativeMap.put(UUID, initializeJavaNative(UUID, UUID_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(BOOLEANCHAR, initializeJavaNative(BOOLEANCHAR, BOOLEANCHAR_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(BOOLEANINT, initializeJavaNative(BOOLEANINT, BOOLEANINT_NATIVE_TYPE));
 
@@ -263,6 +268,8 @@ public class TypeMap {
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.DATE), DATE);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIME), TIME);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.TIMESTAMP), TIMESTAMP);
+        // UUID has not been supported yet on JDBC.
+        //_jdbcTypeToTorqueTypeMap.put(new Integer(Types.UUID), UUID);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.ARRAY), ARRAY);
 
         _torqueTypeToJdbcTypeMap = new Hashtable<String, Integer>();
