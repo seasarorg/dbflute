@@ -112,7 +112,7 @@ public abstract class DfAbsractDataWriter {
         }
         return true;
     }
-    
+
     protected boolean isNullValue(Object value) {
         return value == null;
     }
@@ -347,6 +347,38 @@ public abstract class DfAbsractDataWriter {
         }
     }
 
+    // -----------------------------------------------------
+    //                                                  UUID
+    //                                                  ----
+    protected boolean processUUID(String columnName, String value, PreparedStatement ps, int bindCount,
+            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo != null) {
+            if (columnMetaInfo.getJdbcType() != Types.OTHER || !"uuid".equalsIgnoreCase(columnMetaInfo.getDbTypeName())) {
+                return false;
+            }
+
+            // This is resolved only when the information of column meta exists.
+            // If the information of column meta is null,do nothing here!
+            // And basically this is for PostgreSQL.
+            value = filterUUIDValue(value);
+            ps.setObject(bindCount, value, Types.OTHER);
+            return true;
+        }
+        return false;
+    }
+
+    protected String filterUUIDValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        value = value.trim();
+        return value;
+    }
+
+    // -----------------------------------------------------
+    //                                           Type Helper
+    //                                           -----------
     /**
      * @param columnMetaInfo The meta information of column. (NotNull)
      * @return The type of column. (Nullable: However Basically NotNull)

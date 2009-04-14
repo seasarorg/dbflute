@@ -218,6 +218,14 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                                 continue;
                             }
 
+                            // - - - - - - - - - - - - - - 
+                            // Against UUID Headache
+                            // - - - - - - - - - - - - - -
+                            if (processUUID(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
+                            }
+
                             ps.setString(bindCount, value);
                             bindCount++;
                         }
