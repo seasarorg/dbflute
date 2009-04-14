@@ -94,6 +94,10 @@ public class ${myClassName} {
 #if ($col.isJavaNativeBinaryObject())
         return (${col.javaNative})extractValueAsObject("${col.name}");
 #end
+#if ($col.isJavaNativeUUIDObject())
+        String string = extractValueAsString("${col.name}");
+        return string != null ? (${col.javaNative})java.util.UUID.fromString(string) : null;
+#end
     }
 
 #end
