@@ -13,6 +13,7 @@
 	<property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
 
 	<property name="dbflute.dist" value="dist"/>
+	<property name="dbflute.templates" value="templates"/>
 	<property name="dbflute.jar.file" value="dbflute.jar"/>
 	<property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
 	<property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
@@ -185,13 +186,18 @@
 	  		  tofile="${dbflute.www.download.dir}/dbflute/dbflute-${internal.version}.zip">
 	  	</copy>
 	</target>
+
+	<target name="adjust">
+		<fixcrlf srcdir="${dbflute.templates}" eol="crlf" encoding="UTF-8" />
+		<fixcrlf srcdir="${dbflute.templates}/om/csharp" eol="crlf" encoding="UTF-8" />
+	</target>
 	
 	<target name="expand-dist">
 	  	<delete dir="${dbflute.deploy.dir}"/>
 	  	<unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
 	  	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
 	</target>
-	
+
 	<!-- ============================================================================= -->
 	<!--                                             R E F L E C T I O N  F O R  M A C -->
 	<!--                                             ================================= -->
