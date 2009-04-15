@@ -86,9 +86,15 @@ public class ${myClassName} extends AbstractConditionBean {
             }
         }
 #else
+#if (${col.isJavaNativeUUIDObject()})
+                query().set${col.javaName}_Equal(java.util.UUID.fromString((String)obj));
+            }
+        }
+#else
                 query().set${col.javaName}_Equal(new ${col.javaNative}((String)obj));
             }
         }
+#end
 #end
 #end
 #end
