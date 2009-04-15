@@ -226,6 +226,14 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                                 continue;
                             }
 
+                            // - - - - - - - - - - - - - - 
+                            // Against Array Headache
+                            // - - - - - - - - - - - - - -
+                            if (processArray(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                                bindCount++;
+                                continue;
+                            }
+
                             ps.setString(bindCount, value);
                             bindCount++;
                         }

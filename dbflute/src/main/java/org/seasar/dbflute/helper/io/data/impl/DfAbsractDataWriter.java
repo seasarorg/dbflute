@@ -377,6 +377,38 @@ public abstract class DfAbsractDataWriter {
     }
 
     // -----------------------------------------------------
+    //                                    ARRAY (PostgreSQL)
+    //                                    ------------------
+    protected boolean processArray(String columnName, String value, PreparedStatement ps, int bindCount,
+            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo != null) {
+            // rsMeta#getColumnTypeName() returns value starts with "_" if
+            // rsMeta#getColumnType() returns Types.ARRAY in PostgreSQL.
+            //   e.g. UUID[] -> _uuid
+            if (columnMetaInfo.getJdbcType() != Types.ARRAY || !columnMetaInfo.getDbTypeName().startsWith("_")) {
+                return false;
+            }
+
+            // This is resolved only when the information of column meta exists.
+            // If the information of column meta is null,do nothing here!
+            // And basically this is for PostgreSQL.
+            value = filterArrayValue(value);
+            ps.setObject(bindCount, value, Types.OTHER);
+            return true;
+        }
+        return false;
+    }
+
+    protected String filterArrayValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        value = value.trim();
+        return value;
+    }
+
+    // -----------------------------------------------------
     //                                           Type Helper
     //                                           -----------
     /**
