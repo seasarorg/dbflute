@@ -188,7 +188,9 @@
 	</target>
 
 	<target name="adjust">
-		<fixcrlf srcdir="${dbflute.templates}" eol="crlf" encoding="UTF-8" />
+		<fixcrlf srcdir="${dbflute.templates}" eol="crlf" encoding="UTF-8">
+			<exclude name="**/*.vmnet"/>	
+		</fixcrlf>
 		<fixcrlf srcdir="${dbflute.templates}/om/csharp" eol="crlf" encoding="UTF-8" />
 	</target>
 	
