@@ -748,6 +748,16 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
     }
+#if (${col.isAvailableStringInScope()})
+
+    /**
+     * InScope(in ('a', 'b')). And NullOrEmptyIgnored, NullOrEmptyElementIgnored, SeveralRegistered.
+     * @param ${tmpUncapitalisedJavaName}List The collection of ${col.uncapitalisedJavaName} as inScope.
+     */
+    public void set${tmpJavaName}_InScope(Collection<${col.javaNative}> ${tmpUncapitalisedJavaName}List) {
+        regINS(CK_INS, cTL(${tmpUncapitalisedJavaName}List), getCValue${tmpJavaName}(), "${col.name}");
+    }
+#end
 #end
 #if (!${col.isNotNull()} || ${col.isPrimaryKey()})
 
