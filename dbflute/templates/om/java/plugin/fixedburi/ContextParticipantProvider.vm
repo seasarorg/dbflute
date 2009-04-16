@@ -1,0 +1,31 @@
+${database.allClassCopyright}package ${glPackageFixedBuri};
+
+import java.util.List;
+import java.util.ArrayList;
+
+import org.escafe.buri.engine.IdentityInfo;
+import org.escafe.buri.engine.ParticipantProvider;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glContextParticipantProvider} implements ParticipantProvider {
+
+    public Object getUserData(IdentityInfo identityInfo) {
+        return identityInfo;
+    }
+
+    public IdentityInfo getUserId(Object userData) {
+        return (IdentityInfo) userData;
+    }
+
+    public boolean hasAuthority(ParticipantContext context) {
+        return true;
+    }
+
+    public List<IdentityInfo> getAuthorizedUserIds(ParticipantContext context) {
+        List<IdentityInfo> result = new ArrayList<IdentityInfo>();
+        result.add(context.getUserId());
+        return result;
+    }
+}
