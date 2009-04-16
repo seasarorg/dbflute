@@ -26,7 +26,11 @@ import org.seasar.dbflute.dbmeta.hierarchy.HierarchyBasicRequest;
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchyRequest;
 #end
 import org.seasar.dbflute.jdbc.StatementConfig;
-import ${glPackageBaseCommon}.*;
+import ${glPackageBaseCommon}.${glDBCurrent};
+import ${glPackageBaseCommon}.${glDBFluteConfig};
+#if ($table.isBuriTarget())
+import ${glPackagePluginBuri}.${glBuriDef};
+#end
 #if (${table.hasOnlyOnePrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
 #end

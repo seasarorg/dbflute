@@ -1,9 +1,8 @@
-${database.allClassCopyright}package ${glPackageAdaptedBuri};
+${database.allClassCopyright}package ${glPackagePluginBuri};
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.AccessContext;
 import org.escafe.buri.engine.IdentityInfo;
-import ${glPackageBaseCommon}.${glBuriDef};
 
 /**
  * @author ${database.ClassAuthor}

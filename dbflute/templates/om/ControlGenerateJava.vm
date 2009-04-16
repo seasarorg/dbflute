@@ -70,7 +70,6 @@ targetdatabase = $targetDatabase
     ##                                               -------
     ## [AllCommon]
     #set ($glAccessContext = "${glProjectPrefix}AccessContext")
-    #set ($glBuriDef = "${glProjectPrefix}BuriDef")
     #set ($glCDef = "${glProjectPrefix}CDef")
     #set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
     #set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
@@ -85,12 +84,13 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                               Plug-in
     ##                                               -------
-    ## [AdaptedBuri]
-    #set ($glBehaviorToDataAccessRule = "${glProjectPrefix}BehaviorToDataAccessRule")
-    #set ($glFixedBuriDataAccessScriptFactoryImpl = "${glProjectPrefix}FixedBuriDataAccessScriptFactoryImpl")
-    #set ($glFixedScriptDataAccessUtilKeyImpl = "${glProjectPrefix}FixedScriptDataAccessUtilKeyImpl")
+    ## [Buri]
     #set ($glBasicParticipantProvider = "${glProjectPrefix}BasicParticipantProvider")
     #set ($glBasicBuriUserDataProvider = "${glProjectPrefix}BasicBuriUserDataProvider")
+    #set ($glBehaviorToDataAccessRule = "${glProjectPrefix}BehaviorToDataAccessRule")
+    #set ($glBuriDef = "${glProjectPrefix}BuriDef")
+    #set ($glFixedBuriDataAccessScriptFactoryImpl = "${glProjectPrefix}FixedBuriDataAccessScriptFactoryImpl")
+    #set ($glFixedScriptDataAccessUtilKeyImpl = "${glProjectPrefix}FixedScriptDataAccessUtilKeyImpl")
 
     ## ===================================================================================
     ##                                                                            Variable
@@ -130,8 +130,8 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                               Plug-in
     ##                                               -------
-    ## [AdaptedBuri]
-    #set ($glPackageAdaptedBuri = "${database.baseCommonPackage}.plugin.adaptedburi")
+    ## [Buri]
+    #set ($glPackagePluginBuri = "${database.baseCommonPackage}.plugin.buri")
 
     ## *****************************************************************************************************************
     ##                                                                                                           Parsing
@@ -143,12 +143,6 @@ targetdatabase = $targetDatabase
 
     #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
     $database.makeDirectory($path)
-
-    #if ($database.isUseBuri())
-      $database.info("    parse('BuriDef');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glBuriDef}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/allcommon/BuriDef.${glTemplateFileExtension}",$path ,"" ,"")
-    #end
 
     #if ($database.hasClassificationDefinitionMap())
       $database.info("    parse('CDef');")
@@ -198,33 +192,37 @@ targetdatabase = $targetDatabase
     ##                                                                             Plug-in
     ##                                                                             =======
     ## -----------------------------------------------------
-    ##                                           AdaptedBuri
-    ##                                           -----------
+    ##                                                  Buri
+    ##                                                  ----
     #if ($database.isUseBuri())
-      $database.info("public void parseAdaptedBuri() {")
+      $database.info("public void parseBuri() {")
 
-      #set ($path = $database.getPackageAsPath(${glPackageAdaptedBuri}))
+      #set ($path = $database.getPackageAsPath(${glPackagePluginBuri}))
       $database.makeDirectory($path)
 
       $database.info("    parse('BasicBuriUserDataProvider');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageAdaptedBuri})}${glBasicBuriUserDataProvider}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/adaptedburi/BasicBuriUserDataProvider.${glTemplateFileExtension}",$path ,"" ,"")
+      #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glBasicBuriUserDataProvider}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/buri/BasicBuriUserDataProvider.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("    parse('BasicParticipantProvider');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageAdaptedBuri})}${glBasicParticipantProvider}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/adaptedburi/BasicParticipantProvider.${glTemplateFileExtension}",$path ,"" ,"")
+      #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glBasicParticipantProvider}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/buri/BasicParticipantProvider.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("    parse('BehaviorToDataAccessRule');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageAdaptedBuri})}${glBehaviorToDataAccessRule}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/adaptedburi/BehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
+      #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glBehaviorToDataAccessRule}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/buri/BehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.info("    parse('BuriDef');")
+      #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glBuriDef}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/buri/BuriDef.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("    parse('FixedBuriDataAccessScriptFactoryImpl');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageAdaptedBuri})}${glFixedBuriDataAccessScriptFactoryImpl}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/adaptedburi/FixedBuriDataAccessScriptFactoryImpl.${glTemplateFileExtension}",$path ,"" ,"")
+      #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glFixedBuriDataAccessScriptFactoryImpl}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/buri/FixedBuriDataAccessScriptFactoryImpl.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("    parse('FixedScriptDataAccessUtilKeyImpl');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageAdaptedBuri})}${glFixedScriptDataAccessUtilKeyImpl}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/adaptedburi/FixedScriptDataAccessUtilKeyImpl.${glTemplateFileExtension}",$path ,"" ,"")
+      #set ( $path = "${database.getPackageAsPath(${glPackagePluginBuri})}${glFixedScriptDataAccessUtilKeyImpl}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/buri/FixedScriptDataAccessUtilKeyImpl.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("}")
     #end
