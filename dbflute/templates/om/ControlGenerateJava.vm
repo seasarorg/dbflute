@@ -89,8 +89,8 @@ targetdatabase = $targetDatabase
     #set ($glBehaviorToDataAccessRule = "${glProjectPrefix}BehaviorToDataAccessRule")
     #set ($glFixedBuriDataAccessScriptFactoryImpl = "${glProjectPrefix}FixedBuriDataAccessScriptFactoryImpl")
     #set ($glFixedScriptDataAccessUtilKeyImpl = "${glProjectPrefix}FixedScriptDataAccessUtilKeyImpl")
-    #set ($glContextParticipantProvider = "${glProjectPrefix}ContextParticipantProvider")
-    #set ($glContextBuriUserDataProvider = "${glProjectPrefix}ContextBuriUserDataProvider")
+    #set ($glAccessContextParticipantProvider = "${glProjectPrefix}AccessContextParticipantProvider")
+    #set ($glAccessContextBuriUserDataProvider = "${glProjectPrefix}AccessContextBuriUserDataProvider")
 
     ## ===================================================================================
     ##                                                                            Variable

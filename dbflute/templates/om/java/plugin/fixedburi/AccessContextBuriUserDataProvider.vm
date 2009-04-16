@@ -8,7 +8,7 @@ import ${glPackageBaseCommon}.*;
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glContextBuriUserDataProvider} implements ${BuriDef}.BuriUserDataProvider {
+public class ${glAccessContextBuriUserDataProvider} implements ${BuriDef}.BuriUserDataProvider {
 
     public Object provide(${BuriDef}.BuriProcess process, Entity entity, ${BuriDef}.BuriAction action) {
         IdentityInfo identityInfo = new IdentityInfo();

@@ -1,0 +1,57 @@
+${database.allClassCopyright}package ${glPackageFixedBuri};
+
+import java.util.List;
+import java.util.ArrayList;
+
+import org.escafe.buri.engine.IdentityInfo;
+import org.escafe.buri.engine.ParticipantProvider;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glAccessContextParticipantProvider} implements ParticipantProvider {
+
+    // ===================================================================================
+    //                                                                User Data Conversion
+    //                                                                ====================
+    /**
+     * @param appUserId The user identity information of application. (Nullable)
+     * @return The user data. (Nullable)
+     */
+    public Object getUserData(IdentityInfo identityInfo) {
+        return identityInfo;
+    }
+
+    /**
+     * @param userData The user data. (Nullable)
+     * @return The user identity information of application. (Nullable)
+     */
+    public IdentityInfo getUserId(Object userData) {
+        return (IdentityInfo) userData;
+    }
+
+    // ===================================================================================
+    //                                                                      Authentication
+    //                                                                      ==============
+    /**
+     * Does the current user have an authority of execution about target data? <br />
+     * This method is called when it executes action to target data.
+     * @param context The context of participant that provides current informations. (NotNull)
+     * @return Determination.
+     */
+    public boolean hasAuthority(ParticipantContext context) {
+        return true;
+    }
+
+    /**
+     * Get the authorized user IDs for target data. <br />
+     * This method is called when the status of target data changes.
+     * @param context The context of participant that provides current informations. (NotNull)
+     * @return The list of user identity Information. (NotNull)
+     */
+    public List<IdentityInfo> getAuthorizedUserIds(ParticipantContext context) {
+        List<IdentityInfo> result = new ArrayList<IdentityInfo>();
+        result.add(context.getUserId());
+        return result;
+    }
+}
