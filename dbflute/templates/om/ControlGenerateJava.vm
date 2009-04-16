@@ -184,6 +184,9 @@ targetdatabase = $targetDatabase
     #if ($database.isUseBuri())
       $database.info("public void parseFixedBuri() {")
 
+      #set ($path = $database.getPackageAsPath(${glPackageFixedBuri}))
+      $database.makeDirectory($path)
+
       $database.info("    parse('DBFluteBehaviorToDataAccessRule');")
       #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glDBFluteBehaviorToDataAccessRule}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/other/fixedburi/DBFluteBehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
