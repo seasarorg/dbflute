@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.escafe.buri.engine.IdentityInfo;
+import org.escafe.buri.engine.ParticipantContext;
 import org.escafe.buri.engine.ParticipantProvider;
 
 /**
