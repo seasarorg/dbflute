@@ -1,4 +1,4 @@
-${database.allClassCopyright}package ${glPackageFixedBuri};
+${database.allClassCopyright}package ${glPackageAdaptedBuri};
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.AccessContext;

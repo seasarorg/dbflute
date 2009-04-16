@@ -1,4 +1,4 @@
-${database.allClassCopyright}package ${glPackageFixedBuri};
+${database.allClassCopyright}package ${glPackageAdaptedBuri};
 
 import org.apache.commons.beanutils.converters.LongConverter;
 import org.escafe.buri.dataaccess.impl.ScriptDataAccessUtilLongKeyImpl;

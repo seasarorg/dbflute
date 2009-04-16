@@ -85,7 +85,7 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                               Plug-in
     ##                                               -------
-    ## [FixedBuri]
+    ## [AdaptedBuri]
     #set ($glBehaviorToDataAccessRule = "${glProjectPrefix}BehaviorToDataAccessRule")
     #set ($glFixedBuriDataAccessScriptFactoryImpl = "${glProjectPrefix}FixedBuriDataAccessScriptFactoryImpl")
     #set ($glFixedScriptDataAccessUtilKeyImpl = "${glProjectPrefix}FixedScriptDataAccessUtilKeyImpl")
@@ -130,8 +130,8 @@ targetdatabase = $targetDatabase
     ## -----------------------------------------------------
     ##                                               Plug-in
     ##                                               -------
-    ## [FixedBuri]
-    #set ($glPackageFixedBuri = "${database.baseCommonPackage}.plugin.fixedburi")
+    ## [AdaptedBuri]
+    #set ($glPackageAdaptedBuri = "${database.baseCommonPackage}.plugin.adaptedburi")
 
     ## *****************************************************************************************************************
     ##                                                                                                           Parsing
@@ -198,25 +198,33 @@ targetdatabase = $targetDatabase
     ##                                                                             Plug-in
     ##                                                                             =======
     ## -----------------------------------------------------
-    ##                                             FixedBuri
-    ##                                             ---------
+    ##                                           AdaptedBuri
+    ##                                           -----------
     #if ($database.isUseBuri())
-      $database.info("public void parseFixedBuri() {")
+      $database.info("public void parseAdaptedBuri() {")
 
-      #set ($path = $database.getPackageAsPath(${glPackageFixedBuri}))
+      #set ($path = $database.getPackageAsPath(${glPackageAdaptedBuri}))
       $database.makeDirectory($path)
 
+      $database.info("    parse('AccessContextBuriUserDataProvider');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageAdaptedBuri})}${glAccessContextBuriUserDataProvider}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/adaptedburi/AccessContextBuriUserDataProvider.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.info("    parse('AccessContextParticipantProvider');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageAdaptedBuri})}${glAccessContextParticipantProvider}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/adaptedburi/AccessContextParticipantProvider.${glTemplateFileExtension}",$path ,"" ,"")
+
       $database.info("    parse('BehaviorToDataAccessRule');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glBehaviorToDataAccessRule}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/BehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
+      #set ( $path = "${database.getPackageAsPath(${glPackageAdaptedBuri})}${glBehaviorToDataAccessRule}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/adaptedburi/BehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("    parse('FixedBuriDataAccessScriptFactoryImpl');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glFixedBuriDataAccessScriptFactoryImpl}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/FixedBuriDataAccessScriptFactoryImpl.${glTemplateFileExtension}",$path ,"" ,"")
+      #set ( $path = "${database.getPackageAsPath(${glPackageAdaptedBuri})}${glFixedBuriDataAccessScriptFactoryImpl}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/adaptedburi/FixedBuriDataAccessScriptFactoryImpl.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("    parse('FixedScriptDataAccessUtilKeyImpl');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glFixedScriptDataAccessUtilKeyImpl}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/FixedScriptDataAccessUtilKeyImpl.${glTemplateFileExtension}",$path ,"" ,"")
+      #set ( $path = "${database.getPackageAsPath(${glPackageAdaptedBuri})}${glFixedScriptDataAccessUtilKeyImpl}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/adaptedburi/FixedScriptDataAccessUtilKeyImpl.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("}")
     #end
