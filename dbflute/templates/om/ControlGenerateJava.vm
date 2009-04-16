@@ -79,7 +79,7 @@ targetdatabase = $targetDatabase
     #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
     #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
 
-    ## [FixedBuri]
+    ## [Plugin.FixedBuri]
     #set ($glDBFluteBehaviorToDataAccessRule = "${glProjectPrefix}DBFluteBehaviorToDataAccessRule")
 
     ## ===================================================================================
@@ -94,6 +94,9 @@ targetdatabase = $targetDatabase
     ## ===================================================================================
     ##                                                                             Package
     ##                                                                             =======
+    ## -----------------------------------------------------
+    ##                                               Regular
+    ##                                               -------
     #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
     #set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
     #set ($glPackageBaseDao = "${database.baseDaoPackage}" )
@@ -114,8 +117,11 @@ targetdatabase = $targetDatabase
     #set ($glPackageBaseDBMeta = "${glPackageBaseEntity}.dbmeta")
     #set ($glPackageBaseCustomizeDBMeta = "${glPackageBaseCustomizeEntity}.dbmeta")
 
+    ## -----------------------------------------------------
+    ##                                               Plug-in
+    ##                                               -------
     ## [FixedBuri]
-    #set ($glPackageFixedBuri = "${database.packageBase}.fixedburi")
+    #set ($glPackageFixedBuri = "${database.baseCommonPackage}.plugin.fixedburi")
 
     ## *****************************************************************************************************************
     ##                                                                                                           Parsing
@@ -179,8 +185,11 @@ targetdatabase = $targetDatabase
     $database.info("}")
 
     ## ===================================================================================
-    ##                                                                           FixedBuri
-    ##                                                                           =========
+    ##                                                                             Plug-in
+    ##                                                                             =======
+    ## -----------------------------------------------------
+    ##                                             FixedBuri
+    ##                                             ---------
     #if ($database.isUseBuri())
       $database.info("public void parseFixedBuri() {")
 
@@ -189,7 +198,7 @@ targetdatabase = $targetDatabase
 
       $database.info("    parse('DBFluteBehaviorToDataAccessRule');")
       #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glDBFluteBehaviorToDataAccessRule}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/other/fixedburi/DBFluteBehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
+      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/DBFluteBehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("}")
     #end
