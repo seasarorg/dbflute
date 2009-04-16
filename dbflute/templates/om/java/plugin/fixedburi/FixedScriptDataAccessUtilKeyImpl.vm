@@ -10,7 +10,7 @@ import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glDBFluteScriptDataAccessUtilKeyImpl} extends ScriptDataAccessUtilLongKeyImpl {
+public class ${glFixedScriptDataAccessUtilKeyImpl} extends ScriptDataAccessUtilLongKeyImpl {
 
     // ===================================================================================
     //                                                                          Definition
@@ -20,7 +20,7 @@ public class ${glDBFluteScriptDataAccessUtilKeyImpl} extends ScriptDataAccessUti
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ${glDBFluteScriptDataAccessUtilKeyImpl}(BuriDataFieldType fieldType) {
+    public ${glFixedScriptDataAccessUtilKeyImpl}(BuriDataFieldType fieldType) {
         super(fieldType);
     }
 

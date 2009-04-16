@@ -1,0 +1,18 @@
+${database.allClassCopyright}package ${glPackageFixedBuri};
+
+import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.AccessContext;
+import org.escafe.buri.engine.IdentityInfo;
+import ${glPackageBaseCommon}.*;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glContextBuriUserDataProvider} implements ${BuriDef}.BuriUserDataProvider {
+
+    public Object provide(${BuriDef}.BuriProcess process, Entity entity, ${BuriDef}.BuriAction action) {
+        IdentityInfo identityInfo = new IdentityInfo();
+        identityInfo.setIdString(AccessContext.getAccessContextOnThread().getAccessUser());
+        return identityInfo;
+    }
+}

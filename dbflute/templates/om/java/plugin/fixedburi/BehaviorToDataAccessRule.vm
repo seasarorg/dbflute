@@ -22,7 +22,7 @@ import org.seasar.framework.container.S2Container;
  * It is precondition that the entity of DBFlute is not enhanced.
  * @author ${database.ClassAuthor}
  */
-public class ${glDBFluteBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule {
+public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule {
 
     // ===================================================================================
     //                                                                          Definition

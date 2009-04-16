@@ -14,7 +14,7 @@ import org.seasar.coffee.script.ScriptFactory;
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glDBFluteBuriDataAccessScriptFactoryImpl} extends BuriDataAccessFactoryImpl {
+public class ${glFixedBuriDataAccessScriptFactoryImpl} extends BuriDataAccessFactoryImpl {
 
     // ===================================================================================
     //                                                                           Attribute

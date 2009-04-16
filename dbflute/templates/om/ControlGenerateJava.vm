@@ -86,9 +86,11 @@ targetdatabase = $targetDatabase
     ##                                               Plug-in
     ##                                               -------
     ## [FixedBuri]
-    #set ($glDBFluteBehaviorToDataAccessRule = "${glProjectPrefix}DBFluteBehaviorToDataAccessRule")
-    #set ($glDBFluteBuriDataAccessScriptFactoryImpl = "${glProjectPrefix}DBFluteBuriDataAccessScriptFactoryImpl")
-    #set ($glDBFluteScriptDataAccessUtilKeyImpl = "${glProjectPrefix}DBFluteScriptDataAccessUtilKeyImpl")
+    #set ($glBehaviorToDataAccessRule = "${glProjectPrefix}BehaviorToDataAccessRule")
+    #set ($glFixedBuriDataAccessScriptFactoryImpl = "${glProjectPrefix}FixedBuriDataAccessScriptFactoryImpl")
+    #set ($glFixedScriptDataAccessUtilKeyImpl = "${glProjectPrefix}FixedScriptDataAccessUtilKeyImpl")
+    #set ($glContextParticipantProvider = "${glProjectPrefix}ContextParticipantProvider")
+    #set ($glContextBuriUserDataProvider = "${glProjectPrefix}ContextBuriUserDataProvider")
 
     ## ===================================================================================
     ##                                                                            Variable
@@ -204,17 +206,17 @@ targetdatabase = $targetDatabase
       #set ($path = $database.getPackageAsPath(${glPackageFixedBuri}))
       $database.makeDirectory($path)
 
-      $database.info("    parse('DBFluteBehaviorToDataAccessRule');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glDBFluteBehaviorToDataAccessRule}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/DBFluteBehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
+      $database.info("    parse('BehaviorToDataAccessRule');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glBehaviorToDataAccessRule}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/BehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.info("    parse('DBFluteBuriDataAccessScriptFactoryImpl');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glDBFluteBuriDataAccessScriptFactoryImpl}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/DBFluteBuriDataAccessScriptFactoryImpl.${glTemplateFileExtension}",$path ,"" ,"")
+      $database.info("    parse('FixedBuriDataAccessScriptFactoryImpl');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glFixedBuriDataAccessScriptFactoryImpl}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/FixedBuriDataAccessScriptFactoryImpl.${glTemplateFileExtension}",$path ,"" ,"")
 
-      $database.info("    parse('DBFluteScriptDataAccessUtilKeyImpl');")
-      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glDBFluteScriptDataAccessUtilKeyImpl}.${glClassFileExtension}" )
-      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/DBFluteScriptDataAccessUtilKeyImpl.${glTemplateFileExtension}",$path ,"" ,"")
+      $database.info("    parse('FixedScriptDataAccessUtilKeyImpl');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glFixedScriptDataAccessUtilKeyImpl}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/FixedScriptDataAccessUtilKeyImpl.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("}")
     #end
@@ -222,7 +224,7 @@ targetdatabase = $targetDatabase
     ## ===================================================================================
     ##                                                                     ContainerConfig
     ##                                                                     ===============
-    $database.info("parseContainerConfig() {")
+    $database.info("public void parseContainerConfig() {")
     #if ($database.isTargetContainerSeasar())
       #if ($database.isAvailableHotDeploy())
         #set ($glBehaviorCreator = "${glProjectPrefix}BehaviorCreator")
