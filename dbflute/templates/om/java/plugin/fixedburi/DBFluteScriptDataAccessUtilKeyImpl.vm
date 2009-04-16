@@ -1,0 +1,43 @@
+${database.allClassCopyright}package ${glPackageFixedBuri};
+
+import org.apache.commons.beanutils.converters.LongConverter;
+import org.escafe.buri.dataaccess.impl.ScriptDataAccessUtilLongKeyImpl;
+import org.escafe.buri.oouo.internal.structure.BuriDataFieldType;
+import org.seasar.dbflute.s2dao.beans.TnBeanDesc;
+import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
+import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+
+/**
+ * @author ${database.ClassAuthor}
+ */
+public class ${glDBFluteScriptDataAccessUtilKeyImpl} extends ScriptDataAccessUtilLongKeyImpl {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final LongConverter _converter = new LongConverter(new Long(0));
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${glDBFluteScriptDataAccessUtilKeyImpl}(BuriDataFieldType fieldType) {
+        super(fieldType);
+    }
+
+    // ===================================================================================
+    //                                                                            Override
+    //                                                                            ========
+    /**
+     * Override for allowing not Long type.
+     * @param target The target entity. (NotNull)
+     * @param prop The property of primary key. (NotNull)
+     * @return The The value of primary key as Long type. (NotNull)
+     */
+    @Override
+    protected Long getLongPkey(Object target, String prop) {
+        TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(target.getClass());
+        TnPropertyDesc pkeyPropertyDesc = beanDesc.getPropertyDesc(prop);
+        Object result = pkeyPropertyDesc.getValue(target);
+        return (Long) _converter.convert(Long.class, result);
+    }
+}

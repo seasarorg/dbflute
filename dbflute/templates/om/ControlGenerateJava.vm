@@ -65,7 +65,10 @@ targetdatabase = $targetDatabase
     ## ===================================================================================
     ##                                                                          Class Name
     ##                                                                          ==========
-    ## [Allcommon]
+    ## -----------------------------------------------------
+    ##                                               Regular
+    ##                                               -------
+    ## [AllCommon]
     #set ($glAccessContext = "${glProjectPrefix}AccessContext")
     #set ($glBuriDef = "${glProjectPrefix}BuriDef")
     #set ($glCDef = "${glProjectPrefix}CDef")
@@ -79,8 +82,13 @@ targetdatabase = $targetDatabase
     #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
     #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
 
-    ## [Plugin.FixedBuri]
+    ## -----------------------------------------------------
+    ##                                               Plug-in
+    ##                                               -------
+    ## [FixedBuri]
     #set ($glDBFluteBehaviorToDataAccessRule = "${glProjectPrefix}DBFluteBehaviorToDataAccessRule")
+    #set ($glDBFluteBuriDataAccessScriptFactoryImpl = "${glProjectPrefix}DBFluteBuriDataAccessScriptFactoryImpl")
+    #set ($glDBFluteScriptDataAccessUtilKeyImpl = "${glProjectPrefix}DBFluteScriptDataAccessUtilKeyImpl")
 
     ## ===================================================================================
     ##                                                                            Variable
@@ -199,6 +207,14 @@ targetdatabase = $targetDatabase
       $database.info("    parse('DBFluteBehaviorToDataAccessRule');")
       #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glDBFluteBehaviorToDataAccessRule}.${glClassFileExtension}" )
       $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/DBFluteBehaviorToDataAccessRule.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.info("    parse('DBFluteBuriDataAccessScriptFactoryImpl');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glDBFluteBuriDataAccessScriptFactoryImpl}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/DBFluteBuriDataAccessScriptFactoryImpl.${glTemplateFileExtension}",$path ,"" ,"")
+
+      $database.info("    parse('DBFluteScriptDataAccessUtilKeyImpl');")
+      #set ( $path = "${database.getPackageAsPath(${glPackageFixedBuri})}${glDBFluteScriptDataAccessUtilKeyImpl}.${glClassFileExtension}" )
+      $generator.parse("om/${glResourceDirectory}/plugin/fixedburi/DBFluteScriptDataAccessUtilKeyImpl.${glTemplateFileExtension}",$path ,"" ,"")
 
       $database.info("}")
     #end
