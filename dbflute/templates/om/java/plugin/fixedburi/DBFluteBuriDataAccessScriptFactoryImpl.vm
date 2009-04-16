@@ -44,7 +44,7 @@ public class ${glDBFluteBuriDataAccessScriptFactoryImpl} extends BuriDataAccessF
     }
 
     protected ScriptDataAccessUtilLongKeyImpl createScriptDataAccessUtilLongKeyImpl(BuriDataFieldType fieldType) {
-        return new AppScriptDataAccessUtilKeyImpl(fieldType);
+        return new ${glDBFluteScriptDataAccessUtilKeyImpl}(fieldType);
     }
 
     @Override
