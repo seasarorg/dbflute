@@ -9,7 +9,7 @@ import org.escafe.buri.engine.ParticipantProvider;
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glAccessContextParticipantProvider} implements ParticipantProvider {
+public class ${glBasicParticipantProvider} implements ParticipantProvider {
 
     // ===================================================================================
     //                                                                User Data Conversion

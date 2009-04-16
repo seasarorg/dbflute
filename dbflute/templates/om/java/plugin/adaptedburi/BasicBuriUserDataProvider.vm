@@ -8,11 +8,15 @@ import ${glPackageBaseCommon}.*;
 /**
  * @author ${database.ClassAuthor}
  */
-public class ${glAccessContextBuriUserDataProvider} implements ${BuriDef}.BuriUserDataProvider {
+public class ${glBasicBuriUserDataProvider} implements ${BuriDef}.BuriUserDataProvider {
 
     public Object provide(${BuriDef}.BuriProcess process, Entity entity, ${BuriDef}.BuriAction action) {
         IdentityInfo identityInfo = new IdentityInfo();
-        identityInfo.setIdString(AccessContext.getAccessContextOnThread().getAccessUser());
+        identityInfo.setIdString(getAccessUserOnThread());
         return identityInfo;
+    }
+    
+    protected String getAccessUserOnThread() {
+        return AccessContext.getAccessContextOnThread().getAccessUser();
     }
 }
