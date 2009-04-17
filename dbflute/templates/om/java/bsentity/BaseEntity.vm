@@ -5,12 +5,6 @@ import java.io.Serializable;
 import java.util.*;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
-#if ($table.isBuriTarget())
-import ${glPackagePluginBuri}.${glBuriDef};
-#end
-#if ($table.hasClassification())
-import ${glPackageBaseCommon}.${glCDef};
-#end
 #if (${table.hasAllCommonColumn()})
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #else
@@ -18,6 +12,12 @@ import org.seasar.dbflute.Entity;
 #end
 #if (!$isSql2Entity)
 import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
+#end
+#if ($table.hasClassification())
+import ${glPackageBaseCommon}.${glCDef};
+#end
+#if ($table.isBuriTarget())
+import ${glPackagePluginBuri}.${glBuriDef};
 #end
 #if ($table.hasRelation())
 import ${myExtendedEntityPackageName}.*;
