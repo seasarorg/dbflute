@@ -8,7 +8,6 @@ namespace ${glPackageBaseCommon} {
     public class ${glAccessContext} {
 
         private static LocalDataStoreSlot _accessContextSlot = Thread.AllocateDataSlot();
-        private static bool _defaultValid = false;
 
         public static ${glAccessContext} GetAccessContextOnThread() {
             return (${glAccessContext})Thread.GetData(_accessContextSlot);
