@@ -239,9 +239,17 @@ public class ${glDBFluteConfig} {
 	public void registerValueType(Class<?> keyType, ValueType valueType) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
-		    _log.info("...Setting valueType: keyType=" + keyType + " valueType=" + valueType);
+		    _log.info("...Registering valueType: keyType=" + keyType + " valueType=" + valueType);
 		}
 	    TnValueTypes.registerValueType(keyType, valueType);
+	}
+
+	public void removeValueType(Class<?> keyType) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Removing valueType: keyType=" + keyType);
+		}
+	    TnValueTypes.unregisterValueType(keyType);
 	}
 	
     // ===================================================================================
