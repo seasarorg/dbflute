@@ -98,8 +98,8 @@ import org.seasar.dbflute.properties.DfBasicProperties;
  * DATE          | java.util.Date       | DateTime?     |
  * TIME          | java.sql.Time        | DateTime?     |
  * TIMESTAMP     | java.sql.Timestamp   | DateTime?     |
- * ARRAY         | java.lang.String     | String        |
- * UUID          | java.util.UUID       | (Pending)     |
+ * ARRAY         | *Unsupported         | *Unsupported  |
+ * UUID          | java.util.UUID       | *Unsupported  |
  * ------------------------------------------------------
  * </pre>
  * ARRAY type is basically unsupported but it's defined for user's extension.

@@ -50,4 +50,6 @@ map:{
 # | DATE          | java.util.Date       | DateTime?   |
 # | TIME          | java.sql.Time        | DateTime?   |
 # | TIMESTAMP     | java.sql.Timestamp   | DateTime?   |
+# | ARRAY         | *Unsupported         |*Unsupported |
+# | UUID          | java.util.UUID       |*Unsupported |
 # ------------------------------------------------------
