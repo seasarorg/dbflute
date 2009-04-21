@@ -81,22 +81,19 @@ public class ${myClassName} {
     public ${col.javaNative} get${col.javaName}() throws SQLException {
 #if ($col.isJavaNativeStringObject())
         return extractValueAsString("${col.name}");
-#end
-#if ($col.isJavaNativeBooleanObject())
+#elseif ($col.isJavaNativeBooleanObject())
         return extractValueAsBoolean("${col.name}");
-#end
-#if ($col.isJavaNativeNumberObject())
+#elseif ($col.isJavaNativeNumberObject())
         return (${col.javaNative})extractValueAsNumber(${col.javaNative}.class, "${col.name}");
-#end
-#if ($col.isJavaNativeDateObject())
+#elseif ($col.isJavaNativeDateObject())
         return (${col.javaNative})extractValueAsDate(${col.javaNative}.class, "${col.name}");
-#end
-#if ($col.isJavaNativeBinaryObject())
+#elseif ($col.isJavaNativeBinaryObject())
         return (${col.javaNative})extractValueAsObject("${col.name}");
-#end
-#if ($col.isJavaNativeUUIDObject())
+#elseif ($col.isJavaNativeUUIDObject())
         String string = extractValueAsString("${col.name}");
         return string != null ? (${col.javaNative})java.util.UUID.fromString(string) : null;
+#else
+        return (${col.javaNative})extractValueAsObject("${col.name}");
 #end
     }
 
