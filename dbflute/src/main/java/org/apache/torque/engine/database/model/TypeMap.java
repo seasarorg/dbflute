@@ -187,9 +187,13 @@ public class TypeMap {
     // ===================================================================================
     //                                                        Property jdbcToJavaNativeMap
     //                                                        ============================
-    protected static final Map<String, Object> _propertyTorqueTypeToJavaNativeMap;
-    protected static final Map<String, String> _propertyJavaNativeToFlexNativeMap;
+    protected static Map<String, Object> _propertyTorqueTypeToJavaNativeMap;
+    protected static Map<String, String> _propertyJavaNativeToFlexNativeMap;
     static {
+        setupPropertyNativeMap();
+    }
+
+    protected static void setupPropertyNativeMap() {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         _propertyTorqueTypeToJavaNativeMap = prop.getTypeMappingProperties().getJdbcToJavaNativeMap();
         _propertyJavaNativeToFlexNativeMap = prop.getFlexDtoProperties().getJavaToFlexNativeMap();
@@ -199,6 +203,15 @@ public class TypeMap {
     //                                                                    Initialized Mark
     //                                                                    ================
     private static boolean _initialized = false;
+
+    // ===================================================================================
+    //                                                                              Reload
+    //                                                                              ======
+    public static void reload() { // for test
+        setupPropertyNativeMap();
+        _initialized = false;
+        initialize();
+    }
 
     // ===================================================================================
     //                                                                          Initialize
@@ -212,9 +225,9 @@ public class TypeMap {
             return;
         }
 
-        /*
-         * Create JDBC -> native Java type mappings.
-         */
+        // * * * * * * * * * * * * * * * * * * * 
+        // The map of Torque Type to Java Native
+        // * * * * * * * * * * * * * * * * * * * 
         _torqueTypeToJavaNativeMap = new Hashtable<String, String>();
 
         // Default types are for Java.
@@ -245,6 +258,21 @@ public class TypeMap {
         _torqueTypeToJavaNativeMap.put(BOOLEANCHAR, initializeJavaNative(BOOLEANCHAR, BOOLEANCHAR_NATIVE_TYPE));
         _torqueTypeToJavaNativeMap.put(BOOLEANINT, initializeJavaNative(BOOLEANINT, BOOLEANINT_NATIVE_TYPE));
 
+        // Register new torque type from property.
+        {
+            final Set<String> propertyTorqueTypeSet = _propertyTorqueTypeToJavaNativeMap.keySet();
+            for (String propertyTorqueType : propertyTorqueTypeSet) {
+                if (_torqueTypeToJavaNativeMap.containsKey(propertyTorqueType)) {
+                    continue; // because it does not need to override
+                }
+                String propertyJavaNative = (String) _propertyTorqueTypeToJavaNativeMap.get(propertyTorqueType);
+                _torqueTypeToJavaNativeMap.put(propertyTorqueType, propertyJavaNative); // as
+            }
+        }
+
+        // * * * * * * * * * * * * * * * * * * * 
+        // The map of JDBC Type to Torque Type
+        // * * * * * * * * * * * * * * * * * * * 
         _jdbcTypeToTorqueTypeMap = new Hashtable<Integer, String>();
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.CHAR), CHAR);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.VARCHAR), VARCHAR);
@@ -272,6 +300,9 @@ public class TypeMap {
         //_jdbcTypeToTorqueTypeMap.put(new Integer(Types.UUID), UUID);
         _jdbcTypeToTorqueTypeMap.put(new Integer(Types.ARRAY), ARRAY);
 
+        // * * * * * * * * * * * * * * * * * * * 
+        // The map of Torque Type to JDBC Type
+        // * * * * * * * * * * * * * * * * * * *
         _torqueTypeToJdbcTypeMap = new Hashtable<String, Integer>();
         {
             Set<Integer> keySet = _jdbcTypeToTorqueTypeMap.keySet();
@@ -281,6 +312,9 @@ public class TypeMap {
             }
         }
 
+        // * * * * * * * * * * * * * * * * * * * 
+        // The map of Java Native to Flex Native
+        // * * * * * * * * * * * * * * * * * * *
         _javaNativeToFlexNativeMap = new Hashtable<String, String>();
         _javaNativeToFlexNativeMap.put("String", initializeFlexNative("String", "String"));
         _javaNativeToFlexNativeMap.put("Short", initializeFlexNative("Short", "int"));

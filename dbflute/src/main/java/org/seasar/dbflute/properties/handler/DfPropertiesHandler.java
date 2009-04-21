@@ -29,8 +29,6 @@ import org.seasar.dbflute.properties.DfSqlLogRegistryProperties;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**
- * Build properties for Torque.
- * 
  * @author jflute
  */
 public final class DfPropertiesHandler {
@@ -38,7 +36,7 @@ public final class DfPropertiesHandler {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final DfPropertiesHandler _insntace = new DfPropertiesHandler();
+    private static DfPropertiesHandler _insntace = new DfPropertiesHandler();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -51,6 +49,10 @@ public final class DfPropertiesHandler {
     //                                                                           =========
     public static DfPropertiesHandler getInstance() {
         return _insntace;
+    }
+    
+    public void reload() { // for Test
+        _insntace = new DfPropertiesHandler();
     }
 
     // ===================================================================================

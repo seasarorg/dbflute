@@ -18,7 +18,6 @@ package org.seasar.dbflute.helper.jdbc.metadata;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -26,10 +25,12 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.mapping.DfTorqueTypeMapper;
+import org.seasar.dbflute.logic.mapping.DfTorqueTypeMapper.Resource;
+import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**
  * @author jflute
@@ -40,6 +41,11 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfColumnHandler.class);
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected DfTorqueTypeMapper _torqueTypeMapper;
 
     // ===================================================================================
     //                                                                        Meta Getting
@@ -185,81 +191,63 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                 Torque Type Getting
     //                                                                 ===================
+    /**
+     * Get the Torque type of the column. <br /> 
+     * Look at the java-doc of overload method if you want to know the priority of mapping.
+     * @param columnMetaInfo The meta information of column. (NotNull)
+     * @return The Torque type of the column. (NotNull)
+     */
     public String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
         return getColumnTorqueType(columnMetaInfo.getJdbcType(), columnMetaInfo.getDbTypeName());
     }
 
+    /**
+     * Get the Torque type of the column. <br /> 
+     * @param jdbcType The data type of JDBC.
+     * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
+     * @return The Torque type of the column. (NotNull)
+     */
     public String getColumnTorqueType(int jdbcType, String dbTypeName) {
-        if (isPostgreSQLBytesOid(dbTypeName)) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.BLOB);
-            return torqueType;
+        return getTorqueTypeMapper().getColumnTorqueType(jdbcType, dbTypeName);
+    }
+
+    protected DfTorqueTypeMapper getTorqueTypeMapper() {
+        if (_torqueTypeMapper == null) {
+            _torqueTypeMapper = newTorqueTypeMapper();
         }
+        return _torqueTypeMapper;
+    }
 
-        if (Types.OTHER != jdbcType) {
-
-            // For compatible to Oracle's JDBC driver.
-            if (isOracleCompatibleDate(jdbcType, dbTypeName)) {
-                return getDateTorqueType();
+    protected DfTorqueTypeMapper newTorqueTypeMapper() {
+        final DfTypeMappingProperties typeMappingProperties = getProperties().getTypeMappingProperties();
+        final Map<String, String> nameToTorqueTypeMap = typeMappingProperties.getNameToTorqueTypeMap();
+        return new DfTorqueTypeMapper(nameToTorqueTypeMap, new Resource() {
+            public boolean isTargetLanguageJava() {
+                return getBasicProperties().isTargetLanguageJava();
             }
 
-            try {
-                return TypeMap.getTorqueType(jdbcType);
-            } catch (RuntimeException e) {
-                String msg = "Not found the sqlTypeCode in TypeMap: jdbcType=";
-                msg = msg + jdbcType + " message=" + e.getMessage();
-                _log.warn(msg);
+            public boolean isDatabaseOracle() {
+                return isOracle();
             }
-        }
 
-        // If other
-        if (dbTypeName == null) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
-            return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("varchar")) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
-            return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("char")) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.CHAR);
-            return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("timestamp")) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.TIMESTAMP);
-            return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("date")) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.DATE);
-            return torqueType;
-        } else if (dbTypeName.toLowerCase().contains("clob")) {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.CLOB);
-            return torqueType;
-        } else if (getBasicProperties().isTargetLanguageJava() && dbTypeName.toLowerCase().contains("uuid")) {
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-            // This is for Java only because the type has not been checked yet on C#.
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+            public boolean isDatabasePostgreSQL() {
+                return isPostgreSQL();
+            }
+        });
+    }
 
-            // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
-            return TypeMap.UUID;
-        } else {
-            final String torqueType = TypeMap.getTorqueType(java.sql.Types.VARCHAR);
-            return torqueType;
-        }
+    // -----------------------------------------------------
+    //                                    Type Determination
+    //                                    ------------------
+    public boolean isOracleStringClob(final String dbTypeName) {
+        return getTorqueTypeMapper().isOracleStringClob(dbTypeName);
+    }
+
+    public boolean isPostgreSQLBytesOid(final String dbTypeName) {
+        return getTorqueTypeMapper().isPostgreSQLBytesOid(dbTypeName);
     }
 
     public boolean isUUID(final String dbTypeName) {
         return "uuid".equalsIgnoreCase(dbTypeName);
-    }
-
-    public boolean isOracleCompatibleDate(final int jdbcType, final String dbTypeName) {
-        return isOracle() && java.sql.Types.TIMESTAMP == jdbcType && "date".equalsIgnoreCase(dbTypeName);
-    }
-
-    public boolean isOracleStringClob(final String dbTypeName) {
-        return isOracle() && "clob".equalsIgnoreCase(dbTypeName);
-    }
-
-    public boolean isPostgreSQLBytesOid(final String dbTypeName) {
-        return isPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
-    }
-
-    protected String getDateTorqueType() {
-        return TypeMap.getTorqueType(java.sql.Types.DATE);
     }
 }

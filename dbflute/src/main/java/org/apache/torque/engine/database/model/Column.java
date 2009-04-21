@@ -158,6 +158,8 @@ public class Column {
     //    /** class name to do input validation on this column */
     //    private String _inputValidator = null;
 
+    private DfColumnHandler _columnHandler = new DfColumnHandler();
+    
     // -----------------------------------------------------
     //                                              Internal
     //                                              --------
@@ -1191,7 +1193,7 @@ public class Column {
         if (dbTypeName == null) {
             return false;
         }
-        return new DfColumnHandler().isUUID(dbTypeName);
+        return _columnHandler.isUUID(dbTypeName);
     }
 
     public boolean isJavaNativeStringClob() {
@@ -1199,7 +1201,7 @@ public class Column {
         if (dbTypeName == null) {
             return false;
         }
-        return new DfColumnHandler().isOracleStringClob(dbTypeName);
+        return _columnHandler.isOracleStringClob(dbTypeName);
     }
 
     public boolean isJavaNativeBytesOid() {
@@ -1207,7 +1209,7 @@ public class Column {
         if (dbTypeName == null) {
             return false;
         }
-        return new DfColumnHandler().isPostgreSQLBytesOid(dbTypeName);
+        return _columnHandler.isPostgreSQLBytesOid(dbTypeName);
     }
 
     public boolean isJavaNativeCSharpNullable() {

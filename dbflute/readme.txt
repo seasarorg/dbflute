@@ -19,10 +19,14 @@ build-torque.xml: For tasks of DBFlute at runtime
 #                                                                                Reference
 #                                                                                =========
 # ----------------------------------------------------------
+#                                          Data Type Mapping
+#                                          -----------------
+The point of data type mapping is DfTorqueTypeMapper.getColumnTorqueType().
+
+# ----------------------------------------------------------
 #                                             JDBC Meta Data
 #                                             --------------
 [Column Data]
 http://d.hatena.ne.jp/amutan/20090222/1235300928
 http://d.hatena.ne.jp/amutan/20090222/1235300058
 http://d.hatena.ne.jp/amutan/20090224/1235487682
-
