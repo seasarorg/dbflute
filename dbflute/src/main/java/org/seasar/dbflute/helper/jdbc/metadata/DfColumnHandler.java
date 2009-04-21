@@ -218,10 +218,10 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return _torqueTypeMapper;
     }
 
-    protected DfTorqueTypeMapper newTorqueTypeMapper() {
+    protected DfTorqueTypeMapper newTorqueTypeMapper() { // only once
         final DfTypeMappingProperties typeMappingProperties = getProperties().getTypeMappingProperties();
         final Map<String, String> nameToTorqueTypeMap = typeMappingProperties.getNameToTorqueTypeMap();
-        return new DfTorqueTypeMapper(nameToTorqueTypeMap, new Resource() {
+        final DfTorqueTypeMapper mapper = new DfTorqueTypeMapper(nameToTorqueTypeMap, new Resource() {
             public boolean isTargetLanguageJava() {
                 return getBasicProperties().isTargetLanguageJava();
             }
@@ -233,7 +233,14 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             public boolean isDatabasePostgreSQL() {
                 return isPostgreSQL();
             }
+
+            @Override
+            public String toString() {
+                return "{" + isTargetLanguageJava() + ", " + isDatabaseOracle() + ", " + isDatabasePostgreSQL() + "}";
+            }
         });
+        _log.info("TorqueTypeMapper: " + mapper);
+        return mapper;
     }
 
     // -----------------------------------------------------

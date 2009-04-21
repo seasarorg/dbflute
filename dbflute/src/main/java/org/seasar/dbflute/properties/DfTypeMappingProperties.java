@@ -76,7 +76,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
         }
         return jdbcTypeMappingMap;
     }
-    
+
     // -----------------------------------------------------
     //                                 Name Type Mapping Map
     //                                 ---------------------
@@ -114,9 +114,7 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
                 msg = msg + " typeMappingMap=" + typeMappingMap;
                 throw new IllegalStateException(msg);
             }
-            String realKey = key.substring("$$".length());
-            realKey = realKey.substring(0, realKey.length() - "$$".length());
-            nameTypeMappingMap.put(key, strVal);
+            nameTypeMappingMap.put(extractDbTypeName(key), strVal);
         }
         return nameTypeMappingMap;
     }

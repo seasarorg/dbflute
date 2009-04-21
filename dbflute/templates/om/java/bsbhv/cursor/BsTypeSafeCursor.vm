@@ -22,8 +22,8 @@ public class ${myClassName} {
 #foreach ($col in $table.columns)
     /** DB name of ${col.name}. */
     public static final String DB_NAME_${col.name} = "$col.name";
-#end
 
+#end
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========

@@ -188,4 +188,12 @@ public class DfTorqueTypeMapper {
     protected String getBlobTorqueType() {
         return TypeMap.getTorqueType(java.sql.Types.BLOB);
     }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return _nameToTorqueTypeMap + ":" + _resource;
+    }
 }
