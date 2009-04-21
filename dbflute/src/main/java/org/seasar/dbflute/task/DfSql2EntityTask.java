@@ -93,6 +93,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
     protected final Map<String, DfProcedureMetaInfo> _procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
+    
+    protected DfColumnHandler _columnHandler = new DfColumnHandler();
 
     // ===================================================================================
     //                                                                          DataSource
@@ -845,7 +847,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
             final Integer columnSize = procedureColumnMetaInfo.getColumnSize();
             final Integer decimalDigits = procedureColumnMetaInfo.getDecimalDigits();
-            final String torqueType = new DfColumnHandler().getColumnTorqueType(jdbcType, dbTypeName);
+            final String torqueType = _columnHandler.getColumnTorqueType(jdbcType, dbTypeName);
             propertyType = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
         }
         return propertyType;
@@ -1062,8 +1064,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        final DfColumnHandler columnHandler = new DfColumnHandler();
-        return columnHandler.getColumnTorqueType(columnMetaInfo);
+        return _columnHandler.getColumnTorqueType(columnMetaInfo);
     }
 
     protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,

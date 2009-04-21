@@ -85,7 +85,8 @@ public class Column {
     //                                                                          Definition
     //                                                                          ==========
     private static Log _log = LogFactory.getLog(Column.class);
-
+    private static DfColumnHandler _columnHandler = new DfColumnHandler();
+    
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -158,8 +159,6 @@ public class Column {
     //    /** class name to do input validation on this column */
     //    private String _inputValidator = null;
 
-    private DfColumnHandler _columnHandler = new DfColumnHandler();
-    
     // -----------------------------------------------------
     //                                              Internal
     //                                              --------

@@ -239,7 +239,6 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 return "{" + isTargetLanguageJava() + ", " + isDatabaseOracle() + ", " + isDatabasePostgreSQL() + "}";
             }
         });
-        _log.info("TorqueTypeMapper: " + mapper);
         return mapper;
     }
 

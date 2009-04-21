@@ -161,7 +161,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                          Check Object
     //                                          ------------
     protected StringSet _refTableCheckSet;
-
+    
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
@@ -485,8 +485,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        final DfColumnHandler columnHandler = new DfColumnHandler();
-        return columnHandler.getColumnTorqueType(columnMetaInfo);
+        return _columnHandler.getColumnTorqueType(columnMetaInfo);
     }
 
     protected void setupColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
