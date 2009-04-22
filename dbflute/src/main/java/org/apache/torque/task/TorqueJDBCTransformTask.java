@@ -481,18 +481,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        columnElement.setAttribute("type", getColumnTorqueType(columnMetaInfo));
+        columnElement.setAttribute("type", getColumnJdbcType(columnMetaInfo));
     }
 
-    protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        return _columnHandler.getColumnTorqueType(columnMetaInfo);
+    protected String getColumnJdbcType(final DfColumnMetaInfo columnMetaInfo) {
+        return _columnHandler.getColumnJdbcType(columnMetaInfo);
     }
 
     protected void setupColumnJavaType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final String jdbcType = getColumnTorqueType(columnMetaInfo);
+        final String jdbcType = getColumnJdbcType(columnMetaInfo);
         final int columnSize = columnMetaInfo.getColumnSize();
         final int decimalDigits = columnMetaInfo.getDecimalDigits();
-        final String javaNative = TypeMap.findJavaNativeString(jdbcType, columnSize > 0 ? columnSize : null,
+        final String javaNative = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize > 0 ? columnSize : null,
                 decimalDigits > 0 ? decimalDigits : null);
         columnElement.setAttribute("javaType", javaNative);
     }
@@ -502,7 +502,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final int jdbcType = columnMetaInfo.getJdbcType();
+        final int jdbcType = columnMetaInfo.getJdbcDefValue();
         final int columnSize = columnMetaInfo.getColumnSize();
         final int decimalDigits = columnMetaInfo.getDecimalDigits();
         if (columnSize > 0 && isColumnSizeValidSqlType(jdbcType)) {

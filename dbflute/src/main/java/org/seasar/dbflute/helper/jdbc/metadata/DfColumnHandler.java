@@ -28,8 +28,8 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.logic.mapping.DfTorqueTypeMapper;
-import org.seasar.dbflute.logic.mapping.DfTorqueTypeMapper.Resource;
+import org.seasar.dbflute.logic.mapping.DfJdbcTypeMapper;
+import org.seasar.dbflute.logic.mapping.DfJdbcTypeMapper.Resource;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**
@@ -45,7 +45,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DfTorqueTypeMapper _torqueTypeMapper;
+    protected DfJdbcTypeMapper _jdbcTypeMapper;
 
     // ===================================================================================
     //                                                                        Meta Getting
@@ -164,7 +164,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
             final DfColumnMetaInfo columnMetaInfo = new DfColumnMetaInfo();
             columnMetaInfo.setColumnName(columnName);
-            columnMetaInfo.setJdbcType(jdbcTypeCode);
+            columnMetaInfo.setJdbcDefValue(jdbcTypeCode);
             columnMetaInfo.setDbTypeName(dbTypeName);
             columnMetaInfo.setColumnSize(columnSize);
             columnMetaInfo.setDecimalDigits(decimalDigits);
@@ -192,36 +192,36 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     //                                                                 Torque Type Getting
     //                                                                 ===================
     /**
-     * Get the Torque type of the column. <br /> 
+     * Get the JDBC type of the column. <br /> 
      * Look at the java-doc of overload method if you want to know the priority of mapping.
      * @param columnMetaInfo The meta information of column. (NotNull)
-     * @return The Torque type of the column. (NotNull)
+     * @return The JDBC type of the column. (NotNull)
      */
-    public String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        return getColumnTorqueType(columnMetaInfo.getJdbcType(), columnMetaInfo.getDbTypeName());
+    public String getColumnJdbcType(final DfColumnMetaInfo columnMetaInfo) {
+        return getColumnJdbcType(columnMetaInfo.getJdbcDefValue(), columnMetaInfo.getDbTypeName());
     }
 
     /**
-     * Get the Torque type of the column. <br /> 
-     * @param jdbcType The data type of JDBC.
+     * Get the JDBC type of the column. <br /> 
+     * @param jdbcDefValue The JDBC definition value.
      * @param dbTypeName The name of DB data type. (Nullable: If null, the mapping using this is invalid)
-     * @return The Torque type of the column. (NotNull)
+     * @return The JDBC type of the column. (NotNull)
      */
-    public String getColumnTorqueType(int jdbcType, String dbTypeName) {
-        return getTorqueTypeMapper().getColumnTorqueType(jdbcType, dbTypeName);
+    public String getColumnJdbcType(int jdbcDefValue, String dbTypeName) {
+        return getJdbcTypeMapper().getColumnJdbcType(jdbcDefValue, dbTypeName);
     }
 
-    protected DfTorqueTypeMapper getTorqueTypeMapper() {
-        if (_torqueTypeMapper == null) {
-            _torqueTypeMapper = newTorqueTypeMapper();
+    protected DfJdbcTypeMapper getJdbcTypeMapper() {
+        if (_jdbcTypeMapper == null) {
+            _jdbcTypeMapper = newJdbcTypeMapper();
         }
-        return _torqueTypeMapper;
+        return _jdbcTypeMapper;
     }
 
-    protected DfTorqueTypeMapper newTorqueTypeMapper() { // only once
+    protected DfJdbcTypeMapper newJdbcTypeMapper() { // only once
         final DfTypeMappingProperties typeMappingProperties = getProperties().getTypeMappingProperties();
-        final Map<String, String> nameToTorqueTypeMap = typeMappingProperties.getNameToTorqueTypeMap();
-        final DfTorqueTypeMapper mapper = new DfTorqueTypeMapper(nameToTorqueTypeMap, new Resource() {
+        final Map<String, String> nameToJdbcTypeMap = typeMappingProperties.getNameToJdbcTypeMap();
+        final DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToJdbcTypeMap, new Resource() {
             public boolean isTargetLanguageJava() {
                 return getBasicProperties().isTargetLanguageJava();
             }
@@ -246,11 +246,11 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     //                                    Type Determination
     //                                    ------------------
     public boolean isOracleStringClob(final String dbTypeName) {
-        return getTorqueTypeMapper().isOracleStringClob(dbTypeName);
+        return getJdbcTypeMapper().isOracleStringClob(dbTypeName);
     }
 
     public boolean isPostgreSQLBytesOid(final String dbTypeName) {
-        return getTorqueTypeMapper().isPostgreSQLBytesOid(dbTypeName);
+        return getJdbcTypeMapper().isPostgreSQLBytesOid(dbTypeName);
     }
 
     public boolean isUUID(final String dbTypeName) {

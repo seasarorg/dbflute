@@ -27,29 +27,29 @@ map:{
 # ----------------/
 #
 # Default mapping as follows:
-# ------------------------------------------------------
-# | JDBC Type     | Java Type            | CSharp Type |
-# | ----------------------------------------------------
-# | CHAR          | java.lang.String     | String      |
-# | VARCHAR       | java.lang.String     | String      |
-# | LONGVARCHAR   | java.lang.String     | String      |
-# | NUMERIC       | java.math.BigDecimal | decimal?    |
-# | DECIMAL       | java.math.BigDecimal | decimal?    |
-# | BIT           | java.lang.Boolean    | bool?       |
-# | BOOLEAN       | java.lang.Boolean    | bool?       |
-# | TINYINT       | java.lang.Integer    | int?        |
-# | SMALLINT      | java.lang.Integer    | int?        |
-# | INTEGER       | java.lang.Integer    | int?        |
-# | BIGINT        | java.lang.Long       | long?       |
-# | REAL          | java.math.BigDecimal | decimal?    |
-# | FLOAT         | java.math.BigDecimal | decimal?    |
-# | DOUBLE        | java.math.BigDecimal | decimal?    |
-# | BINARY        | byte[]               | byte[]      |
-# | VARBINARY     | byte[]               | byte[]      |
-# | LONGVARBINARY | byte[]               | byte[]      |
-# | DATE          | java.util.Date       | DateTime?   |
-# | TIME          | java.sql.Time        | DateTime?   |
-# | TIMESTAMP     | java.sql.Timestamp   | DateTime?   |
-# | ARRAY         | *Unsupported         |*Unsupported |
-# | UUID          | java.util.UUID       |*Unsupported |
-# ------------------------------------------------------
+# --------------------------------------------------------
+# | JDBC Type     | Java Native          | CSharp Native |
+# | ------------------------------------------------------
+# | CHAR          | java.lang.String     | String        |
+# | VARCHAR       | java.lang.String     | String        |
+# | LONGVARCHAR   | java.lang.String     | String        |
+# | NUMERIC       | java.math.BigDecimal | decimal?      |
+# | DECIMAL       | java.math.BigDecimal | decimal?      |
+# | BIT           | java.lang.Boolean    | bool?         |
+# | BOOLEAN       | java.lang.Boolean    | bool?         |
+# | TINYINT       | java.lang.Integer    | int?          |
+# | SMALLINT      | java.lang.Integer    | int?          |
+# | INTEGER       | java.lang.Integer    | int?          |
+# | BIGINT        | java.lang.Long       | long?         |
+# | REAL          | java.math.BigDecimal | decimal?      |
+# | FLOAT         | java.math.BigDecimal | decimal?      |
+# | DOUBLE        | java.math.BigDecimal | decimal?      |
+# | BINARY        | byte[]               | byte[]        |
+# | VARBINARY     | byte[]               | byte[]        |
+# | LONGVARBINARY | byte[]               | byte[]        |
+# | DATE          | java.util.Date       | DateTime?     |
+# | TIME          | java.sql.Time        | DateTime?     |
+# | TIMESTAMP     | java.sql.Timestamp   | DateTime?     |
+# | ARRAY         | *Unsupported         | *Unsupported  |
+# | UUID          | java.util.UUID       | *Unsupported  |
+# --------------------------------------------------------

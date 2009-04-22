@@ -164,8 +164,8 @@ public class DataTable {
             final DfColumnMetaInfo metaInfo = metaMap.get(column.getColumnName());
             if (metaInfo != null) {
                 column.setWritable(true);
-                final int jdbcType = metaInfo.getJdbcType();
-                column.setColumnType(ColumnTypes.getColumnType(jdbcType));
+                final int jdbcDefValue = metaInfo.getJdbcDefValue();
+                column.setColumnType(ColumnTypes.getColumnType(jdbcDefValue));
             } else {
                 column.setWritable(false);
             }

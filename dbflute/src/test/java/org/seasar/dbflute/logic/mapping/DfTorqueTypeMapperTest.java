@@ -10,7 +10,7 @@ import java.util.Properties;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.junit.Test;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.logic.mapping.DfTorqueTypeMapper.Resource;
+import org.seasar.dbflute.logic.mapping.DfJdbcTypeMapper.Resource;
 
 /**
  * @author jflute
@@ -23,40 +23,40 @@ public class DfTorqueTypeMapperTest {
         initializeEmptyProperty();
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
         nameToTorqueTypeMap.put("foo", "bar");
-        DfTorqueTypeMapper mapper = new DfTorqueTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
+        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
         // ## Act & Assert ##
-        assertEquals("bar", mapper.getColumnTorqueType(Types.TIMESTAMP, "foo"));
-        assertEquals(TypeMap.TIMESTAMP, mapper.getColumnTorqueType(Types.TIMESTAMP, "bar"));
+        assertEquals("bar", mapper.getColumnJdbcType(Types.TIMESTAMP, "foo"));
+        assertEquals(TypeMap.TIMESTAMP, mapper.getColumnJdbcType(Types.TIMESTAMP, "bar"));
     }
 
     @Test
     public void test_getColumnTorqueType_Java_Oracle() {
         initializeEmptyProperty();
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
-        DfTorqueTypeMapper mapper = new DfTorqueTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
+        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
 
         // ## Act & Assert ##
-        assertEquals(TypeMap.TIMESTAMP, mapper.getColumnTorqueType(Types.TIMESTAMP, "timestamp"));
-        assertEquals(TypeMap.DATE, mapper.getColumnTorqueType(Types.TIMESTAMP, "date"));
-        assertEquals(TypeMap.DATE, mapper.getColumnTorqueType(Types.DATE, "date"));
-        assertEquals(TypeMap.VARCHAR, mapper.getColumnTorqueType(Types.VARCHAR, "varchar"));
-        assertEquals(TypeMap.VARCHAR, mapper.getColumnTorqueType(Types.OTHER, "nvarchar"));
+        assertEquals(TypeMap.TIMESTAMP, mapper.getColumnJdbcType(Types.TIMESTAMP, "timestamp"));
+        assertEquals(TypeMap.DATE, mapper.getColumnJdbcType(Types.TIMESTAMP, "date"));
+        assertEquals(TypeMap.DATE, mapper.getColumnJdbcType(Types.DATE, "date"));
+        assertEquals(TypeMap.VARCHAR, mapper.getColumnJdbcType(Types.VARCHAR, "varchar"));
+        assertEquals(TypeMap.VARCHAR, mapper.getColumnJdbcType(Types.OTHER, "nvarchar"));
     }
 
     @Test
     public void test_getColumnTorqueType_Java_PostgreSQL() {
         initializeEmptyProperty();
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
-        DfTorqueTypeMapper mapper = new DfTorqueTypeMapper(nameToTorqueTypeMap, new TestResource().java().postgreSQL());
+        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().postgreSQL());
 
         // ## Act & Assert ##
-        assertEquals(TypeMap.TIMESTAMP, mapper.getColumnTorqueType(Types.TIMESTAMP, "timestamp"));
-        assertEquals(TypeMap.TIMESTAMP, mapper.getColumnTorqueType(Types.TIMESTAMP, "date"));
-        assertEquals(TypeMap.DATE, mapper.getColumnTorqueType(Types.DATE, "date"));
-        assertEquals(TypeMap.VARCHAR, mapper.getColumnTorqueType(Types.VARCHAR, "varchar"));
-        assertEquals(TypeMap.VARCHAR, mapper.getColumnTorqueType(Types.OTHER, "nvarchar"));
-        assertEquals(TypeMap.BLOB, mapper.getColumnTorqueType(Types.OTHER, "oid"));
-        assertEquals(TypeMap.UUID, mapper.getColumnTorqueType(Types.OTHER, "uuid"));
+        assertEquals(TypeMap.TIMESTAMP, mapper.getColumnJdbcType(Types.TIMESTAMP, "timestamp"));
+        assertEquals(TypeMap.TIMESTAMP, mapper.getColumnJdbcType(Types.TIMESTAMP, "date"));
+        assertEquals(TypeMap.DATE, mapper.getColumnJdbcType(Types.DATE, "date"));
+        assertEquals(TypeMap.VARCHAR, mapper.getColumnJdbcType(Types.VARCHAR, "varchar"));
+        assertEquals(TypeMap.VARCHAR, mapper.getColumnJdbcType(Types.OTHER, "nvarchar"));
+        assertEquals(TypeMap.BLOB, mapper.getColumnJdbcType(Types.OTHER, "oid"));
+        assertEquals(TypeMap.UUID, mapper.getColumnJdbcType(Types.OTHER, "uuid"));
     }
 
     @Test
@@ -67,11 +67,11 @@ public class DfTorqueTypeMapperTest {
         initializeTestProperty(prop);
         Map<String, String> nameToTorqueTypeMap = new LinkedHashMap<String, String>();
         nameToTorqueTypeMap.put("__int4", "FOO");
-        DfTorqueTypeMapper mapper = new DfTorqueTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
+        DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToTorqueTypeMap, new TestResource().java().oracle());
 
         // ## Act & Assert ##
-        assertEquals("FOO", mapper.getColumnTorqueType(Types.TIMESTAMP, "__int4"));
-        assertEquals("java.bar.Tender", TypeMap.findJavaNativeString("FOO", 0, 0));
+        assertEquals("FOO", mapper.getColumnJdbcType(Types.TIMESTAMP, "__int4"));
+        assertEquals("java.bar.Tender", TypeMap.findJavaNativeByJdbcType("FOO", 0, 0));
     }
 
     protected void initializeEmptyProperty() {

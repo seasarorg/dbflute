@@ -92,15 +92,15 @@ public abstract class DfAbsractDataWriter {
         if (columnMetaInfo == null) {
             return false;
         }
-        final int jdbcType = columnMetaInfo.getJdbcType();
+        final int jdbcType = columnMetaInfo.getJdbcDefValue();
         try {
             statement.setNull(bindCount, jdbcType);
         } catch (SQLException e) {
             if (jdbcType != Types.OTHER) {
                 throw e;
             }
-            final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
-            final Integer mappedJdbcType = TypeMap.getJdbcType(torqueType);
+            final String torqueType = _columnHandler.getColumnJdbcType(columnMetaInfo);
+            final Integer mappedJdbcType = TypeMap.getJdbcDefValueByJdbcType(torqueType);
             try {
                 statement.setNull(bindCount, mappedJdbcType);
             } catch (SQLException ignored) {
@@ -354,7 +354,7 @@ public abstract class DfAbsractDataWriter {
             DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
-            if (columnMetaInfo.getJdbcType() != Types.OTHER || !"uuid".equalsIgnoreCase(columnMetaInfo.getDbTypeName())) {
+            if (columnMetaInfo.getJdbcDefValue() != Types.OTHER || !"uuid".equalsIgnoreCase(columnMetaInfo.getDbTypeName())) {
                 return false;
             }
 
@@ -386,7 +386,7 @@ public abstract class DfAbsractDataWriter {
             // rsMeta#getColumnTypeName() returns value starts with "_" if
             // rsMeta#getColumnType() returns Types.ARRAY in PostgreSQL.
             //   e.g. UUID[] -> _uuid
-            if (columnMetaInfo.getJdbcType() != Types.ARRAY || !columnMetaInfo.getDbTypeName().startsWith("_")) {
+            if (columnMetaInfo.getJdbcDefValue() != Types.ARRAY || !columnMetaInfo.getDbTypeName().startsWith("_")) {
                 return false;
             }
 
@@ -416,10 +416,10 @@ public abstract class DfAbsractDataWriter {
      * @return The type of column. (Nullable: However Basically NotNull)
      */
     protected Class<?> getColumnType4Judgement(DfColumnMetaInfo columnMetaInfo) { // by original way
-        final String torqueType = _columnHandler.getColumnTorqueType(columnMetaInfo);
+        final String torqueType = _columnHandler.getColumnJdbcType(columnMetaInfo);
         final int columnSize = columnMetaInfo.getColumnSize();
         final int decimalDigits = columnMetaInfo.getDecimalDigits();
-        final String javaNativeString = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
+        final String javaNativeString = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
         Class<?> clazz = null;
         try {
             clazz = Class.forName(javaNativeString);
@@ -429,7 +429,7 @@ public abstract class DfAbsractDataWriter {
                 clazz = Class.forName(fullName);
             } catch (ClassNotFoundException ignored) {
                 // Only Date and Boolean and Number
-                final int jdbcType = columnMetaInfo.getJdbcType();
+                final int jdbcType = columnMetaInfo.getJdbcDefValue();
                 if (jdbcType == Types.TIMESTAMP || jdbcType == Types.DATE) {
                     return Date.class;
                 } else if (jdbcType == Types.TIME) {

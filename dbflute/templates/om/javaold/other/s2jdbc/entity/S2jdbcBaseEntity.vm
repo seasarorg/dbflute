@@ -59,16 +59,16 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #if ($col.isIdentity())
     @javax.persistence.GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
 #end
-#if ($col.isTorqueTypeDate())
+#if ($col.isJdbcTypeDate())
     @javax.persistence.Temporal(javax.persistence.TemporalType.DATE)
 #end
-#if ($col.isTorqueTypeTime())
+#if ($col.isJdbcTypeTime())
     @javax.persistence.Temporal(javax.persistence.TemporalType.TIME)
 #end
-#if ($col.isTorqueTypeTimestamp())
+#if ($col.isJdbcTypeTimestamp())
     @javax.persistence.Temporal(javax.persistence.TemporalType.TIMESTAMP)
 #end
-#if ($col.isTorqueTypeBlob() && $col.isTorqueTypeClob())
+#if ($col.isJdbcTypeBlob() && $col.isJdbcTypeClob())
     @javax.persistence.Lob
 #end
 #if ($table.isUseVersionNo() && $col.isVersionNo())

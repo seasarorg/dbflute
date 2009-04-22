@@ -495,7 +495,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 int nullableType = metaData.isNullable(index);
                 DfColumnMetaInfo column = new DfColumnMetaInfo();
                 column.setColumnName(columnName);
-                column.setJdbcType(columnType);
+                column.setJdbcDefValue(columnType);
                 column.setDbTypeName(columnTypeName);
                 column.setColumnSize(precision);
                 column.setDecimalDigits(scale);

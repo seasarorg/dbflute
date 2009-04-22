@@ -387,7 +387,7 @@ namespace ${glPackageBaseCQ} {
 #if (${col.isAvailableDateLessEqual()})
         public void Set${tmpJavaName}_LessEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_LE, v); }
 #end
-#if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
+#if (${col.isAvailableDateFromTo()} && !${col.isJdbcTypeTime()})
         public void Set${tmpJavaName}_FromTo(DateTime? from, DateTime? to, ${glFromToOption} option)
         { regFTQ(from, to, getCValue${tmpJavaName}(), "${col.name}", option); }
         public void Set${tmpJavaName}_DateFromTo(DateTime? from, DateTime? to) { Set${tmpJavaName}_FromTo(from, to, new ${glDateFromToOption}()); }

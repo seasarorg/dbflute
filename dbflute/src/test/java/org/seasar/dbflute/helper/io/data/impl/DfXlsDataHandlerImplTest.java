@@ -102,7 +102,7 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
         DfColumnMetaInfo info = new DfColumnMetaInfo();
         info.setColumnName("foo");
         info.setColumnSize(3);
-        info.setJdbcType(Types.NUMERIC);
+        info.setJdbcDefValue(Types.NUMERIC);
         columnMetaInfoMap.put("foo", info);
 
         // ## Act ##

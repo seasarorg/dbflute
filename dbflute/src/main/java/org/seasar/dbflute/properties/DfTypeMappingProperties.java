@@ -186,16 +186,16 @@ public final class DfTypeMappingProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                 Name to Torque Type
-    //                                                                 ===================
-    protected Map<String, String> _nameToTorqueTypeMap;
+    //                                                                   Name to JDBC Type
+    //                                                                   =================
+    protected Map<String, String> _nameToJdbcTypeMap;
 
-    public Map<String, String> getNameToTorqueTypeMap() {
-        if (_nameToTorqueTypeMap != null) {
-            return _nameToTorqueTypeMap;
+    public Map<String, String> getNameToJdbcTypeMap() {
+        if (_nameToJdbcTypeMap != null) {
+            return _nameToJdbcTypeMap;
         }
-        _nameToTorqueTypeMap = getNameTypeMappingMap();
-        return _nameToTorqueTypeMap;
+        _nameToJdbcTypeMap = getNameTypeMappingMap();
+        return _nameToJdbcTypeMap;
     }
 
     // ===================================================================================

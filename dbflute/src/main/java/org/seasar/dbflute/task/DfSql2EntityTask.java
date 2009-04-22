@@ -268,7 +268,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             metaInfo.setColumnName(columnName);
                             
                             final int columnType = md.getColumnType(i);
-                            metaInfo.setJdbcType(columnType);
+                            metaInfo.setJdbcDefValue(columnType);
                             
                             final String columnTypeName = md.getColumnTypeName(i);
                             metaInfo.setDbTypeName(columnTypeName);
@@ -847,8 +847,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
             final Integer columnSize = procedureColumnMetaInfo.getColumnSize();
             final Integer decimalDigits = procedureColumnMetaInfo.getDecimalDigits();
-            final String torqueType = _columnHandler.getColumnTorqueType(jdbcType, dbTypeName);
-            propertyType = TypeMap.findJavaNativeString(torqueType, columnSize, decimalDigits);
+            final String torqueType = _columnHandler.getColumnJdbcType(jdbcType, dbTypeName);
+            propertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
         }
         return propertyType;
     }
@@ -1039,13 +1039,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (allCommonColumn) {
             final String commonColumnTorqueType = getCommonColumnTorqueType(columnName);
             if (commonColumnTorqueType != null) {
-                column.setTorqueType(commonColumnTorqueType);
+                column.setJdbcType(commonColumnTorqueType);
                 return;
             }
         }
         final DfColumnMetaInfo columnMetaInfo = columnJdbcTypeMap.get(columnName);
         final String columnTorqueType = getColumnTorqueType(columnMetaInfo);
-        column.setTorqueType(columnTorqueType);
+        column.setJdbcType(columnTorqueType);
     }
 
     protected void setupDbType(Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName, Column column) {
@@ -1064,7 +1064,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String getColumnTorqueType(final DfColumnMetaInfo columnMetaInfo) {
-        return _columnHandler.getColumnTorqueType(columnMetaInfo);
+        return _columnHandler.getColumnJdbcType(columnMetaInfo);
     }
 
     protected void setupColumnSizeContainsDigit(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,

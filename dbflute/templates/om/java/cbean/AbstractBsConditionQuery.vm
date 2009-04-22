@@ -691,7 +691,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         reg${tmpJavaName}(CK_LE, ${tmpUncapitalisedJavaName});
     }
 #end
-#if (${col.isAvailableDateFromTo()} && !${col.isTorqueTypeTime()})
+#if (${col.isAvailableDateFromTo()} && !${col.isJdbcTypeTime()})
 
     /**
      * FromTo($fromDate &lt;= COLUMN_NAME &lt;= $toDate). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}

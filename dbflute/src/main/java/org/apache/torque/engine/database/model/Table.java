@@ -112,7 +112,6 @@ public class Table {
     private boolean _containsForeignPK;
     private Column _inheritanceColumn;
     protected DfFlexibleMap<String, Column> _columnMap = new DfFlexibleMap<String, Column>();
-    private boolean _isNeedsTransactionInPostgres;
     private boolean _isForReferenceOnly;
     private boolean _existSameNameTable;
 
@@ -762,7 +761,6 @@ public class Table {
         _columnMap.put(col.getName(), col);
 
         col.setPosition(_columnList.size());
-        _isNeedsTransactionInPostgres |= col.requiresTransactionInPostgres();
     }
 
     /**
@@ -1222,15 +1220,8 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                                      ???
-    //                                                                      ==============
-    /**
-     * Return true if the column requires a transaction in Postgres
-     */
-    public boolean requiresTransactionInPostgres() {
-        return _isNeedsTransactionInPostgres;
-    }
-
+    //                                                                                 ???
+    //                                                                                 ===
     /**
      * A utility function to create a new id method parameter
      * from attrib and add it to this table.

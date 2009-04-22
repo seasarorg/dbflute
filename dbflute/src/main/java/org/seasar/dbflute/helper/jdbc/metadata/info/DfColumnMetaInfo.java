@@ -28,7 +28,7 @@ public class DfColumnMetaInfo {
     //                                                                           Attribute
     //                                                                           =========
     protected String columnName;
-    protected int jdbcType;
+    protected int jdbcDefValue;
     protected String dbTypeName;
     protected int columnSize;
     protected int decimalDigits;
@@ -67,7 +67,7 @@ public class DfColumnMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + columnName + ", " + dbTypeName + "(" + columnSize + "," + decimalDigits + "), " + jdbcType + ", "
+        return "{" + columnName + ", " + dbTypeName + "(" + columnSize + "," + decimalDigits + "), " + jdbcDefValue + ", "
                 + required + ", " + columnComment + ", " + defaultValue + "}";
     }
 
@@ -114,12 +114,12 @@ public class DfColumnMetaInfo {
         this.required = required;
     }
 
-    public int getJdbcType() {
-        return jdbcType;
+    public int getJdbcDefValue() {
+        return jdbcDefValue;
     }
 
-    public void setJdbcType(int jdbcType) {
-        this.jdbcType = jdbcType;
+    public void setJdbcDefValue(int jdbcDefValue) {
+        this.jdbcDefValue = jdbcDefValue;
     }
 
     public String getDbTypeName() {

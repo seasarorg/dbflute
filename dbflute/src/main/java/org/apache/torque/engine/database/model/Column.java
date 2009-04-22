@@ -86,60 +86,45 @@ public class Column {
     //                                                                          ==========
     private static Log _log = LogFactory.getLog(Column.class);
     private static DfColumnHandler _columnHandler = new DfColumnHandler();
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                     Basic Information
+    //                                     -----------------
+    private String _name;
+    private String _javaName;
+    private String _description;
     private Table _table;
 
     // -----------------------------------------------------
-    //                                                 Basic
-    //                                                 -----
-    private String _name;
-
-    private String _description;
-
-    private boolean _isPrimaryKey = false;
-
-    private boolean _additionalPrimaryKey = false;
-
-    private boolean _isAutoIncrement = false;
-
-    private String _defaultValue;
-
-    private String _comment;
-
-    // -----------------------------------------------------
-    //                                                  Type
-    //                                                  ----
-    private String _javaType;
-
-    private String _torqueType;
-
+    //                                     Column Definition
+    //                                     -----------------
+    private boolean _isPrimaryKey;
+    private boolean _isAutoIncrement;
+    private boolean _additionalPrimaryKey;
+    private boolean _isNotNull;
     private String _dbType;
-
     private String _columnSize;
-
-    // -----------------------------------------------------
-    //                                            Constraint
-    //                                            ----------
-    private boolean _isNotNull = false;
-
-    // -----------------------------------------------------
-    //                                             Java Name
-    //                                             ---------
-    private String _javaName = null;
-
-    private String _javaNamingMethod;
-
-    // -----------------------------------------------------
-    //                                              Relation
-    //                                              --------
+    private String _defaultValue;
+    private String _comment;
     private List<ForeignKey> _referrers;
 
     // -----------------------------------------------------
-    //                                                 Other
-    //                                                 -----
+    //                                          Type Mapping
+    //                                          ------------
+    private String _jdbcType;
+
+    // -----------------------------------------------------
+    //                                Sql2Entity Information
+    //                                ----------------------
+    private String _sql2EntityTableName;
+    private String _sql2EntityJavaNative;
+
+    // -----------------------------------------------------
+    //                                       Other Component
+    //                                       ---------------
     private int _position;
 
     // only one type is supported currently, which assumes the
@@ -149,21 +134,11 @@ public class Column {
     private String _inheritanceType;
 
     private boolean _isInheritance;
-
     private boolean _isEnumeratedClasses;
-
     private List<Inheritance> _inheritanceList;
+    private String _javaNamingMethod;
 
-    private boolean _needsTransactionInPostgres;
-
-    //    /** class name to do input validation on this column */
-    //    private String _inputValidator = null;
-
-    // -----------------------------------------------------
-    //                                              Internal
-    //                                              --------
-    private String _sql2EntityTableName;
-    private String _sql2EntityJavaNative;
+    //private String _inputValidator = null;
 
     // ==============================================================================
     //                                                                    Constructor
@@ -183,48 +158,22 @@ public class Column {
         this._name = name;
     }
 
-    // ==============================================================================
-    //                                                                        Loading
-    //                                                                        =======
-    public static String makeList(List<String> columns) {
-        Object obj = columns.get(0);
-        boolean isColumnList = (obj instanceof Column);
-        if (isColumnList) {
-            obj = ((Column) obj).getName();
-        }
-        StringBuffer buf = new StringBuffer((String) obj);
-        for (int i = 1; i < columns.size(); i++) {
-            obj = columns.get(i);
-            if (isColumnList) {
-                obj = ((Column) obj).getName();
-            }
-            buf.append(", ").append(obj);
-        }
-        return buf.toString();
-    }
-
+    // -----------------------------------------------------
+    //                                         Load from XML
+    //                                         -------------
     public void loadFromXML(Attributes attrib) {
         // Name
         _name = attrib.getValue("name");
-
         _javaName = attrib.getValue("javaName");
-        _javaType = attrib.getValue("javaType");
-        if (_javaType != null && _javaType.length() == 0) {
-            _javaType = null;
-        }
 
-        // retrieves the method for converting from specified name to
-        // a java name.
+        // retrieves the method for converting from specified name to a java name.
         _javaNamingMethod = attrib.getValue("javaNamingMethod");
         if (_javaNamingMethod == null) {
             _javaNamingMethod = _table.getDatabase().getDefaultJavaNamingMethod();
         }
 
         // Primary Key
-        {
-            final String primaryKey = attrib.getValue("primaryKey");
-            _isPrimaryKey = ("true".equals(primaryKey));
-        }
+        _isPrimaryKey = ("true".equals(attrib.getValue("primaryKey")));
 
         // HELP: Should primary key, index, and/or idMethod="native"
         // affect isNotNull?  If not, please document why here.
@@ -235,21 +184,24 @@ public class Column {
         final String autoIncrement = attrib.getValue("autoIncrement");
         _isAutoIncrement = ("true".equals(autoIncrement));
 
-        // Column comment.
         _comment = attrib.getValue("comment");
-
-        // Default column value.
         _defaultValue = attrib.getValue("default");
-
         _columnSize = attrib.getValue("size");
 
-        setTorqueType(attrib.getValue("type"));
+        setJdbcType(attrib.getValue("type"));
         setDbType(attrib.getValue("dbType"));
+
+        // It is not necessary to use this value on XML
+        // because it uses the JavaNative value.
+        //_javaType = attrib.getValue("javaType");
+        //if (_javaType != null && _javaType.length() == 0) {
+        //    _javaType = null;
+        //}
 
         _inheritanceType = attrib.getValue("inheritance");
         _isInheritance = (_inheritanceType != null && !_inheritanceType.equals("false"));
 
-        //        this._inputValidator = attrib.getValue("inputValidator");
+        //this._inputValidator = attrib.getValue("inputValidator");
         _description = attrib.getValue("description");
     }
 
@@ -305,18 +257,6 @@ public class Column {
             return "null";
         }
         return "\"" + alias + "\"";
-    }
-
-    // -----------------------------------------------------
-    //                                           Description
-    //                                           -----------
-    // No use at DBFlute
-    public String getDescription() {
-        return _description;
-    }
-
-    public void setDescription(String newDescription) {
-        _description = newDescription;
     }
 
     // -----------------------------------------------------
@@ -391,35 +331,6 @@ public class Column {
     }
 
     // -----------------------------------------------------
-    //                                             Java Type
-    //                                             ---------
-    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = 
-    // Unused at Generate task.
-    // Generate task instead uses JavaNative.
-    // Basically the value is same as this property 'javaType'.
-    // = = = = = = = = = =/ 
-    /**
-     * Get type to use in Java sources
-     */
-    public String getJavaType() {
-        return _javaType;
-    }
-
-    // -----------------------------------------------------
-    //                                           Torque Type
-    //                                           -----------
-    public void setTorqueType(String torqueType) {
-        this._torqueType = torqueType;
-        if (torqueType.equals("VARBINARY") || torqueType.equals("BLOB")) {
-            _needsTransactionInPostgres = true;
-        }
-    }
-
-    public Object getTorqueType() {
-        return _torqueType;
-    }
-
-    // -----------------------------------------------------
     //                                              Position
     //                                              --------
     /**
@@ -436,6 +347,18 @@ public class Column {
      */
     public void setPosition(int v) {
         this._position = v;
+    }
+
+    // -----------------------------------------------------
+    //                                           Description
+    //                                           -----------
+    // No use at DBFlute
+    public String getDescription() {
+        return _description;
+    }
+
+    public void setDescription(String newDescription) {
+        _description = newDescription;
     }
 
     // -----------------------------------------------------
@@ -459,58 +382,23 @@ public class Column {
         return _table;
     }
 
+    protected Database getDatabaseChecked() {
+        final Table tbl = getTable();
+        if (tbl == null) {
+            throw new IllegalStateException("getTable() should not be null at " + getName());
+        }
+        final Database db = tbl.getDatabase();
+        if (db == null) {
+            throw new IllegalStateException("getTable().getDatabase() should not be null at " + getName());
+        }
+        return db;
+    }
+
     /**
      * Returns the Name of the table the column is in
      */
     public String getTableName() {
         return _table.getName();
-    }
-
-    /**
-     * A utility function to create a new column
-     * from attrib and add it to this table.
-     */
-    public Inheritance addInheritance(Attributes attrib) {
-        Inheritance inh = new Inheritance();
-        inh.loadFromXML(attrib);
-        addInheritance(inh);
-
-        return inh;
-    }
-
-    /**
-     * Adds a new inheritance definition to the inheritance list and set the
-     * parent column of the inheritance to the current column
-     */
-    public void addInheritance(Inheritance inh) {
-        inh.setColumn(this);
-        if (_inheritanceList == null) {
-            _inheritanceList = new ArrayList<Inheritance>();
-            _isEnumeratedClasses = true;
-        }
-        _inheritanceList.add(inh);
-    }
-
-    /**
-     * Get the inheritance definitions.
-     */
-    public List<Inheritance> getChildren() {
-        return _inheritanceList;
-    }
-
-    /**
-     * Determine if this column is a normal property or specifies a
-     * the classes that are represented in the table containing this column.
-     */
-    public boolean isInheritance() {
-        return _isInheritance;
-    }
-
-    /**
-     * Determine if possible classes have been enumerated in the xml file.
-     */
-    public boolean isEnumeratedClasses() {
-        return _isEnumeratedClasses;
     }
 
     // =====================================================================================
@@ -640,13 +528,6 @@ public class Column {
             }
         }
         return false;
-    }
-
-    /**
-     * Return true if the column requires a transaction in Postgres SQL
-     */
-    public boolean requiresTransactionInPostgres() {
-        return _needsTransactionInPostgres;
     }
 
     // -----------------------------------------------------
@@ -794,23 +675,6 @@ public class Column {
     // -----------------------------------------------------
     //                                         Default Value
     //                                         -------------
-    /**
-     * Return a string that will give this column a default value.
-     */
-    public String getDefaultSetting() {
-        StringBuffer dflt = new StringBuffer(0);
-        if (_defaultValue != null) {
-            dflt.append("default ");
-            if (TypeMap.isTextType(_torqueType)) {
-                // TODO: Properly SQL-escape the text.
-                dflt.append('\'').append(_defaultValue).append('\'');
-            } else {
-                dflt.append(_defaultValue);
-            }
-        }
-        return dflt.toString();
-    }
-
     public void setDefaultValue(String def) {
         _defaultValue = def;
     }
@@ -1042,87 +906,22 @@ public class Column {
     }
 
     // ===================================================================================
-    //                                                                    Sql2Entity Table
-    //                                                                    ================
-    public String getSql2EntityTableName() {
-        return _sql2EntityTableName;
+    //                                                                        Type Mapping
+    //                                                                        ============
+    // -----------------------------------------------------
+    //                                             JDBC Type
+    //                                             ---------
+    public void setJdbcType(String jdbcType) {
+        this._jdbcType = jdbcType;
     }
 
-    public void setSql2EntityTableName(String sql2EntityTableName) {
-        _sql2EntityTableName = sql2EntityTableName;
+    public Object getJdbcType() {
+        return _jdbcType;
     }
 
-    public String getSql2EntityJavaNative() {
-        return _sql2EntityJavaNative;
-    }
-
-    public void setSql2EntityJavaNative(String sql2EntityJavaNative) {
-        _sql2EntityJavaNative = sql2EntityJavaNative;
-    }
-
-    // ===================================================================================
-    //                                                                      Checked Getter
-    //                                                                      ==============
-    protected Database getDatabaseChecked() {
-        final Table tbl = getTable();
-        if (tbl == null) {
-            throw new IllegalStateException("getTable() should not be null at " + getName());
-        }
-        final Database db = tbl.getDatabase();
-        if (db == null) {
-            throw new IllegalStateException("getTable().getDatabase() should not be null at " + getName());
-        }
-        return db;
-    }
-
-    // ===================================================================================
-    //                                                                      Basic Override
-    //                                                                      ==============
-    /**
-     * String representation of the column. This is an xml representation.
-     * @return string representation in xml
-     */
-    public String toString() {
-        StringBuffer result = new StringBuffer();
-        result.append("    <column name=\"").append(_name).append('"');
-
-        if (_javaName != null) {
-            result.append(" javaName=\"").append(_javaName).append('"');
-        }
-
-        if (_isPrimaryKey) {
-            result.append(" primaryKey=\"").append(_isPrimaryKey).append('"');
-        }
-
-        if (_isNotNull) {
-            result.append(" required=\"true\"");
-        } else {
-            result.append(" required=\"false\"");
-        }
-
-        result.append(" type=\"").append(_torqueType).append('"');
-
-        if (_columnSize != null) {
-            result.append(" size=\"").append(_columnSize).append('"');
-        }
-
-        if (_defaultValue != null) {
-            result.append(" default=\"").append(_defaultValue).append('"');
-        }
-
-        if (isInheritance()) {
-            result.append(" inheritance=\"").append(_inheritanceType).append('"');
-        }
-
-        // Close the column.
-        result.append(" />\n");
-
-        return result.toString();
-    }
-
-    // ===================================================================================
-    //                                                                         Java Native
-    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                           Java Native
+    //                                           -----------
     /**
      * Return a string representation of the native java type which corresponds
      * to the JDBC type of this column. Use in the generation of Base objects.
@@ -1134,7 +933,7 @@ public class Column {
         if (_sql2EntityJavaNative != null && _sql2EntityJavaNative.trim().length() > 0) {
             return _sql2EntityJavaNative;
         }
-        return TypeMap.findJavaNativeString(_torqueType, getIntegerColumnSize(), getDecimalDigits());
+        return TypeMap.findJavaNativeByJdbcType(_jdbcType, getIntegerColumnSize(), getDecimalDigits());
     }
 
     public String getJavaNativeRemovedPackage() { // for SchemaHTML
@@ -1153,16 +952,16 @@ public class Column {
         return javaNative;
     }
 
-    // ===================================================================================
-    //                                                                         Flex Native
-    //                                                                         ===========
+    // -----------------------------------------------------
+    //                                           Flex Native
+    //                                           -----------
     public String getFlexNative() {
-        return TypeMap.findFlexNativeString(getJavaNative());
+        return TypeMap.findFlexNativeByJavaNative(getJavaNative());
     }
 
-    // ===================================================================================
-    //                                                                  Type Determination
-    //                                                                  ==================
+    // -----------------------------------------------------
+    //                                    Type Determination
+    //                                    ------------------
     public boolean isJavaNativeStringObject() {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeStringList());
     }
@@ -1215,24 +1014,24 @@ public class Column {
         return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
     }
 
-    public boolean isTorqueTypeClob() {// as Pinpoint
-        return "CLOB".equals(getTorqueType());
+    public boolean isJdbcTypeClob() { // as Pinpoint
+        return "CLOB".equals(getJdbcType());
     }
 
-    public boolean isTorqueTypeDate() {// as Pinpoint
-        return "DATE".equals(getTorqueType());
+    public boolean isJdbcTypeDate() { // as Pinpoint
+        return "DATE".equals(getJdbcType());
     }
 
-    public boolean isTorqueTypeTime() {// as Pinpoint
-        return "TIME".equals(getTorqueType());
+    public boolean isJdbcTypeTime() { // as Pinpoint
+        return "TIME".equals(getJdbcType());
     }
 
-    public boolean isTorqueTypeTimestamp() {// as Pinpoint
-        return "TIMESTAMP".equals(getTorqueType());
+    public boolean isJdbcTypeTimestamp() { // as Pinpoint
+        return "TIMESTAMP".equals(getJdbcType());
     }
 
-    public boolean isTorqueTypeBlob() {// as Pinpoint
-        return "BLOB".equals(getTorqueType());
+    public boolean isJdbcTypeBlob() { // as Pinpoint
+        return "BLOB".equals(getJdbcType());
     }
 
     protected boolean containsAsEndsWith(String str, List<Object> ls) {
@@ -1243,6 +1042,147 @@ public class Column {
             }
         }
         return false;
+    }
+
+    // ===================================================================================
+    //                                                              Sql2Entity Information
+    //                                                              ======================
+    public String getSql2EntityTableName() {
+        return _sql2EntityTableName;
+    }
+
+    public void setSql2EntityTableName(String sql2EntityTableName) {
+        _sql2EntityTableName = sql2EntityTableName;
+    }
+
+    public String getSql2EntityJavaNative() {
+        return _sql2EntityJavaNative;
+    }
+
+    public void setSql2EntityJavaNative(String sql2EntityJavaNative) {
+        _sql2EntityJavaNative = sql2EntityJavaNative;
+    }
+
+    // ===================================================================================
+    //                                                                     Other Component
+    //                                                                     ===============
+    /**
+     * A utility function to create a new column
+     * from attrib and add it to this table.
+     */
+    public Inheritance addInheritance(Attributes attrib) {
+        Inheritance inh = new Inheritance();
+        inh.loadFromXML(attrib);
+        addInheritance(inh);
+
+        return inh;
+    }
+
+    /**
+     * Adds a new inheritance definition to the inheritance list and set the
+     * parent column of the inheritance to the current column
+     */
+    public void addInheritance(Inheritance inh) {
+        inh.setColumn(this);
+        if (_inheritanceList == null) {
+            _inheritanceList = new ArrayList<Inheritance>();
+            _isEnumeratedClasses = true;
+        }
+        _inheritanceList.add(inh);
+    }
+
+    /**
+     * Get the inheritance definitions.
+     */
+    public List<Inheritance> getChildren() {
+        return _inheritanceList;
+    }
+
+    /**
+     * Determine if this column is a normal property or specifies a
+     * the classes that are represented in the table containing this column.
+     */
+    public boolean isInheritance() {
+        return _isInheritance;
+    }
+
+    /**
+     * Determine if possible classes have been enumerated in the xml file.
+     */
+    public boolean isEnumeratedClasses() {
+        return _isEnumeratedClasses;
+    }
+
+    // ===================================================================================
+    //                                                                      Column Utility
+    //                                                                      ==============
+    public static String makeList(List<String> columns) {
+        Object obj = columns.get(0);
+        boolean isColumnList = (obj instanceof Column);
+        if (isColumnList) {
+            obj = ((Column) obj).getName();
+        }
+        StringBuffer buf = new StringBuffer((String) obj);
+        for (int i = 1; i < columns.size(); i++) {
+            obj = columns.get(i);
+            if (isColumnList) {
+                obj = ((Column) obj).getName();
+            }
+            buf.append(", ").append(obj);
+        }
+        return buf.toString();
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * String representation of the column. This is an xml representation.
+     * @return string representation in xml
+     */
+    public String toString() {
+        StringBuffer result = new StringBuffer();
+        result.append("    <column name=\"").append(_name).append('"');
+
+        if (_javaName != null) {
+            result.append(" javaName=\"").append(_javaName).append('"');
+        }
+
+        if (_isPrimaryKey) {
+            result.append(" primaryKey=\"").append(_isPrimaryKey).append('"');
+        }
+
+        if (_isNotNull) {
+            result.append(" required=\"true\"");
+        } else {
+            result.append(" required=\"false\"");
+        }
+
+        result.append(" type=\"").append(_jdbcType).append('"');
+
+        if (_columnSize != null) {
+            result.append(" size=\"").append(_columnSize).append('"');
+        }
+
+        if (_defaultValue != null) {
+            result.append(" default=\"").append(_defaultValue).append('"');
+        }
+
+        if (isInheritance()) {
+            result.append(" inheritance=\"").append(_inheritanceType).append('"');
+        }
+
+        // Close the column.
+        result.append(" />\n");
+
+        return result.toString();
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
     }
 
     // ===================================================================================
@@ -1514,13 +1454,6 @@ public class Column {
 
     public boolean isAvailableDateLessEqualOldAsInline() {
         return getIncludeQueryProperties().isAvailableDateLessEqualOldAsInline(getTableName(), getName());
-    }
-
-    // ===================================================================================
-    //                                                                          Properties
-    //                                                                          ==========
-    protected DfBuildProperties getProperties() {
-        return DfBuildProperties.getInstance();
     }
 
     // ===================================================================================
