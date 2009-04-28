@@ -25,7 +25,7 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
         String prop = stringProp("torque.allClassCopyright", "");
 
         // All line separator should be CR + LF
-        // because Source Code use CR + LF. (2009/04/28)
+        // because Source Code uses CR + LF. (2009/04/28)
         prop = DfStringUtil.replace(prop, "\r\n", "\n");
         prop = DfStringUtil.replace(prop, "\n", "\r\n");
         _copyright = prop;
