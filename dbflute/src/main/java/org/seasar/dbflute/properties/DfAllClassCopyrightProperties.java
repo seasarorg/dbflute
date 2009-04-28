@@ -2,10 +2,14 @@ package org.seasar.dbflute.properties;
 
 import java.util.Properties;
 
+import org.seasar.dbflute.util.DfStringUtil;
+
 /**
  * @author jflute
  */
 public final class DfAllClassCopyrightProperties extends DfAbstractHelperProperties {
+
+    protected String _copyright;
 
     public DfAllClassCopyrightProperties(Properties prop) {
         super(prop);
@@ -15,6 +19,16 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
     //                                                                           Copyright
     //                                                                           =========
     public String getAllClassCopyright() {
-        return stringProp("torque.allClassCopyright", "");
+        if (_copyright != null) {
+            return _copyright;
+        }
+        String prop = stringProp("torque.allClassCopyright", "");
+
+        // All line separator should be CR + LF
+        // because Source Code use CR + LF. (2009/04/28)
+        prop = DfStringUtil.replace(prop, "\r\n", "\n");
+        prop = DfStringUtil.replace(prop, "\n", "\r\n");
+        _copyright = prop;
+        return _copyright;
     }
 }

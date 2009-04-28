@@ -36,7 +36,6 @@ public class DfStringFileReader {
     //                                                                                Read
     //                                                                                ====
     public String readString(String path, String encoding) {
-        final String lineSeparator = System.getProperty("line.separator");
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
         if (file.exists()) {
@@ -60,7 +59,7 @@ public class DfStringFileReader {
                     if (_lineCommentMark != null && lineString.trim().startsWith(_lineCommentMark)) {
                         continue;
                     }
-                    sb.append(lineString + lineSeparator);
+                    sb.append(lineString + "\n");
                 }
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
