@@ -682,7 +682,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 
     public ${glBuriDef}.${processName}_Status getStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
-        java.util.List<BuriPathData> buriPathDataList = xgetCurrentPathDataList(${myEntityVariableName});
+        java.util.List<BuriPathData> buriPathDataList = xgetCurrentPathDataList(${myEntityVariableName}, ${glBuriDef}.BuriProcess.${processName});
         java.util.List<${glBuriDef}.${processName}_Status> statusList = new java.util.ArrayList<${glBuriDef}.${processName}_Status>();
         if (buriPathDataList.isEmpty()) { return null; }
         for (BuriPathData buriPathData : buriPathDataList) {
@@ -711,10 +711,11 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     }
 #end
 
-    private List<BuriPathData> xgetCurrentPathDataList(${myExtendedObjectClassName} ${myEntityVariableName}) {
+    private List<BuriPathData> xgetCurrentPathDataList(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.BuriProcess process) {
         ${glPackageExtendedBhv}.BuriPathDataBhv bhv = xgetBuriPathDataBhv();
         BuriPathDataCB cb = bhv.newMyConditionBean();
         cb.specify().columnPathName();
+        cb.query().setPathName_LikeSearch(process.path(), new org.seasar.dbflute.cbean.coption.LikeSearchOption().likePrefix());
         cb.query().setPkeyNum_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
         cb.query().setDataType_Equal(${myExtendedObjectClassName}.class.getName());
         return bhv.selectList(cb);
