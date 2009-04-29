@@ -1,5 +1,9 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
+#if ($database.isTargetContainerSpring())
+import java.sql.Connection;
+import java.sql.SQLException;
+#end
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.DBDef;
@@ -9,6 +13,9 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
 import org.seasar.dbflute.jdbc.DataSourceWrapper;
+#if ($database.isTargetContainerSpring())
+import org.seasar.dbflute.jdbc.NotCloseConnection;
+#end
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
 #if ($database.isTargetContainerSeasar())
@@ -24,6 +31,10 @@ import org.seasar.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl;
 
 import org.seasar.framework.util.Disposable;
 import org.seasar.framework.util.DisposableUtil;
+#end
+#if ($database.isTargetContainerSpring())
+
+import org.springframework.jdbc.datasource.DataSourceUtils;
 #end
 
 /**
@@ -196,5 +207,40 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 
     public void setDataSource(DataSource dataSource) {
         _dataSource = dataSource;
+#if ($database.isTargetContainerSpring())
+        setupDataSourceHandler(_dataSource);
+#end
     }
+#if ($database.isTargetContainerSpring())
+
+    protected void setupDataSourceHandler(DataSource dataSource) { // should be executed when application is initialized.
+        if (dataSource == null) {
+            return;
+        }
+        DataSourceHandler dataSourceHandler = ${glDBFluteConfig}.getInstance().getDataSourceHandler();
+        if (dataSourceHandler != null) {
+            return;
+        }
+        String dataSourceFqcn = dataSource.getClass().getName();
+        if (dataSourceFqcn.startsWith("org.apache.commons.dbcp")) {
+            ${glDBFluteConfig} config = ${glDBFluteConfig}.getInstance();
+            synchronized (config) {
+                final boolean locked = config.isLocked();
+                if (locked) {
+                    config.unlock();
+                }
+                config.setDataSourceHandler(new SpringDBCPDataSourceHandler());
+                if (locked) {
+                    config.lock();
+                }
+            }
+        }
+    }
+
+    protected static class SpringDBCPDataSourceHandler implements DataSourceHandler {
+        public Connection getConnection(final DataSource ds) throws SQLException {
+            return new NotCloseConnection(DataSourceUtils.getConnection(ds));
+        }
+    }
+#end
 }
