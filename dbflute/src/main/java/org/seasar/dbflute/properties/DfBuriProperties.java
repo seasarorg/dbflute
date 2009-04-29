@@ -306,31 +306,46 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         final Map<String, List<String>> targetProcessMap = getTargetProcessMap();
         final Set<String> tableNameSet = targetProcessMap.keySet();
         for (String current : tableNameSet) {
+            final List<String> relatedProcessList = targetProcessMap.get(current);
             final String tableName = current.toUpperCase();
-            final String foreignName = "FK_" + tableName + "_BURIPATHDATA";
-            if (additionalForeignKeyMap.containsKey(foreignName)) {
-                continue;
+            int identity = 1;
+            for (String relatedProcess : relatedProcessList) {
+                final String foreignName = "FK_" + tableName + "_BURIPATHDATA" + identity;
+                if (additionalForeignKeyMap.containsKey(foreignName)) {
+                    continue;
+                }
+                final LinkedHashMap<String, String> elementMap = newLinkedHashMap();
+                final Table table = finder.findTable(tableName);
+                if (table == null) {
+                    String msg = "The table was not found: " + tableName;
+                    throw new IllegalStateException(msg);
+                }
+                if (table.hasTwoOrMorePrimaryKeys()) {
+                    String msg = "The table should have the only one primary key: " + tableName;
+                    throw new IllegalStateException(msg);
+                }
+                elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_TABLE_NAME, tableName);
+                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_TABLE_NAME, "BURIPATHDATA");
+                final String primaryKeyName = table.getPrimaryKeyAsOne().getName();
+                elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_COLUMN_NAME, primaryKeyName);
+                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_COLUMN_NAME, "PKEYNUM");
+
+                // Fixed Condition
+                final String entityName = table.getExtendedEntityClassName();
+                final String fqcn = entityPackage + "." + entityName;
+                final StringBuilder sb = new StringBuilder();
+                sb.append("$$foreignAlias$$.PATHNAME like '").append(relatedProcess).append(".%'");
+                sb.append(" and $$foreignAlias$$.DATATYPE = '").append(fqcn).append("'");
+                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_CONDITION, sb.toString());
+
+                // Fixed Suffix
+                final String processExpression = DfStringUtil.replace(relatedProcess, ".", "_");
+                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_SUFFIX, "_" + processExpression);
+
+                additionalForeignKeyMap.put(foreignName, elementMap);
+                _log.info(foreignName);
+                ++identity;
             }
-            final LinkedHashMap<String, String> elementMap = newLinkedHashMap();
-            final Table table = finder.findTable(tableName);
-            if (table == null) {
-                String msg = "The table was not found: " + tableName;
-                throw new IllegalStateException(msg);
-            }
-            if (table.hasTwoOrMorePrimaryKeys()) {
-                String msg = "The table should have the only one primary key: " + tableName;
-                throw new IllegalStateException(msg);
-            }
-            elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_TABLE_NAME, tableName);
-            elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_TABLE_NAME, "BURIPATHDATA");
-            final String primaryKeyName = table.getPrimaryKeyAsOne().getName();
-            elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_COLUMN_NAME, primaryKeyName);
-            elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_COLUMN_NAME, "PKEYNUM");
-            final String entityName = table.getExtendedEntityClassName();
-            final String fixedCondition = "$$foreignAlias$$.DATATYPE = '" + entityPackage + "." + entityName + "'";
-            elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_CONDITION, fixedCondition);
-            additionalForeignKeyMap.put(foreignName, elementMap);
-            _log.info(foreignName);
         }
         _log.info("==========/");
     }
