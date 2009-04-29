@@ -134,13 +134,14 @@ public class DfAdditionalForeignKeyInitializer {
         }
         table.addForeignKey(fk);
         final boolean canBeReferrer = getTable(foreignTableName).addReferrer(fk);
-        if (!canBeReferrer) {
+        if (canBeReferrer) {
+            for (String foreignColumnName : foreignColumnNameList) {
+                final Column foreignColumn = getTable(foreignTableName).getColumn(foreignColumnName);
+                foreignColumn.addReferrer(fk);
+            }
+        } else {
             String msg = "    *Cannot add referrer!";
             _log.info(msg);
-        }
-        for (String foreignColumnName : foreignColumnNameList) {
-            final Column foreignColumn = getTable(foreignTableName).getColumn(foreignColumnName);
-            foreignColumn.addReferrer(fk);
         }
     }
 

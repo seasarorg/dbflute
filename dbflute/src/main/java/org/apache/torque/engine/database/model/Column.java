@@ -857,12 +857,12 @@ public class Column {
         if (!hasReferrer()) {
             return _singleKeyRefferrers;
         }
-        final List<ForeignKey> reffererList = getReferrers();
-        for (ForeignKey refferer : reffererList) {
-            if (!refferer.isSimpleKeyFK()) {
+        final List<ForeignKey> referrerList = getReferrers();
+        for (ForeignKey referrer : referrerList) {
+            if (!referrer.isSimpleKeyFK()) {
                 continue;
             }
-            _singleKeyRefferrers.add(refferer);
+            _singleKeyRefferrers.add(referrer);
         }
         return _singleKeyRefferrers;
     }
