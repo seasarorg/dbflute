@@ -139,6 +139,14 @@
     <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
     	  tofile="../dbflute-spring-example/lib/sources/dbflute-runtime-${version}-sources.jar"
     	  overwrite="true"/>
+
+    <delete file="../dbflute-guice-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-guice-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-guice-example/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
   </target>
 		
 </project>
