@@ -13,8 +13,10 @@ import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+#if ($database.isTargetContainerSeasar())
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
+#end
 import org.seasar.dbflute.util.DfSystemUtil;
 #if ($database.isTargetContainerSpring())
 
