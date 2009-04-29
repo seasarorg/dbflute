@@ -223,6 +223,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
      * If you use a transaction library which has a data source which supports transaction,
      * It doesn't need these arrangement. (For example, the framework 'Atomikos') <br />
      * This method should be executed when application is initialized.
+     * @param dataSource The instance of data source. (Nullable: If the value is null, do nothing)
      */
     protected void setupDataSourceHandler(DataSource dataSource) {
         if (dataSource == null) {

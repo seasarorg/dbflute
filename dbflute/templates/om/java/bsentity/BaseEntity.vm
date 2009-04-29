@@ -419,7 +419,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                                                      ==============
 #foreach ($processName in $table.tableProcessForMethodNameList)
     public ${glBuriDef}.${processName}_Status getStatus_${processName}() {
-        if (getBuriPathData() == null) { return null; }
+        if (getBuriPathData_${processName}() == null) { return null; }
         return ${glBuriDef}.${processName}_Status.codeOf(getBuriPathData_${processName}().getPathName());
     }
 #end
