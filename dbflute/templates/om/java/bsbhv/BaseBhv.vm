@@ -700,13 +700,13 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
             , ${glBuriDef}.${processName}_Status... statuses) {
         assertObjectNotNull("statuses", statuses);
         ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.setupSelect_BuriPathData();
+        cb.setupSelect_BuriPathData_${processName}();
         conditionBeanSetupper.setup(cb);
         java.util.List<String> pathNameList = new java.util.ArrayList<String>();
         for (${glBuriDef}.${processName}_Status status : statuses) {
             pathNameList.add(status.path());
         }
-        cb.query().queryBuriPathData().setPathName_InScope(pathNameList);
+        cb.query().queryBuriPathData_${processName}().setPathName_InScope(pathNameList);
         return selectList(cb);
     }
 #end
