@@ -22,10 +22,11 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 /**
- * The wrapper of data source.
+ * The wrapper of data source with handling.
  * @author jflute
+ * @since 0.9.5 (2009/04/29 Wednesday)
  */
-public class DataSourceWrapper implements DataSource {
+public class HandlingDataSourceWrapper implements DataSource {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -36,7 +37,7 @@ public class DataSourceWrapper implements DataSource {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DataSourceWrapper(DataSource dataSource, DataSourceHandler dataSourceHandler) {
+    public HandlingDataSourceWrapper(DataSource dataSource, DataSourceHandler dataSourceHandler) {
         if (dataSource == null) {
             String msg = "The argument 'dataSource' should not be null!";
             throw new IllegalArgumentException(msg);

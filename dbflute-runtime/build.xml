@@ -1,7 +1,7 @@
 <project name="DBFluteRuntime" default="dist" basedir=".">
 
-  <property name="version" value="0.9.4.1"/>
-  <property name="build.version" value="0.9.4.1"/>
+  <property name="version" value="0.9.5"/>
+  <property name="build.version" value="0.9.5-02-SNAPSHOT"/>
 
   <target name="dist">
 
@@ -130,6 +130,14 @@
     	  overwrite="true"/>
     <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
     	  tofile="../dbflute-basic-example/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
+
+    <delete file="../dbflute-spring-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-spring-example/lib/sources/dbflute-runtime-${version}-sources.jar"
     	  overwrite="true"/>
   </target>
 		
