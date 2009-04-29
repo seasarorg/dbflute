@@ -715,7 +715,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         ${glPackageExtendedBhv}.BuriPathDataBhv bhv = xgetBuriPathDataBhv();
         BuriPathDataCB cb = bhv.newMyConditionBean();
         cb.specify().columnPathName();
-        cb.query().setPathName_LikeSearch(process.path(), new org.seasar.dbflute.cbean.coption.LikeSearchOption().likePrefix());
+        cb.query().setPathName_LikeSearch(process.path() + ".", new org.seasar.dbflute.cbean.coption.LikeSearchOption().likePrefix());
         cb.query().setPkeyNum_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
         cb.query().setDataType_Equal(${myExtendedObjectClassName}.class.getName());
         return bhv.selectList(cb);

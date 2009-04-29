@@ -12,9 +12,9 @@ import org.seasar.dbflute.bhv.core.InvokerAssistant;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
-import org.seasar.dbflute.jdbc.DataSourceWrapper;
+import org.seasar.dbflute.jdbc.HandlingDataSourceWrapper;
 #if ($database.isTargetContainerSpring())
-import org.seasar.dbflute.jdbc.NotCloseConnection;
+import org.seasar.dbflute.jdbc.NotClosingConnectionWrapper;
 #end
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
@@ -65,7 +65,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     public DataSource assistDataSource() {
         DataSourceHandler dataSourceHandler = ${glDBFluteConfig}.getInstance().getDataSourceHandler();
         if (dataSourceHandler != null) {
-            return new DataSourceWrapper(_dataSource, dataSourceHandler);
+            return new HandlingDataSourceWrapper(_dataSource, dataSourceHandler);
         }
         return _dataSource;
     }
@@ -251,7 +251,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 
     protected static class SpringDBCPDataSourceHandler implements DataSourceHandler {
         public Connection getConnection(final DataSource ds) throws SQLException {
-            return new NotCloseConnection(DataSourceUtils.getConnection(ds));
+            return new NotClosingConnectionWrapper(DataSourceUtils.getConnection(ds));
         }
     }
 #end
