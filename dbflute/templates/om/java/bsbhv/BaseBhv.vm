@@ -682,7 +682,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 
     public ${glBuriDef}.${processName}_Status getStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
-        java.util.List<BuriAllRoundState> buriAllRoundStateList = xgetCurrentPathDataList(${myEntityVariableName}, ${glBuriDef}.BuriProcess.${processName});
+        java.util.List<BuriAllRoundState> buriAllRoundStateList = xgetCurrentStateList(${myEntityVariableName}, ${glBuriDef}.BuriProcess.${processName});
         java.util.List<${glBuriDef}.${processName}_Status> statusList = new java.util.ArrayList<${glBuriDef}.${processName}_Status>();
         if (buriAllRoundStateList.isEmpty()) { return null; }
         for (BuriAllRoundState buriAllRoundState : buriAllRoundStateList) {
@@ -711,7 +711,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     }
 #end
 
-    private List<BuriAllRoundState> xgetCurrentPathDataList(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.BuriProcess process) {
+    private List<BuriAllRoundState> xgetCurrentStateList(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.BuriProcess process) {
         ${glPackageExtendedBhv}.BuriAllRoundStateBhv bhv = xgetBuriAllRoundStateBhv();
         BuriAllRoundStateCB cb = bhv.newMyConditionBean();
         cb.specify().columnPathName();

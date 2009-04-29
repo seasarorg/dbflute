@@ -42,7 +42,7 @@ public class ${glDBFluteInitializer} {
      * Constructor. And initialize various components.
      */
     public ${glDBFluteInitializer}() {
-        _log.info("...Initializing DBFlute");
+        _log.info("...Initializing DBFlute components!");
         handleSqlLogRegistry();
         loadCoolClasses();
         ${glDBFluteConfig}.getInstance().lock();
@@ -77,7 +77,7 @@ public class ${glDBFluteInitializer} {
      * @param dataSource The instance of data source. (NotNull)
      */
     public ${glDBFluteInitializer}(DataSource dataSource) {
-        _log.info("...Initializing DBFlute");
+        _log.info("...Initializing DBFlute components!");
         setupDataSourceHandler(dataSource);
         ${glDBFluteConfig}.getInstance().lock();
     }
@@ -121,7 +121,7 @@ public class ${glDBFluteInitializer} {
      * Constructor. And initialize various components.
      */
     public ${glDBFluteInitializer}() {
-        _log.info("...Initializing DBFlute");
+        _log.info("...Initializing DBFlute components!");
         ${glDBFluteConfig}.getInstance().lock();
     }
 #end
