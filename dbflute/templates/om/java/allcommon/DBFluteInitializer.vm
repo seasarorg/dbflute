@@ -99,13 +99,13 @@ public class ${glDBFluteInitializer} {
             String msg = "The argument 'dataSource' should not be null!";
             throw new IllegalArgumentException(msg);
         }
-        DataSourceHandler dataSourceHandler = ${glDBFluteConfig}.getInstance().getDataSourceHandler();
+        final ${glDBFluteConfig} config = ${glDBFluteConfig}.getInstance();
+        final DataSourceHandler dataSourceHandler = config.getDataSourceHandler();
         if (dataSourceHandler != null) {
             return;
         }
-        String dataSourceFqcn = dataSource.getClass().getName();
-        if (dataSourceFqcn.startsWith("org.apache.commons.dbcp")) {
-            ${glDBFluteConfig} config = ${glDBFluteConfig}.getInstance();
+        final String dataSourceFqcn = dataSource.getClass().getName();
+        if (dataSourceFqcn.startsWith("org.apache.commons.dbcp.")) {
             config.unlock();
             config.setDataSourceHandler(new SpringDBCPDataSourceHandler());
         }

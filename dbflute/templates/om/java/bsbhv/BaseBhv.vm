@@ -682,11 +682,11 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 
     public ${glBuriDef}.${processName}_Status getStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
-        java.util.List<BuriPathData> buriPathDataList = xgetCurrentPathDataList(${myEntityVariableName}, ${glBuriDef}.BuriProcess.${processName});
+        java.util.List<BuriAllRoundState> buriAllRoundStateList = xgetCurrentPathDataList(${myEntityVariableName}, ${glBuriDef}.BuriProcess.${processName});
         java.util.List<${glBuriDef}.${processName}_Status> statusList = new java.util.ArrayList<${glBuriDef}.${processName}_Status>();
-        if (buriPathDataList.isEmpty()) { return null; }
-        for (BuriPathData buriPathData : buriPathDataList) {
-            ${glBuriDef}.${processName}_Status status = ${glBuriDef}.${processName}_Status.codeOf(buriPathData.getPathName());
+        if (buriAllRoundStateList.isEmpty()) { return null; }
+        for (BuriAllRoundState buriAllRoundState : buriAllRoundStateList) {
+            ${glBuriDef}.${processName}_Status status = ${glBuriDef}.${processName}_Status.codeOf(buriAllRoundState.getPathName());
             if (status != null) { statusList.add(status); }
         }
         if (statusList.size() > 1) {
@@ -700,20 +700,20 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
             , ${glBuriDef}.${processName}_Status... statuses) {
         assertObjectNotNull("statuses", statuses);
         ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.setupSelect_BuriPathData_${processName}();
+        cb.setupSelect_BuriAllRoundState_${processName}();
         conditionBeanSetupper.setup(cb);
         java.util.List<String> pathNameList = new java.util.ArrayList<String>();
         for (${glBuriDef}.${processName}_Status status : statuses) {
             pathNameList.add(status.path());
         }
-        cb.query().queryBuriPathData_${processName}().setPathName_InScope(pathNameList);
+        cb.query().queryBuriAllRoundState_${processName}().setPathName_InScope(pathNameList);
         return selectList(cb);
     }
 #end
 
-    private List<BuriPathData> xgetCurrentPathDataList(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.BuriProcess process) {
-        ${glPackageExtendedBhv}.BuriPathDataBhv bhv = xgetBuriPathDataBhv();
-        BuriPathDataCB cb = bhv.newMyConditionBean();
+    private List<BuriAllRoundState> xgetCurrentPathDataList(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.BuriProcess process) {
+        ${glPackageExtendedBhv}.BuriAllRoundStateBhv bhv = xgetBuriAllRoundStateBhv();
+        BuriAllRoundStateCB cb = bhv.newMyConditionBean();
         cb.specify().columnPathName();
         cb.query().setPathName_LikeSearch(process.path() + ".", new org.seasar.dbflute.cbean.coption.LikeSearchOption().likePrefix());
         cb.query().setPkeyNum_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
@@ -721,8 +721,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         return bhv.selectList(cb);
     }
 
-    private ${glPackageExtendedBhv}.BuriPathDataBhv xgetBuriPathDataBhv() {
-        return getBehaviorSelector().select(${glPackageExtendedBhv}.BuriPathDataBhv.class);
+    private ${glPackageExtendedBhv}.BuriAllRoundStateBhv xgetBuriAllRoundStateBhv() {
+        return getBehaviorSelector().select(${glPackageExtendedBhv}.BuriAllRoundStateBhv.class);
     }
 #end
     

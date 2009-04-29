@@ -310,7 +310,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
             final String tableName = current.toUpperCase();
             int identity = 1;
             for (String relatedProcess : relatedProcessList) {
-                final String foreignName = "FK_" + tableName + "_BURIPATHDATA" + identity;
+                final String foreignName = "FK_" + tableName + "_BURI_ALL_ROUND_STATE_" + identity;
                 if (additionalForeignKeyMap.containsKey(foreignName)) {
                     continue;
                 }
@@ -325,17 +325,17 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
                     throw new IllegalStateException(msg);
                 }
                 elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_TABLE_NAME, tableName);
-                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_TABLE_NAME, "BURIPATHDATA");
+                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_TABLE_NAME, "BURI_ALL_ROUND_STATE");
                 final String primaryKeyName = table.getPrimaryKeyAsOne().getName();
                 elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_COLUMN_NAME, primaryKeyName);
-                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_COLUMN_NAME, "PKEYNUM");
+                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_COLUMN_NAME, "PKEY_NUM");
 
                 // Fixed Condition
                 final String entityName = table.getExtendedEntityClassName();
                 final String fqcn = entityPackage + "." + entityName;
                 final StringBuilder sb = new StringBuilder();
-                sb.append("$$foreignAlias$$.PATHNAME like '").append(relatedProcess).append(".%'");
-                sb.append(" and $$foreignAlias$$.DATATYPE = '").append(fqcn).append("'");
+                sb.append("$$foreignAlias$$.PATH_NAME like '").append(relatedProcess).append(".%'");
+                sb.append(" and $$foreignAlias$$.DATA_TYPE = '").append(fqcn).append("'");
                 elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_CONDITION, sb.toString());
 
                 // Fixed Suffix
