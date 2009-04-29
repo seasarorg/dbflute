@@ -213,7 +213,18 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     }
 #if ($database.isTargetContainerSpring())
 
-    protected void setupDataSourceHandler(DataSource dataSource) { // should be executed when application is initialized.
+    /**
+     * Set up the handler of data source to the configuration of DBFlute. <br />
+     * If it uses commons-DBCP, it needs to arrange some for transaction.
+     * <ul>
+     *     <li>A. To use DataSourceUtils which is Spring Framework class.</li>
+     *     <li>B. To use TransactionConnection that is original class and doesn't close really.</li>
+     * </ul>
+     * If you use a transaction library which has a data source which supports transaction,
+     * It doesn't need these arrangement. (For example, the framework 'Atomikos') <br />
+     * This method should be executed when application is initialized.
+     */
+    protected void setupDataSourceHandler(DataSource dataSource) {
         if (dataSource == null) {
             return;
         }
