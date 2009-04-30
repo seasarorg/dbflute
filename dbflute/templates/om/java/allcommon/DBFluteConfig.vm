@@ -280,11 +280,11 @@ public class ${glDBFluteConfig} {
         return _fullTextSearchOperand;
     }
 
-    public void setupDefaultFullTextSearchOperand() {
+    public void useDefaultFullTextSearchOperand() {
         _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand.FULL_TEXT_SEARCH; 
     }
 
-    public void setupOldFullTextSearchOperand() {
+    public void useOldFullTextSearchOperand() {
         _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand.OLD_FULL_TEXT_SEARCH; 
     }
 #end
