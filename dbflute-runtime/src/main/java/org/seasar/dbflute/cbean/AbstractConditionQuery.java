@@ -507,7 +507,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
                 } else {
                     getSqlClause().makeAdditionalConditionAsOrEffective();
-                    invokeSetterLikeSearch(colName, currentValue, option);
+                    invokeQueryLikeSearch(colName, currentValue, option);
                 }
             }
             getSqlClause().ignoreAdditionalConditionAsOr();
@@ -534,7 +534,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         throw new RequiredOptionNotFoundException(msg);
     }
 
-    protected void invokeSetterLikeSearch(String columnFlexibleName, Object value, LikeSearchOption option) {
+    protected void invokeQueryLikeSearch(String columnFlexibleName, Object value, LikeSearchOption option) {
         if (value == null) {
             return;
         }
