@@ -281,10 +281,18 @@ public class ${glDBFluteConfig} {
     }
 
     public void useDefaultFullTextSearchOperand() {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Using fullTextSearchOperand: Default");
+		}
         _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand.FULL_TEXT_SEARCH; 
     }
 
     public void useOldFullTextSearchOperand() {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Using fullTextSearchOperand: Old");
+		}
         _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand.OLD_FULL_TEXT_SEARCH; 
     }
 #end

@@ -864,7 +864,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
             }
             invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
                 @Override
-                public ExtensionOperand getExtensionOperand() {
+                public org.seasar.dbflute.dbway.ExtensionOperand getExtensionOperand() {
                     return ${glDBFluteConfig}.getInstance().getFullTextSearchOperand();
                 }
             });
