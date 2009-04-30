@@ -835,7 +835,8 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if ($database.isDatabaseMySQL())
 
     /**
-     * Match for full-text search.
+     * Match for full-text search. <br />
+     * Bind variable is unused because the condition value should be literal in MySQL.
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (Nullable: If the value is null or empty, it does not make condition!)
      * @param modifier The modifier of full-text search. (Nullable: If the value is null, No modifier specified)
