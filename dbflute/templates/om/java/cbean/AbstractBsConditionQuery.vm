@@ -9,9 +9,6 @@ import org.seasar.dbflute.cbean.coption.*;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
-#if ($table.hasClassification())
-import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
-#end
 import ${glPackageBaseCommon}.*;
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
@@ -850,6 +847,30 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         String conditionString = ((org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql)getSqlClause())
                 .buildMatchCondition(textColumnList, conditionValue, modifier, getTableDbName(), getRealAliasName());
         registerWhereClause(conditionString);
+    }
+#end
+#if ($database.isDatabasePostgreSQL())
+
+    /**
+     * Match for full-text search. <br />
+     * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
+     * @param conditionValue The condition value. (NotNull)
+     */
+    public void match(java.util.List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList, String conditionValue) {
+        int index = 0;
+        for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
+            if (index > 0) {
+                getSqlClause().makeAdditionalConditionAsOrEffective();
+            }
+            invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
+                @Override
+                public ExtensionOperand getExtensionOperand() {
+                    return ${glDBFluteConfig}.getInstance().getFullTextSearchOperand();
+                }
+            });
+            ++index;
+        }
+        getSqlClause().ignoreAdditionalConditionAsOr();
     }
 #end
 #end

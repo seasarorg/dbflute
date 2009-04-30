@@ -42,6 +42,9 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                         Configuration
+    //                                         -------------
 	protected StatementConfig _defaultStatementConfig;
 	protected boolean _queryLogLevelInfo;
 	protected boolean _executeStatusLogLevelInfo;
@@ -53,6 +56,19 @@ public class ${glDBFluteConfig} {
 	protected boolean _disableSelectIndex;
 	protected boolean _internalDebug;
 
+    // -----------------------------------------------------
+    //                                   Database Dependency
+    //                                   -------------------
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabasePostgreSQL())
+    protected org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand _fullTextSearchOperand
+            = org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand.FULL_TEXT_SEARCH;
+#end
+#end
+
+    // -----------------------------------------------------
+    //                                                  Lock
+    //                                                  ----
 	protected boolean _locked = true;
 	
     // ===================================================================================
@@ -252,6 +268,28 @@ public class ${glDBFluteConfig} {
 	    TnValueTypes.unregisterValueType(keyType);
 	}
 	
+    // ===================================================================================
+    //                                                                 Database Dependency
+    //                                                                 ===================
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabasePostgreSQL())
+    // -----------------------------------------------------
+    //                              Full-Text Search Operand
+    //                              ------------------------
+    public org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand getFullTextSearchOperand() {
+        return _fullTextSearchOperand;
+    }
+
+    public void setupDefaultFullTextSearchOperand() {
+        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand.FULL_TEXT_SEARCH; 
+    }
+
+    public void setupOldFullTextSearchOperand() {
+        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand.OLD_FULL_TEXT_SEARCH; 
+    }
+#end
+#end
+
     // ===================================================================================
     //                                                                  Configuration Lock
     //                                                                  ==================
