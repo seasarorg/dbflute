@@ -44,7 +44,8 @@ public class WayOfPostgreSQL implements DBWay {
     public enum LikeSearchOperand implements ExtensionOperand {
         BASIC("like")
         , CASE_INSENSITIVE("ilike")
-        , FULL_TEXT_SEARCH("@@")
+        , FULL_TEXT_SEARCH("%%")
+        , OLD_FULL_TEXT_SEARCH("@@")
         ;
         private static final Map<String, LikeSearchOperand> _codeValueMap = new HashMap<String, LikeSearchOperand>();
         static { for (LikeSearchOperand value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
