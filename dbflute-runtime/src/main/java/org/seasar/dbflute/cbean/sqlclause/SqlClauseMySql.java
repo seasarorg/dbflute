@@ -15,6 +15,11 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import java.util.List;
+
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier;
+
 /**
  * SqlClause for MySQL.
  * @author jflute
@@ -121,5 +126,69 @@ public class SqlClauseMySql extends AbstractSqlClause {
 	@Override
     protected boolean isUpdateSubQueryUseLocalTableSupported() {
         return false;
+    }
+	
+	// [DBFlute-0.9.5]
+	// ===================================================================================
+	//                                                                    Full-Text Search
+	//                                                                    ================
+    /**
+     * Build a condition string of match statement for full-text search.
+     * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
+     * @param conditionValue The condition value. (NotNull)
+     * @param modifier The modifier of full-text search. (Nullable: If the value is null, No modifier specified)
+     * @param tableDbName The DB name of the target table. (NotNull)
+     * @param aliasName The alias name of the target table. (NotNull)
+     * @return The condition string of match statement. (NotNull)
+     */
+    public String buildMatchCondition(List<ColumnInfo> textColumnList
+                                    , String conditionValue, FullTextSearchModifier modifier
+                                    , String tableDbName, String aliasName) {
+        if (textColumnList == null) {
+            throw new IllegalArgumentException("The argument 'textColumnList' should not be null!");
+        }
+        if (textColumnList.isEmpty()) {
+            throw new IllegalArgumentException("The argument 'textColumnList' should not be empty list!");
+        }
+        if (conditionValue == null || conditionValue.length() == 0) {
+            throw new IllegalArgumentException("The argument 'conditionValue' should not be null or empty: " + conditionValue);
+        }
+        if (tableDbName == null || tableDbName.trim().length() == 0) {
+            throw new IllegalArgumentException("The argument 'tableDbName' should not be null or trimmed-empty: " + tableDbName);
+        }
+        if (aliasName == null || aliasName.trim().length() == 0) {
+            throw new IllegalArgumentException("The argument 'aliasName' should not be null or trimmed-empty: " + aliasName);
+        }
+        StringBuilder sb = new StringBuilder();
+        int index = 0;
+        for (ColumnInfo columnInfo : textColumnList) {
+            if (columnInfo == null) {
+                continue;
+            }
+            String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
+            if (!tableOfColumn.equalsIgnoreCase(tableDbName)) {
+                String msg = "The table of the text column should be '" + tableDbName + "'";
+                msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
+                throw new IllegalArgumentException(msg);
+            }
+            Class<?> propertyType = columnInfo.getPropertyType();
+            if (!String.class.isAssignableFrom(propertyType)) {
+                String msg = "The text column should be String type:";
+                msg = msg + " type=" + propertyType + " column=" + columnInfo;
+                throw new IllegalArgumentException(msg);
+            }
+            String columnDbName = columnInfo.getColumnDbName();
+            if (index > 0) {
+                sb.append(",");
+            }
+            sb.append(aliasName).append(".").append(columnDbName);
+            ++index;
+        }
+        sb.insert(0, "match(").append(") against ('").append(conditionValue).append("'");
+        if (modifier != null) {
+            sb.append(" ").append(modifier.code());
+        }
+        sb.append(")");
+        return sb.toString();
     }
 }
