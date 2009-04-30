@@ -1222,7 +1222,13 @@ public abstract class AbstractDBMeta implements DBMeta {
 	protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {
 	    return new ArrayList<ELEMENT>();
 	}
-	
+
+    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT element) {
+        ArrayList<ELEMENT> arrayList = new ArrayList<ELEMENT>();
+        arrayList.add(element);
+        return arrayList;
+    }
+
 	protected <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> collection) {
 	    return new ArrayList<ELEMENT>(collection);
 	}
