@@ -888,6 +888,21 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         }
         int index = 0;
         for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
+            if (columnInfo == null) {
+                continue;
+            }
+            String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
+            if (!tableOfColumn.equalsIgnoreCase(tableDbName)) {
+                String msg = "The table of the text column should be '" + tableDbName + "'";
+                msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
+                throw new IllegalArgumentException(msg);
+            }
+            Class<?> propertyType = columnInfo.getPropertyType();
+            if (!String.class.isAssignableFrom(propertyType)) {
+                String msg = "The text column should be String type:";
+                msg = msg + " type=" + propertyType + " column=" + columnInfo;
+                throw new IllegalArgumentException(msg);
+            }
             if (index > 0) {
                 getSqlClause().makeAdditionalConditionAsOrEffective();
             }
