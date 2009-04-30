@@ -43,8 +43,8 @@ public class WayOfMySQL implements DBWay {
     //                                                                     ===============
     public enum FullTextSearchModifier {
         InBooleanMode("IN BOOLEAN MODE")
-        , InNatualLanguageMode("IN NATURAL LANGUAGE MODE")
-        , InNatualLanguageModeWithQueryExpansion("IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION")
+        , InNaturalLanguageMode("IN NATURAL LANGUAGE MODE")
+        , InNaturalLanguageModeWithQueryExpansion("IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION")
         , WithQueryExpansion("WITH QUERY EXPANSION");
         private static final Map<String, FullTextSearchModifier> _codeValueMap = new HashMap<String, FullTextSearchModifier>();
         static { for (FullTextSearchModifier value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
