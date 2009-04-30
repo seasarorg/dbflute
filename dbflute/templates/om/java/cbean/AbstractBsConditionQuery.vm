@@ -831,6 +831,27 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
     public abstract String keepMyselfInScopeSubQuery(${myConditionQueryClassName} subQuery);
 #end
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabaseMySQL())
+
+    /**
+     * Match for full-text search.
+     * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
+     * @param conditionValue The condition value. (Nullable: If the value is null or empty, it does not make condition!)
+     * @param modifier The modifier of full-text search. (Nullable: If the value is null, No modifier specified)
+     */
+    public void match(java.util.List<org.seasar.dbflute.dbmeta.info.ColumnInfo> textColumnList
+                    , String conditionValue
+                    , org.seasar.dbflute.dbway.WayOfMySQL.FullTextSearchModifier modifier) {
+        if (conditionValue == null || conditionValue.length() == 0) {
+            return;
+        }
+        String conditionString = ((org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql)getSqlClause())
+                .buildMatchCondition(textColumnList, conditionValue, modifier, getTableDbName(), getRealAliasName());
+        registerWhereClause(conditionString);
+    }
+#end
+#end
 
     // ===================================================================================
     //                                                                       Very Internal
