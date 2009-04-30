@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.dbway;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The DB way of PostgreSQL.
  * @author jflute
@@ -33,5 +36,26 @@ public class WayOfPostgreSQL implements DBWay {
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return "23505".equals(sqlState);
+    }
+    
+    // ===================================================================================
+    //                                                                     ENUM Definition
+    //                                                                     ===============
+    public enum LikeSearchOperand implements ExtensionOperand {
+        BASIC("like")
+        , CASE_INSENSITIVE("ilike")
+        , FULL_TEXT_SEARCH("@@")
+        ;
+        private static final Map<String, LikeSearchOperand> _codeValueMap = new HashMap<String, LikeSearchOperand>();
+        static { for (LikeSearchOperand value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
+        private String _code;
+        private LikeSearchOperand(String code) { _code = code; }
+        public String code() { return _code; }
+        public static LikeSearchOperand codeOf(Object code) {
+            if (code == null) { return null; } return _codeValueMap.get(code.toString().toLowerCase());
+        }
+        public String operand() {
+            return _code;
+        }
     }
 }

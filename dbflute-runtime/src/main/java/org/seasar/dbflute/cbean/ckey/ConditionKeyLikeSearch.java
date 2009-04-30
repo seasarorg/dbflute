@@ -20,6 +20,7 @@ import java.util.List;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.dbway.ExtensionOperand;
 
 /**
  * The condition-key of likeSearch.
@@ -76,7 +77,12 @@ public class ConditionKeyLikeSearch extends ConditionKey {
             throw new IllegalArgumentException(msg);
         }
         final LikeSearchOption myOption = (LikeSearchOption)option;
-        conditionList.add(buildBindClauseWithRearOption(columnName, value.getLikeSearchLocation(), myOption.getRearOption()));
+        final ExtensionOperand extOperand = myOption.getExtensionOperand();
+        String operand = extOperand != null ? extOperand.operand() : null;
+        if (operand == null || operand.trim().length() == 0) {
+            operand = getOperand();
+        }
+        conditionList.add(buildBindClauseWithRearOption(columnName, operand, value.getLikeSearchLocation(), myOption.getRearOption()));
     }
 
     /**

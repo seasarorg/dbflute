@@ -202,7 +202,7 @@ public abstract class ConditionKey {
     //                                                                         Bind Clause
     //                                                                         ===========
     /**
-     * Build bind clause. (for s2dao)
+     * Build bind clause.
      * @param columnName Column name. (NotNull)
      * @param location Location. (NotNull)
      * @return Bind clause. (NotNull)
@@ -212,18 +212,19 @@ public abstract class ConditionKey {
     }
 
     /**
-     * Build bind clause. (for s2dao)
+     * Build bind clause. (basically for like-search)
      * @param columnName Column name. (NotNull)
+     * @param operand Operand. (NotNull)
      * @param location Location. (NotNull)
      * @param rearOption Rear option. (NotNull)
      * @return Bind clause. (NotNull)
      */
-    protected String buildBindClauseWithRearOption(String columnName, String location, String rearOption) {
-        return columnName + " " + getOperand() + " " + "/*dto." + location + "*/null" + rearOption;
+    protected String buildBindClauseWithRearOption(String columnName, String operand, String location, String rearOption) {
+        return columnName + " " + operand + " " + "/*dto." + location + "*/null" + rearOption;
     }
 
     /**
-     * Build bind clause. (for s2dao)
+     * Build bind clause.
      * @param columnName Column name. (NotNull)
      * @param location Location. (NotNull)
      * @param dummyValue Dummy value. (NotNull)

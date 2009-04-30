@@ -17,6 +17,7 @@ package org.seasar.dbflute.cbean.coption;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
+import org.seasar.dbflute.dbway.ExtensionOperand;
 import org.seasar.dbflute.resource.ResourceContext;
 
 /**
@@ -221,6 +222,17 @@ public class LikeSearchOption extends SimpleStringOption {
 
     protected SimpleStringOption newDeepCopyInstance() {
         return new LikeSearchOption();
+    }
+    
+    // ===================================================================================
+    //                                                                   Extension Operand
+    //                                                                   =================
+    /**
+     * Get the operand for extension.
+     * @return The operand for extension. (Nullable: If the value is null, it means no extension)
+     */
+    public ExtensionOperand getExtensionOperand() { // for application extension
+        return null; // as default
     }
 
     // ===================================================================================
