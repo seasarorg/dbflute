@@ -133,7 +133,8 @@ public class SqlClauseMySql extends AbstractSqlClause {
 	//                                                                    Full-Text Search
 	//                                                                    ================
     /**
-     * Build a condition string of match statement for full-text search.
+     * Build a condition string of match statement for full-text search. <br />
+     * Bind variable is unused because the condition value should be literal in MySQL.
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (NotNull)
      * @param modifier The modifier of full-text search. (Nullable: If the value is null, No modifier specified)
