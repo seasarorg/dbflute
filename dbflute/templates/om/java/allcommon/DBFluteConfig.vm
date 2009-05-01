@@ -61,8 +61,8 @@ public class ${glDBFluteConfig} {
     //                                   -------------------
 #if ($database.isAvailableDatabaseDependency())
 #if ($database.isDatabasePostgreSQL())
-    protected org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand _fullTextSearchOperand
-            = org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand.FULL_TEXT_SEARCH;
+    protected org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch _fullTextSearchOperand
+            = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH;
 #end
 #end
 
@@ -276,7 +276,7 @@ public class ${glDBFluteConfig} {
     // -----------------------------------------------------
     //                              Full-Text Search Operand
     //                              ------------------------
-    public org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand getFullTextSearchOperand() {
+    public org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch getFullTextSearchOperand() {
         return _fullTextSearchOperand;
     }
 
@@ -285,7 +285,7 @@ public class ${glDBFluteConfig} {
 		if (_log.isInfoEnabled()) {
 		    _log.info("...Using fullTextSearchOperand: Default");
 		}
-        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand.FULL_TEXT_SEARCH; 
+        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH; 
     }
 
     public void useOldFullTextSearchOperand() {
@@ -293,7 +293,7 @@ public class ${glDBFluteConfig} {
 		if (_log.isInfoEnabled()) {
 		    _log.info("...Using fullTextSearchOperand: Old");
 		}
-        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.LikeSearchOperand.OLD_FULL_TEXT_SEARCH; 
+        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.OLD_FULL_TEXT_SEARCH; 
     }
 #end
 #end
