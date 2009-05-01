@@ -963,7 +963,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
             }
             invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
                 @Override
-                public org.seasar.dbflute.dbway.ExtensionOperand getExtensionOperand() {
+                public org.seasar.dbflute.cbean.sqlclause.WhereClauseArranger getWhereClauseArranger() {
                     return ((org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause())
                            .createFullTextSearchClauseArranger();
                 }
