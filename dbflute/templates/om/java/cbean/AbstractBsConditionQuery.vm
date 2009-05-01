@@ -932,6 +932,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 
     /**
      * Match for full-text search. <br />
+     * The specified condition value is escaped in this method automatically.
      * @param textColumnList The list of text column. (NotNull, NotEmpty, StringColumn, TargetTableColumn)
      * @param conditionValue The condition value. (Nullable: If the value is null or empty, it does not make condition!)
      */
@@ -941,6 +942,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         if (textColumnList.isEmpty()) {
             throw new IllegalArgumentException("The argument 'textColumnList' should not be empty list!");
         }
+        conditionValue = escapeFullTextSearchValue(conditionValue);
         int index = 0;
         for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
             if (columnInfo == null) {
@@ -971,6 +973,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
             ++index;
         }
         getSqlClause().ignoreAdditionalConditionAsOr();
+    }
+
+    protected String escapeFullTextSearchValue(String conditionValue) {
+        return ((org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause())
+               .escapeFullTextSearchValue(conditionValue);
     }
 #end
 #end
