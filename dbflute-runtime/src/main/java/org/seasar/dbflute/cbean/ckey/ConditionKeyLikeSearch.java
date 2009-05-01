@@ -77,9 +77,9 @@ public class ConditionKeyLikeSearch extends ConditionKey {
             String msg = "The argument[option] should be LikeSearchOption: columnName=" + columnName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
+        final String location = value.getLikeSearchLocation();
         final LikeSearchOption myOption = (LikeSearchOption)option;
         final String rearOption = myOption.getRearOption();
-        final String location = value.getLikeSearchLocation();
         final ExtensionOperand extOperand = myOption.getExtensionOperand();
         String operand = extOperand != null ? extOperand.operand() : null;
         if (operand == null || operand.trim().length() == 0) {
