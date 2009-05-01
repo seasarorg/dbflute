@@ -1,6 +1,7 @@
 ${database.allClassCopyright}package ${glPackageCB};
-
 #set ($myClassName = "${myConditionBeanClassName}")
+
+import ${glPackageBaseCB}.${myBaseConditionBeanClassName};
 
 /**
  * The condition-bean of ${table.name}.
@@ -10,5 +11,5 @@ ${database.allClassCopyright}package ${glPackageCB};
  * </p>
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} extends ${glPackageBaseCB}.${myBaseConditionBeanClassName} {
+public class ${myClassName} extends ${myBaseConditionBeanClassName} {
 }

@@ -1,6 +1,8 @@
 ${database.allClassCopyright}package ${myExtendedDaoCursorPackageName};
 #set ($myClassName = "${myExtendedTypeSafeCursorClassName}")
 
+import ${myBaseDaoCursorPackageName}.${myBaseTypeSafeCursorClassName};
+
 /**
  * The cursor of ${table.name}.
  * <p>
@@ -9,5 +11,5 @@ ${database.allClassCopyright}package ${myExtendedDaoCursorPackageName};
  * </p>
  * @author ${database.ClassAuthor}
  */
-public class ${myClassName} extends ${myBaseDaoCursorPackageName}.${myBaseTypeSafeCursorClassName} {
+public class ${myClassName} extends ${myBaseTypeSafeCursorClassName} {
 }

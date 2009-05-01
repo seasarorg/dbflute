@@ -1,6 +1,8 @@
 ${database.allClassCopyright}package ${glPackageExtendedBhv};
 #set ($myClassName = "${myExtendedBhvClassName}")
 
+import ${glPackageBaseBhv}.${myBaseBhvClassName};
+
 /**
  * The behavior of ${table.name}.
  * <p>
@@ -9,5 +11,5 @@ ${database.allClassCopyright}package ${glPackageExtendedBhv};
  * </p>
  * @author ${database.ClassAuthor}
  */
-public class $myClassName extends ${glPackageBaseBhv}.${myBaseBhvClassName} {
+public class $myClassName extends ${myBaseBhvClassName} {
 }

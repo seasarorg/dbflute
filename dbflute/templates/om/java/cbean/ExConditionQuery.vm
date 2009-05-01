@@ -33,7 +33,7 @@ public class ${myClassName} extends ${myBaseConditionQueryClassName} {
     //                                                                      Arrange Method
     //                                                                      ==============
 	// You can make original arrange query methods here.
-	// public void arranegeXxx() {
+	// public void arrangeXxx() {
 	//     ...
 	// }
 }
