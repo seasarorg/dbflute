@@ -193,4 +193,12 @@ public class SqlClauseOracle extends AbstractSqlClause {
             return "contains(" + columnName + ", " + bindExpression + ") > 0";
         }
     }
+    
+    public String escapeFullTextSearchValue(String conditionValue) {
+        if (conditionValue.contains("}")) {
+            conditionValue = replaceString(conditionValue, "}", "}}");
+        }
+        conditionValue = "{" + conditionValue + "}";
+        return conditionValue;
+    }
 }

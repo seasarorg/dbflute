@@ -62,4 +62,15 @@ public class SqlClauseOracleTest extends PlainTestCase {
         log(target._lockSqlSuffix);
         assertTrue(target._lockSqlSuffix.endsWith(" nowait"));
     }
+
+    public void test_escapeFullTextSearchValue() {
+        // ## Arrange ##
+        SqlClauseOracle target = new SqlClauseOracle("test");
+
+        // ## Act & Assert ##
+        assertEquals("{foo}", target.escapeFullTextSearchValue("foo"));
+        assertEquals("{f{oo}", target.escapeFullTextSearchValue("f{oo"));
+        assertEquals("{fo}}o}", target.escapeFullTextSearchValue("fo}o"));
+        assertEquals("{f{o}}o}", target.escapeFullTextSearchValue("f{o}o"));
+    }
 }
