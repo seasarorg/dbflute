@@ -13,17 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.dbway;
+package org.seasar.dbflute.cbean.sqlclause;
 
 /**
- * The operand for extension.
+ * The arranger of where clause.
  * @author jflute
  */
-public interface ExtensionOperand {
-    
-    /**
-     * Get the value of operand.
-     * @return The value of operand. (Nullable)
-     */
-    String operand();
+public interface WhereClauseArranger {
+
+    String arrange(String columnName, String operand, String bindExpression, String rearOption);
 }

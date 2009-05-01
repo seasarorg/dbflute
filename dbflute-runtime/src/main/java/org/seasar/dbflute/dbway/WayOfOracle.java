@@ -27,7 +27,7 @@ public class WayOfOracle implements DBWay {
     public String getIdentitySelectSql() {
         return null;
     }
-    
+
     // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================

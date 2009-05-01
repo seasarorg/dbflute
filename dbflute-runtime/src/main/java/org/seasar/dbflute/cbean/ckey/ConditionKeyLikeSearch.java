@@ -20,6 +20,7 @@ import java.util.List;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
+import org.seasar.dbflute.cbean.sqlclause.WhereClauseArranger;
 import org.seasar.dbflute.dbway.ExtensionOperand;
 
 /**
@@ -77,12 +78,21 @@ public class ConditionKeyLikeSearch extends ConditionKey {
             throw new IllegalArgumentException(msg);
         }
         final LikeSearchOption myOption = (LikeSearchOption)option;
+        final String rearOption = myOption.getRearOption();
+        final String location = value.getLikeSearchLocation();
         final ExtensionOperand extOperand = myOption.getExtensionOperand();
         String operand = extOperand != null ? extOperand.operand() : null;
         if (operand == null || operand.trim().length() == 0) {
             operand = getOperand();
         }
-        conditionList.add(buildBindClauseWithRearOption(columnName, operand, value.getLikeSearchLocation(), myOption.getRearOption()));
+        final WhereClauseArranger arranger = myOption.getWhereClauseArranger();
+        final String clause;
+        if (arranger != null) {
+            clause = arranger.arrange(columnName, operand, buildBindExpression(location, null), rearOption);
+        } else {
+            clause = buildBindClauseWithRearOption(columnName, operand, location, rearOption);
+        }
+        conditionList.add(clause);
     }
 
     /**

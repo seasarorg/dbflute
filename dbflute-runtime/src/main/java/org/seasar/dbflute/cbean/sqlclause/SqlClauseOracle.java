@@ -179,4 +179,18 @@ public class SqlClauseOracle extends AbstractSqlClause {
     public int getInScopeLimit() {
         return 1000;
     }
+
+    // [DBFlute-0.9.5]
+    // ===================================================================================
+    //                                                                    Full-Text Search
+    //                                                                    ================
+    public WhereClauseArranger createFullTextSearchClauseArranger() {
+        return new FullTextSearchClauseArranger();
+    }
+    
+    protected static class FullTextSearchClauseArranger implements WhereClauseArranger {
+        public String arrange(String columnName, String operand, String bindExpression, String rearOption) {
+            return "contains(" + columnName + ", " + bindExpression + ") > 0";
+        }
+    }
 }

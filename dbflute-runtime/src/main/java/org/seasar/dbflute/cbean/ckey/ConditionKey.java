@@ -208,7 +208,7 @@ public abstract class ConditionKey {
      * @return Bind clause. (NotNull)
      */
     protected String buildBindClause(String columnName, String location) {
-        return columnName + " " + getOperand() + " " + "/*dto." + location + "*/null";
+        return columnName + " " + getOperand() + " " + buildBindExpression(location, null);
     }
 
     /**
@@ -220,7 +220,7 @@ public abstract class ConditionKey {
      * @return Bind clause. (NotNull)
      */
     protected String buildBindClauseWithRearOption(String columnName, String operand, String location, String rearOption) {
-        return columnName + " " + operand + " " + "/*dto." + location + "*/null" + rearOption;
+        return columnName + " " + operand + " " + buildBindExpression(location, null) + rearOption;
     }
 
     /**
@@ -231,7 +231,7 @@ public abstract class ConditionKey {
      * @return Bind clause. (NotNull)
      */
     protected String buildBindClause(String columnName, String location, String dummyValue) {
-        return columnName + " " + getOperand() + " " + "/*dto." + location + "*/" + dummyValue;
+        return columnName + " " + getOperand() + " " + buildBindExpression(location, dummyValue);
     }
 
     /**
@@ -243,6 +243,10 @@ public abstract class ConditionKey {
         return columnName + " " + getOperand();
     }
 
+    protected String buildBindExpression(String location, String dummyValue) {
+        return "/*dto." + location + "*/" + dummyValue;
+    }
+    
     /**
      * Get wild-card.
      * @return Wild-card.

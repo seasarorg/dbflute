@@ -39,20 +39,20 @@ public class WayOfPostgreSQL implements DBWay {
     }
     
     // ===================================================================================
-    //                                                                     ENUM Definition
-    //                                                                     ===============
-    public enum LikeSearchOperand implements ExtensionOperand {
+    //                                                                Extension Definition
+    //                                                                ====================
+    public enum OperandOfLikeSearch implements ExtensionOperand {
         BASIC("like")
         , CASE_INSENSITIVE("ilike")
         , FULL_TEXT_SEARCH("%%")
         , OLD_FULL_TEXT_SEARCH("@@")
         ;
-        private static final Map<String, LikeSearchOperand> _codeValueMap = new HashMap<String, LikeSearchOperand>();
-        static { for (LikeSearchOperand value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
+        private static final Map<String, OperandOfLikeSearch> _codeValueMap = new HashMap<String, OperandOfLikeSearch>();
+        static { for (OperandOfLikeSearch value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
         private String _code;
-        private LikeSearchOperand(String code) { _code = code; }
+        private OperandOfLikeSearch(String code) { _code = code; }
         public String code() { return _code; }
-        public static LikeSearchOperand codeOf(Object code) {
+        public static OperandOfLikeSearch codeOf(Object code) {
             if (code == null) { return null; } return _codeValueMap.get(code.toString().toLowerCase());
         }
         public String operand() {
