@@ -51,28 +51,69 @@ public class PagingInvoker<ENTITY> {
         assertObjectNotNull("handler.getPagingBean()", pagingBean);
         if (!pagingBean.isFetchScopeEffective()) {
             String msg = "The paging bean is not effective about fetch-scope!";
-            msg = msg + " When you select page, you should set up fetch-scope of paging bean(Should invoke fetchFirst() and fetchPage()!).";
+            msg = msg + " When you select page, you should set up fetch-scope of";
+            msg = msg + " paging bean(Should invoke fetchFirst() and fetchPage()!).";
             msg = msg + " The paging bean is: " + pagingBean;
             throw new IllegalStateException(msg);
         }
+        final ResultBeanBuilder<ENTITY> builder = createResultBeanBuilder();
         final int allRecordCount;
         final List<ENTITY> selectedList;
         if (_countLater) {
             selectedList = handler.paging();
-            allRecordCount = handler.count();
+            if (isNecessaryToReadCountLater(selectedList, pagingBean)) {
+                allRecordCount = handler.count();                
+            } else {
+                allRecordCount = selectedList.size();
+            }
         } else {
             allRecordCount = handler.count();
-            selectedList = handler.paging();
+            if (allRecordCount > 0) {
+                selectedList = handler.paging();
+            } else {
+                // The list to skip unnecessary select is list-result-bean as empty
+                // because both condition-bean and outside-SQL do so.
+                // (This program was implemented after implementing condition-bean and outside-SQL)
+                selectedList = builder.buildEmptyListResultBean(pagingBean);
+            }
         }
-        final PagingResultBean<ENTITY> rb = new ResultBeanBuilder<ENTITY>(_tableDbName).buildPagingResultBean(pagingBean, allRecordCount, selectedList);
+        final PagingResultBean<ENTITY> rb = builder.buildPagingResultBean(pagingBean, allRecordCount, selectedList);
         if (pagingBean.canPagingReSelect() && isNecessaryToReadPageAgain(rb)) {
             pagingBean.fetchPage(rb.getAllPageCount());
             final int reAllRecordCount = handler.count();
-            final java.util.List<ENTITY> reSelectedList = handler.paging();
-            return new ResultBeanBuilder<ENTITY>(_tableDbName).buildPagingResultBean(pagingBean, reAllRecordCount, reSelectedList);
+            final List<ENTITY> reSelectedList = handler.paging();
+            return builder.buildPagingResultBean(pagingBean, reAllRecordCount, reSelectedList);
         } else {
             return rb;
         }
+    }
+
+    /**
+     * Create the builder of result bean.
+     * @return The builder of result bean. (NotNull)
+     */
+    protected ResultBeanBuilder<ENTITY> createResultBeanBuilder() {
+        return new ResultBeanBuilder<ENTITY>(_tableDbName);
+    }
+
+    /**
+     * Is it necessary to read count as count-later?
+     * @param selectedList The selected list. (NotNull)
+     * @param pagingBean The bean of paging. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isNecessaryToReadCountLater(List<ENTITY> selectedList, PagingBean pagingBean) {
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+        // It returns true if the size of list is NOT under fetch size(page size).
+        // 
+        // {For example}
+        // If the fetch size is 20 and the size of selected list is 19 or less,
+        // it is NOT necessary to read count because the 19 is the very all record count.
+        // 
+        // If the fetch size is 20 and the size of selected list is 20 or more,
+        // it is necessary to read count because we cannot know whether the next pages exist or not.
+        // - - - - - - - - - -/
+        return selectedList.size() > (pagingBean.getFetchSize() - 1);
     }
 
     /**

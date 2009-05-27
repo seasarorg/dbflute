@@ -47,6 +47,7 @@ import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.PagingHandler;
 import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -127,7 +128,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * {@inheritDoc}
-     * 
      * @param cb Condition-bean. (NotNull)
      * @return Read entity. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
@@ -194,7 +194,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     public ListResultBean<Entity> readList(ConditionBean cb) {
         assertCBNotNull(cb);
-        return new org.seasar.dbflute.cbean.ResultBeanBuilder<Entity>(getTableDbName()).buildListResultBean(cb, callReadList(cb));
+        return new ResultBeanBuilder<Entity>(getTableDbName()).buildListResultBean(cb, callReadList(cb));
     }
 
     /**

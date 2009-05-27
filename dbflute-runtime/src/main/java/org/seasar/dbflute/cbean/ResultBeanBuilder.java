@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,6 +66,24 @@ public class ResultBeanBuilder<ENTITY> {
         rb.setSelectedList(selectedList);
         rb.setOrderByClause(cb.getSqlComponentOfOrderByClause());
         return rb;
+    }
+    
+    /**
+     * Build the result bean of list as empty. {for CB}
+     * @param pb The bean of paging. (NotNull)
+     * @return The result bean of list as empty. (NotNull)
+     */
+    public ListResultBean<ENTITY> buildEmptyListResultBean(PagingBean pb) {
+        ListResultBean<ENTITY> rb = new ListResultBean<ENTITY>();
+        rb.setTableDbName(_tableDbName);
+        rb.setAllRecordCount(0);
+        rb.setSelectedList(newEmptyList());
+        rb.setOrderByClause(pb.getSqlComponentOfOrderByClause());
+        return rb;
+    }
+
+    protected List<ENTITY> newEmptyList() {
+        return new ArrayList<ENTITY>();
     }
 
     /**
