@@ -235,8 +235,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * @return Determination.
      */
     public boolean isCountLater() {
-        String msg = "This method is unsupported on ConditionBean!";
-        throw new UnsupportedOperationException(msg);
+        return false; // as default
     }
 
     // -----------------------------------------------------

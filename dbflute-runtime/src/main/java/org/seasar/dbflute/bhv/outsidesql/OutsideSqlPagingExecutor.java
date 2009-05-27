@@ -183,9 +183,6 @@ public class OutsideSqlPagingExecutor {
             }
         };
         final PagingInvoker<ENTITY> invoker = new PagingInvoker<ENTITY>(_tableDbName);
-        if (pmb.isCountLater()) {
-            invoker.countLater();
-        }
         return invoker.invokePaging(handler);
     }
 

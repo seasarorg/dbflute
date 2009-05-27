@@ -113,14 +113,14 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * ${database.ImplementComment}
+     * {@inheritDoc}
      */
     public void disablePagingReSelect() {
         _canPagingReSelect = false;
     }
 
     /**
-     * ${database.ImplementComment}
+     * {@inheritDoc}
      * @return Can the paging re-select execute?
      */
     public boolean canPagingReSelect() {

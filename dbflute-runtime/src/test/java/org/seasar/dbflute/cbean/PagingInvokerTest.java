@@ -52,11 +52,15 @@ public class PagingInvokerTest extends PlainTestCase {
     public void test_invokePaging_emtpy_countLater() {
         // ## Arrange ##
         final List<String> selectedList = new ArrayList<String>();
-        final SimplePagingBean pagingBean = new SimplePagingBean();
+        final SimplePagingBean pagingBean = new SimplePagingBean() {
+            @Override
+            public boolean isCountLater() {
+                return true;
+            }
+        };
         pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
-        tgt.countLater();
 
         // ## Act ##
         final List<String> markList = new ArrayList<String>();
@@ -120,35 +124,39 @@ public class PagingInvokerTest extends PlainTestCase {
         assertEquals("count", markList.get(0));
         assertEquals("paging", markList.get(1));
     }
-    
+
     public void test_invokePaging_onePage_countLater() {
         // ## Arrange ##
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 19);
-        final SimplePagingBean pagingBean = new SimplePagingBean();
+        final SimplePagingBean pagingBean = new SimplePagingBean() {
+            @Override
+            public boolean isCountLater() {
+                return true;
+            }
+        };
         pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
-        tgt.countLater();
-        
+
         // ## Act ##
         final List<String> markList = new ArrayList<String>();
         PagingResultBean<String> rb = tgt.invokePaging(new PagingHandler<String>() {
             public PagingBean getPagingBean() {
                 return pagingBean;
             }
-            
+
             public int count() {
                 markList.add("count");
                 return 19;
             }
-            
+
             public List<String> paging() {
                 markList.add("paging");
                 return selectedList;
             }
         });
-        
+
         // ## Assert ##
         assertEquals(19, rb.size());
         assertEquals(19, rb.getAllRecordCount());
@@ -157,35 +165,39 @@ public class PagingInvokerTest extends PlainTestCase {
         assertEquals("paging", markList.get(0));
         assertEquals(1, markList.size());
     }
-    
+
     public void test_invokePaging_onePage_countLater_just() {
         // ## Arrange ##
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 20);
-        final SimplePagingBean pagingBean = new SimplePagingBean();
+        final SimplePagingBean pagingBean = new SimplePagingBean() {
+            @Override
+            public boolean isCountLater() {
+                return true;
+            }
+        };
         pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
         pagingBean.fetchFirst(20);
         PagingInvoker<String> tgt = createTarget();
-        tgt.countLater();
-        
+
         // ## Act ##
         final List<String> markList = new ArrayList<String>();
         PagingResultBean<String> rb = tgt.invokePaging(new PagingHandler<String>() {
             public PagingBean getPagingBean() {
                 return pagingBean;
             }
-            
+
             public int count() {
                 markList.add("count");
                 return 20;
             }
-            
+
             public List<String> paging() {
                 markList.add("paging");
                 return selectedList;
             }
         });
-        
+
         // ## Assert ##
         assertEquals(20, rb.size());
         assertEquals(20, rb.getAllRecordCount());
@@ -195,7 +207,7 @@ public class PagingInvokerTest extends PlainTestCase {
         assertEquals("count", markList.get(1));
     }
 
-    public void test_invokePaging_twoPage() {
+    public void test_invokePaging_twoPageAll() {
         // ## Arrange ##
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 20);
@@ -231,7 +243,49 @@ public class PagingInvokerTest extends PlainTestCase {
         assertEquals("paging", markList.get(1));
     }
 
-    public void test_invokePaging_threePage_just() {
+    public void test_invokePaging_twoPageCurrent_countLater() {
+        // ## Arrange ##
+        final List<String> selectedList = new ArrayList<String>();
+        fillList(selectedList, 19);
+        final SimplePagingBean pagingBean = new SimplePagingBean() {
+            @Override
+            public boolean isCountLater() {
+                return true;
+            }
+        };
+        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.fetchFirst(20);
+        pagingBean.fetchPage(2);
+        PagingInvoker<String> tgt = createTarget();
+
+        // ## Act ##
+        final List<String> markList = new ArrayList<String>();
+        PagingResultBean<String> rb = tgt.invokePaging(new PagingHandler<String>() {
+            public PagingBean getPagingBean() {
+                return pagingBean;
+            }
+
+            public int count() {
+                markList.add("count");
+                return 68; // should be unused
+            }
+
+            public List<String> paging() {
+                markList.add("paging");
+                return selectedList;
+            }
+        });
+
+        // ## Assert ##
+        assertEquals(19, rb.size());
+        assertEquals(39, rb.getAllRecordCount());
+        assertEquals(2, rb.getAllPageCount());
+        assertEquals(1, rb.getOrderByClause().getOrderByList().size());
+        assertEquals("paging", markList.get(0));
+        assertEquals(1, markList.size());
+    }
+
+    public void test_invokePaging_threePageAll_just() {
         // ## Arrange ##
         final List<String> selectedList = new ArrayList<String>();
         fillList(selectedList, 20);
@@ -267,10 +321,94 @@ public class PagingInvokerTest extends PlainTestCase {
         assertEquals("paging", markList.get(1));
     }
 
+    public void test_invokePaging_threePageCurrent_countLater() {
+        // ## Arrange ##
+        final List<String> selectedList = new ArrayList<String>();
+        fillList(selectedList, 19);
+        final SimplePagingBean pagingBean = new SimplePagingBean() {
+            @Override
+            public boolean isCountLater() {
+                return true;
+            }
+        };
+        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.fetchFirst(20);
+        pagingBean.fetchPage(3);
+        PagingInvoker<String> tgt = createTarget();
+
+        // ## Act ##
+        final List<String> markList = new ArrayList<String>();
+        PagingResultBean<String> rb = tgt.invokePaging(new PagingHandler<String>() {
+            public PagingBean getPagingBean() {
+                return pagingBean;
+            }
+
+            public int count() {
+                markList.add("count");
+                return 59;
+            }
+
+            public List<String> paging() {
+                markList.add("paging");
+                return selectedList;
+            }
+        });
+
+        // ## Assert ##
+        assertEquals(19, rb.size());
+        assertEquals(59, rb.getAllRecordCount());
+        assertEquals(3, rb.getAllPageCount());
+        assertEquals(1, rb.getOrderByClause().getOrderByList().size());
+        assertEquals("paging", markList.get(0));
+        assertEquals(1, markList.size());
+    }
+
+    public void test_invokePaging_threePageCurrent_countLater_just() {
+        // ## Arrange ##
+        final List<String> selectedList = new ArrayList<String>();
+        fillList(selectedList, 20);
+        final SimplePagingBean pagingBean = new SimplePagingBean() {
+            @Override
+            public boolean isCountLater() {
+                return true;
+            }
+        };
+        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.fetchFirst(20);
+        pagingBean.fetchPage(3);
+        PagingInvoker<String> tgt = createTarget();
+
+        // ## Act ##
+        final List<String> markList = new ArrayList<String>();
+        PagingResultBean<String> rb = tgt.invokePaging(new PagingHandler<String>() {
+            public PagingBean getPagingBean() {
+                return pagingBean;
+            }
+
+            public int count() {
+                markList.add("count");
+                return 60;
+            }
+
+            public List<String> paging() {
+                markList.add("paging");
+                return selectedList;
+            }
+        });
+
+        // ## Assert ##
+        assertEquals(20, rb.size());
+        assertEquals(60, rb.getAllRecordCount());
+        assertEquals(3, rb.getAllPageCount());
+        assertEquals(1, rb.getOrderByClause().getOrderByList().size());
+        assertEquals("paging", markList.get(0));
+        assertEquals("count", markList.get(1));
+    }
+
     // ===================================================================================
     //                                                       isNecessaryToReadCountLater()
     //                                                       =============================
-    public void test_isNecessaryToReadCountLater() {
+    public void test_isCurrentLastPage() {
         // ## Arrange ##
         List<String> selectedList = new ArrayList<String>();
         PagingBean pagingBean = new SimplePagingBean();
@@ -279,17 +417,40 @@ public class PagingInvokerTest extends PlainTestCase {
 
         // ## Act & Assert ##
         fillList(selectedList, 28);
-        assertFalse(tgt.isNecessaryToReadCountLater(selectedList, pagingBean));
+        assertTrue(tgt.isCurrentLastPage(selectedList, pagingBean));
         fillList(selectedList, 29);
-        assertFalse(tgt.isNecessaryToReadCountLater(selectedList, pagingBean));
+        assertTrue(tgt.isCurrentLastPage(selectedList, pagingBean));
         fillList(selectedList, 30);
-        assertTrue(tgt.isNecessaryToReadCountLater(selectedList, pagingBean));
+        assertFalse(tgt.isCurrentLastPage(selectedList, pagingBean));
         fillList(selectedList, 31);
-        assertTrue(tgt.isNecessaryToReadCountLater(selectedList, pagingBean));
+        assertFalse(tgt.isCurrentLastPage(selectedList, pagingBean));
         fillList(selectedList, 60);
-        assertTrue(tgt.isNecessaryToReadCountLater(selectedList, pagingBean));
+        assertFalse(tgt.isCurrentLastPage(selectedList, pagingBean));
         fillList(selectedList, 61);
-        assertTrue(tgt.isNecessaryToReadCountLater(selectedList, pagingBean));
+        assertFalse(tgt.isCurrentLastPage(selectedList, pagingBean));
+    }
+
+    // ===================================================================================
+    //                                            deriveAllRecordCountFromLastPageValues()
+    //                                            ========================================
+    public void test_deriveAllRecordCountFromLastPageValues() {
+        // ## Arrange ##
+        List<String> selectedList = new ArrayList<String>();
+        PagingBean pagingBean = new SimplePagingBean();
+        pagingBean.fetchFirst(30);
+        PagingInvoker<String> tgt = createTarget();
+
+        // ## Act & Assert ##
+        pagingBean.fetchPage(1);
+        fillList(selectedList, 28);
+        assertEquals(28, tgt.deriveAllRecordCountFromLastPageValues(selectedList, pagingBean));
+        fillList(selectedList, 30);
+        assertEquals(30, tgt.deriveAllRecordCountFromLastPageValues(selectedList, pagingBean));
+        pagingBean.fetchPage(2);
+        fillList(selectedList, 28);
+        assertEquals(58, tgt.deriveAllRecordCountFromLastPageValues(selectedList, pagingBean));
+        fillList(selectedList, 30);
+        assertEquals(60, tgt.deriveAllRecordCountFromLastPageValues(selectedList, pagingBean));
     }
 
     // ===================================================================================

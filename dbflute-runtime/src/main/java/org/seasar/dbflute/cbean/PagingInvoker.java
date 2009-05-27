@@ -28,7 +28,6 @@ public class PagingInvoker<ENTITY> {
     //                                                                           Attribute
     //                                                                           =========
     protected String _tableDbName;
-    protected boolean _countLater;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -59,22 +58,22 @@ public class PagingInvoker<ENTITY> {
         final ResultBeanBuilder<ENTITY> builder = createResultBeanBuilder();
         final int allRecordCount;
         final List<ENTITY> selectedList;
-        if (_countLater) {
+        if (pagingBean.isCountLater()) {
             selectedList = handler.paging();
-            if (isNecessaryToReadCountLater(selectedList, pagingBean)) {
-                allRecordCount = handler.count();                
+            if (isCurrentLastPage(selectedList, pagingBean)) {
+                allRecordCount = deriveAllRecordCountFromLastPageValues(selectedList, pagingBean);
             } else {
-                allRecordCount = selectedList.size();
+                allRecordCount = handler.count();
             }
         } else {
             allRecordCount = handler.count();
-            if (allRecordCount > 0) {
-                selectedList = handler.paging();
-            } else {
+            if (allRecordCount == 0) {
                 // The list to skip unnecessary select is list-result-bean as empty
                 // because both condition-bean and outside-SQL do so.
                 // (This program was implemented after implementing condition-bean and outside-SQL)
                 selectedList = builder.buildEmptyListResultBean(pagingBean);
+            } else {
+                selectedList = handler.paging();
             }
         }
         final PagingResultBean<ENTITY> rb = builder.buildPagingResultBean(pagingBean, allRecordCount, selectedList);
@@ -97,23 +96,35 @@ public class PagingInvoker<ENTITY> {
     }
 
     /**
-     * Is it necessary to read count as count-later?
+     * Is the current page is last page?
      * @param selectedList The selected list. (NotNull)
      * @param pagingBean The bean of paging. (NotNull)
      * @return Determination.
      */
-    protected boolean isNecessaryToReadCountLater(List<ENTITY> selectedList, PagingBean pagingBean) {
+    protected boolean isCurrentLastPage(List<ENTITY> selectedList, PagingBean pagingBean) {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
         // It returns true if the size of list is NOT under fetch size(page size).
         // 
         // {For example}
         // If the fetch size is 20 and the size of selected list is 19 or less,
-        // it is NOT necessary to read count because the 19 is the very all record count.
+        // the current page must be last page(contains when only one page exists). 
+        // it is NOT necessary to read count because the 19 is the hint to derive all record count.
         // 
-        // If the fetch size is 20 and the size of selected list is 20 or more,
+        // If the fetch size is 20 and the size of selected list is 20,
         // it is necessary to read count because we cannot know whether the next pages exist or not.
         // - - - - - - - - - -/
-        return selectedList.size() > (pagingBean.getFetchSize() - 1);
+        return selectedList.size() <= (pagingBean.getFetchSize() - 1);
+    }
+
+    /**
+     * Derive all record count from last page values.
+     * @param selectedList The selected list. (NotNull)
+     * @param pagingBean The bean of paging. (NotNull)
+     * @return Derived all record count.
+     */
+    protected int deriveAllRecordCountFromLastPageValues(List<ENTITY> selectedList, PagingBean pagingBean) {
+        int baseSize = (pagingBean.getFetchPageNumber() - 1) * pagingBean.getFetchSize();
+        return baseSize + selectedList.size();
     }
 
     /**
@@ -123,13 +134,6 @@ public class PagingInvoker<ENTITY> {
      */
     protected boolean isNecessaryToReadPageAgain(PagingResultBean<ENTITY> rb) {
         return rb.getAllRecordCount() > 0 && rb.getSelectedList().isEmpty();
-    }
-
-    // ===================================================================================
-    //                                                                              Option
-    //                                                                              ======
-    public PagingInvoker<ENTITY> countLater() {
-        _countLater = true; return this;
     }
 
     // ===================================================================================
