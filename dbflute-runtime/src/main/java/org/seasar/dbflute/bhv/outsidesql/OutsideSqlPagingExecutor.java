@@ -88,14 +88,13 @@ public class OutsideSqlPagingExecutor {
      * #   from MEMBER member
      * #     left outer join MEMBER_STATUS memberStatus
      * #       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
-     * #  /[*]BEGIN[*]/where
-     * #    /[*]IF pmb.memberId != null[*]/member.MEMBER_ID = /[*]pmb.memberId[*]/'123'/[*]END[*]/
-     * #    /[*]IF pmb.memberName != null[*]/and member.MEMBER_NAME like /[*]pmb.memberName[*]/'Billy' || '%'/[*]END[*]/
-     * #  /[*]END[*]/
+     * #  /*BEGIN&#42;/where
+     * #    /*IF pmb.memberId != null&#42;/member.MEMBER_ID = /*pmb.memberId&#42;/'123'/*END&#42;/
+     * #    /*IF pmb.memberName != null&#42;/and member.MEMBER_NAME like /*pmb.memberName&#42;/'Billy' || '%'/*END&#42;/
+     * #  /*END&#42;/
      * #  order by member.UPDATE_DATETIME desc
-     * #  limit /[*]$pmb.pageStartIndex[*]/80, /[*]$pmb.fetchSize[*]/20
+     * #  limit /*$pmb.pageStartIndex&#42;/80, /*$pmb.fetchSize&#42;/20
      * # 
-     * o [*] is easy escape to Java Doc Comment.
      * o If it's autoPaging, the line of 'limit 80, 20' is unnecessary!
      * </pre>
      * @param <ENTITY> The type of entity.
@@ -121,42 +120,41 @@ public class OutsideSqlPagingExecutor {
      * - - - - - - - - - - - - - - - - - - - - - - -
      * ex) Your Correct SQL {MySQL and manualPaging}
      * - - - - - - - - - - - - - - - - - - - - - - -
-     * # /[*]IF pmb.isPaging()[*]/
+     * # /*IF pmb.isPaging()&#42;/
      * # select member.MEMBER_ID
      * #      , member.MEMBER_NAME
      * #      , memberStatus.MEMBER_STATUS_NAME
      * # -- ELSE select count(*)
-     * # /[*]END[*]/
+     * # /*END&#42;/
      * #   from MEMBER member
-     * #     /[*]IF pmb.isPaging()[*]/
+     * #     /*IF pmb.isPaging()&#42;/
      * #     left outer join MEMBER_STATUS memberStatus
      * #       on member.MEMBER_STATUS_CODE = memberStatus.MEMBER_STATUS_CODE
-     * #     /[*]END[*]/
-     * #  /[*]BEGIN[*]/where
-     * #    /[*]IF pmb.memberId != null[*]/member.MEMBER_ID = /[*]pmb.memberId[*]/'123'/[*]END[*]/
-     * #    /[*]IF pmb.memberName != null[*]/and member.MEMBER_NAME like /[*]pmb.memberName[*]/'Billy' || '%'/[*]END[*]/
-     * #  /[*]END[*]/
-     * #  /[*]IF pmb.isPaging()[*]/
+     * #     /*END&#42;/
+     * #  /*BEGIN&#42;/where
+     * #    /*IF pmb.memberId != null&#42;/member.MEMBER_ID = /*pmb.memberId&#42;/'123'/*END&#42;/
+     * #    /*IF pmb.memberName != null&#42;/and member.MEMBER_NAME like /*pmb.memberName&#42;/'Billy' || '%'/*END&#42;/
+     * #  /*END&#42;/
+     * #  /*IF pmb.isPaging()&#42;/
      * #  order by member.UPDATE_DATETIME desc
-     * #  /[*]END[*]/
-     * #  /[*]IF pmb.isPaging()[*]/
-     * #  limit /[*]$pmb.pageStartIndex[*]/80, /[*]$pmb.fetchSize[*]/20
-     * #  /[*]END[*]/
+     * #  /*END&#42;/
+     * #  /*IF pmb.isPaging()&#42;/
+     * #  limit /*$pmb.pageStartIndex&#42;/80, /*$pmb.fetchSize&#42;/20
+     * #  /*END&#42;/
      * # 
-     * o [*] is easy escape to Java Doc Comment.
      * o If it's autoPaging, the line of 'limit 80, 20' is unnecessary!
      * 
      * - - - - - - - - - - - - - - - - - - - - - - - - -
      * ex) Wrong SQL {part 1}
      *     -- Line comment before ELSE comment --
      * - - - - - - - - - - - - - - - - - - - - - - - - -
-     * # /[*]IF pmb.isPaging()[*]/
+     * # /*IF pmb.isPaging()&#42;/
      * # select member.MEMBER_ID
      * #      , member.MEMBER_NAME -- The name of member...    *NG
      * #      -- The status name of member...                  *NG
      * #      , memberStatus.MEMBER_STATUS_NAME
      * # -- ELSE select count(*)
-     * # /[*]END[*]/
+     * # /*END&#42;/
      * # ...
      * o It's restriction...Sorry
      * </pre>
