@@ -51,6 +51,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                           Attribute
     //                                                                           =========
     protected DBMeta _dbmeta;
+    protected boolean _beanAssignable;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -62,12 +63,20 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
      * @param beanClass The class of target bean to find DB-meta. (Nullable)
      * @return The instance of internal row creator. (NotNull)
      */
-    public static TnRowCreatorExtension createInternalRowCreator(Class<?> beanClass) {
+    public static TnRowCreatorExtension createRowCreator(Class<?> beanClass) {
         final TnRowCreatorExtension rowCreator = new TnRowCreatorExtension();
         if (beanClass != null) {
-            rowCreator.setDBMeta(findDBMetaByClass(beanClass));
+            final DBMeta dbmeta = findDBMetaByClass(beanClass);
+            if (dbmeta != null) {
+                rowCreator.setDBMeta(dbmeta);
+                rowCreator.setBeanAssignable(isBeanAssignableFromEntity(beanClass, dbmeta.getEntityType()));
+            }
         }
         return rowCreator;
+    }
+
+    protected static boolean isBeanAssignableFromEntity(Class<?> beanClass, Class<?> entityType) {
+        return beanClass.isAssignableFrom(entityType);
     }
 
     // ===================================================================================
@@ -95,7 +104,11 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         final DBMeta dbmeta;
         if (_dbmeta != null) {
             dbmeta = _dbmeta;
-            row = dbmeta.newEntity();
+            if (_beanAssignable) {
+                row = dbmeta.newEntity();
+            } else {
+                row = newBean(beanClass);
+            }
         } else {
             row = newBean(beanClass);
             dbmeta = findDBMeta(row);
@@ -298,5 +311,9 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                            ========
     public void setDBMeta(DBMeta dbmeta) {
         this._dbmeta = dbmeta;
+    }
+    
+    public void setBeanAssignable(boolean beanAssignable) {
+        this._beanAssignable = beanAssignable;
     }
 }

@@ -144,7 +144,7 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
 
     protected TnRowCreatorExtension createInternalRowCreator(TnBeanMetaData bmd) {
         final Class<?> clazz = bmd != null ? bmd.getBeanClass() : null;
-        return TnRowCreatorExtension.createInternalRowCreator(clazz);
+        return TnRowCreatorExtension.createRowCreator(clazz);
     }
 
     protected TnRelationRowCreatorExtension createInternalRelationRowCreator(TnBeanMetaData bmd) {
