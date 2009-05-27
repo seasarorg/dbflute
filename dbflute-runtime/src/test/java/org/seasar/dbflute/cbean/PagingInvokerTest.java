@@ -157,6 +157,43 @@ public class PagingInvokerTest extends PlainTestCase {
         assertEquals("paging", markList.get(0));
         assertEquals(1, markList.size());
     }
+    
+    public void test_invokePaging_onePage_countLater_just() {
+        // ## Arrange ##
+        final List<String> selectedList = new ArrayList<String>();
+        fillList(selectedList, 20);
+        final SimplePagingBean pagingBean = new SimplePagingBean();
+        pagingBean.getSqlClause().registerOrderBy("aaa", "bbb", true);
+        pagingBean.fetchFirst(20);
+        PagingInvoker<String> tgt = createTarget();
+        tgt.countLater();
+        
+        // ## Act ##
+        final List<String> markList = new ArrayList<String>();
+        PagingResultBean<String> rb = tgt.invokePaging(new PagingHandler<String>() {
+            public PagingBean getPagingBean() {
+                return pagingBean;
+            }
+            
+            public int count() {
+                markList.add("count");
+                return 20;
+            }
+            
+            public List<String> paging() {
+                markList.add("paging");
+                return selectedList;
+            }
+        });
+        
+        // ## Assert ##
+        assertEquals(20, rb.size());
+        assertEquals(20, rb.getAllRecordCount());
+        assertEquals(1, rb.getAllPageCount());
+        assertEquals(1, rb.getOrderByClause().getOrderByList().size());
+        assertEquals("paging", markList.get(0));
+        assertEquals("count", markList.get(1));
+    }
 
     public void test_invokePaging_twoPage() {
         // ## Arrange ##
