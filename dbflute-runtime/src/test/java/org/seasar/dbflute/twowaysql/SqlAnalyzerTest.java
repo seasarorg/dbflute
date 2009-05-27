@@ -141,7 +141,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
     // -----------------------------------------------------
     //                                                Nested
     //                                                ------
-    public void test_parse_BEGIN_that_has_nested_BEGIN_unsupported() {
+    public void test_parse_BEGIN_that_has_nested_BEGIN_true_unsupported() {
         // ## Arrange ##
         String sql = "/*BEGIN*/where";
         sql = sql + " ";
@@ -150,7 +150,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         sql = sql + "/*END*/";
         sql = sql + " ";
         sql = sql + "/*BEGIN*/";
-        sql = sql + "and AAA /*IF true*/and BBB/*END*/";
+        sql = sql + "FIXED2 /*IF true*/and BBB/*END*/ /*IF true*/and CCC/*END*/";
         sql = sql + "/*END*/";
         sql = sql + "/*END*/";
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
@@ -166,7 +166,66 @@ public class SqlAnalyzerTest extends PlainTestCase {
         log("ctx:" + ctx);
 
         // Basically Unsupported!
-        assertEquals("where FIXED and AAA BBB", ctx.getSql());
+        assertEquals("where FIXED FIXED2 BBB and CCC", ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_that_has_nested_BEGIN_false_unsupported() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " ";
+        sql = sql + "/*IF pmb.memberName != null*/";
+        sql = sql + "FIXED";
+        sql = sql + "/*END*/";
+        sql = sql + " ";
+        sql = sql + "/*BEGIN*/";
+        sql = sql + "FIXED2 /*IF false*/and BBB/*END*/ /*IF false*/and CCC/*END*/";
+        sql = sql + "/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+
+        // Basically Unsupported!
+        assertEquals("where FIXED ", ctx.getSql());
+    }
+
+    public void test_parse_BEGIN_that_has_nested_BEGIN_parentfalse_selftrue_unsupported() {
+        // ## Arrange ##
+        String sql = "/*BEGIN*/where";
+        sql = sql + " ";
+        sql = sql + "/*IF false*/";
+        sql = sql + "FIXED";
+        sql = sql + "/*END*/";
+        sql = sql + " ";
+        sql = sql + "/*BEGIN*/";
+        sql = sql + "FIXED2 /*IF true*/and BBB/*END*/ /*IF true*/and CCC/*END*/";
+        sql = sql + "/*END*/";
+        sql = sql + "/*END*/";
+        SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+
+        // ## Act ##
+        Node rootNode = analyzer.parse();
+
+        // ## Assert ##
+        SimpleMemberPmb pmb = new SimpleMemberPmb();
+        pmb.setMemberName("foo");
+        CommandContext ctx = createCtx(pmb);
+        rootNode.accept(ctx);
+        log("ctx:" + ctx);
+
+        // Basically Unsupported!
+        // If all IF comments of parent return false
+        // and nested IF comment in BEGIN comment returns true, 
+        // parent BEGIN manages false. It's strange!!!
+        assertEquals("", ctx.getSql());
     }
 
     public void test_parse_BEGIN_that_has_nested_IFIF_root_has_and() {
