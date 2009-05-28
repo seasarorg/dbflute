@@ -16,26 +16,53 @@ using ${glPackageBaseCommonJdbc};
 namespace ${glPackageBaseCommonS2Dao} {
 
     public class ${glS2DaoSetting} : AbstractDaoSetting {
+
         protected override void SetupDao(IDataSource dataSource) {
-            BasicCommandFactory commandFactory = new InternalBasicCommandFactory();
-            BasicDataReaderFactory dataReaderFactory = new BasicDataReaderFactory(commandFactory);
-            FieldAnnotationReaderFactory annotationReaderFactory = new FieldAnnotationReaderFactory();
+            ICommandFactory commandFactory = CreateCommandFactory();
+            IDataReaderFactory dataReaderFactory = CreateDataReaderFactory(commandFactory);
+            IAnnotationReaderFactory annotationReaderFactory = CreateAnnotationReaderFactory();
             _daoMetaDataFactory = new ${glS2DaoMetaDataFactoryImpl}(dataSource, commandFactory, annotationReaderFactory, dataReaderFactory);
             _daoInterceptor = new ${glS2DaoInterceptor}(_daoMetaDataFactory);
         }
+
+        protected ICommandFactory CreateCommandFactory() {
+            IDbParameterParser dbParamterParser = ${glDBFluteConfig}.GetInstance().DbParameterParser;
+            BasicCommandFactory commandFactory;
+            if (dbParamterParser != null) {
+                commandFactory = new TnBasicCommandFactory(dbParamterParser);
+            } else {
+                commandFactory = new TnBasicCommandFactory();
+            }
+            return commandFactory;
+        }
+
+        protected IDataReaderFactory CreateDataReaderFactory(ICommandFactory commandFactory) {
+            return new BasicDataReaderFactory(commandFactory);
+        }
+
+        protected IAnnotationReaderFactory CreateAnnotationReaderFactory() {
+            return new FieldAnnotationReaderFactory();
+        }
 #if ($database.isQuillDataSourceNameValid())
+
         public override String DataSourceName {
             get { return "${database.quillDataSourceName}"; }
         }
 #end
     }
 
-    public class InternalBasicCommandFactory : BasicCommandFactory {
+    public class TnBasicCommandFactory : BasicCommandFactory {
 
         // ===============================================================================
         //                                                                      Definition
         //                                                                      ==========
         private static readonly log4net.ILog _log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public TnBasicCommandFactory() : base() {}
+        public TnBasicCommandFactory(IDbParameterParser dbParameterParser) : base(dbParameterParser) {}
 
         // ===============================================================================
         //                                                                Command Creation

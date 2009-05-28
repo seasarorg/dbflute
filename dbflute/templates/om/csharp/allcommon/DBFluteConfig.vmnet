@@ -4,6 +4,7 @@ using System.Reflection;
 
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonJdbc};
+using Seasar.Extension.ADO;
 
 namespace ${glPackageBaseCommon} {
 
@@ -60,6 +61,7 @@ public class ${myClassName} {
 #end
     protected AdditionalAssembly _additionalAssemblyProvider;
     protected FileSystemPath _fileSystemPathResolver;
+    protected IDbParameterParser _dbParamterParser;
 	protected bool _internalDebug;
 	protected bool _locked = true;
 
@@ -269,6 +271,22 @@ public class ${myClassName} {
 		        _log.Info("...Setting fileSystemPathResolver: " + value);
 		    }
 	        _fileSystemPathResolver = value;
+		}
+	}
+
+    // ===================================================================================
+    //                                                                 DB Parameter Parser
+    //                                                                 ===================
+	public IDbParameterParser DbParamterParser { // CSharp only
+	    get {
+	        return _dbParamterParser;
+		}
+		set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting dbParamterParser: " + value);
+		    }
+	        _dbParamterParser = value;
 		}
 	}
 
