@@ -1,8 +1,8 @@
 
 using System;
 using System.Data;
-using System.Data.SqlTypes;
 
+using Seasar.Dao;
 using Seasar.Dao.Impl;
 using Seasar.Extension.ADO;
 using Seasar.Extension.ADO.Impl;

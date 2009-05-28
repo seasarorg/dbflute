@@ -61,7 +61,7 @@ public class ${myClassName} {
 #end
     protected AdditionalAssembly _additionalAssemblyProvider;
     protected FileSystemPath _fileSystemPathResolver;
-    protected IDbParameterParser _dbParamterParser;
+    protected IDbParameterParser _dbParameterParser;
 	protected bool _internalDebug;
 	protected bool _locked = true;
 
@@ -277,16 +277,16 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                 DB Parameter Parser
     //                                                                 ===================
-	public IDbParameterParser DbParamterParser { // CSharp only
+	public IDbParameterParser DbParameterParser { // CSharp only
 	    get {
-	        return _dbParamterParser;
+	        return _dbParameterParser;
 		}
 		set {
 	        AssertNotLocked();
 		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting dbParamterParser: " + value);
+		        _log.Info("...Setting dbParameterParser: " + value);
 		    }
-	        _dbParamterParser = value;
+	        _dbParameterParser = value;
 		}
 	}
 
