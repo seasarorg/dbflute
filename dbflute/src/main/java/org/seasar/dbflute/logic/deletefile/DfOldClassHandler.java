@@ -78,14 +78,14 @@ public class DfOldClassHandler {
     protected List<String> _deletedOldTableBaseBehaviorList;
 
     public void deleteOldTableClass_for_BaseBehavior() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getBaseBehaviorClassName();
             }
         };
         final String packagePath = getBaseBehaviorPackage();
         final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Bhv", setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "Bhv", setupper);
         _deletedOldTableBaseBehaviorList = deletor.deleteOldTableClass();
         showDeleteOldTableFile(_deletedOldTableBaseBehaviorList);
     }
@@ -97,14 +97,14 @@ public class DfOldClassHandler {
     protected List<String> _deletedOldTableBaseDaoList;
 
     public void deleteOldTableClass_for_BaseDao() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getBaseDaoClassName();
             }
         };
         final String packagePath = getBaseDaoPackage();
         final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Dao", setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "Dao", setupper);
         _deletedOldTableBaseDaoList = deletor.deleteOldTableClass();
         showDeleteOldTableFile(_deletedOldTableBaseDaoList);
     }
@@ -116,14 +116,14 @@ public class DfOldClassHandler {
     protected List<String> _deletedOldTableBaseEntityList;
 
     public void deleteOldTableClass_for_BaseEntity() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getBaseEntityClassName();
             }
         };
         final String packagePath = getBaseEntityPackage();
         final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, null, setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, null, setupper);
         _deletedOldTableBaseEntityList = deletor.deleteOldTableClass();
         showDeleteOldTableFile(_deletedOldTableBaseEntityList);
     }
@@ -133,14 +133,14 @@ public class DfOldClassHandler {
     }
 
     public void deleteOldTableClass_for_DBMeta() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getDBMetaClassName();
             }
         };
         final String packagePath = getDBMetaPackage();
         final String classPrefix = getProjectPrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Dbm", setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "Dbm", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
 
@@ -149,14 +149,14 @@ public class DfOldClassHandler {
     }
 
     public void deleteOldTableClass_for_BaseConditionBean() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getBaseConditionBeanClassName();
             }
         };
         final String packagePath = getConditionBeanPackage() + ".bs";
         final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CB", setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "CB", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
 
@@ -165,74 +165,74 @@ public class DfOldClassHandler {
     }
 
     public void deleteOldTableClass_for_AbstractBaseConditionQuery() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getAbstractBaseConditionQueryClassName();
             }
         };
         final String packagePath = getConditionBeanPackage() + ".cq.bs";
         final String classPrefix = getProjectPrefix() + "Abstract" + getBasePrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "CQ", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
 
     public void deleteOldTableClass_for_BaseConditionQuery() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getBaseConditionQueryClassName();
             }
         };
         final String packagePath = getConditionBeanPackage() + ".cq.bs";
         final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "CQ", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
 
     public void deleteOldTableClass_for_NestSelectSetupper() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getNestSelectSetupperClassName();
             }
         };
         final String packagePath = getConditionBeanPackage() + ".nss";
         final String classPrefix = getProjectPrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "Nss", setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "Nss", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
 
     public void deleteOldTableClass_for_ExtendedConditionBean() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getExtendedConditionBeanClassName();
             }
         };
         final String packagePath = getConditionBeanPackage();
         final String classPrefix = getProjectPrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CB", setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "CB", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
 
     public void deleteOldTableClass_for_ExtendedConditionQuery() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getExtendedConditionQueryClassName();
             }
         };
         final String packagePath = getConditionBeanPackage() + ".cq";
         final String classPrefix = getProjectPrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CQ", setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "CQ", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
 
     public void deleteOldTableClass_for_ExtendedConditionInlineQuery() {
-        final NotDeleteTableClassNameSetupper setupper = new NotDeleteTableClassNameSetupper() {
+        final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
                 return table.getExtendedConditionInlineQueryClassName();
             }
         };
         final String packagePath = getConditionBeanPackage() + ".cq.ciq";
         final String classPrefix = getProjectPrefix();
-        final DfOldTableClassDeletor deletor = createOldTableClassDeletor(packagePath, classPrefix, "CIQ", setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "CIQ", setupper);
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
 
@@ -311,25 +311,28 @@ public class DfOldClassHandler {
         }
     }
 
-    protected DfOldTableClassDeletor createOldTableClassDeletor(String packagePath, String classPrefix,
-            String classSuffix, NotDeleteTableClassNameSetupper notDeleteTableClassNameSetupper) {
+    protected DfOldTableClassDeletor createTCD(String packagePath, String classPrefix, String classSuffix,
+            NotDeleteTCNSetupper setupper) { // createOldTableClassDeletor()
         final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(_generator, createPackagePathHandler());
-        deletor.setPackagePath(packagePath);
+        deletor.addPackagePath(packagePath);
         deletor.setClassPrefix(classPrefix);
         deletor.setClassSuffix(classSuffix);
         deletor.setClassExtension(getClassFileExtension());
-        final Set<String> notDeleteClassNameSet = new HashSet<String>();
-        final List<Table> tableList = getTableList();
-        for (Table table : tableList) {
-            final String baseBehaviorClassName = notDeleteTableClassNameSetupper.setup(table);
-            notDeleteClassNameSet.add(baseBehaviorClassName);
-        }
-        deletor.setNotDeleteClassNameSet(notDeleteClassNameSet);
+        deletor.setNotDeleteClassNameSet(createNotDeleteTCNSet(setupper));
         return deletor;
     }
 
-    protected static interface NotDeleteTableClassNameSetupper {
+    protected static interface NotDeleteTCNSetupper { // NotDeleteTableClassNameSetupper
         public String setup(Table table);
+    }
+
+    protected Set<String> createNotDeleteTCNSet(NotDeleteTCNSetupper setupper) {
+        final Set<String> notDeleteClassNameSet = new HashSet<String>();
+        final List<Table> tableList = getTableList();
+        for (Table table : tableList) {
+            notDeleteClassNameSet.add(setupper.setup(table));
+        }
+        return notDeleteClassNameSet;
     }
 
     // ===================================================================================
@@ -357,13 +360,11 @@ public class DfOldClassHandler {
         final String customizePackageName = _generatedClassPackageDefault.getCustomizeEntitySimplePackageName();
         final String packagePath = getBaseEntityPackage() + "." + customizePackageName;
         final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final Set<String> notDeleteClassNameSet = new HashSet<String>();
-        final List<Table> tableList = getTableList();
-        for (Table table : tableList) {
-            notDeleteClassNameSet.add(table.getBaseEntityClassName());
-        }
-        final DfOldTableClassDeletor deletor = createOldCustomizeClassDeletor(packagePath, classPrefix, null,
-                notDeleteClassNameSet);
+        final DfOldTableClassDeletor deletor = createCCD(packagePath, classPrefix, null, new NotDeleteTCNSetupper() {
+            public String setup(Table table) {
+                return table.getBaseEntityClassName();
+            }
+        });
         _deletedOldCustomizeBaseEntityList = deletor.deleteOldTableClass();
         showDeleteOldTableFile(_deletedOldCustomizeBaseEntityList);
     }
@@ -373,13 +374,11 @@ public class DfOldClassHandler {
         final String dbmetaSimplePackageName = _generatedClassPackageDefault.getDBMetaSimplePackageName();
         final String packagePath = getBaseEntityPackage() + "." + customizePackageName + "." + dbmetaSimplePackageName;
         final String classPrefix = getProjectPrefix();
-        final Set<String> notDeleteClassNameSet = new HashSet<String>();
-        final List<Table> tableList = getTableList();
-        for (Table table : tableList) {
-            notDeleteClassNameSet.add(table.getDBMetaClassName());
-        }
-        final DfOldTableClassDeletor deletor = createOldCustomizeClassDeletor(packagePath, classPrefix, "Dbm",
-                notDeleteClassNameSet);
+        final DfOldTableClassDeletor deletor = createCCD(packagePath, classPrefix, "Dbm", new NotDeleteTCNSetupper() {
+            public String setup(Table table) {
+                return table.getDBMetaClassName();
+            }
+        });
         showDeleteOldTableFile(deletor.deleteOldTableClass());
     }
 
@@ -387,16 +386,17 @@ public class DfOldClassHandler {
 
     public void deleteOldCustomizeClass_for_BaseCursor() {
         final String cursorPackageName = _generatedClassPackageDefault.getCursorSimplePackageName();
-        final String packagePath = getBaseDaoPackage() + "." + cursorPackageName;
+        final String packagePath = getBaseBehaviorPackage() + "." + cursorPackageName;
+        final String oldStylePackagePath = getBaseDaoPackage() + "." + cursorPackageName;
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final String classSuffix = "Cursor";
-        final Set<String> notDeleteClassNameSet = new HashSet<String>();
-        final List<Table> tableList = getTableList();
-        for (Table table : tableList) {
-            notDeleteClassNameSet.add(table.getBaseEntityClassName() + classSuffix);
-        }
-        final DfOldTableClassDeletor deletor = createOldCustomizeClassDeletor(packagePath, classPrefix, classSuffix,
-                notDeleteClassNameSet);
+        final DfOldTableClassDeletor deletor = createCCD(packagePath, classPrefix, classSuffix,
+                new NotDeleteTCNSetupper() {
+                    public String setup(Table table) {
+                        return table.getBaseEntityClassName() + classSuffix;
+                    }
+                });
+        deletor.addPackagePath(oldStylePackagePath); // for Old Style Package
         _deletedOldCustomizeBaseCursorList = deletor.deleteOldTableClass();
         showDeleteOldTableFile(_deletedOldCustomizeBaseCursorList);
     }
@@ -405,16 +405,17 @@ public class DfOldClassHandler {
 
     public void deleteOldCustomizeClass_for_BaseCursorHandler() {
         final String cursorPackageName = _generatedClassPackageDefault.getCursorSimplePackageName();
-        final String packagePath = getBaseDaoPackage() + "." + cursorPackageName;
+        final String packagePath = getBaseBehaviorPackage() + "." + cursorPackageName;
+        final String oldStylePackagePath = getBaseDaoPackage() + "." + cursorPackageName;
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final String classSuffix = "CursorHandler";
-        final Set<String> notDeleteClassNameSet = new HashSet<String>();
-        final List<Table> tableList = getTableList();
-        for (Table table : tableList) {
-            notDeleteClassNameSet.add(table.getBaseEntityClassName() + classSuffix);
-        }
-        final DfOldTableClassDeletor deletor = createOldCustomizeClassDeletor(packagePath, classPrefix, classSuffix,
-                notDeleteClassNameSet);
+        final DfOldTableClassDeletor deletor = createCCD(packagePath, classPrefix, classSuffix,
+                new NotDeleteTCNSetupper() {
+                    public String setup(Table table) {
+                        return table.getBaseEntityClassName() + classSuffix;
+                    }
+                });
+        deletor.addPackagePath(oldStylePackagePath); // for Old Style Package
         _deletedOldCustomizeBaseCursorHandlerList = deletor.deleteOldTableClass();
         showDeleteOldTableFile(_deletedOldCustomizeBaseCursorHandlerList);
     }
@@ -423,7 +424,8 @@ public class DfOldClassHandler {
 
     public void deleteOldCustomizeClass_for_BaseParameterBean() {
         final String parameterBeanPackageName = _generatedClassPackageDefault.getParameterBeanSimplePackageName();
-        final String packagePath = getBaseDaoPackage() + "." + parameterBeanPackageName;
+        final String packagePath = getBaseBehaviorPackage() + "." + parameterBeanPackageName;
+        final String oldStylePackagePath = getBaseDaoPackage() + "." + parameterBeanPackageName;
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final Set<String> notDeleteClassNameSet = new HashSet<String>();
         final Map<String, DfParameterBeanMetaData> pmbMetaDataMap = getPmbMetaDataMap();
@@ -433,8 +435,8 @@ public class DfOldClassHandler {
                 notDeleteClassNameSet.add(getProjectPrefix() + getBasePrefix() + pmbName);
             }
         }
-        final DfOldTableClassDeletor deletor = createOldCustomizeClassDeletor(packagePath, classPrefix, null,
-                notDeleteClassNameSet);
+        final DfOldTableClassDeletor deletor = createCCD(packagePath, classPrefix, null, notDeleteClassNameSet);
+        deletor.addPackagePath(oldStylePackagePath); // for Old Style Package
         _deletedOldCustomizeBaseParameterBeanList = deletor.deleteOldTableClass();
         showDeleteOldTableFile(_deletedOldCustomizeBaseParameterBeanList);
     }
@@ -444,19 +446,8 @@ public class DfOldClassHandler {
             return;
         }
         final String customizePackageName = _generatedClassPackageDefault.getCustomizeEntitySimplePackageName();
-        final String outputPath = _generator.getOutputPath();
         final String packagePath = getExtendedEntityPackage() + "." + customizePackageName;
-        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
-        final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
-        for (String baseClassName : _deletedOldCustomizeBaseEntityList) {
-            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
-            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
-            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
-            if (file.exists()) {
-                file.delete();
-                _log.info("deleteOldCustoimzeClass('" + extendedClassName + "');");
-            }
-        }
+        deleteCustomizeExtendedClass(_deletedOldCustomizeBaseEntityList, packagePath);
     }
 
     public void deleteOldCustomizeClass_for_ExtendedCursor() {
@@ -464,19 +455,9 @@ public class DfOldClassHandler {
             return;
         }
         final String cursorPackageName = _generatedClassPackageDefault.getCursorSimplePackageName();
-        final String outputPath = _generator.getOutputPath();
-        final String packagePath = getExtendedDaoPackage() + "." + cursorPackageName;
-        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
-        final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
-        for (String baseClassName : _deletedOldCustomizeBaseCursorList) {
-            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
-            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
-            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
-            if (file.exists()) {
-                file.delete();
-                _log.info("deleteOldCustoimzeClass('" + extendedClassName + "');");
-            }
-        }
+        final String packagePath = getExtendedBehaviorPackage() + "." + cursorPackageName;
+        final String oldStylePackagePath = getExtendedDaoPackage() + "." + cursorPackageName;
+        deleteCustomizeExtendedClass(_deletedOldCustomizeBaseCursorList, packagePath, oldStylePackagePath);
     }
 
     public void deleteOldCustomizeClass_for_ExtendedCursorHandler() {
@@ -484,19 +465,9 @@ public class DfOldClassHandler {
             return;
         }
         final String cursorPackageName = _generatedClassPackageDefault.getCursorSimplePackageName();
-        final String outputPath = _generator.getOutputPath();
-        final String packagePath = getExtendedDaoPackage() + "." + cursorPackageName;
-        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
-        final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
-        for (String baseClassName : _deletedOldCustomizeBaseCursorHandlerList) {
-            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
-            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
-            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
-            if (file.exists()) {
-                file.delete();
-                _log.info("deleteOldCustoimzeClass('" + extendedClassName + "');");
-            }
-        }
+        final String packagePath = getExtendedBehaviorPackage() + "." + cursorPackageName;
+        final String oldStylePackagePath = getExtendedDaoPackage() + "." + cursorPackageName;
+        deleteCustomizeExtendedClass(_deletedOldCustomizeBaseCursorHandlerList, packagePath, oldStylePackagePath);
     }
 
     public void deleteOldCustomizeClass_for_ExtendedParameterBean() {
@@ -504,26 +475,21 @@ public class DfOldClassHandler {
             return;
         }
         final String parameterBeanPackageName = _generatedClassPackageDefault.getParameterBeanSimplePackageName();
-        final String outputPath = _generator.getOutputPath();
-        final String packagePath = getExtendedDaoPackage() + "." + parameterBeanPackageName;
-        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
-        final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
-        for (String baseClassName : _deletedOldCustomizeBaseParameterBeanList) {
-            final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
-            final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
-            final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
-            if (file.exists()) {
-                file.delete();
-                _log.info("deleteOldCustoimzeClass('" + extendedClassName + "');");
-            }
-        }
+        final String packagePath = getExtendedBehaviorPackage() + "." + parameterBeanPackageName;
+        final String oldStylePackagePath = getExtendedDaoPackage() + "." + parameterBeanPackageName;
+        deleteCustomizeExtendedClass(_deletedOldCustomizeBaseParameterBeanList, packagePath, oldStylePackagePath);
     }
 
-    protected DfOldTableClassDeletor createOldCustomizeClassDeletor(String packagePath, String classPrefix,
-            String classSuffix, Set<String> notDeleteClassNameSet) {
-        final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(_generator, new DfPackagePathHandler(
-                _basicProperties));
-        deletor.setPackagePath(packagePath);
+    protected DfOldTableClassDeletor createCCD(String packagePath, String classPrefix, String classSuffix,
+            NotDeleteTCNSetupper setupper) { // createOldCustomizeClassDeletor()
+        return createCCD(packagePath, classPrefix, classSuffix, createNotDeleteTCNSet(setupper));
+    }
+
+    protected DfOldTableClassDeletor createCCD(String packagePath, String classPrefix, String classSuffix,
+            Set<String> notDeleteClassNameSet) { // createOldCustomizeClassDeletor()
+        final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(_basicProperties);
+        final DfOldTableClassDeletor deletor = new DfOldTableClassDeletor(_generator, packagePathHandler);
+        deletor.addPackagePath(packagePath);
         deletor.setClassPrefix(classPrefix);
         deletor.setClassSuffix(classSuffix);
         deletor.setClassExtension(getClassFileExtension());
@@ -531,8 +497,21 @@ public class DfOldClassHandler {
         return deletor;
     }
 
-    protected static interface NotDeleteCustomizeClassNameSetupper {
-        public String setup(Table table);
+    protected void deleteCustomizeExtendedClass(List<String> baseClassList, String... packagePathList) {
+        final String outputPath = _generator.getOutputPath();
+        final DfPackagePathHandler packagePathHandler = createPackagePathHandler();
+        for (String packagePath : packagePathList) {
+            final String dirPath = outputPath + "/" + packagePathHandler.getPackageAsPath(packagePath);
+            for (String baseClassName : baseClassList) {
+                final int prefixLength = getProjectPrefix().length() + getBasePrefix().length();
+                final String extendedClassName = getProjectPrefix() + baseClassName.substring(prefixLength);
+                final File file = new File(dirPath + "/" + extendedClassName + "." + getClassFileExtension());
+                if (file.exists()) {
+                    file.delete();
+                    _log.info("deleteOldCustoimzeClass('" + extendedClassName + "');");
+                }
+            }
+        }
     }
 
     // ===================================================================================

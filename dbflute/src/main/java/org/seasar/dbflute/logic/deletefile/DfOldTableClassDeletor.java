@@ -36,7 +36,7 @@ public class DfOldTableClassDeletor {
     //                                                                           =========
     protected DfGenerator _generator;
     protected DfPackagePathHandler _packagePathHandler;
-    protected String _packagePath;
+    protected List<String> _packagePathList = new ArrayList<String>();
     protected String _classPrefix;
     protected String _classSuffix;
     protected String _classExtension;
@@ -55,15 +55,17 @@ public class DfOldTableClassDeletor {
     //                                                                              ======
     public List<String> deleteOldTableClass() {
         final List<String> deletedClassNameList = new ArrayList<String>();
-        final List<File> files = findPackageFileList(_packagePath, _classPrefix, _classSuffix);
-        for (File file : files) {
-            final String name = file.getName();
-            final String nameWithoutExt = name.substring(0, name.lastIndexOf(_classExtension));
-            if (notDeleteClassNameSet.contains(nameWithoutExt)) {
-                continue;
+        for (String packagePath : _packagePathList) {
+            final List<File> files = findPackageFileList(packagePath, _classPrefix, _classSuffix);
+            for (File file : files) {
+                final String name = file.getName();
+                final String nameWithoutExt = name.substring(0, name.lastIndexOf(_classExtension));
+                if (notDeleteClassNameSet.contains(nameWithoutExt)) {
+                    continue;
+                }
+                deletedClassNameList.add(nameWithoutExt);
+                file.delete();
             }
-            deletedClassNameList.add(nameWithoutExt);
-            file.delete();
         }
         return deletedClassNameList;
     }
@@ -116,12 +118,8 @@ public class DfOldTableClassDeletor {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public String getPackagePath() {
-        return _packagePath;
-    }
-
-    public void setPackagePath(String packagePath) {
-        _packagePath = packagePath;
+    public void addPackagePath(String packagePath) {
+        _packagePathList.add(packagePath);
     }
 
     protected String getClassPrefix() {
