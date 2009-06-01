@@ -150,7 +150,7 @@
   <target name="stage">
     <copy overwrite="true" 
 	      file="${dbflute.zip.dirfile}"
-	      tofile="${dbflute.www.download.dir}/dbflute/dbflute-${internal.version}.zip">
+	      tofile="${dbflute.www.download.dir}/dbflute/dbflute.net-${internal.version}.zip">
     </copy>
   </target>
 
