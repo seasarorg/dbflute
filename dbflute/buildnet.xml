@@ -17,8 +17,8 @@
 
   <property name="workspace.base" value=".."/>
   <property name="dbflute.www.download.dir" value="${workspace.base}/dbflute-www/download"/>
-  <property name="dbflute.nbasic.example.dir" value="${workspace.base}/dbflute-nbasic-example"/>
-  <property name="dbflute.noracle.example.dir" value="${workspace.base}/dbflute-noracle-example"/>
+  <property name="dfnet.basic.example.dir" value="${workspace.base}/dfnet-basic-example"/>
+  <property name="dfnet.asp.net.example.dir" value="${workspace.base}/dbflute-noracle-example"/>
 
   <target name="clean">
     <delete dir="target/classes"/>
@@ -160,14 +160,14 @@
   	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
   </target>
 
-  <target name="reflect-win-nbasic" depends="expand-dist" description="==> reflect to nbasic example">
-    <copy todir="${dbflute.nbasic.example.dir}/mydbflute/dbflute-${version}">
+  <target name="reflect-win-basic" depends="expand-dist" description="==> reflect to basic example">
+    <copy todir="${dfnet.basic.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
 
-  <target name="reflect-win-noracle" depends="expand-dist" description="==> reflect to noracle example">
-    <copy todir="${dbflute.noracle.example.dir}/mydbflute/dbflute-${version}">
+  <target name="reflect-win-asp.net" depends="expand-dist" description="==> reflect to asp.net example">
+    <copy todir="${dfnet.asp.net.example.dir}/mydbflute/dbflute-${version}">
       <fileset dir="${dbflute.deploy.dir}"/>
     </copy>
   </target>
