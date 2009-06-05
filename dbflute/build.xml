@@ -9,9 +9,6 @@
 	<property name="internal.version" value="${version}-SNAPSHOT"/>
 
 	<!-- Directories and Module Files -->
-	<property name="deploy.base" value="../../dbflute"/>
-	<property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
-
 	<property name="dbflute.dist" value="dist"/>
 	<property name="dbflute.templates" value="templates"/>
 	<property name="dbflute.jar.file" value="dbflute.jar"/>
@@ -22,17 +19,20 @@
 	<property name="workspace.base" value=".."/>
 	<property name="dbflute.runtime.dir" value="${workspace.base}/dbflute-runtime"/>
 
-	<!-- Basic -->
+	<property name="deploy.base" value="../dbflute-temporary-deploy/dbflute"/>
+	<property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
+
+	<!-- Basic Examples -->
 	<property name="dbflute.www.download.dir" value="${workspace.base}/dbflute-www/download"/>
 	<property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
 
-	<!-- Container -->
+	<!-- Container Examples -->
 	<property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
 	<property name="dbflute.lucy.example.dir" value="${workspace.base}/dbflute-lucy-example"/>
 	<property name="dbflute.guice.example.dir" value="${workspace.base}/dbflute-guice-example"/>
 	<property name="dbflute.slim3.example.dir" value="${workspace.base}/dbflute-slim3-example"/>
 
-	<!-- Database -->
+	<!-- Database Examples -->
 	<property name="dbflute.mysql.example.dir" value="${workspace.base}/dbflute-mysql-example"/>
 	<property name="dbflute.postgresql.example.dir" value="${workspace.base}/dbflute-postgresql-example"/>
 	<property name="dbflute.oracle.example.dir" value="${workspace.base}/dbflute-oracle-example"/>
@@ -42,7 +42,7 @@
 	<property name="dbflute.msaccess.example.dir" value="${workspace.base}/dbflute-msaccess-example"/>
 	<property name="dbflute.multipledb.example.dir" value="${workspace.base}/dbflute-multipledb-example"/>
 		
-	<!-- Friendly -->
+	<!-- Friendly Examples -->
 	<property name="dbflute.ymir.example.dir" value="${workspace.base}/dbflute-ymir-example"/>
 	<property name="dbflute.sastruts.example.dir" value="${workspace.base}/dbflute-sastruts-example"/>
 	<property name="dbflute.buri.example.dir" value="${workspace.base}/dbflute-buri-example"/>
@@ -182,6 +182,17 @@
 	  	</zip>
 	</target>
 
+	<target name="adjust">
+		<fixcrlf srcdir="${dbflute.templates}" eol="crlf" encoding="UTF-8">
+			<exclude name="**/*.vmnet"/>	
+		</fixcrlf>
+		<fixcrlf srcdir="${dbflute.templates}/om/csharp" eol="crlf" encoding="UTF-8" />
+	</target>
+
+	<!-- ============================================================================= -->
+	<!--                                                            S T A G E  T A S K -->
+	<!--                                                            ================== -->
+
 	<target name="stage">
 	  	<copy overwrite="true" 
 	  		  file="${dbflute.zip.dirfile}"
@@ -189,64 +200,62 @@
 	  	</copy>
 	</target>
 
-	<target name="adjust">
-		<fixcrlf srcdir="${dbflute.templates}" eol="crlf" encoding="UTF-8">
-			<exclude name="**/*.vmnet"/>	
-		</fixcrlf>
-		<fixcrlf srcdir="${dbflute.templates}/om/csharp" eol="crlf" encoding="UTF-8" />
-	</target>
-	
-	<target name="expand-dist">
+	<!-- ============================================================================= -->
+	<!--                                                        E X A M P L E  T A S K -->
+	<!--                                                        ====================== -->
+
+    <!-- basically for example projects -->
+	<target name="deploy-dist">
 	  	<delete dir="${dbflute.deploy.dir}"/>
 	  	<unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
 	  	<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
 	</target>
 
-	<!-- ============================================================================= -->
-	<!--                                             R E F L E C T I O N  F O R  M A C -->
-	<!--                                             ================================= -->
+	<!-- = = = = = = = = = = -->
+    <!-- Reflection for Mac  -->
+	<!-- = = = = = = = = = = -->
 
-	<target name="reflect-mac-basic" depends="expand-dist" description="==> reflect to basic application">
+	<target name="reflect-mac-basic" depends="deploy-dist" description="==> reflect to basic application">
 	  	<copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-mac-spring" depends="expand-dist" description="==> reflect to spring application">
+	<target name="reflect-mac-spring" depends="deploy-dist" description="==> reflect to spring application">
 	  	<copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-mac-lucy" depends="expand-dist" description="==> reflect to lucy application">
+	<target name="reflect-mac-lucy" depends="deploy-dist" description="==> reflect to lucy application">
 	  	<copy todir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-mac-guice" depends="expand-dist" description="==> reflect to guice application">
+	<target name="reflect-mac-guice" depends="deploy-dist" description="==> reflect to guice application">
 	  	<copy todir="${dbflute.guice.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-mac-slim3" depends="expand-dist" description="==> reflect to slim3 application">
+	<target name="reflect-mac-slim3" depends="deploy-dist" description="==> reflect to slim3 application">
 	  	<copy todir="${dbflute.slim3.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-mac-mysql" depends="expand-dist" description="==> reflect to mysql example">
+	<target name="reflect-mac-mysql" depends="deploy-dist" description="==> reflect to mysql example">
 	  	<copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 	
-	<target name="reflect-mac-multipledb" depends="expand-dist" description="==> reflect to multipledb example">
+	<target name="reflect-mac-multipledb" depends="deploy-dist" description="==> reflect to multipledb example">
 	  	<copy todir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-mac-ymir" depends="expand-dist" description="==> reflect to ymir example">
+	<target name="reflect-mac-ymir" depends="deploy-dist" description="==> reflect to ymir example">
 	  	<copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-mac-s2jdbc" depends="expand-dist" description="==> reflect to s2jdbc example">
+	<target name="reflect-mac-s2jdbc" depends="deploy-dist" description="==> reflect to s2jdbc example">
 	  	<copy todir="${dbflute.s2jdbc.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-mac-flex" depends="expand-dist" description="==> reflect to flex example">
+	<target name="reflect-mac-flex" depends="deploy-dist" description="==> reflect to flex example">
 	  	<copy todir="${dbflute.flex.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-mac-others" depends="expand-dist" description="==> reflect to other examples">
+	<target name="reflect-mac-others" depends="deploy-dist" description="==> reflect to other examples">
 	  	<copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.guice.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
@@ -257,39 +266,39 @@
 	  	<copy todir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<!-- ============================================================================= -->
-	<!--                                     R E F L E C T I O N  F O R  W I N D O W S -->
-	<!--                                     ========================================= -->
+	<!-- = = = = = = = = = = = = -->
+    <!-- Reflection for Windows  -->
+	<!-- = = = = = = = = = = = = -->
 
-	<target name="reflect-win-basic" depends="expand-dist" description="==> reflect to basic example">
+	<target name="reflect-win-basic" depends="deploy-dist" description="==> reflect to basic example">
 	  	<copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-win-oracle" depends="expand-dist" description="==> reflect to oracle example">
+	<target name="reflect-win-oracle" depends="deploy-dist" description="==> reflect to oracle example">
 	  	<copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-win-postgresql" depends="expand-dist" description="==> reflect to postgresql example">
+	<target name="reflect-win-postgresql" depends="deploy-dist" description="==> reflect to postgresql example">
 	  	<copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-win-db2" depends="expand-dist" description="==> reflect to db2 example">
+	<target name="reflect-win-db2" depends="deploy-dist" description="==> reflect to db2 example">
 	  	<copy todir="${dbflute.db2.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-win-sqlserver" depends="expand-dist" description="==> reflect to sqlserver example">
+	<target name="reflect-win-sqlserver" depends="deploy-dist" description="==> reflect to sqlserver example">
 	  	<copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-win-msaccess" depends="expand-dist" description="==> reflect to msaccess example">
+	<target name="reflect-win-msaccess" depends="deploy-dist" description="==> reflect to msaccess example">
 	  	<copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-win-buri" depends="expand-dist" description="==> reflect to buri example">
+	<target name="reflect-win-buri" depends="deploy-dist" description="==> reflect to buri example">
 	  	<copy todir="${dbflute.buri.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
-	<target name="reflect-win-others" depends="expand-dist" description="==> reflect to other examples">
+	<target name="reflect-win-others" depends="deploy-dist" description="==> reflect to other examples">
 	  	<copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.db2.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
