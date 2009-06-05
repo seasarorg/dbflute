@@ -1,8 +1,0 @@
-${database.allClassCopyright}package ${glPackageBaseCommonBhvCore};
-
-/**
- * @author ${database.ClassAuthor}
- */
-public interface ${glBehaviorInitializer} {
-    // This is old class. So this will be deleted at the future!
-}
