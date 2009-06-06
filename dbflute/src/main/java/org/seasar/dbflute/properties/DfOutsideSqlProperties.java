@@ -32,15 +32,19 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return _outsideSqlDefinitionMap;
     }
 
+    public String getProperty(String key, String defaultValue) {
+        return getProperty(key, defaultValue, getOutsideSqlDefinitionMap());
+    }
+
+    public boolean isProperty(String key, boolean defaultValue) {
+        return isProperty(key, defaultValue, getOutsideSqlDefinitionMap());
+    }
+
     // ===================================================================================
     //                                                             Procedure ParameterBean
     //                                                             =======================
     public boolean isGenerateProcedureParameterBean() {
-        String value = (String) getOutsideSqlDefinitionMap().get("generateProcedureParameterBean");
-        if (value == null) {
-            value = (String) getOutsideSqlDefinitionMap().get("isGenerateProcedureParameterBean");
-        }
-        return value != null && value.trim().equalsIgnoreCase("true");
+        return isProperty("isGenerateProcedureParameterBean", false);
     }
 
     public boolean isTargetProcedureCatalog(String procedureCatalog) {
@@ -228,7 +232,7 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                     OutputDirectory
     //                                                                     ===============
-    public String getSql2EntityOutputDirectory() {
+    public String getSql2EntityOutputDirectory() { // It's closet!
         final String value = (String) getOutsideSqlDefinitionMap().get("sql2EntityOutputDirectory");
         if (value == null || value.trim().length() == 0) {
             return getBasicProperties().getOutputDirectory();
@@ -240,22 +244,22 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                      Package Detail
     //                                                                      ==============
-    protected String getSpecifiedBaseCustomizeEntityPackage() {
+    protected String getSpecifiedBaseCustomizeEntityPackage() { // It's closet!
         final String value = (String) getOutsideSqlDefinitionMap().get("baseCustomizeEntityPackage");
         return (value != null && value.trim().length() > 0) ? value : null;
     }
 
-    protected String getSpecifiedExtendedCustomizeEntityPackage() {
+    protected String getSpecifiedExtendedCustomizeEntityPackage() { // It's closet!
         final String value = (String) getOutsideSqlDefinitionMap().get("extendedCustomizeEntityPackage");
         return (value != null && value.trim().length() > 0) ? value : null;
     }
 
-    protected String getSpecifiedBaseParameterBeanPackage() {
+    protected String getSpecifiedBaseParameterBeanPackage() { // It's closet!
         final String value = (String) getOutsideSqlDefinitionMap().get("baseParameterBeanPackage");
         return (value != null && value.trim().length() > 0) ? value : null;
     }
 
-    protected String getSpecifiedExtendedParameterBeanPackage() {
+    protected String getSpecifiedExtendedParameterBeanPackage() { // It's closet!
         final String value = (String) getOutsideSqlDefinitionMap().get("extendedParameterBeanPackage");
         return (value != null && value.trim().length() > 0) ? value : null;
     }
@@ -377,6 +381,13 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
 
     protected boolean isMakeDaoInterface() {
         return getLittleAdjustmentProperties().isMakeDaoInterface();
+    }
+
+    // ===================================================================================
+    //                                                                   BehaviorQueryPath
+    //                                                                   =================
+    public boolean isSuppressBehaviorQueryPath() { // It's closet!
+        return isProperty("isSuppressBehaviorQueryPath", false);
     }
 
     // ===================================================================================

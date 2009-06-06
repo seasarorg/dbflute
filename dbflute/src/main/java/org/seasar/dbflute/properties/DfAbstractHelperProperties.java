@@ -16,10 +16,10 @@ import org.seasar.dbflute.helper.io.text.DfStringFileReader;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
-import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -79,6 +79,60 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                      Properties
     //                                                                      ==========
+    // -----------------------------------------------------
+    //                                              Accessor
+    //                                              --------
+    public String getProperty(String key, String defaultValue, Map<String, ? extends Object> map) {
+        final Object obj = map.get(key);
+        if (obj != null) {
+            if (!(obj instanceof String)) {
+                String msg = "The key's value should be string:";
+                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                throw new IllegalStateException(msg);
+            }
+            String value = (String) obj;
+            if (value.trim().length() > 0) {
+                return value;
+            } else {
+                return defaultValue;
+            }
+        }
+        return stringProp("torque." + key, defaultValue);
+    }
+
+    public boolean isProperty(String key, boolean defaultValue, Map<String, ? extends Object> map) {
+        Object obj = map.get(key);
+        if (obj == null) {
+            final String anotherKey = deriveBooleanAnotherKey(key);
+            if (anotherKey != null) {
+                obj = map.get(anotherKey);
+            }
+        }
+        if (obj != null) {
+            if (!(obj instanceof String)) {
+                String msg = "The key's value should be boolean:";
+                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                throw new IllegalStateException(msg);
+            }
+            String value = (String) obj;
+            if (value.trim().length() > 0) {
+                return value.trim().equalsIgnoreCase("true");
+            } else {
+                return defaultValue;
+            }
+        }
+        return booleanProp("torque." + key, defaultValue);
+    }
+
+    static String deriveBooleanAnotherKey(String key) {
+        if (key.length() > "is".length() && key.startsWith("is")) {
+            if (Character.isUpperCase(key.substring("is".length()).charAt(0))) {
+                return DfStringUtil.initUncap(key.substring("is".length()));
+            }
+        }
+        return null;
+    }
+
     // -----------------------------------------------------
     //                                                String
     //                                                ------
@@ -375,7 +429,7 @@ public abstract class DfAbstractHelperProperties {
     protected DfBasicProperties getBasicProperties() {
         return DfPropertiesHandler.getInstance().getBasicProperties(getProperties());
     }
-    
+
     protected DfDatabaseProperties getDatabaseProperties() {
         return DfPropertiesHandler.getInstance().getDatabaseProperties(getProperties());
     }

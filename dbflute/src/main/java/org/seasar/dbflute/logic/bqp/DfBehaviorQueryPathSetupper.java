@@ -42,6 +42,7 @@ import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -75,6 +76,10 @@ public class DfBehaviorQueryPathSetupper {
      * @param sqlFileList The list of SQL file. (NotNull)
      */
     public void setupBehaviorQueryPath(List<File> sqlFileList) {
+        if (getOutsideSqlProperties().isSuppressBehaviorQueryPath()) {
+            _log.info("*Behavior Query Path is suppressed!");
+            return;
+        }
         final String exbhvName;
         {
             String exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
@@ -406,6 +411,10 @@ public class DfBehaviorQueryPathSetupper {
 
     protected DfBasicProperties getBasicProperties() {
         return _buildProperties.getBasicProperties();
+    }
+    
+    protected DfOutsideSqlProperties getOutsideSqlProperties() {
+        return _buildProperties.getOutsideSqlProperties();
     }
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
