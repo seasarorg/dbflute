@@ -324,7 +324,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected void throwLikeSearchOptionNotFoundException(String colName, String value) {
-        DBMeta dbmeta = DBMetaInstanceHandler.FindDBMeta(getTableDbName());
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String propertyName = dbmeta.FindPropertyName(colName);
         String capPropName = initCap(propertyName);
         String msg = "Look! Read the message below." + getLineSeparator();
