@@ -348,7 +348,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                          Inline Query
     //                                          ------------
     protected virtual void regIQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
-        DBMeta dbmeta = DBMetaInstanceHandler.FindDBMeta(getTableDbName());
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String propertyName = dbmeta.FindPropertyName(colName);
         String capPropName = initCap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
@@ -363,7 +363,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     protected virtual void regIQ(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                , String colName, ${glConditionOption} option) {
-        DBMeta dbmeta = DBMetaInstanceHandler.FindDBMeta(getTableDbName());
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String propertyName = dbmeta.FindPropertyName(colName);
         String capPropName = initCap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
@@ -712,7 +712,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                          Where Clause
     //                                          ------------
     protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue, String colName) {
-        DBMeta dbmeta = DBMetaInstanceHandler.FindDBMeta(getTableDbName());
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String propertyName = dbmeta.FindPropertyName(colName);
         String capPropName = initCap(propertyName);
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key)); // If CSharp, it is necessary to use capPropName!
@@ -721,7 +721,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     protected virtual void setupConditionValueAndRegisterWhereClause(${glConditionKey} key, Object value, ${glConditionValue} cvalue
                                                                    , String colName, ${glConditionOption} option) {
-        DBMeta dbmeta = DBMetaInstanceHandler.FindDBMeta(getTableDbName());
+        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String propertyName = dbmeta.FindPropertyName(colName);
         String capPropName = initCap(propertyName);
         key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option); // If CSharp, it is necessary to use capPropName!
