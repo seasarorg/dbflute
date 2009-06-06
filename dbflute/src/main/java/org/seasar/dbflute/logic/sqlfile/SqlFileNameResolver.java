@@ -47,17 +47,17 @@ public class SqlFileNameResolver {
         if (fileName.contains("/")) {
             fileName = fileName.substring(fileName.lastIndexOf("/") + "/".length());
         }
-        if (!fileName.contains("Bhv_")) {
-            String msg = "The SQL file should be under BehaviorQueryPath if you use auto-naming:";
-            msg = msg + " className=" + className + " fileName=" + fileName;
-            throw new IllegalStateException(msg);
-        }
         if (!fileName.endsWith(".sql")) {
             String msg = "The SQL file should ends '.sql' if you use auto-naming:";
             msg = msg + " className=" + className + " fileName=" + fileName;
             throw new IllegalStateException(msg);
         }
-        final int beginIndex = fileName.indexOf("Bhv_") + "Bhv_".length();
+        final int beginIndex;
+        if (fileName.contains("Bhv_")) {
+            beginIndex = fileName.indexOf("Bhv_") + "Bhv_".length();
+        } else {
+            beginIndex = 0;
+        }
         String tmp = fileName.substring(beginIndex);
         int endIndex = tmp.indexOf("_");
         if (endIndex < 0) {
@@ -65,6 +65,11 @@ public class SqlFileNameResolver {
         }
         if (endIndex < 0) { // basically no way because it has already been checked
             String msg = "The SQL file should ends '.sql' if you use auto-naming:";
+            msg = msg + " className=" + className + " fileName=" + fileName;
+            throw new IllegalStateException(msg);
+        }
+        if (endIndex == 0) {
+            String msg = "The name of SQL file have an unexpected underscore:";
             msg = msg + " className=" + className + " fileName=" + fileName;
             throw new IllegalStateException(msg);
         }

@@ -121,14 +121,15 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     }
 
     @Test
-    public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath() {
+    public void test_resolveObjectNameIfNeeds_entity_startsWithUnderScore() {
         // ## Arrange ##
         SqlFileNameResolver resolver = new SqlFileNameResolver();
         String className = SqlFileNameResolver.ENTITY_MARK;
+        String fileName = "MemberBhv__selectSimpleMember.sql";
 
         // ## Act ##
         try {
-            resolver.resolveEntityNameIfNeeds(className, "Mem_selectSimpleMember.sql");
+            resolver.resolveEntityNameIfNeeds(className, fileName);
 
             // ## Assert ##
             fail();
@@ -136,10 +137,59 @@ public class SqlFileNameResolverTest extends PlainTestCase {
             // OK
             log(e.getMessage());
         }
+    }
+
+    @Test
+    public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath() {
+        // ## Arrange ##
+        SqlFileNameResolver resolver = new SqlFileNameResolver();
+        String className = SqlFileNameResolver.ENTITY_MARK;
+
+        // ## Act ##
+        String actual = resolver.resolveEntityNameIfNeeds(className, "selectSimpleMember.sql");
+
+        // ## Assert ##
+        log(actual);
+        assertEquals("SimpleMember", actual);
+    }
+
+    @Test
+    public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath_DBSuffix() {
+        // ## Arrange ##
+        SqlFileNameResolver resolver = new SqlFileNameResolver();
+        String className = SqlFileNameResolver.ENTITY_MARK;
+
+        // ## Act ##
+        String actual = resolver.resolveEntityNameIfNeeds(className, "selectSimpleMember_oracle.sql");
+
+        // ## Assert ##
+        log(actual);
+        assertEquals("SimpleMember", actual);
+    }
+
+    @Test
+    public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath_Unsupport() {
+        // ## Arrange ##
+        SqlFileNameResolver resolver = new SqlFileNameResolver();
+        String className = SqlFileNameResolver.ENTITY_MARK;
+
+        // ## Act ##
+        String actual = resolver.resolveEntityNameIfNeeds(className, "Member_selectSimpleMember.sql");
+
+        // ## Assert ##
+        log(actual);
+        assertEquals("Member", actual);
+    }
+
+    @Test
+    public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath_startsWithUnderScore() {
+        // ## Arrange ##
+        SqlFileNameResolver resolver = new SqlFileNameResolver();
+        String className = SqlFileNameResolver.ENTITY_MARK;
 
         // ## Act ##
         try {
-            resolver.resolveEntityNameIfNeeds(className, "selectSimpleMember.sql");
+            resolver.resolveEntityNameIfNeeds(className, "_selectSimpleMember.sql");
 
             // ## Assert ##
             fail();
@@ -293,26 +343,11 @@ public class SqlFileNameResolverTest extends PlainTestCase {
         String className = SqlFileNameResolver.PMB_MARK;
 
         // ## Act ##
-        try {
-            resolver.resolvePmbNameIfNeeds(className, "Mem_selectSimpleMember.sql");
+        String actual = resolver.resolvePmbNameIfNeeds(className, "selectSimpleMember.sql");
 
-            // ## Assert ##
-            fail();
-        } catch (IllegalStateException e) {
-            // OK
-            log(e.getMessage());
-        }
-
-        // ## Act ##
-        try {
-            resolver.resolvePmbNameIfNeeds(className, "selectSimpleMember.sql");
-
-            // ## Assert ##
-            fail();
-        } catch (IllegalStateException e) {
-            // OK
-            log(e.getMessage());
-        }
+        // ## Assert ##
+        log(actual);
+        assertEquals("SimpleMemberPmb", actual);
     }
 
     @Test
