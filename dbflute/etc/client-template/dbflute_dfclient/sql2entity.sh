@@ -9,7 +9,7 @@ echo "nnnnnnnnnn/"
 export MY_PROPERTIES_PATH=build-${MY_PROJECT_NAME}.properties
 
 echo "/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
-echo "Execute {Invoke Sql Directory}."
+echo "Execute {Sql2Entity}."
 echo "nnnnnnnnnn/"
 sh $DBFLUTE_HOME/etc/cmd/_df-sql2entity.sh $MY_PROPERTIES_PATH
 
