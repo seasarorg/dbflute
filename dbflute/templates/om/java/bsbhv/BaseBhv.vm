@@ -662,6 +662,25 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         _buriAutoSelectProcessor = buriAutoSelectProcessor;
     }
 
+    protected void toNextStatusAction(String processPath, Object entity, Object userData, String action) {
+        try {
+            _buriAutoSelectProcessor.toNextStatusAction(processPath, entity, userData, action);
+        } catch (org.seasar.coffee.script.exception.ScriptExecuteException e) {
+            if (e.getCause() instanceof ognl.MethodFailedException) {
+                ognl.MethodFailedException fail = (ognl.MethodFailedException) e.getCause();
+                Throwable reason = fail.getReason();
+                if (reason instanceof org.seasar.dbflute.exception.EntityAlreadyExistsException) {
+                    throw (org.seasar.dbflute.exception.EntityAlreadyExistsException)reason;
+                } else if (reason instanceof org.seasar.dbflute.exception.EntityAlreadyDeletedException) {
+                    throw (org.seasar.dbflute.exception.EntityAlreadyDeletedException)reason;
+                } else if (reason instanceof org.seasar.dbflute.exception.EntityAlreadyUpdatedException) {
+                    throw (org.seasar.dbflute.exception.EntityAlreadyUpdatedException)reason;
+                }
+            }
+            throw e;
+        }
+    }
+
     protected ${glBuriDef}.BuriUserDataProvider _buriUserDataProvider;
     public void setBuriUserDataProvider(${glBuriDef}.BuriUserDataProvider buriUserDataProvider) {
         _buriUserDataProvider = buriUserDataProvider;
@@ -672,7 +691,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         assertEntityNotNull(${myEntityVariableName});
         String processPath = ${glBuriDef}.BuriProcess.${processName}.path();
         Object userData = getUserData_${processName}(${myEntityVariableName}, action);
-        _buriAutoSelectProcessor.toNextStatusAction(processPath, ${myEntityVariableName}, userData, action.code());
+        toNextStatusAction(processPath, ${myEntityVariableName}, userData, action.code());
     }
 
     protected Object getUserData_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
