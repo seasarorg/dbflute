@@ -864,8 +864,18 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     protected List<DfClassificationTop> extractClassificationResource() {
         final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
-        final String environmentTypePath = isEnvironmentDefault() ? "/" : getEnvironmentType() + "/";
-        return analyzer.analyze("./dfprop/" + environmentTypePath, NAME_CLASSIFICATION_RESOURCE, "dfprop");
+        final String dirBaseName = "./dfprop";
+        final String resource = NAME_CLASSIFICATION_RESOURCE;
+        final String extension = "dfprop";
+        if (isEnvironmentDefault()) {
+            return analyzer.analyze(dirBaseName, resource, extension);
+        }
+        final String dirEnvName = dirBaseName + "/" + getEnvironmentType();
+        final List<DfClassificationTop> ls = analyzer.analyze(dirEnvName, resource, extension);
+        if (!ls.isEmpty()) {
+            return ls;
+        }
+        return analyzer.analyze(dirBaseName, resource, extension);
     }
 
     protected void reflectClassificationResourceToDefinition() {
