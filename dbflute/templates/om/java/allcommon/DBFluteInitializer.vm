@@ -113,7 +113,12 @@ public class ${glDBFluteInitializer} {
 
     protected static class SpringDBCPDataSourceHandler implements DataSourceHandler {
         public Connection getConnection(final DataSource ds) throws SQLException {
-            return new NotClosingConnectionWrapper(DataSourceUtils.getConnection(ds));
+            final Connection conn = DataSourceUtils.getConnection(ds);
+            if (DataSourceUtils.isConnectionTransactional(conn, ds)) {
+                return new NotClosingConnectionWrapper(conn);
+            } else {
+                return conn;
+            }
         }
         @Override
         public String toString() {
