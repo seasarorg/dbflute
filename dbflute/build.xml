@@ -40,7 +40,8 @@
 	<property name="dbflute.db2.example.dir" value="${workspace.base}/dbflute-db2-example"/>
 	<property name="dbflute.sqlserver.example.dir" value="${workspace.base}/dbflute-db2-example"/>
 	<property name="dbflute.msaccess.example.dir" value="${workspace.base}/dbflute-msaccess-example"/>
-	<property name="dbflute.multipledb.example.dir" value="${workspace.base}/dbflute-multipledb-example"/>
+	<property name="dbflute.multipledb.seasar.example.dir" value="${workspace.base}/dbflute-multipledb-example"/>
+	<property name="dbflute.multipledb.spring.example.dir" value="${workspace.base}/dbflute-multipledb-spring-example"/>
 		
 	<!-- Friendly Examples -->
 	<property name="dbflute.ymir.example.dir" value="${workspace.base}/dbflute-ymir-example"/>
@@ -240,7 +241,8 @@
 	</target>
 	
 	<target name="reflect-mac-multipledb" depends="deploy-dist" description="==> reflect to multipledb example">
-	  	<copy todir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	  	<copy todir="${dbflute.multipledb.seasar.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	  	<copy todir="${dbflute.multipledb.spring.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
 	<target name="reflect-mac-ymir" depends="deploy-dist" description="==> reflect to ymir example">
@@ -261,7 +263,8 @@
 	  	<copy todir="${dbflute.guice.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.slim3.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
-	  	<copy todir="${dbflute.multipledb.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	  	<copy todir="${dbflute.multipledb.seasar.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	  	<copy todir="${dbflute.multipledb.spring.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.sastruts.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
