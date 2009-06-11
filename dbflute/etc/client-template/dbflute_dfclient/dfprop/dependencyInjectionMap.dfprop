@@ -24,7 +24,7 @@
 map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o dbfluteDiconNamespace (NotRequired - Default 'dbflute')
-    #  The name-space of DBFlute DI configuration.
+    #  The namespace of DBFlute DI configuration.
     #
     # @JavaSeasarOnly
     #; dbfluteDiconNamespace = dbflute
