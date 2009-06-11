@@ -14,12 +14,18 @@
     </bean>
     <bean id="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}" autowire="byType"/>
     <bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}" autowire="byType"/>
-    <bean id="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker" autowire="byType"/>
+    <bean id="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker" autowire="byType">
+        <property name="invokerAssistant"><ref bean="${database.invokerAssistantComponentName}"/></property>
+    </bean>
 
     <!-- The components of Behavior. -->
 #foreach ($table in $database.tables)
 	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}" autowire="byType">
         <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
+        <property name="behaviorSelector"><ref bean="${database.behaviorSelectorComponentName}"/></property>
+#if ($table.isWritable())
+        <property name="commonColumnAutoSetupper"><ref bean="${database.commonColumnAutoSetupperComponentName}"/></property>
+#end
     </bean>
 #end
 </beans>
