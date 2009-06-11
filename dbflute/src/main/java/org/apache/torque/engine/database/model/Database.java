@@ -724,7 +724,7 @@ public class Database {
     public boolean isDatabaseOracle() {
         return getBasicProperties().isDatabaseOracle();
     }
-    
+
     public boolean isDatabaseDB2() {
         return getBasicProperties().isDatabaseDB2();
     }
@@ -732,15 +732,15 @@ public class Database {
     public boolean isDatabaseSQLServer() {
         return getBasicProperties().isDatabaseSqlServer();
     }
-    
+
     public boolean isDatabaseDerby() {
         return getBasicProperties().isDatabaseDerby();
     }
-    
+
     public boolean isDatabaseH2() {
         return getBasicProperties().isDatabaseH2();
     }
-    
+
     public boolean isDatabaseMSAccess() {
         return getBasicProperties().isDatabaseMsAccess();
     }
@@ -799,11 +799,11 @@ public class Database {
     public boolean isTargetContainerLucy() {
         return getBasicProperties().isTargetContainerLucy();
     }
-    
+
     public boolean isTargetContainerGuice() {
         return getBasicProperties().isTargetContainerGuice();
     }
-    
+
     public boolean isTargetContainerSlim3() {
         return getBasicProperties().isTargetContainerSlim3();
     }
@@ -992,7 +992,9 @@ public class Database {
     // ===================================================================================
     //                                                                Dependency Injection
     //                                                                ====================
-    // Seasar
+    // -----------------------------------------------------
+    //                                                Seasar
+    //                                                ------
     public String getDBFluteDiconNamespace() {
         return getProperties().getDependencyInjectionProperties().getDBFluteDiconNamespace();
     }
@@ -1024,17 +1026,25 @@ public class Database {
     public List<String> getDBFluteDiconOtherIncludePathList() {
         return getProperties().getDependencyInjectionProperties().getDBFluteDiconOtherIncludePathList();
     }
-
-    // Spring
-    public String getDBFluteBeansFileName() {
-        return getProperties().getDependencyInjectionProperties().getDBFluteBeansFileName();
-    }
-
+    
+    // -----------------------------------------------------
+    //                                         Spring & Lucy
+    //                                         -------------
     public List<String> getDBFluteBeansPackageNameList() {
         return getProperties().getDependencyInjectionProperties().getDBFluteBeansPackageNameList();
     }
 
-    // Quill
+    public String getDBFluteBeansFileName() {
+        return getProperties().getDependencyInjectionProperties().getDBFluteBeansFileName();
+    }
+    
+    public String getDBFluteBeansDataSourceName() {
+        return getProperties().getDependencyInjectionProperties().getDBFluteBeansDataSourceName();
+    }
+    
+    // -----------------------------------------------------
+    //                                                 Quill
+    //                                                 -----
     public boolean isQuillDataSourceNameValid() {
         return getProperties().getDependencyInjectionProperties().isQuillDataSourceNameValid();
     }
@@ -1299,7 +1309,7 @@ public class Database {
     public boolean isMakeEntityTraceRelation() {
         return getProperties().getLittleAdjustmentProperties().isMakeEntityTraceRelation();
     }
-    
+
     public boolean isMakeEntityS2DaoAnnotation() {
         return getProperties().getLittleAdjustmentProperties().isMakeEntityS2DaoAnnotation();
     }
@@ -1587,26 +1597,51 @@ public class Database {
     // ===================================================================================
     //                                                  Component Name Helper for Template
     //                                                  ==================================
-    public String getDaoSelectorComponentName() {
-        return filterProjectSuffixForComponentName("daoSelector");
+    // -----------------------------------------------------
+    //                                   AllCommon Component
+    //                                   -------------------
+    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = 
+    // These methods for all-common components are used when it needs to identity their components.
+    // For example when the DI container is Seasar, These methods are not used
+    // because S2Container has name-space in the DI architecture.
+    // = = = = = = = = = =/
+
+    // Comment out because the dbfluteInitializer does not need ID or Name basically.
+    //public String getDBFluteInitializerComponentName() {
+    //    return filterComponentNameWithProjectPrefix("dbfluteInitializer");
+    //}
+
+    public String getInvokerAssistantComponentName() {
+        return filterComponentNameWithProjectPrefix("invokerAssistant");
+    }
+
+    public String getCommonColumnAutoSetupperComponentName() {
+        return filterComponentNameWithProjectPrefix("commonColumnAutoSetupper");
     }
 
     public String getBehaviorSelectorComponentName() {
-        return filterProjectSuffixForComponentName("behaviorSelector");
+        return filterComponentNameWithProjectPrefix("behaviorSelector");
     }
 
-    public String filterProjectSuffixForComponentName(String targetName) {
-        if (getBasicProperties().isAppendProjectSuffixToComponentName()) {
-            final String prefix = getBasicProperties().getProjectPrefix();
-            if (prefix == null || prefix.trim().length() == 0) {
-                return targetName;
-            } else {
-                final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
-                return filteredPrefix + targetName.substring(0, 1).toUpperCase() + targetName.substring(1);
-            }
-        } else {
-            return targetName;
+    public String getBehaviorCommandInvokerComponentName() {
+        return filterComponentNameWithProjectPrefix("behaviorCommandInvoker");
+    }
+
+    // -----------------------------------------------------
+    //                                     Filtering Utility
+    //                                     -----------------
+    /**
+     * Filter a component name with a project prefix.
+     * @param componentName The name of component. (NotNull)
+     * @return A filtered component name with project prefix. (NotNull)
+     */
+    public String filterComponentNameWithProjectPrefix(String componentName) {
+        final String prefix = getBasicProperties().getProjectPrefix();
+        if (prefix == null || prefix.trim().length() == 0) {
+            return componentName;
         }
+        final String filteredPrefix = prefix.substring(0, 1).toLowerCase() + prefix.substring(1);
+        return filteredPrefix + componentName.substring(0, 1).toUpperCase() + componentName.substring(1);
     }
 
     // ===================================================================================

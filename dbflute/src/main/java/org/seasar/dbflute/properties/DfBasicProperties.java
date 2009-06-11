@@ -324,10 +324,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return "Bs";
     }
 
-    public boolean isAppendProjectSuffixToComponentName() { // It's closet!
-        return isProperty("isAppendProjectSuffixToComponentName", true);
-    }
-
     // ===================================================================================
     //                                                                        Class Author
     //                                                                        ============

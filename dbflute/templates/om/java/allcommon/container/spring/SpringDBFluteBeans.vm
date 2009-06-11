@@ -5,22 +5,21 @@
 >
 <beans>
     <!-- The components of DBFlute Runtime. -->
-    <bean id="dbfluteInitializer" class="${glPackageBaseCommon}.DBFluteInitializer">
-        <constructor-arg index="0">
-            <ref bean="dataSource"/>
-        </constructor-arg>
+    <bean class="${glPackageBaseCommon}.DBFluteInitializer">
+        <constructor-arg index="0"><ref bean="${database.DBFluteBeansDataSourceName}"/></constructor-arg>
     </bean>
-    <bean id="invokerAssistant" class="${glPackageBaseCommon}.ImplementedInvokerAssistant" autowire="byType">
-        <property name="dataSource">
-            <ref bean="dataSource"/>
-        </property>
+    <bean id="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.ImplementedInvokerAssistant" autowire="byType">
+        <property name="dataSource"><ref bean="${database.DBFluteBeansDataSourceName}"/></property>
+        <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
     </bean>
-    <bean id="commonColumnAutoSetupper" class="${glPackageBaseCommon}.ImplementedCommonColumnAutoSetupper" autowire="byType"/>
-    <bean id="behaviorSelector" class="${glPackageBaseCommon}.ImplementedBehaviorSelector" autowire="byType"/>
-    <bean id="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker" autowire="byType"/>
+    <bean id="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.ImplementedCommonColumnAutoSetupper" autowire="byType"/>
+    <bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.ImplementedBehaviorSelector" autowire="byType"/>
+    <bean id="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker" autowire="byType"/>
 
     <!-- The components of Behavior. -->
 #foreach ($table in $database.tables)
-	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}" autowire="byType"/>
+	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}" autowire="byType">
+        <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
+    </bean>
 #end
 </beans>

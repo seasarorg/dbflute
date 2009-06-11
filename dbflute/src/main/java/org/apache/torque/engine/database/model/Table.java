@@ -688,11 +688,11 @@ public class Table {
     //                                        Component Name
     //                                        --------------
     public String getDaoComponentName() {
-        return getDatabase().filterProjectSuffixForComponentName(getUncapitalisedJavaName()) + "Dao";
+        return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Dao";
     }
 
     public String getBehaviorComponentName() {
-        return getDatabase().filterProjectSuffixForComponentName(getUncapitalisedJavaName()) + "Bhv";
+        return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Bhv";
     }
 
     // -----------------------------------------------------

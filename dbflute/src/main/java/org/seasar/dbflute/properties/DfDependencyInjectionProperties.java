@@ -164,12 +164,8 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
     }
 
     // ===================================================================================
-    //                                                                DBFluteBeans(Spring)
-    //                                                                ====================
-    public String getDBFluteBeansFileName() { // Java Only
-        return getProperty("dbfluteBeansFileName", "dbfluteBeans.xml");
-    }
-
+    //                                                           DBFluteBeans(Spring/Lucy)
+    //                                                           =========================
     public List<String> getDBFluteBeansPackageNameList() { // Java Only
         final String defaultPackageName = getDefaultDBFluteDicon().getDBFluteDiconPackageName();
         final String prop = getProperty("dbfluteBeansPackageName", defaultPackageName);
@@ -181,6 +177,14 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         return ls;
     }
 
+    public String getDBFluteBeansFileName() { // Java Only
+        return getProperty("dbfluteBeansFileName", "dbfluteBeans.xml");
+    }
+    
+    public String getDBFluteBeansDataSourceName() { // Java Only
+        return getProperty("dbfluteBeansDataSourceName", "dataSource");
+    }
+    
     // ===================================================================================
     //                                                             Quill DataSource(Quill)
     //                                                             =======================

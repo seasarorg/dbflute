@@ -2,25 +2,25 @@
 <!DOCTYPE lucy-config PUBLIC "-//LUCY//DTD LUCY//EN" "http://www.lucy.org/dtd/lucy-config.dtd">
 <lucy-config>
     <!-- The components of DBFlute Runtime. -->
-    <component name="dbfluteInitializer" class="${glPackageBaseCommon}.DBFluteInitializer"/>
-    <component name="invokerAssistant" class="${glPackageBaseCommon}.ImplementedInvokerAssistant">
-        <inject method="setDataSource">dataSource</inject>
+    <component class="${glPackageBaseCommon}.DBFluteInitializer"/>
+    <component name="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.ImplementedInvokerAssistant">
+        <inject method="setDataSource">${database.DBFluteBeansDataSourceName}</inject>
     </component>
-    <component name="commonColumnAutoSetupper" class="${glPackageBaseCommon}.ImplementedCommonColumnAutoSetupper"/>
-    <component name="behaviorSelector" class="${glPackageBaseCommon}.ImplementedBehaviorSelector">
+    <component name="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.ImplementedCommonColumnAutoSetupper"/>
+    <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.ImplementedBehaviorSelector">
         <inject method="setContainer">lucy</inject>
     </component>
-    <component name="behaviorCommandInvoker" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker">
-        <inject method="setInvokerAssistant">invokerAssistant</inject>
+    <component name="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker">
+        <inject method="setInvokerAssistant">${database.invokerAssistantComponentName}</inject>
     </component>
     
     <!-- The components of Behavior. -->
 #foreach ($table in $database.tables)
 	<component name="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}">
-        <inject method="setBehaviorCommandInvoker">behaviorCommandInvoker</inject>
-        <inject method="setBehaviorSelector">behaviorSelector</inject>
+        <inject method="setBehaviorCommandInvoker">${database.behaviorCommandInvokerComponentName}</inject>
+        <inject method="setBehaviorSelector">${database.behaviorSelectorComponentName}</inject>
 #if ($table.isWritable())
-        <inject method="setCommonColumnAutoSetupper">commonColumnAutoSetupper</inject>
+        <inject method="setCommonColumnAutoSetupper">${database.commonColumnAutoSetupperComponentName}</inject>
 #end
     </component>
 #end
