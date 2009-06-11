@@ -2,12 +2,12 @@
 <!DOCTYPE lucy-config PUBLIC "-//LUCY//DTD LUCY//EN" "http://www.lucy.org/dtd/lucy-config.dtd">
 <lucy-config>
     <!-- The components of DBFlute Runtime. -->
-    <component class="${glPackageBaseCommon}.DBFluteInitializer"/>
-    <component name="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.ImplementedInvokerAssistant">
+    <component class="${glPackageBaseCommon}.${glDBFluteInitializer}"/>
+    <component name="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}">
         <inject method="setDataSource">${database.DBFluteBeansDataSourceName}</inject>
     </component>
-    <component name="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.ImplementedCommonColumnAutoSetupper"/>
-    <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.ImplementedBehaviorSelector">
+    <component name="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}"/>
+    <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}">
         <inject method="setContainer">lucy</inject>
     </component>
     <component name="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker">

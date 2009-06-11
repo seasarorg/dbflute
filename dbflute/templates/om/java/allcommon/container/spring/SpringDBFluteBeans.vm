@@ -5,15 +5,15 @@
 >
 <beans>
     <!-- The components of DBFlute Runtime. -->
-    <bean class="${glPackageBaseCommon}.DBFluteInitializer">
+    <bean class="${glPackageBaseCommon}.${glDBFluteInitializer}">
         <constructor-arg index="0"><ref bean="${database.DBFluteBeansDataSourceName}"/></constructor-arg>
     </bean>
-    <bean id="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.ImplementedInvokerAssistant" autowire="byType">
+    <bean id="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}" autowire="byType">
         <property name="dataSource"><ref bean="${database.DBFluteBeansDataSourceName}"/></property>
         <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
     </bean>
-    <bean id="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.ImplementedCommonColumnAutoSetupper" autowire="byType"/>
-    <bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.ImplementedBehaviorSelector" autowire="byType"/>
+    <bean id="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}" autowire="byType"/>
+    <bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}" autowire="byType"/>
     <bean id="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker" autowire="byType"/>
 
     <!-- The components of Behavior. -->
