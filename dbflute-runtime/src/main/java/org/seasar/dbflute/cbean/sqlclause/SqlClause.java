@@ -164,10 +164,9 @@ public interface SqlClause {
      * @param joinOnMap Map that has conditions of on-clause. (NotNull)
      */
     public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap);
-
     
     public SqlClause makeInnerJoinEffective();
-
+    
     public SqlClause backToOuterJoin();
     
     // ===================================================================================
