@@ -93,6 +93,9 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     /** The map of outer join. */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>();
+    
+    /** Is inner-join effective? Default value is false. */
+    protected boolean _isInnerJoinEffective = false;
 
     /** The list of where clause. */
     protected List<String> _whereList = new ArrayList<String>();
@@ -487,7 +490,11 @@ public abstract class AbstractSqlClause implements SqlClause {
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
             sb.append(getLineSeparator()).append("   ");
-            sb.append(" left outer join ");
+            if (joinInfo.isInnerJoin()) { // basically false
+                sb.append(" inner join ");
+            } else {
+                sb.append(" left outer join "); // is main!
+            }
             if (inlineWhereClauseList.isEmpty()) {
                 sb.append(joinTableName);
             } else {
@@ -680,7 +687,20 @@ public abstract class AbstractSqlClause implements SqlClause {
         joinInfo.setAliasName(aliasName);
         joinInfo.setJoinTableName(joinTableName);
         joinInfo.setJoinOnMap(joinOnMap);
+        if (_isInnerJoinEffective) { // basically false
+            joinInfo.setInnerJoin(true);
+        }
         _outerJoinMap.put(aliasName, joinInfo);
+    }
+    
+    public SqlClause makeInnerJoinEffective() {
+        _isInnerJoinEffective = true;
+        return this;
+    }
+
+    public SqlClause backToOuterJoin() {
+        _isInnerJoinEffective = false;
+        return this;
     }
 
     protected static class LeftOuterJoinInfo {
@@ -689,7 +709,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         protected List<String> _inlineWhereClauseList = new ArrayList<String>();
         protected List<String> _additionalOnClauseList = new ArrayList<String>();
         protected Map<String, String> _joinOnMap;
-        protected boolean _onClauseInline;
+        protected boolean _innerJoin;
 
         public String getAliasName() {
             return _aliasName;
@@ -731,12 +751,12 @@ public abstract class AbstractSqlClause implements SqlClause {
             _joinOnMap = value;
         }
 
-        public boolean isOnClauseInline() {
-            return _onClauseInline;
+        public boolean isInnerJoin() {
+            return _innerJoin;
         }
-
-        public void setOnClauseInline(boolean value) {
-            _onClauseInline = value;
+        
+        public void setInnerJoin(boolean value) {
+            _innerJoin = value;
         }
     }
 
@@ -895,16 +915,16 @@ public abstract class AbstractSqlClause implements SqlClause {
         _orderByClause.clear();
         return this;
     }
-
-    public SqlClause ignoreOrderBy() {
-        _isOrderByEffective = false;
-        return this;
-    }
-
+    
     public SqlClause makeOrderByEffective() {
         if (!_orderByClause.isEmpty()) {
             _isOrderByEffective = true;
         }
+        return this;
+    }
+
+    public SqlClause ignoreOrderBy() {
+        _isOrderByEffective = false;
         return this;
     }
 

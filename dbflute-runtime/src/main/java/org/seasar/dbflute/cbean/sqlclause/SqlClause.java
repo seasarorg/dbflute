@@ -165,6 +165,11 @@ public interface SqlClause {
      */
     public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap);
 
+    
+    public SqlClause makeInnerJoinEffective();
+
+    public SqlClause backToOuterJoin();
+    
     // ===================================================================================
     //                                                                               Where
     //                                                                               =====
