@@ -3,15 +3,15 @@ package org.seasar.dbflute.exception;
 /**
  * @author jflute
  */
-public class TableNotFoundException extends RuntimeException {
+public class DfTableNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
     
-    public TableNotFoundException(String msg) {
+    public DfTableNotFoundException(String msg) {
         super(msg);
     }
 
-    public TableNotFoundException(String msg, Throwable e) {
+    public DfTableNotFoundException(String msg, Throwable e) {
         super(msg, e);
     }
 }

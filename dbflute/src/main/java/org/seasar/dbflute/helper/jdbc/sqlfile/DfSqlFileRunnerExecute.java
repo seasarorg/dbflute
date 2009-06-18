@@ -28,6 +28,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfAssertionFailureCountNotZeroException;
+import org.seasar.dbflute.exception.DfAssertionFailureListNotZeroException;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 
 /**
@@ -220,14 +222,6 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         throw new DfAssertionFailureCountNotZeroException(msg);
     }
 
-    public static class DfAssertionFailureCountNotZeroException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public DfAssertionFailureCountNotZeroException(String msg) {
-            super(msg);
-        }
-    }
-
     protected void throwAssertionFailureListNotZeroException(String sql, int resultCount,
             List<Map<String, String>> resultList) {
         String msg = "Look! Read the message below." + ln();
@@ -249,13 +243,5 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         }
         msg = msg + "* * * * * * * * * */";
         throw new DfAssertionFailureListNotZeroException(msg);
-    }
-
-    public static class DfAssertionFailureListNotZeroException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public DfAssertionFailureListNotZeroException(String msg) {
-            super(msg);
-        }
     }
 }

@@ -77,7 +77,7 @@ import org.apache.xerces.dom.DocumentTypeImpl;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
-import org.seasar.dbflute.exception.TableNotFoundException;
+import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.metadata.DfAutoIncrementHandler;
 import org.seasar.dbflute.helper.jdbc.metadata.DfColumnHandler;
@@ -477,7 +477,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         msg = msg + " schema = " + _schema + ln();
         msg = msg + " user   = " + _userId + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new TableNotFoundException(msg);
+        throw new DfTableNotFoundException(msg);
     }
 
     protected void setupColumnType(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {

@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.IllegalPropertyTypeException;
+import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -164,7 +164,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         if (!(obj instanceof List)) {
             String msg = "The type of the property 'additionalDropMapList' should be List: " + obj;
-            throw new IllegalPropertyTypeException(msg);
+            throw new DfIllegalPropertyTypeException(msg);
         }
         return (List<Map<String, Object>>) obj;
     }

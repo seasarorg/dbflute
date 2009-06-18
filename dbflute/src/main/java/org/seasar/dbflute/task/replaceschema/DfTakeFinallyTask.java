@@ -329,21 +329,23 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             }
 
             // Take Finally
-            sb.append(ln);
-            sb.append(ln).append(" ").append(result.getResultMessage());
-            final String detailMessage = result.getDetailMessage();
-            if (detailMessage != null && detailMessage.trim().length() > 0) {
-                final LineToken lineToken = new LineTokenImpl();
-                final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
-                lineTokenizingOption.setDelimiter(ln);
-                final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
-                for (String tokenizedElement : tokenizedList) {
-                    sb.append(ln).append("  ").append(tokenizedElement);
+            if (result != null) {
+                sb.append(ln);
+                sb.append(ln).append(" ").append(result.getResultMessage());
+                final String detailMessage = result.getDetailMessage();
+                if (detailMessage != null && detailMessage.trim().length() > 0) {
+                    final LineToken lineToken = new LineTokenImpl();
+                    final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
+                    lineTokenizingOption.setDelimiter(ln);
+                    final List<String> tokenizedList = lineToken.tokenize(detailMessage, lineTokenizingOption);
+                    for (String tokenizedElement : tokenizedList) {
+                        sb.append(ln).append("  ").append(tokenizedElement);
+                    }
                 }
             }
 
             // Exists Error
-            final boolean existsError = isLine2True(line2) || result.isExistsError();
+            final boolean existsError = isLine2True(line2) || (result == null || result.isExistsError());
             if (existsError) {
                 sb.append(ln).append("    * * * * * *");
                 sb.append(ln).append("    * Failure *");

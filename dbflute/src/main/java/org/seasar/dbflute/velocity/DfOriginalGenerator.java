@@ -22,7 +22,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.exception.TemplateParsingException;
+import org.seasar.dbflute.exception.DfTemplateParsingException;
 
 /**
  * @author modified by taktos
@@ -247,7 +247,7 @@ public class DfOriginalGenerator extends DfGenerator {
         msg = msg + ln();
         msg = msg + "[Input Template]" + ln() + inputTemplate + " (" + specifiedInputEncoding + ")" + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new TemplateParsingException(msg, e);
+        throw new DfTemplateParsingException(msg, e);
     }
 
     /**
