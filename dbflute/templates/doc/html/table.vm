@@ -38,7 +38,7 @@
     <td class="subcell">#if ($col.hasDefaultValue() && !$col.isIdentityOrSequence()) ${col.defaultValue}#else &nbsp;#end</td>
     <td class="linkcell">${col.foreignTableNameCommaStringWithHtmlHref}&nbsp;</td>
     <td class="linkcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
-    <td class="linkcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}">${col.classificationName}</a>#else &nbsp;#end</td>
+    <td class="linkcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}Cls">${col.classificationName}</a>#else &nbsp;#end</td>
     <td class="commentcell">#if ($col.hasComment()) ${col.commentForSchemaHtml}#else &nbsp;#end</td>
     <td class="subcell">${col.javaBeansRulePropertyName}</td>
     <td class="subcell">${col.javaNativeRemovedPackage}</td>
