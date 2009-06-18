@@ -24,6 +24,7 @@
 	<!-- Basic Examples -->
 	<property name="dfnet.basic.example.dir" value="${workspace.base}/dfnet-basic-example"/>
 	<property name="dfnet.asp.net.example.dir" value="${workspace.base}/dfnet-asp.net-example"/>
+	<property name="dfnet.multipledb.quill.example.dir" value="${workspace.base}/dfnet-multipledb-quill-example"/>
 
 	<!-- ============================================================================= -->
 	<!--                                                        C O M P I L E  T A S K -->
@@ -190,6 +191,12 @@
 
 	<target name="reflect-win-asp.net" depends="deploy-dist" description="==> reflect to asp.net example">
 		<copy todir="${dfnet.asp.net.example.dir}/mydbflute/dbflute-${version}">
+			<fileset dir="${dbflute.deploy.dir}"/>
+		</copy>
+	</target>
+
+	<target name="reflect-win-multipledb-quill" depends="deploy-dist" description="==> reflect to multipledb quill example">
+		<copy todir="${dfnet.multipledb.quill.example.dir}/mydbflute/dbflute-${version}">
 			<fileset dir="${dbflute.deploy.dir}"/>
 		</copy>
 	</target>
