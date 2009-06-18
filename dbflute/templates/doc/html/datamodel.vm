@@ -164,12 +164,14 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
             <tr>
               <th>Code</th>
               <th>Name</th>
+              <th>Alias</th>
               <th>Comment</th>
             </tr>
 #foreach ($classificationMap in $classificationMapList)
             <tr>
               <td>$classificationMap.get('code')</td>
               <td>${classificationMap.get('name')}</td>
+              <td>#if ($classificationMap.containsKey('alias'))${classificationMap.get('alias')}#else &nbsp;#end</td>
               <td>#if ($classificationMap.containsKey('comment'))${classificationMap.get('comment')}#else &nbsp;#end</td>
             </tr>
 #end
