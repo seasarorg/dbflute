@@ -79,7 +79,7 @@ public class BehaviorCommandInvoker {
     public boolean isExecutionCacheEmpty() {
         return _executionMap.isEmpty();
     }
-    
+
     public int getExecutionCacheSize() {
         return _executionMap.size();
     }
@@ -118,7 +118,7 @@ public class BehaviorCommandInvoker {
     public <RESULT> RESULT invoke(BehaviorCommand<RESULT> behaviorCommand) {
         clearContext();
         try {
-            return doInvoke(behaviorCommand);
+            return dispatchInvoking(behaviorCommand);
         } finally {
             clearContext();
         }
@@ -129,7 +129,7 @@ public class BehaviorCommandInvoker {
      * @param behaviorCommand The command of behavior. (NotNull)
      * @return The result object. (Nullable)
      */
-    protected <RESULT> RESULT doInvoke(BehaviorCommand<RESULT> behaviorCommand) {
+    protected <RESULT> RESULT dispatchInvoking(BehaviorCommand<RESULT> behaviorCommand) {
         setupResourceContext();
         final boolean logEnabled = isLogEnabled();
 
@@ -141,30 +141,8 @@ public class BehaviorCommandInvoker {
             return null; // The end! (Initialize Only)
         }
         behaviorCommand.beforeGettingSqlExecution();
-        SqlExecution execution = null;
-        try {
-            final String key = behaviorCommand.buildSqlExecutionKey();
-            execution = getSqlExecution(key);
-            if (execution == null) {
-                long beforeCmd = 0;
-                if (logEnabled) {
-                    beforeCmd = systemTime();
-                }
-                SqlExecutionCreator creator = behaviorCommand.createSqlExecutionCreator();
-                execution = getSqlExecution(key, creator);
-                if (isLogEnabled()) {
-                    final long afterCmd = systemTime();
-                    if (beforeCmd != afterCmd) {
-                        logSqlExecution(behaviorCommand, execution, beforeCmd, afterCmd);
-                    }
-                }
-            }
-        } finally {
-            if (logEnabled) {
-                logInvocation(behaviorCommand);
-            }
-        }
-        
+        SqlExecution execution = findSqlExecution(behaviorCommand);
+
         // - - - - - - - - - - -
         // Execute SQL Execution
         // - - - - - - - - - - -
@@ -203,7 +181,7 @@ public class BehaviorCommandInvoker {
         // Cast and Return!
         // - - - - - - - - -
         @SuppressWarnings("unchecked")
-        final RESULT result = (RESULT)ret;
+        final RESULT result = (RESULT) ret;
         return result;
     }
 
@@ -228,11 +206,11 @@ public class BehaviorCommandInvoker {
     protected long systemTime() {
         return System.currentTimeMillis(); // for calculating performance
     }
-    
-    protected void callbackSqlResultHanler(boolean existsSqlResultHandler, SqlResultHandler sqlResultHander
-                                         , Object ret, long before, long after) {
+
+    protected void callbackSqlResultHanler(boolean existsSqlResultHandler, SqlResultHandler sqlResultHander,
+            Object ret, long before, long after) {
         if (existsSqlResultHandler) {
-            final String displaySql = (String)InternalMapContext.getObject("df:DisplaySql");
+            final String displaySql = (String) InternalMapContext.getObject("df:DisplaySql");
             if (displaySql != null) { // if the SQL would be executed certainly  
                 sqlResultHander.handle(ret, displaySql, before, after);
             }
@@ -242,13 +220,41 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                       SQL Execution
     //                                                                       =============
+    protected <RESULT> SqlExecution findSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
+        final boolean logEnabled = isLogEnabled();
+        SqlExecution execution = null;
+        try {
+            final String key = behaviorCommand.buildSqlExecutionKey();
+            execution = getSqlExecution(key);
+            if (execution == null) {
+                long beforeCmd = 0;
+                if (logEnabled) {
+                    beforeCmd = systemTime();
+                }
+                SqlExecutionCreator creator = behaviorCommand.createSqlExecutionCreator();
+                execution = getSqlExecution(key, creator);
+                if (logEnabled) {
+                    final long afterCmd = systemTime();
+                    if (beforeCmd != afterCmd) {
+                        logSqlExecution(behaviorCommand, execution, beforeCmd, afterCmd);
+                    }
+                }
+            }
+            return execution;
+        } finally {
+            if (logEnabled) {
+                logInvocation(behaviorCommand);
+            }
+        }
+    }
+
     protected <RESULT> void initializeSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
         final String key = behaviorCommand.buildSqlExecutionKey();
         SqlExecutionCreator creator = behaviorCommand.createSqlExecutionCreator();
         getSqlExecution(key, creator);
     }
 
-    protected  SqlExecution getSqlExecution(String key) {
+    protected SqlExecution getSqlExecution(String key) {
         return _executionMap.get(key);
     }
 
@@ -257,7 +263,7 @@ public class BehaviorCommandInvoker {
      * @param executionCreator The creator of SQL execution. (NotNull)
      * @return The SQL execution that may be created then. (NotNull)
      */
-    protected  SqlExecution getSqlExecution(String key, SqlExecutionCreator executionCreator) {
+    protected SqlExecution getSqlExecution(String key, SqlExecutionCreator executionCreator) {
         SqlExecution execution = getSqlExecution(key);
         if (execution == null) {
             synchronized (_executionMap) {
@@ -291,7 +297,8 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      Log SqlCommand
     //                                                                      ==============
-    protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution, long beforeCmd, long afterCmd) {
+    protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution,
+            long beforeCmd, long afterCmd) {
         log("SqlExecution Initialization Cost: [" + TraceViewUtil.convertToPerformanceView(afterCmd - beforeCmd) + "]");
     }
 
@@ -312,7 +319,8 @@ public class BehaviorCommandInvoker {
             invokeClassName = behaviorCommand.getTableDbName();
             invokeMethodName = behaviorCommand.getCommandName();
         }
-        final String expWithoutKakko = buildInvocationExpressionWithoutKakko(behaviorCommand, invokeClassName, invokeMethodName);
+        final String expWithoutKakko = buildInvocationExpressionWithoutKakko(behaviorCommand, invokeClassName,
+                invokeMethodName);
 
         // Save behavior invoke name for error message.
         putObjectToMapContext("df:BehaviorInvokeName", expWithoutKakko + "()");
@@ -335,7 +343,8 @@ public class BehaviorCommandInvoker {
         }
     }
 
-    protected <RESULT> void filterBehaviorResult(BehaviorCommand<RESULT> behaviorCommand, InvokeNameResult behaviorResult) {
+    protected <RESULT> void filterBehaviorResult(BehaviorCommand<RESULT> behaviorCommand,
+            InvokeNameResult behaviorResult) {
         final String simpleClassName = behaviorResult.getSimpleClassName();
         if (simpleClassName == null) {
             return;
@@ -347,11 +356,13 @@ public class BehaviorCommandInvoker {
         }
     }
 
-    protected <RESULT> void logPath(BehaviorCommand<RESULT> behaviorCommand, StackTraceElement[] stackTrace, InvokeNameResult behaviorResult) {
+    protected <RESULT> void logPath(BehaviorCommand<RESULT> behaviorCommand, StackTraceElement[] stackTrace,
+            InvokeNameResult behaviorResult) {
         final int bhvNextIndex = behaviorResult.getNextStartIndex();
         final InvokeNameResult clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
         final int clientFirstIndex = clientResult.getFoundFirstIndex();
-        final InvokeNameResult byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex - bhvNextIndex);
+        final InvokeNameResult byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex
+                - bhvNextIndex);
 
         final String clientInvokeName = clientResult.getInvokeName();
         final String byPassInvokeName = byPassResult.getInvokeName();
@@ -359,7 +370,7 @@ public class BehaviorCommandInvoker {
         if (clientInvokeName.trim().length() == 0 && byPassInvokeName.trim().length() == 0) {
             return;
         }
-        
+
         // Save client invoke name for error message.
         if (!clientResult.isEmptyResult()) {
             putObjectToMapContext("df:ClientInvokeName", clientInvokeName);
@@ -368,12 +379,12 @@ public class BehaviorCommandInvoker {
         if (!byPassResult.isEmptyResult()) {
             putObjectToMapContext("df:ByPassInvokeName", byPassInvokeName);
         }
-        
+
         log(clientInvokeName + byPassInvokeName + behaviorInvokeName + "...");
     }
 
-    protected <RESULT> String buildInvocationExpressionWithoutKakko(BehaviorCommand<RESULT> behaviorCommand
-                                                                  , String invokeClassName, String invokeMethodName) {
+    protected <RESULT> String buildInvocationExpressionWithoutKakko(BehaviorCommand<RESULT> behaviorCommand,
+            String invokeClassName, String invokeMethodName) {
         if (invokeClassName.contains("OutsideSql") && invokeClassName.endsWith("Executor")) { // OutsideSql Executor Handling
             try {
                 final String originalName = invokeClassName;
@@ -400,7 +411,7 @@ public class BehaviorCommandInvoker {
                 log("Ignored exception occurred: msg=" + ignored.getMessage());
             }
         }
-        String callerExpressionWithoutKakko = invokeClassName  + "." + invokeMethodName;
+        String callerExpressionWithoutKakko = invokeClassName + "." + invokeMethodName;
         if ("selectPage".equals(invokeMethodName)) { // Special Handling!
             boolean resultTypeInteger = false;
             if (behaviorCommand.isOutsideSql()) {
@@ -438,20 +449,24 @@ public class BehaviorCommandInvoker {
     }
 
     protected InvokeNameResult extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
-        final List<String> suffixList = Arrays.asList(new String[]{"Page", "Action"});
+        final List<String> suffixList = Arrays.asList(new String[] { "Page", "Action" });
         final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
             public boolean isTargetElement(String className, String methodName) {
                 return isClassNameEndsWith(className, suffixList);
             }
+
             public String filterSimpleClassName(String simpleClassName) {
                 return simpleClassName;
             }
+
             public boolean isUseAdditionalInfo() {
                 return true;
             }
+
             public int getStartIndex() {
                 return startIndex;
             }
+
             public int getLoopSize() {
                 return 25;
             }
@@ -459,21 +474,27 @@ public class BehaviorCommandInvoker {
         return extractInvokeName(resource, stackTrace);
     }
 
-    protected InvokeNameResult extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex, final int loopSize) {
-        final List<String> suffixList = Arrays.asList(new String[]{"Service", "ServiceImpl", "Facade", "FacadeImpl"});
+    protected InvokeNameResult extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex,
+            final int loopSize) {
+        final List<String> suffixList = Arrays
+                .asList(new String[] { "Service", "ServiceImpl", "Facade", "FacadeImpl" });
         final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
             public boolean isTargetElement(String className, String methodName) {
                 return isClassNameEndsWith(className, suffixList);
             }
+
             public String filterSimpleClassName(String simpleClassName) {
                 return simpleClassName;
             }
+
             public boolean isUseAdditionalInfo() {
                 return true;
             }
+
             public int getStartIndex() {
                 return startIndex;
             }
+
             public int getLoopSize() {
                 return loopSize >= 0 ? loopSize : 25;
             }
@@ -482,11 +503,13 @@ public class BehaviorCommandInvoker {
     }
 
     protected InvokeNameResult extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
-        final List<String> suffixList = Arrays.asList(new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable" , "PagingInvoker"});
-        final List<String> keywordList = Arrays.asList(new String[]{"Bhv$", "BehaviorReadable$", "BehaviorWritable$"});
-        final List<String> ousideSql1List = Arrays.asList(new String[]{"OutsideSql"});
-        final List<String> ousideSql2List = Arrays.asList(new String[]{"Executor"});
-        final List<String> ousideSql3List = Arrays.asList(new String[]{"Executor$"});
+        final List<String> suffixList = Arrays.asList(new String[] { "Bhv", "BehaviorReadable", "BehaviorWritable",
+                "PagingInvoker" });
+        final List<String> keywordList = Arrays
+                .asList(new String[] { "Bhv$", "BehaviorReadable$", "BehaviorWritable$" });
+        final List<String> ousideSql1List = Arrays.asList(new String[] { "OutsideSql" });
+        final List<String> ousideSql2List = Arrays.asList(new String[] { "Executor" });
+        final List<String> ousideSql3List = Arrays.asList(new String[] { "Executor$" });
         final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
             public boolean isTargetElement(String className, String methodName) {
                 if (isClassNameEndsWith(className, suffixList)) {
@@ -496,20 +519,25 @@ public class BehaviorCommandInvoker {
                     return true;
                 }
                 if (isClassNameContains(className, ousideSql1List)
-                        && (isClassNameEndsWith(className, ousideSql2List) || isClassNameContains(className, ousideSql3List))) {
+                        && (isClassNameEndsWith(className, ousideSql2List) || isClassNameContains(className,
+                                ousideSql3List))) {
                     return true;
                 }
                 return false;
             }
+
             public String filterSimpleClassName(String simpleClassName) {
                 return removeBasePrefixFromSimpleClassName(simpleClassName);
             }
+
             public boolean isUseAdditionalInfo() {
                 return false;
             }
+
             public int getStartIndex() {
                 return 0;
             }
+
             public int getLoopSize() {
                 return 25;
             }
@@ -525,7 +553,7 @@ public class BehaviorCommandInvoker {
         }
         return false;
     }
-    
+
     protected boolean isClassNameContains(String className, List<String> keywordList) {
         for (String keyword : keywordList) {
             if (className.contains(keyword)) {
@@ -574,9 +602,11 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                          Log Return
     //                                                                          ==========
-    protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret, long before, long after) {
+    protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
+            long before, long after) {
         try {
-            final String daoResultPrefix = "===========/ [" + TraceViewUtil.convertToPerformanceView(after - before) + " - ";
+            final String daoResultPrefix = "===========/ [" + TraceViewUtil.convertToPerformanceView(after - before)
+                    + " - ";
             if (List.class.isAssignableFrom(retType)) {
                 if (ret == null) {
                     log(daoResultPrefix + "Selected list: null]");
@@ -661,14 +691,14 @@ public class BehaviorCommandInvoker {
         }
         return OutsideSqlContext.getOutsideSqlContextOnThread();
     }
-    
+
     protected SqlResultHandler getSqlResultHander() {
         if (!CallbackContext.isExistCallbackContextOnThread()) {
             return null;
         }
         return CallbackContext.getCallbackContextOnThread().getSqlResultHandler();
     }
-    
+
     protected void putObjectToMapContext(String key, Object value) {
         InternalMapContext.setObject(key, value);
     }
@@ -705,7 +735,7 @@ public class BehaviorCommandInvoker {
     protected void log(String msg) {
         XLog.log(msg);
     }
-    
+
     protected boolean isLogEnabled() {
         return XLog.isLogEnabled();
     }

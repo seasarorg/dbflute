@@ -1,8 +1,12 @@
 package org.seasar.dbflute.bhv.core;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
+import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.FetchNarrowingBeanContext;
@@ -10,16 +14,394 @@ import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.mock.MockConditionBean;
 import org.seasar.dbflute.mock.MockOutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
+import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
- * 
  * @author jflute
  * @since 0.9.1 (2009/02/03 Tuesday)
  */
 public class BehaviorCommandInvokerTest extends PlainTestCase {
+
+    public void test_dispatchInvoking_whitebox_logEnabled() {
+        // ## Arrange ##
+        final List<String> markList = new ArrayList<String>();
+        final Object result = new Object();
+        final Object[] args = new Object[] { "foo", "bar" };
+        BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
+            @Override
+            protected void setupResourceContext() {
+                markList.add("setupResourceContext");
+            }
+
+            @Override
+            protected boolean isLogEnabled() {
+                markList.add("isLogEnabled");
+                return true;
+            }
+
+            @Override
+            protected <RESULT> void initializeSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
+                throw new IllegalStateException("initializeSqlExecution should not be called!");
+            }
+
+            @Override
+            protected <RESULT> SqlExecution findSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
+                markList.add("findSqlExecution");
+                return new SqlExecution() {
+                    public Object execute(Object[] actualArgs) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new IllegalStateException(e);
+                        }
+                        markList.add("SqlExecution.execute");
+                        assertEquals(args[0], actualArgs[0]);
+                        assertEquals(args[1], actualArgs[1]);
+                        return result;
+                    }
+                };
+            }
+
+            @Override
+            protected long deriveCommandBeforeAfterTimeIfNeeds(boolean logEnabled, boolean existsSqlResultHandler) {
+                if (markList.contains("deriveCommandBeforeAfterTimeIfNeeds")) {
+                    markList.add("deriveCommandBeforeAfterTimeIfNeeds2");
+                } else {
+                    markList.add("deriveCommandBeforeAfterTimeIfNeeds");
+                }
+                return super.deriveCommandBeforeAfterTimeIfNeeds(logEnabled, existsSqlResultHandler);
+            }
+
+            @Override
+            protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
+                    long before, long after) {
+                markList.add("logReturn");
+                log("before=" + before + ", after=" + after);
+                assertTrue(before > 0);
+                assertTrue(after > 0);
+                assertTrue((after - before) > 999);
+            }
+        };
+
+        // ## Act ##
+        final Object actualResult = invoker.dispatchInvoking(new MockBehaviorCommand() {
+            @Override
+            public Object[] getSqlExecutionArgument() {
+                return args;
+            }
+        });
+
+        // ## Assert ##
+        assertEquals(result, actualResult);
+        assertEquals("setupResourceContext", markList.get(0));
+        assertEquals("isLogEnabled", markList.get(1));
+        assertEquals("findSqlExecution", markList.get(2));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds", markList.get(3));
+        assertEquals("SqlExecution.execute", markList.get(4));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds2", markList.get(5));
+        assertEquals("logReturn", markList.get(6));
+        assertEquals(7, markList.size());
+    }
+
+    public void test_dispatchInvoking_whitebox_logDisabled() {
+        // ## Arrange ##
+        final List<String> markList = new ArrayList<String>();
+        final Object result = new Object();
+        final Object[] args = new Object[] { "foo", "bar" };
+        BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
+            @Override
+            protected void setupResourceContext() {
+                markList.add("setupResourceContext");
+            }
+
+            @Override
+            protected boolean isLogEnabled() {
+                markList.add("isLogEnabled");
+                return false;
+            }
+
+            @Override
+            protected <RESULT> void initializeSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
+                throw new IllegalStateException("initializeSqlExecution should not be called!");
+            }
+
+            @Override
+            protected <RESULT> SqlExecution findSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
+                markList.add("findSqlExecution");
+                return new SqlExecution() {
+                    public Object execute(Object[] actualArgs) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new IllegalStateException(e);
+                        }
+                        markList.add("SqlExecution.execute");
+                        assertEquals(args[0], actualArgs[0]);
+                        assertEquals(args[1], actualArgs[1]);
+                        return result;
+                    }
+                };
+            }
+
+            @Override
+            protected long deriveCommandBeforeAfterTimeIfNeeds(boolean logEnabled, boolean existsSqlResultHandler) {
+                if (markList.contains("deriveCommandBeforeAfterTimeIfNeeds")) {
+                    markList.add("deriveCommandBeforeAfterTimeIfNeeds2");
+                } else {
+                    markList.add("deriveCommandBeforeAfterTimeIfNeeds");
+                }
+                return super.deriveCommandBeforeAfterTimeIfNeeds(logEnabled, existsSqlResultHandler);
+            }
+
+            @Override
+            protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
+                    long before, long after) {
+                throw new IllegalStateException("logReturn() should not be called!");
+            }
+
+            @Override
+            protected long systemTime() {
+                throw new IllegalStateException("systemTime() should not be called!");
+            }
+        };
+
+        // ## Act ##
+        final Object actualResult = invoker.dispatchInvoking(new MockBehaviorCommand() {
+            @Override
+            public Object[] getSqlExecutionArgument() {
+                return args;
+            }
+        });
+
+        // ## Assert ##
+        assertEquals(result, actualResult);
+        assertEquals("setupResourceContext", markList.get(0));
+        assertEquals("isLogEnabled", markList.get(1));
+        assertEquals("findSqlExecution", markList.get(2));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds", markList.get(3));
+        assertEquals("SqlExecution.execute", markList.get(4));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds2", markList.get(5));
+        assertEquals(6, markList.size());
+    }
+
+    public void test_dispatchInvoking_whitebox_logDisabled_sqlResultHandler() {
+        // ## Arrange ##
+        final List<String> markList = new ArrayList<String>();
+        final Object result = new Object();
+        final Object[] args = new Object[] { "foo", "bar" };
+        BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
+            @Override
+            protected void setupResourceContext() {
+                markList.add("setupResourceContext");
+            }
+
+            @Override
+            protected boolean isLogEnabled() {
+                markList.add("isLogEnabled");
+                return false;
+            }
+
+            @Override
+            protected <RESULT> void initializeSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
+                throw new IllegalStateException("initializeSqlExecution should not be called!");
+            }
+
+            @Override
+            protected <RESULT> SqlExecution findSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
+                markList.add("findSqlExecution");
+                return new SqlExecution() {
+                    public Object execute(Object[] actualArgs) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new IllegalStateException(e);
+                        }
+                        markList.add("SqlExecution.execute");
+                        assertEquals(args[0], actualArgs[0]);
+                        assertEquals(args[1], actualArgs[1]);
+                        return result;
+                    }
+                };
+            }
+
+            @Override
+            protected long deriveCommandBeforeAfterTimeIfNeeds(boolean logEnabled, boolean existsSqlResultHandler) {
+                if (markList.contains("deriveCommandBeforeAfterTimeIfNeeds")) {
+                    markList.add("deriveCommandBeforeAfterTimeIfNeeds2");
+                } else {
+                    markList.add("deriveCommandBeforeAfterTimeIfNeeds");
+                }
+                return super.deriveCommandBeforeAfterTimeIfNeeds(logEnabled, existsSqlResultHandler);
+            }
+
+            @Override
+            protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
+                    long before, long after) {
+                throw new IllegalStateException("logReturn() should not be called!");
+            }
+        };
+
+        // ## Act ##
+        final Object actualResult;
+        try {
+            CallbackContext callbackContext = new CallbackContext();
+            callbackContext.setSqlResultHandler(new SqlResultHandler() {
+                public void handle(Object result, String displaySql, long before, long after) {
+                    markList.add("handle");
+                    log("before=" + before + ", after=" + after);
+                    assertTrue(before > 0);
+                    assertTrue(after > 0);
+                    assertTrue((after - before) > 999);
+                }
+            });
+            CallbackContext.setCallbackContextOnThread(callbackContext);
+            InternalMapContext.setObject("df:DisplaySql", "select ...");
+            actualResult = invoker.dispatchInvoking(new MockBehaviorCommand() {
+                @Override
+                public Object[] getSqlExecutionArgument() {
+                    return args;
+                }
+            });
+        } finally {
+            CallbackContext.clearCallbackContextOnThread();
+            InternalMapContext.clearInternalMapContextOnThread();
+        }
+
+        // ## Assert ##
+        assertEquals(result, actualResult);
+        assertEquals("setupResourceContext", markList.get(0));
+        assertEquals("isLogEnabled", markList.get(1));
+        assertEquals("findSqlExecution", markList.get(2));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds", markList.get(3));
+        assertEquals("SqlExecution.execute", markList.get(4));
+        assertEquals("deriveCommandBeforeAfterTimeIfNeeds2", markList.get(5));
+        assertEquals("handle", markList.get(6));
+        assertEquals(7, markList.size());
+    }
+
+    public void test_dispatchInvoking_initializeOnly() {
+        // ## Arrange ##
+        final List<String> markList = new ArrayList<String>();
+        BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
+            @Override
+            protected void setupResourceContext() {
+                markList.add("setupResourceContext");
+            }
+
+            @Override
+            protected boolean isLogEnabled() {
+                markList.add("isLogEnabled");
+                return true;
+            }
+
+            @Override
+            protected <RESULT> void initializeSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
+                markList.add("initializeSqlExecution");
+            }
+
+            @Override
+            protected <RESULT> SqlExecution findSqlExecution(BehaviorCommand<RESULT> behaviorCommand) {
+                throw new IllegalStateException("findSqlExecution should not be called!");
+            }
+
+            @Override
+            protected long deriveCommandBeforeAfterTimeIfNeeds(boolean logEnabled, boolean existsSqlResultHandler) {
+                throw new IllegalStateException("deriveCommandBeforeAfterTimeIfNeeds should not be called!");
+            }
+
+            @Override
+            protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
+                    long before, long after) {
+                throw new IllegalStateException("logReturn should not be called!");
+            }
+        };
+
+        // ## Act ##
+        final Object actualResult = invoker.dispatchInvoking(new MockBehaviorCommand() {
+            @Override
+            public boolean isInitializeOnly() {
+                return true;
+            }
+        });
+
+        // ## Assert ##
+        assertNull(actualResult);
+        assertEquals("setupResourceContext", markList.get(0));
+        assertEquals("isLogEnabled", markList.get(1));
+        assertEquals("initializeSqlExecution", markList.get(2));
+        assertEquals(3, markList.size());
+    }
+
+    protected static class MockBehaviorCommand implements BehaviorCommand<Object> {
+        public void afterExecuting() {
+        }
+
+        public void beforeGettingSqlExecution() {
+        }
+
+        public String buildSqlExecutionKey() {
+            throw new UnsupportedOperationException();
+        }
+
+        public SqlExecutionCreator createSqlExecutionCreator() {
+            throw new UnsupportedOperationException();
+        }
+
+        public String getCommandName() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Class<?> getCommandReturnType() {
+            return Object.class;
+        }
+
+        public ConditionBean getConditionBean() {
+            throw new UnsupportedOperationException();
+        }
+
+        public OutsideSqlOption getOutsideSqlOption() {
+            throw new UnsupportedOperationException();
+        }
+
+        public String getOutsideSqlPath() {
+            throw new UnsupportedOperationException();
+        }
+
+        public Object[] getSqlExecutionArgument() {
+            return new Object[] {};
+        }
+
+        public String getTableDbName() {
+            return "TEST";
+        }
+
+        public boolean isConditionBean() {
+            return false;
+        }
+
+        public boolean isInitializeOnly() {
+            return false;
+        }
+
+        public boolean isOutsideSql() {
+            return false;
+        }
+
+        public boolean isProcedure() {
+            return false;
+        }
+
+        public boolean isSelect() {
+            return false;
+        }
+
+        public boolean isSelectCount() {
+            return false;
+        }
+    }
 
     public void test_clearContext() {
         // ## Arrange ##
