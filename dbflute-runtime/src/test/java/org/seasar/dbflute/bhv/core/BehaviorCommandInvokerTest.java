@@ -3,6 +3,12 @@ package org.seasar.dbflute.bhv.core;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.Entity;
@@ -403,6 +409,98 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
 
         public boolean isSelectCount() {
             return false;
+        }
+    }
+
+    public void test_getSqlExecution_threadSafe() {
+        // ## Arrange & Act & Assert ##
+        // Try Five Times!
+        // Expect no exception
+        getSqlExecution_on_multiple_thread();
+        getSqlExecution_on_multiple_thread();
+        getSqlExecution_on_multiple_thread();
+        getSqlExecution_on_multiple_thread();
+        getSqlExecution_on_multiple_thread();
+    }
+
+    protected void getSqlExecution_on_multiple_thread() {
+        // ## Arrange ##
+        final ExecutorService service = Executors.newCachedThreadPool();
+        final Set<String> markSet = new HashSet<String>();
+        final BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
+            @Override
+            protected void toBeDisposable() {
+                markSet.add("toBeDisposable");
+            }
+        };
+        final ExecutionCreationCount count = new ExecutionCreationCount();
+
+        // ## Act ##
+        Future<?> future1 = service.submit(createTestCallable(invoker, count));
+        Future<?> future2 = service.submit(createTestCallable(invoker, count));
+        Future<?> future3 = service.submit(createTestCallable(invoker, count));
+        Future<?> future4 = service.submit(createTestCallable(invoker, count));
+        Future<?> future5 = service.submit(createTestCallable(invoker, count));
+        Future<?> future6 = service.submit(createTestCallable(invoker, count));
+        Future<?> future7 = service.submit(createTestCallable(invoker, count));
+        Future<?> future8 = service.submit(createTestCallable(invoker, count));
+        Future<?> future9 = service.submit(createTestCallable(invoker, count));
+        Future<?> future10 = service.submit(createTestCallable(invoker, count));
+
+        waitFor(future1, future2, future3, future4, future5, future6, future7, future8, future9, future10);
+        log("All threads are finished!");
+
+        // ## Assert ##
+        int expectedCreatedCount = 100;
+        assertEquals(expectedCreatedCount, invoker._executionMap.size());
+        assertEquals(expectedCreatedCount, count.count());
+        assertTrue(markSet.contains("toBeDisposable"));
+    }
+
+    protected void waitFor(Future<?>... futures) {
+        for (Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                throw new IllegalStateException(e);
+            } catch (ExecutionException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
+    protected Callable<List<SqlExecution>> createTestCallable(final BehaviorCommandInvoker invoker,
+            final ExecutionCreationCount count) {
+        return new Callable<List<SqlExecution>>() {
+            public List<SqlExecution> call() {
+                SqlExecutionCreator creator = new SqlExecutionCreator() {
+                    public SqlExecution createSqlExecution() {
+                        count.increment();
+                        return new SqlExecution() {
+                            public Object execute(Object[] args) {
+                                return null;
+                            }
+                        };
+                    }
+                };
+                final List<SqlExecution> resultList = new ArrayList<SqlExecution>();
+                for (int i = 0; i < 100; i++) {
+                    resultList.add(invoker.getSqlExecution("key" + i, creator));
+                }
+                return resultList;
+            }
+        };
+    }
+
+    protected static class ExecutionCreationCount {
+        protected int _count;
+
+        public void increment() {
+            ++_count;
+        }
+
+        public int count() {
+            return _count;
         }
     }
 

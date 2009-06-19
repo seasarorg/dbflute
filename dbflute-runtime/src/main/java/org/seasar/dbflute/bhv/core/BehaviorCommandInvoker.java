@@ -271,28 +271,29 @@ public class BehaviorCommandInvoker {
      */
     protected SqlExecution getSqlExecution(String key, SqlExecutionCreator executionCreator) {
         SqlExecution execution = getSqlExecution(key);
-        if (execution == null) {
-            synchronized (_executionMap) {
-                execution = getSqlExecution(key);
-                if (execution == null) {
-                    if (isLogEnabled()) {
-                        log("...Initializing sqlExecution for the key '" + key + "'");
-                    }
-                    _executionMap.put(key, executionCreator.createSqlExecution());
-                } else {
-                    if (isLogEnabled()) {
-                        log("...Getting sqlExecution as cache because the previous thread have already initialized.");
-                    }
-                }
-            }
-            execution = getSqlExecution(key);
-            if (execution == null) {
-                String msg = "sqlExecutionCreator.createSqlCommand() should not return null:";
-                msg = msg + " sqlExecutionCreator=" + executionCreator + " key=" + key;
-                throw new IllegalStateException(msg);
-            }
-            toBeDisposable(); // for HotDeploy
+        if (execution != null) {
+            return execution;
         }
+        synchronized (_executionMap) {
+            execution = getSqlExecution(key);
+            if (execution != null) {
+                if (isLogEnabled()) {
+                    log("...Getting sqlExecution as cache because the previous thread have already initialized.");
+                }
+                return execution;
+            }
+            if (isLogEnabled()) {
+                log("...Initializing sqlExecution for the key '" + key + "'");
+            }
+            _executionMap.put(key, executionCreator.createSqlExecution());
+        }
+        execution = getSqlExecution(key);
+        if (execution == null) {
+            String msg = "sqlExecutionCreator.createSqlCommand() should not return null:";
+            msg = msg + " sqlExecutionCreator=" + executionCreator + " key=" + key;
+            throw new IllegalStateException(msg);
+        }
+        toBeDisposable(); // for HotDeploy
         return execution;
     }
 
