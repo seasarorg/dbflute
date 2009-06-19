@@ -31,9 +31,7 @@ public class ${glDBFluteModule} extends AbstractModule {
         // The components of DBFlute Runtime.
         ${glImplementedBehaviorSelector} behaviorSelector = new ${glImplementedBehaviorSelector}();
         BehaviorCommandInvoker behaviorCommandInvoker = new BehaviorCommandInvoker();
-        ${glImplementedInvokerAssistant} invokerAssistant = new ${glImplementedInvokerAssistant}();
-        invokerAssistant.setBehaviorCommandInvoker(behaviorCommandInvoker);
-        invokerAssistant.setDataSource(dataSource);
+        ${glImplementedInvokerAssistant} invokerAssistant = createImplementedInvokerAssistant(behaviorCommandInvoker);
         behaviorCommandInvoker.setInvokerAssistant(invokerAssistant);
         ${glImplementedCommonColumnAutoSetupper} commonColumnAutoSetupper = new ${glImplementedCommonColumnAutoSetupper}();
         
@@ -57,5 +55,12 @@ public class ${glDBFluteModule} extends AbstractModule {
             bind(${table.extendedBehaviorClassName}.class).toInstance(bhv);
         }
 #end
+    }
+
+    protected ${glImplementedInvokerAssistant} createBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
+        ${glImplementedInvokerAssistant} invokerAssistant = new ${glImplementedInvokerAssistant}();
+        invokerAssistant.setBehaviorCommandInvoker(behaviorCommandInvoker);
+        invokerAssistant.setDataSource(dataSource);
+        return invokerAssistant;
     }
 }
