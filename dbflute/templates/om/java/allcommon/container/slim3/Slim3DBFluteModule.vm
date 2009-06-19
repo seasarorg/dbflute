@@ -33,9 +33,7 @@ public class ${glDBFluteModule} {
         ${glImplementedBehaviorSelector} behaviorSelector = new ${glImplementedBehaviorSelector}();
         behaviorSelector.setContainer(S3ContainerFactory.getInstance().getContainer());
         BehaviorCommandInvoker behaviorCommandInvoker = new BehaviorCommandInvoker();
-        ${glImplementedInvokerAssistant} invokerAssistant = new ${glImplementedInvokerAssistant}();
-        invokerAssistant.setBehaviorCommandInvoker(behaviorCommandInvoker);
-        invokerAssistant.setDataSource(dataSource);
+        ${glImplementedInvokerAssistant} invokerAssistant = createBehaviorCommandInvoker(behaviorCommandInvoker);
         behaviorCommandInvoker.setInvokerAssistant(invokerAssistant);
         ${glImplementedCommonColumnAutoSetupper} commonColumnAutoSetupper = new ${glImplementedCommonColumnAutoSetupper}();
         
@@ -59,6 +57,17 @@ public class ${glDBFluteModule} {
             bind(${table.extendedBehaviorClassName}.class).toInstance(bhv);
         }
 #end
+    }
+
+    protected ${glImplementedInvokerAssistant} createBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
+#if ($database.hasExtendedImplementedInvokerAssistantClassValid())
+        ${glImplementedInvokerAssistant} invokerAssistant = new ${database.extendedImplementedInvokerAssistantClass}();
+#else
+        ${glImplementedInvokerAssistant} invokerAssistant = new ${glImplementedInvokerAssistant}();
+#end
+        invokerAssistant.setBehaviorCommandInvoker(behaviorCommandInvoker);
+        invokerAssistant.setDataSource(dataSource);
+        return invokerAssistant;
     }
 
     protected Setupper bind(Class<?> type) {

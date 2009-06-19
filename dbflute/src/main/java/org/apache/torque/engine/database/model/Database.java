@@ -1358,6 +1358,14 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().getExtractAcceptEqual();
     }
     
+    public boolean hasExtendedImplementedInvokerAssistantClassValid() {
+        return getProperties().getLittleAdjustmentProperties().hasExtendedImplementedInvokerAssistantClassValid();
+    }
+    
+    public String getExtendedImplementedInvokerAssistantClass() {
+        return getProperties().getLittleAdjustmentProperties().getExtendedImplementedInvokerAssistantClass();
+    }
+    
     public boolean hasExtendedS2DaoSettingClassValid() {
         return getProperties().getLittleAdjustmentProperties().hasExtendedS2DaoSettingClassValid();
     }

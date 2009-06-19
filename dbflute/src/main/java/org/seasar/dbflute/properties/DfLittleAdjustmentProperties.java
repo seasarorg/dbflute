@@ -259,11 +259,23 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                        Extended Implemented Invoker Assistant Class
+    //                                        ============================================
+    public boolean hasExtendedImplementedInvokerAssistantClassValid() {
+        String str = getExtendedImplementedInvokerAssistantClass();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
+    }
+
+    public String getExtendedImplementedInvokerAssistantClass() { // It's closet! Java Only
+        return getProperty("extendedImplementedInvokerAssistantClass", null);
+    }
+
+    // ===================================================================================
     //                                                        Extended S2Dao Setting Class
     //                                                        ============================
     public boolean hasExtendedS2DaoSettingClassValid() {
-        String settingClass = getExtendedS2DaoSettingClass();
-        return settingClass != null && settingClass.trim().length() > 0;
+        String str = getExtendedS2DaoSettingClass();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
     public String getExtendedS2DaoSettingClass() { // It's closet! CSharp Only

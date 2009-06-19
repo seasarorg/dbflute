@@ -58,7 +58,11 @@ public class ${glDBFluteModule} extends AbstractModule {
     }
 
     protected ${glImplementedInvokerAssistant} createBehaviorCommandInvoker(BehaviorCommandInvoker behaviorCommandInvoker) {
+#if ($database.hasExtendedImplementedInvokerAssistantClassValid())
+        ${glImplementedInvokerAssistant} invokerAssistant = new ${database.extendedImplementedInvokerAssistantClass}();
+#else
         ${glImplementedInvokerAssistant} invokerAssistant = new ${glImplementedInvokerAssistant}();
+#end
         invokerAssistant.setBehaviorCommandInvoker(behaviorCommandInvoker);
         invokerAssistant.setDataSource(dataSource);
         return invokerAssistant;

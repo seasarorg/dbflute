@@ -7,5 +7,4 @@
     <include path="${glDBFluteDiconNamespace}-customizer.dicon"/>
 
     <component class="${glPackageBaseCommonS2Container}.${glBehaviorCreator}"/>
-    <component class="org.seasar.framework.container.creator.DaoCreator"/>
 </components>
