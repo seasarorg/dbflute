@@ -66,13 +66,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (!method.IsAbstract) {
                 return invocation.Proceed();
             }
+            bool logEnabled = IsLogEnabled();
         
             // - - - - - - - - - - - - -
             // Initialize DAO meta data
             // - - - - - - - - - - - - -
             if (method.Name.Equals("InitializeDaoMetaData")) {
                 InitializeSqlCommand(invocation);
-                return null;// The end! (Initilization Only)
+                return null; // The end! (Initilization Only)
             }
 
             // - - - - - - - - - - -
@@ -91,11 +92,11 @@ namespace ${glPackageBaseCommonS2Dao} {
             ISqlCommand cmd = null;
             try {
                 DateTime? beforeCmd = null;
-                if (_log.IsDebugEnabled) {
+                if (logEnabled) {
                     beforeCmd = DateTime.Now;
                 }
 				cmd = FindSqlCommand(invocation);
-                if (IsLogEnabled() && beforeCmd != null) {
+                if (logEnabled) {
                     DateTime afterCmd = DateTime.Now;
                     if (!afterCmd.Equals(beforeCmd.Value)) {
                         LogSqlCommand(invocation, cmd, beforeCmd.Value, afterCmd);
@@ -107,8 +108,10 @@ namespace ${glPackageBaseCommonS2Dao} {
                 }
 			}
 
+            ${glSqlResultHandler} sqlResultHandler = GetSqlResultHander();
+            bool existsSqlResultHandler = sqlResultHandler != null;
             DateTime? before = null;
-            if (IsLogEnabled()) {
+            if (logEnabled || existsSqlResultHandler) {
                 before = DateTime.Now; // for performance view
             }
 
@@ -133,9 +136,20 @@ namespace ${glPackageBaseCommonS2Dao} {
             Type retType = ((MethodInfo) method).ReturnType;
             ret = Seasar.Framework.Util.ConversionUtil.ConvertTargetType(ret, retType);
 
-            if (IsLogEnabled() && before != null) {
+            if (logEnabled || existsSqlResultHandler) {
                 DateTime after = DateTime.Now; // for performance view
-                LogReturn(invocation, retType, ret, before.Value, after);
+                if (logEnabled) {
+                    LogReturn(invocation, retType, ret, before.Value, after);
+                }
+                if (existsSqlResultHandler) {
+                    ${glSqlResultInfo} info = new ${glSqlResultInfo}();
+                    info.Result = ret;
+                    info.CommandName = method.Name;
+                    info.DisplaySql = ${glInternalMapContext}.GetObject("df:DisplaySql");
+                    info.BeforeDateTime = before.Value;
+                    info.AfterDateTime = after;
+                    info.Invoke(sqlResultInfo);
+                }
             }
             return ret;
         }
@@ -147,7 +161,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             Type targetType = GetComponentDef(invocation).ComponentType;
             IDaoMetaData dmd = _daoMetaDataFactory.GetDaoMetaData(targetType);
             if (typeof(${glOutsideSqlDao}).IsAssignableFrom(targetType)) {
-                return;// Do nothing!
+                return; // Do nothing!
             } else {
                 Object[] arguments = invocation.Arguments;
                 if (arguments != null && arguments.Length > 0 && arguments[0] is String) {
@@ -832,6 +846,13 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected bool IsSpecifiedOutsideSql() {
             ${glOutsideSqlContext} outsideSqlContext = GetOutsideSqlContext();
             return outsideSqlContext != null && outsideSqlContext.IsSpecifiedOutsideSql;
+        }
+
+        protected virtual ${glSqlResultHandler} GetSqlResultHander() {
+            if (!${glCallbackContext}.IsExistCallbackContextOnThread()) {
+                return null;
+            }
+            return ${glCallbackContext}.GetCallbackContextOnThread().SqlResultHandler;
         }
 
         protected void PutObjectToMapContext(String key, Object value) {

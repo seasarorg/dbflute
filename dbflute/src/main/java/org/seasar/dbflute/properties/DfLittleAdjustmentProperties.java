@@ -257,4 +257,16 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         // The default value is true since 0.7.8.
         return isProperty("isSkipGenerateIfSameFile", true);
     }
+
+    // ===================================================================================
+    //                                                        Extended S2Dao Setting Class
+    //                                                        ============================
+    public boolean hasExtendedS2DaoSettingClassValid() {
+        String settingClass = getExtendedS2DaoSettingClass();
+        return settingClass != null && settingClass.trim().length() > 0;
+    }
+
+    public String getExtendedS2DaoSettingClass() { // It's closet! CSharp Only
+        return getProperty("extendedS2DaoSettingClass", null);
+    }
 }

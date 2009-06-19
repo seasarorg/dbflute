@@ -1357,6 +1357,14 @@ public class Database {
     public String getExtractAcceptEqual() {
         return getProperties().getLittleAdjustmentProperties().getExtractAcceptEqual();
     }
+    
+    public boolean hasExtendedS2DaoSettingClassValid() {
+        return getProperties().getLittleAdjustmentProperties().hasExtendedS2DaoSettingClassValid();
+    }
+
+    public String getExtendedS2DaoSettingClass() {
+        return getProperties().getLittleAdjustmentProperties().getExtendedS2DaoSettingClass();
+    }
 
     // ===================================================================================
     //                                                                     Buri Properties

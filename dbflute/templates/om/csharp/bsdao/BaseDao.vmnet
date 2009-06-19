@@ -20,7 +20,11 @@ using ${glPackageCB};
 namespace ${myExtendedDaoPackageName} {
 
     [Implementation]
+#if ($database.hasExtendedS2DaoSettingClassValid())
+    [S2Dao(typeof(${database.extendedS2DaoSettingClass}))]
+#else
     [S2Dao(typeof(${glS2DaoSetting}))]
+#end
     [Bean(typeof(${myExtendedObjectClassName}))]
     public partial interface ${myClassName} : ${InterfaceName} {
 		void InitializeDaoMetaData(String methodName);// Very Internal Method!

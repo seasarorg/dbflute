@@ -78,22 +78,35 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         //                                       SQL Logging
         //                                       -----------
         protected virtual void LogSql(Object[] args, Type[] argTypes) {
+            // [SqlLogHandler]
             ${glSqlLogHandler} sqlLogHandler = GetSqlLogHander();
             bool existsSqlLogHandler = sqlLogHandler != null;
+
+            // [SqlResultHandler]
+            ${glSqlResultHandler} sqlResultHandler = GetSqlResultHander();
+            bool existsSqlResultHandler = sqlResultHandler != null;
+
+            // [SqlLogRegistry]
             ${glInternalSqlLogRegistry} sqlLogRegistry = ${glInternalSqlLogRegistryLocator}.Instance;
             bool existsSqlLogRegistry = sqlLogRegistry != null;
-            if (IsLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
-                String completeSql = GetCompleteSql(args);
+
+            if (IsLogEnabled() || existsSqlLogHandler || existsSqlResultHandler || existsSqlLogRegistry) {
+                String displaySql = GetCompleteSql(args);
                 if (IsLogEnabled()) {
-                    Log((IsContainsLineSeparatorInSql() ? GetLineSeparator() : "") + completeSql);
+                    Log((IsContainsLineSeparatorInSql() ? GetLineSeparator() : "") + displaySql);
                 }
                 if (existsSqlLogHandler) { // DBFlute provides
-                    sqlLogHandler.Invoke(this.Sql, completeSql, args, argTypes);
+                    sqlLogHandler.Invoke(this.Sql, displaySql, args, argTypes);
                 }
                 if (existsSqlLogRegistry) { // S2Container provides (But Actually DBFlute provides at CSharp)
-                    sqlLogRegistry.Add(CreateInternalSqlLog(completeSql, args, argTypes));
+                    sqlLogRegistry.Add(CreateInternalSqlLog(displaySql, args, argTypes));
                 }
+                PutObjectToMapContext("df:DisplaySql", displaySql);
             }
+        }
+
+        protected void PutObjectToMapContext(String key, Object value) {
+            ${glInternalMapContext}.SetObject(key, value);
         }
 
         protected virtual bool IsLogEnabled() {
@@ -115,14 +128,21 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return ${glCallbackContext}.GetCallbackContextOnThread().SqlLogHandler;
         }
 
+        protected virtual ${glSqlResultHandler} GetSqlResultHander() {
+            if (!${glCallbackContext}.IsExistCallbackContextOnThread()) {
+                return null;
+            }
+            return ${glCallbackContext}.GetCallbackContextOnThread().SqlResultHandler;
+        }
+
         protected virtual bool IsContainsLineSeparatorInSql() {
             return Sql != null ? Sql.Contains(GetLineSeparator()) : false;
         }
         
-        protected virtual ${glInternalSqlLog} CreateInternalSqlLog(String completeSql, Object[] args, Type[] argTypes) {
+        protected virtual ${glInternalSqlLog} CreateInternalSqlLog(String displaySql, Object[] args, Type[] argTypes) {
             ${glInternalSqlLog} sqlLog = new ${glInternalSqlLog}();
             sqlLog.RawSql = this.Sql;
-            sqlLog.CompleteSql = completeSql;
+            sqlLog.CompleteSql = displaySql;
             sqlLog.BindArgs = args;
             sqlLog.BindArgTypes = argTypes;
             return sqlLog;
@@ -143,19 +163,19 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
         }
 
         protected void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid) {
-            String completeSql = BuildLoggingMessageSql();
-            new DbExceptionHandler().HandleDbException(e, cmd, uniqueConstraintValid, completeSql);
+            String displaySql = BuildLoggingMessageSql();
+            new DbExceptionHandler().HandleDbException(e, cmd, uniqueConstraintValid, displaySql);
         }
 
         protected virtual String BuildLoggingMessageSql() {
-            String completeSql = null;
+            String displaySql = null;
             if (_sql != null && _loggingMessageSqlArgs != null) {
                 try {
-                    completeSql = GetCompleteSql(_loggingMessageSqlArgs);
+                    displaySql = GetCompleteSql(_loggingMessageSqlArgs);
                 } catch (Exception) {
                 }
             }
-            return completeSql;
+            return displaySql;
         }
         
         // ===============================================================================
@@ -283,12 +303,12 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             HandleDbException(e, cmd, false, null);
         }
 
-        public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, String completeSql) {
+        public void HandleDbException(Exception e, IDbCommand cmd, bool uniqueConstraintValid, String displaySql) {
             // [UnderReview]: How do I get unique constraint on ADO.NET?
             // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
             //     ThrowEntityAlreadyExistsException(e, cmd, resource);
             // }
-            ThrowSQLFailureException(e, cmd, completeSql);
+            ThrowSQLFailureException(e, cmd, displaySql);
         }
 
         protected bool IsUniqueConstraintException(DbException e) {
@@ -297,7 +317,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             return false;
         }
 
-        protected void ThrowSQLFailureException(Exception e, IDbCommand cmd, String completeSql) {
+        protected void ThrowSQLFailureException(Exception e, IDbCommand cmd, String displaySql) {
             String msg = "Look! Read the message below." + GetLineSeparator();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + GetLineSeparator();
             msg = msg + "The SQL failed to execute!" + GetLineSeparator();
@@ -375,10 +395,10 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
                 msg = msg + GetLineSeparator();
                 msg = msg + "[Statement]" + GetLineSeparator() + cmd + GetLineSeparator();
             }
-            if (completeSql != null) {
+            if (displaySql != null) {
                 msg = msg + GetLineSeparator();
                 msg = msg + "[Display SQL]" + GetLineSeparator();
-                msg = msg + completeSql + GetLineSeparator();
+                msg = msg + displaySql + GetLineSeparator();
             }
             msg = msg + "* * * * * * * * * */";
             throw new ${glSQLFailureException}(msg, e);
