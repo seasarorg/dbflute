@@ -97,7 +97,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
     }
 
     @Override
-    protected String getCompleteSql(final Object[] args) {// for Procedure Call
+    protected String getDisplaySql(final Object[] args) {// for Procedure Call
         String sql = getSql();
         Object dto = getArgumentDto(args);
         if (args == null || dto == null) {

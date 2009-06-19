@@ -16,9 +16,10 @@
 package org.seasar.dbflute;
 
 import org.seasar.dbflute.jdbc.SqlLogHandler;
+import org.seasar.dbflute.jdbc.SqlResultHandler;
 
 /**
- * The context of callback.
+ * The context of callback in DBFlute internal logic.
  * @author jflute
  */
 public class CallbackContext {
@@ -68,6 +69,7 @@ public class CallbackContext {
     //                                                                           Attribute
     //                                                                           =========
     protected SqlLogHandler _sqlLogHandler;
+    protected SqlResultHandler _sqlResultHandler;
 
     // ===================================================================================
     //                                                                            Accessor
@@ -77,6 +79,8 @@ public class CallbackContext {
     }
 
     /**
+     * Set the handler of SQL log. <br />
+     * This handler is called back before executing the SQL. 
      * <pre>
      * context.setSqlLogHandler(new SqlLogHandler() {
      *     public void handle(String executedSql, String displaySql
@@ -90,4 +94,26 @@ public class CallbackContext {
     public void setSqlLogHandler(SqlLogHandler sqlLogHandler) {
         this._sqlLogHandler = sqlLogHandler;
     }
+    
+    public SqlResultHandler getSqlResultHandler() {
+        return _sqlResultHandler;
+    }
+    
+    /**
+     * Set the handler of SQL result. <br />
+     * This handler is called back before executing the SQL. 
+     * <pre>
+     * context.setSqlResultHandler(new SqlResultHandler() {
+     *     public void handle(Object result, String displaySql
+     *                      , long before, long after) {
+     *         // You can get your SQL result object here.
+     *     }
+     * });
+     * </pre>
+     * @param sqlResultHandler The handler of SQL result. (Nullable)
+     */
+    public void setSqlResultHandler(SqlResultHandler sqlResultHandler) {
+        this._sqlResultHandler = sqlResultHandler;
+    }
 }
+

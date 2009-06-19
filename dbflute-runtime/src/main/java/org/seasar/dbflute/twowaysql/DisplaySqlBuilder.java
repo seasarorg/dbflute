@@ -27,7 +27,7 @@ import org.seasar.dbflute.resource.ResourceContext;
 /**
  * @author jflute
  */
-public class CompleteSqlBuilder {
+public class DisplaySqlBuilder {
 
     // ===================================================================================
     //                                                                          Definition
@@ -37,25 +37,25 @@ public class CompleteSqlBuilder {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    private CompleteSqlBuilder() {
+    private DisplaySqlBuilder() {
     }
 
     // ===================================================================================
     //                                                                        Complete SQL
     //                                                                        ============
-    public static String getCompleteSql(String sql, Object[] args
-                                        , String logDateFormat
-                                        , String logTimestampFormat) {
+    public static String buildDisplaySql(String sql, Object[] args
+                                       , String logDateFormat
+                                       , String logTimestampFormat) {
         if (args == null || args.length == 0) {
             return sql;
         }
-        return getCompleteSql(sql, args, new ValueType[args.length], logDateFormat, logTimestampFormat);
+        return buildDisplaySql(sql, args, new ValueType[args.length], logDateFormat, logTimestampFormat);
     }
 
-    public static String getCompleteSql(String sql, Object[] args
-                                        , ValueType[] valueTypes
-                                        , String logDateFormat
-                                        , String logTimestampFormat) {
+    public static String buildDisplaySql(String sql, Object[] args
+                                       , ValueType[] valueTypes
+                                       , String logDateFormat
+                                       , String logTimestampFormat) {
         if (args == null || args.length == 0) {
             return sql;
         }

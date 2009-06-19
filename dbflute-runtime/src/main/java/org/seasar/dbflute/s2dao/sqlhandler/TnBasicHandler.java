@@ -27,13 +27,15 @@ import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.QLog;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
+import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.resource.SQLExceptionHandler;
 import org.seasar.dbflute.s2dao.extension.TnSqlLogRegistry;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
-import org.seasar.dbflute.twowaysql.CompleteSqlBuilder;
+import org.seasar.dbflute.twowaysql.DisplaySqlBuilder;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -115,22 +117,35 @@ public class TnBasicHandler {
     //                                           SQL Logging
     //                                           -----------
     protected void logSql(Object[] args, Class<?>[] argTypes) {
+        // [SqlLogHandler]
         final SqlLogHandler sqlLogHandler = getSqlLogHander();
         final boolean existsSqlLogHandler = sqlLogHandler != null;
+        
+        // [SqlResultHandler]
+        final SqlResultHandler sqlResultHander = getSqlResultHander();
+        final boolean existsSqlResultHandler = sqlResultHander != null;
+        
+        // [SqlLogRegistry]
         final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
         final boolean existsSqlLogRegistry = sqlLogRegistry != null;
-        if (isLogEnabled() || existsSqlLogHandler || existsSqlLogRegistry) {
-            final String completeSql = getCompleteSql(args);
+        
+        if (isLogEnabled() || existsSqlLogHandler || existsSqlResultHandler || existsSqlLogRegistry) {
+            final String displaySql = getDisplaySql(args);
             if (isLogEnabled()) {
-                log((isContainsLineSeparatorInSql() ? getLineSeparator() : "") + completeSql);
+                log((isContainsLineSeparatorInSql() ? getLineSeparator() : "") + displaySql);
             }
             if (existsSqlLogHandler) { // DBFlute provides
-                sqlLogHandler.handle(getSql(), completeSql, args, argTypes);
+                sqlLogHandler.handle(getSql(), displaySql, args, argTypes);
             }
             if (existsSqlLogRegistry) { // S2Container provides
-                TnSqlLogRegistry.push(getSql(), completeSql, args, argTypes, sqlLogRegistry);
+                TnSqlLogRegistry.push(getSql(), displaySql, args, argTypes, sqlLogRegistry);
             }
+            putObjectToMapContext("df:DisplaySql", displaySql);
         }
+    }
+
+    protected void putObjectToMapContext(String key, Object value) {
+        InternalMapContext.setObject(key, value);
     }
 
     protected boolean isLogEnabled() {
@@ -141,10 +156,10 @@ public class TnBasicHandler {
         QLog.log(msg);
     }
 
-    protected String getCompleteSql(Object[] args) {
+    protected String getDisplaySql(Object[] args) {
         String logDateFormat = ResourceContext.getLogDateFormat();
         String logTimestampFormat = ResourceContext.getLogTimestampFormat();
-        return CompleteSqlBuilder.getCompleteSql(sql, args, logDateFormat, logTimestampFormat);
+        return DisplaySqlBuilder.buildDisplaySql(sql, args, logDateFormat, logTimestampFormat);
     }
 
     protected SqlLogHandler getSqlLogHander() {
@@ -154,6 +169,13 @@ public class TnBasicHandler {
         return CallbackContext.getCallbackContextOnThread().getSqlLogHandler();
     }
 
+    protected SqlResultHandler getSqlResultHander() {
+        if (!CallbackContext.isExistCallbackContextOnThread()) {
+            return null;
+        }
+        return CallbackContext.getCallbackContextOnThread().getSqlResultHandler();
+    }
+    
     protected boolean isContainsLineSeparatorInSql() {
         return sql != null ? sql.contains(getLineSeparator()) : false;
     }
@@ -164,7 +186,7 @@ public class TnBasicHandler {
     protected String getBindVariableText(Object bindVariable) {
         String logDateFormat = ResourceContext.getLogDateFormat();
         String logTimestampFormat = ResourceContext.getLogTimestampFormat();
-        return CompleteSqlBuilder.getBindVariableText(bindVariable, logDateFormat, logTimestampFormat);
+        return DisplaySqlBuilder.getBindVariableText(bindVariable, logDateFormat, logTimestampFormat);
     }
 
     // ===================================================================================
@@ -183,7 +205,7 @@ public class TnBasicHandler {
         String completeSql = null;
         if (sql != null && loggingMessageSqlArgs != null) {
             try {
-                completeSql = getCompleteSql(loggingMessageSqlArgs);
+                completeSql = getDisplaySql(loggingMessageSqlArgs);
             } catch (RuntimeException ignored) {
             }
         }

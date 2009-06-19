@@ -322,7 +322,7 @@ public class SqlAnalyzer {
             node.accept(context);
         }
         final String preparedSql = context.getSql();
-        return CompleteSqlBuilder.getCompleteSql(preparedSql, context.getBindVariables(), logDateFormat,
+        return DisplaySqlBuilder.buildDisplaySql(preparedSql, context.getBindVariables(), logDateFormat,
                 logTimestampFormat);
     }
 }

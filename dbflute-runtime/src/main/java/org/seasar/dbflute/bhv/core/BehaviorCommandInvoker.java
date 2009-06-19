@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
@@ -28,6 +29,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
 import org.seasar.dbflute.helper.stacktrace.impl.InvokeNameExtractorImpl;
+import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -129,6 +131,7 @@ public class BehaviorCommandInvoker {
      */
     protected <RESULT> RESULT doInvoke(BehaviorCommand<RESULT> behaviorCommand) {
         setupResourceContext();
+        final boolean logEnabled = isLogEnabled();
 
         // - - - - - - - - - - - - -
         // Initialize SQL Execution
@@ -138,14 +141,13 @@ public class BehaviorCommandInvoker {
             return null; // The end! (Initialize Only)
         }
         behaviorCommand.beforeGettingSqlExecution();
-
         SqlExecution execution = null;
         try {
             final String key = behaviorCommand.buildSqlExecutionKey();
             execution = getSqlExecution(key);
             if (execution == null) {
                 long beforeCmd = 0;
-                if (isLogEnabled()) {
+                if (logEnabled) {
                     beforeCmd = systemTime();
                 }
                 SqlExecutionCreator creator = behaviorCommand.createSqlExecutionCreator();
@@ -158,16 +160,17 @@ public class BehaviorCommandInvoker {
                 }
             }
         } finally {
-            if (isLogEnabled()) {
+            if (logEnabled) {
                 logInvocation(behaviorCommand);
             }
         }
-
-        long before = 0;
-        if (isLogEnabled()) {
-            before = systemTime();
-        }
-
+        
+        // - - - - - - - - - - -
+        // Execute SQL Execution
+        // - - - - - - - - - - -
+        final SqlResultHandler sqlResultHander = getSqlResultHander();
+        final boolean existsSqlResultHandler = sqlResultHander != null;
+        final long before = deriveCommandBeforeAfterTimeIfNeeds(logEnabled, existsSqlResultHandler);
         Object ret = null;
         try {
             final Object[] args = behaviorCommand.getSqlExecutionArgument();
@@ -177,9 +180,8 @@ public class BehaviorCommandInvoker {
         }
         final Class<?> retType = behaviorCommand.getCommandReturnType();
         assertRetType(retType, ret);
-
-        if (isLogEnabled()) {
-            final long after = systemTime();
+        final long after = deriveCommandBeforeAfterTimeIfNeeds(logEnabled, existsSqlResultHandler);
+        if (logEnabled) {
             logReturn(behaviorCommand, retType, ret, before, after);
         }
 
@@ -191,6 +193,15 @@ public class BehaviorCommandInvoker {
         } else if (Number.class.isAssignableFrom(retType)) {
             ret = convertNumber(retType, ret);
         }
+
+        // - - - - - - - - - - - -
+        // Call the handler back!
+        // - - - - - - - - - - - -
+        callbackSqlResultHanler(existsSqlResultHandler, sqlResultHander, ret, before, after);
+
+        // - - - - - - - - -
+        // Cast and Return!
+        // - - - - - - - - -
         @SuppressWarnings("unchecked")
         final RESULT result = (RESULT)ret;
         return result;
@@ -205,11 +216,29 @@ public class BehaviorCommandInvoker {
         resourceContext.setResourceParameter(_invokerAssistant.assistResourceParameter());
         ResourceContext.setResourceContextOnThread(resourceContext);
     }
-    
+
+    protected long deriveCommandBeforeAfterTimeIfNeeds(boolean logEnabled, boolean existsSqlResultHandler) {
+        long time = 0;
+        if (logEnabled || existsSqlResultHandler) {
+            time = systemTime();
+        }
+        return time;
+    }
+
     protected long systemTime() {
         return System.currentTimeMillis(); // for calculating performance
     }
     
+    protected void callbackSqlResultHanler(boolean existsSqlResultHandler, SqlResultHandler sqlResultHander
+                                         , Object ret, long before, long after) {
+        if (existsSqlResultHandler) {
+            final String displaySql = (String)InternalMapContext.getObject("df:DisplaySql");
+            if (displaySql != null) { // if the SQL would be executed certainly  
+                sqlResultHander.handle(ret, displaySql, before, after);
+            }
+        }
+    }
+
     // ===================================================================================
     //                                                                       SQL Execution
     //                                                                       =============
@@ -497,7 +526,6 @@ public class BehaviorCommandInvoker {
         return false;
     }
     
-    
     protected boolean isClassNameContains(String className, List<String> keywordList) {
         for (String keyword : keywordList) {
             if (className.contains(keyword)) {
@@ -632,6 +660,13 @@ public class BehaviorCommandInvoker {
             return null;
         }
         return OutsideSqlContext.getOutsideSqlContextOnThread();
+    }
+    
+    protected SqlResultHandler getSqlResultHander() {
+        if (!CallbackContext.isExistCallbackContextOnThread()) {
+            return null;
+        }
+        return CallbackContext.getCallbackContextOnThread().getSqlResultHandler();
     }
     
     protected void putObjectToMapContext(String key, Object value) {
