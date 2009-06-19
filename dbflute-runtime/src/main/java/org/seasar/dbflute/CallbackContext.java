@@ -94,19 +94,18 @@ public class CallbackContext {
     public void setSqlLogHandler(SqlLogHandler sqlLogHandler) {
         this._sqlLogHandler = sqlLogHandler;
     }
-    
+
     public SqlResultHandler getSqlResultHandler() {
         return _sqlResultHandler;
     }
-    
+
     /**
      * Set the handler of SQL result. <br />
      * This handler is called back before executing the SQL. 
      * <pre>
      * context.setSqlResultHandler(new SqlResultHandler() {
-     *     public void handle(Object result, String displaySql
-     *                      , long before, long after) {
-     *         // You can get your SQL result object here.
+     *     public void handle(SqlResultInfo sqlResultInfo) {
+     *         // You can get your SQL result information here.
      *     }
      * });
      * </pre>
@@ -116,4 +115,3 @@ public class CallbackContext {
         this._sqlResultHandler = sqlResultHandler;
     }
 }
-

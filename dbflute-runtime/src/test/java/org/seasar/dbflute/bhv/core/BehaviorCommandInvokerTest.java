@@ -11,6 +11,7 @@ import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.FetchNarrowingBeanContext;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
+import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.mock.MockConditionBean;
 import org.seasar.dbflute.mock.MockOutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
@@ -249,8 +250,10 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         try {
             CallbackContext callbackContext = new CallbackContext();
             callbackContext.setSqlResultHandler(new SqlResultHandler() {
-                public void handle(Object result, String displaySql, long before, long after) {
+                public void handle(SqlResultInfo info) {
                     markList.add("handle");
+                    long before = info.getBefore();
+                    long after = info.getAfter();
                     log("before=" + before + ", after=" + after);
                     assertTrue(before > 0);
                     assertTrue(after > 0);
@@ -351,7 +354,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         }
 
         public String getCommandName() {
-            throw new UnsupportedOperationException();
+            return "FooCommand";
         }
 
         public Class<?> getCommandReturnType() {
@@ -375,7 +378,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         }
 
         public String getTableDbName() {
-            return "TEST";
+            return "FooTable";
         }
 
         public boolean isConditionBean() {
@@ -457,14 +460,28 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
             InternalMapContext.setObject("df:DisplaySql", "select ...");
 
             // ## Act & Assert ##
-            invoker.callbackSqlResultHanler(true, new SqlResultHandler() {
-                public void handle(Object result, String displaySql, long actualBefore, long actualAfter) {
-                    assertEquals(ret, result);
-                    assertEquals("select ...", displaySql);
+            invoker.callbackSqlResultHanler(new MockBehaviorCommand() {
+                @Override
+                public String getTableDbName() {
+                    return "FOO";
+                }
+
+                @Override
+                public String getCommandName() {
+                    return "BAR";
+                }
+            }, true, new SqlResultHandler() {
+                public void handle(SqlResultInfo info) {
+                    long actualBefore = info.getBefore();
+                    long actualAfter = info.getAfter();
+                    assertEquals(ret, info.getResult());
+                    assertEquals("FOO", info.getTableDbName());
+                    assertEquals("BAR", info.getCommandName());
+                    assertEquals("select ...", info.getDisplaySql());
                     assertEquals(before, actualBefore);
                     assertEquals(after, actualAfter);
                     markSet.add("handle()");
-                    log(result + ":" + displaySql + ":" + actualBefore + ":" + actualAfter);
+                    log(info.getResult() + ":" + info.getDisplaySql() + ":" + actualBefore + ":" + actualAfter);
                 }
             }, ret, before, after);
             assertTrue(markSet.size() == 1);
@@ -483,18 +500,32 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final HashSet<String> markSet = new HashSet<String>();
         try {
             // ## Act & Assert ##
-            invoker.callbackSqlResultHanler(true, new SqlResultHandler() {
-                public void handle(Object result, String displaySql, long actualBefore, long actualAfter) {
-                    assertEquals(ret, result);
-                    assertEquals("select ...", displaySql);
+            invoker.callbackSqlResultHanler(new MockBehaviorCommand() {
+                @Override
+                public String getTableDbName() {
+                    return "FOO";
+                }
+
+                @Override
+                public String getCommandName() {
+                    return "BAR";
+                }
+            }, true, new SqlResultHandler() {
+                public void handle(SqlResultInfo info) {
+                    long actualBefore = info.getBefore();
+                    long actualAfter = info.getAfter();
+                    assertEquals(ret, info.getResult());
+                    assertEquals("FOO", info.getTableDbName());
+                    assertEquals("BAR", info.getCommandName());
+                    assertEquals(null, info.getDisplaySql());
                     assertEquals(before, actualBefore);
                     assertEquals(after, actualAfter);
                     markSet.add("handle()");
-                    log(result + ":" + displaySql + ":" + actualBefore + ":" + actualAfter);
+                    log(info.getResult() + ":" + info.getDisplaySql() + ":" + actualBefore + ":" + actualAfter);
                 }
             }, ret, before, after);
-            assertTrue(markSet.size() == 0);
-            assertFalse(markSet.contains("handle()"));
+            assertTrue(markSet.size() == 1);
+            assertTrue(markSet.contains("handle()"));
         } finally {
             InternalMapContext.clearInternalMapContextOnThread();
         }

@@ -6,6 +6,7 @@ import java.util.List;
 import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.jdbc.SqlLogHandler;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
+import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.unit.PlainTestCase;
 
@@ -168,7 +169,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
         try {
             CallbackContext callbackContext = new CallbackContext();
             callbackContext.setSqlResultHandler(new SqlResultHandler() {
-                public void handle(Object result, String displaySql, long before, long after) {
+                public void handle(SqlResultInfo sqlResultInfo) {
                     throw new IllegalStateException("handle should not be called!");
                 }
             });
@@ -234,7 +235,7 @@ public class TnBasicHandlerTest extends PlainTestCase {
                 }
             });
             callbackContext.setSqlResultHandler(new SqlResultHandler() {
-                public void handle(Object result, String displaySql, long before, long after) {
+                public void handle(SqlResultInfo sqlResultInfo) {
                     throw new IllegalStateException("handle should not be called!");
                 }
             });

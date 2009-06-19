@@ -30,6 +30,7 @@ import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
 import org.seasar.dbflute.helper.stacktrace.impl.InvokeNameExtractorImpl;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
+import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -175,7 +176,7 @@ public class BehaviorCommandInvoker {
         // - - - - - - - - - - - -
         // Call the handler back!
         // - - - - - - - - - - - -
-        callbackSqlResultHanler(existsSqlResultHandler, sqlResultHander, ret, before, after);
+        callbackSqlResultHanler(behaviorCommand, existsSqlResultHandler, sqlResultHander, ret, before, after);
 
         // - - - - - - - - -
         // Cast and Return!
@@ -207,13 +208,18 @@ public class BehaviorCommandInvoker {
         return System.currentTimeMillis(); // for calculating performance
     }
 
-    protected void callbackSqlResultHanler(boolean existsSqlResultHandler, SqlResultHandler sqlResultHander,
-            Object ret, long before, long after) {
+    protected <RESULT> void callbackSqlResultHanler(BehaviorCommand<RESULT> behaviorCommand,
+            boolean existsSqlResultHandler, SqlResultHandler sqlResultHander, Object ret, long before, long after) {
         if (existsSqlResultHandler) {
             final String displaySql = (String) InternalMapContext.getObject("df:DisplaySql");
-            if (displaySql != null) { // if the SQL would be executed certainly  
-                sqlResultHander.handle(ret, displaySql, before, after);
-            }
+            SqlResultInfo info = new SqlResultInfo();
+            info.setResult(ret);
+            info.setTableDbName(behaviorCommand.getTableDbName());
+            info.setCommandName(behaviorCommand.getCommandName());
+            info.setDisplaySql(displaySql);
+            info.setBefore(before);
+            info.setAfter(after);
+            sqlResultHander.handle(info);
         }
     }
 
