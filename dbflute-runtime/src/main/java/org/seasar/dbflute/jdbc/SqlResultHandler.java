@@ -21,18 +21,11 @@ package org.seasar.dbflute.jdbc;
  * (before you get the result)
  * <pre>
  * context.setSqlResultHandler(new SqlResultHandler() {
- *     public void handle(SqlResultInfo sqlResultInfo) {
+ *     public void handle(SqlResultInfo info) {
  *         // You can get your SQL result information here.
  *     }
  * });
  * </pre>
- * <p>
- * Attention: <br />
- * If the SQL would be not executed, the displaySql in the information is null.
- * For example, update() that the entity has no modification. <br />
- * And if the command would be for batch, this is called back only once in a command.
- * So the displaySql is the latest SQL in a command at that time.
- * </p>
  * @author jflute
  */
 public interface SqlResultHandler {
@@ -43,11 +36,18 @@ public interface SqlResultHandler {
      * [SqlResultInfo]
      * o result : The result(mapped object) of executed SQL. (NotNull)
      * o tableDbName : The DB name of table of executed behavior. (NotNull)
-     * o commandName : The name of executed command. (NotNull)
-     * o displaySql : The latest executed SQL for display. (Nullable: if the SQL would be not executed)
-     * o before : The time in millisecond before executing command(after initializing executions).
-     * o after : The time in millisecond after executing command(after mapping entities).
+     * o commandName : The name of executed command. (for display only) (NotNull)
+     * o displaySql : The latest executed SQL for display. (for display only) (Nullable: if the SQL would be not executed)
+     * o beforeTimeMillis : The time in millisecond before executing command(after initializing executions).
+     * o afterTimeMillis : The time in millisecond after executing command(after mapping entities).
      * </pre>
+     * <p>
+     * Attention: <br />
+     * If the SQL would be not executed, the displaySql in the information is null.
+     * For example, update() that the entity has no modification. <br />
+     * And if the command would be for batch, this is called back only once in a command.
+     * So the displaySql is the latest SQL in a command at that time.
+     * </p>
      * @param info The information of executed SQL result. (NotNull)
      */
     void handle(SqlResultInfo info);

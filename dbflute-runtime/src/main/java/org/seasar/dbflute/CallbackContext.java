@@ -104,7 +104,7 @@ public class CallbackContext {
      * This handler is called back before executing the SQL. 
      * <pre>
      * context.setSqlResultHandler(new SqlResultHandler() {
-     *     public void handle(SqlResultInfo sqlResultInfo) {
+     *     public void handle(SqlResultInfo info) {
      *         // You can get your SQL result information here.
      *     }
      * });

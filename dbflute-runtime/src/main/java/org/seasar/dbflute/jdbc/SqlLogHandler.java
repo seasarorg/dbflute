@@ -26,16 +26,18 @@ package org.seasar.dbflute.jdbc;
  *     }
  * });
  * </pre>
- * Attention: <br />
- * If the command would be not executed, this is not called back. <br />
- * For example, update() that the entity has no modification. <br />
- * And if the command would be for batch, this is called back per batch elements in a command.
  * @author jflute
  */
 public interface SqlLogHandler {
 
     /**
-     * Handle the SQL log.
+     * Handle the SQL log. <br />
+     * <p>
+     * Attention: <br />
+     * If the command would be not executed, this is not called back. <br />
+     * For example, update() that the entity has no modification. <br />
+     * And if the command would be for batch, this is called back per batch elements in a command.
+     * </p>
      * @param executedSql The executed SQL. (NotNull)
      * @param displaySql The SQL for display. (NotNull)
      * @param args The arguments of the SQL. (Nullable)

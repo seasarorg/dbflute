@@ -28,8 +28,8 @@ public class SqlResultInfo {
     protected String _tableDbName;
     protected String _commandName;
     protected String _displaySql;
-    protected long _before;
-    protected long _after;
+    protected long _beforeTimeMillis;
+    protected long _afterTimeMillis;
 
     // ===================================================================================
     //                                                                            Accessor
@@ -66,19 +66,19 @@ public class SqlResultInfo {
         this._displaySql = displaySql;
     }
 
-    public long getBefore() {
-        return _before;
+    public long getBeforeTimeMillis() {
+        return _beforeTimeMillis;
     }
 
-    public void setBefore(long before) {
-        this._before = before;
+    public void setBeforeTimeMillis(long beforeTimeMillis) {
+        this._beforeTimeMillis = beforeTimeMillis;
     }
 
-    public long getAfter() {
-        return _after;
+    public long getAfterTimeMillis() {
+        return _afterTimeMillis;
     }
 
-    public void setAfter(long after) {
-        this._after = after;
+    public void setAfterTimeMillis(long beforeTimeMillis) {
+        this._afterTimeMillis = beforeTimeMillis;
     }
 }

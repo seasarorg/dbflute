@@ -217,8 +217,8 @@ public class BehaviorCommandInvoker {
             info.setTableDbName(behaviorCommand.getTableDbName());
             info.setCommandName(behaviorCommand.getCommandName());
             info.setDisplaySql(displaySql);
-            info.setBefore(before);
-            info.setAfter(after);
+            info.setBeforeTimeMillis(before);
+            info.setAfterTimeMillis(after);
             sqlResultHander.handle(info);
         }
     }
