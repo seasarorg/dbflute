@@ -34,7 +34,7 @@ public interface SqlResultHandler {
      * Handle the SQL result.
      * <pre>
      * [SqlResultInfo]
-     * o result : The result(mapped object) of executed SQL. (NotNull)
+     * o result : The result(mapped object) of executed SQL. (Nullable)
      * o tableDbName : The DB name of table of executed behavior. (NotNull)
      * o commandName : The name of executed command. (for display only) (NotNull)
      * o displaySql : The latest executed SQL for display. (for display only) (Nullable: if the SQL would be not executed)
