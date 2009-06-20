@@ -82,7 +82,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         if (_dbmetaProvider != null) {
             return _dbmetaProvider;
         }
-        synchronized (_dbmetaProvider) {
+        synchronized (this) {
             if (_dbmetaProvider != null) {
                 return _dbmetaProvider;
             }
@@ -102,7 +102,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         if (_sqlClauseCreator != null) {
             return _sqlClauseCreator;
         }
-        synchronized (_sqlClauseCreator) {
+        synchronized (this) {
             if (_sqlClauseCreator != null) {
                 return _sqlClauseCreator;
             }
@@ -122,7 +122,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         if (_statementFactory != null) {
             return _statementFactory;
         }
-        synchronized (_statementFactory) {
+        synchronized (this) {
             if (_statementFactory != null) {
                 return _statementFactory;
             }
@@ -145,7 +145,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         if (_beanMetaDataFactory != null) {
             return _beanMetaDataFactory;
         }
-        synchronized (_beanMetaDataFactory) {
+        synchronized (this) {
             if (_beanMetaDataFactory != null) {
                 return _beanMetaDataFactory;
             }
@@ -168,7 +168,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         if (_valueTypeFactory != null) {
             return _valueTypeFactory;
         }
-        synchronized (_valueTypeFactory) {
+        synchronized (this) {
             if (_valueTypeFactory != null) {
                 return _valueTypeFactory;
             }
