@@ -42,7 +42,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     protected TnBeanMetaDataFactory _beanMetaDataFactory;
     protected TnValueTypeFactory _valueTypeFactory;
     
-    protected boolean _disposable;
+    protected volatile boolean _disposable;
 
     // ===================================================================================
     //                                                                 Assistant Main Work
@@ -142,33 +142,35 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                                                                             =======
     public void toBeDisposable() { // for HotDeploy
 #if ($database.isTargetContainerSeasar())
-        if (!_disposable) {
-            synchronized (this) {
-                if (!_disposable) {
-                    // Register for BehaviorCommandInvoker
-                    DisposableUtil.add(new Disposable() {
-                        public void dispose() {
-                            if (_behaviorCommandInvoker != null) {
-                                _behaviorCommandInvoker.clearExecutionCache();
-                            }
-                            _disposable = false;
-                        }
-                    });
-                    // Register for BeanDescFactory
-                    DisposableUtil.add(new Disposable() {
-                        public void dispose() {
-                            TnBeanDescFactory.clear();
-                        }
-                    });
-                    // Register for ValueTypes
-                    DisposableUtil.add(new Disposable() {
-                        public void dispose() {
-                            ValueTypes.clear();
-                        }
-                    });
-                    _disposable = true;
-                }
+        if (_disposable) {
+            return;
+        }
+        synchronized (this) {
+            if (_disposable) {
+                return;
             }
+            // Register for BehaviorCommandInvoker
+            DisposableUtil.add(new Disposable() {
+                public void dispose() {
+                    if (_behaviorCommandInvoker != null) {
+                        _behaviorCommandInvoker.clearExecutionCache();
+                    }
+                    _disposable = false;
+                }
+            });
+            // Register for BeanDescFactory
+            DisposableUtil.add(new Disposable() {
+                public void dispose() {
+                    TnBeanDescFactory.clear();
+                }
+            });
+            // Register for ValueTypes
+            DisposableUtil.add(new Disposable() {
+                public void dispose() {
+                    ValueTypes.clear();
+                }
+            });
+            _disposable = true;
         }
 #end
     }

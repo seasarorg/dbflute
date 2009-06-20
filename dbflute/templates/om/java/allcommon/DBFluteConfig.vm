@@ -20,9 +20,6 @@ public class ${glDBFluteConfig} {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(${glDBFluteConfig}.class);
 
-    /** Singleton instance. */
-    private static final ${glDBFluteConfig} _instance = new ${glDBFluteConfig}();
-
 #if ($database.isOutsideSqlPackageValid())
     /** The default package of outside SQL. The default value is '${database.outsideSqlPackage}'. */
     private static final String DEFAULT_OUTSIDE_SQL_PACKAGE = "${database.outsideSqlPackage}";
@@ -38,6 +35,9 @@ public class ${glDBFluteConfig} {
     /** The default value of whether it uses SQL Log Registry. The default value is false. */
     private static final boolean DEFAULT_USE_SQL_LOG_REGISTRY = false;
 #end
+
+    /** Singleton instance. */
+    private static final ${glDBFluteConfig} _instance = new ${glDBFluteConfig}();
 
     // ===================================================================================
     //                                                                           Attribute

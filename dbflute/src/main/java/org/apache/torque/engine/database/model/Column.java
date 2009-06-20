@@ -55,6 +55,7 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -962,6 +963,9 @@ public class Column {
     // -----------------------------------------------------
     //                                    Type Determination
     //                                    ------------------
+    // - - - -
+    // [Basic]
+    // - - - -
     public boolean isJavaNativeStringObject() {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeStringList());
     }
@@ -982,6 +986,9 @@ public class Column {
         return containsAsEndsWith(getJavaNative(), getTable().getDatabase().getJavaNativeBinaryList());
     }
 
+    // - - - - - -
+    // [Pinpoint]
+    // - - - - - -
     public boolean isJavaNativeUUIDObject() {
         if (isJavaNativeStringObject() || isJavaNativeNumberObject() || isJavaNativeDateObject()
                 || isJavaNativeBooleanObject() || isJavaNativeBinaryObject()) {
@@ -1010,6 +1017,14 @@ public class Column {
         return _columnHandler.isPostgreSQLBytesOid(dbTypeName);
     }
 
+    public boolean isJavaNativeValueOfAbleNObject() { // Java Only: valueOf-able
+        List<Object> list = Arrays.asList(new Object[] { "Integer", "Long", "Short", "Byte", "Boolean", "Character" });
+        return containsAsEndsWith(getJavaNative(), list);
+    }
+
+    // - - - - -
+    // [CSharp]
+    // - - - - -
     public boolean isJavaNativeCSharpNullable() {
         return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
     }

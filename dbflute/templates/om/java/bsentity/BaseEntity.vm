@@ -165,7 +165,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
      */
     public void classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
+#if ($col.isJavaNativeStringObject())
+        set${col.javaName}(cls != null ? cls.code() : null);
+#elseif ($col.isJavaNativeValueOfAbleNObject())
+        set${col.javaName}(cls != null ? ${col.javaNative}.valueOf(cls.code()) : null);
+#else
         set${col.javaName}(cls != null ? new ${col.javaNative}(cls.code()) : null);
+#end
     }
 
 #foreach ($classificationMap in $col.classificationMapList)
