@@ -40,7 +40,7 @@
 	<property name="dbflute.db2.example.dir" value="${workspace.base}/dbflute-db2-example"/>
 	<property name="dbflute.sqlserver.example.dir" value="${workspace.base}/dbflute-db2-example"/>
 	<property name="dbflute.msaccess.example.dir" value="${workspace.base}/dbflute-msaccess-example"/>
-	<property name="dbflute.multipledb.seasar.example.dir" value="${workspace.base}/dbflute-multipledb-example"/>
+	<property name="dbflute.multipledb.seasar.example.dir" value="${workspace.base}/dbflute-multipledb-seasar-example"/>
 	<property name="dbflute.multipledb.spring.example.dir" value="${workspace.base}/dbflute-multipledb-spring-example"/>
 		
 	<!-- Friendly Examples -->
