@@ -57,11 +57,13 @@ public final class DfAntTaskUtil {
             final String sources[] = StringUtils.split(file, ",");
             for (int i = 0; i < sources.length; i++) {
                 final Properties source = new Properties();
+                FileInputStream fis = null;
                 try {
                     final File fullPath = project.resolveFile(sources[i]);
                     _log.info("Using contextProperties file: " + fullPath);
-                    source.load(new FileInputStream(fullPath));
-                } catch (Exception e) {
+                    fis = new FileInputStream(fullPath);
+                    source.load(fis);
+                } catch (IOException e) {
                     final ClassLoader classLoader = project.getClass().getClassLoader();
                     try {
                         final java.io.InputStream inputStream = classLoader.getResourceAsStream(sources[i]);
@@ -73,6 +75,13 @@ public final class DfAntTaskUtil {
                         source.load(inputStream);
                     } catch (IOException ioe) {
                         throw new RuntimeException("InputStream threw the exception!", ioe);
+                    }
+                } finally {
+                    if (fis != null) {
+                        try {
+                            fis.close();
+                        } catch (IOException ignored) {
+                        }
                     }
                 }
                 for (final Iterator ite = source.keySet().iterator(); ite.hasNext();) {
@@ -93,7 +102,7 @@ public final class DfAntTaskUtil {
                 final String value = prop.getProperty(key);
                 _log.info("    " + key + " = " + value);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             _log.warn("setContextProperties() threw the exception!!!", e);
             throw new IllegalStateException("buildContextProperties() threw the exception!", e);
         }

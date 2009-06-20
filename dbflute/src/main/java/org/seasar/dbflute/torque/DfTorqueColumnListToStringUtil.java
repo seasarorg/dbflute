@@ -28,18 +28,18 @@ public class DfTorqueColumnListToStringUtil {
     public static String getColumnArgsString(List<Column> columnList) {
         validateColumnList(columnList);
 
-        String result = "";
+        final StringBuilder sb = new StringBuilder();
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
             final Column pk = (Column) ite.next();
             final String javaNative = pk.getJavaNative();
             final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
-            if ("".equals(result)) {
-                result = javaNative + " " + uncapitalisedJavaName;
+            if ("".equals(sb.toString())) {
+                sb.append(javaNative).append(" ").append(uncapitalisedJavaName);
             } else {
-                result = result + ", " + javaNative + " " + uncapitalisedJavaName;
+                sb.append(", ").append(javaNative).append(" ").append(uncapitalisedJavaName);
             }
         }
-        return result;
+        return sb.toString();
     }
 
     public static String getColumnArgsSetupString(String beanName, List<Column> columnList) {
@@ -148,17 +148,17 @@ public class DfTorqueColumnListToStringUtil {
     public static String getColumnOrderByString(List<Column> columnList, String sortString) {
         validateColumnList(columnList);
 
-        String result = "";
+        final StringBuilder sb = new StringBuilder();
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
             final Column pk = (Column) ite.next();
             final String name = pk.getName();
-            if ("".equals(result)) {
-                result = name + " " + sortString;
+            if ("".equals(sb.toString())) {
+                sb.append(name).append(" ").append(sortString);
             } else {
-                result = result + ", " + name + " " + sortString;
+                sb.append(", ").append(name).append(" ").append(sortString);
             }
         }
-        return result;
+        return sb.toString();
     }
 
     public static String getColumnDispValueString(List<Column> columnList, String getterPrefix) {
