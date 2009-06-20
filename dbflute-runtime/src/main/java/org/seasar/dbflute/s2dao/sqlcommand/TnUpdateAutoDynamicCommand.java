@@ -27,6 +27,7 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateAutoHandler;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.TraceViewUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -38,7 +39,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     //                                                                          Definition
     //                                                                          ==========
     /** The result for no update as normal execution. */
-    private static final Integer NO_UPDATE = new Integer(1);
+    private static final Integer NO_UPDATE = Integer.valueOf(1);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -79,7 +80,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         //     throw createNotSingleRowUpdatedRuntimeException(args[0], i);
         // }
 
-        return new Integer(i);
+        return Integer.valueOf(i);
     }
 
     protected TnUpdateAutoHandler createInternalUpdateAutoHandler(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
@@ -107,7 +108,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         }
         if (types.isEmpty()) {
             String msg = "The property type for update was not found:";
-            msg = msg + " propertyNames=" + propertyNames;
+            msg = msg + " propertyNames=" + TraceViewUtil.convertObjectArrayToStringView(propertyNames);
             throw new IllegalStateException(msg);
         }
         TnPropertyType[] propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);
@@ -208,7 +209,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
     protected String getLineSeparator() {
         return DfSystemUtil.getLineSeparator();
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

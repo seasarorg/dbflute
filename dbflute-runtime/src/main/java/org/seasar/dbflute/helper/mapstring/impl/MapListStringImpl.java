@@ -406,7 +406,7 @@ public class MapListStringImpl implements MapListString {
             throw new IllegalArgumentException(msg);
         }
         if (prefixString == null) {
-            String msg = "Argument[prefixString] must not be null: " + prefixString;
+            String msg = "Argument[prefixString] must not be null!";
             throw new IllegalArgumentException(msg);
         }
 
@@ -479,7 +479,7 @@ public class MapListStringImpl implements MapListString {
     protected void assertMapString(String mapString) {
         if (mapString == null) {
             String msg = "Argument[mapString] must not be null: ";
-            throw new IllegalArgumentException(msg + "mapString=" + mapString);
+            throw new IllegalArgumentException(msg + "mapString=null");
         }
         mapString = mapString.trim();
         if (!isStartsWithMapPrefix(mapString)) {
@@ -510,7 +510,7 @@ public class MapListStringImpl implements MapListString {
     protected void assertListString(String listString) {
         if (listString == null) {
             String msg = "Argument[listString] must not be null: ";
-            throw new IllegalArgumentException(msg + "listString=" + listString);
+            throw new IllegalArgumentException(msg + "listString=null");
         }
         listString = listString.trim();
         if (!isStartsWithListPrefix(listString)) {
@@ -541,11 +541,11 @@ public class MapListStringImpl implements MapListString {
      * @param mapString4Log Map-string for log. (NotNull)
      * @param currentMap4Log Current-map for log. (NotNull)
      */
-    protected void assertEqualIndex(String remainderMapString, int equalIndex, String mapString4Log
-            , Map<String, Object> currentMap4Log) {
+    protected void assertEqualIndex(String remainderMapString, int equalIndex, String mapString4Log,
+            Map<String, Object> currentMap4Log) {
         if (remainderMapString == null) {
             String msg = "Argument[remainderMapString] must not be null:";
-            msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
+            msg = msg + getNewLineAndIndent() + " # remainderMapString --> null";
             msg = msg + getNewLineAndIndent() + " # equalIndex --> " + equalIndex;
             msg = msg + getNewLineAndIndent() + " # mapString4Log --> " + mapString4Log;
             msg = msg + getNewLineAndIndent() + " # currentMap4Log --> " + currentMap4Log;
@@ -606,11 +606,11 @@ public class MapListStringImpl implements MapListString {
      * @param mapString4Log Map-string for log. (NotNull)
      * @param currentMap4Log Current-map for log. (NotNull)
      */
-    protected void assertEndBracekIndex(String remainderMapString, int endBraceIndex, String mapString4Log
-            , Map<String, Object> currentMap4Log) {
+    protected void assertEndBracekIndex(String remainderMapString, int endBraceIndex, String mapString4Log,
+            Map<String, Object> currentMap4Log) {
         if (remainderMapString == null) {
             String msg = "Argument[remainderMapString] must not be null:";
-            msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
+            msg = msg + getNewLineAndIndent() + " # remainderMapString --> null";
             msg = msg + getNewLineAndIndent() + " # endBraceIndex --> " + endBraceIndex;
             msg = msg + getNewLineAndIndent() + " # mapString --> " + mapString4Log;
             msg = msg + getNewLineAndIndent() + " # currentMap --> " + currentMap4Log;
@@ -647,7 +647,8 @@ public class MapListStringImpl implements MapListString {
             throw new IllegalArgumentException(msg);
         }
 
-        final String expectedAsEndMark = remainderMapString.substring(endBraceIndex, endBraceIndex + _endBrace.length());
+        final String expectedAsEndMark = remainderMapString
+                .substring(endBraceIndex, endBraceIndex + _endBrace.length());
         if (!expectedAsEndMark.equals(_endBrace)) {
             String msg = "Argument[remainderMapString] must have '" + _endBrace + "' at Argument[endBraceIndex]:";
             msg = msg + getNewLineAndIndent() + " # remainderMapString --> " + remainderMapString;
@@ -670,10 +671,11 @@ public class MapListStringImpl implements MapListString {
      * @param listString4Log List-string for log. (NotNull)
      * @param currentList4Log Current-list for log. (NotNull)
      */
-    protected void assertEndBraceIndex(String remainderListString, int endBraceIndex, String listString4Log, List<?> currentList4Log) {
+    protected void assertEndBraceIndex(String remainderListString, int endBraceIndex, String listString4Log,
+            List<?> currentList4Log) {
         if (remainderListString == null) {
             String msg = "Argument[remainderListString] must not be null:";
-            msg = msg + getNewLineAndIndent() + " # remainderListString --> " + remainderListString;
+            msg = msg + getNewLineAndIndent() + " # remainderListString --> null";
             msg = msg + getNewLineAndIndent() + " # endBraceIndex --> " + endBraceIndex;
             msg = msg + getNewLineAndIndent() + " # listString --> " + listString4Log;
             msg = msg + getNewLineAndIndent() + " # currentList --> " + currentList4Log;
@@ -710,7 +712,8 @@ public class MapListStringImpl implements MapListString {
             throw new IllegalArgumentException(msg);
         }
 
-        final String expectedAsEndBrace = remainderListString.substring(endBraceIndex, endBraceIndex + _endBrace.length());
+        final String expectedAsEndBrace = remainderListString.substring(endBraceIndex, endBraceIndex
+                + _endBrace.length());
         if (!expectedAsEndBrace.equals(_endBrace)) {
             String msg = "Argument[remainderListString] must have '" + _endBrace + "' at Argument[endBraceIndex]:";
             msg = msg + getNewLineAndIndent() + " # remainderListString --> " + remainderListString;
@@ -760,7 +763,7 @@ public class MapListStringImpl implements MapListString {
      */
     protected boolean isStartsWithMapPrefix(String targetString) {
         if (targetString == null) {
-            String msg = "Argument[targetString] must not be null: " + targetString;
+            String msg = "Argument[targetString] must not be null!";
             throw new IllegalArgumentException(msg);
         }
         targetString = targetString.trim();
@@ -779,7 +782,7 @@ public class MapListStringImpl implements MapListString {
      */
     protected boolean isStartsWithListPrefix(String targetString) {
         if (targetString == null) {
-            String msg = "Argument[targetString] must not be null: " + targetString;
+            String msg = "Argument[targetString] must not be null!";
             throw new IllegalArgumentException(msg);
         }
         targetString = targetString.trim();
@@ -798,7 +801,7 @@ public class MapListStringImpl implements MapListString {
      */
     protected boolean isStartsWithDelimiter(String targetString) {
         if (targetString == null) {
-            String msg = "Argument[targetString] must not be null: " + targetString;
+            String msg = "Argument[targetString] must not be null!";
             throw new IllegalArgumentException(msg);
         }
         targetString = targetString.trim();
@@ -817,7 +820,7 @@ public class MapListStringImpl implements MapListString {
      */
     protected boolean isStartsWithEndBrace(String targetString) {
         if (targetString == null) {
-            String msg = "Argument[targetString] must not be null: " + targetString;
+            String msg = "Argument[targetString] must not be null!";
             throw new IllegalArgumentException(msg);
         }
         targetString = targetString.trim();
@@ -836,7 +839,7 @@ public class MapListStringImpl implements MapListString {
      */
     protected boolean isEndsWithEndBrace(String targetString) {
         if (targetString == null) {
-            String msg = "Argument[targetString] must not be null: " + targetString;
+            String msg = "Argument[targetString] must not be null!";
             throw new IllegalArgumentException(msg);
         }
         targetString = targetString.trim();

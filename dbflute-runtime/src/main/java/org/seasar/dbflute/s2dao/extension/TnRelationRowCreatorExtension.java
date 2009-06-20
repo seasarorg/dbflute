@@ -17,10 +17,10 @@ package org.seasar.dbflute.s2dao.extension;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
@@ -99,14 +99,12 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         return TnRowCreatorExtension.findDBMeta(rowType, tableName);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void setupRelationAllValue(TnRelationRowCreationResource res) throws SQLException {
-        final Map propertyCacheElement = res.extractPropertyCacheElement();
-        final Set columnNameCacheElementKeySet = propertyCacheElement.keySet();
-        for (final Iterator ite = columnNameCacheElementKeySet.iterator(); ite.hasNext();) {
-            final String columnName = (String) ite.next();
-            final TnPropertyType pt = (TnPropertyType) propertyCacheElement.get(columnName);
+        final Map<String, TnPropertyType> propertyCacheElement = res.extractPropertyCacheElement();
+        final Set<Entry<String, TnPropertyType>> entrySet = propertyCacheElement.entrySet();
+        for (Entry<String, TnPropertyType> entry : entrySet) {
+            final TnPropertyType pt = entry.getValue();
             res.setCurrentPropertyType(pt);
             if (!isValidRelationPerPropertyLoop(res)) {
                 res.clearRowInstance();
@@ -175,10 +173,10 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
         // Set up property cache about current beanMetaData.
         final TnBeanMetaData nextBmd = res.getRelationBeanMetaData();
-        Map<String, TnPropertyType> propertyTypeMap = nextBmd.getPropertyTypeMap();
-        Set<String> keySet = propertyTypeMap.keySet();
-        for (String key : keySet) {
-            TnPropertyType pt = propertyTypeMap.get(key);
+        final Map<String, TnPropertyType> propertyTypeMap = nextBmd.getPropertyTypeMap();
+        final Set<Entry<String, TnPropertyType>> entrySet = propertyTypeMap.entrySet();
+        for (Entry<String, TnPropertyType> entry : entrySet) {
+            final TnPropertyType pt = entry.getValue();
             res.setCurrentPropertyType(pt);
             if (!isTargetProperty(res)) {
                 continue;

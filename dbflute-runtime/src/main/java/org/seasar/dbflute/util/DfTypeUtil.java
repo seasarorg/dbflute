@@ -53,7 +53,7 @@ public class DfTypeUtil {
     //                                               -------
     public static Boolean toBoolean(Object o) {
         if (o == null) {
-            return null;
+            return (Boolean) o;
         } else if (o instanceof Boolean) {
             return (Boolean) o;
         } else if (o instanceof Number) {
@@ -96,16 +96,16 @@ public class DfTypeUtil {
         } else if (o instanceof Integer) {
             return (Integer) o;
         } else if (o instanceof Number) {
-            return new Integer(((Number) o).intValue());
+            return Integer.valueOf(((Number) o).intValue());
         } else if (o instanceof String) {
             return toInteger((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
                 return new Integer(new SimpleDateFormat(pattern).format(o));
             }
-            return new Integer((int) ((java.util.Date) o).getTime());
+            return Integer.valueOf((int) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? new Integer(1) : new Integer(0);
+            return ((Boolean) o).booleanValue() ? Integer.valueOf(1) : Integer.valueOf(0);
         } else {
             return toInteger(o.toString());
         }
@@ -161,16 +161,16 @@ public class DfTypeUtil {
         } else if (o instanceof Long) {
             return (Long) o;
         } else if (o instanceof Number) {
-            return new Long(((Number) o).longValue());
+            return Long.valueOf(((Number) o).longValue());
         } else if (o instanceof String) {
             return toLong((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
                 return new Long(new SimpleDateFormat(pattern).format(o));
             }
-            return new Long(((java.util.Date) o).getTime());
+            return Long.valueOf(((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? new Long(1) : new Long(0);
+            return ((Boolean) o).booleanValue() ? Long.valueOf(1) : Long.valueOf(0);
         } else {
             return toLong(o.toString());
         }
@@ -376,16 +376,16 @@ public class DfTypeUtil {
         } else if (o instanceof Short) {
             return (Short) o;
         } else if (o instanceof Number) {
-            return new Short(((Number) o).shortValue());
+            return Short.valueOf(((Number) o).shortValue());
         } else if (o instanceof String) {
             return toShort((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Short(new SimpleDateFormat(pattern).format(o));
+                return Short.valueOf(new SimpleDateFormat(pattern).format(o));
             }
-            return new Short((short) ((java.util.Date) o).getTime());
+            return Short.valueOf((short) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? new Short((short) 1) : new Short((short) 0);
+            return ((Boolean) o).booleanValue() ? Short.valueOf((short) 1) : Short.valueOf((short) 0);
         } else {
             return toShort(o.toString());
         }
@@ -462,16 +462,16 @@ public class DfTypeUtil {
         } else if (o instanceof Byte) {
             return (Byte) o;
         } else if (o instanceof Number) {
-            return new Byte(((Number) o).byteValue());
+            return Byte.valueOf(((Number) o).byteValue());
         } else if (o instanceof String) {
             return toByte((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
                 return new Byte(new SimpleDateFormat(pattern).format(o));
             }
-            return new Byte((byte) ((java.util.Date) o).getTime());
+            return Byte.valueOf((byte) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? new Byte((byte) 1) : new Byte((byte) 0);
+            return ((Boolean) o).booleanValue() ? Byte.valueOf((byte) 1) : Byte.valueOf((byte) 0);
         } else {
             return toByte(o.toString());
         }
@@ -1013,7 +1013,7 @@ public class DfTypeUtil {
             if (i != null) {
                 return i;
             }
-            return new Integer(0);
+            return Integer.valueOf(0);
         } else if (type == double.class) {
             Double d = toDouble(o);
             if (d != null) {
@@ -1025,7 +1025,7 @@ public class DfTypeUtil {
             if (l != null) {
                 return l;
             }
-            return new Long(0);
+            return Long.valueOf(0);
         } else if (type == float.class) {
             Float f = toFloat(o);
             if (f != null) {
@@ -1037,7 +1037,7 @@ public class DfTypeUtil {
             if (s != null) {
                 return s;
             }
-            return new Short((short) 0);
+            return Short.valueOf((short) 0);
         } else if (type == boolean.class) {
             Boolean b = toBoolean(o);
             if (b != null) {
@@ -1049,7 +1049,7 @@ public class DfTypeUtil {
             if (b != null) {
                 return b;
             }
-            return new Byte((byte) 0);
+            return Byte.valueOf((byte) 0);
         }
         return o;
     }
@@ -1060,7 +1060,7 @@ public class DfTypeUtil {
             if (i != null) {
                 return i;
             }
-            return new Integer(0);
+            return Integer.valueOf(0);
         } else if (type == double.class) {
             Double d = toDouble(o);
             if (d != null) {
@@ -1072,7 +1072,7 @@ public class DfTypeUtil {
             if (l != null) {
                 return l;
             }
-            return new Long(0);
+            return Long.valueOf(0);
         } else if (type == float.class) {
             Float f = toFloat(o);
             if (f != null) {
@@ -1084,7 +1084,7 @@ public class DfTypeUtil {
             if (s != null) {
                 return s;
             }
-            return new Short((short) 0);
+            return Short.valueOf((short) 0);
         } else if (type == boolean.class) {
             Boolean b = toBoolean(o);
             if (b != null) {
@@ -1096,7 +1096,7 @@ public class DfTypeUtil {
             if (b != null) {
                 return b;
             }
-            return new Byte((byte) 0);
+            return Byte.valueOf((byte) 0);
         }
         return o;
     }
@@ -1295,7 +1295,7 @@ public class DfTypeUtil {
         if (value == null) {
             return NULL;
         }
-        return quote(value.toString() + "(byteLength=" + Integer.toString(value.length) + ")");
+        return quote(value.getClass() + "(byteLength=" + Integer.toString(value.length) + ")");
     }
 
     public static String toText(Object value) {
@@ -1507,7 +1507,7 @@ public class DfTypeUtil {
      */
     protected static void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
-            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            String msg = "The value should not be null: variableName=null value=" + value;
             throw new IllegalArgumentException(msg);
         }
         if (value == null) {

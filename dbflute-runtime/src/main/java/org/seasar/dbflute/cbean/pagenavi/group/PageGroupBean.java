@@ -101,7 +101,7 @@ public class PageGroupBean implements java.io.Serializable {
 
         final List<Integer> resultList = new ArrayList<Integer>();
         for (int i = currentPageGroupStartPageNumber; i < nextPageGroupStartPageNumber && i <= allPageCount; i++) {
-            resultList.add(new Integer(i));
+            resultList.add(Integer.valueOf(i));
         }
         return resultList;
     }

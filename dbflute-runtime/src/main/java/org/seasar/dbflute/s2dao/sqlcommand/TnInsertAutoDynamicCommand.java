@@ -62,7 +62,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
         handler.setSql(sql);
         handler.setLoggingMessageSqlArgs(args);
         final int rows = handler.execute(args);
-        return new Integer(rows);
+        return Integer.valueOf(rows);
     }
 
     protected String createInsertSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
@@ -134,7 +134,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
     protected String getLineSeparator() {
         return DfSystemUtil.getLineSeparator();
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

@@ -54,8 +54,8 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractAutoHandler(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
+    public TnAbstractAutoHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
+            TnPropertyType[] propertyTypes) {
         super(dataSource, statementFactory);
         this.beanMetaData = beanMetaData;
         this.propertyTypes = propertyTypes;
@@ -140,7 +140,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
                 setTimestamp(ResourceContext.getAccessTimestamp());
                 varList.add(getTimestamp());
             } else if (pt.getPropertyName().equalsIgnoreCase(versionNoPropertyName)) {
-                setVersionNo(new Integer(0));
+                setVersionNo(Integer.valueOf(0));
                 varList.add(getVersionNo());
             } else {
                 varList.add(pt.getPropertyDesc().getValue(bean));
@@ -148,7 +148,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
             varValueTypeList.add(pt.getValueType());
         }
         setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[])varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
+        setBindVariableValueTypes((ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
     }
 
     protected void setupUpdateBindVariables(Object bean) {
@@ -171,7 +171,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
                     continue;// because of 'VERSION_NO = VERSION_NO + 1'
                 }
                 int intValue = DfTypeUtil.toPrimitiveInt(value) + 1;
-                setVersionNo(new Integer(intValue));
+                setVersionNo(Integer.valueOf(intValue));
                 varList.add(getVersionNo());
             } else {
                 varList.add(pt.getPropertyDesc().getValue(bean));
@@ -188,7 +188,7 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         final List<ValueType> varValueTypeList = new ArrayList<ValueType>();
         addAutoUpdateWhereBindVariables(varList, varValueTypeList, bean);
         setBindVariables(varList.toArray());
-        setBindVariableValueTypes((ValueType[])varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
+        setBindVariableValueTypes((ValueType[]) varValueTypeList.toArray(new ValueType[varValueTypeList.size()]));
     }
 
     protected void addAutoUpdateWhereBindVariables(List<Object> varList, List<ValueType> varValueTypeList, Object bean) {

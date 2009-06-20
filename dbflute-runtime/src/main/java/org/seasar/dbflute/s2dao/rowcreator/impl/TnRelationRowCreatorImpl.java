@@ -18,9 +18,9 @@ package org.seasar.dbflute.s2dao.rowcreator.impl;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -71,13 +71,9 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         // - - - - - - - - - - - 
         // Recursive Call Point!
         // - - - - - - - - - - -
-
-        // Select句に該当RelationのPropertyが一つも指定されていない場合は、
-        // この時点ですぐにreturn null;とする。以前のS2Daoの仕様通りである。[DAO-7]
         if (!res.hasPropertyCacheElement()) {
             return null;
         }
-
         setupRelationKeyValue(res);
         setupRelationAllValue(res);
         return res.getRow();
@@ -113,10 +109,9 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
     protected void setupRelationAllValue(TnRelationRowCreationResource res) throws SQLException {
         final Map<String, TnPropertyType> propertyCacheElement = res.extractPropertyCacheElement();
-        final Set<String> columnNameCacheElementKeySet = propertyCacheElement.keySet();
-        for (final Iterator<String> ite = columnNameCacheElementKeySet.iterator(); ite.hasNext();) {
-            final String columnName = (String) ite.next();
-            final TnPropertyType pt = (TnPropertyType) propertyCacheElement.get(columnName);
+        final Set<Entry<String, TnPropertyType>> entrySet = propertyCacheElement.entrySet();
+        for (Entry<String, TnPropertyType> entry : entrySet) {
+            final TnPropertyType pt = entry.getValue();
             res.setCurrentPropertyType(pt);
             if (!isValidRelationPerPropertyLoop(res)) {
                 res.clearRowInstance();
@@ -153,7 +148,8 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         registerRelationValue(res, columnName);
     }
 
-    protected abstract void registerRelationValue(TnRelationRowCreationResource res, String columnName) throws SQLException;
+    protected abstract void registerRelationValue(TnRelationRowCreationResource res, String columnName)
+            throws SQLException;
 
     protected void registerRelationValidValue(TnRelationRowCreationResource res, TnPropertyType pt, Object value)
             throws SQLException {
@@ -249,10 +245,10 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
         // Set up property cache about current beanMetaData.
         final TnBeanMetaData nextBmd = res.getRelationBeanMetaData();
-        Map<String, TnPropertyType> propertyTypeMap = nextBmd.getPropertyTypeMap();
-        Set<String> keySet = propertyTypeMap.keySet();
-        for (String key : keySet) {
-            TnPropertyType pt = propertyTypeMap.get(key);
+        final Map<String, TnPropertyType> propertyTypeMap = nextBmd.getPropertyTypeMap();
+        final Set<Entry<String, TnPropertyType>> entrySet = propertyTypeMap.entrySet();
+        for (Entry<String, TnPropertyType> entry : entrySet) {
+            final TnPropertyType pt = entry.getValue();
             res.setCurrentPropertyType(pt);
             if (!isTargetProperty(res)) {
                 continue;

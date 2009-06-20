@@ -76,7 +76,8 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * @param groupingOption The option of grouping. (NotNull and it requires the breakCount or the determiner)
      * @return The grouped list. (NotNull)
      */
-    public <ROW> List<ROW> groupingList(GroupingRowSetupper<ROW, ENTITY> groupingRowSetupper, GroupingOption<ENTITY> groupingOption) {
+    public <ROW> List<ROW> groupingList(GroupingRowSetupper<ROW, ENTITY> groupingRowSetupper,
+            GroupingOption<ENTITY> groupingOption) {
         final List<ROW> groupingList = new ArrayList<ROW>();
         GroupingRowEndDeterminer<ENTITY> rowEndDeterminer = groupingOption.getGroupingRowEndDeterminer();
         if (rowEndDeterminer == null) {
@@ -160,10 +161,11 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * @return Hash-code from primary-keys.
      */
     public int hashCode() {
-        if (_selectedList == null) {
-            return super.hashCode();
+        int result = 17;
+        if (_selectedList != null) {
+            result = (31 * result) + _selectedList.hashCode();
         }
-        return _selectedList.hashCode();
+        return result;
     }
 
     /**
@@ -171,22 +173,26 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * @return Comparing result. If other is null, returns false.
      */
     public boolean equals(Object other) {
-        if (_selectedList == null) {
-            return false;
-        }
         if (other == null) {
             return false;
         }
         if (!(other instanceof List)) {
             return false;
         }
-        return _selectedList.equals(other);
+        if (_selectedList == null) {
+            return false;
+        }
+        if (other instanceof ListResultBean) {
+            return _selectedList.equals(((ListResultBean<?>) other).getSelectedList());
+        } else {
+            return _selectedList.equals(other);
+        }
     }
 
     /**
      * @return The view string of all attribute values. (NotNull)
      */
-	@Override
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("{").append(_tableDbName);
@@ -340,7 +346,9 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * @param selectedList Selected list. (NotNull: If you set null, it ignores it.)
      */
     public void setSelectedList(List<ENTITY> selectedList) {
-        if (selectedList == null) { return; } // Not allowed to set null value to the selected list
+        if (selectedList == null) {
+            return;
+        } // Not allowed to set null value to the selected list
         _selectedList = selectedList;
     }
 
@@ -357,7 +365,9 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
      * @param orderByClause The value of orderByClause. (NotNull: If you set null, it ignores it.)
      */
     public void setOrderByClause(OrderByClause orderByClause) {
-        if (orderByClause == null) { return; } // Not allowed to set null value to the selected list
+        if (orderByClause == null) {
+            return;
+        } // Not allowed to set null value to the selected list
         _orderByClause = orderByClause;
     }
 }

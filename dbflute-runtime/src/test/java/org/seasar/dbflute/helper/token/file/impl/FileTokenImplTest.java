@@ -202,4 +202,20 @@ public class FileTokenImplTest extends PlainTestCase {
         assertEquals("a,\"b,b\",\"c\"\",c\",\"d", split[2]);
         assertEquals("\",e", split[3]);
     }
+
+    public void test_isOddNumber() {
+        // ## Arrange ##
+        FileTokenImpl impl = new FileTokenImpl();
+
+        // ## Act & Assert ##
+        assertFalse(impl.isOddNumber(0));
+        assertTrue(impl.isOddNumber(1));
+        assertFalse(impl.isOddNumber(2));
+        assertTrue(impl.isOddNumber(3));
+        assertFalse(impl.isOddNumber(4));
+        assertTrue(impl.isOddNumber(123));
+        assertFalse(impl.isOddNumber(1234));
+        assertTrue(impl.isOddNumber(-1));
+        assertFalse(impl.isOddNumber(-2));
+    }
 }

@@ -24,8 +24,8 @@ public class SplitOptionParts {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-	protected String _split;
-	protected String _splitContainedDelimiter;
+    protected String _split;
+    protected String _splitContainedDelimiter;
     protected int _splitLimitCount;
 
     // =====================================================================================
@@ -69,7 +69,7 @@ public class SplitOptionParts {
     //                                                                            ==========
     public String[] generateSplitValueArray(String value) {
         if (value == null) {
-            String msg = "The argument[value] should not be null of empty: " + value;
+            String msg = "The argument[value] should not be null!";
             throw new IllegalArgumentException(msg);
         }
         value = repalceContainedDelimiterToRealDelimiter(value);
@@ -83,7 +83,7 @@ public class SplitOptionParts {
         final String[] values = removeInvalidValue(tokenizedValues);
         if (_splitLimitCount > 0 && values.length > _splitLimitCount) {
             final String[] realValues = new String[_splitLimitCount];
-            for (int i=0; i < values.length; i++) {
+            for (int i = 0; i < values.length; i++) {
                 if (i == _splitLimitCount) {
                     break;
                 }
@@ -93,7 +93,7 @@ public class SplitOptionParts {
         } else {
             return values;
         }
-        
+
     }
 
     protected String repalceContainedDelimiterToRealDelimiter(String value) {
@@ -128,8 +128,7 @@ public class SplitOptionParts {
     // =====================================================================================
     //                                                                                Helper
     //                                                                                ======
-    protected final String replace(String text, String fromText,
-            String toText) {
+    protected final String replace(String text, String fromText, String toText) {
 
         if (text == null || fromText == null || toText == null) {
             return null;

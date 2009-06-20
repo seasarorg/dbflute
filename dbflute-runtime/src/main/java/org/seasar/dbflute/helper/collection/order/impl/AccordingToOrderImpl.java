@@ -41,7 +41,8 @@ public class AccordingToOrderImpl implements AccordingToOrder {
      * @param <ELEMENT_TYPE> The type of element.
      * @param <ID_TYPE> The type of ID.
      */
-    public <ELEMENT_TYPE, ID_TYPE> void order(final List<ELEMENT_TYPE> unorderedList, final AccordingToOrderOption<ELEMENT_TYPE, ID_TYPE> option) {
+    public <ELEMENT_TYPE, ID_TYPE> void order(final List<ELEMENT_TYPE> unorderedList,
+            final AccordingToOrderOption<ELEMENT_TYPE, ID_TYPE> option) {
         assertObjectNotNull("unorderedList", unorderedList);
         if (unorderedList.isEmpty()) {
             return;
@@ -97,7 +98,7 @@ public class AccordingToOrderImpl implements AccordingToOrder {
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
-            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            String msg = "The value should not be null: variableName=null value=" + value;
             throw new IllegalArgumentException(msg);
         }
         if (value == null) {

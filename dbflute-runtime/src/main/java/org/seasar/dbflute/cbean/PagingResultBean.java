@@ -99,7 +99,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     public int getCurrentEndRecordNumber() {
         return calculateCurrentEndRecordNumber(_currentPageNumber, _pageSize);
     }
-	
+
     // ===================================================================================
     //                                                                    Page Group/Range
     //                                                                    ================
@@ -290,16 +290,52 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
     //                                                                      Basic Override
     //                                                                      ==============
     /**
+     * @return Hash-code from primary-keys.
+     */
+    public int hashCode() {
+        int result = 17;
+        result = (31 * result) + _pageSize;
+        result = (31 * result) + _currentPageNumber;
+        if (_selectedList != null) {
+            result = (31 * result) + _selectedList.hashCode();
+        }
+        return result;
+    }
+
+    /**
+     * @param other Other entity. (Nullable)
+     * @return Comparing result. If other is null, returns false.
+     */
+    public boolean equals(Object other) {
+        boolean equals = super.equals(other);
+        if (!equals) {
+            return false;
+        }
+        if (!(other instanceof PagingResultBean)) {
+            return false;
+        }
+        PagingResultBean<?> otherBean = (PagingResultBean<?>) other;
+        if (_pageSize != otherBean.getPageSize()) {
+            return false;
+        }
+        if (_currentPageNumber != otherBean.getCurrentPageNumber()) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @return The view string of all attribute values. (NotNull)
      */
-	@Override
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("{").append(getCurrentPageNumber()).append("/").append(getAllPageCount());
         sb.append(" of ").append(getAllRecordCount());
         sb.append(" ").append(isExistPrePage()).append("/").append(isExistNextPage());
         if (_pageGroupOption != null) {
-            sb.append(" group:{").append(getPageGroupSize()).append(",").append(pageGroup().createPageNumberList()).append("}");
+            sb.append(" group:{").append(getPageGroupSize()).append(",").append(pageGroup().createPageNumberList())
+                    .append("}");
         }
         if (_pageRangeOption != null) {
             sb.append(" range:{").append(getPageRangeSize()).append(",").append(_pageRangeOption.isFillLimit());
@@ -311,7 +347,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
         sb.append(":selectedList=").append(getSelectedList());
         return sb.toString();
     }
-	
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

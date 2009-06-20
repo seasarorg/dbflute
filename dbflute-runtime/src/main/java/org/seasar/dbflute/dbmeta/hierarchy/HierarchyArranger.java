@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -282,9 +283,9 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         }
 
         // Clear modified properties.
-        final java.util.Set<String> alreadyRegisteredEntityKeySet = alreadyRegisteredEntityMap.keySet();
-        for (String key : alreadyRegisteredEntityKeySet) {
-            final Entity currentRegisteredEntity = alreadyRegisteredEntityMap.get(key);
+        final Set<Entry<String, Entity>> entrySet = alreadyRegisteredEntityMap.entrySet();
+        for (Entry<String, Entity> entry : entrySet) {
+            final Entity currentRegisteredEntity = entry.getValue();
             currentRegisteredEntity.clearModifiedPropertyNames();
         }
 
@@ -293,7 +294,6 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
 
     /**
      * Build top already-registered key.
-     * 
      * @param primaryKeyMap The map of primary key. (NotNull)
      * @return Top already-registered key. (NotNull)
      */
@@ -303,8 +303,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
 
     /**
      * Do column loop.
-     * 
-     * @param topInfo The information object of top that has generics of the type of local entity. (NotNull)
+     * @param topInfo The information object of top that has generic of the type of local entity. (NotNull)
      */
     protected void doColumnLoop(TopInfo<LOCAL_ENTITY> topInfo) {
         final HierarchyRequest<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
@@ -341,7 +340,8 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
      * @param requestElement The element of request. This is relation loop resource. (NotNull)
      * @param relationPropNameList The list of relation property name that has generics of string. (NotNull)
      */
-    protected void doRelationLoop(TopInfo<LOCAL_ENTITY> topInfo, HierarchyRequestElement requestElement, java.util.List<String> relationPropNameList) {
+    protected void doRelationLoop(TopInfo<LOCAL_ENTITY> topInfo, HierarchyRequestElement requestElement,
+            java.util.List<String> relationPropNameList) {
         final HierarchyRequest<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, Entity> alreadyRegisteredEntityMap = topInfo.getAlreadyRegisteredEntityMap();
 
@@ -484,9 +484,9 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
      */
     protected boolean isNotExistPrimaryKey(TopInfo<LOCAL_ENTITY> topInfo, String relationPath) {
         final Map<String, Object> primaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, relationPath);
-        final Set<String> keySet = primaryKeyMap.keySet();
-        for (String key : keySet) {
-            final Object value = primaryKeyMap.get(key);
+        final Set<Entry<String, Object>> entrySet = primaryKeyMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            final Object value = entry.getValue();
             if (value == null) {
                 return true;
             }
@@ -503,7 +503,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
      * @param primaryKeyMap The map of primary key. (NotNull)
      */
     protected void doLastLoopInjection(TopInfo<LOCAL_ENTITY> topInfo, HierarchyRequestElement requestElement,
-                                       Entity localEntity, Map<String, Object> primaryKeyMap) {
+            Entity localEntity, Map<String, Object> primaryKeyMap) {
         final ColumnInfo destinationColumnInfo = requestElement.getDestinationColumnInfo();
         if (!primaryKeyMap.containsKey(destinationColumnInfo.getColumnDbName())) {// The column is primary key!
             final HierarchySourceRow sourceRow = topInfo.getSourceRow();
@@ -535,8 +535,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         return primaryKeyMap;
     }
 
-    protected Object extractColumnValueFromSource(HierarchySourceRow sourceRow,
-            HierarchySourceColumn sourceColumn) {
+    protected Object extractColumnValueFromSource(HierarchySourceRow sourceRow, HierarchySourceColumn sourceColumn) {
         return sourceRow.extractColumnValue(sourceColumn);
     }
 
@@ -553,7 +552,8 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
      * @param columnInfo Column info. (NotNull)
      * @param columnValue Column value. (NotNull)
      */
-    protected void injectColumnValueToDestinationIfNotNull(Entity entity, ColumnInfo columnInfo, final Object columnValue) {
+    protected void injectColumnValueToDestinationIfNotNull(Entity entity, ColumnInfo columnInfo,
+            final Object columnValue) {
         if (columnValue != null) {
             injectColumnValueToDestination(entity, columnInfo.getColumnDbName(), columnValue);
         }
@@ -569,16 +569,18 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
     }
 
     protected void injectColumnValueMapToDestination(Entity entity, final Map<String, Object> columnValueMap) {
-        final Set<String> columnNameSet = columnValueMap.keySet();
-        for (String columnName : columnNameSet) {
-            final Object columnValue = columnValueMap.get(columnName);
+        final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            final String columnName = entry.getKey();
+            final Object columnValue = entry.getValue();
             injectColumnValueToDestination(entity, columnName, columnValue);
         }
     }
 
     protected void injectForeignEntity(Entity entity, String foreignPropName, Entity foreignEntity) {
         final String capPropReferrerName = initCap(foreignPropName);
-        final Method method = findMethod(entity.getClass(), "set" + capPropReferrerName, new Class[] { foreignEntity.getDBMeta().getEntityType() });
+        final Method method = findMethod(entity.getClass(), "set" + capPropReferrerName, new Class[] { foreignEntity
+                .getDBMeta().getEntityType() });
         invoke(method, entity, new Object[] { foreignEntity });
     }
 
@@ -594,7 +596,8 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         injectColumnValueMapToDestination(referrerEntity, referrerPrimaryKeyMap);
     }
 
-    protected void injectLocalForeignKey(TopInfo<LOCAL_ENTITY> topInfo, Entity localEntity, ForeignInfo foreignInfo, String foreignRelationPath) {
+    protected void injectLocalForeignKey(TopInfo<LOCAL_ENTITY> topInfo, Entity localEntity, ForeignInfo foreignInfo,
+            String foreignRelationPath) {
         final HierarchyRequest<LOCAL_ENTITY> request = topInfo.getHierarchyRequest();
         final Map<String, Object> foreignPrimaryKeyMap = extractPrimaryKeyMapFromSource(topInfo, foreignRelationPath);
         final List<HierarchyRequestElement> primaryKeyElementList = request.findPrimaryKeyElement(foreignRelationPath);
@@ -664,14 +667,16 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
             final Class<?>[] parameterTypes = method.getParameterTypes();
             String msg = "Invoking method threw the exception:" + lineSeparator;
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
-            msg = msg + "[" + method.getDeclaringClass().getSimpleName() + "." + method.getName() + "()]" + lineSeparator;
+            msg = msg + "[" + method.getDeclaringClass().getSimpleName() + "." + method.getName() + "()]"
+                    + lineSeparator;
             msg = msg + " methodArgTypes     = {" + createTypeViewFromTypeArray(parameterTypes) + "}" + lineSeparator;
             msg = msg + " specifiedArgValues = {" + createValueViewFromValueArray(args) + "}" + lineSeparator;
             msg = msg + " specifiedArgTypes  = {" + createTypeViewFromValueArray(args) + "}" + lineSeparator;
-            if (parameterTypes.length > 0 && args.length > 0 && args[0] != null && !parameterTypes[0].equals(args[0].getClass())) {
+            if (parameterTypes.length > 0 && args.length > 0 && args[0] != null
+                    && !parameterTypes[0].equals(args[0].getClass())) {
                 msg = msg + " " + lineSeparator;
                 final String compareString = "{" + parameterTypes[0] + " -- " + args[0].getClass() + "}";
-                msg = msg + " *Warning! The argType is ummatched: " + compareString + lineSeparator;    
+                msg = msg + " *Warning! The argType is ummatched: " + compareString + lineSeparator;
             }
             msg = msg + "* * * * * * * * * */" + lineSeparator;
             throw new RuntimeException(msg, e);
@@ -693,7 +698,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
 
     private String createValueViewFromValueArray(Object[] array) {
         final StringBuffer sb = new StringBuffer();
-        for (int i=0; i < array.length; i++) {
+        for (int i = 0; i < array.length; i++) {
             final Object value = array[i];
             if (sb.length() == 0) {
                 sb.append(value);
@@ -703,10 +708,10 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         }
         return sb.toString();
     }
-    
+
     private String createTypeViewFromValueArray(Object[] array) {
         final StringBuffer sb = new StringBuffer();
-        for (int i=0; i < array.length; i++) {
+        for (int i = 0; i < array.length; i++) {
             final Object value = array[i];
             final String typeName = value != null ? value.getClass().getSimpleName() : "null";
             if (sb.length() == 0) {
@@ -717,10 +722,10 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         }
         return sb.toString();
     }
-    
+
     private String createTypeViewFromTypeArray(Class<?>[] array) {
         final StringBuffer sb = new StringBuffer();
-        for (int i=0; i < array.length; i++) {
+        for (int i = 0; i < array.length; i++) {
             final Class<?> type = array[i];
             if (sb.length() == 0) {
                 sb.append(type.getSimpleName());

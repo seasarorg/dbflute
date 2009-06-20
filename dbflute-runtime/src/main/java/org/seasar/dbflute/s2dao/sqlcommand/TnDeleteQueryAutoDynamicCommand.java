@@ -52,16 +52,16 @@ public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     //                                                                             =======
     public Object execute(Object[] args) {
         ConditionBean cb = extractConditionBeanWithCheck(args);
-        String[] argNames = new String[]{"dto"};
-        Class<?>[] argTypes = new Class<?>[]{cb.getClass()};
+        String[] argNames = new String[] { "dto" };
+        Class<?>[] argTypes = new Class<?>[] { cb.getClass() };
         String twoWaySql = buildQueryDeleteTwoWaySql(cb);
         CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
         TnCommandContextHandler handler = createCommandContextHandler(context);
         handler.setLoggingMessageSqlArgs(context.getBindVariables());
         int rows = handler.execute(args);
-        return new Integer(rows);
+        return Integer.valueOf(rows);
     }
-    
+
     protected ConditionBean extractConditionBeanWithCheck(Object[] args) {
         if (args == null || args.length == 0) {
             String msg = "The arguments should have one argument! But:";
@@ -76,7 +76,7 @@ public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         }
         return (ConditionBean) fisrtArg;
     }
-    
+
     protected TnCommandContextHandler createCommandContextHandler(CommandContext context) {
         return new TnCommandContextHandler(dataSource, statementFactory, context);
     }
@@ -84,8 +84,9 @@ public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     protected String buildQueryDeleteTwoWaySql(ConditionBean cb) {
         return cb.getSqlClause().getClauseQueryDelete();
     }
-    
-    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
+
+    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,
+            Object[] args) {
         CommandContext context;
         {
             SqlAnalyzer parser = new SqlAnalyzer(twoWaySql, true);
@@ -96,7 +97,7 @@ public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         }
         return context;
     }
-	
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

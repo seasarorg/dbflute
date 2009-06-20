@@ -229,6 +229,11 @@ public class DfResourceUtil {
             String msg = "fileOutputStream.write(toBytes) threw the " + e.getClass().getSimpleName();
             msg = msg + ": outputFilename=" + outputFilename;
             throw new IllegalStateException(msg, e);
+        } finally {
+            try {
+                fileOutputStream.close();
+            } catch (IOException ignored) {
+            }
         }
     }
 
@@ -362,7 +367,7 @@ public class DfResourceUtil {
      */
     protected static void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
-            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            String msg = "The value should not be null: variableName=null value=" + value;
             throw new IllegalArgumentException(msg);
         }
         if (value == null) {

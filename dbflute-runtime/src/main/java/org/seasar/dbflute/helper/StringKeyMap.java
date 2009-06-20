@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <VALUE> The type of value.
  */
 public class StringKeyMap<VALUE> implements Map<String, VALUE> {
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -45,7 +45,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
             _internalMap = newHashMap();
         }
     }
-    
+
     /**
      * Create The map of string key as case insensitive. <br />
      * You can set null value.
@@ -55,7 +55,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     public static <VALUE> StringKeyMap<VALUE> createAsCaseInsensitive() {
         return new StringKeyMap<VALUE>(false, false);
     }
-    
+
     /**
      * Create The map of string key as case insensitive and concurrent. <br />
      * You cannot set null value.
@@ -105,9 +105,11 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     }
 
     public final void putAll(Map<? extends String, ? extends VALUE> map) {
-        final Set<? extends String> keySet = map.keySet();
-        for (String key : keySet) {
-            put(key, map.get(key));
+        final Set<?> entrySet = map.entrySet();
+        for (Object entryObj : entrySet) {
+            @SuppressWarnings("unchecked")
+            final Entry<String, VALUE> entry = (Entry<String, VALUE>) entryObj;
+            put(entry.getKey(), entry.getValue());
         }
     }
 

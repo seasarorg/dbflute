@@ -67,7 +67,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         handler.setSql(getSql());
         handler.setLoggingMessageSqlArgs(args);
         int rows = handler.execute(args);
-        return new Integer(rows);
+        return Integer.valueOf(rows);
     }
 
     protected EntityAlreadyUpdatedException createEntityAlreadyUpdatedException(Object bean, int rows) {

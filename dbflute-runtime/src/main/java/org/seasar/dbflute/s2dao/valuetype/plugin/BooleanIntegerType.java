@@ -71,7 +71,7 @@ public class BooleanIntegerType extends TnAbstractValueType {
             return DfTypeUtil.nullText();
         }
         int var = toInt(value);
-        return DfTypeUtil.toText(new Integer(var));
+        return DfTypeUtil.toText(Integer.valueOf(var));
     }
 
     protected int toInt(Object value) {

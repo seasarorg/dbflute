@@ -61,7 +61,7 @@ public class ToSingleByteOptionParts {
 
         // To Single Byte
         if (_toSingleByteSpace) {
-            value = (value != null ? value.replaceAll("\u3000", " ") : value);
+            value = value.replaceAll("\u3000", " ");
         }
         if (_toSingleByteAlphabetNumberMark) {
             value = getGeneralCharacter().toSingleByteAlphabetNumberMark(value);

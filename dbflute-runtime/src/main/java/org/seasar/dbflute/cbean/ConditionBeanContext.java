@@ -166,19 +166,19 @@ public class ConditionBeanContext {
             }
         }
         {
-            Class<?> clazz = org.seasar.dbflute.AccessContext.class;
-            clazz = org.seasar.dbflute.CallbackContext.class;
-            clazz = org.seasar.dbflute.cbean.EntityRowHandler.class;
-            clazz = org.seasar.dbflute.cbean.coption.FromToOption.class;
-            clazz = org.seasar.dbflute.cbean.coption.LikeSearchOption.class;
-            clazz = org.seasar.dbflute.cbean.coption.InScopeOption.class;
-            clazz = org.seasar.dbflute.cbean.grouping.GroupingOption.class;
-            clazz = org.seasar.dbflute.cbean.grouping.GroupingRowEndDeterminer.class;
-            clazz = org.seasar.dbflute.cbean.grouping.GroupingRowResource.class;
-            clazz = org.seasar.dbflute.cbean.grouping.GroupingRowSetupper.class;
-            clazz = org.seasar.dbflute.cbean.pagenavi.PageNumberLink.class;
-            clazz = org.seasar.dbflute.cbean.pagenavi.PageNumberLinkSetupper.class;
-            clazz = org.seasar.dbflute.jdbc.CursorHandler.class;
+            loadClass(org.seasar.dbflute.AccessContext.class);
+            loadClass(org.seasar.dbflute.CallbackContext.class);
+            loadClass(org.seasar.dbflute.cbean.EntityRowHandler.class);
+            loadClass(org.seasar.dbflute.cbean.coption.FromToOption.class);
+            loadClass(org.seasar.dbflute.cbean.coption.LikeSearchOption.class);
+            loadClass(org.seasar.dbflute.cbean.coption.InScopeOption.class);
+            loadClass(org.seasar.dbflute.cbean.grouping.GroupingOption.class);
+            loadClass(org.seasar.dbflute.cbean.grouping.GroupingRowEndDeterminer.class);
+            loadClass(org.seasar.dbflute.cbean.grouping.GroupingRowResource.class);
+            loadClass(org.seasar.dbflute.cbean.grouping.GroupingRowSetupper.class);
+            loadClass(org.seasar.dbflute.cbean.pagenavi.PageNumberLink.class);
+            loadClass(org.seasar.dbflute.cbean.pagenavi.PageNumberLinkSetupper.class);
+            loadClass(org.seasar.dbflute.jdbc.CursorHandler.class);
             if (debugEnabled) {
                 sb.append("  ...Loading class of ...and so on");
             }
@@ -186,6 +186,10 @@ public class ConditionBeanContext {
         if (debugEnabled) {
             _log.debug("{Initialize against the ClassLoader Headache}" + ln() + sb);
         }
+    }
+
+    protected static void loadClass(Class<?> clazz) { // for avoiding Find-Bugs warnings
+        // do nothing
     }
 
     // ===================================================================================
@@ -238,11 +242,12 @@ public class ConditionBeanContext {
             throw new EntityDuplicatedException(msg);
         }
     }
-    
+
     // -----------------------------------------------------
     //                                         Set up Select
     //                                         -------------
-    public static void throwSetupSelectAfterUnionException(String className, String foreignPropertyName, String displaySql) {
+    public static void throwSetupSelectAfterUnionException(String className, String foreignPropertyName,
+            String displaySql) {
         String methodName = "setupSelect_" + initCap(foreignPropertyName) + "()";
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -274,13 +279,16 @@ public class ConditionBeanContext {
     // -----------------------------------------------------
     //                                        Specify Column
     //                                        --------------
-    public static void throwSpecifyColumnNotSetupSelectColumnException(ConditionBean baseCB, String tableDbName, String columnName) {
+    public static void throwSpecifyColumnNotSetupSelectColumnException(ConditionBean baseCB, String tableDbName,
+            String columnName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "You specified the column that had Not been Set up!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
-        msg = msg + "You should call setupSelect_[ForeignTable]() before calling specify[ForeignTable]().column[TargetColumn]()." + ln();
+        msg = msg
+                + "You should call setupSelect_[ForeignTable]() before calling specify[ForeignTable]().column[TargetColumn]()."
+                + ln();
         msg = msg + "  For example:" + ln();
         msg = msg + "    " + ln();
         msg = msg + "    [Wrong]" + ln();
@@ -337,11 +345,11 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new ScalarSelectInvalidForeignSpecificationException(msg);
     }
-    
+
     // -----------------------------------------------------
     //                              Specify Derived Referrer
     //                              ------------------------
-    public static void throwSpecifyDerivedReferrerInvalidAliasNameException(ConditionQuery localCQ) { 
+    public static void throwSpecifyDerivedReferrerInvalidAliasNameException(ConditionQuery localCQ) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The alias name for specify derived-referrer was Invalid!" + ln();
@@ -374,7 +382,7 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new SpecifyDerivedReferrerInvalidAliasNameException(msg);
     }
-    
+
     public static void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -413,7 +421,7 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new SpecifyDerivedReferrerEntityPropertyNotFoundException(msg);
     }
-    
+
     public static void throwSpecifyDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -460,8 +468,9 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new SpecifyDerivedReferrerInvalidColumnSpecificationException(msg);
     }
-    
-    public static void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
+
+    public static void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function,
+            String deriveColumnName, Class<?> deriveColumnType) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The type of the specified the column unmatched with the function!" + ln();
@@ -480,7 +489,7 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new SpecifyDerivedReferrerUnmatchedColumnTypeException(msg);
     }
-    
+
     public static void throwDerivedReferrerInvalidForeignSpecificationException(String foreignPropertyName) { // Query one uses too 
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -514,7 +523,7 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new DerivedReferrerInvalidForeignSpecificationException(msg);
     }
-    
+
     // -----------------------------------------------------
     //                             Specified Derived OrderBy
     //                             -------------------------
@@ -553,7 +562,7 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new SpecifiedDerivedOrderByAliasNameNotFoundException(msg);
     }
-    
+
     // -----------------------------------------------------
     //                                Query Derived Referrer
     //                                ----------------------
@@ -602,8 +611,9 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new QueryDerivedReferrerInvalidColumnSpecificationException(msg);
     }
-    
-    public static void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType, Object value) {
+
+    public static void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName,
+            Class<?> deriveColumnType, Object value) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The type of the specified the column unmatched with the function or the parameter!" + ln();
@@ -624,7 +634,7 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new QueryDerivedReferrerUnmatchedColumnTypeException(msg);
     }
-    
+
     // -----------------------------------------------------
     //                                       Scalar SubQuery
     //                                       ---------------
@@ -661,7 +671,7 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new ScalarSubQueryInvalidForeignSpecificationException(msg);
     }
-    
+
     public static void throwScalarSubQueryInvalidColumnSpecificationException(String function) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -707,8 +717,9 @@ public class ConditionBeanContext {
         msg = msg + "* * * * * * * * * */";
         throw new ScalarSubQueryInvalidColumnSpecificationException(msg);
     }
-    
-    public static void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
+
+    public static void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName,
+            Class<?> deriveColumnType) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The type of the specified the column unmatched with the function!" + ln();
@@ -767,7 +778,7 @@ public class ConditionBeanContext {
     protected static String initCap(String str) {
         return DfStringUtil.initCap(str);
     }
-    
+
     protected static String initUncap(String str) {
         return DfStringUtil.initUncap(str);
     }

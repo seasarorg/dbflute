@@ -42,7 +42,6 @@ import org.seasar.dbflute.util.DfAssertUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
-
 /**
  * The abstract class of DB meta.
  * @author jflute
@@ -61,17 +60,17 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                  Information Resource
     //                                  --------------------
     // Initialized at its getter.
-    private StringKeyMap<String> _tableDbNameFlexibleMap;
-    private StringKeyMap<String> _tablePropertyNameFlexibleMap;
-    private List<ColumnInfo> _columnInfoList;
-    private StringKeyMap<ColumnInfo> _columnInfoFlexibleMap;
-    private List<ForeignInfo> _foreignInfoList;
-    private StringKeyMap<ForeignInfo> _foreignInfoFlexibleMap;
-    private List<ReferrerInfo> _referrerInfoList;
-    private StringKeyMap<ReferrerInfo> _referrerInfoFlexibleMap;
+    private volatile StringKeyMap<String> _tableDbNameFlexibleMap;
+    private volatile StringKeyMap<String> _tablePropertyNameFlexibleMap;
+    private volatile List<ColumnInfo> _columnInfoList;
+    private volatile StringKeyMap<ColumnInfo> _columnInfoFlexibleMap;
+    private volatile List<ForeignInfo> _foreignInfoList;
+    private volatile StringKeyMap<ForeignInfo> _foreignInfoFlexibleMap;
+    private volatile List<ReferrerInfo> _referrerInfoList;
+    private volatile StringKeyMap<ReferrerInfo> _referrerInfoFlexibleMap;
 
     // Initialized at hasMethod().
-    private Map<String, Object> _methodNameMap = newConcurrentHashMap();
+    private final Map<String, Object> _methodNameMap = newConcurrentHashMap();
 
     // ===================================================================================
     //                                                             Resource Initialization
@@ -92,10 +91,10 @@ public abstract class AbstractDBMeta implements DBMeta {
         // These should not be initialized here!
         // because the problem 'cyclic reference' occurred! 
         // So these are initialized as lazy.
-        // getForeignInfoList();
-        // getForeignInfoFlexibleMap();
-        // getReferrerInfoList();
-        // getReferrerInfoFlexibleMap();
+        //getForeignInfoList();
+        //getForeignInfoFlexibleMap();
+        //getReferrerInfoList();
+        //getReferrerInfoFlexibleMap();
 
         // Initialize the map of (public)method name. 
         hasMethod("dummy");
@@ -157,7 +156,7 @@ public abstract class AbstractDBMeta implements DBMeta {
      * {@inheritDoc}
      * @param columnFlexibleName The flexible name(IgnoreCase, IgnoreUnderscore) of the column. (NotNull, NotEmpty)
      * @return The information of the column. (NotNull)
-     */ 
+     */
     public ColumnInfo findColumnInfo(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         final ColumnInfo columnInfo = getColumnInfoFlexibleMap().get(columnFlexibleName);
@@ -168,21 +167,22 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
         return columnInfo;
     }
-    
-    protected ColumnInfo cci(String columnDbName, String columnAlias, String propertyName
-            , Class<?> propertyType, boolean primary, boolean autoIncrement
-            , Integer columnSize, Integer columnDecimalDigits) { // createColumnInfo()
-        return new ColumnInfo(this, columnDbName, columnAlias, propertyName, propertyType, primary, autoIncrement, columnSize, columnDecimalDigits);
+
+    protected ColumnInfo cci(String columnDbName, String columnAlias, String propertyName, Class<?> propertyType,
+            boolean primary, boolean autoIncrement, Integer columnSize, Integer columnDecimalDigits) { // createColumnInfo()
+        return new ColumnInfo(this, columnDbName, columnAlias, propertyName, propertyType, primary, autoIncrement,
+                columnSize, columnDecimalDigits);
     }
 
-    protected ColumnInfo cci(String columnDbName, String columnAlias, String propertyName
-           , Class<?> propertyType, boolean primary, boolean autoIncrement
-           , Integer columnSize, Integer columnDecimalDigits, OptimisticLockType optimisticLockType) { // createColumnInfo()
-        return new ColumnInfo(this, columnDbName, columnAlias, propertyName, propertyType, primary, autoIncrement, columnSize, columnDecimalDigits, optimisticLockType);
+    protected ColumnInfo cci(String columnDbName, String columnAlias, String propertyName, Class<?> propertyType,
+            boolean primary, boolean autoIncrement, Integer columnSize, Integer columnDecimalDigits,
+            OptimisticLockType optimisticLockType) { // createColumnInfo()
+        return new ColumnInfo(this, columnDbName, columnAlias, propertyName, propertyType, primary, autoIncrement,
+                columnSize, columnDecimalDigits, optimisticLockType);
     }
 
     /**
-	 * {@inheritDoc}
+     * {@inheritDoc}
      * @return The list of columns. (NotNull, NotEmpty)
      */
     public List<ColumnInfo> getColumnInfoList() {
@@ -197,11 +197,11 @@ public abstract class AbstractDBMeta implements DBMeta {
             _columnInfoList = newArrayList();
             String prefix = "column";
             Class<ColumnInfo> returnType = ColumnInfo.class;
-            Object[] args = new Object[]{};
+            Object[] args = new Object[] {};
             try {
                 for (Method method : methods) {
                     if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                        _columnInfoList.add((ColumnInfo)method.invoke(this, args));
+                        _columnInfoList.add((ColumnInfo) method.invoke(this, args));
                     }
                 }
             } catch (Exception e) {
@@ -250,10 +250,11 @@ public abstract class AbstractDBMeta implements DBMeta {
     /**
      * @param relationPropertyName The flexible name of the relation property. (NotNull)
      * @return The information of relation. (NotNull)
-     */ 
+     */
     public RelationInfo findRelationInfo(String relationPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("relationPropertyName", relationPropertyName);
-        return hasForeign(relationPropertyName) ? (RelationInfo)findForeignInfo(relationPropertyName) : (RelationInfo)findReferrerInfo(relationPropertyName);
+        return hasForeign(relationPropertyName) ? (RelationInfo) findForeignInfo(relationPropertyName)
+                : (RelationInfo) findReferrerInfo(relationPropertyName);
     }
 
     // -----------------------------------------------------
@@ -263,7 +264,7 @@ public abstract class AbstractDBMeta implements DBMeta {
      * {@inheritDoc}
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return Determination. (NotNull)
-     */ 
+     */
     public boolean hasForeign(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
@@ -274,7 +275,7 @@ public abstract class AbstractDBMeta implements DBMeta {
      * {@inheritDoc}
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return Foreign DBMeta. (NotNull)
-     */ 
+     */
     public DBMeta findForeignDBMeta(String foreignPropertyName) {
         return findForeignInfo(foreignPropertyName).getForeignDBMeta();
     }
@@ -283,31 +284,29 @@ public abstract class AbstractDBMeta implements DBMeta {
      * {@inheritDoc}
      * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
      * @return Foreign information. (NotNull)
-     */ 
+     */
     public ForeignInfo findForeignInfo(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = buildRelationInfoGetterMethodNameInitCap("foreign", foreignPropertyName);
         Method method = null;
         try {
-            method = this.getClass().getMethod(methodName, new Class[]{});
+            method = this.getClass().getMethod(methodName, new Class[] {});
         } catch (NoSuchMethodException e) {
             String msg = "Not found foreign by foreignPropertyName: foreignPropertyName=" + foreignPropertyName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
         try {
-            return (ForeignInfo)method.invoke(this, new Object[]{});
+            return (ForeignInfo) method.invoke(this, new Object[] {});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
             throw new RuntimeException(e.getCause());
         }
     }
-    
-    protected ForeignInfo cfi(String propName
-                            , DBMeta localDbm, DBMeta foreignDbm
-                            , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap
-                            , int relNo, boolean oneToOne) { // createForeignInfo()
+
+    protected ForeignInfo cfi(String propName, DBMeta localDbm, DBMeta foreignDbm,
+            Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relNo, boolean oneToOne) { // createForeignInfo()
         return new ForeignInfo(propName, localDbm, foreignDbm, localForeignColumnInfoMap, relNo, oneToOne);
     }
 
@@ -327,11 +326,11 @@ public abstract class AbstractDBMeta implements DBMeta {
             _foreignInfoList = newArrayList();
             String prefix = "foreign";
             Class<ForeignInfo> returnType = ForeignInfo.class;
-            Object[] args = new Object[]{};
+            Object[] args = new Object[] {};
             try {
                 for (Method method : methods) {
                     if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                        _foreignInfoList.add((ForeignInfo)method.invoke(this, args));
+                        _foreignInfoList.add((ForeignInfo) method.invoke(this, args));
                     }
                 }
             } catch (Exception e) {
@@ -368,7 +367,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     /**
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Determination. (NotNull)
-     */ 
+     */
     public boolean hasReferrer(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
         final String methodName = buildRelationInfoGetterMethodNameInitCap("referrer", referrerPropertyName);
@@ -378,7 +377,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     /**
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Referrer DBMeta. (NotNull)
-     */ 
+     */
     public DBMeta findReferrerDBMeta(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
         return findReferrerInfo(referrerPropertyName).getReferrerDBMeta();
@@ -387,20 +386,20 @@ public abstract class AbstractDBMeta implements DBMeta {
     /**
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Referrer information. (NotNull)
-     */ 
+     */
     public ReferrerInfo findReferrerInfo(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
         final String methodName = buildRelationInfoGetterMethodNameInitCap("referrer", referrerPropertyName);
         java.lang.reflect.Method method = null;
         try {
-            method = this.getClass().getMethod(methodName, new Class[]{});
+            method = this.getClass().getMethod(methodName, new Class[] {});
         } catch (NoSuchMethodException e) {
             String msg = "Not found referrer by referrerPropertyName: referrerPropertyName=" + referrerPropertyName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
             throw new RuntimeException(msg, e);
         }
         try {
-            return (ReferrerInfo)method.invoke(this, new Object[]{});
+            return (ReferrerInfo) method.invoke(this, new Object[] {});
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -408,10 +407,8 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
     }
 
-    protected ReferrerInfo cri(String propName
-                             , DBMeta localDbm, DBMeta referrerDbm
-                             , Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap
-                             , boolean oneToOne) { // createReferrerInfo()
+    protected ReferrerInfo cri(String propName, DBMeta localDbm, DBMeta referrerDbm,
+            Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap, boolean oneToOne) { // createReferrerInfo()
         return new ReferrerInfo(propName, localDbm, referrerDbm, localReferrerColumnInfoMap, oneToOne);
     }
 
@@ -431,11 +428,11 @@ public abstract class AbstractDBMeta implements DBMeta {
             _referrerInfoList = newArrayList();
             String prefix = "referrer";
             Class<ReferrerInfo> returnType = ReferrerInfo.class;
-            Object[] args = new Object[]{};
+            Object[] args = new Object[] {};
             try {
                 for (Method method : methods) {
                     if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                        _referrerInfoList.add((ReferrerInfo)method.invoke(this, args));
+                        _referrerInfoList.add((ReferrerInfo) method.invoke(this, args));
                     }
                 }
             } catch (Exception e) {
@@ -470,9 +467,9 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                          Common Logic
     //                                          ------------
     protected String buildRelationInfoGetterMethodNameInitCap(String targetName, String relationPropertyName) {
-        return  targetName + relationPropertyName.substring(0, 1).toUpperCase() + relationPropertyName.substring(1);
+        return targetName + relationPropertyName.substring(0, 1).toUpperCase() + relationPropertyName.substring(1);
     }
-	
+
     // -----------------------------------------------------
     //                                        Relation Trace
     //                                        --------------
@@ -539,7 +536,7 @@ public abstract class AbstractDBMeta implements DBMeta {
          * @return Relation trace(result). (NotNull)
          */
         protected RelationTrace fixTrace(List<RelationInfo> traceRelationInfoList, ColumnInfo traceColumnInfo) {
-            final AbstractRelationTrace localRelationTrace = (AbstractRelationTrace)_relationTraceList.get(0);
+            final AbstractRelationTrace localRelationTrace = (AbstractRelationTrace) _relationTraceList.get(0);
             localRelationTrace.setTraceRelation(traceRelationInfoList);
             localRelationTrace.setTraceColumn(traceColumnInfo);
             localRelationTrace.recycle();
@@ -585,8 +582,8 @@ public abstract class AbstractDBMeta implements DBMeta {
      */
     public MapStringBuilder createMapStringBuilder() {
         final List<String> columnDbNameList = new ArrayList<String>();
-        for (final Iterator<ColumnInfo> ite = getColumnInfoList().iterator(); ite.hasNext(); ) {
-            final ColumnInfo columnInfo = (ColumnInfo)ite.next();
+        for (final Iterator<ColumnInfo> ite = getColumnInfoList().iterator(); ite.hasNext();) {
+            final ColumnInfo columnInfo = (ColumnInfo) ite.next();
             columnDbNameList.add(columnInfo.getColumnDbName());
         }
         return MapStringUtil.createMapStringBuilder(columnDbNameList);
@@ -596,14 +593,37 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                                        Various Info
     //                                                                        ============
     // These methods is expected to override if it needs.
-    public boolean hasIdentity() { return false; }
-    public boolean hasSequence() { return false; }
-    public String getSequenceNextValSql() { return null; }
-    public boolean hasVersionNo() { return false; }
-    public ColumnInfo getVersionNoColumnInfo() { return null; }
-    public boolean hasUpdateDate() { return false; }
-    public ColumnInfo getUpdateDateColumnInfo() { return null; }
-    public boolean hasCommonColumn() { return false; }
+    public boolean hasIdentity() {
+        return false;
+    }
+
+    public boolean hasSequence() {
+        return false;
+    }
+
+    public String getSequenceNextValSql() {
+        return null;
+    }
+
+    public boolean hasVersionNo() {
+        return false;
+    }
+
+    public ColumnInfo getVersionNoColumnInfo() {
+        return null;
+    }
+
+    public boolean hasUpdateDate() {
+        return false;
+    }
+
+    public ColumnInfo getUpdateDateColumnInfo() {
+        return null;
+    }
+
+    public boolean hasCommonColumn() {
+        return false;
+    }
 
     // ===================================================================================
     //                                                                       Name Handling
@@ -619,7 +639,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         // It uses column before table because column is used much more than table.
         // This is the same consideration at other methods.
         return getColumnInfoFlexibleMap().containsKey(flexibleName)
-               || getTableDbNameFlexibleMap().containsKey(flexibleName);
+                || getTableDbNameFlexibleMap().containsKey(flexibleName);
     }
 
     /**
@@ -666,9 +686,8 @@ public abstract class AbstractDBMeta implements DBMeta {
     // -----------------------------------------------------
     //                                                Accept
     //                                                ------
-    protected <ENTITY extends Entity> void doAcceptPrimaryKeyMap(ENTITY entity
-            , Map<String, ? extends Object> columnValueMap
-            , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
+    protected <ENTITY extends Entity> void doAcceptPrimaryKeyMap(ENTITY entity,
+            Map<String, ? extends Object> columnValueMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
         MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap, entity.getModifiedPropertyNames());
         List<ColumnInfo> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
@@ -693,9 +712,8 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
     }
 
-    protected <ENTITY extends Entity> void doAcceptColumnValueMap(ENTITY entity
-            , Map<String, ? extends Object> columnValueMap
-            , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
+    protected <ENTITY extends Entity> void doAcceptColumnValueMap(ENTITY entity,
+            Map<String, ? extends Object> columnValueMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
         MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap, entity.getModifiedPropertyNames());
         List<ColumnInfo> columnInfoList = getColumnInfoList();
@@ -720,116 +738,108 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
     }
 
-    protected String doExtractPrimaryKeyMapString(Entity entity
-                                                , String startBrace
-                                                , String endBrace
-                                                , String delimiter
-                                                , String equal) {
+    protected String doExtractPrimaryKeyMapString(Entity entity, String startBrace, String endBrace, String delimiter,
+            String equal) {
         String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         StringBuilder sb = new StringBuilder();
         List<ColumnInfo> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
-		try {
+        try {
             for (ColumnInfo columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
                 Method getterMethod = columnInfo.findGetter();
-				Object value = getterMethod.invoke(entity, (Object[])null);
+                Object value = getterMethod.invoke(entity, (Object[]) null);
                 helpAppendingColumnValueString(sb, delimiter, equal, columnName, value);
             }
-		} catch (Exception e) {
-		    throw new IllegalStateException(e);
-		}
-		sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
-		return sb.toString();
-	}
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
+        return sb.toString();
+    }
 
-    protected String doExtractColumnValueMapString(Entity entity
-                                                 , String startBrace
-                                                 , String endBrace
-                                                 , String delimiter
-                                                 , String equal) {
+    protected String doExtractColumnValueMapString(Entity entity, String startBrace, String endBrace, String delimiter,
+            String equal) {
         String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         StringBuilder sb = new StringBuilder();
         List<ColumnInfo> columnInfoList = getColumnInfoList();
-		try {
+        try {
             for (ColumnInfo columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
                 Method getterMethod = columnInfo.findGetter();
-				Object value = getterMethod.invoke(entity, (Object[])null);
+                Object value = getterMethod.invoke(entity, (Object[]) null);
                 helpAppendingColumnValueString(sb, delimiter, equal, columnName, value);
             }
-		} catch (Exception e) {
-		    throw new IllegalStateException(e);
-		}
-		sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
-		return sb.toString();
-	}
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
+        return sb.toString();
+    }
 
     // -----------------------------------------------------
     //                                               Convert
     //                                               -------
     protected Map<String, Object> doConvertToColumnValueMap(Entity entity) {
         Map<String, Object> valueMap = newLinkedHashMap();
-		try {
+        try {
             List<ColumnInfo> columnInfoList = getColumnInfoList();
             for (ColumnInfo columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
                 Method getterMethod = columnInfo.findGetter();
-                Object value = getterMethod.invoke(entity, (Object[])null);
+                Object value = getterMethod.invoke(entity, (Object[]) null);
                 valueMap.put(columnName, value);
             }
-		} catch (Exception e) {
-		    throw new IllegalStateException(e);
-		}
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
         return valueMap;
     }
-	
+
     protected Map<String, String> doConvertToColumnStringValueMap(Entity entity) {
         Map<String, String> valueMap = newLinkedHashMap();
-		try {
+        try {
             List<ColumnInfo> columnInfoList = getColumnInfoList();
             for (ColumnInfo columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
                 Method getterMethod = columnInfo.findGetter();
-                Object value = getterMethod.invoke(entity, (Object[])null);
+                Object value = getterMethod.invoke(entity, (Object[]) null);
                 valueMap.put(columnName, helpGettingColumnStringValue(value));
             }
-		} catch (Exception e) {
-		    throw new IllegalStateException(e);
-		}
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
         return valueMap;
     }
-	
-	// ===================================================================================
+
+    // ===================================================================================
     //                                                               Entity Property Setup
     //                                                               =====================
-	// It's very INTERNAL!
-    protected <ENTITY extends Entity> void setupEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap
-                                                           , Eps<ENTITY> setupper
-                                                           , ColumnInfo columnInfo) {
+    // It's very INTERNAL!
+    protected <ENTITY extends Entity> void setupEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap,
+            Eps<ENTITY> setupper, ColumnInfo columnInfo) {
         String columnName = columnInfo.getColumnDbName();
         String propertyName = columnInfo.getPropertyName();
         registerEntityPropertySetupper(columnName, propertyName, setupper, entityPropertySetupperMap);
     }
 
-    protected <ENTITY extends Entity> void registerEntityPropertySetupper(
-		                                          String columnName
-												, String propertyName
-	                                            , Eps<ENTITY> setupper
-											    , Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
-		// Only column name is registered because the map must be flexible map.
-		entityPropertySetupperMap.put(columnName, setupper);
-	}
+    protected <ENTITY extends Entity> void registerEntityPropertySetupper(String columnName, String propertyName,
+            Eps<ENTITY> setupper, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
+        // Only column name is registered because the map must be flexible map.
+        entityPropertySetupperMap.put(columnName, setupper);
+    }
 
-    protected <ENTITY extends Entity> Eps<ENTITY> findEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap, String propertyName) {
+    protected <ENTITY extends Entity> Eps<ENTITY> findEps(Map<String, Eps<ENTITY>> entityPropertySetupperMap,
+            String propertyName) {
         Eps<ENTITY> setupper = entityPropertySetupperMap.get(propertyName);
         if (setupper == null) {
             String msg = "The propertyName was Not Found in the map of setupper of entity property:";
-            msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.keySet()=" + entityPropertySetupperMap.keySet();
+            msg = msg + " propertyName=" + propertyName + " _entityPropertySetupperMap.keySet()="
+                    + entityPropertySetupperMap.keySet();
             throw new IllegalStateException(msg);
         }
         return setupper;
     }
-	
+
     // ===================================================================================
     //                                                                          Util Class
     //                                                                          ==========
@@ -902,7 +912,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         public static long parseDateStringAsMillis(Object value, String propertyName, String typeName) {
             checkTypeString(value, propertyName, typeName);
             try {
-                final String valueString = filterTimestampValue(((String)value).trim());
+                final String valueString = filterTimestampValue(((String) value).trim());
                 return java.sql.Timestamp.valueOf(valueString).getTime();
             } catch (RuntimeException e) {
                 String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
@@ -976,12 +986,15 @@ public abstract class AbstractDBMeta implements DBMeta {
                 throw new IllegalArgumentException(msg);
             }
         }
-        public static void assertColumnExistingInPrimaryKeyMap(java.util.Map<String, ? extends Object> primaryKeyMap, String columnName) {
+
+        public static void assertColumnExistingInPrimaryKeyMap(java.util.Map<String, ? extends Object> primaryKeyMap,
+                String columnName) {
             if (!primaryKeyMap.containsKey(columnName)) {
                 String msg = "The primaryKeyMap must have the value of " + columnName;
                 throw new IllegalStateException(msg + ": primaryKeyMap --> " + primaryKeyMap);
             }
         }
+
         public static void assertColumnValueMapNotNullAndNotEmpty(java.util.Map<String, ? extends Object> columnValueMap) {
             if (columnValueMap == null) {
                 String msg = "The argument[columnValueMap] should not be null.";
@@ -997,7 +1010,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     /**
      * This class is for Internal. Don't use this!
      */
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     protected static class MapStringValueAnalyzer {
         protected java.util.Map<String, ? extends Object> _valueMap;
         protected java.util.Set<String> _modifiedPropertyNames;
@@ -1005,7 +1018,8 @@ public abstract class AbstractDBMeta implements DBMeta {
         protected String _uncapPropName;
         protected String _propertyName;
 
-        public MapStringValueAnalyzer(java.util.Map<String, ? extends Object> valueMap, java.util.Set<String> modifiedPropertyNames) {
+        public MapStringValueAnalyzer(java.util.Map<String, ? extends Object> valueMap,
+                java.util.Set<String> modifiedPropertyNames) {
             this._valueMap = valueMap;
             this._modifiedPropertyNames = modifiedPropertyNames;
         }
@@ -1024,7 +1038,7 @@ public abstract class AbstractDBMeta implements DBMeta {
                 return null;
             }
             helpCheckingTypeString(obj, _uncapPropName, javaType.getName());
-            return (COLUMN_TYPE)obj;
+            return (COLUMN_TYPE) obj;
         }
 
         public <COLUMN_TYPE> COLUMN_TYPE analyzeNumber(Class<COLUMN_TYPE> javaType) {
@@ -1034,9 +1048,9 @@ public abstract class AbstractDBMeta implements DBMeta {
                 return null;
             }
             if (javaType.isAssignableFrom(obj.getClass())) {
-                return (COLUMN_TYPE)obj;
+                return (COLUMN_TYPE) obj;
             }
-            return (COLUMN_TYPE)newInstanceByConstructor(javaType, String.class, obj.toString());
+            return (COLUMN_TYPE) newInstanceByConstructor(javaType, String.class, obj.toString());
         }
 
         public <COLUMN_TYPE> COLUMN_TYPE analyzeDate(Class<COLUMN_TYPE> javaType) {
@@ -1046,9 +1060,10 @@ public abstract class AbstractDBMeta implements DBMeta {
                 return null;
             }
             if (javaType.isAssignableFrom(obj.getClass())) {
-                return (COLUMN_TYPE)obj;
+                return (COLUMN_TYPE) obj;
             }
-            return (COLUMN_TYPE)newInstanceByConstructor(javaType, long.class, helpParsingDateString(obj, _uncapPropName, javaType.getName()));
+            return (COLUMN_TYPE) newInstanceByConstructor(javaType, long.class, helpParsingDateString(obj,
+                    _uncapPropName, javaType.getName()));
         }
 
         public <COLUMN_TYPE> COLUMN_TYPE analyzeOther(Class<COLUMN_TYPE> javaType) {
@@ -1057,21 +1072,21 @@ public abstract class AbstractDBMeta implements DBMeta {
                 _modifiedPropertyNames.remove(_propertyName);
                 return null;
             }
-            return (COLUMN_TYPE)obj;
+            return (COLUMN_TYPE) obj;
         }
 
-	    private void helpCheckingTypeString(Object value, String uncapPropName, String typeName) {
-	        MapStringUtil.checkTypeString(value, uncapPropName, typeName);
-	    }
+        private void helpCheckingTypeString(Object value, String uncapPropName, String typeName) {
+            MapStringUtil.checkTypeString(value, uncapPropName, typeName);
+        }
 
-	    private long helpParsingDateString(Object value, String uncapPropName, String typeName) {
-	        return MapStringUtil.parseDateStringAsMillis(value, uncapPropName, typeName);
-	    }
+        private long helpParsingDateString(Object value, String uncapPropName, String typeName) {
+            return MapStringUtil.parseDateStringAsMillis(value, uncapPropName, typeName);
+        }
 
         protected Object newInstanceByConstructor(Class targetType, Class argType, Object arg) {
             java.lang.reflect.Constructor constructor;
             try {
-                constructor = targetType.getConstructor(new Class[]{argType});
+                constructor = targetType.getConstructor(new Class[] { argType });
             } catch (SecurityException e) {
                 String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
                 throw new RuntimeException(msg, e);
@@ -1080,7 +1095,7 @@ public abstract class AbstractDBMeta implements DBMeta {
                 throw new RuntimeException(msg, e);
             }
             try {
-                return constructor.newInstance(new Object[]{arg});
+                return constructor.newInstance(new Object[] { arg });
             } catch (IllegalArgumentException e) {
                 String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
                 throw new RuntimeException(msg, e);
@@ -1100,11 +1115,11 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-	@SuppressWarnings("unchecked")
-	protected <ENTITY> ENTITY downcast(Entity entity) {
-		checkDowncast(entity);
-		return (ENTITY)entity;
-	}
+    @SuppressWarnings("unchecked")
+    protected <ENTITY> ENTITY downcast(Entity entity) {
+        checkDowncast(entity);
+        return (ENTITY) entity;
+    }
 
     protected void checkDowncast(Entity entity) {
         assertObjectNotNull("entity", entity);
@@ -1117,18 +1132,19 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
     }
 
-    protected void helpAppendingColumnValueString(StringBuilder sb, String delimiter, String equal, String colName, Object value) {
+    protected void helpAppendingColumnValueString(StringBuilder sb, String delimiter, String equal, String colName,
+            Object value) {
         sb.append(delimiter).append(colName).append(equal);
         sb.append(helpGettingColumnStringValue(value));
     }
 
     protected String helpGettingColumnStringValue(Object value) {
         if (value instanceof java.sql.Timestamp) {
-            return (value != null ? helpFormatingTimestamp((java.sql.Timestamp)value) : "");
+            return helpFormatingTimestamp((java.sql.Timestamp) value);
         } else if (value instanceof java.util.Date) {
-            return (value != null ? helpFormatingDate((java.util.Date)value) : "");
+            return helpFormatingDate((java.util.Date) value);
         } else {
-            return (value != null ? value.toString() : "");
+            return value != null ? value.toString() : "";
         }
     }
 
@@ -1142,11 +1158,11 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected Map<String, String> setupKeyToLowerMap(boolean dbNameKey) {
         final Map<String, String> map;
-		if (dbNameKey) {
-		    map = newConcurrentHashMap(getTableDbName().toLowerCase(), getTablePropertyName());
-		} else {
-		    map = newConcurrentHashMap(getTablePropertyName().toLowerCase(), getTableDbName());
-		}
+        if (dbNameKey) {
+            map = newConcurrentHashMap(getTableDbName().toLowerCase(), getTablePropertyName());
+        } else {
+            map = newConcurrentHashMap(getTablePropertyName().toLowerCase(), getTableDbName());
+        }
         Method[] methods = this.getClass().getMethods();
         String columnInfoMethodPrefix = "column";
         try {
@@ -1155,21 +1171,21 @@ public abstract class AbstractDBMeta implements DBMeta {
                 if (!name.startsWith(columnInfoMethodPrefix)) {
                     continue;
                 }
-                ColumnInfo columnInfo = (ColumnInfo)method.invoke(this);
+                ColumnInfo columnInfo = (ColumnInfo) method.invoke(this);
                 String dbName = columnInfo.getColumnDbName();
                 String propertyName = columnInfo.getPropertyName();
                 if (dbNameKey) {
                     map.put(dbName.toLowerCase(), propertyName);
                 } else {
-                    map.put(propertyName.toLowerCase(), dbName);                    
+                    map.put(propertyName.toLowerCase(), dbName);
                 }
             }
-			return Collections.unmodifiableMap(map);
+            return Collections.unmodifiableMap(map);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }
-	
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
@@ -1177,51 +1193,51 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                       String Handling
     //                                       ---------------
     protected final String replaceString(String text, String fromText, String toText) {
-	    return DfStringUtil.replace(text, fromText, toText);
+        return DfStringUtil.replace(text, fromText, toText);
     }
 
     protected String initCap(String str) {
-	    return DfStringUtil.initCap(str);
+        return DfStringUtil.initCap(str);
     }
 
     protected String initUncap(String str) {
-	    return DfStringUtil.initUncap(str);
+        return DfStringUtil.initUncap(str);
     }
 
     protected String getLineSeparator() {
-	    return DfSystemUtil.getLineSeparator();
+        return DfSystemUtil.getLineSeparator();
     }
-		
+
     // -----------------------------------------------------
     //                                  Collection Generator
     //                                  --------------------
-	protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+    protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
         return new HashMap<KEY, VALUE>();
     }
 
-	protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
+    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
         return new ConcurrentHashMap<KEY, VALUE>();
     }
 
-	protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key, VALUE value) {
-		ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMap();
-		map.put(key, value);
+    protected <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap(KEY key, VALUE value) {
+        ConcurrentHashMap<KEY, VALUE> map = newConcurrentHashMap();
+        map.put(key, value);
         return map;
     }
 
-	protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
+    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
     }
-	
-	protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(KEY key, VALUE value) {
-		LinkedHashMap<KEY, VALUE> map = newLinkedHashMap();
-		map.put(key, value);
+
+    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap(KEY key, VALUE value) {
+        LinkedHashMap<KEY, VALUE> map = newLinkedHashMap();
+        map.put(key, value);
         return map;
     }
-	
-	protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {
-	    return new ArrayList<ELEMENT>();
-	}
+
+    protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {
+        return new ArrayList<ELEMENT>();
+    }
 
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList(ELEMENT element) {
         ArrayList<ELEMENT> arrayList = new ArrayList<ELEMENT>();
@@ -1229,10 +1245,10 @@ public abstract class AbstractDBMeta implements DBMeta {
         return arrayList;
     }
 
-	protected <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> collection) {
-	    return new ArrayList<ELEMENT>(collection);
-	}
-	
+    protected <ELEMENT> ArrayList<ELEMENT> newArrayList(Collection<ELEMENT> collection) {
+        return new ArrayList<ELEMENT>(collection);
+    }
+
     // -----------------------------------------------------
     //                                   Reflection Handling
     //                                   -------------------
@@ -1255,7 +1271,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
         return _methodNameMap.containsKey(methodName);
     }
-	
+
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------

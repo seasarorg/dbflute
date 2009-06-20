@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -570,8 +571,8 @@ public class TnBeanDescImpl implements TnBeanDesc {
     }
 
     private void setupMethods() {
-        Map<String, List<Method>> methodListMap = new LinkedHashMap<String, List<Method>>();
-        Method[] methods = beanClass.getMethods();
+        final Map<String, List<Method>> methodListMap = new LinkedHashMap<String, List<Method>>();
+        final Method[] methods = beanClass.getMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             if (DfReflectionUtil.isBridgeMethod(method) || DfReflectionUtil.isSyntheticMethod(method)) {
@@ -585,9 +586,10 @@ public class TnBeanDescImpl implements TnBeanDesc {
             }
             list.add(method);
         }
-        final Set<String> keySet = methodListMap.keySet();
-        for (String key : keySet) {
-            final List<Method> methodList = methodListMap.get(key);
+        final Set<Entry<String,List<Method>>> entrySet = methodListMap.entrySet();
+        for (Entry<String, List<Method>> entry : entrySet) {
+            final String key = entry.getKey();
+            final List<Method> methodList = entry.getValue();
             methodsMap.put(key, methodList.toArray(new Method[methodList.size()]));
         }
     }

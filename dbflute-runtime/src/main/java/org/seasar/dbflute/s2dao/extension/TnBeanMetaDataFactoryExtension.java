@@ -40,7 +40,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     //                                                                           Attribute
     //                                                                           =========
     /** The map of bean meta data for cache. */
-    protected Map<Class<?>, TnBeanMetaData> _metaMap = newConcurrentHashMap();
+    protected final Map<Class<?>, TnBeanMetaData> _metaMap = newConcurrentHashMap();
 
     // ===================================================================================
     //                                                                  Override for Cache
@@ -107,8 +107,8 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
         // for ConditionBean and insert() and update() and delete() and so on...
         // = = = = = = = = = =/
         return new TnBeanMetaDataImpl() {
-            protected List<TnIdentifierGenerator> _internalIdentifierGeneratorList = new ArrayList<TnIdentifierGenerator>();
-            protected Map<String, TnIdentifierGenerator> _internalIdentifierGeneratorsByPropertyName = newConcurrentHashMap();
+            protected final List<TnIdentifierGenerator> _internalIdentifierGeneratorList = new ArrayList<TnIdentifierGenerator>();
+            protected final Map<String, TnIdentifierGenerator> _internalIdentifierGeneratorsByPropertyName = newConcurrentHashMap();
 
             // /= = = = = = =
             // for cache
@@ -160,16 +160,6 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
             }
         };
     }
-
-    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    // Other extension points about BeanMetaDataImpl is as follows:
-    // 
-    //   S2DaoMetaDataExtension.createNonConcurrencyBmdFactory()
-    //     --> for NonConcurrency (updateNonstrict() and deleteNonstrict() and so on...) 
-    // 
-    //   S2DaoMetaDataExtension.createOutsideSqlCustomizeBeanMetaDataFactory()
-    //     --> for OutsideSql but it overrides nothing.
-    // = = = = = = = = = =/
 
     // ===================================================================================
     //                                                                 Relation Next Level

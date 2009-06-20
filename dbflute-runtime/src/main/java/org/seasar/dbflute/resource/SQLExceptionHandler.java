@@ -115,7 +115,7 @@ public class SQLExceptionHandler {
                 msg = msg + pmb.getClass().getName() + ln();
                 msg = msg + pmb + ln();
             } else {
-                msg = msg + pmb + ln();
+                msg = msg + "null" + ln();
             }
         }
         if (statement != null) {
@@ -182,7 +182,7 @@ public class SQLExceptionHandler {
                 msg = msg + pmb.getClass().getName() + ln();
                 msg = msg + pmb + ln();
             } else {
-                msg = msg + pmb + ln();
+                msg = msg + "null" + ln();
             }
         }
         if (statement != null) {

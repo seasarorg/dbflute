@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
 import org.seasar.dbflute.cbean.coption.ConditionOption;
@@ -93,7 +94,7 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     /** The map of outer join. */
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>();
-    
+
     /** Is inner-join effective? Default value is false. */
     protected boolean _isInnerJoinEffective = false;
 
@@ -348,7 +349,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             for (String deriveSubQuery : deriveSubQuerySet) {
                 sb.append(getLineSeparator()).append("     ");
                 sb.append(", ").append(deriveSubQuery);
-                
+
                 // [DBFlute-0.8.3]
                 int beginIndex = deriveSubQuery.lastIndexOf(" as ");
                 if (beginIndex >= 0) { // basically true
@@ -502,9 +503,10 @@ public abstract class AbstractSqlClause implements SqlClause {
             }
             sb.append(" ").append(aliasName).append(" on ");
             int count = 0;
-            Set<String> localColumnNameSet = joinOnMap.keySet();
-            for (String localColumnName : localColumnNameSet) {
-                String foreignColumnName = (String) joinOnMap.get(localColumnName);
+            Set<Entry<String, String>> entrySet = joinOnMap.entrySet();
+            for (Entry<String, String> entry : entrySet) {
+                String localColumnName = entry.getKey();
+                String foreignColumnName = entry.getValue();
                 if (count > 0) {
                     sb.append(" and ");
                 }
@@ -692,7 +694,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         }
         _outerJoinMap.put(aliasName, joinInfo);
     }
-    
+
     public SqlClause makeInnerJoinEffective() {
         _isInnerJoinEffective = true;
         return this;
@@ -754,7 +756,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         public boolean isInnerJoin() {
             return _innerJoin;
         }
-        
+
         public void setInnerJoin(boolean value) {
             _innerJoin = value;
         }
@@ -915,7 +917,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         _orderByClause.clear();
         return this;
     }
-    
+
     public SqlClause makeOrderByEffective() {
         if (!_orderByClause.isEmpty()) {
             _isOrderByEffective = true;
@@ -1037,7 +1039,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             }
         };
     }
-    
+
     public void addManualOrderToPreviousOrderByElement(ManumalOrderInfo manumalOrderInfo) {
         assertObjectNotNull("manumalOrderInfo", manumalOrderInfo);
         if (hasUnionQuery()) {
@@ -1586,8 +1588,10 @@ public abstract class AbstractSqlClause implements SqlClause {
         sb.append("update ").append(_tableName).append(ln);
         int index = 0;
         // It is guaranteed that the map has one or more elements.
-        for (String columnName : columnParameterMap.keySet()) {
-            final String parameter = columnParameterMap.get(columnName);
+        final Set<Entry<String, String>> entrySet = columnParameterMap.entrySet();
+        for (Entry<String, String> entry : entrySet) {
+            final String columnName = entry.getKey();
+            final String parameter = entry.getValue();
             if (index == 0) {
                 sb.append("   set ").append(columnName).append(" = ").append(parameter).append(ln);
             } else {
@@ -1680,7 +1684,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     public int getInScopeLimit() {
         return 0; // as default
     }
-    
+
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============

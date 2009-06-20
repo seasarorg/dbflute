@@ -75,14 +75,14 @@ public class PageRangeBean implements java.io.Serializable {
             if (i < 1) {
                 continue;
             }
-            resultList.add(new Integer(i));
+            resultList.add(Integer.valueOf(i));
         }
 
-        resultList.add(new Integer(currentPageNumber));
+        resultList.add(Integer.valueOf(currentPageNumber));
 
         final int endPageNumber = (currentPageNumber + pageRangeSize);
         for (int i = currentPageNumber + 1; i <= endPageNumber && i <= allPageCount; i++) {
-            resultList.add(new Integer(i));
+            resultList.add(Integer.valueOf(i));
         }
 
         final boolean fillLimit = _pageRangeOption.isFillLimit();
@@ -92,11 +92,11 @@ public class PageRangeBean implements java.io.Serializable {
             final Integer lastElements = (Integer) resultList.get(resultList.size() - 1);
             if (firstElements.intValue() > 1) {
                 for (int i = firstElements.intValue() - 1; resultList.size() < limitSize && i > 0; i--) {
-                    resultList.add(0, new Integer(i));
+                    resultList.add(0, Integer.valueOf(i));
                 }
             }
             for (int i = lastElements.intValue() + 1; resultList.size() < limitSize && i <= allPageCount; i++) {
-                resultList.add(new Integer(i));
+                resultList.add(Integer.valueOf(i));
             }
         }
         return resultList;

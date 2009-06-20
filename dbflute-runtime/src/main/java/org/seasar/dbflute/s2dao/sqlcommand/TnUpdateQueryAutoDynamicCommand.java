@@ -62,19 +62,19 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     public Object execute(Object[] args) {
         ConditionBean cb = extractConditionBeanWithCheck(args);
         Entity entity = extractEntityWithCheck(args);
-        String[] argNames = new String[]{"dto", "entity"};
-        Class<?>[] argTypes = new Class<?>[]{cb.getClass(), entity.getClass()};
+        String[] argNames = new String[] { "dto", "entity" };
+        Class<?>[] argTypes = new Class<?>[] { cb.getClass(), entity.getClass() };
         String twoWaySql = buildQueryUpdateTwoWaySql(cb, entity);
         if (twoWaySql == null) {
-            return 0;// No execute!
+            return 0; // No execute!
         }
         CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
         TnCommandContextHandler handler = createCommandContextHandler(context);
         handler.setLoggingMessageSqlArgs(context.getBindVariables());
         int rows = handler.execute(args);
-        return new Integer(rows);
+        return Integer.valueOf(rows);
     }
-    
+
     protected ConditionBean extractConditionBeanWithCheck(Object[] args) {
         assertArgument(args);
         Object fisrtArg = args[0];
@@ -85,7 +85,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         }
         return (ConditionBean) fisrtArg;
     }
-    
+
     protected Entity extractEntityWithCheck(Object[] args) {
         assertArgument(args);
         Object secondArg = args[1];
@@ -96,7 +96,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         }
         return (Entity) secondArg;
     }
-	
+
     protected void assertArgument(Object[] args) {
         if (args == null || args.length <= 1) {
             String msg = "The arguments should have two argument! But:";
@@ -104,7 +104,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
             throw new IllegalArgumentException(msg);
         }
     }
-    
+
     protected TnCommandContextHandler createCommandContextHandler(CommandContext context) {
         return new TnCommandContextHandler(dataSource, statementFactory, context);
     }
@@ -128,7 +128,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
                 ColumnInfo columnInfo = dbmeta.findColumnInfo(propertyName);
                 String columnName = columnInfo.getColumnDbName();
                 Method getter = columnInfo.findGetter();
-                Object value = getter.invoke(entity, (Object[])null);
+                Object value = getter.invoke(entity, (Object[]) null);
                 if (value != null) {
                     columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
                 } else {
@@ -152,7 +152,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         }
         return cb.getSqlClause().getClauseQueryUpdate(columnParameterMap);
     }
-    
+
     protected void throwQueryUpdateFailureException(ConditionBean cb, Entity entity, String propertyName, Exception e) {
         String msg = "Look! Read the message below." + getLineSeparator();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
@@ -175,15 +175,17 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         msg = msg + "* * * * * * * * * */";
         throw new QueryUpdateFailureException(msg, e);
     }
-	
+
     public static class QueryUpdateFailureException extends RuntimeException {
         private static final long serialVersionUID = 1L;
+
         public QueryUpdateFailureException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes, Object[] args) {
+    protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,
+            Object[] args) {
         CommandContext context;
         {
             SqlAnalyzer parser = new SqlAnalyzer(twoWaySql, true);
@@ -194,7 +196,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         }
         return context;
     }
-	
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

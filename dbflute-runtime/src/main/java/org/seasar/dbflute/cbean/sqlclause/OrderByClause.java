@@ -33,7 +33,7 @@ public class OrderByClause implements Serializable {
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
-    protected List<OrderByElement> _orderByList = new ArrayList<OrderByElement>();
+    protected final List<OrderByElement> _orderByList = new ArrayList<OrderByElement>();
 
     // =====================================================================================
     //                                                                           Constructor
@@ -107,6 +107,10 @@ public class OrderByClause implements Serializable {
     }
 
     public static class ManumalOrderInfo {
+
+        /** Serial version UID. (Default) */
+        private static final long serialVersionUID = 1L;
+
         protected List<? extends Object> manualValueList;
 
         public boolean hasManualValueList() {

@@ -48,13 +48,13 @@ public class OrderByElement implements Serializable {
     protected String _ascDesc = "asc";
 
     /** The set-upper of order-by nulls. */
-    protected OrderByClause.OrderByNullsSetupper _orderByNullsSetupper;
+    protected transient OrderByClause.OrderByNullsSetupper _orderByNullsSetupper;
 
     /** Is nulls ordered first? */
     protected boolean _nullsFirst;
 
     /** The information of manual order. */
-    protected OrderByClause.ManumalOrderInfo _manualOrderInfo;
+    protected transient OrderByClause.ManumalOrderInfo _manualOrderInfo;
 
     // =====================================================================================
     //                                                                          Manipulation

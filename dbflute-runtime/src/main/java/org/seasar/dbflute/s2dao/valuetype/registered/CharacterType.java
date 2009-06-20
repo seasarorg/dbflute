@@ -56,7 +56,7 @@ public class CharacterType extends TnAbstractValueType {
         }
         final char[] chars = value.toCharArray();
         if (chars.length == 1) {
-            return new Character(chars[0]);
+            return Character.valueOf(chars[0]);
         }
         if (chars.length == 0) {
             return null;

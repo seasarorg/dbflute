@@ -50,10 +50,10 @@ public class ToUpperLowerCaseOptionParts {
 
         // To Upper/Lower Case
         if (_toUpperCase) {
-            value = (value != null ? value.toUpperCase() : value);
+            value = value.toUpperCase();
         }
         if (_toLowerCase) {
-            value = (value != null ? value.toLowerCase() : value);
+            value = value.toLowerCase();
         }
         return value;
     }

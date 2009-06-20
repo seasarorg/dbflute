@@ -12,6 +12,13 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class DfTypeUtilTest extends PlainTestCase {
 
+    public void test_toBoolean() {
+        // ## Arrange & Act & Assert ##
+        assertNull(DfTypeUtil.toBoolean(null));
+        assertTrue(DfTypeUtil.toBoolean("true"));
+        assertFalse(DfTypeUtil.toBoolean("false"));
+    }
+
     public void test_toDateFlexibly() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

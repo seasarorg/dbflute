@@ -67,16 +67,19 @@ public class TnProcedureMetaData {
             }
             final Integer parameterIndex1 = parameterType1.getParameterIndex();
             final Integer parameterIndex2 = parameterType2.getParameterIndex();
-            if (parameterIndex1 == null && parameterIndex2 == null) {
-                return oneGreaterThanTwo; // No changes
+            if (parameterIndex1 == null) {
+                if (parameterIndex2 == null) {
+                    return oneGreaterThanTwo; // No changes
+                } else {
+                    return oneGreaterThanTwo; // Not null is prior
+                }
+            } else {
+                if (parameterIndex2 == null) {
+                    return twoGreaterThanOne; // Not null is prior
+                } else {
+                    return parameterIndex1.compareTo(parameterIndex2);
+                }
             }
-            if (parameterIndex1 != null && parameterIndex2 == null) {
-                return twoGreaterThanOne; // Not null is prior
-            }
-            if (parameterIndex1 == null && parameterIndex2 != null) {
-                return oneGreaterThanTwo; // Not null is prior
-            }
-            return parameterIndex1.compareTo(parameterIndex2);
         }
     }
 

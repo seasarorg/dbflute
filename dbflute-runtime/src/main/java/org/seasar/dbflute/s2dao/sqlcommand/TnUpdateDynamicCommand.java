@@ -42,9 +42,9 @@ public class TnUpdateDynamicCommand extends TnAbstractDynamicCommand {
         final TnBasicUpdateHandler updateHandler = createBasicUpdateHandler(ctx);
         final Object[] bindVariables = ctx.getBindVariables();
         updateHandler.setLoggingMessageSqlArgs(bindVariables);
-        return new Integer(updateHandler.execute(bindVariables, ctx.getBindVariableTypes()));
+        return Integer.valueOf(updateHandler.execute(bindVariables, ctx.getBindVariableTypes()));
     }
-    
+
     protected TnBasicUpdateHandler createBasicUpdateHandler(CommandContext ctx) {
         return new TnBasicUpdateHandler(getDataSource(), ctx.getSql(), getStatementFactory());
     }
