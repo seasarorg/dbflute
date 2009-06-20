@@ -154,11 +154,11 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             }
             columnNameSet.add(columnName);
 
-            final Integer jdbcTypeCode = new Integer(columnResultSet.getString(5));
+            final Integer jdbcTypeCode = Integer.valueOf(columnResultSet.getString(5));
             final String dbTypeName = columnResultSet.getString(6);
-            final Integer columnSize = new Integer(columnResultSet.getInt(7));
+            final Integer columnSize = Integer.valueOf(columnResultSet.getInt(7));
             final Integer decimalDigits = columnResultSet.getInt(9);
-            final Integer nullType = new Integer(columnResultSet.getInt(11));
+            final Integer nullType = Integer.valueOf(columnResultSet.getInt(11));
             final String columnComment = columnResultSet.getString(12);
             final String defaultValue = columnResultSet.getString(13);
 
