@@ -18,6 +18,7 @@ package org.seasar.dbflute.config;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
@@ -57,13 +58,17 @@ public class DfDatabaseConfig {
         mapListString.setDelimiter(";");
         final Map<String, Object> map = mapListString.generateMap(_databaseBaseInfo);
         final Map<String, Map<String, String>> realMap = new LinkedHashMap<String, Map<String, String>>();
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            final Map<?, ?> elementMap = (Map<?, ?>) map.get(key);
+        final Set<Entry<String, Object>> entrySet = map.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            final String key = entry.getKey();
+            final Map<?, ?> elementMap = (Map<?, ?>) entry.getValue();
             final Map<String, String> elementRealMap = new LinkedHashMap<String, String>();
-            final Set<?> elementKeySet = elementMap.keySet();
-            for (Object elementKey : elementKeySet) {
-                final Object elementValue = elementMap.get(elementKey);
+            final Set<?> elementEntrySet = elementMap.entrySet();
+            for (Object object : elementEntrySet) {
+                @SuppressWarnings("unchecked")
+                final Entry<Object, Object> elementEntry = (Entry<Object, Object>) object;
+                final Object elementKey = elementEntry.getKey();
+                final Object elementValue = elementEntry.getValue();
                 elementRealMap.put((String) elementKey, (String) elementValue);
             }
             realMap.put(key, elementRealMap);

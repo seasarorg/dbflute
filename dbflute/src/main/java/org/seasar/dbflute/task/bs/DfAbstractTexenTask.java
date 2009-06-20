@@ -26,6 +26,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -343,16 +344,25 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     private static String fileContentsToString(String file) {
         String contents = "";
         File f = new File(file);
-        if (f.exists())
+        if (f.exists()) {
+            FileReader fr = null;
             try {
-                FileReader fr = new FileReader(f);
+                fr = new FileReader(f);
                 char template[] = new char[(int) f.length()];
                 fr.read(template);
                 contents = new String(template);
             } catch (Exception e) {
                 System.out.println(e);
                 e.printStackTrace();
+            } finally {
+                if (fr != null) {
+                    try {
+                        fr.close();
+                    } catch (IOException ignored) {
+                    }
+                }
             }
+        }
         return contents;
     }
 
@@ -397,14 +407,17 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             super.setContextProperties(file);
             {
                 final Hashtable<?, ?> env = super.getProject().getProperties();
-                for (final Iterator<?> ite = env.keySet().iterator(); ite.hasNext();) {
-                    final String key = (String) ite.next();
+                Set<?> entrySet = env.entrySet();
+                for (Object object : entrySet) {
+                    java.util.Map.Entry<?, ?> entry = (java.util.Map.Entry<?, ?>) object;
+                    final String key = (String) entry.getKey();
+                    final String value = (String) entry.getValue();
                     if (key.startsWith("torque.")) {
                         String newKey = key.substring("torque.".length());
                         for (int j = newKey.indexOf("."); j != -1; j = newKey.indexOf(".")) {
                             newKey = newKey.substring(0, j) + DfStringUtil.initCap(newKey.substring(j + 1));
                         }
-                        contextProperties.setProperty(newKey, (String) env.get(key));
+                        contextProperties.setProperty(newKey, value);
                     }
                 }
             }

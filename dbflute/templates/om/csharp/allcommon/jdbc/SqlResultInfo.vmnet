@@ -3,7 +3,7 @@ using System;
 
 namespace ${glPackageBaseCommonJdbc} {
 
-public class ${glSqlResultInfo}
+public class ${glSqlResultInfo} {
 
     // ===================================================================================
     //                                                                           Attribute
