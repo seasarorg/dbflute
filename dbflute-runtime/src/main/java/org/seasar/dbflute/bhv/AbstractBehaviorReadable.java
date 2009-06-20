@@ -977,7 +977,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
-            String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+            String msg = "The value should not be null: variableName=null value=" + value;
             throw new IllegalArgumentException(msg);
         }
         if (value == null) {
