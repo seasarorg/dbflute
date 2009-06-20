@@ -34,24 +34,40 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                          DI component
+    //                                          ------------
     protected BehaviorCommandInvoker _behaviorCommandInvoker;
     protected DataSource _dataSource;
-    protected DBMetaProvider _dbmetaProvider;
-    protected SqlClauseCreator _sqlClauseCreator;
-    protected StatementFactory _statementFactory;
-    protected TnBeanMetaDataFactory _beanMetaDataFactory;
-    protected TnValueTypeFactory _valueTypeFactory;
-    
+
+    // -----------------------------------------------------
+    //                                        Lazy component
+    //                                        --------------
+    protected volatile DBMetaProvider _dbmetaProvider;
+    protected volatile SqlClauseCreator _sqlClauseCreator;
+    protected volatile StatementFactory _statementFactory;
+    protected volatile TnBeanMetaDataFactory _beanMetaDataFactory;
+    protected volatile TnValueTypeFactory _valueTypeFactory;
+
+    // -----------------------------------------------------
+    //                                       Disposable Flag
+    //                                       ---------------
     protected volatile boolean _disposable;
 
     // ===================================================================================
     //                                                                 Assistant Main Work
     //                                                                 ===================
+    // -----------------------------------------------------
+    //                                         Current DBDef
+    //                                         -------------
     public DBDef assistCurrentDBDef() {
         return ${glDBCurrent}.getInstance().currentDBDef();
     }
 
-    public DataSource assistDataSource() {
+    // -----------------------------------------------------
+    //                                           Data Source
+    //                                           -----------
+    public DataSource assistDataSource() { // DI component
         DataSourceHandler dataSourceHandler = ${glDBFluteConfig}.getInstance().getDataSourceHandler();
         if (dataSourceHandler != null) {
             return new HandlingDataSourceWrapper(_dataSource, dataSourceHandler);
@@ -59,11 +75,19 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return _dataSource;
     }
 
-    public DBMetaProvider assistDBMetaProvider() {
+    // -----------------------------------------------------
+    //                                       DBMeta Provider
+    //                                       ---------------
+    public DBMetaProvider assistDBMetaProvider() { // Lazy component
         if (_dbmetaProvider != null) {
             return _dbmetaProvider;
         }
-        _dbmetaProvider = createDBMetaProvider();
+        synchronized (_dbmetaProvider) {
+            if (_dbmetaProvider != null) {
+                return _dbmetaProvider;
+            }
+            _dbmetaProvider = createDBMetaProvider();
+        }
         return _dbmetaProvider;
     }
 
@@ -71,11 +95,19 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return new ${glDBMetaInstanceHandler}();
     }
 
-    public SqlClauseCreator assistSqlClauseCreator() {
+    // -----------------------------------------------------
+    //                                    SQL Clause Creator
+    //                                    ------------------
+    public SqlClauseCreator assistSqlClauseCreator() { // Lazy component
         if (_sqlClauseCreator != null) {
             return _sqlClauseCreator;
         }
-        _sqlClauseCreator = createSqlClauseCreator();
+        synchronized (_sqlClauseCreator) {
+            if (_sqlClauseCreator != null) {
+                return _sqlClauseCreator;
+            }
+            _sqlClauseCreator = createSqlClauseCreator();
+        }
         return _sqlClauseCreator;
     }
 
@@ -83,11 +115,19 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return new ${glImplementedSqlClauseCreator}();
     }
 
-    public StatementFactory assistStatementFactory() {
+    // -----------------------------------------------------
+    //                                     Statement Factory
+    //                                     -----------------
+    public StatementFactory assistStatementFactory() { // Lazy component
         if (_statementFactory != null) {
             return _statementFactory;
         }
-        _statementFactory = createStatementFactory();
+        synchronized (_statementFactory) {
+            if (_statementFactory != null) {
+                return _statementFactory;
+            }
+            _statementFactory = createStatementFactory();
+        }
         return _statementFactory;
     }
 
@@ -98,11 +138,19 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return factory;
     }
 
-    public TnBeanMetaDataFactory assistBeanMetaDataFactory() {
+    // -----------------------------------------------------
+    //                                Bean Meta Data Factory
+    //                                ----------------------
+    public TnBeanMetaDataFactory assistBeanMetaDataFactory() { // Lazy component
         if (_beanMetaDataFactory != null) {
             return _beanMetaDataFactory;
         }
-        _beanMetaDataFactory = createBeanMetaDataFactory();
+        synchronized (_beanMetaDataFactory) {
+            if (_beanMetaDataFactory != null) {
+                return _beanMetaDataFactory;
+            }
+            _beanMetaDataFactory = createBeanMetaDataFactory();
+        }
         return _beanMetaDataFactory;
     }
 
@@ -112,12 +160,20 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         factory.setValueTypeFactory(assistValueTypeFactory());
         return factory;
     }
-    
-    public TnValueTypeFactory assistValueTypeFactory() {
+
+    // -----------------------------------------------------
+    //                                    Value Type Factory
+    //                                    ------------------
+    public TnValueTypeFactory assistValueTypeFactory() { // Lazy component
         if (_valueTypeFactory != null) {
             return _valueTypeFactory;
         }
-        _valueTypeFactory = createValueTypeFactory();
+        synchronized (_valueTypeFactory) {
+            if (_valueTypeFactory != null) {
+                return _valueTypeFactory;
+            }
+            _valueTypeFactory = createValueTypeFactory();
+        }
         return _valueTypeFactory;
     }
 
@@ -125,6 +181,9 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return new TnValueTypeFactoryImpl();
     }
 
+    // -----------------------------------------------------
+    //                                    Resource Parameter
+    //                                    ------------------
     public ResourceParameter assistResourceParameter() {
         ResourceParameter resourceParameter = new ResourceParameter();
         resourceParameter.setOutsideSqlPackage(${glDBFluteConfig}.getInstance().getOutsideSqlPackage());
@@ -133,6 +192,9 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
         return resourceParameter;
     }
 
+    // -----------------------------------------------------
+    //                                     SQL File Encoding
+    //                                     -----------------
     public String assistSqlFileEncoding() {
         return "${database.sqlFileEncoding}";
     }
