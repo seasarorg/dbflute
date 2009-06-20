@@ -16,6 +16,7 @@
 package org.seasar.dbflute.task;
 
 import java.io.File;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -93,7 +94,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
     protected final Map<String, DfProcedureMetaInfo> _procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
-    
+
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
 
     // ===================================================================================
@@ -236,13 +237,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
                         _goodSqlCount++;
                         alreadyIncrementGoodSqlCount = true;
-                        
+
                         final StringKeyMap<String> columnJavaNativeMap = createColumnJavaNativeMap(sql);
                         final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = new LinkedHashMap<String, DfColumnMetaInfo>();
                         final ResultSetMetaData md = rs.getMetaData();
                         for (int i = 1; i <= md.getColumnCount(); i++) {
                             final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
-                            
+
                             String sql2EntityTableName = null;
                             try {
                                 sql2EntityTableName = md.getTableName(i);
@@ -253,7 +254,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                                 _log.info(msg);
                             }
                             metaInfo.setSql2EntityTableName(sql2EntityTableName);
-                            
+
                             String columnName = md.getColumnLabel(i);
                             if (columnName == null || columnName.trim().length() == 0) {
                                 columnName = md.getColumnName(i);
@@ -266,25 +267,25 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                                 throw new IllegalArgumentException(msg);
                             }
                             metaInfo.setColumnName(columnName);
-                            
+
                             final int columnType = md.getColumnType(i);
                             metaInfo.setJdbcDefValue(columnType);
-                            
+
                             final String columnTypeName = md.getColumnTypeName(i);
                             metaInfo.setDbTypeName(columnTypeName);
-                            
+
                             int columnSize = md.getPrecision(i);
                             if (columnSize <= 0) { // Example: sum(COLUMN)
                                 columnSize = md.getColumnDisplaySize(i);
                             }
                             metaInfo.setColumnSize(columnSize);
-                            
+
                             final int scale = md.getScale(i);
                             metaInfo.setDecimalDigits(scale);
-                            
-                            final String sql2entityJavaNative = columnJavaNativeMap.get(columnName); 
+
+                            final String sql2entityJavaNative = columnJavaNativeMap.get(columnName);
                             metaInfo.setSql2EntityJavaNative(sql2entityJavaNative);
-                            
+
                             columnJdbcTypeMap.put(columnName, metaInfo);
                         }
 
@@ -314,7 +315,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                                 String msg = "Waning!" + ln;
                                 msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;
                                 msg = msg + "The meta data of parameter-bean already bean registered." + ln;
-                                msg = msg + "It overrides the old one by NEW parameter-bean: name=" + parameterBeanMetaDataKey + ln;
+                                msg = msg + "It overrides the old one by NEW parameter-bean: name="
+                                        + parameterBeanMetaDataKey + ln;
                                 msg = msg + "- - - - - - - - - - -" + ln;
                                 msg = msg + " sql=" + sql + ln;
                                 msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;
@@ -360,7 +362,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     }
                 }
             }
-            
+
             protected StringKeyMap<String> createColumnJavaNativeMap(String sql) {
                 final List<String> entityPropertyTypeList = getEntityPropertyTypeList(sql);
                 final StringKeyMap<String> columnJavaNativeMap = StringKeyMap.createAsFlexible();
@@ -582,7 +584,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final String targetString = getTargetString(sql, "+");
         return targetString != null && (targetString.contains("cursor") || targetString.contains("cursol"));
     }
-    
+
     protected List<String> getEntityPropertyTypeList(final String sql) {
         return getTargetList(sql, "##");
     }
@@ -649,11 +651,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected String removeLineComment(final String sql) {
         return DfSqlStringUtil.removeLineComment(sql); // With removing CR
     }
-    
+
     protected String resolveEntityNameIfNeeds(String className, File file) {
         return new SqlFileNameResolver().resolveEntityNameIfNeeds(className, file.getName());
     }
-    
+
     protected String resolvePmbNameIfNeeds(String className, File file) {
         return new SqlFileNameResolver().resolvePmbNameIfNeeds(className, file.getName());
     }
@@ -820,21 +822,30 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected List<DfProcedureMetaInfo> getProcedures() throws SQLException {
-        final DatabaseMetaData metaData = getDataSource().getConnection().getMetaData();
-        final DfProcedureHandler handler = new DfProcedureHandler();
-        final List<DfProcedureMetaInfo> procedures = handler.getProcedures(metaData, _schema);
-        final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
-        for (String additionalSchema : additionalSchemaList) {
-            final List<DfProcedureMetaInfo> additionalProcedureList = handler.getProcedures(metaData, additionalSchema);
-            for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
-                final String procedureSchema = metaInfo.getProcedureSchema();
-                if (procedureSchema == null || procedureSchema.trim().length() == 0) {
-                    metaInfo.setProcedureSchema(additionalSchema);
+        Connection conn = null;
+        try {
+            conn = getDataSource().getConnection();
+            final DatabaseMetaData metaData = conn.getMetaData();
+            final DfProcedureHandler handler = new DfProcedureHandler();
+            final List<DfProcedureMetaInfo> procedures = handler.getProcedures(metaData, _schema);
+            final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
+            for (String additionalSchema : additionalSchemaList) {
+                final List<DfProcedureMetaInfo> additionalProcedureList = handler.getProcedures(metaData,
+                        additionalSchema);
+                for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
+                    final String procedureSchema = metaInfo.getProcedureSchema();
+                    if (procedureSchema == null || procedureSchema.trim().length() == 0) {
+                        metaInfo.setProcedureSchema(additionalSchema);
+                    }
                 }
+                procedures.addAll(additionalProcedureList);
             }
-            procedures.addAll(additionalProcedureList);
+            return procedures;
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
         }
-        return procedures;
     }
 
     protected String getProcedureColumnPropertyType(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
@@ -1081,7 +1092,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final String sql2EntityTableName = metaInfo.getSql2EntityTableName();
         column.setSql2EntityTableName(sql2EntityTableName);
     }
-    
+
     protected void setupSql2EntitySecondJavaNative(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
             String columnName, final Column column) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
