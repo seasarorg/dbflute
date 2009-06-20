@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
@@ -26,7 +27,6 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
-
 
 /**
  * @author jflute
@@ -138,7 +138,7 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
         }
         final Entity entity;
         try {
-            entity = (Entity)beanType.newInstance();
+            entity = (Entity) beanType.newInstance();
         } catch (InstantiationException e) {
             throw new IllegalStateException(e);
         } catch (IllegalAccessException e) {
@@ -149,10 +149,10 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
 
     protected String[] getPersistentPropertyNames(TnBeanMetaData bmd) {
         final List<String> nameList = new ArrayList<String>();
-        Map<String, TnPropertyType> propertyTypeMap = bmd.getPropertyTypeMap();
-        Set<String> keySet = propertyTypeMap.keySet();
-        for (String key : keySet) {
-            TnPropertyType pt = propertyTypeMap.get(key);
+        final Map<String, TnPropertyType> propertyTypeMap = bmd.getPropertyTypeMap();
+        final Set<Entry<String, TnPropertyType>> entrySet = propertyTypeMap.entrySet();
+        for (Entry<String, TnPropertyType> entry : entrySet) {
+            final TnPropertyType pt = entry.getValue();
             if (pt.isPersistent()) {
                 nameList.add(pt.getPropertyName());
             }

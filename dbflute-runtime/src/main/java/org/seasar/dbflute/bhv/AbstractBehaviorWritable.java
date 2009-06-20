@@ -211,6 +211,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         } else if (updatedCount > 1) {
             String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
             msg = msg + ": entity=" + entity;
+            throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
         }
     }
 
