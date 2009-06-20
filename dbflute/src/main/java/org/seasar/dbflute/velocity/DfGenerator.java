@@ -6,7 +6,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 
 /**
  * @author jflute
@@ -18,9 +17,9 @@ public abstract class DfGenerator {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    public static final Log _log = LogFactory.getLog(DfAbstractTexenTask.class);
+    public static final Log _log = LogFactory.getLog(DfGenerator.class);
 
-    private static DfGenerator _instance;
+    private static volatile DfGenerator _instance;
 
     // ===================================================================================
     //                                                                         Constructor

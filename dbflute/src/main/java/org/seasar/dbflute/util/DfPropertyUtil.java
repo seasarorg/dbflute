@@ -156,8 +156,9 @@ public class DfPropertyUtil {
             }
             sb.delete(index, index + oldStr.length());
             sb.insert(index, newStr);
-            result = result + sb.substring(0, index + newStr.length());
-            sb.delete(0, index + newStr.length());
+            int endIndex = index + newStr.length();
+            result = result + sb.substring(0, endIndex);
+            sb.delete(0, endIndex);
         }
 
         return result;
@@ -208,7 +209,7 @@ public class DfPropertyUtil {
         }
         for (int i = 0; i < removeStrs.length; i++) {
             String removeStr = removeStrs[i];
-            if (removeStrs == null) {
+            if (removeStr == null) {
                 throw new IllegalArgumentException("'removeStrs' has null: index==[" + i + "]");
             }
             targetStr = convertAll(targetStr, removeStr, "");
