@@ -240,7 +240,7 @@ namespace ${glPackageBaseCommonBhv} {
 
         }
 
-        protected virtual void FilterEntityOfInsert(${glEntity} targetEntity) {
+        protected override void FilterEntityOfInsert(${glEntity} targetEntity) {
         }
 
         protected virtual void AssertEntityOfInsert(${glEntity} entity) {

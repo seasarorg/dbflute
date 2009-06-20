@@ -378,6 +378,8 @@ namespace ${glPackageBaseCommonBhv} {
         protected abstract int DoCallReadCount(${glConditionBean} cb);
         protected IList<${glEntity}> CallReadList(${glConditionBean} cb) { return DoCallReadList(cb); }
         protected abstract IList<${glEntity}> DoCallReadList(${glConditionBean} cb);
+        protected virtual void FilterEntityOfInsert(${glEntity} targetEntity) { // for isAvailableNonPrimaryKeyWritable
+        }
 
         // ===============================================================================
         //                                                                  General Helper
