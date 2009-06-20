@@ -293,7 +293,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                     } catch (NumberFormatException nfe) {
                         String booleanString = contextProperties.testBoolean(value);
                         if (booleanString != null) {
-                            c.put(property, new Boolean(booleanString));
+                            c.put(property, Boolean.valueOf(booleanString));
                         } else {
                             if (property.endsWith("file.contents")) {
                                 value = fileContentsToString(super.project.resolveFile(value).getCanonicalPath());

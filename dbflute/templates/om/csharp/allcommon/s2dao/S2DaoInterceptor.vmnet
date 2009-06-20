@@ -145,7 +145,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     ${glSqlResultInfo} info = new ${glSqlResultInfo}();
                     info.Result = ret;
                     info.CommandName = method.Name;
-                    info.DisplaySql = ${glInternalMapContext}.GetObject("df:DisplaySql");
+                    info.DisplaySql = (String)${glInternalMapContext}.GetObject("df:DisplaySql");
                     info.BeforeDateTime = before.Value;
                     info.AfterDateTime = after;
                     info.Invoke(sqlResultInfo);

@@ -196,7 +196,10 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     protected void dumpFireResult(FireResult result) {
         final File file = new File(LOG_PATH);
         if (file.exists()) {
-            file.delete();
+            boolean deleted = file.delete();
+            if (!deleted) {
+                return; // skip to dump!
+            }
         }
         final String resultMessage = result.getResultMessage();
         if (resultMessage == null || resultMessage.trim().length() == 0) {
@@ -213,7 +216,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             final FileOutputStream fos = new FileOutputStream(file);
             bw = new BufferedWriter(new OutputStreamWriter(fos, "UTF-8"));
             bw.write(contentsSb.toString());
-
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(e);
         } catch (FileNotFoundException e) {

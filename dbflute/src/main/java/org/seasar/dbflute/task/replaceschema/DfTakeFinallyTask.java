@@ -366,7 +366,10 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
                 }
             }
             if (file.exists()) {
-                file.delete();
+                boolean deleted = file.delete();
+                if (!deleted) {
+                    // ignored
+                }
             }
         }
     }

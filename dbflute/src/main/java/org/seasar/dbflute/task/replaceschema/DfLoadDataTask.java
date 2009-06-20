@@ -2,6 +2,7 @@ package org.seasar.dbflute.task.replaceschema;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -96,11 +97,12 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         _log.warn("* * * * * * * * * * * * * * *");
         _log.warn("Not Persistent Columns in " + typeName);
         _log.warn("* * * * * * * * * * * * * * *");
-        final Set<String> notFoundColumnSet = notFoundColumnMap.keySet();
-        for (String tableName : notFoundColumnSet) {
+        Set<Entry<String, Set<String>>> entrySet = notFoundColumnMap.entrySet();
+        for (Entry<String, Set<String>> entry : entrySet) {
+            String tableName = entry.getKey();
+            Set<String> columnNameSet = entry.getValue();
             _log.warn("[" + tableName + "]");
-            final Set<String> columnNameList = notFoundColumnMap.get(tableName);
-            for (String columnName : columnNameList) {
+            for (String columnName : columnNameSet) {
                 _log.warn("    " + columnName);
             }
             _log.warn(" ");
