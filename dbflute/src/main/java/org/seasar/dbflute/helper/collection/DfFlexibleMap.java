@@ -86,9 +86,13 @@ public class DfFlexibleMap<KEY, VALUE> {
     }
 
     public final void putAll(Map<KEY, ? extends VALUE> map) {
-        final Set<KEY> keySet = map.keySet();
-        for (KEY key : keySet) {
-            put(key, map.get(key));
+        Set<?> entrySet = map.entrySet();
+        for (Object object : entrySet) {
+            @SuppressWarnings("unchecked")
+            java.util.Map.Entry<KEY, ? extends VALUE> entry = (java.util.Map.Entry<KEY, ? extends VALUE>) object;
+            KEY key = entry.getKey();
+            VALUE value = entry.getValue();
+            put(key, value);
         }
     }
 

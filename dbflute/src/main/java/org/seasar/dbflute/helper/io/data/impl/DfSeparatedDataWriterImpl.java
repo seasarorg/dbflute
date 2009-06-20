@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -177,8 +178,10 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                         }
                         ps = _dataSource.getConnection().prepareStatement(sql);
                         int bindCount = 1;
-                        for (String columnName : columnValueMap.keySet()) {
-                            final Object obj = columnValueMap.get(columnName);
+                        final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
+                        for (Entry<String, Object> entry : entrySet) {
+                            final String columnName = entry.getKey();
+                            final Object obj = entry.getValue();
 
                             // If the value is not null and the value has the own type except string,
                             // It registers the value to statement by the type.
@@ -448,7 +451,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         list.add(value.substring(i));
         return list;
     }
-    
+
     protected ValueLineInfo arrangeValueList(List<String> valueList, String delimiter) {
         final ValueLineInfo valueLineInfo = new ValueLineInfo();
         final ArrayList<String> resultList = new ArrayList<String>();
@@ -543,7 +546,11 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                 break;
             }
         }
-        return count > 0 && (count % 2) == 1;
+        return count > 0 && isOddNumber(count);
+    }
+
+    protected boolean isOddNumber(int number) {
+        return (number % 2) != 0;
     }
 
     protected String removeDoubleQuotation(String value) {

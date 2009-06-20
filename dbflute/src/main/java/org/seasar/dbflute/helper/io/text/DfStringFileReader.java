@@ -65,6 +65,13 @@ public class DfStringFileReader {
                 throw new RuntimeException(e);
             } catch (IOException e) {
                 throw new RuntimeException(e);
+            } finally {
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException ignored) {
+                    }
+                }
             }
         }
         if (!_saveInitialUnicodeBom) {

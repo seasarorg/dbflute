@@ -280,7 +280,7 @@ public abstract class DfAbsractDataWriter {
 
     protected Boolean getBooleanValue(String value) {
         try {
-            return new Boolean(value);
+            return Boolean.valueOf(value);
         } catch (RuntimeException e) {
             String msg = "The value should be boolean: value=" + value;
             throw new IllegalStateException(msg, e);
@@ -354,7 +354,8 @@ public abstract class DfAbsractDataWriter {
             DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
-            if (columnMetaInfo.getJdbcDefValue() != Types.OTHER || !"uuid".equalsIgnoreCase(columnMetaInfo.getDbTypeName())) {
+            if (columnMetaInfo.getJdbcDefValue() != Types.OTHER
+                    || !"uuid".equalsIgnoreCase(columnMetaInfo.getDbTypeName())) {
                 return false;
             }
 

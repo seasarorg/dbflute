@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -155,9 +156,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                             _log.info(getSql4Log(tableName, columnNameList, valueList));
                         }
                         int bindCount = 1;
-                        final Set<String> columnNameSet = columnValueMap.keySet();
-                        for (String columnName : columnNameSet) {
-                            final Object obj = columnValueMap.get(columnName);
+                        final Set<Entry<String, Object>> entrySet = columnValueMap.entrySet();
+                        for (Entry<String, Object> entry : entrySet) {
+                            final String columnName = entry.getKey();
+                            final Object obj = entry.getValue();
 
                             // If the value is not null and the value has the own type except string,
                             // It registers the value to statement by the type.
@@ -305,7 +307,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             throw new IllegalStateException(e);
         }
     }
-    
+
     // ===================================================================================
     //                                                                        Xls Handling
     //                                                                        ============

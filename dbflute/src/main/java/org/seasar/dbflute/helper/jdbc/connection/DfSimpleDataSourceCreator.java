@@ -77,14 +77,22 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     public void commit() {
         if (DfDataSourceContext.isExistDataSource()) {
             final DataSource dataSource = DfDataSourceContext.getDataSource();
+            Connection conn = null;
             try {
-                final Connection connection = dataSource.getConnection();
-                if (!connection.getAutoCommit()) {
+                conn = dataSource.getConnection();
+                if (!conn.getAutoCommit()) {
                     _log.info("...commit()");
-                    connection.commit();
+                    conn.commit();
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
+            } finally {
+                if (conn != null) {
+                    try {
+                        conn.close();
+                    } catch (SQLException ignored) {
+                    }
+                }
             }
         }
     }
