@@ -14,7 +14,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             _transactionContext = new TransactionContext();
             TransactionContext txContext = (TransactionContext)_transactionContext;
             txContext.DataSouce = dataSource;
-            txContext.IsolationLevel = IsolationLevel.ReadCommitted;
+            txContext.IsolationLevel = this.IsolationLevel;
 
             Type dataSourceType = dataSource.GetType();
             if (typeof(SelectableDataSourceProxyWithDictionary).IsAssignableFrom(dataSourceType)) {
@@ -23,12 +23,26 @@ namespace ${glPackageBaseCommonS2Dao} {
                 ((TxDataSource)dataSource).Context = txContext;
             }
 
-            LocalRequiredTxHandler handler = new LocalRequiredTxHandler();
-            handler.Context = txContext;
-            _transactionInterceptor = new TransactionInterceptor(handler);
+            ITransactionHandler handler = CreateTransactionHandler(txContext);
+            _transactionInterceptor = CreateTransactionInterceptor(handler);
             ((TransactionInterceptor)_transactionInterceptor).TransactionStateHandler = txContext;
         }
+
+        protected virtual IsolationLevel IsolationLevel {
+            get { return IsolationLevel.ReadCommitted; }
+        }
+
+        protected virtual ITransactionHandler CreateTransactionHandler(TransactionContext txContext) {
+            LocalRequiredTxHandler handler = new LocalRequiredTxHandler();
+            handler.Context = txContext;
+            return handler;
+        }
+
+        protected virtual TransactionInterceptor CreateTransactionInterceptor(ITransactionHandler handler) {
+            return new TransactionInterceptor(handler);
+        }
 #if ($database.isQuillDataSourceNameValid())
+
         public override String DataSourceName {
             get { return "${database.quillDataSourceName}"; }
         }
