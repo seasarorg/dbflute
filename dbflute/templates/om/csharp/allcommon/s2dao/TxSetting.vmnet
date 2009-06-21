@@ -18,7 +18,15 @@ namespace ${glPackageBaseCommonS2Dao} {
 
             Type dataSourceType = dataSource.GetType();
             if (typeof(SelectableDataSourceProxyWithDictionary).IsAssignableFrom(dataSourceType)) {
-                ((SelectableDataSourceProxyWithDictionary)dataSource).SetTransactionContext(txContext);
+                SelectableDataSourceProxyWithDictionary dataSourceProxyWithDictionary = (SelectableDataSourceProxyWithDictionary)dataSource;
+                if (!string.IsNullOrEmpty(DataSourceName)) {
+                    IDataSource usingDataSource = dataSourceProxyWithDictionary.GetDataSource(DataSourceName);
+                    if (usingDataSource is TxDataSource) {
+                        ((TxDataSource)usingDataSource).Context = txContext;
+                    }
+                } else { // when only one dataSource
+                    dataSourceProxyWithDictionary.SetTransactionContext(txContext);
+                }
             } else if (typeof(TxDataSource).IsAssignableFrom(dataSourceType)) {
                 ((TxDataSource)dataSource).Context = txContext;
             }
