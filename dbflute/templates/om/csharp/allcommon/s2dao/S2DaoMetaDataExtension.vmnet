@@ -71,6 +71,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return cmd;
             }
             lock (this) {
+                cmd = (ISqlCommand)_sqlCommands[methodName];
                 if (cmd != null) {
                     return cmd;
                 }
