@@ -43,8 +43,8 @@ public class TnBasicSelectHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBasicSelectHandler(DataSource dataSource, String sql,
-            TnResultSetHandler resultSetHandler, StatementFactory statementFactory) {
+    public TnBasicSelectHandler(DataSource dataSource, String sql, TnResultSetHandler resultSetHandler,
+            StatementFactory statementFactory) {
         super(dataSource, statementFactory);
         setSql(sql);
         setResultSetHandler(resultSetHandler);
@@ -95,6 +95,9 @@ public class TnBasicSelectHandler extends TnBasicHandler {
     }
 
     protected ResultSet createResultSet(PreparedStatement ps) throws SQLException {
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // All select statements on DBFlute use this result set. 
+        // - - - - - - - - - -/
         final ResultSet resultSet = ps.executeQuery();
         if (!FetchNarrowingBeanContext.isExistFetchNarrowingBeanOnThread()) {
             return resultSet;
@@ -105,10 +108,12 @@ public class TnBasicSelectHandler extends TnBasicHandler {
         }
         final TnPagingResultSet wrapper;
         if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
-            final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
-            wrapper = new TnPagingResultSet(resultSet, cb, outsideSqlContext.isOffsetByCursorForcedly(), outsideSqlContext.isLimitByCursorForcedly());
+            final OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
+            final boolean offsetByCursorForcedly = context.isOffsetByCursorForcedly();
+            final boolean limitByCursorForcedly = context.isLimitByCursorForcedly();
+            wrapper = createPagingResultSet(resultSet, cb, offsetByCursorForcedly, limitByCursorForcedly);
         } else {
-            wrapper = new TnPagingResultSet(resultSet, cb, false, false);
+            wrapper = createPagingResultSet(resultSet, cb, false, false);
         }
         return wrapper;
     }
@@ -130,6 +135,11 @@ public class TnBasicSelectHandler extends TnBasicHandler {
             return true;
         }
         return false;
+    }
+
+    protected TnPagingResultSet createPagingResultSet(ResultSet resultSet, FetchNarrowingBean cb,
+            boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
+        return new TnPagingResultSet(resultSet, cb, offsetByCursorForcedly, limitByCursorForcedly);
     }
 
     // ===================================================================================
