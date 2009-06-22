@@ -528,12 +528,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
 #if ($col.isJavaNativeStringClob())
     /** The value type annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
-    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "dbfluteStringClobType";
+    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "stringClobType";
 
 #end
 #if ($col.isJavaNativeBytesOid())
     /** The value type annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
-    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "dbfluteBytesOidType";
+    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "bytesOidType";
 
 #end
     /**
