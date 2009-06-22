@@ -30,7 +30,7 @@ public class TnBeanDescFactory {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static Map<Class<?>, TnBeanDesc> beanDescCache = new ConcurrentHashMap<Class<?>, TnBeanDesc>(1024);
+    private static final Map<Class<?>, TnBeanDesc> beanDescCache = new ConcurrentHashMap<Class<?>, TnBeanDesc>(1024);
 
     // ===================================================================================
     //                                                                         Constructor
