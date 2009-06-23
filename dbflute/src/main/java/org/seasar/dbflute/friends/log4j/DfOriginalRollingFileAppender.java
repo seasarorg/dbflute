@@ -75,7 +75,7 @@ public class DfOriginalRollingFileAppender extends RollingFileAppender {
         final String logExt = ".log";
         if (baseFileName.endsWith(logExt) && baseFileName.length() > logExt.length()) {
             final int extIndex = baseFileName.lastIndexOf(logExt);
-            return baseFileName.substring(0, extIndex) + "-" + index + logExt;
+            return baseFileName.substring(0, extIndex) + "-backup" + index + logExt;
         } else {
             return baseFileName + "." + index;
         }

@@ -19,6 +19,7 @@ public abstract class DfGenerator {
     /** Log instance. */
     public static final Log _log = LogFactory.getLog(DfGenerator.class);
 
+    /** The generator of Velocity. (Singleton) */
     private static volatile DfGenerator _instance;
 
     // ===================================================================================
