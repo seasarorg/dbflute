@@ -1,5 +1,5 @@
 <h2 id="${table.name}" title="${table.toolTipTitle}">${table.aliasExpression}${table.name}</h2>
-<table>
+<table summary="Columns in ${table.name}">
   <thead>
     <tr>
       <th>PK</th>

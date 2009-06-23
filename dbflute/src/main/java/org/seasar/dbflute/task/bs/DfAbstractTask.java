@@ -91,7 +91,7 @@ public abstract class DfAbstractTask extends Task {
                 _log.warn("Ignored exception occured!", ignored);
                 _log.error("Failed to execute DBFlute Task!", e);
             }
-            throw e;
+            throwTaskFailure();
         } catch (Error e) {
             try {
                 logError(e);
@@ -99,10 +99,11 @@ public abstract class DfAbstractTask extends Task {
                 _log.warn("Ignored exception occured!", ignored);
                 _log.error("Failed to execute DBFlute Task!", e);
             }
-            throw e;
+            throwTaskFailure();
         } finally {
             long after = getTaskAfterTimeMillis();
             if (isValidTaskEndInformation()) {
+                String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
                 StringBuilder sb = new StringBuilder();
                 String ln = ln();
                 sb.append(ln);
@@ -114,8 +115,7 @@ public abstract class DfAbstractTask extends Task {
                 sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
                 sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
                 sb.append(ln);
-                sb.append(ln).append(
-                        "  DBFLUTE_ENVIRONMENT_TYPE: {" + DfEnvironmentType.getInstance().getEnvironmentType() + "}");
+                sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + environmentType + "}");
                 sb.append(ln).append("    driver = " + _driver);
                 sb.append(ln).append("    url    = " + _url);
                 sb.append(ln).append("    schema = " + _schema);
@@ -159,6 +159,10 @@ public abstract class DfAbstractTask extends Task {
 
     protected String getFinalInformation() {
         return null; // as default
+    }
+
+    protected void throwTaskFailure() {
+        DfAntTaskUtil.throwTaskFailure(getDisplayTaskName());
     }
 
     protected void initializeDatabaseInfo() {

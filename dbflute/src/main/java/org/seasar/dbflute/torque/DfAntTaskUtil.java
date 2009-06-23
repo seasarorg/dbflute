@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfDBFluteTaskFailureException;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 
@@ -110,45 +111,45 @@ public final class DfAntTaskUtil {
     }
 
     public static void logRuntimeException(RuntimeException e, String taskName) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "Failed to execute DBFlute Task '" + taskName + "'!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Basic Properties]" + getLineSeparator();
-        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + getLineSeparator();
-        msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + getLineSeparator();
-        msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Database Properties]" + getLineSeparator();
-        msg = msg + "driver = " + getDatabaseProperties().getDatabaseDriver() + getLineSeparator();
-        msg = msg + "url    = " + getDatabaseProperties().getDatabaseUrl() + getLineSeparator();
-        msg = msg + "schema = " + getDatabaseProperties().getDatabaseSchema() + getLineSeparator();
-        msg = msg + "user   = " + getDatabaseProperties().getDatabaseUser() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Runtime Exception]" + getLineSeparator();
-        msg = msg + "exception class   = " + e.getClass() + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Failed to execute DBFlute Task '" + taskName + "'!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Basic Properties]" + ln();
+        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + ln();
+        msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + ln();
+        msg = msg + "container = " + getBasicProperties().getTargetContainerName() + ln();
+        msg = msg + ln();
+        msg = msg + "[Database Properties]" + ln();
+        msg = msg + "driver = " + getDatabaseProperties().getDatabaseDriver() + ln();
+        msg = msg + "url    = " + getDatabaseProperties().getDatabaseUrl() + ln();
+        msg = msg + "schema = " + getDatabaseProperties().getDatabaseSchema() + ln();
+        msg = msg + "user   = " + getDatabaseProperties().getDatabaseUser() + ln();
+        msg = msg + ln();
+        msg = msg + "[Runtime Exception]" + ln();
+        msg = msg + "exception class   = " + e.getClass() + ln();
         msg = msg + "* * * * * * * * * */";
         _log.error(msg, e);
     }
 
     public static void logError(Error e, String taskName) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "Failed to execute DBFlute Task '" + taskName + "'!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Basic Properties]" + getLineSeparator();
-        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + getLineSeparator();
-        msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + getLineSeparator();
-        msg = msg + "container = " + getBasicProperties().getTargetContainerName() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Database Properties]" + getLineSeparator();
-        msg = msg + "driver = " + getDatabaseProperties().getDatabaseDriver() + getLineSeparator();
-        msg = msg + "url    = " + getDatabaseProperties().getDatabaseUrl() + getLineSeparator();
-        msg = msg + "schema = " + getDatabaseProperties().getDatabaseSchema() + getLineSeparator();
-        msg = msg + "user   = " + getDatabaseProperties().getDatabaseUser() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Error]" + getLineSeparator();
-        msg = msg + "error class   = " + e.getClass() + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Failed to execute DBFlute Task '" + taskName + "'!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Basic Properties]" + ln();
+        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + ln();
+        msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + ln();
+        msg = msg + "container = " + getBasicProperties().getTargetContainerName() + ln();
+        msg = msg + ln();
+        msg = msg + "[Database Properties]" + ln();
+        msg = msg + "driver = " + getDatabaseProperties().getDatabaseDriver() + ln();
+        msg = msg + "url    = " + getDatabaseProperties().getDatabaseUrl() + ln();
+        msg = msg + "schema = " + getDatabaseProperties().getDatabaseSchema() + ln();
+        msg = msg + "user   = " + getDatabaseProperties().getDatabaseUser() + ln();
+        msg = msg + ln();
+        msg = msg + "[Error]" + ln();
+        msg = msg + "error class   = " + e.getClass() + ln();
         msg = msg + "* * * * * * * * * */";
         _log.error(msg, e);
     }
@@ -175,6 +176,14 @@ public final class DfAntTaskUtil {
         }
     }
 
+    public static void throwTaskFailure(String displayTaskName) {
+        String msg = ln() + "/* * * * * * * * * * * * * * * * * * * * * * * * *";
+        msg = msg + ln() + "Failed to execute DBFlute task: " + displayTaskName;
+        msg = msg + ln() + "Look at the log: console or dbflute.log";
+        msg = msg + ln() + "* * * * * * * * * */";
+        throw new DfDBFluteTaskFailureException(msg);
+    }
+
     protected static DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
@@ -187,7 +196,7 @@ public final class DfAntTaskUtil {
         return getProperties().getDatabaseProperties();
     }
 
-    protected static String getLineSeparator() {
+    protected static String ln() {
         return System.getProperty("line.separator");
     }
 }

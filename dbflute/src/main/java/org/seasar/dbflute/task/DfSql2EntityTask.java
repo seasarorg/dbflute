@@ -311,7 +311,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         if (parameterBeanMetaData != null) {
                             final String parameterBeanMetaDataKey = parameterBeanMetaData.getClassName();
                             if (_pmbMetaDataMap.containsKey(parameterBeanMetaDataKey)) {
-                                final String ln = getLineSeparator();
+                                final String ln = ln();
                                 String msg = "Waning!" + ln;
                                 msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;
                                 msg = msg + "The meta data of parameter-bean already bean registered." + ln;
