@@ -40,7 +40,7 @@ public class DfOriginalLog4JLogSystem extends SimpleLog4JLogSystem {
             logger.setLevel(Level.DEBUG);
 
             final DfOriginalRollingFileAppender appender = createOriginalRollingFileAppender(logfile);
-            appender.setMaxBackupIndex(1);
+            appender.setMaxBackupIndex(2);
             appender.setMaximumFileSize(100000);
             logger.addAppender(appender);
 
