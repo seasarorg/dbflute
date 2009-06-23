@@ -267,7 +267,13 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 Velocity.setProperty("classpath.resource.loader.modificationCheckInterval", "2");
             }
             Velocity.setProperty(VelocityEngine.RUNTIME_LOG, "./log/velocity.log");
+
+            // These do not work! Why?
+            //Velocity.setProperty(VelocityEngine.LOGSYSTEM_LOG4J_FILE_SIZE, "1MB");
+            //Velocity.setProperty(VelocityEngine.LOGSYSTEM_LOG4J_FILE_BACKUPS, 0);
+
             Velocity.init();
+
             final DfGenerator generator = getGeneratorHandler();
             generator.setOutputPath(outputDirectory);
             generator.setInputEncoding(inputEncoding);
