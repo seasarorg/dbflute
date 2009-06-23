@@ -480,6 +480,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     protected String getLeftOuterJoinClause() {
+        String fixedConditionKey = getFixedConditionKey();
         StringBuilder sb = new StringBuilder();
         for (Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext();) {
             String aliasName = ite.next();
@@ -510,7 +511,7 @@ public abstract class AbstractSqlClause implements SqlClause {
                 if (count > 0) {
                     sb.append(" and ");
                 }
-                if (localColumnName.equals("$$fixedCondition$$")) {
+                if (localColumnName.equals(fixedConditionKey)) {
                     sb.append(foreignColumnName);
                 } else {
                     sb.append(localColumnName).append(" = ").append(foreignColumnName);
@@ -703,6 +704,10 @@ public abstract class AbstractSqlClause implements SqlClause {
     public SqlClause backToOuterJoin() {
         _isInnerJoinEffective = false;
         return this;
+    }
+
+    public String getFixedConditionKey() {
+        return "$$fixedCondition$$";
     }
 
     protected static class LeftOuterJoinInfo {

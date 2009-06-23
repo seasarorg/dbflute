@@ -46,6 +46,7 @@ import org.seasar.dbflute.util.TraceViewUtil;
  * @author jflute
  */
 public abstract class AbstractConditionQuery implements ConditionQuery {
+// No formatter!
 
     // ===================================================================================
     //                                                                          Definition
@@ -68,7 +69,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /** The property of condition-query. */
     protected static final String CQ_PROPERTY = "conditionQuery";
-
+    
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -350,7 +351,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @param baseQueryAsSuper Base query as super. (NotNull)
      * @param unionQueryAsSuper Union query as super. (NotNull)
      */
-    abstract protected void reflectRelationOnUnionQuery(ConditionQuery baseQueryAsSuper, ConditionQuery unionQueryAsSuper);
+    protected abstract void reflectRelationOnUnionQuery(ConditionQuery baseQueryAsSuper, ConditionQuery unionQueryAsSuper);
 
     /**
      * Has union query or union all query?
@@ -1720,6 +1721,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap) {
         getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);
+    }
+    
+    protected String fxcKey() { // getFixedConditionKey()
+        return getSqlClause().getFixedConditionKey();
     }
 
     // ===================================================================================
