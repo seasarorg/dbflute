@@ -255,16 +255,18 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                         if (e instanceof BatchUpdateException) {
                             _log.warn("");
                             _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-                            _log.warn("BatchUpdateException was thrown!");
+                            _log.warn("[BatchUpdateException]");
                             _log.warn(e.getMessage());
+                            _log.warn(" - - - - - - - -");
+                            _log.warn("Also look at the nextException thrown!");
                             _log.warn("* * * * * * * * * */");
                             _log.warn("");
                             String msg = "Failed to register the table data: " + tableName;
-                            throw new DfTableDataRegistrationFailureException(msg, nextEx); // Change!
+                            throw new DfTableDataRegistrationFailureException(msg, nextEx); // Switch!
                         } else {
                             _log.warn("");
                             _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-                            _log.warn("SQLException was thrown! nextException=" + nextEx.getClass(), nextEx);
+                            _log.warn("[NextException]", nextEx);
                             _log.warn("* * * * * * * * * */");
                             _log.warn("");
                             String msg = "Failed to register the table data: " + tableName;
