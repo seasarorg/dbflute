@@ -6,8 +6,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/forCompile/jdbc-2.0.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/velocity-1.3.1.jar"/>
-	<classpathentry kind="lib" path="lib/forCompile/xercesImpl-2.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/forCompile/xmlParserAPIs-2.0.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/forCompile/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/log4j-1.2.13.jar"/>
@@ -15,7 +13,7 @@
 	<classpathentry kind="lib" path="lib/forCompile/commons-lang-1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/poi-3.2-FINAL-20081019.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/dbflute-runtime.jar" sourcepath="lib/forCompile/sources/dbflute-runtime-sources.jar"/>
-	<classpathentry kind="lib" path="lib/forExecute/derby-10.5.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/forCompile/ant-1.7.0.jar"/>
+	<classpathentry kind="lib" path="lib/forCompile/xercesImpl.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
