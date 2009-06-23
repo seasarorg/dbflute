@@ -332,7 +332,11 @@ public class DfXlsReader {
             boolean b = cell.getBooleanCellValue();
             return Boolean.valueOf(b);
         default:
-            return null;
+            if (isEmptyStringTarget(columnIndex, table)) {
+                return "\"\"";
+            } else {
+                return null;
+            }
         }
     }
 
@@ -357,10 +361,10 @@ public class DfXlsReader {
         if (!_emptyStringTableColumnMap.containsKey(tableName)) {
             return false;
         }
-        final List<String> emptyStringTargetColumnMap = _emptyStringTableColumnMap.get(tableName);
+        final List<String> emptyStringTargetColumnList = _emptyStringTableColumnMap.get(tableName);
         final DataColumn column = table.getColumn(columnIndex);
         final String targetColumnName = column.getColumnName();
-        for (String currentColumnName : emptyStringTargetColumnMap) {
+        for (String currentColumnName : emptyStringTargetColumnList) {
             if (targetColumnName.equalsIgnoreCase(currentColumnName)) {
                 return true;
             }
