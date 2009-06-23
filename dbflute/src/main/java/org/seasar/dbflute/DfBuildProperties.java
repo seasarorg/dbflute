@@ -45,11 +45,14 @@ import org.seasar.dbflute.properties.DfTypeMappingProperties;
 import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 
 /**
- * Build properties.
+ * The properties to build.
  * @author jflute
  */
 public final class DfBuildProperties {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Singleton-instance. */
     private static final DfBuildProperties _instance = new DfBuildProperties();
 
@@ -58,7 +61,7 @@ public final class DfBuildProperties {
     //                                                                           =========
     /** Build properties. */
     private Properties _buildProperties;
-    
+
     /** The version of DBFlute. */
     private Integer _version;
 
@@ -297,7 +300,7 @@ public final class DfBuildProperties {
     public void setVersion(Integer version) {
         this._version = version;
     }
-    
+
     public boolean isVersionJavaOverNinety() {
         if (!getBasicProperties().isTargetLanguageJava()) {
             return false;

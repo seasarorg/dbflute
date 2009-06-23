@@ -26,13 +26,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Task;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
+import org.seasar.dbflute.friends.torque.DfAntTaskUtil;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.scmconn.CurrentSchemaConnector;
 import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
-import org.seasar.dbflute.torque.DfAntTaskUtil;
 
 /**
  * The abstract task.

@@ -1,4 +1,4 @@
-package org.seasar.dbflute.velocity;
+package org.seasar.dbflute.friends.velocity;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -25,6 +25,8 @@ import org.apache.velocity.context.Context;
 import org.seasar.dbflute.exception.DfTemplateParsingException;
 
 /**
+ * DBFlute original generator that refers to the generator of Velocity. <br />
+ * Thanks, Velocity!
  * @author modified by taktos
  * @author modified by jflute
  * @since 0.7.6 (2008/07/01 Tuesday)

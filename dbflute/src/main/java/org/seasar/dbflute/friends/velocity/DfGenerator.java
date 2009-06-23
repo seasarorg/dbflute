@@ -1,4 +1,4 @@
-package org.seasar.dbflute.velocity;
+package org.seasar.dbflute.friends.velocity;
 
 import java.util.List;
 

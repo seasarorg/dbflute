@@ -73,6 +73,9 @@ import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseConfig;
+import org.seasar.dbflute.friends.torque.DfAdditionalForeignKeyInitializer;
+import org.seasar.dbflute.friends.torque.DfAdditionalPrimaryKeyInitializer;
+import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
@@ -87,9 +90,6 @@ import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupResource;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
-import org.seasar.dbflute.torque.DfAdditionalForeignKeyInitializer;
-import org.seasar.dbflute.torque.DfAdditionalPrimaryKeyInitializer;
-import org.seasar.dbflute.velocity.DfGenerator;
 import org.xml.sax.Attributes;
 
 /**

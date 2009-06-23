@@ -42,6 +42,9 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
+import org.seasar.dbflute.friends.torque.DfAntTaskUtil;
+import org.seasar.dbflute.friends.velocity.DfGenerator;
+import org.seasar.dbflute.friends.velocity.DfOriginalLog4JLogSystem;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.scmconn.CurrentSchemaConnector;
@@ -49,9 +52,7 @@ import org.seasar.dbflute.logic.sqlfile.SqlFileCollector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
-import org.seasar.dbflute.torque.DfAntTaskUtil;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.velocity.DfGenerator;
 
 /**
  * The abstract class of texen task.
@@ -229,7 +230,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     protected void fireSuperExecute() {
         // /----------------------------------------------
         // Set up the encoding of templates from property.
-        // -----/
+        // ----------/
         setInputEncoding(getBasicProperties().getTemplateFileEncoding());
         setOutputEncoding(getBasicProperties().getSourceFileEncoding());
         doExecuteAlmostSameAsSuper();
@@ -256,21 +257,13 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         try {
             if (templatePath != null) {
                 log("Using templatePath: " + templatePath, 3);
-                Velocity.setProperty("file.resource.loader.path", templatePath);
+                setupVelocityTemplateProperty();
             }
             if (useClasspath) {
                 log("Using classpath");
-                Velocity.addProperty("resource.loader", "classpath");
-                Velocity.setProperty("classpath.resource.loader.class",
-                        "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-                Velocity.setProperty("classpath.resource.loader.cache", "false");
-                Velocity.setProperty("classpath.resource.loader.modificationCheckInterval", "2");
+                setupVelocityClasspathProperty();
             }
-            Velocity.setProperty(VelocityEngine.RUNTIME_LOG, "./log/velocity.log");
-
-            // These do not work! Why?
-            //Velocity.setProperty(VelocityEngine.LOGSYSTEM_LOG4J_FILE_SIZE, "1MB");
-            //Velocity.setProperty(VelocityEngine.LOGSYSTEM_LOG4J_FILE_BACKUPS, 0);
+            setupVelocityLogProperty();
 
             Velocity.init();
 
@@ -348,6 +341,22 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                     "Generation failed. For more information consult the velocity log, or invoke ant with the -debug flag.",
                     e);
         }
+    }
+
+    private void setupVelocityTemplateProperty() {
+        Velocity.setProperty("file.resource.loader.path", templatePath);
+    }
+
+    private void setupVelocityClasspathProperty() {
+        final String resourceLoaderName = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
+        Velocity.addProperty("resource.loader", "classpath");
+        Velocity.setProperty("classpath.resource.loader.class", resourceLoaderName);
+        Velocity.setProperty("classpath.resource.loader.cache", "false");
+        Velocity.setProperty("classpath.resource.loader.modificationCheckInterval", "2");
+    }
+
+    private void setupVelocityLogProperty() {
+        Velocity.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM_CLASS, DfOriginalLog4JLogSystem.class.getName());
     }
 
     // Copy from velocity.

@@ -87,7 +87,7 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
             protected String removeBlockComment(final String sql) {
                 return DfSqlStringUtil.removeBlockComment(sql);
             }
-            
+
             protected String removeLineComment(final String sql) {
                 return DfSqlStringUtil.removeLineComment(sql);
             }
@@ -113,8 +113,7 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
 
             @Override
             protected void traceResult(int goodSqlCount, int totalSqlCount) {
-                _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount)
-                        + ln());
+                _log.info("  --> success=" + goodSqlCount + " failure=" + (totalSqlCount - goodSqlCount) + ln());
             }
 
             @Override
