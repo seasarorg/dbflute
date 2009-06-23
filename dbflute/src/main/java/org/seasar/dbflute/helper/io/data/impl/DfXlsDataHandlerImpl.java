@@ -255,7 +255,8 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                         if (e instanceof BatchUpdateException) {
                             _log.warn("");
                             _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-                            _log.warn("BatchUpdateException was thrown!", e);
+                            _log.warn("BatchUpdateException was thrown!");
+                            _log.warn(e.getMessage());
                             _log.warn("* * * * * * * * * */");
                             _log.warn("");
                             String msg = "Failed to register the table data: " + tableName;
