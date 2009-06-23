@@ -240,7 +240,7 @@ public abstract class DfAbstractTask extends Task {
     }
 
     public void setContextProperties(String file) {
-        final Properties prop = DfAntTaskUtil.getBuildProperties(file, super.project);
+        final Properties prop = DfAntTaskUtil.getBuildProperties(file, getProject());
         DfBuildProperties.getInstance().setProperties(prop);
     }
 

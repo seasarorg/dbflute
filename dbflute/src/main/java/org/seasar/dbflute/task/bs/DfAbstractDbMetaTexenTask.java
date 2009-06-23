@@ -86,8 +86,8 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
             } else {
                 for (int i = 0; i < _filesets.size(); i++) {
                     final FileSet fs = (FileSet) _filesets.get(i);
-                    final File srcDir = fs.getDir(project);
-                    final DirectoryScanner directoryScanner = fs.getDirectoryScanner(project);
+                    final File srcDir = fs.getDir(getProject());
+                    final DirectoryScanner directoryScanner = fs.getDirectoryScanner(getProject());
                     final String dataModelFiles[] = directoryScanner.getIncludedFiles();
                     for (int j = 0; j < dataModelFiles.length; j++) {
                         final File file = new File(srcDir, dataModelFiles[j]);
@@ -145,7 +145,7 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     //                                                                            Accessor
     //                                                                            ========
     public void setSqlDbMap(String sqldbmap) {
-        this._sqldbmap = project.resolveFile(sqldbmap).toString();
+        this._sqldbmap = getProject().resolveFile(sqldbmap).toString();
     }
 
     public String getSqlDbMap() {
@@ -165,7 +165,7 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     }
 
     public void setXmlFile(String xmlFile) {
-        this._xmlFile = project.resolveFile(xmlFile).toString();
+        this._xmlFile = getProject().resolveFile(xmlFile).toString();
     }
 
     public void addFileset(FileSet set) {

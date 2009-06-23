@@ -300,7 +300,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                             c.put(property, Boolean.valueOf(booleanString));
                         } else {
                             if (property.endsWith("file.contents")) {
-                                value = fileContentsToString(super.project.resolveFile(value).getCanonicalPath());
+                                value = fileContentsToString(getProject().resolveFile(value).getCanonicalPath());
                                 property = property.substring(0, property.indexOf("file.contents") - 1);
                             }
                             c.put(property, value);
@@ -445,7 +445,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             // Initialize torque properties as Properties and set up singleton class that saves 'build.properties'.
             //   This property is used by You.
             // -------/
-            final Properties prop = DfAntTaskUtil.getBuildProperties(file, super.project);
+            final Properties prop = DfAntTaskUtil.getBuildProperties(file, getProject());
             DfBuildProperties.getInstance().setProperties(prop);
 
         } catch (Exception e) {
