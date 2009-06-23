@@ -17,6 +17,7 @@ package org.seasar.dbflute.helper.io.data.impl;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.sql.BatchUpdateException;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -250,12 +251,24 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                     ps.executeBatch();
                 } catch (SQLException e) {
                     final SQLException nextEx = e.getNextException();
-                    if (nextEx != null) {
-                        _log.warn("");
-                        _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
-                        _log.warn("SQLException was thrown! getNextException()=" + nextEx.getClass(), nextEx);
-                        _log.warn("* * * * * * * * * */");
-                        _log.warn("");
+                    if (nextEx != null && !e.equals(nextEx)) {
+                        if (e instanceof BatchUpdateException) {
+                            _log.warn("");
+                            _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+                            _log.warn("BatchUpdateException was thrown!", e);
+                            _log.warn("* * * * * * * * * */");
+                            _log.warn("");
+                            String msg = "Failed to register the table data: " + tableName;
+                            throw new DfTableDataRegistrationFailureException(msg, nextEx); // Change!
+                        } else {
+                            _log.warn("");
+                            _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ");
+                            _log.warn("SQLException was thrown! nextException=" + nextEx.getClass(), nextEx);
+                            _log.warn("* * * * * * * * * */");
+                            _log.warn("");
+                            String msg = "Failed to register the table data: " + tableName;
+                            throw new DfTableDataRegistrationFailureException(msg, e);
+                        }
                     }
                     String msg = "Failed to register the table data: " + tableName;
                     throw new DfTableDataRegistrationFailureException(msg, e);
