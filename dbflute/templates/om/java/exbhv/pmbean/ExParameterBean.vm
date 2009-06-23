@@ -7,7 +7,7 @@ import ${glPackageBaseParameterBean}.${myBaseParameterBeanClassName};
  * The parameter-bean of ${pmbClassName}.
  * <p>
  * You can implement your original methods here.
- * This class is NOT overrided when re-generating.
+ * This class remains when re-generating.
  * </p>
  * @author ${database.ClassAuthor}
  */

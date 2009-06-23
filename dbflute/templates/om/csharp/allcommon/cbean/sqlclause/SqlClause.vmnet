@@ -43,7 +43,8 @@ public interface ${myClassName} {
     //                                                                           OuterJoin
     //                                                                           =========
     void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap);
-
+    String getFixedConditionKey();
+    
     // ===================================================================================
     //                                                                               Where
     //                                                                               =====

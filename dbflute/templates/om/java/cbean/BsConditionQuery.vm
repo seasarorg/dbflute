@@ -445,7 +445,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         joinOnMap.put(getRealColumnName("${localColumn.name}"), cq.getRealColumnName("${foreignColumnName}"));
 #end
 #if ($fk.hasFixedCondition())
-        joinOnMap.put("$$fixedCondition$$", ppFxCd("${fk.fixedCondition}", getRealAliasName(), cq.getRealAliasName()));
+        joinOnMap.put(fxcKey(), ppFxCd("${fk.fixedCondition}", getRealAliasName(), cq.getRealAliasName()));
 #end
         registerOuterJoin(cq, joinOnMap);
     }
@@ -483,7 +483,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         joinOnMap.put(getRealColumnName("${foreignColumn.name}"), cq.getRealColumnName("${referrerColumnName}"));
 #end
 #if ($referrer.hasFixedCondition())
-        joinOnMap.put("$$fixedCondition$$", ppFxCd("${referrer.fixedCondition}", getRealAliasName(), cq.getRealAliasName()));
+        joinOnMap.put(fxcKey(), ppFxCd("${referrer.fixedCondition}", getRealAliasName(), cq.getRealAliasName()));
 #end
         registerOuterJoin(cq, joinOnMap);
     }

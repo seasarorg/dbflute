@@ -273,7 +273,6 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
 #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.RefrererPropertyNameInitCap}")
 #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
 #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
@@ -389,7 +388,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * Update the entity modified-only. {UpdateCountZeroException, ConcurrencyControl}
      * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
 #if ($table.hasOptimisticLock())
-     * @exception org.seasar.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
 #else
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
@@ -433,7 +432,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * Insert or update the entity modified-only. {ConcurrencyControl(when update)}
      * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
 #if ($table.hasOptimisticLock())
-     * @exception org.seasar.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
 #else
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
@@ -483,7 +482,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * Delete the entity. {UpdateCountZeroException, ConcurrencyControl}
      * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
 #if ($table.hasOptimisticLock())
-     * @exception org.seasar.dbflute.exception.${glEntityAlreadyUpdatedException} When the entity has already been updated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
 #else
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
@@ -541,7 +540,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of updated count.
 #if ($table.hasOptimisticLock())
-     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
 #else
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end
@@ -571,7 +570,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @param ${myEntityListVariableName} The list of the entity. (NotNull)
      * @return The array of deleted count.
 #if ($table.hasOptimisticLock())
-     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends ${glEntityAlreadyUpdateException}.
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
 #else
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
 #end

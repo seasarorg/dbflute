@@ -691,7 +691,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #if (${col.isAvailableDateFromTo()} && !${col.isJdbcTypeTime()})
 
     /**
-     * FromTo($fromDate &lt;= COLUMN_NAME &lt;= $toDate). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * FromTo(fromDate &lt;= COLUMN_NAME &lt;= toDate). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
      * @param fromDate The from-date of ${col.uncapitalisedJavaName}. (Nullable)
      * @param toDate The to-date of ${col.uncapitalisedJavaName}. (Nullable)
      * @param fromToOption The option of from-to. (NotNull)
@@ -705,7 +705,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     }
 
     /**
-     * FromTo($fromDate &lt;= COLUMN_NAME &lt; $toDate + 1). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
+     * FromTo(fromDate &lt;= COLUMN_NAME &lt; toDate + 1). And NullIgnored, OnlyOnceRegistered. {${col.columnDefinitionLineDisp}}
      * @param fromDate The from-date of ${col.uncapitalisedJavaName}. (Nullable)
      * @param toDate The to-date of ${col.uncapitalisedJavaName}. (Nullable)
      */

@@ -1057,6 +1057,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);
     }
 
+    protected String fxcKey() { // getFixedConditionKey()
+        return getSqlClause().getFixedConditionKey();
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============

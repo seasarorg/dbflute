@@ -233,7 +233,6 @@ targetdatabase = $targetDatabase
 
       #foreach ($pmbMetaData in $database.pmbMetaDataList)
         #set ($pmbClassName = "$pmbMetaData.className")
-        #set ($pmbSuperClassName = "$pmbMetaData.superClassName")
         #set ($myBaseParameterBeanClassName = "${glProjectPrefix}${glBasePrefix}${pmbClassName}")
         #set ($myExtendedParameterBeanClassName = "${glProjectPrefix}${pmbClassName}")
 

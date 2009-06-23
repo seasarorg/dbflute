@@ -44,6 +44,7 @@ public class DfOriginalLog4JLogSystem extends SimpleLog4JLogSystem {
             appender.setMaximumFileSize(100000);
             logger.addAppender(appender);
 
+            logVelocityMessage(0, ""); // as begin mark.
             logVelocityMessage(0, getClass().getSimpleName() + " initialized using logfile '" + logfile + "'");
         } catch (Exception e) {
             _log.warn("PANIC : error configuring " + getClass().getSimpleName() + " : ", e);

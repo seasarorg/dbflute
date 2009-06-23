@@ -391,6 +391,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     protected String getLeftOuterJoinClause() {
+        String fixedConditionKey = getFixedConditionKey();
         StringBuilder sb = new StringBuilder();
         for (Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext(); ) {
             String aliasName = ite.next();
@@ -416,7 +417,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 if (count > 0) {
                     sb.append(" and ");
                 }
-                if (localColumnName.Equals("$$fixedCondition$$")) {
+                if (localColumnName.Equals(fixedConditionKey)) {
                     sb.append(foreignColumnName);
                 } else {
                     sb.append(localColumnName).append(" = ").append(foreignColumnName);
@@ -590,6 +591,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
         joinInfo.setJoinTableName(joinTableName);
         joinInfo.setJoinOnMap(joinOnMap);
         _outerJoinMap.put(aliasName, joinInfo);
+    }
+
+    public String getFixedConditionKey() {
+        return "$$fixedCondition$$";
     }
 
     protected class LeftOuterJoinInfo {

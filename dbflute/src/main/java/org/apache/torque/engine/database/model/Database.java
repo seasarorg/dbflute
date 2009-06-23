@@ -1026,7 +1026,7 @@ public class Database {
     public List<String> getDBFluteDiconOtherIncludePathList() {
         return getProperties().getDependencyInjectionProperties().getDBFluteDiconOtherIncludePathList();
     }
-    
+
     // -----------------------------------------------------
     //                                         Spring & Lucy
     //                                         -------------
@@ -1037,11 +1037,11 @@ public class Database {
     public String getDBFluteBeansFileName() {
         return getProperties().getDependencyInjectionProperties().getDBFluteBeansFileName();
     }
-    
+
     public String getDBFluteBeansDataSourceName() {
         return getProperties().getDependencyInjectionProperties().getDBFluteBeansDataSourceName();
     }
-    
+
     // -----------------------------------------------------
     //                                                 Quill
     //                                                 -----
@@ -1357,15 +1357,15 @@ public class Database {
     public String getExtractAcceptEqual() {
         return getProperties().getLittleAdjustmentProperties().getExtractAcceptEqual();
     }
-    
+
     public boolean hasExtendedImplementedInvokerAssistantClassValid() {
         return getProperties().getLittleAdjustmentProperties().hasExtendedImplementedInvokerAssistantClassValid();
     }
-    
+
     public String getExtendedImplementedInvokerAssistantClass() {
         return getProperties().getLittleAdjustmentProperties().getExtendedImplementedInvokerAssistantClass();
     }
-    
+
     public boolean hasExtendedS2DaoSettingClassValid() {
         return getProperties().getLittleAdjustmentProperties().hasExtendedS2DaoSettingClassValid();
     }
