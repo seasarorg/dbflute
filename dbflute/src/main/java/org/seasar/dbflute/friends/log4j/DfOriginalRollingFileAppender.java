@@ -10,6 +10,7 @@ import org.apache.log4j.helpers.LogLog;
 
 /**
  * DBFlute original appender with rolling-file that extends the RollingFileAppender of Logj4. <br />
+ * Thanks, Velocity!
  * @author jflute
  * @since 0.9.5.1 (2009/06/23 Tuesday)
  */
@@ -19,6 +20,7 @@ public class DfOriginalRollingFileAppender extends RollingFileAppender {
     //                                                                         Constructor
     //                                                                         ===========
     public DfOriginalRollingFileAppender() {
+        super();
     }
 
     public DfOriginalRollingFileAppender(Layout layout, String filename, boolean append) throws IOException {

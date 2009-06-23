@@ -10,7 +10,8 @@ import org.apache.velocity.runtime.log.SimpleLog4JLogSystem;
 import org.seasar.dbflute.friends.log4j.DfOriginalRollingFileAppender;
 
 /**
- * DBFlute original LogSystem using Log4j that extends the SimpleLog4JLogSystem of Velocity.
+ * DBFlute original LogSystem using Log4j that extends the SimpleLog4JLogSystem of Velocity. <br />
+ * Thanks, Velocity!
  * @author jflute
  * @since 0.9.5.1 (2009/06/23 Tuesday)
  */
