@@ -26,8 +26,8 @@
   <tr>
     <td class="flgcell#if ($col.isAdditionalPrimaryKey()) additionalpk#end">#if ($col.isPrimaryKey())o#else &nbsp;#end</td>
     <td class="flgcell">#if ($col.isIdentityOrSequence())o#else &nbsp;#end</td>
-    <td class="flgcell">#if ($col.isUnique())o#else &nbsp;#end</td>
-    <td class="flgcell">#if ($col.hasIndex())o#else &nbsp;#end</td>
+    <td class="flgcell"${col.uniqueToolTipTitleAttributeForSchemaHtml}>${col.uniqueMarkForSchemaHtml}</td>
+    <td class="flgcell"${col.indexToolTipTitleAttributeForSchemaHtml}>${col.indexMarkForSchemaHtml}</td>
     <td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
 #if ($database.isAliasDelimiterInDbCommentValid())
     <td class="${col.schemaHtmlColumnAliasCssClass}">${col.alias}</td>

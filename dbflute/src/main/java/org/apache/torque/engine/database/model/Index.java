@@ -59,6 +59,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -191,18 +192,23 @@ public class Index {
     }
 
     public boolean hasSameFirstColumn(Column column) {
-        if (getIndexColumnMap().isEmpty()) {
-            return false;
-        }
         final String first = getIndexColumnMap().get(FIRST_POSITION);
         if (first == null) {
             return false;
         }
-        return first.equals(column.getName());
+        return first.equalsIgnoreCase(column.getName());
     }
 
     public boolean hasSameColumn(Column column) {
-        return getIndexColumnMap().containsValue(column.getName());
+        final Map<Integer, String> indexColumnMap = getIndexColumnMap();
+        final Set<Entry<Integer, String>> entrySet = indexColumnMap.entrySet();
+        for (Entry<Integer, String> entry : entrySet) {
+            final String columnName = entry.getValue();
+            if (column.getName().equalsIgnoreCase(columnName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -211,6 +217,10 @@ public class Index {
      */
     public boolean isUnique() {
         return false;
+    }
+
+    public boolean isTwoOrMoreColumn() {
+        return _indexColumnMap.size() > 1;
     }
 
     // ===================================================================================

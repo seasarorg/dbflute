@@ -420,7 +420,7 @@ public class Table {
     }
 
     public String getToolTipTitle() {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append("type=").append(_type);
         if (isAdditionalSchema()) {
             sb.append(", schema=").append(_schema);

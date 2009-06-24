@@ -60,6 +60,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -504,26 +505,21 @@ public class Column {
     // -----------------------------------------------------
     //                                            Unique Key
     //                                            ----------
-    /**
-     * Set true if the column is UNIQUE
-     * @param u Determination.
-     */
-    public void setUnique(boolean u) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Get the UNIQUE property
-     * @return Determination.
-     */
-    public boolean isUnique() {
+    public boolean isUnique() { // means this column is contained to one of unique constraints.
         final List<Unique> uniqueList = getTable().getUniqueList();
         for (Unique unique : uniqueList) {
-            final Map<Integer, String> uniqueColumnMap = unique.getIndexColumnMap();
-            final Set<Integer> ordinalPositionSet = uniqueColumnMap.keySet();
-            for (Integer ordinalPosition : ordinalPositionSet) {
-                final String columnName = uniqueColumnMap.get(ordinalPosition);
-                if (getName().equals(columnName)) {
+            if (unique.hasSameColumn(this)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasOnlyOneColumnUnique() {
+        final List<Unique> uniqueList = getTable().getUniqueList();
+        for (Unique unique : uniqueList) {
+            if (!unique.isTwoOrMoreColumn()) {
+                if (unique.hasSameColumn(this)) {
                     return true;
                 }
             }
@@ -531,10 +527,63 @@ public class Column {
         return false;
     }
 
+    public boolean hasTwoOrMoreColumnUnique() {
+        final List<Unique> uniqueList = getTable().getUniqueList();
+        for (Unique unique : uniqueList) {
+            if (unique.isTwoOrMoreColumn()) {
+                if (unique.hasSameColumn(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String getUniqueMarkForSchemaHtml() {
+        final StringBuilder sb = new StringBuilder();
+        if (isUnique()) {
+            sb.append("o");
+            if (hasTwoOrMoreColumnUnique()) {
+                sb.append("<span class=\"flgplus\">+</span>");
+            }
+        } else {
+            sb.append("&nbsp;");
+        }
+        return sb.toString();
+    }
+
+    public String getUniqueToolTipTitleAttributeForSchemaHtml() {
+        if (!hasTwoOrMoreColumnUnique()) {
+            return "";
+        }
+        final StringBuilder sb = new StringBuilder();
+        final List<Unique> uniqueList = getTable().getUniqueList();
+        for (Unique unique : uniqueList) {
+            if (!unique.hasSameColumn(this)) {
+                continue;
+            }
+            sb.append(sb.length() > 0 ? ", {" : "{");
+            final Map<Integer, String> indexColumnMap = unique.getIndexColumnMap();
+            final Set<Entry<Integer, String>> entrySet = indexColumnMap.entrySet();
+            final StringBuilder oneUniqueSb = new StringBuilder();
+            for (Entry<Integer, String> entry : entrySet) {
+                final String columnName = entry.getValue();
+                if (oneUniqueSb.length() > 0) {
+                    oneUniqueSb.append(", ");
+                }
+                oneUniqueSb.append(columnName);
+            }
+            sb.append(oneUniqueSb);
+            sb.append("}");
+        }
+        sb.insert(0, " title=\"").append("\"");
+        return sb.toString();
+    }
+
     // -----------------------------------------------------
     //                                                 Index
     //                                                 -----
-    public boolean hasIndex() {
+    public boolean hasIndex() { // means this column is contained to one of indexes.
         final List<Index> indexList = getTable().getIndexList();
         for (Index index : indexList) {
             if (index.hasSameFirstColumn(this)) {
@@ -542,6 +591,71 @@ public class Column {
             }
         }
         return false;
+    }
+
+    public boolean hasOnlyOneColumnIndex() {
+        final List<Index> indexList = getTable().getIndexList();
+        for (Index index : indexList) {
+            if (!index.isTwoOrMoreColumn()) {
+                if (index.hasSameColumn(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasTwoOrMoreColumnIndex() {
+        final List<Index> indexList = getTable().getIndexList();
+        for (Index index : indexList) {
+            if (index.isTwoOrMoreColumn()) {
+                if (index.hasSameColumn(this)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public String getIndexMarkForSchemaHtml() {
+        final StringBuilder sb = new StringBuilder();
+        if (hasIndex()) {
+            sb.append("o");
+            if (hasTwoOrMoreColumnIndex()) {
+                sb.append("<span class=\"flgplus\">+</span>");
+            }
+        } else {
+            sb.append("&nbsp;");
+        }
+        return sb.toString();
+    }
+
+    public String getIndexToolTipTitleAttributeForSchemaHtml() {
+        if (!hasTwoOrMoreColumnIndex()) {
+            return "";
+        }
+        final StringBuilder sb = new StringBuilder();
+        final List<Index> indexList = getTable().getIndexList();
+        for (Index index : indexList) {
+            if (!index.hasSameColumn(this)) {
+                continue;
+            }
+            sb.append(sb.length() > 0 ? ", {" : "{");
+            final Map<Integer, String> indexColumnMap = index.getIndexColumnMap();
+            final Set<Entry<Integer, String>> entrySet = indexColumnMap.entrySet();
+            final StringBuilder oneIndexSb = new StringBuilder();
+            for (Entry<Integer, String> entry : entrySet) {
+                final String columnName = entry.getValue();
+                if (oneIndexSb.length() > 0) {
+                    oneIndexSb.append(", ");
+                }
+                oneIndexSb.append(columnName);
+            }
+            sb.append(oneIndexSb);
+            sb.append("}");
+        }
+        sb.insert(0, " title=\"").append("\"");
+        return sb.toString();
     }
 
     // -----------------------------------------------------

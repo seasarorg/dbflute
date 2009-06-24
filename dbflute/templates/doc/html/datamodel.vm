@@ -53,6 +53,9 @@
 	.flgcell {
 		text-align: center;
 	}
+	.flgplus {
+		font-size: 0.7em;
+	}
 	.numcell {
 		text-align: center;
 	}
