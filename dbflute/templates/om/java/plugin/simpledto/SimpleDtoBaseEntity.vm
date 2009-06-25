@@ -156,10 +156,7 @@ public abstract class $myClassName implements java.io.Serializable {
     //                                                                      ==============
 #if ($table.hasPrimaryKey())
     /**
-     * ${database.OverrideComment}
-     * If the primary-key of the other is same as this one, returns true.
-     * @param other Other entity.
-     * @return Comparing result.
+     * ${database.overrideComment}
      */
     public boolean equals(Object other) {
         if (other == null || !(other instanceof $myClassName)) { return false; }
@@ -176,9 +173,7 @@ public abstract class $myClassName implements java.io.Serializable {
     }
 
     /**
-     * ${database.OverrideComment}
-     * Calculates hash-code from primary-key.
-     * @return Hash-code from primary-keys.
+     * ${database.overrideComment}
      */
     public int hashCode() {
         int result = 0;
@@ -190,10 +185,7 @@ public abstract class $myClassName implements java.io.Serializable {
 
 #else
     /**
-     * ${database.OverrideComment}
-     * If the all-column value of the other is same as this one, returns true.
-     * @param other Other entity. (Nullable)
-     * @return Comparing result. If other is null, returns false.
+     * ${database.overrideComment}
      */
     public boolean equals(Object other) {
         if (other == null || !(other instanceof $myClassName)) { return false; }
@@ -210,9 +202,7 @@ public abstract class $myClassName implements java.io.Serializable {
     }
 
     /**
-     * ${database.OverrideComment}
-     * Calculates hash-code from all-columns.
-     * @return Hash-code from all-columns.
+     * ${database.overrideComment}
      */
     public int hashCode() {
         int result = 0;
@@ -224,8 +214,7 @@ public abstract class $myClassName implements java.io.Serializable {
 #end
 
     /**
-     * ${database.OverrideComment}
-     * @return Column-value map-string. (NotNull)
+     * ${database.overrideComment}
      */
     public String toString() {
         final String delimiter = ",";

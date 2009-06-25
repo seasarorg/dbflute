@@ -149,8 +149,7 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     /**
-     * ${database.ImplementComment}
-     * @return The conditionQuery of the local table as interface. (NotNull)
+     * ${database.implementComment}
      */
     public ConditionQuery localCQ() {
         return getConditionQuery();

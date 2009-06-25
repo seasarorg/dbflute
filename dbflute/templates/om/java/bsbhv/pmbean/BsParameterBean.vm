@@ -92,8 +92,7 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
     //                                                                      Basic Override
     //                                                                      ==============
     /**
-     * ${database.OverrideComment}
-     * @return The view of properties. (NotNull)
+     * ${database.overrideComment}
      */
     @Override
     public String toString() {

@@ -534,8 +534,8 @@ public class Database {
     //                              ClassificationDeployment
     //                              ------------------------
     public void initializeClassificationDeployment() {
-        getClassificationProperties().initializeClassificationDeploymentMap(getTableList());
         getClassificationProperties().initializeClassificationDefinition(); // Together!
+        getClassificationProperties().initializeClassificationDeployment(getTableList());
     }
 
     // -----------------------------------------------------

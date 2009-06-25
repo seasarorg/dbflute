@@ -15,7 +15,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer;
 import org.seasar.dbflute.properties.bean.DfClassificationElement;
 import org.seasar.dbflute.properties.bean.DfClassificationTop;
@@ -30,6 +30,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfClassificationProperties.class);
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final List<ClassificationInfo> _tableClassificationList = new ArrayList<ClassificationInfo>();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -145,7 +150,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 // ********
                 // revising
                 // ********
-                final String table = (String) elementMap.get("table");
+                final String table = (String) elementMap.get(ClassificationInfo.KEY_TABLE);
 
                 // - - - - - -
                 // from Table
@@ -153,12 +158,17 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 if (table != null) {
                     // Classification
                     final ClassificationInfo classificationInfo = new ClassificationInfo();
-                    classificationInfo.acceptClassificationMap(elementMap);
+                    classificationInfo.setClassificationName(classificationName);
+                    classificationInfo.setTable(table);
+                    classificationInfo.acceptBasicClassificationMap(elementMap);
                     final String where = (String) elementMap.get("where");
                     final String orderBy = (String) elementMap.get("orderBy");
                     final String sql = buildSql(classificationInfo, table, where, orderBy);
                     final List<?> exceptCodeList = extractExceptCodeList(elementMap);
                     setupFromDatabase(elementList, sql, classificationInfo, exceptCodeList);
+
+                    // for Auto Deployment
+                    _tableClassificationList.add(classificationInfo);
 
                     // Classification Meta
                     setupClassificationTopFromLiteralIfNeeds(classificationName, elementMap);
@@ -194,8 +204,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                                     -----------------
     protected void setupFromDatabaseByTopSql(String sql) {
         final ClassificationTopSqlExecutor executor = new ClassificationTopSqlExecutor();
-        final List<Map<String, String>> resultList = executor.executeTopSql(
-                getDatabaseProperties().getConnection(), sql);
+        final List<Map<String, String>> resultList = executor.executeTopSql(getDatabaseProperties().getConnection(),
+                sql);
 
         for (Map<String, String> map : resultList) {
             final String classificationName = map.get("classificationName");
@@ -242,7 +252,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         public List<Map<String, String>> executeTopSql(Connection conn, String sql) {
             Statement stmt = null;
             ResultSet rs = null;
-            final java.util.List<java.util.Map<String, String>> elementList = new ArrayList<Map<String, String>>();
+            final List<Map<String, String>> elementList = new ArrayList<Map<String, String>>();
             try {
                 stmt = conn.createStatement();
                 _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
@@ -416,7 +426,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return;
         }
         final ClassificationInfo classificationInfo = new ClassificationInfo();
-        classificationInfo.acceptClassificationMetaMap(elementMap);
+        classificationInfo.acceptMetaClassificationMap(elementMap);
         final Map<String, String> groupMap = new LinkedHashMap<String, String>();
         groupMap.put("classificationName", classificationName);
         if (classificationInfo.getCode() != null) {
@@ -479,20 +489,23 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         public static final String KEY_NAME = "name";
         public static final String KEY_ALIAS = "alias";
         public static final String KEY_COMMENT = "comment";
+        public static final String KEY_TABLE = "table";
         public static final String KEY_TOP_CODE = "topCode";
         public static final String KEY_TOP_COMMENT = "topComment";
 
+        protected String classificationName;
+        protected String table;
         protected String code;
         protected String name;
         protected String alias;
         protected String comment;
         protected boolean group;
 
-        public void acceptClassificationMap(Map<?, ?> elementMap) {
-            acceptMap(elementMap, ClassificationInfo.KEY_CODE, "name", "alias", "comment", false);
+        public void acceptBasicClassificationMap(Map<?, ?> elementMap) {
+            acceptMap(elementMap, KEY_CODE, KEY_NAME, KEY_ALIAS, KEY_COMMENT, false);
         }
 
-        public void acceptClassificationMetaMap(Map<?, ?> elementMap) {
+        public void acceptMetaClassificationMap(Map<?, ?> elementMap) {
             group = true;
             acceptMap(elementMap, KEY_TOP_CODE, null, null, KEY_TOP_COMMENT, true);
         }
@@ -521,12 +534,20 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             this.comment = comment;
         }
 
-        public String getAlias() {
-            return alias;
+        public String getClassificationName() {
+            return classificationName;
         }
 
-        public void setAlias(String alias) {
-            this.alias = alias;
+        public void setClassificationName(String classificationName) {
+            this.classificationName = classificationName;
+        }
+
+        public String getTable() {
+            return table;
+        }
+
+        public void setTable(String table) {
+            this.table = table;
         }
 
         public String getCode() {
@@ -537,20 +558,28 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             this.code = code;
         }
 
-        public String getComment() {
-            return comment;
-        }
-
-        public void setComment(String comment) {
-            this.comment = comment;
-        }
-
         public String getName() {
             return name;
         }
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public String getAlias() {
+            return alias;
+        }
+
+        public void setAlias(String alias) {
+            this.alias = alias;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
         }
 
         public boolean isGroup() {
@@ -680,7 +709,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return _classificationDeploymentMap;
         }
         final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);
-        _classificationDeploymentMap = new LinkedHashMap<String, Map<String, String>>();
+        _classificationDeploymentMap = StringKeyMap.createAsFlexible();
         final Set<String> deploymentMapkeySet = map.keySet();
         for (String tableName : deploymentMapkeySet) {
             final Object value = map.get(tableName);
@@ -688,7 +717,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 @SuppressWarnings("unchecked")
                 final Map<String, String> tmpMap = (Map<String, String>) value;
                 final Set<String> tmpMapKeySet = tmpMap.keySet();
-                final Map<String, String> columnClassificationMap = new LinkedHashMap<String, String>();
+                final Map<String, String> columnClassificationMap = StringKeyMap.createAsFlexible();
                 for (Object columnNameObj : tmpMapKeySet) {
                     final String columnName = (String) columnNameObj;
                     final String classificationName = (String) tmpMap.get(columnName);
@@ -708,30 +737,42 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                             Initialize
     //                             ----------
     /**
-     * Initialize the map of classification deployment. <br />
-     * Resolving all column classification.
+     * Initialize classification deployment. <br />
+     * Resolving all column classifications and table classifications. <br />
+     * This method calls initializeClassificationDefinition() internally.
      * @param tableList The list of table.
      */
-    public void initializeClassificationDeploymentMap(List<Table> tableList) { // This should be called when the task start.
+    public void initializeClassificationDeployment(List<Table> tableList) { // This should be called when the task start.
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final DfFlexibleMap<String, Map<String, String>> flexibleDeploymentMap = newFlexibleNameMap(deploymentMap);
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
-        if (allColumnClassificationMap == null) {
-            return;
-        }
-        for (Table table : tableList) {
-            Map<String, String> columnClassificationMap = flexibleDeploymentMap.get(table.getName());
-            if (columnClassificationMap == null) {
-                columnClassificationMap = new LinkedHashMap<String, String>();
-                deploymentMap.put(table.getName(), columnClassificationMap);
+        if (allColumnClassificationMap != null) {
+            for (Table table : tableList) {
+                final Map<String, String> columnClsMap = getColumnClsMap(deploymentMap, table.getName());
+                final Set<String> columnNameKeySet = allColumnClassificationMap.keySet();
+                for (String columnName : columnNameKeySet) {
+                    final String classificationName = allColumnClassificationMap.get(columnName);
+                    columnClsMap.put(columnName, classificationName);
+                }
             }
-            final Set<String> columnNameKeySet = allColumnClassificationMap.keySet();
-            for (String columnName : columnNameKeySet) {
-                final String classificationName = allColumnClassificationMap.get(columnName);
-                columnClassificationMap.put(columnName, classificationName);
+        }
+        initializeClassificationDefinition();
+        for (ClassificationInfo info : _tableClassificationList) {
+            final Map<String, String> columnClsMap = getColumnClsMap(deploymentMap, info.getTable());
+            final String classificationName = columnClsMap.get(info.getCode());
+            if (classificationName == null) {
+                columnClsMap.put(info.getCode(), info.getClassificationName());
             }
         }
         _classificationDeploymentMap = deploymentMap;
+    }
+
+    protected Map<String, String> getColumnClsMap(Map<String, Map<String, String>> deploymentMap, String tableName) {
+        Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
+        if (columnClassificationMap == null) {
+            columnClassificationMap = new LinkedHashMap<String, String>();
+            deploymentMap.put(tableName, columnClassificationMap);
+        }
+        return columnClassificationMap;
     }
 
     public String getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation() {
@@ -744,13 +785,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                -----------------------
     public boolean hasClassification(String tableName, String columnName) {
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final DfFlexibleMap<String, Map<String, String>> flexibledeploymentMap = newFlexibleNameMap(deploymentMap);
-        final Map<String, String> columnClassificationMap = flexibledeploymentMap.get(tableName);
+        final Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
         if (columnClassificationMap == null) {
             return false;
         }
-        final DfFlexibleMap<String, String> flexibleColumnClassificationMap = newFlexibleNameMap(columnClassificationMap);
-        final String classificationName = flexibleColumnClassificationMap.get(columnName);
+        final String classificationName = columnClassificationMap.get(columnName);
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
             for (String columnNameHint : columnClassificationMapKeySet) {
@@ -765,13 +804,11 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
     public String getClassificationName(String tableName, String columnName) {
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
-        final DfFlexibleMap<String, Map<String, String>> flexibledeploymentMap = newFlexibleNameMap(deploymentMap);
-        if (!flexibledeploymentMap.containsKey(tableName)) {
+        if (!deploymentMap.containsKey(tableName)) {
             return null;
         }
-        final Map<String, String> columnClassificationMap = flexibledeploymentMap.get(tableName);
-        final DfFlexibleMap<String, String> flexibleColumnClassificationMap = newFlexibleNameMap(columnClassificationMap);
-        final String classificationName = flexibleColumnClassificationMap.get(columnName);
+        final Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
+        final String classificationName = columnClassificationMap.get(columnName);
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
             for (String columnNameHint : columnClassificationMapKeySet) {
