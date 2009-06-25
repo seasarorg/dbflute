@@ -99,8 +99,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                          ==========
     /**
      * {@inheritDoc}
-     * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
-     * @return Read count. (NotNull)
      */
     public int readCount(ConditionBean cb) {
         assertCBNotNull(cb);
@@ -112,9 +110,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                         ===========
     /**
      * {@inheritDoc}
-     * @param cb Condition-bean. (NotNull)
-     * @return Read entity. (Nullalble)
-     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public Entity readEntity(ConditionBean cb) {
         assertCBNotNull(cb);
@@ -128,10 +123,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * {@inheritDoc}
-     * @param cb Condition-bean. (NotNull)
-     * @return Read entity. (NotNull)
-     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public Entity readEntityWithDeletedCheck(ConditionBean cb) {
         assertCBNotNull(cb);
@@ -189,8 +180,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                           =========
     /**
      * {@inheritDoc}
-     * @param cb Condition-bean.
-     * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
     public ListResultBean<Entity> readList(ConditionBean cb) {
         assertCBNotNull(cb);
@@ -199,8 +188,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /**
      * {@inheritDoc}
-     * @param cb Condition-bean. (NotNull)
-     * @return Read page. (NotNull)
      */
     public PagingResultBean<Entity> readPage(final ConditionBean cb) {
         assertCBNotNull(cb);
@@ -462,7 +449,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                            ========
     /**
      * {@inheritDoc}
-     * @return The value of sequence. (NotNull)
      */
     public java.math.BigDecimal readNextVal() {
         try {

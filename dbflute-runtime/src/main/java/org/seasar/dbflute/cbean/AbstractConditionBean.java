@@ -90,7 +90,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                           =========
     /**
      * {@inheritDoc}
-     * @return SQL clause. (NotNull)
      */
     public SqlClause getSqlClause() {
         return _sqlClause;

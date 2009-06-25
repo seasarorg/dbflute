@@ -1492,8 +1492,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                 ===================
     /**
      * {@inheritDoc}
-     * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
-     * @return The conditionValue. (NotNull)
      */
     public ConditionValue invokeValue(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
@@ -1506,9 +1504,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /**
      * {@inheritDoc}
-     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
-     * @param conditionKeyName The name of the conditionKey. (NotNull)
-     * @param value The value of the condition. (NotNull)
      */
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
@@ -1528,8 +1523,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /**
      * {@inheritDoc}
-     * @param columnFlexibleName The flexible name of a column allowed to contain relations. (NotNull and NotEmpty)
-     * @param isAsc Is it ascend?
      */
     public void invokeOrderBy(String columnFlexibleName, boolean isAsc) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
@@ -1546,8 +1539,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /**
      * {@inheritDoc}
-     * @param foreignPropertyName The property name of foreign. (NotNull and NotEmpty)
-     * @return The conditionQuery of foreign as interface. (NotNull)
      */
     public ConditionQuery invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);

@@ -144,8 +144,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                                         ===========
     /**
      * {@inheritDoc}
-     * @param columnFlexibleName The flexible name(IgnoreCase, IgnoreUnderscore) of the column. (NotNull, NotEmpty)
-     * @return Determination.
      */
     public boolean hasColumn(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
@@ -154,8 +152,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * {@inheritDoc}
-     * @param columnFlexibleName The flexible name(IgnoreCase, IgnoreUnderscore) of the column. (NotNull, NotEmpty)
-     * @return The information of the column. (NotNull)
      */
     public ColumnInfo findColumnInfo(String columnFlexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
@@ -183,7 +179,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * {@inheritDoc}
-     * @return The list of columns. (NotNull, NotEmpty)
      */
     public List<ColumnInfo> getColumnInfoList() {
         if (_columnInfoList != null) {
@@ -262,8 +257,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                       ---------------
     /**
      * {@inheritDoc}
-     * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
-     * @return Determination. (NotNull)
      */
     public boolean hasForeign(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
@@ -273,8 +266,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * {@inheritDoc}
-     * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
-     * @return Foreign DBMeta. (NotNull)
      */
     public DBMeta findForeignDBMeta(String foreignPropertyName) {
         return findForeignInfo(foreignPropertyName).getForeignDBMeta();
@@ -282,8 +273,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * {@inheritDoc}
-     * @param foreignPropertyName The flexible name of the foreign property. (NotNull)
-     * @return Foreign information. (NotNull)
      */
     public ForeignInfo findForeignInfo(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
@@ -312,7 +301,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * {@inheritDoc}
-     * @return The list of foreign information. (NotNull)
      */
     public List<ForeignInfo> getForeignInfoList() {
         if (_foreignInfoList != null) {
@@ -414,7 +402,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * {@inheritDoc}
-     * @return The list of referrer information. (NotNull)
      */
     public List<ReferrerInfo> getReferrerInfoList() {
         if (_referrerInfoList != null) {
@@ -515,7 +502,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
         /**
          * {@inheritDoc}
-         * @return The trace of relation as the list of relation info. (NotNull)
          */
         public List<RelationInfo> getTraceRelation() {
             return _traceRelationInfoList;
@@ -523,7 +509,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
         /**
          * {@inheritDoc}
-         * @return The trace of column as column info. (Nullable)
          */
         public ColumnInfo getTraceColumn() {
             return _traceColumnInfo;
@@ -570,7 +555,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                                          ==========
     /**
      * {@inheritDoc}
-     * @return Map list string that is prepared. (NotNull)
      */
     public MapListString createMapListString() {
         return MapStringUtil.createMapListString();
@@ -578,7 +562,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * {@inheritDoc}
-     * @return Map string builder that is prepared. (NotNull)
      */
     public MapStringBuilder createMapStringBuilder() {
         final List<String> columnDbNameList = new ArrayList<String>();
@@ -630,8 +613,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                                                       =============
     /**
      * {@inheritDoc}
-     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
-     * @return Determination.
      */
     public boolean hasFlexibleName(String flexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
@@ -644,8 +625,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * {@inheritDoc}
-     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
-     * @return DB name. (NotNull, NotEmpty)
      */
     public String findDbName(String flexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);
@@ -663,8 +642,6 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     /**
      * {@inheritDoc}
-     * @param flexibleName The flexible name(IgnoreCase, IgnoreUnderscore). (NotNull, NotEmpty)
-     * @return DB name. (NotNull, NotEmpty)
      */
     public String findPropertyName(String flexibleName) {
         assertStringNotNullAndNotTrimmedEmpty("flexibleName", flexibleName);

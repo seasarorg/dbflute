@@ -85,8 +85,6 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
     //                                                                      ==============
     /**
      * {@inheritDoc}}
-     * @param pd The description of property. (NotNull)
-     * @return The DB name of the column. (Nullable)
      */
     public String getColumnAnnotation(TnPropertyDesc pd) {
         if (simpleType) {
@@ -103,7 +101,6 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
 
     /**
      * {@inheritDoc}}
-     * @return The DB name of the table. (Nullable) 
      */
     public String getTableAnnotation() {
         if (simpleType) {

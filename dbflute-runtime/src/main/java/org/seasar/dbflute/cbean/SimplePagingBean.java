@@ -69,7 +69,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     // * * * * * * * *
     /**
      * {@inheritDoc}
-     * @return Determination.
      */
     public boolean isPaging() {
         return _paging;
@@ -80,7 +79,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     // * * * * * * * *
     /**
      * {@inheritDoc}
-     * @return Determination.
      */
     public boolean isCountLater() {
         return _countLater;
@@ -91,8 +89,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                        --------------
     /**
      * {@inheritDoc}
-	 * @param pageSize The page size per one page. (NotMinus & NotZero)
-	 * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
      */
     public void paging(int pageSize, int pageNumber) {
         fetchFirst(pageSize);
@@ -100,8 +96,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     /**
-     * {@inheritDoc} {INTERNAL METHOD: Don't Invoke This!}
-     * @param paging Determination.
+     * {@inheritDoc}
      */
     public void xsetPaging(boolean paging) {
         if (paging) {
@@ -121,7 +116,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @return Can the paging re-select execute?
      */
     public boolean canPagingReSelect() {
         return _canPagingReSelect;
@@ -132,8 +126,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                         -------------
     /**
      * {@inheritDoc}
-     * @param fetchSize Fetch-size. (NotMinus & NotZero)
-     * @return this. (NotNull)
      */
     public PagingBean fetchFirst(int fetchSize) {
         getSqlClause().fetchFirst(fetchSize);
@@ -142,9 +134,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
-     * @param fetchSize Fetch-size. (NotMinus & NotZero)
-     * @return this. (NotNull)
      */
     public PagingBean fetchScope(int fetchStartIndex, int fetchSize) {
         getSqlClause().fetchScope(fetchStartIndex, fetchSize);
@@ -153,8 +142,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
-     * @return this. (NotNull)
      */
     public PagingBean fetchPage(int fetchPageNumber) {
         getSqlClause().fetchPage(fetchPageNumber);
@@ -166,7 +153,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                        --------------
     /**
      * {@inheritDoc}
-     * @return Fetch-start-index.
      */
     public int getFetchStartIndex() {
         return getSqlClause().getFetchStartIndex();
@@ -174,7 +160,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @return Fetch-size.
      */
     public int getFetchSize() {
         return getSqlClause().getFetchSize();
@@ -182,7 +167,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @return Fetch-page-number.
      */
     public int getFetchPageNumber() {
         return getSqlClause().getFetchPageNumber();
@@ -190,7 +174,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @return Page start index. 0 origin. (NotMinus)
      */
     public int getPageStartIndex() {
         return getSqlClause().getPageStartIndex();
@@ -198,15 +181,13 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @return Page end index. 0 origin. (NotMinus)
      */
     public int getPageEndIndex() {
         return getSqlClause().getPageEndIndex();
     }
 
     /**
-     * Is fetch scope effective?
-     * @return Determination.
+     * {@inheritDoc}
      */
     public boolean isFetchScopeEffective() {
         return getSqlClause().isFetchScopeEffective();
@@ -216,62 +197,56 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                                Implementation of FetchNarrowingBean
     //                                                ====================================
     /**
-     * Get fetch-narrowing start-index.
-     * @return Fetch-narrowing start-index.
+     * {@inheritDoc}
      */
     public int getFetchNarrowingSkipStartIndex() {
         return getSqlClause().getFetchNarrowingSkipStartIndex();
     }
 
     /**
-     * Get fetch-narrowing size.
-     * @return Fetch-narrowing size.
+     * {@inheritDoc}
      */
     public int getFetchNarrowingLoopCount() {
         return getSqlClause().getFetchNarrowingLoopCount();
     }
 
     /**
-     * Is fetch start index supported?
-     * @return Determination.
+     * {@inheritDoc}
      */
     public boolean isFetchNarrowingSkipStartIndexEffective() {
         return !getSqlClause().isFetchStartIndexSupported();
     }
 
     /**
-     * Is fetch size supported?
-     * @return Determination.
+     * {@inheritDoc}
      */
     public boolean isFetchNarrowingLoopCountEffective() {
         return !getSqlClause().isFetchSizeSupported();
     }
 
     /**
-     * Is fetch-narrowing effective?
-     * @return Determination.
+     * {@inheritDoc}
      */
     public boolean isFetchNarrowingEffective() {
         return _fetchNarrowing && getSqlClause().isFetchNarrowingEffective();
     }
 
     /**
-     * Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
+     * {@inheritDoc}
      */
     public void ignoreFetchNarrowing() {
         _fetchNarrowing = false;
     }
 
     /**
-     * Restore ignored fetch narrowing. {INTERNAL METHOD}
+     * {@inheritDoc}
      */
     public void restoreIgnoredFetchNarrowing() {
         _fetchNarrowing = true;
     }
 
     /**
-     * Get safety max result size.
-     * @return Safety max result size.
+     * {@inheritDoc}
      */
     public int getSafetyMaxResultSize() {
         return _safetyMaxResultSize;
@@ -282,7 +257,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                                       =============================
     /**
      * {@inheritDoc}
-     * @return Sql component of order-by clause. (NotNull)
      */
     public OrderByClause getSqlComponentOfOrderByClause() {
         return getSqlClause().getSqlComponentOfOrderByClause();
@@ -290,7 +264,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @return Order-by clause. (NotNull)
      */
     public String getOrderByClause() {
         return getSqlClause().getOrderByClause();
@@ -298,7 +271,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public OrderByBean clearOrderBy() {
         getSqlClause().clearOrderBy();
@@ -307,7 +279,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public OrderByBean ignoreOrderBy() {
         getSqlClause().ignoreOrderBy();
@@ -316,7 +287,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
 
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public OrderByBean makeOrderByEffective() {
         getSqlClause().makeOrderByEffective();
@@ -327,8 +297,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                                    Implementation of SelectResource
     //                                                    ================================
     /**
-     * Check safety result.
-     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     * {@inheritDoc}
      */
     public void checkSafetyResult(int safetyMaxResultSize) {
         this._safetyMaxResultSize = safetyMaxResultSize;
@@ -338,8 +307,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     //                                                  Implementation of MapParameterBean
     //                                                  ==================================
     /**
-     * Get the map of parameter.
-     * @return The map of parameter. (Nullable)
+     * {@inheritDoc}
      */
     public Map<String, Object> getParameterMap() {
         return _parameterMap;

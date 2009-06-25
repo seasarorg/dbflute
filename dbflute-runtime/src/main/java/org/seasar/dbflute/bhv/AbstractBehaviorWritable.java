@@ -133,11 +133,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                      ----------------
     /**
      * {@inheritDoc}
-     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
-     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void createOrModify(org.seasar.dbflute.Entity entity) {
         assertEntityNotNull(entity);
@@ -148,10 +143,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
     /**
      * {@inheritDoc}
-     * @param entity Entity. This must contain primary-key value at least(Except use identity). (NotNull)
-     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
-     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
-     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
     public void createOrModifyNonstrict(org.seasar.dbflute.Entity entity) {
         assertEntityNotNull(entity);

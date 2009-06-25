@@ -35,11 +35,6 @@ public class AccordingToOrderImpl implements AccordingToOrder {
     //                                                                                ====
     /**
      * {@inheritDoc}
-     * 
-     * @param unorderedList The unordered list. (NotNull)
-     * @param option The option of according-to-order. (NotNull)
-     * @param <ELEMENT_TYPE> The type of element.
-     * @param <ID_TYPE> The type of ID.
      */
     public <ELEMENT_TYPE, ID_TYPE> void order(final List<ELEMENT_TYPE> unorderedList,
             final AccordingToOrderOption<ELEMENT_TYPE, ID_TYPE> option) {

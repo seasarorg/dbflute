@@ -10,6 +10,24 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class StringKeyMapTest extends PlainTestCase {
 
+    public void test_put_null() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> mapAsFlexible = StringKeyMap.createAsFlexible();
+        StringKeyMap<Object> mapAsFlexibleConcurrent = StringKeyMap.createAsFlexibleConcurrent();
+
+        // ## Act ##
+        mapAsFlexible.put("aaa", null);
+        try {
+            mapAsFlexibleConcurrent.put("aaa", null);
+            fail();
+        } catch (NullPointerException e) {
+            // OK
+        }
+
+        // ## Assert ##
+        assertEquals(null, mapAsFlexibleConcurrent.get("aaa"));
+    }
+
     public void test_putAll() throws Exception {
         // ## Arrange ##
         StringKeyMap<Object> map = StringKeyMap.createAsCaseInsensitive();

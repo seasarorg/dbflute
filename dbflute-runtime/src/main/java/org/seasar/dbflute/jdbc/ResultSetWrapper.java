@@ -255,6 +255,7 @@ public class ResultSetWrapper implements ResultSet {
      * @param columnIndex
      * @return The value as InputStream.
      * @deprecated 
+     * @throws SQLException
      */
     public InputStream getUnicodeStream(int columnIndex) throws SQLException {
         return original.getUnicodeStream(columnIndex);
@@ -384,6 +385,7 @@ public class ResultSetWrapper implements ResultSet {
      * @param scale
      * @return The value as BigDecimal.
      * @deprecated 
+     * @throws SQLException
      */
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException {
         return original.getBigDecimal(columnIndex, scale);
@@ -479,6 +481,7 @@ public class ResultSetWrapper implements ResultSet {
      * @param columnName
      * @return The value as InputStream.
      * @deprecated 
+     * @throws SQLException
      */
     public InputStream getUnicodeStream(String columnName) throws SQLException {
         return original.getUnicodeStream(columnName);
@@ -538,6 +541,7 @@ public class ResultSetWrapper implements ResultSet {
      * @param scale
      * @return The value as BigDecimal.
      * @deprecated 
+     * @throws SQLException
      */
     public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
         return original.getBigDecimal(columnName, scale);
