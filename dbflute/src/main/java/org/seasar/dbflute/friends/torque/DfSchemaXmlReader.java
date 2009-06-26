@@ -37,8 +37,8 @@ public class DfSchemaXmlReader {
 
     protected String grokName(String xmlFile) {
         final String name;
-        int fileSeparatorLastIndex = xmlFile.lastIndexOf(System.getProperty("file.separator"));
-        if (fileSeparatorLastIndex != -1) {
+        int fileSeparatorLastIndex = xmlFile.lastIndexOf("/");
+        if (fileSeparatorLastIndex > -1) { // basically true
             fileSeparatorLastIndex++;
             final int commaLastIndex = xmlFile.lastIndexOf('.');
             if (fileSeparatorLastIndex < commaLastIndex) {
@@ -47,7 +47,7 @@ public class DfSchemaXmlReader {
                 name = xmlFile.substring(fileSeparatorLastIndex);
             }
         } else {
-            name = "data-model"; // Default-name
+            name = "schema"; // Default-name
         }
         return name;
     }
