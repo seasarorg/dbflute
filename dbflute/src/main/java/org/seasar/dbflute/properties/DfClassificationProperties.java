@@ -742,6 +742,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     /**
      * Initialize classification deployment. <br />
      * Resolving all column classifications and table classifications. <br />
+     * You can call this several times with other database objects. <br />
      * This method calls initializeClassificationDefinition() internally.
      * @param database The database object. (NotNull)
      */

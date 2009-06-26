@@ -43,6 +43,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.friends.torque.DfSchemaXmlReader;
+import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
@@ -116,6 +117,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected void doExecute() {
         setupControlTemplate();
         setupDataSource();
+        setupSchemaInformation();
 
         final DfRunnerInformation runInfo = new DfRunnerInformation();
         runInfo.setDriver(_driver);
@@ -982,8 +984,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     // ===================================================================================
-    //                                                                       Task Override
-    //                                                                       =============
+    //                                                                 Initialize Override
+    //                                                                 ===================
     public Context initControlContext() throws Exception {
         final Database database = new Database();
         database.setSql2EntitySchemaData(_schemaData);
@@ -1120,12 +1122,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected VelocityContext createVelocityContext(final AppData appData) {
-        VelocityContext context = new VelocityContext();
-        final List<AppData> dataModels = new ArrayList<AppData>();
-        dataModels.add(appData);
-        context.put("dataModels", dataModels);
-        context.put("targetDatabase", getTargetDatabase());
-        return context;
+        final DfVelocityContextFactory factory = new DfVelocityContextFactory();
+        return factory.create(appData);
     }
 
     protected boolean needsConvert(String columnName) {

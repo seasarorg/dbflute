@@ -1874,10 +1874,6 @@ public class Database {
         _appData = appData;
     }
 
-    public AppData getSql2EntitySchemaData() {
-        return _sql2entitySchemaData;
-    }
-
     public void setSql2EntitySchemaData(AppData sql2entitySchemaData) {
         _sql2entitySchemaData = sql2entitySchemaData;
     }

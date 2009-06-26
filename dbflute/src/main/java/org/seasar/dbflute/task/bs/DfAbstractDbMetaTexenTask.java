@@ -16,7 +16,6 @@
 package org.seasar.dbflute.task.bs;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.tools.ant.types.FileSet;
@@ -24,6 +23,7 @@ import org.apache.torque.engine.database.model.AppData;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.friends.torque.DfSchemaXmlReader;
+import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 
 /**
  * @author jflute
@@ -45,17 +45,14 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     }
 
     // ===================================================================================
-    //                                                                  Important Override
-    //                                                                  ==================
+    //                                                                 Initialize Override
+    //                                                                 ===================
+    @Override
     public Context initControlContext() throws Exception {
         final DfSchemaXmlReader schemaFileReader = createSchemaFileReader();
         schemaFileReader.read();
         _schemaData = schemaFileReader.getSchemaData();
-
-        // Initialize velocity-context.
-        _context = new VelocityContext();
-        _context.put("dataModels", new ArrayList<AppData>(Arrays.asList(_schemaData))); // for compatible
-        _context.put("schemaData", _schemaData);
+        _context = createVelocityContext(_schemaData);
         return _context;
     }
 
@@ -63,6 +60,14 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
         return new DfSchemaXmlReader(_schemaXml, getProject(), getTargetDatabase());
     }
 
+    protected VelocityContext createVelocityContext(final AppData appData) {
+        final DfVelocityContextFactory factory = new DfVelocityContextFactory();
+        return factory.create(appData);
+    }
+
+    // ===================================================================================
+    //                                                                    Execute Override
+    //                                                                    ================
     @Override
     protected void doExecute() {
         fireSuperExecute();

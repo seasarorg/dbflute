@@ -154,15 +154,6 @@ public class XmlToAppData extends DefaultHandler {
             // Uses InputStreamReader for specifying an encoding for project schema XML.
             final String encoding = getProejctSchemaXMLEncoding();
             final InputStreamReader fr = new InputStreamReader(new FileInputStream(xmlFile), encoding);
-
-            // *FileReader that uses default encoding is unavailable here!      
-            // FileReader fr = null;
-            // try {
-            //     fr = new FileReader(xmlFile);
-            // } catch (FileNotFoundException fnfe) {
-            //     throw new FileNotFoundException(new File(xmlFile).getAbsolutePath());
-            // }
-
             final BufferedReader br = new BufferedReader(fr);
             try {
                 final InputSource is = new InputSource(br);
