@@ -14,6 +14,9 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.Column;
+import org.apache.torque.engine.database.model.Database;
+import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer;
@@ -709,7 +712,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return _classificationDeploymentMap;
         }
         final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);
-        _classificationDeploymentMap = StringKeyMap.createAsFlexible();
+        _classificationDeploymentMap = StringKeyMap.createAsFlexibleOrder();
         final Set<String> deploymentMapkeySet = map.keySet();
         for (String tableName : deploymentMapkeySet) {
             final Object value = map.get(tableName);
@@ -717,7 +720,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 @SuppressWarnings("unchecked")
                 final Map<String, String> tmpMap = (Map<String, String>) value;
                 final Set<String> tmpMapKeySet = tmpMap.keySet();
-                final Map<String, String> columnClassificationMap = StringKeyMap.createAsFlexible();
+                final Map<String, String> columnClassificationMap = StringKeyMap.createAsFlexibleOrder();
                 for (Object columnNameObj : tmpMapKeySet) {
                     final String columnName = (String) columnNameObj;
                     final String classificationName = (String) tmpMap.get(columnName);
@@ -740,12 +743,13 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
      * Initialize classification deployment. <br />
      * Resolving all column classifications and table classifications. <br />
      * This method calls initializeClassificationDefinition() internally.
-     * @param tableList The list of table.
+     * @param database The database object. (NotNull)
      */
-    public void initializeClassificationDeployment(List<Table> tableList) { // This should be called when the task start.
+    public void initializeClassificationDeployment(Database database) { // This should be called when the task start.
         final Map<String, Map<String, String>> deploymentMap = getClassificationDeploymentMap();
         final Map<String, String> allColumnClassificationMap = getAllColumnClassificationMap();
         if (allColumnClassificationMap != null) {
+            final List<Table> tableList = database.getTableList();
             for (Table table : tableList) {
                 final Map<String, String> columnClsMap = getColumnClsMap(deploymentMap, table.getName());
                 final Set<String> columnNameKeySet = allColumnClassificationMap.keySet();
@@ -758,9 +762,25 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         initializeClassificationDefinition();
         for (ClassificationInfo info : _tableClassificationList) {
             final Map<String, String> columnClsMap = getColumnClsMap(deploymentMap, info.getTable());
-            final String classificationName = columnClsMap.get(info.getCode());
-            if (classificationName == null) {
-                columnClsMap.put(info.getCode(), info.getClassificationName());
+            final String classificationName = info.getClassificationName();
+            registerColumnClsIfNeeds(columnClsMap, info.getCode(), classificationName);
+            final Table table = database.getTable(info.getTable());
+            if (table == null || table.hasTwoOrMorePrimaryKeys()) {
+                continue;
+            }
+            final Column column = table.getColumn(info.getCode());
+            if (column == null || !column.isPrimaryKey()) {
+                continue;
+            }
+            final List<ForeignKey> referrers = column.getReferrers();
+            for (ForeignKey referrer : referrers) {
+                if (!referrer.isSimpleKeyFK()) {
+                    continue;
+                }
+                final Table referrerTable = referrer.getTable();
+                final Map<String, String> referrerClsMap = getColumnClsMap(deploymentMap, referrerTable.getName());
+                final Column localColumnAsOne = referrer.getLocalColumnAsOne();
+                registerColumnClsIfNeeds(referrerClsMap, localColumnAsOne.getName(), classificationName);
             }
         }
         _classificationDeploymentMap = deploymentMap;
@@ -773,6 +793,15 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             deploymentMap.put(tableName, columnClassificationMap);
         }
         return columnClassificationMap;
+    }
+
+    protected void registerColumnClsIfNeeds(Map<String, String> columnClsMap, String columnName,
+            String classificationName) {
+        final String value = columnClsMap.get(columnName);
+        if (value != null) {
+            return;
+        }
+        columnClsMap.put(columnName, classificationName);
     }
 
     public String getClassificationDeploymentMapAsStringRemovedLineSeparatorFilteredQuotation() {

@@ -75,7 +75,7 @@ import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.friends.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.friends.torque.DfAdditionalPrimaryKeyInitializer;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.deletefile.DfOldClassHandler;
@@ -122,7 +122,7 @@ public class Database {
     //                                                 Table
     //                                                 -----
     protected List<Table> _tableList = new ArrayList<Table>(100);
-    protected DfFlexibleMap<String, Table> _flexibleTableMap = new DfFlexibleMap<String, Table>();
+    protected StringKeyMap<Table> _flexibleTableMap = StringKeyMap.createAsFlexibleOrder();
 
     // -----------------------------------------------------
     //                                        for Sql2Entity
@@ -210,7 +210,7 @@ public class Database {
     }
 
     public Table getTable(String name) {
-        return (Table) _flexibleTableMap.get(name);
+        return _flexibleTableMap.get(name);
     }
 
     public Table addTable(Attributes attrib) {
@@ -522,8 +522,22 @@ public class Database {
     //                              ClassificationDeployment
     //                              ------------------------
     public void initializeClassificationDeployment() {
-        getClassificationProperties().initializeClassificationDefinition(); // Together!
-        getClassificationProperties().initializeClassificationDeployment(getTableList());
+        final DfClassificationProperties clsProp = getClassificationProperties();
+
+        // Initialize classification definition before initializing deployment.
+        clsProp.initializeClassificationDefinition(); // Together!
+
+        // Initialize current target database.
+        clsProp.initializeClassificationDeployment(this);
+
+        // If this is in sql2entity task, initialize schema database.
+        if (_sql2entitySchemaData != null) {
+            try {
+                clsProp.initializeClassificationDeployment(_sql2entitySchemaData.getDatabase());
+            } catch (EngineException e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 
     // -----------------------------------------------------

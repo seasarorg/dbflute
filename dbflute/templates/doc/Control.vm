@@ -1,24 +1,20 @@
-#set ( $basepath = $generator.OutputPath)
-
+#set ($database = $schemaData.database)
+#set ($basepath = $generator.OutputPath)
     
-#foreach ($dataModel in $dataModels)
-  #if ($outputFormat=="html")
-    #set ( $outFile = "${dataModel.name}.html" )
-  #else
-    #set ( $outFile = "${dataModel.name}.xml" )
-  #end
-
-  File to be created: $outFile
-
-  #set ($database = $dataModel.database)
-
-  ## - - - - - - - - - - - -
-  ## Initialize properties.
-  ## - - - - - - - - - - - -
-  $database.initializeVersion(90)
-  $database.initializeAdditionalPrimaryKey()
-  $database.initializeAdditionalForeignKey()
-  $database.initializeClassificationDeployment()
-
-  $generator.parse("doc/$outputFormat/datamodel.vm",$outFile,"dataModel",$dataModel)
+#if ($outputFormat=="html")
+  #set ( $outFile = "${schemaData.name}.html" )
+#else
+  #set ( $outFile = "${schemaData.name}.xml" )
 #end
+
+File to be created: $outFile
+
+## - - - - - - - - - - - -
+## Initialize properties.
+## - - - - - - - - - - - -
+$database.initializeVersion(90)
+$database.initializeAdditionalPrimaryKey()
+$database.initializeAdditionalForeignKey()
+$database.initializeClassificationDeployment()
+
+$generator.parse("doc/$outputFormat/datamodel.vm",$outFile,"dataModel",$dataModel)

@@ -1,7 +1,7 @@
 #
 # @since DBFlute-0.9.0
 #
-#set ($database = $schemaData.database) 
+#set ($database = $schemaData.database)
 $database.enableGenerateOutputDirectory()
 
 ## - - - - - - - - - - - -

@@ -68,6 +68,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.friends.torque.DfTorqueColumnListToStringUtil;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.logic.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -111,7 +112,7 @@ public class Table {
     private List<String> _foreignTableNames;
     private boolean _containsForeignPK;
     private Column _inheritanceColumn;
-    protected DfFlexibleMap<String, Column> _columnMap = new DfFlexibleMap<String, Column>();
+    protected StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexibleOrder();
     private boolean _isForReferenceOnly;
     private boolean _existSameNameTable;
 
@@ -842,7 +843,6 @@ public class Table {
 
     /**
      * Returns a specified column.
-     *
      * @param name name of the column
      * @return Return a Column object or null if it does not exist.
      */
