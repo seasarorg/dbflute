@@ -173,14 +173,11 @@
     <torque-data-model
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.om}"
+      schemaXml="project-schema-${torque.project}.xml"
       outputDirectory="${torque.java.dir}"
       outputFile="report.${torque.project}.om.generation"
       useClasspath="${torque.useClasspath}"
       environmentType="${dfenv}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.om.includes}"
-        excludes="${torque.schema.om.excludes}"
-      />
     </torque-data-model>
   </target>
 
@@ -188,14 +185,11 @@
     <torque-data-model
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.om}"
+      schemaXml="project-schema-${torque.project}.xml"
       outputDirectory="${torque.java.dir}"
       outputFile="report.${torque.project}.om.generation"
       templatePath="${torque.templatePath}"
       environmentType="${dfenv}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.om.includes}"
-        excludes="${torque.schema.om.excludes}"
-      />
     </torque-data-model>
   </target>
 
@@ -220,17 +214,13 @@
     <torque-doc
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.doc}"
+      schemaXml="project-schema-${torque.project}.xml"
       outputDirectory="${torque.doc.dir}"
       outputFile="report.${torque.project}.doc.generation"
       outputFormat="${torque.doc.format}"
-      sqldbmap="${torque.sql.dir}/sqldb.map"
       templatePath="${torque.templatePath}"
       useClasspath="${torque.useClasspath}"
       environmentType="${dfenv}">
-      <fileset dir="${torque.schema.dir}"
-        includes="${torque.schema.doc.includes}"
-        excludes="${torque.schema.doc.excludes}"
-      />
     </torque-doc>
   </target>
 
@@ -289,11 +279,11 @@
     <torque-sql2entity
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.sql2entity}"
+      schemaXml="project-schema-${torque.project}.xml"
       outputDirectory="${torque.java.dir}"
       outputFile="report.${torque.project}.sql2entity.generation"
       templatePath="${torque.templatePath}"
-      environmentType="${dfenv}"
-    >
+      environmentType="${dfenv}">
     </torque-sql2entity>
   </target>
 

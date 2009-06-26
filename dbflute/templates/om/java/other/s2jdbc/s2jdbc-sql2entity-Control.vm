@@ -1,7 +1,4 @@
 
-
-targetdatabase = $targetDatabase
-
 ##
 ## Loop by data-model.
 ##

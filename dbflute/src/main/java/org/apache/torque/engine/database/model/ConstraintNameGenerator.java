@@ -82,23 +82,16 @@ public class ConstraintNameGenerator implements NameGenerator {
      */
     public String generateName(List<?> inputs) throws EngineException {
         final StringBuffer name = new StringBuffer();
-        final Database db = (Database) inputs.get(0);
         name.append((String) inputs.get(1));
         final String namePostfix = (String) inputs.get(2);
         final String constraintNbr = inputs.get(3).toString();
 
         // Calculate maximum RDBMS-specific column character limit.
-        int maxBodyLength = -1;
-        try {
-            int maxColumnNameLength = Integer.parseInt(db.getProperty("maxColumnNameLength"));
-            maxBodyLength = (maxColumnNameLength - namePostfix.length() - constraintNbr.length() - 2);
+        final int maxColumnNameLength = 30; // Oracle has the least length.
+        final int maxBodyLength = (maxColumnNameLength - namePostfix.length() - constraintNbr.length() - 2);
 
-            if (log.isDebugEnabled()) {
-                log.debug("maxColumnNameLength=" + maxColumnNameLength + " maxBodyLength=" + maxBodyLength);
-            }
-        } catch (EngineException e) {
-            log.error(e.getMessage(), e);
-        } catch (NumberFormatException maxLengthUnknown) {
+        if (log.isDebugEnabled()) {
+            log.debug("maxColumnNameLength=" + maxColumnNameLength + " maxBodyLength=" + maxBodyLength);
         }
 
         // Do any necessary trimming.

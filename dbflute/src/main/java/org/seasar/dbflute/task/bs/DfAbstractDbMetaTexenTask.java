@@ -15,23 +15,15 @@
  */
 package org.seasar.dbflute.task.bs;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.FileSet;
-import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
-import org.apache.torque.engine.database.model.Database;
-import org.apache.torque.engine.database.transform.XmlToAppData;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.seasar.dbflute.friends.torque.DfSchemaXmlReader;
 
 /**
  * @author jflute
@@ -39,101 +31,36 @@ import org.apache.velocity.context.Context;
 public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
 
     // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    /** Log instance. */
-    public static final Log _log = LogFactory.getLog(DfAbstractDbMetaTexenTask.class);
-
-    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _xmlFile;
-
-    protected List<FileSet> _filesets;
-
-    protected List<AppData> _dataModels;
-
+    protected String _schemaXml;
+    protected final List<FileSet> _filesets = new ArrayList<FileSet>();
+    protected AppData _schemaData;
     protected Context _context;
-
-    protected Hashtable<String, String> _dataModelDbMap;
-
-    protected Hashtable<String, String> _databaseNames;
-
-    protected String _sqldbmap;
-
-    private String _targetPackage;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfAbstractDbMetaTexenTask() {
-        _filesets = new ArrayList<FileSet>();
-        _dataModels = new ArrayList<AppData>();
     }
 
     // ===================================================================================
     //                                                                  Important Override
     //                                                                  ==================
     public Context initControlContext() throws Exception {
-        if (_xmlFile == null && _filesets.isEmpty()) {
-            throw new BuildException("You must specify an XML schema or fileset of XML schemas!");
-        }
-        try {
-            if (_xmlFile != null) {
-                final AppData appData = newInstanceXmlToAppData().parseFile(_xmlFile);
-                appData.setName(grokName(_xmlFile));
-                _dataModels.add(appData);
-            } else {
-                for (int i = 0; i < _filesets.size(); i++) {
-                    final FileSet fs = (FileSet) _filesets.get(i);
-                    final File srcDir = fs.getDir(getProject());
-                    final DirectoryScanner directoryScanner = fs.getDirectoryScanner(getProject());
-                    final String dataModelFiles[] = directoryScanner.getIncludedFiles();
-                    for (int j = 0; j < dataModelFiles.length; j++) {
-                        final File file = new File(srcDir, dataModelFiles[j]);
-                        final AppData appData = newInstanceXmlToAppData().parseFile(file.toString());
-                        appData.setName(grokName(file.toString()));
-                        _dataModels.add(appData);
-                    }
-                }
-            }
-            _databaseNames = new Hashtable<String, String>();
-            _dataModelDbMap = new Hashtable<String, String>();
-            for (final Iterator<AppData> ite = _dataModels.iterator(); ite.hasNext();) {
-                final AppData appData = (AppData) ite.next();
-                final Database database = appData.getDatabase();
-                _dataModelDbMap.put(appData.getName(), database.getName());
-                _databaseNames.put(database.getName(), database.getName());
-            }
-        } catch (EngineException e) {
-            throw new BuildException(e);
-        }
+        final DfSchemaXmlReader schemaFileReader = createSchemaFileReader();
+        schemaFileReader.read();
+        _schemaData = schemaFileReader.getSchemaData();
 
         // Initialize velocity-context.
         _context = new VelocityContext();
-        _context.put("dataModels", _dataModels);
-        _context.put("databaseNames", _databaseNames);
-        _context.put("targetDatabase", getTargetDatabase());
-        _context.put("targetPackage", _targetPackage);
+        _context.put("dataModels", new ArrayList<AppData>(Arrays.asList(_schemaData))); // for compatible
+        _context.put("schemaData", _schemaData);
         return _context;
     }
 
-    protected XmlToAppData newInstanceXmlToAppData() {
-        return new XmlToAppData(getTargetDatabase(), getTargetPackage());
-    }
-
-    protected String grokName(String xmlFile) {
-        String name = "data-model"; // Default-name
-        int fileSeparatorLastIndex = xmlFile.lastIndexOf(System.getProperty("file.separator"));
-        if (fileSeparatorLastIndex != -1) {
-            fileSeparatorLastIndex++;
-            final int commaLastIndex = xmlFile.lastIndexOf('.');
-            if (fileSeparatorLastIndex < commaLastIndex)
-                name = xmlFile.substring(fileSeparatorLastIndex, commaLastIndex);
-            else
-                name = xmlFile.substring(fileSeparatorLastIndex);
-        }
-        return name;
+    protected DfSchemaXmlReader createSchemaFileReader() {
+        return new DfSchemaXmlReader(_schemaXml, getProject(), getTargetDatabase());
     }
 
     @Override
@@ -144,40 +71,7 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setSqlDbMap(String sqldbmap) {
-        this._sqldbmap = getProject().resolveFile(sqldbmap).toString();
+    public void setSchemaXml(String schemaXml) {
+        _schemaXml = schemaXml;
     }
-
-    public String getSqlDbMap() {
-        return _sqldbmap;
-    }
-
-    public List<AppData> getDataModels() {
-        return _dataModels;
-    }
-
-    public Hashtable<String, String> getDataModelDbMap() {
-        return _dataModelDbMap;
-    }
-
-    public String getXmlFile() {
-        return _xmlFile;
-    }
-
-    public void setXmlFile(String xmlFile) {
-        this._xmlFile = getProject().resolveFile(xmlFile).toString();
-    }
-
-    public void addFileset(FileSet set) {
-        _filesets.add(set);
-    }
-
-    public String getTargetPackage() {
-        return _targetPackage;
-    }
-
-    public void setTargetPackage(String v) {
-        _targetPackage = v;
-    }
-
 }

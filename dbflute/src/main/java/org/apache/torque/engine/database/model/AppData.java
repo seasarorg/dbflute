@@ -55,11 +55,8 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.torque.engine.EngineException;
@@ -70,7 +67,7 @@ import org.xml.sax.Attributes;
  * @author Modified by jflute
  */
 public class AppData {
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -78,11 +75,6 @@ public class AppData {
      * The list of databases for this application.
      */
     private List<Database> _dbList = new ArrayList<Database>(5);
-
-    /**
-     * The table of idiosyncrasies for various database types.
-     */
-    private Map<String, Properties> _idiosyncrasyTable = new HashMap<String, Properties>(8);
 
     /**
      * The type for our databases.
@@ -113,50 +105,6 @@ public class AppData {
     //                                                                            Accessor
     //                                                                            ========
     /**
-     * Each database has its own list of idiosyncrasies which can be
-     * configured by editting its <code>db.props</code> file.
-     * @param databaseType The type of database to retrieve the properties of.
-     * @return The idiosyncrasies of <code>databaseType</code>.
-     * @exception EngineException Couldn't locate properties file.
-     */
-    protected Properties getIdiosyncrasies(String databaseType) throws EngineException {
-        Properties idiosyncrasies = (Properties) _idiosyncrasyTable.get(databaseType);
-
-        // - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // Comment out because of deleting _basePropsFilePath.
-        // - - - - - - - - - - - - - - - - - - - - - - - - - -
-        // 
-        // If we haven't yet loaded the properties and we have the
-        // information to do so, proceed with loading.
-        //        if (idiosyncrasies == null && _basePropsFilePath != null && databaseType != null) {
-        //            idiosyncrasies = new Properties();
-        //            File propsFile = new File(_basePropsFilePath + databaseType, "db.props");
-        //            if (propsFile.exists()) {
-        //                try {
-        //                    idiosyncrasies.load(new FileInputStream(propsFile));
-        //                } catch (Exception e) {
-        //                    _log.error(e, e);
-        //                }
-        //                _idiosyncrasyTable.put(databaseType, idiosyncrasies);
-        //            } else {
-        //                try {
-        //                    String path = '/' + _basePropsFilePath + databaseType + "/db.props";
-        //                    idiosyncrasies.load(getClass().getResourceAsStream(path));
-        //                } catch (Exception e) {
-        //                    _log.error(e, e);
-        //                }
-        //            }
-        //
-        //            if (idiosyncrasies.isEmpty()) {
-        //                throw new EngineException("Database-specific properties " + "file does not exist: "
-        //                        + propsFile.getAbsolutePath());
-        //            }
-        //        }
-        
-        return idiosyncrasies;
-    }
-
-    /**
      * Set the name of the database.
      * @param name of the database.
      */
@@ -181,8 +129,9 @@ public class AppData {
     }
 
     /**
-     * Get database object.
-     * @return Database database
+     * Get database object of first element in list. <br />
+     * DBFlute uses this method!
+     * @return Database database of first element in list. (NotNull)
      */
     public Database getDatabase() throws EngineException {
         doFinalInitialization();

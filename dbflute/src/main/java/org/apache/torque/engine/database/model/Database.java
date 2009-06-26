@@ -62,7 +62,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -117,6 +116,7 @@ public class Database {
     //                                               AppData
     //                                               -------
     protected AppData _appData;
+    protected AppData _sql2entitySchemaData; // when sql2entity only
 
     // -----------------------------------------------------
     //                                                 Table
@@ -225,18 +225,6 @@ public class Database {
         tbl.setDatabase(this);
         _tableList.add(tbl);
         _flexibleTableMap.put(tbl.getName(), tbl);
-    }
-
-    /**
-     * Returns the value of the named property from this database's
-     * <code>db.props</code> file.
-     * @param name The name of the property to retrieve the value of.
-     * @return The value of the specified property.
-     * @exception EngineException Couldn't access properties.
-     */
-    protected String getProperty(String name) throws EngineException {
-        Properties p = getAppData().getIdiosyncrasies(_databaseType);
-        return (p == null ? null : p.getProperty(name));
     }
 
     public void doFinalInitialization() throws EngineException { // Unused on DBFlute
@@ -1870,6 +1858,14 @@ public class Database {
 
     public void setAppData(AppData appData) {
         _appData = appData;
+    }
+
+    public AppData getSql2EntitySchemaData() {
+        return _sql2entitySchemaData;
+    }
+
+    public void setSql2EntitySchemaData(AppData sql2entitySchemaData) {
+        _sql2entitySchemaData = sql2entitySchemaData;
     }
 
     public AppData getAppData() {

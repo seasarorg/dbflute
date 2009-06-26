@@ -2,8 +2,6 @@
 # @since DBFlute-0.9.0
 #
 
-targetdatabase = $targetDatabase
-
 ##
 ## Loop by data-model.
 ##

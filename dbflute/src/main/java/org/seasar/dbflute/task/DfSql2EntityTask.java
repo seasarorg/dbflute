@@ -42,6 +42,7 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.friends.torque.DfSchemaXmlReader;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
@@ -97,6 +98,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
 
+    // for getting schema
+    protected String _schemaXml;
+    protected AppData _schemaData;
+
     // ===================================================================================
     //                                                                          DataSource
     //                                                                          ==========
@@ -133,6 +138,20 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         handleNotFoundResult(sqlFileList);
         handleException();
         refreshResources();
+    }
+
+    protected void setupSchemaInformation() {
+        final DfSchemaXmlReader schemaFileReader = createSchemaFileReader();
+        try {
+            schemaFileReader.read();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+        _schemaData = schemaFileReader.getSchemaData();
+    }
+
+    protected DfSchemaXmlReader createSchemaFileReader() {
+        return new DfSchemaXmlReader(_schemaXml, getProject(), getTargetDatabase());
     }
 
     protected void setupControlTemplate() {
@@ -968,6 +987,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                       =============
     public Context initControlContext() throws Exception {
         final Database database = new Database();
+        database.setSql2EntitySchemaData(_schemaData);
         database.setPmbMetaDataMap(_pmbMetaDataMap);
 
         final Set<String> entityNameSet = _entityInfoMap.keySet();
@@ -1152,5 +1172,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     public String getFileSeparator() {
         return File.separator;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setSchemaXml(String schemaXml) { // for getting schema
+        _schemaXml = schemaXml;
     }
 }

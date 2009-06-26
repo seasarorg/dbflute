@@ -64,8 +64,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
-import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
@@ -89,6 +90,12 @@ import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
  * @author Modified by jflute
  */
 public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(TorqueDocumentationTask.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -131,30 +138,27 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final Map<String, List<String>> tableColumnMap = new LinkedHashMap<String, List<String>>();
         final DfAdditionalTableProperties tableProperties = getProperties().getAdditionalTableProperties();
         final Map<String, Object> additionalTableMap = tableProperties.getAdditionalTableMap();
-        final List<AppData> dataModels = getDataModels();
         final boolean containsCommonColumn = isDataXlsTemplateContainsCommonColumn();
         final DfFlexibleMap<String, Object> commonColumnMap = getCommonColumnMap();
-        for (AppData appData : dataModels) { // basically one loop only
-            try {
-                final Database database = appData.getDatabase();
-                final List<Table> tableList = database.getTableList();
-                for (Table table : tableList) {
-                    if (additionalTableMap.containsKey(table.getName())) {
+        try {
+            final Database database = _schemaData.getDatabase();
+            final List<Table> tableList = database.getTableList();
+            for (Table table : tableList) {
+                if (additionalTableMap.containsKey(table.getName())) {
+                    continue;
+                }
+                final Column[] columns = table.getColumns();
+                final List<String> columnNameList = new ArrayList<String>();
+                for (Column column : columns) {
+                    if (!containsCommonColumn && commonColumnMap.containsKey(column.getName())) {
                         continue;
                     }
-                    final Column[] columns = table.getColumns();
-                    final List<String> columnNameList = new ArrayList<String>();
-                    for (Column column : columns) {
-                        if (!containsCommonColumn && commonColumnMap.containsKey(column.getName())) {
-                            continue;
-                        }
-                        columnNameList.add(column.getName());
-                    }
-                    tableColumnMap.put(table.getName(), columnNameList);
+                    columnNameList.add(column.getName());
                 }
-            } catch (EngineException e) {
-                throw new IllegalStateException(e);
+                tableColumnMap.put(table.getName(), columnNameList);
             }
+        } catch (EngineException e) {
+            throw new IllegalStateException(e);
         }
         _log.info("...Creating data xls template: tables=" + tableColumnMap.size());
         dumpDataXlsTemplate(tableColumnMap);

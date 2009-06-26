@@ -83,8 +83,8 @@ import org.xml.sax.helpers.DefaultHandler;
 public class XmlToAppData extends DefaultHandler {
 
     // ===================================================================================
-    //                                                                Attribute
-    //                                                                =========
+    //                                                                           Attribute
+    //                                                                           =========
     private AppData app;
     private Database currDB;
     private Table currTable;
@@ -111,23 +111,20 @@ public class XmlToAppData extends DefaultHandler {
     }
 
     // ===================================================================================
-    //                                                              Constructor
-    //                                                              ===========
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Creates a new instance for the specified database type.
      * @param databaseType The type of database for the application.
-     * @param defaultPackage the default java package used for the template file, including trailing slash.
      */
-    public XmlToAppData(String databaseType, String defaultPackage) {
+    public XmlToAppData(String databaseType) {
         app = new AppData(databaseType);
         firstPass = true;
-        // [Unused on DBFlute]
-        // this.defaultPackage = defaultPackage;
     }
 
     // ===================================================================================
-    //                                                                    Parse
-    //                                                                    =====
+    //                                                                               Parse
+    //                                                                               =====
     /**
      * Parses a XML input file and returns a newly created and
      * populated AppData structure.
