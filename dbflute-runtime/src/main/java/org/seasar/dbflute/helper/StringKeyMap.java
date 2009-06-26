@@ -17,6 +17,7 @@ package org.seasar.dbflute.helper;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,12 +38,20 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected StringKeyMap(boolean removeUnderscore, boolean concurrent) {
+    protected StringKeyMap(boolean removeUnderscore, boolean order, boolean concurrent) {
+        if (order && concurrent) {
+            String msg = "The 'order' and 'concurrent' should not be both true at the same time!";
+            throw new IllegalStateException(msg);
+        }
         _removeUnderscore = removeUnderscore;
         if (concurrent) {
             _internalMap = newConcurrentHashMap();
         } else {
-            _internalMap = newHashMap();
+            if (order) {
+                _internalMap = newLinkedHashMap();
+            } else {
+                _internalMap = newHashMap();
+            }
         }
     }
 
@@ -53,7 +62,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
      * @return The map of string key as case insensitive. (NotNull)
      */
     public static <VALUE> StringKeyMap<VALUE> createAsCaseInsensitive() {
-        return new StringKeyMap<VALUE>(false, false);
+        return new StringKeyMap<VALUE>(false, false, false);
     }
 
     /**
@@ -63,15 +72,23 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
      * @return The map of string key as case insensitive and concurrent. (NotNull)
      */
     public static <VALUE> StringKeyMap<VALUE> createAsCaseInsensitiveConcurrent() {
-        return new StringKeyMap<VALUE>(false, true);
+        return new StringKeyMap<VALUE>(false, false, true);
+    }
+
+    public static <VALUE> StringKeyMap<VALUE> createAsCaseInsensitiveOrder() {
+        return new StringKeyMap<VALUE>(false, true, false);
     }
 
     public static <VALUE> StringKeyMap<VALUE> createAsFlexible() {
-        return new StringKeyMap<VALUE>(true, false);
+        return new StringKeyMap<VALUE>(true, false, false);
     }
 
     public static <VALUE> StringKeyMap<VALUE> createAsFlexibleConcurrent() {
-        return new StringKeyMap<VALUE>(true, true);
+        return new StringKeyMap<VALUE>(true, false, true);
+    }
+
+    public static <VALUE> StringKeyMap<VALUE> createAsFlexibleOrder() {
+        return new StringKeyMap<VALUE>(true, true, false);
     }
 
     // ===================================================================================
@@ -198,6 +215,10 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
 
     protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
         return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
+    protected static <KEY, VALUE> HashMap<KEY, VALUE> newLinkedHashMap() {
+        return new LinkedHashMap<KEY, VALUE>();
     }
 
     protected static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {

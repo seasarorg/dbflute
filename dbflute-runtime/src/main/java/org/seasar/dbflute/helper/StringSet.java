@@ -18,6 +18,7 @@ package org.seasar.dbflute.helper;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,29 +43,45 @@ public class StringSet implements Set<String> {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected StringSet(boolean removeUnderscore, boolean concurrent) {
+    protected StringSet(boolean removeUnderscore, boolean order, boolean concurrent) {
+        if (order && concurrent) {
+            String msg = "The 'order' and 'concurrent' should not be both true at the same time!";
+            throw new IllegalStateException(msg);
+        }
         _removeUnderscore = removeUnderscore;
         if (concurrent) {
             _internalMap = newConcurrentHashMap();
         } else {
-            _internalMap = newHashMap();
+            if (order) {
+                _internalMap = newLinkedHashMap();
+            } else {
+                _internalMap = newHashMap();
+            }
         }
     }
 
-    public static StringSet createAsFlexible() {
-        return new StringSet(true, false);
-    }
-
-    public static StringSet createAsFlexibleConcurrent() {
-        return new StringSet(true, true);
-    }
-
     public static StringSet createAsCaseInsensitive() {
-        return new StringSet(false, false);
+        return new StringSet(false, false, false);
     }
 
     public static StringSet createAsCaseInsensitiveConcurrent() {
-        return new StringSet(false, true);
+        return new StringSet(false, false, true);
+    }
+
+    public static StringSet createAsCaseInsensitiveOrder() {
+        return new StringSet(false, true, false);
+    }
+
+    public static StringSet createAsFlexible() {
+        return new StringSet(true, false, false);
+    }
+
+    public static StringSet createAsFlexibleConcurrent() {
+        return new StringSet(true, false, true);
+    }
+
+    public static StringSet createAsFlexibleOrder() {
+        return new StringSet(true, true, false);
     }
 
     // ===================================================================================
@@ -215,6 +232,10 @@ public class StringSet implements Set<String> {
 
     protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
         return new ConcurrentHashMap<KEY, VALUE>();
+    }
+
+    protected static <KEY, VALUE> HashMap<KEY, VALUE> newLinkedHashMap() {
+        return new LinkedHashMap<KEY, VALUE>();
     }
 
     protected static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {

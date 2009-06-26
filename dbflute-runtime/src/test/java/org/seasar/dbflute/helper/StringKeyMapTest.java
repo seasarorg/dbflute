@@ -1,6 +1,9 @@
 package org.seasar.dbflute.helper;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 import org.seasar.dbflute.unit.PlainTestCase;
 
@@ -44,5 +47,115 @@ public class StringKeyMapTest extends PlainTestCase {
         assertEquals(2, map.get("bbb"));
         assertEquals(3, map.get("ccc"));
         assertEquals(3, map.size());
+    }
+
+    public void test_createAsCaseInsensitive() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map = StringKeyMap.createAsCaseInsensitive();
+
+        // ## Act ##
+        map.put("aaa", 1);
+        map.put("bbb", 2);
+        map.put("ccc", 3);
+
+        // ## Assert ##
+        assertEquals(1, map.get("AaA"));
+        assertEquals(2, map.get("Bbb"));
+        assertEquals(3, map.get("CCC"));
+        assertEquals(null, map.get("Aa_A"));
+        log(map.keySet());
+    }
+
+    public void test_createAsCaseInsensitiveConcurrent() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map = StringKeyMap.createAsCaseInsensitiveConcurrent();
+
+        // ## Act ##
+        map.put("aaa", 1);
+        map.put("bbb", 2);
+        map.put("ccc", 3);
+
+        // ## Assert ##
+        assertEquals(1, map.get("AaA"));
+        assertEquals(2, map.get("Bbb"));
+        assertEquals(3, map.get("CCC"));
+        assertEquals(null, map.get("Aa_A"));
+        log(map.keySet());
+    }
+
+    public void test_createAsCaseInsensitiveOrder() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map = StringKeyMap.createAsCaseInsensitiveOrder();
+
+        // ## Act ##
+        map.put("aaa", 1);
+        map.put("bbb", 2);
+        map.put("ccc", 3);
+
+        // ## Assert ##
+        assertEquals(1, map.get("AaA"));
+        assertEquals(2, map.get("Bbb"));
+        assertEquals(3, map.get("CCC"));
+        assertEquals(null, map.get("Aa_A"));
+        Set<String> keySet = map.keySet();
+        List<String> list = new ArrayList<String>(keySet);
+        assertEquals("aaa", list.get(0));
+        assertEquals("bbb", list.get(1));
+        assertEquals("ccc", list.get(2));
+    }
+
+    public void test_createAsFlexible() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map = StringKeyMap.createAsFlexible();
+
+        // ## Act ##
+        map.put("aaa", 1);
+        map.put("bbb", 2);
+        map.put("ccc", 3);
+
+        // ## Assert ##
+        assertEquals(1, map.get("AaA"));
+        assertEquals(2, map.get("Bbb"));
+        assertEquals(3, map.get("CCC"));
+        assertEquals(1, map.get("Aa_A"));
+        log(map.keySet());
+    }
+
+    public void test_createAsFlexibleConcurrent() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map = StringKeyMap.createAsFlexibleConcurrent();
+
+        // ## Act ##
+        map.put("aaa", 1);
+        map.put("bbb", 2);
+        map.put("ccc", 3);
+
+        // ## Assert ##
+        assertEquals(1, map.get("AaA"));
+        assertEquals(2, map.get("Bbb"));
+        assertEquals(3, map.get("CCC"));
+        assertEquals(1, map.get("Aa_A"));
+        log(map.keySet());
+    }
+
+    public void test_createAsFlexibleOrder() throws Exception {
+        // ## Arrange ##
+        StringKeyMap<Object> map = StringKeyMap.createAsFlexibleOrder();
+
+        // ## Act ##
+        map.put("aaa", 1);
+        map.put("bbb", 2);
+        map.put("ccc", 3);
+
+        // ## Assert ##
+        assertEquals(1, map.get("AaA"));
+        assertEquals(2, map.get("Bbb"));
+        assertEquals(3, map.get("CCC"));
+        assertEquals(1, map.get("Aa_A"));
+        Set<String> keySet = map.keySet();
+        List<String> list = new ArrayList<String>(keySet);
+        assertEquals("aaa", list.get(0));
+        assertEquals("bbb", list.get(1));
+        assertEquals("ccc", list.get(2));
     }
 }
