@@ -173,7 +173,7 @@
     <torque-data-model
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.om}"
-      schemaXml="project-schema-${torque.project}.xml"
+      schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
       outputDirectory="${torque.java.dir}"
       outputFile="report.${torque.project}.om.generation"
       useClasspath="${torque.useClasspath}"
@@ -185,7 +185,7 @@
     <torque-data-model
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.om}"
-      schemaXml="project-schema-${torque.project}.xml"
+      schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
       outputDirectory="${torque.java.dir}"
       outputFile="report.${torque.project}.om.generation"
       templatePath="${torque.templatePath}"
@@ -214,7 +214,7 @@
     <torque-doc
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.doc}"
-      schemaXml="project-schema-${torque.project}.xml"
+      schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
       outputDirectory="${torque.doc.dir}"
       outputFile="report.${torque.project}.doc.generation"
       outputFormat="${torque.doc.format}"
@@ -279,7 +279,7 @@
     <torque-sql2entity
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.sql2entity}"
-      schemaXml="project-schema-${torque.project}.xml"
+      schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
       outputDirectory="${torque.java.dir}"
       outputFile="report.${torque.project}.sql2entity.generation"
       templatePath="${torque.templatePath}"
