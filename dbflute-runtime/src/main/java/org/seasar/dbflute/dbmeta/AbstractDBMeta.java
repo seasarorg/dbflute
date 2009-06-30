@@ -38,6 +38,7 @@ import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.helper.mapstring.impl.MapStringBuilderImpl;
+import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.util.DfAssertUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -718,29 +719,20 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected String doExtractPrimaryKeyMapString(Entity entity, String startBrace, String endBrace, String delimiter,
             String equal) {
-        String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
-        StringBuilder sb = new StringBuilder();
-        List<ColumnInfo> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
-        try {
-            for (ColumnInfo columnInfo : columnInfoList) {
-                String columnName = columnInfo.getColumnDbName();
-                Method getterMethod = columnInfo.findGetter();
-                Object value = getterMethod.invoke(entity, (Object[]) null);
-                value = filterClassificationValueIfNeeds(value);
-                helpAppendingColumnValueString(sb, delimiter, equal, columnName, value);
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-        sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
-        return sb.toString();
+        List<ColumnInfo> uniqueColumnList = getPrimaryUniqueInfo().getUniqueColumnList();
+        return doExtractValueMapMapString(entity, uniqueColumnList, startBrace, endBrace, delimiter, equal);
     }
 
     protected String doExtractColumnValueMapString(Entity entity, String startBrace, String endBrace, String delimiter,
             String equal) {
+        List<ColumnInfo> columnInfoList = getColumnInfoList();
+        return doExtractValueMapMapString(entity, columnInfoList, startBrace, endBrace, delimiter, equal);
+    }
+
+    protected String doExtractValueMapMapString(Entity entity, List<ColumnInfo> columnInfoList, String startBrace,
+            String endBrace, String delimiter, String equal) {
         String mapMarkAndStartBrace = MAP_STRING_MAP_MARK + startBrace;
         StringBuilder sb = new StringBuilder();
-        List<ColumnInfo> columnInfoList = getColumnInfoList();
         try {
             for (ColumnInfo columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
@@ -760,8 +752,8 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (value == null) {
             return null;
         }
-        if (value instanceof DefinitionOfClassification) {
-            value = ((DefinitionOfClassification) value).code();
+        if (value instanceof Classification) {
+            value = ((Classification) value).code();
         }
         return value;
     }
@@ -1002,12 +994,12 @@ public abstract class AbstractDBMeta implements DBMeta {
      */
     @SuppressWarnings("unchecked")
     protected static class MapStringValueAnalyzer {
-        protected java.util.Map<String, ? extends Object> _valueMap;
+        protected Map<String, ? extends Object> _valueMap;
         protected String _columnName;
         protected String _uncapPropName;
         protected String _propertyName;
 
-        public MapStringValueAnalyzer(java.util.Map<String, ? extends Object> valueMap) {
+        public MapStringValueAnalyzer(Map<String, ? extends Object> valueMap) {
             this._valueMap = valueMap;
         }
 
@@ -1050,21 +1042,21 @@ public abstract class AbstractDBMeta implements DBMeta {
                     _uncapPropName, javaType.getName()));
         }
 
-        public <COLUMN_TYPE> COLUMN_TYPE analyzeOther(Class<COLUMN_TYPE> javaType) {
+        public Object analyzeOther(Class<?> javaType) {
             final Object obj = _valueMap.get(_columnName);
             if (obj == null) {
                 return null;
             }
-            if (DefinitionOfClassification.class.isAssignableFrom(javaType)) {
+            if (Classification.class.isAssignableFrom(javaType)) {
                 try {
                     final Method codeOfMethod = javaType.getMethod("codeOf", new Class[] { Object.class });
-                    return (COLUMN_TYPE) codeOfMethod.invoke(null, new Object[] { obj });
+                    return codeOfMethod.invoke(null, new Object[] { obj });
                 } catch (Exception e) {
                     String msg = "The method threw the exception: javaType=" + javaType + " obj=" + obj;
                     throw new IllegalStateException(msg, e);
                 }
             }
-            return (COLUMN_TYPE) obj;
+            return obj;
         }
 
         private void helpCheckingTypeString(Object value, String uncapPropName, String typeName) {

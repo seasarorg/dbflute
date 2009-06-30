@@ -13,27 +13,28 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.dbmeta;
+package org.seasar.dbflute.jdbc;
 
 
 /**
- * The marker interface for definition of classification.
+ * The definition of classification. <br />
+ * It's an internal interface for DBFlute runtime.
  * @author jflute
  */
-public interface DefinitionOfClassification {
+public interface Classification {
 
     /**
      * @return The code of the classification. (NotNull)
      */
-    public Integer code();
+    String code();
 
     /**
      * @return The name of the classification. (NotNull)
      */
-    public String name();
+    String name();
 
     /**
      * @return The code of the classification. (Nullable: when an alias is not specified in its setting)
      */
-    public String alias();
+    String alias();
 }
