@@ -13,7 +13,22 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class AbstractDBMetaTest extends PlainTestCase {
 
-    public void test_MapStringValueAnalyzer_analyzeOther() throws Exception {
+    public void test_MapStringValueAnalyzer_analyzeOther_normalValue() throws Exception {
+        // ## Arrange ##
+        Map<String, Object> valueMap = new HashMap<String, Object>();
+        Object value = new Object();
+        valueMap.put("FOO_NAME", value);
+        MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(valueMap);
+        analyzer.init("FOO_NAME", "fooName", "FooName");
+
+        // ## Act ##
+        Object actual = analyzer.analyzeOther(Object.class);
+
+        // ## Assert ##
+        assertEquals(value, actual);
+    }
+
+    public void test_MapStringValueAnalyzer_analyzeOther_classification() throws Exception {
         // ## Arrange ##
         Map<String, String> valueMap = new HashMap<String, String>();
         valueMap.put("FOO_NAME", "bar");

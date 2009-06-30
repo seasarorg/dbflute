@@ -140,7 +140,10 @@ public class TnValueTypes {
         registerValueType(boolean.class, BOOLEAN);
         registerValueType(Boolean.class, BOOLEAN);
         registerValueType(UUID.class, UUID);
-        // registerValueType(Object.class, OBJECT);
+
+        // Because object type is to be handle as special type.
+        //registerValueType(Object.class, OBJECT);
+
         try {
             isEnumMethod = Class.class.getMethod("isEnum", (Class[]) null);
         } catch (Throwable ignore) {
@@ -157,12 +160,8 @@ public class TnValueTypes {
     }
 
     // ===================================================================================
-    //                                                                               Clear
-    //                                                                               =====
-    public static void clear() {
-        valueTypeCache.clear();
-    }
-
+    //                                                                            Register
+    //                                                                            ========
     public static void registerValueType(Class<?> clazz, ValueType valueType) {
         types.put(clazz, valueType);
     }
@@ -171,18 +170,19 @@ public class TnValueTypes {
         types.remove(clazz);
     }
 
-    public static void setEnumDefaultValueType(Class<?> enumDefaultValueTypeClass) throws NoSuchMethodException {
-        enumDefaultValueTypeConstructor = enumDefaultValueTypeClass.getConstructor(new Class[] { Class.class });
+    /**
+     * @param valueTypeName The name of value type. (NotNull)
+     * @param valueType The value type. (NotNull)
+     */
+    public static void registerPluginValueType(String valueTypeName, ValueType valueType) {
+        assertObjectNotNull("valueTypeName", valueTypeName);
+        assertObjectNotNull("valueType", valueType);
+        pluginValueTypeMap.put(valueTypeName, valueType);
     }
 
-    public static void setEnumOrdinalValueType(Class<?> enumOrdinalValueTypeClass) throws NoSuchMethodException {
-        enumOrdinalValueTypeConstructor = enumOrdinalValueTypeClass.getConstructor(new Class[] { Class.class });
-    }
-
-    public static void setEnumStringValueType(Class<?> enumStringValueTypeClass) throws NoSuchMethodException {
-        enumStringValueTypeConstructor = enumStringValueTypeClass.getConstructor(new Class[] { Class.class });
-    }
-
+    // ===================================================================================
+    //                                                                                 Get
+    //                                                                                 ===
     public static ValueType getValueType(Object obj) {
         if (obj == null) {
             return OBJECT;
@@ -195,12 +195,12 @@ public class TnValueTypes {
             return OBJECT;
         }
         for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
-            ValueType valueType = getValueType0(c);
+            final ValueType valueType = getValueType0(c);
             if (valueType != null) {
                 return valueType;
             }
         }
-        ValueType valueType = getCachedValueType(clazz);
+        final ValueType valueType = getCachedValueType(clazz);
         if (valueType != null) {
             return valueType;
         }
@@ -209,6 +209,15 @@ public class TnValueTypes {
 
     private static ValueType getValueType0(Class<?> clazz) {
         return types.get(clazz);
+    }
+
+    /**
+     * @param valueTypeName The name of value type. (NotNull)
+     * @return The value type. (Nullable)
+     */
+    public static ValueType getPluginValueType(String valueTypeName) {
+        assertObjectNotNull("valueTypeName", valueTypeName);
+        return pluginValueTypeMap.get(valueTypeName);
     }
 
     private static boolean hasCachedValueType(Class<?> clazz) {
@@ -239,30 +248,6 @@ public class TnValueTypes {
         }
         valueTypeCache.put(clazz.getName(), NULL);
         return null;
-    }
-
-    private static Class<?> normalizeEnum(Class<?> clazz) {
-        if (isEnumMethod == null || enumStringValueTypeConstructor == null) {
-            return null;
-        }
-        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
-            if (DfReflectionUtil.invoke(isEnumMethod, c, null).equals(Boolean.TRUE)) {
-                return c;
-            }
-        }
-        return null;
-    }
-
-    public static ValueType getEnumDefaultValueType(Class<?> clazz) {
-        return (ValueType) DfReflectionUtil.newInstance(enumDefaultValueTypeConstructor, new Class<?>[] { clazz });
-    }
-
-    public static ValueType getEnumStringValueType(Class<?> clazz) {
-        return (ValueType) DfReflectionUtil.newInstance(enumStringValueTypeConstructor, new Class<?>[] { clazz });
-    }
-
-    public static ValueType getEnumOrdinalValueType(Class<?> clazz) {
-        return (ValueType) DfReflectionUtil.newInstance(enumOrdinalValueTypeConstructor, new Class<?>[] { clazz });
     }
 
     public static ValueType createUserDefineValueType(Class<?> clazz) {
@@ -346,25 +331,49 @@ public class TnValueTypes {
     }
 
     // ===================================================================================
-    //                                                                Additional ValueType
-    //                                                                ====================
-    /**
-     * @param valueTypeName The name of value type. (NotNull)
-     * @param valueType The value type. (NotNull)
-     */
-    public static void registerPluginValueType(String valueTypeName, ValueType valueType) {
-        assertObjectNotNull("valueTypeName", valueTypeName);
-        assertObjectNotNull("valueType", valueType);
-        pluginValueTypeMap.put(valueTypeName, valueType);
+    //                                                                                Enum
+    //                                                                                ====
+    public static void setEnumDefaultValueType(Class<?> enumDefaultValueTypeClass) throws NoSuchMethodException {
+        enumDefaultValueTypeConstructor = enumDefaultValueTypeClass.getConstructor(new Class[] { Class.class });
     }
 
-    /**
-     * @param valueTypeName The name of value type. (NotNull)
-     * @return The value type. (Nullable)
-     */
-    public static ValueType getPluginValueType(String valueTypeName) {
-        assertObjectNotNull("valueTypeName", valueTypeName);
-        return pluginValueTypeMap.get(valueTypeName);
+    public static void setEnumOrdinalValueType(Class<?> enumOrdinalValueTypeClass) throws NoSuchMethodException {
+        enumOrdinalValueTypeConstructor = enumOrdinalValueTypeClass.getConstructor(new Class[] { Class.class });
+    }
+
+    public static void setEnumStringValueType(Class<?> enumStringValueTypeClass) throws NoSuchMethodException {
+        enumStringValueTypeConstructor = enumStringValueTypeClass.getConstructor(new Class[] { Class.class });
+    }
+
+    private static Class<?> normalizeEnum(Class<?> clazz) {
+        if (isEnumMethod == null || enumStringValueTypeConstructor == null) {
+            return null;
+        }
+        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
+            if (DfReflectionUtil.invoke(isEnumMethod, c, null).equals(Boolean.TRUE)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public static ValueType getEnumDefaultValueType(Class<?> clazz) {
+        return (ValueType) DfReflectionUtil.newInstance(enumDefaultValueTypeConstructor, new Class<?>[] { clazz });
+    }
+
+    public static ValueType getEnumStringValueType(Class<?> clazz) {
+        return (ValueType) DfReflectionUtil.newInstance(enumStringValueTypeConstructor, new Class<?>[] { clazz });
+    }
+
+    public static ValueType getEnumOrdinalValueType(Class<?> clazz) {
+        return (ValueType) DfReflectionUtil.newInstance(enumOrdinalValueTypeConstructor, new Class<?>[] { clazz });
+    }
+
+    // ===================================================================================
+    //                                                                               Clear
+    //                                                                               =====
+    public static void clear() {
+        valueTypeCache.clear();
     }
 
     // ===================================================================================
