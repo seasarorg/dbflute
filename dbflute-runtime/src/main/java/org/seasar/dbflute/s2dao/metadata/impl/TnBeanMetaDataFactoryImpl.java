@@ -76,7 +76,8 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
             if (conn != null) {
                 try {
                     conn.close();
-                } catch (SQLException ignored) {
+                } catch (SQLException e) {
+                    new SQLExceptionHandler().handleSQLException(e);
                 }
             }
         }
