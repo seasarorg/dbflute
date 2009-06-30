@@ -357,6 +357,16 @@ public class ForeignKey {
         return getTable().getColumn(localColumnName);
     }
 
+    public boolean hasLocalColumnExceptPrimaryKey() {
+        final List<Column> localColumnList = getLocalColumnList();
+        for (Column column : localColumnList) {
+            if (!column.isPrimaryKey()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // -----------------------------------------------------
     //                                       Foreign Element
     //                                       ---------------
@@ -983,7 +993,7 @@ public class ForeignKey {
         }
         return result;
     }
-    
+
     // ===================================================================================
     //                                                                     Fixed Condition
     //                                                                     ===============

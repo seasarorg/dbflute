@@ -314,18 +314,20 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
         protected void doSpecifyRequiredColumn() {
 #foreach ($col in $table.primaryKey)
-            column${col.javaName}();// PK
+            column${col.javaName}(); // PK
 #end
 #foreach ($fk in $table.foreignKeys)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
+#if ($fk.hasLocalColumnExceptPrimaryKey())
             if (_myQyCall.qy().hasConditionQuery${tmpPropertyNameInitCap}()) {
 #foreach ($col in $fk.localColumnList)
 #if (!$col.isPrimaryKey())
-                column${col.javaName}();// FK
+                column${col.javaName}(); // FK
 #end
 #end
             }
+#end
 #end
         }
         protected String getTableDbName() { return "$table.name"; }
