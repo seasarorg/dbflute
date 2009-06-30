@@ -77,7 +77,7 @@ public class ${myClassName} extends AbstractConditionBean {
         }
 #else
 #if ($col.isJavaNativeDateObject())
-                query().set${col.javaName}_Equal(new ${col.javaNative}(parseDateStringAsMillis(obj, "${col.uncapitalisedJavaName}", "${col.JavaNative}")));
+                query().set${col.javaName}_Equal(new ${col.javaNative}(parseDateStringAsMillis(obj, "${col.uncapitalisedJavaName}", "${col.javaNative}")));
             }
         }
 #else

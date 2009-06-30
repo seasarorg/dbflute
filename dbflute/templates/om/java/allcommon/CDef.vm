@@ -3,26 +3,13 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 import java.util.HashMap;
 import java.util.Map;
 
+import org.seasar.dbflute.jdbc.Classification;
+
 /**
- * The definition interface that has classification.
+ * The interface of classification definition.
  * @author ${database.classAuthor}
  */
-public interface ${glCDef} {
-
-    /**
-     * @return The code of the classification. (NotNull)
-     */
-	public Integer code();
-
-    /**
-     * @return The name of the classification. (NotNull)
-     */
-	public String name();
-
-    /**
-     * @return The code of the classification. (Nullable: when an alias is not specified in its setting)
-     */
-	public String alias();
+public interface ${glCDef} extends Classification {
 
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
