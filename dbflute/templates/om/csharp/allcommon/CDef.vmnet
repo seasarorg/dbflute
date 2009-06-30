@@ -45,7 +45,8 @@ namespace ${glPackageBaseCommon} {
             public String Name { get { return _name; } }
             public String Alias { get { return _alias; } }
             public static ${classificationName} CodeOf(Object code) {
-                if (code == null) { return null; } return _codeValueMap.get(code.ToString().ToLower());
+                if (code == null) { return null; } if (code is ${classificationName}) { return (${classificationName})code; }
+                return _codeValueMap.get(code.ToString().ToLower());
             }
             public static ${classificationName}[] Values { get {
                 ${classificationName}[] values = new ${classificationName}[_codeValueMap.size()];

@@ -24,7 +24,7 @@ import org.seasar.dbflute.properties.bean.DfClassificationElement;
 import org.seasar.dbflute.properties.bean.DfClassificationTop;
 
 /**
- * Classification properties.
+ * The properties for classification.
  * @author jflute
  */
 public final class DfClassificationProperties extends DfAbstractHelperProperties {
@@ -214,9 +214,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             final String classificationName = map.get("classificationName");
 
             final String code = map.get(ClassificationInfo.KEY_CODE);
-            final String name = map.get("name");
-            final String alias = map.get("alias");
-            final String comment = map.get("comment");
+            final String name = map.get(ClassificationInfo.KEY_NAME);
+            final String alias = map.get(ClassificationInfo.KEY_ALIAS);
+            final String comment = map.get(ClassificationInfo.KEY_COMMENT);
             final String topCode = map.get(ClassificationInfo.KEY_TOP_CODE);
             final String topComment = map.get(ClassificationInfo.KEY_TOP_COMMENT);
 
