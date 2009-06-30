@@ -42,7 +42,7 @@ public interface ${glCDef} {
      * $classificationTopMap.get('topComment')
      */
 #end
-    public enum ${classificationName} {
+    public enum ${classificationName} implements ${glCDef} {
 #set ($count = 0)
 #foreach ($classificationMap in $classificationMapList)
 #if ($count != 0)
