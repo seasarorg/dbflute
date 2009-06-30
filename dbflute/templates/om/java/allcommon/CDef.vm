@@ -4,10 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The definition class that has classification.
- * @author ${database.ClassAuthor}
+ * The definition interface that has classification.
+ * @author ${database.classAuthor}
  */
-public class ${glCDef} {
+public interface ${glCDef} {
+
+    /**
+     * @return The code of the classification. (NotNull)
+     */
+	public Integer code();
+
+    /**
+     * @return The name of the classification. (NotNull)
+     */
+	public String name();
+
+    /**
+     * @return The code of the classification. (Nullable: when an alias is not specified in its setting)
+     */
+	public String alias();
 
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
