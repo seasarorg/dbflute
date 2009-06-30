@@ -11,24 +11,24 @@ import org.seasar.dbflute.unit.PlainTestCase;
  * @author jflute
  * @since 0.9.5.1 (2009/06/30 Tuesday)
  */
-public class MapStringValueAnalyzerTest extends PlainTestCase {
+public class AbstractDBMetaTest extends PlainTestCase {
 
-    public void test_analyzeOther() throws Exception {
+    public void test_MapStringValueAnalyzer_analyzeOther() throws Exception {
         // ## Arrange ##
-        Map<String, MockClassification> valueMap = new HashMap<String, MockClassification>();
-        valueMap.put("FOO_NAME", new MockClassification());
+        Map<String, String> valueMap = new HashMap<String, String>();
+        valueMap.put("FOO_NAME", "bar");
         MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(valueMap);
         analyzer.init("FOO_NAME", "fooName", "FooName");
 
         // ## Act ##
-        Object actual = analyzer.analyzeOther(MockClassification.class);
+        MockClassification actual = analyzer.analyzeOther(MockClassification.class);
 
         // ## Assert ##
-        assertEquals("codeOf", actual);
+        assertEquals(MockClassification.BAR, actual);
     }
 
-    private static class MockClassification implements Classification {
-
+    private static enum MockClassification implements Classification {
+        FOO, BAR;
         public String alias() {
             return null;
         }
@@ -37,12 +37,8 @@ public class MapStringValueAnalyzerTest extends PlainTestCase {
             return null;
         }
 
-        public String name() {
-            return null;
-        }
-
-        public static String codeOf(Object obj) {
-            return "codeOf";
+        public static MockClassification codeOf(Object obj) {
+            return obj instanceof String && obj.equals("bar") ? BAR : null;
         }
     }
 }

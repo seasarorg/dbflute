@@ -1042,7 +1042,7 @@ public abstract class AbstractDBMeta implements DBMeta {
                     _uncapPropName, javaType.getName()));
         }
 
-        public Object analyzeOther(Class<?> javaType) {
+        public <COLUMN_TYPE> COLUMN_TYPE analyzeOther(Class<COLUMN_TYPE> javaType) {
             final Object obj = _valueMap.get(_columnName);
             if (obj == null) {
                 return null;
@@ -1050,13 +1050,13 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (Classification.class.isAssignableFrom(javaType)) {
                 try {
                     final Method codeOfMethod = javaType.getMethod("codeOf", new Class[] { Object.class });
-                    return codeOfMethod.invoke(null, new Object[] { obj });
+                    return (COLUMN_TYPE) codeOfMethod.invoke(null, new Object[] { obj });
                 } catch (Exception e) {
                     String msg = "The method threw the exception: javaType=" + javaType + " obj=" + obj;
                     throw new IllegalStateException(msg, e);
                 }
             }
-            return obj;
+            return (COLUMN_TYPE) obj;
         }
 
         private void helpCheckingTypeString(Object value, String uncapPropName, String typeName) {
