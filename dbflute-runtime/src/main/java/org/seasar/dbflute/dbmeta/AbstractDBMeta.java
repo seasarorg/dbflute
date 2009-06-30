@@ -666,7 +666,8 @@ public abstract class AbstractDBMeta implements DBMeta {
     protected <ENTITY extends Entity> void doAcceptPrimaryKeyMap(ENTITY entity,
             Map<String, ? extends Object> columnValueMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
-        MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap, entity.getModifiedPropertyNames());
+        entity.clearModifiedPropertyNames();
+        MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap);
         List<ColumnInfo> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
         for (ColumnInfo columnInfo : columnInfoList) {
             String columnName = columnInfo.getColumnDbName();
@@ -692,7 +693,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     protected <ENTITY extends Entity> void doAcceptColumnValueMap(ENTITY entity,
             Map<String, ? extends Object> columnValueMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
-        MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap, entity.getModifiedPropertyNames());
+        MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap);
         List<ColumnInfo> columnInfoList = getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
             String columnName = columnInfo.getColumnDbName();
@@ -725,6 +726,7 @@ public abstract class AbstractDBMeta implements DBMeta {
                 String columnName = columnInfo.getColumnDbName();
                 Method getterMethod = columnInfo.findGetter();
                 Object value = getterMethod.invoke(entity, (Object[]) null);
+                value = filterClassificationValueIfNeeds(value);
                 helpAppendingColumnValueString(sb, delimiter, equal, columnName, value);
             }
         } catch (Exception e) {
@@ -744,6 +746,7 @@ public abstract class AbstractDBMeta implements DBMeta {
                 String columnName = columnInfo.getColumnDbName();
                 Method getterMethod = columnInfo.findGetter();
                 Object value = getterMethod.invoke(entity, (Object[]) null);
+                value = filterClassificationValueIfNeeds(value);
                 helpAppendingColumnValueString(sb, delimiter, equal, columnName, value);
             }
         } catch (Exception e) {
@@ -751,6 +754,16 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
         sb.delete(0, delimiter.length()).insert(0, mapMarkAndStartBrace).append(endBrace);
         return sb.toString();
+    }
+
+    protected Object filterClassificationValueIfNeeds(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof DefinitionOfClassification) {
+            value = ((DefinitionOfClassification) value).code();
+        }
+        return value;
     }
 
     // -----------------------------------------------------
@@ -990,15 +1003,12 @@ public abstract class AbstractDBMeta implements DBMeta {
     @SuppressWarnings("unchecked")
     protected static class MapStringValueAnalyzer {
         protected java.util.Map<String, ? extends Object> _valueMap;
-        protected java.util.Set<String> _modifiedPropertyNames;
         protected String _columnName;
         protected String _uncapPropName;
         protected String _propertyName;
 
-        public MapStringValueAnalyzer(java.util.Map<String, ? extends Object> valueMap,
-                java.util.Set<String> modifiedPropertyNames) {
+        public MapStringValueAnalyzer(java.util.Map<String, ? extends Object> valueMap) {
             this._valueMap = valueMap;
-            this._modifiedPropertyNames = modifiedPropertyNames;
         }
 
         public boolean init(String columnName, String uncapPropName, String propertyName) {
@@ -1011,7 +1021,6 @@ public abstract class AbstractDBMeta implements DBMeta {
         public <COLUMN_TYPE> COLUMN_TYPE analyzeString(Class<COLUMN_TYPE> javaType) {
             final Object obj = _valueMap.get(_columnName);
             if (obj == null) {
-                _modifiedPropertyNames.remove(_propertyName);
                 return null;
             }
             helpCheckingTypeString(obj, _uncapPropName, javaType.getName());
@@ -1021,7 +1030,6 @@ public abstract class AbstractDBMeta implements DBMeta {
         public <COLUMN_TYPE> COLUMN_TYPE analyzeNumber(Class<COLUMN_TYPE> javaType) {
             final Object obj = _valueMap.get(_columnName);
             if (obj == null) {
-                _modifiedPropertyNames.remove(_propertyName);
                 return null;
             }
             if (javaType.isAssignableFrom(obj.getClass())) {
@@ -1033,7 +1041,6 @@ public abstract class AbstractDBMeta implements DBMeta {
         public <COLUMN_TYPE> COLUMN_TYPE analyzeDate(Class<COLUMN_TYPE> javaType) {
             final Object obj = _valueMap.get(_columnName);
             if (obj == null) {
-                _modifiedPropertyNames.remove(_propertyName);
                 return null;
             }
             if (javaType.isAssignableFrom(obj.getClass())) {
@@ -1046,8 +1053,16 @@ public abstract class AbstractDBMeta implements DBMeta {
         public <COLUMN_TYPE> COLUMN_TYPE analyzeOther(Class<COLUMN_TYPE> javaType) {
             final Object obj = _valueMap.get(_columnName);
             if (obj == null) {
-                _modifiedPropertyNames.remove(_propertyName);
                 return null;
+            }
+            if (DefinitionOfClassification.class.isAssignableFrom(javaType)) {
+                try {
+                    final Method codeOfMethod = javaType.getMethod("codeOf", new Class[] { Object.class });
+                    return (COLUMN_TYPE) codeOfMethod.invoke(null, new Object[] { obj });
+                } catch (Exception e) {
+                    String msg = "The method threw the exception: javaType=" + javaType + " obj=" + obj;
+                    throw new IllegalStateException(msg, e);
+                }
             }
             return (COLUMN_TYPE) obj;
         }
