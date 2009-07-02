@@ -445,7 +445,6 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                   Assist Helper
     //                                                                   =============
-    @SuppressWarnings("unchecked")
     protected <VALUE> VALUE getByFlexibleKey(Map<String, VALUE> map, String key) {
         return new DfFlexibleMap<String, VALUE>(map).get(key);
     }

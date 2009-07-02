@@ -907,7 +907,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return null;
         }
 
-        // Because columnClassificationMap is not flexible map.
+        // Because allColumnClassificationMap is not flexible map.
         final String classificationName = getByFlexibleKey(allColumnClassificationMap, columnName);
         if (classificationName == null) {
             final Set<String> columnNameHintSet = allColumnClassificationMap.keySet();
