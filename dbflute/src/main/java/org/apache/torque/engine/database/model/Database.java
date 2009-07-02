@@ -122,7 +122,7 @@ public class Database {
     //                                                 Table
     //                                                 -----
     protected List<Table> _tableList = new ArrayList<Table>(100);
-    protected StringKeyMap<Table> _flexibleTableMap = StringKeyMap.createAsFlexibleOrder();
+    protected StringKeyMap<Table> _tableMap = StringKeyMap.createAsFlexibleOrder();
 
     // -----------------------------------------------------
     //                                        for Sql2Entity
@@ -210,7 +210,7 @@ public class Database {
     }
 
     public Table getTable(String name) {
-        return _flexibleTableMap.get(name);
+        return _tableMap.get(name);
     }
 
     public Table addTable(Attributes attrib) {
@@ -224,7 +224,7 @@ public class Database {
     public void addTable(Table tbl) {
         tbl.setDatabase(this);
         _tableList.add(tbl);
-        _flexibleTableMap.put(tbl.getName(), tbl);
+        _tableMap.put(tbl.getName(), tbl);
     }
 
     public void doFinalInitialization() throws EngineException { // Unused on DBFlute

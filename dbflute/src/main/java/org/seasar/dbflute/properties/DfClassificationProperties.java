@@ -712,6 +712,8 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return _classificationDeploymentMap;
         }
         final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);
+
+        // It's flexible because table name should be treated as flexible/
         _classificationDeploymentMap = StringKeyMap.createAsFlexibleOrder();
         final Set<String> deploymentMapkeySet = map.keySet();
         for (String tableName : deploymentMapkeySet) {
@@ -720,7 +722,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 @SuppressWarnings("unchecked")
                 final Map<String, String> tmpMap = (Map<String, String>) value;
                 final Set<String> tmpMapKeySet = tmpMap.keySet();
-                final Map<String, String> columnClassificationMap = StringKeyMap.createAsFlexibleOrder();
+
+                // It's normal map because this column name key contains hint.
+                final Map<String, String> columnClassificationMap = new LinkedHashMap<String, String>();
                 for (Object columnNameObj : tmpMapKeySet) {
                     final String columnName = (String) columnNameObj;
                     final String classificationName = (String) tmpMap.get(columnName);
@@ -790,6 +794,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     protected Map<String, String> getColumnClsMap(Map<String, Map<String, String>> deploymentMap, String tableName) {
         Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
         if (columnClassificationMap == null) {
+            // It's normal map because this column name key contains hint.
             columnClassificationMap = new LinkedHashMap<String, String>();
             deploymentMap.put(tableName, columnClassificationMap);
         }
@@ -838,7 +843,10 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             return null;
         }
         final Map<String, String> columnClassificationMap = deploymentMap.get(tableName);
-        final String classificationName = columnClassificationMap.get(columnName);
+
+        // Because columnClassificationMap is not flexible map.
+        final String classificationName = getByFlexibleKey(columnClassificationMap, columnName);
+
         if (classificationName == null) {
             final Set<String> columnClassificationMapKeySet = columnClassificationMap.keySet();
             for (String columnNameHint : columnClassificationMapKeySet) {
@@ -898,10 +906,15 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         if (allColumnClassificationMap == null) {
             return null;
         }
-        final Set<String> columnNameHintSet = allColumnClassificationMap.keySet();
-        for (String columnNameHint : columnNameHintSet) {
-            if (isHitByTheHint(columnName, columnNameHint)) {
-                return allColumnClassificationMap.get(columnNameHint);
+
+        // Because columnClassificationMap is not flexible map.
+        final String classificationName = getByFlexibleKey(allColumnClassificationMap, columnName);
+        if (classificationName == null) {
+            final Set<String> columnNameHintSet = allColumnClassificationMap.keySet();
+            for (String columnNameHint : columnNameHintSet) {
+                if (isHitByTheHint(columnName, columnNameHint)) {
+                    return allColumnClassificationMap.get(columnNameHint);
+                }
             }
         }
         return null;
