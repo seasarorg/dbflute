@@ -5,12 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationInfo;
 
 /**
  * @author jflute
@@ -134,6 +136,46 @@ public class DfClassificationPropertiesTest {
         assertEquals("Flg", prop.getAllClassificationName("delete_flg"));
         assertEquals("Flg", prop.getAllClassificationName("VALID_FLG"));
         assertEquals("Flg", prop.getAllClassificationName("valid_flg"));
+    }
+
+    @Test
+    public void test_isElementMapClassificationMeta() {
+        // ## Arrange ##
+        final Map<String, Map<String, String>> deploymentMap = new LinkedHashMap<String, Map<String, String>>();
+        final DfClassificationProperties prop = createClassificationProperties(deploymentMap);
+        final Map<String, String> elementMap = new HashMap<String, String>();
+
+        // ## Act & Assert ##
+        assertFalse(prop.isElementMapClassificationMeta(elementMap));
+        elementMap.put(DfClassificationInfo.KEY_TOP_CODE, "foo");
+        assertTrue(prop.isElementMapClassificationMeta(elementMap));
+        elementMap.put(DfClassificationInfo.KEY_TOP_COMMENT, "bar");
+        assertTrue(prop.isElementMapClassificationMeta(elementMap));
+        elementMap.put(DfClassificationInfo.KEY_TOP_CODE, null);
+        assertTrue(prop.isElementMapClassificationMeta(elementMap));
+        elementMap.put(DfClassificationInfo.KEY_TOP_COMMENT, null);
+        assertFalse(prop.isElementMapClassificationMeta(elementMap));
+        elementMap.put(DfClassificationInfo.KEY_CODE, "foo");
+        assertFalse(prop.isElementMapClassificationMeta(elementMap));
+        elementMap.put(DfClassificationInfo.KEY_TOP_CODE, "foo");
+        assertTrue(prop.isElementMapClassificationMeta(elementMap));
+    }
+
+    @Test
+    public void test_isTableClassificationSuppressAutoDeploy() {
+        // ## Arrange ##
+        final Map<String, Map<String, String>> deploymentMap = new LinkedHashMap<String, Map<String, String>>();
+        final DfClassificationProperties prop = createClassificationProperties(deploymentMap);
+        final Map<String, String> elementMap = new HashMap<String, String>();
+
+        // ## Act & Assert ##
+        assertFalse(prop.isTableClassificationSuppressAutoDeploy(elementMap));
+        elementMap.put("suppressAutoDeploy", "false");
+        assertFalse(prop.isTableClassificationSuppressAutoDeploy(elementMap));
+        elementMap.put("suppressAutoDeploy", "true");
+        assertTrue(prop.isTableClassificationSuppressAutoDeploy(elementMap));
+        elementMap.put("suppressAutoDeploy", "True");
+        assertTrue(prop.isTableClassificationSuppressAutoDeploy(elementMap));
     }
 
     protected DfClassificationProperties createClassificationProperties(Map<String, Map<String, String>> deploymentMap) {

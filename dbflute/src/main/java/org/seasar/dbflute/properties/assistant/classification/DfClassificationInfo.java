@@ -33,11 +33,11 @@ public class DfClassificationInfo {
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
-    public void acceptBasicClassificationMap(Map<?, ?> elementMap) {
+    public void acceptClassificationBasicElementMap(Map<?, ?> elementMap) {
         acceptMap(elementMap, KEY_CODE, KEY_NAME, KEY_ALIAS, KEY_COMMENT, false);
     }
 
-    public void acceptMetaClassificationMap(Map<?, ?> elementMap) {
+    public void acceptClassificationMetaElementMap(Map<?, ?> elementMap) {
         group = true;
         acceptMap(elementMap, KEY_TOP_CODE, null, null, KEY_TOP_COMMENT, true);
     }
