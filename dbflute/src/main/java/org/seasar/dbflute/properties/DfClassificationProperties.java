@@ -20,9 +20,9 @@ import org.apache.torque.engine.database.model.ForeignKey;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer;
-import org.seasar.dbflute.properties.assistant.classification.ClassificationLiteralSetupper;
-import org.seasar.dbflute.properties.assistant.classification.ClassificationSqlResourceCloser;
-import org.seasar.dbflute.properties.assistant.classification.ClassificationTopSqlExecutor;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationLiteralSetupper;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationSqlResourceCloser;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTopSqlExecutor;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationInfo;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
@@ -190,7 +190,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
                 if (classificationCode != null || classificationComment != null) {
                     setupClassificationTopFromLiteralIfNeeds(classificationName, elementMap);
                 } else {
-                    new ClassificationLiteralSetupper().setup(classificationName, elementMap, elementList);
+                    new DfClassificationLiteralSetupper().setup(classificationName, elementMap, elementList);
                 }
             }
             _classificationDefinitionMap.put(classificationName, elementList);
@@ -210,7 +210,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                                     Definition Helper
     //                                     -----------------
     protected void setupFromDatabaseByTopSql(String sql) {
-        final ClassificationTopSqlExecutor executor = new ClassificationTopSqlExecutor();
+        final DfClassificationTopSqlExecutor executor = new DfClassificationTopSqlExecutor();
         final List<Map<String, String>> resultList = executor.executeTopSql(getDatabaseProperties().getConnection(),
                 sql);
 
@@ -355,7 +355,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         } catch (SQLException e) {
             throw new RuntimeException("The sql is " + sql, e);
         } finally {
-            new ClassificationSqlResourceCloser().closeSqlResource(conn, stmt, rs);
+            new DfClassificationSqlResourceCloser().closeSqlResource(conn, stmt, rs);
         }
     }
 

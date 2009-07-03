@@ -18,12 +18,12 @@ import org.apache.commons.logging.LogFactory;
  * @author jflute
  * @since 0.9.5.1 (2009/07/03 Friday)
  */
-public class ClassificationTopSqlExecutor {
+public class DfClassificationTopSqlExecutor {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(ClassificationTopSqlExecutor.class);
+    private static final Log _log = LogFactory.getLog(DfClassificationTopSqlExecutor.class);
 
     // ===================================================================================
     //                                                                             Execute
@@ -83,7 +83,7 @@ public class ClassificationTopSqlExecutor {
         } catch (SQLException e) {
             throw new RuntimeException("The sql is " + sql, e);
         } finally {
-            new ClassificationSqlResourceCloser().closeSqlResource(conn, stmt, rs);
+            new DfClassificationSqlResourceCloser().closeSqlResource(conn, stmt, rs);
         }
         return elementList;
     }

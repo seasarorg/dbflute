@@ -13,7 +13,7 @@ import org.seasar.dbflute.properties.DfClassificationProperties;
  * @author jflute
  * @since 0.9.5.1 (2009/07/03 Friday)
  */
-public class ClassificationSqlResourceCloser {
+public class DfClassificationSqlResourceCloser {
 
     // ===================================================================================
     //                                                                          Definition

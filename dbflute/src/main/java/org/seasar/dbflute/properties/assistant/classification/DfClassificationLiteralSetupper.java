@@ -7,7 +7,7 @@ import java.util.Map;
  * @author jflute
  * @since 0.9.5.1 (2009/07/03 Friday)
  */
-public class ClassificationLiteralSetupper {
+public class DfClassificationLiteralSetupper {
 
     @SuppressWarnings("unchecked")
     public void setup(String classificationName, Map elementMap, List<Map<String, String>> elementList) {
