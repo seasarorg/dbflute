@@ -6,16 +6,25 @@ package org.seasar.dbflute.properties.assistant.classification;
  */
 public class DfClassificationElement {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _code;
     protected String _name;
     protected String _alias;
     protected String _comment;
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
     @Override
     public String toString() {
         return "{" + _code + ", " + _name + ", " + _alias + ", " + _comment + "}";
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public String getCode() {
         return _code;
     }
