@@ -1,4 +1,4 @@
-package org.seasar.dbflute.properties.bean;
+package org.seasar.dbflute.properties.assistant.classification;
 
 /**
  * @author jflute

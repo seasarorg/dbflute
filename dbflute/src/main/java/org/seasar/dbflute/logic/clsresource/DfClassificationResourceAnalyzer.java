@@ -15,8 +15,8 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
-import org.seasar.dbflute.properties.bean.DfClassificationElement;
-import org.seasar.dbflute.properties.bean.DfClassificationTop;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.util.DfNameHintUtil;
 
 /**

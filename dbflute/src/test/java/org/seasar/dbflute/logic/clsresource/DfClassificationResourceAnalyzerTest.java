@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.seasar.dbflute.properties.bean.DfClassificationElement;
-import org.seasar.dbflute.properties.bean.DfClassificationTop;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 
 /**
  * @author jflute
