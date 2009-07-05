@@ -76,9 +76,9 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         int i = handler.execute(args);
 
         // [Comment Out]: This statement moved to the handler at [DBFlute-0.8.0].
-        // if (isCheckSingleRowUpdate() && i < 1) {
-        //     throw createNotSingleRowUpdatedRuntimeException(args[0], i);
-        // }
+        //if (isCheckSingleRowUpdate() && i < 1) {
+        //    throw createNotSingleRowUpdatedRuntimeException(args[0], i);
+        //}
 
         return Integer.valueOf(i);
     }
@@ -117,11 +117,11 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 
     protected String createNoUpdateLogMessage(final Object bean, final TnBeanMetaData bmd) {
         final StringBuffer sb = new StringBuffer();
-        sb.append("skip UPDATE: table=").append(targetDBMeta.getTableSqlName());
+        sb.append("skip UPDATE for no modification: table=").append(targetDBMeta.getTableSqlName());
         final int size = bmd.getPrimaryKeySize();
         for (int i = 0; i < size; i++) {
             if (i == 0) {
-                sb.append(", key{");
+                sb.append(", key:{");
             } else {
                 sb.append(", ");
             }
