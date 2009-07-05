@@ -117,11 +117,11 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
 
     protected String createNoUpdateLogMessage(final Object bean, final TnBeanMetaData bmd) {
         final StringBuffer sb = new StringBuffer();
-        sb.append("skip UPDATE for no modification: table=").append(targetDBMeta.getTableSqlName());
+        sb.append("...Skipping update because of no modification: table=").append(targetDBMeta.getTableSqlName());
         final int size = bmd.getPrimaryKeySize();
         for (int i = 0; i < size; i++) {
             if (i == 0) {
-                sb.append(", key:{");
+                sb.append(", primaryKey={");
             } else {
                 sb.append(", ");
             }
