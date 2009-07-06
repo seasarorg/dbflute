@@ -333,9 +333,9 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #end
 #end
 #if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
-#set ($referrerEntityClassName = "${projectPrefix}BuriAllRoundStateHistory")
-#set ($referrerBhvClassName = "${projectPrefix}BuriAllRoundStateHistoryBhv")
-#set ($referrerCBClassName = "${projectPrefix}BuriAllRoundStateHistoryCB")
+#set ($referrerEntityClassName = "${glProjectPrefix}BuriAllRoundStateHistory")
+#set ($referrerBhvClassName = "${glPackageExtendedBhv}.${glProjectPrefix}BuriAllRoundStateHistoryBhv")
+#set ($referrerCBClassName = "${glProjectPrefix}BuriAllRoundStateHistoryCB")
 #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
 #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
