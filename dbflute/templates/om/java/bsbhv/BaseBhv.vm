@@ -340,45 +340,19 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
 #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
-    /**
-     * {Refer to overload method that has an argument of the list of entity.}
-     * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
-     */
     public void loadBuriAllRoundStateHistoryList(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
         xassLRArg(${myEntityVariableName}, conditionBeanSetupper);
-        loadBuriAllRoundStateHistoryList(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
+        loadBuriAllRoundStateHistory_${processName}List(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
     }
-    /**
-     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the setupper for condition-bean of referrer. <br />
-     * About internal policy, the value of primary key(and others too) is treated as case-insensitive. <br />
-     * The condition-bean that the setupper provides have settings before you touch it. It is as follows:
-     * <pre>
-     * cb.query().setInternalPkValue_InScope(pkList);
-     * cb.query().addOrderBy_InternalPkValue_Asc();
-     * </pre>
-     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
-     */
-    public void loadBuriAllRoundStateHistoryList(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
+    public void loadBuriAllRoundStateHistory_${processName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
         xassLRArg(${myEntityListVariableName}, conditionBeanSetupper);
-        loadBuriAllRoundStateHistoryList(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+        loadBuriAllRoundStateHistory_${processName}List(${myEntityListVariableName}, new org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
     }
-    /**
-     * {Refer to overload method that has an argument of the list of entity.}
-     * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param loadReferrerOption The option of load-referrer. (NotNull)
-     */
-    public void loadBuriAllRoundStateHistoryList(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+    public void loadBuriAllRoundStateHistory_${processName}List(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         xassLRArg(${myEntityVariableName}, loadReferrerOption);
-        loadBuriAllRoundStateHistoryList(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
+        loadBuriAllRoundStateHistory_${processName}List(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
     }
-    /**
-     * {Refer to overload method that has an argument of condition-bean setupper.}
-     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
-     * @param loadReferrerOption The option of load-referrer. (NotNull)
-     */
-    public void loadBuriAllRoundStateHistoryList(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+    public void loadBuriAllRoundStateHistory_${processName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         xassLRArg(${myEntityListVariableName}, loadReferrerOption);
         if (${myEntityListVariableName}.isEmpty()) { return; }
         final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
@@ -389,7 +363,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
             { entity.setBuriAllRoundStateHistory_${processName}List(referrerList); }
             public ${referrerCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.newMyConditionBean(); }
             public void callbackReferrer_queryForeignKeyInScope(${referrerCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) {
-                java.util.List internalPkValueList = new java.util.ArrayList<Long>();
+                java.util.List<Long> internalPkValueList = new java.util.ArrayList<Long>();
                 for (${table.getPrimaryKeyJavaNativeAsOne()} pk : pkList) {
                     internalPkValueList.add(Long.valueOf(pk.toString()));
                 }
