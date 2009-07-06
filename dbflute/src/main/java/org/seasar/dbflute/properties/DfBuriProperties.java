@@ -78,6 +78,10 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         return getTargetProcessMap().containsKey(tableName);
     }
 
+    public boolean isBuriAllRoundStateHistory(String tableName) {
+        return VIEW_ALL_ROUND_STATE_HISTORY.equalsIgnoreCase(tableName);
+    }
+
     // ===================================================================================
     //                                                                 Activity Definition
     //                                                                 ===================

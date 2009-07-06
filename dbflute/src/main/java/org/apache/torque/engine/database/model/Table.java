@@ -2389,6 +2389,11 @@ public class Table {
         return buriProperties.getTableProcessForMethodNameList(getName());
     }
 
+    public boolean isBuriAllRoundStateHistory() {
+        final DfBuriProperties buriProperties = getProperties().getBuriProperties();
+        return buriProperties.isBuriAllRoundStateHistory(getName());
+    }
+
     // ===================================================================================
     //                                                                     Behavior Filter
     //                                                                     ===============
