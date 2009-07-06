@@ -333,6 +333,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #end
 #end
 #if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
+#foreach ($processName in $table.tableProcessForMethodNameList)
 #set ($referrerEntityClassName = "${glProjectPrefix}BuriAllRoundStateHistory")
 #set ($referrerBhvClassName = "${glPackageExtendedBhv}.${glProjectPrefix}BuriAllRoundStateHistoryBhv")
 #set ($referrerCBClassName = "${glProjectPrefix}BuriAllRoundStateHistoryCB")
@@ -344,7 +345,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
      */
-    public void loadBuriAllRoundStateHistoryList(${myExtendedObjectClassName} ${myEntityVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
+    public void loadBuriAllRoundStateHistoryList(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
         xassLRArg(${myEntityVariableName}, conditionBeanSetupper);
         loadBuriAllRoundStateHistoryList(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
     }
@@ -359,7 +360,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
      */
-    public void loadBuriAllRoundStateHistoryList(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
+    public void loadBuriAllRoundStateHistoryList(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
         xassLRArg(${myEntityListVariableName}, conditionBeanSetupper);
         loadBuriAllRoundStateHistoryList(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
     }
@@ -368,7 +369,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      */
-    public void loadBuriAllRoundStateHistoryList(${myExtendedObjectClassName} ${myEntityVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+    public void loadBuriAllRoundStateHistoryList(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         xassLRArg(${myEntityVariableName}, loadReferrerOption);
         loadBuriAllRoundStateHistoryList(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
     }
@@ -377,7 +378,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
      * @param loadReferrerOption The option of load-referrer. (NotNull)
      */
-    public void loadBuriAllRoundStateHistoryList(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+    public void loadBuriAllRoundStateHistoryList(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
         xassLRArg(${myEntityListVariableName}, loadReferrerOption);
         if (${myEntityListVariableName}.isEmpty()) { return; }
         final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
@@ -385,10 +386,14 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
             public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity)
             { return entity.get${table.getPrimaryKeyJavaNameAsOne()}(); }
             public void callbackBase_setReferrerList(${myExtendedObjectClassName} entity, List<${referrerEntityClassName}> referrerList)
-            { entity.setBuriAllRoundStateHistoryList(referrerList); }
+            { entity.setBuriAllRoundStateHistory_${processName}List(referrerList); }
             public ${referrerCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.newMyConditionBean(); }
             public void callbackReferrer_queryForeignKeyInScope(${referrerCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) {
-                cb.query().setInternalPkValue_InScope(pkList);
+                java.util.List internalPkValueList = new java.util.ArrayList<Long>();
+                for (${table.getPrimaryKeyJavaNativeAsOne()} pk : pkList) {
+                    internalPkValueList.add(Long.valueOf(pk.toString()));
+                }
+                cb.query().setInternalPkValue_InScope(internalPkValueList);
                 cb.query().setInternalDataType_Equal("${glPackageExtendedEntity}.${myExtendedObjectClassName}"); // is a fixed condition!
             }
             public void callbackReferrer_queryAddOrderByForeignKeyAsc(${referrerCBClassName} cb)
@@ -396,12 +401,13 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
             public List<${referrerEntityClassName}> callbackReferrer_selectList(${referrerCBClassName} cb)
             { return referrerBhv.selectList(cb); }
             public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferrer_getForeignKeyValue(${referrerEntityClassName} entity)
-            { return entity.get${referrer.getLocalColumnJavaNameAsOne()}(); }
+            { return ${table.getPrimaryKeyJavaNativeAsOne()}.valueOf(entity.getInternalPkValue().toString()); }
             public void callbackReferrer_setForeignEntity(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} baseEntity)
-            { referrerEntity.set${referrer.foreignPropertyNameInitCap}(baseEntity); }
+            { referrerEntity.set${table.javaName}_${processName}(baseEntity); }
         } );
     }
 
+#end
 #end
 #end
     // ===================================================================================

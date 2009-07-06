@@ -363,6 +363,23 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
 #end
 #end
+#if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
+#foreach ($processName in $table.tableProcessForMethodNameList)
+#set ($referrerEntityClassName = "${glProjectPrefix}BuriAllRoundStateHistory")
+#set ($referrerVariableName = "${glChildrenVariablePrefix}BuriAllRoundStateHistory_${processName}")
+    protected List<${referrerEntityClassName}> $referrerVariableName;
+
+    public List<${referrerEntityClassName}> getBuriAllRoundStateHistory_${processName}List() {
+        if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
+        return ${referrerVariableName};
+    }
+
+    public void setBuriAllRoundStateHistory_${processName}List(List<${referrerEntityClassName}> buriAllRoundStateHistory_${processName}) {
+        ${referrerVariableName} = buriAllRoundStateHistory_${processName};
+    }
+
+#end
+#end
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
