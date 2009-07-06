@@ -301,53 +301,104 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         _log.info("/===========================================");
         _log.info("...Setting up implicit foreign key for Buri.");
         final DfAdditionalForeignKeyProperties fkprop = getAdditionalForeignKeyProperties();
-        final Map<String, Map<String, String>> additionalForeignKeyMap = fkprop.getAdditionalForeignKeyMap();
+        final Map<String, Map<String, String>> fkMap = fkprop.getAdditionalForeignKeyMap();
         final String entityPackage = getBasicProperties().getExtendedEntityPackage();
         final Map<String, List<String>> targetProcessMap = getTargetProcessMap();
         final Set<String> tableNameSet = targetProcessMap.keySet();
         for (String current : tableNameSet) {
             final List<String> relatedProcessList = targetProcessMap.get(current);
             final String tableName = current.toUpperCase();
-            int identity = 1;
-            for (String relatedProcess : relatedProcessList) {
-                final String foreignName = "FK_" + tableName + "_BURI_ALL_ROUND_STATE_" + identity;
-                if (additionalForeignKeyMap.containsKey(foreignName)) {
-                    continue;
+            int id = 1;
+            for (String process : relatedProcessList) {
+                final boolean statMade = createStateViewFk(fkMap, finder, tableName, entityPackage, process, id);
+                final boolean histMade = createStateHistoryViewFK(fkMap, finder, tableName, entityPackage, process, id);
+                if (statMade || histMade) {
+                    ++id;
                 }
-                final LinkedHashMap<String, String> elementMap = newLinkedHashMap();
-                final Table table = finder.findTable(tableName);
-                if (table == null) {
-                    String msg = "The table was not found: " + tableName;
-                    throw new IllegalStateException(msg);
-                }
-                if (table.hasTwoOrMorePrimaryKeys()) {
-                    String msg = "The table should have the only one primary key: " + tableName;
-                    throw new IllegalStateException(msg);
-                }
-                elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_TABLE_NAME, tableName);
-                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_TABLE_NAME, "BURI_ALL_ROUND_STATE");
-                final String primaryKeyName = table.getPrimaryKeyAsOne().getName();
-                elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_COLUMN_NAME, primaryKeyName);
-                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_COLUMN_NAME, "PKEY_NUM");
-
-                // Fixed Condition
-                final String entityName = table.getExtendedEntityClassName();
-                final String fqcn = entityPackage + "." + entityName;
-                final StringBuilder sb = new StringBuilder();
-                sb.append("$$foreignAlias$$.PATH_NAME like '").append(relatedProcess).append(".%'");
-                sb.append(" and $$foreignAlias$$.DATA_TYPE = '").append(fqcn).append("'");
-                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_CONDITION, sb.toString());
-
-                // Fixed Suffix
-                final String processExpression = DfStringUtil.replace(relatedProcess, ".", "_");
-                elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_SUFFIX, "_" + processExpression);
-
-                additionalForeignKeyMap.put(foreignName, elementMap);
-                _log.info(foreignName);
-                ++identity;
             }
         }
         _log.info("==========/");
+    }
+
+    protected boolean createStateViewFk(Map<String, Map<String, String>> fkMap, TableFinder finder, String tableName,
+            String entityPackage, String relatedProcess, int identity) {
+        final String viewName = "BURI_ALL_ROUND_STATE";
+        final String foreignName = "FK_" + tableName + "_" + viewName + "_" + identity;
+        if (fkMap.containsKey(foreignName)) {
+            return false;
+        }
+        final LinkedHashMap<String, String> elementMap = newLinkedHashMap();
+        final Table table = finder.findTable(tableName);
+        if (table == null) {
+            String msg = "The table was not found: " + tableName;
+            throw new IllegalStateException(msg);
+        }
+        if (table.hasTwoOrMorePrimaryKeys()) {
+            String msg = "The table should have the only one primary key: " + tableName;
+            throw new IllegalStateException(msg);
+        }
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_TABLE_NAME, tableName);
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_TABLE_NAME, viewName);
+        final String primaryKeyName = table.getPrimaryKeyAsOne().getName();
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_COLUMN_NAME, primaryKeyName);
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_COLUMN_NAME, "INTERNAL_PK_VALUE");
+
+        // Fixed Condition
+        final String entityName = table.getExtendedEntityClassName();
+        final String fqcn = entityPackage + "." + entityName;
+        final StringBuilder sb = new StringBuilder();
+        sb.append("$$foreignAlias$$.STATUS_PATH_NAME like '").append(relatedProcess).append(".%'");
+        sb.append(" and $$foreignAlias$$.INTERNAL_DATA_TYPE = '").append(fqcn).append("'");
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_CONDITION, sb.toString());
+
+        // Fixed Suffix
+        final String processExpression = DfStringUtil.replace(relatedProcess, ".", "_");
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_SUFFIX, "_" + processExpression);
+
+        fkMap.put(foreignName, elementMap);
+        _log.info(foreignName);
+        return true;
+    }
+
+    protected boolean createStateHistoryViewFK(Map<String, Map<String, String>> fkMap, TableFinder finder,
+            String tableName, String entityPackage, String relatedProcess, int identity) {
+        final String viewName = "BURI_ALL_ROUND_STATE_HISTORY";
+        final String foreignName = "FK_" + viewName + "_" + tableName + "_" + identity;
+        if (fkMap.containsKey(foreignName)) {
+            return false;
+        }
+        final LinkedHashMap<String, String> elementMap = newLinkedHashMap();
+        final Table table = finder.findTable(tableName);
+        if (table == null) {
+            // Not error because this is not required.
+            return false;
+            //String msg = "The table was not found: " + tableName;
+            //throw new IllegalStateException(msg);
+        }
+        if (table.hasTwoOrMorePrimaryKeys()) {
+            String msg = "The table should have the only one primary key: " + tableName;
+            throw new IllegalStateException(msg);
+        }
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_TABLE_NAME, viewName);
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_TABLE_NAME, tableName);
+        final String primaryKeyName = table.getPrimaryKeyAsOne().getName();
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_LOCAL_COLUMN_NAME, "INTERNAL_PK_VALUE");
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_FOREIGN_COLUMN_NAME, primaryKeyName);
+
+        // Fixed Condition
+        final String entityName = table.getExtendedEntityClassName();
+        final String fqcn = entityPackage + "." + entityName;
+        final StringBuilder sb = new StringBuilder();
+        sb.append(" and $$localAlias$$.INTERNAL_DATA_TYPE = '").append(fqcn).append("'");
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_CONDITION, sb.toString());
+
+        // Fixed Suffix
+        final String processExpression = DfStringUtil.replace(relatedProcess, ".", "_");
+        elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_SUFFIX, "_" + processExpression);
+
+        fkMap.put(foreignName, elementMap);
+        _log.info(foreignName);
+        return true;
     }
 
     public static interface TableFinder {
