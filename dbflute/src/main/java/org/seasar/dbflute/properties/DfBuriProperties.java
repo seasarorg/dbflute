@@ -394,7 +394,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         final String entityName = table.getExtendedEntityClassName();
         final String fqcn = entityPackage + "." + entityName;
         final StringBuilder sb = new StringBuilder();
-        sb.append(" and $$localAlias$$.INTERNAL_DATA_TYPE = '").append(fqcn).append("'");
+        sb.append("$$localAlias$$.INTERNAL_DATA_TYPE = '").append(fqcn).append("'");
         elementMap.put(DfAdditionalForeignKeyProperties.KEY_FIXED_CONDITION, sb.toString());
 
         // Fixed Suffix

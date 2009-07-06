@@ -340,7 +340,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
 #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
-    public void loadBuriAllRoundStateHistoryList(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
+    public void loadBuriAllRoundStateHistory_${processName}List(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
         xassLRArg(${myEntityVariableName}, conditionBeanSetupper);
         loadBuriAllRoundStateHistory_${processName}List(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
     }
