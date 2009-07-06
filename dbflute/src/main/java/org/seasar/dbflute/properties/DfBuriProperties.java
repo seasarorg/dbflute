@@ -370,10 +370,8 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         final LinkedHashMap<String, String> elementMap = newLinkedHashMap();
         final Table table = finder.findTable(tableName);
         if (table == null) {
-            // Not error because this is not required.
-            return false;
-            //String msg = "The table was not found: " + tableName;
-            //throw new IllegalStateException(msg);
+            String msg = "The table was not found: " + tableName;
+            throw new IllegalStateException(msg);
         }
         if (table.hasTwoOrMorePrimaryKeys()) {
             String msg = "The table should have the only one primary key: " + tableName;

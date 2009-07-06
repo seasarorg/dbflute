@@ -426,7 +426,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #foreach ($processName in $table.tableProcessForMethodNameList)
     public ${glBuriDef}.${processName}_Status getStatus_${processName}() {
         if (getBuriAllRoundState_${processName}() == null) { return null; }
-        return ${glBuriDef}.${processName}_Status.codeOf(getBuriAllRoundState_${processName}().getPathName());
+        return ${glBuriDef}.${processName}_Status.codeOf(getBuriAllRoundState_${processName}().getStatusPathName());
     }
 #end
 #end

@@ -704,7 +704,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         java.util.List<${glBuriDef}.${processName}_Status> statusList = new java.util.ArrayList<${glBuriDef}.${processName}_Status>();
         if (buriAllRoundStateList.isEmpty()) { return null; }
         for (BuriAllRoundState buriAllRoundState : buriAllRoundStateList) {
-            ${glBuriDef}.${processName}_Status status = ${glBuriDef}.${processName}_Status.codeOf(buriAllRoundState.getPathName());
+            ${glBuriDef}.${processName}_Status status = ${glBuriDef}.${processName}_Status.codeOf(buriAllRoundState.getStatusPathName());
             if (status != null) { statusList.add(status); }
         }
         if (statusList.size() > 1) {
@@ -724,7 +724,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         for (${glBuriDef}.${processName}_Status status : statuses) {
             pathNameList.add(status.path());
         }
-        cb.query().queryBuriAllRoundState_${processName}().setPathName_InScope(pathNameList);
+        cb.query().queryBuriAllRoundState_${processName}().setStatusPathName_InScope(pathNameList);
         return selectList(cb);
     }
 #end
@@ -732,10 +732,10 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     private List<BuriAllRoundState> xgetCurrentStateList(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.BuriProcess process) {
         ${glPackageExtendedBhv}.BuriAllRoundStateBhv bhv = xgetBuriAllRoundStateBhv();
         BuriAllRoundStateCB cb = bhv.newMyConditionBean();
-        cb.specify().columnPathName();
-        cb.query().setPathName_LikeSearch(process.path() + ".", new org.seasar.dbflute.cbean.coption.LikeSearchOption().likePrefix());
-        cb.query().setPkeyNum_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
-        cb.query().setDataType_Equal(${myExtendedObjectClassName}.class.getName());
+        cb.specify().columnStatusPathName();
+        cb.query().setStatusPathName_LikeSearch(process.path() + ".", new org.seasar.dbflute.cbean.coption.LikeSearchOption().likePrefix());
+        cb.query().setInternalPkValue_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
+        cb.query().setInternalDataType_Equal(${myExtendedObjectClassName}.class.getName());
         return bhv.selectList(cb);
     }
 
