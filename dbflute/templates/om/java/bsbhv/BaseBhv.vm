@@ -269,7 +269,6 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     //                                                                       Load Referrer
     //                                                                       =============
 #foreach ($referrer in $table.referrerList)
-#set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
 #set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
@@ -332,6 +331,77 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     }
 
 #end
+#end
+#if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
+#set ($referrerEntityClassName = "${projectPrefix}BuriAllRoundStateHistory")
+#set ($referrerBhvClassName = "${projectPrefix}BuriAllRoundStateHistoryBhv")
+#set ($referrerCBClassName = "${projectPrefix}BuriAllRoundStateHistoryCB")
+#set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+#set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
+#set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
+    /**
+     * {Refer to overload method that has an argument of the list of entity.}
+     * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
+     */
+    public void loadBuriAllRoundStateHistoryList(${myExtendedObjectClassName} ${myEntityVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
+        xassLRArg(${myEntityVariableName}, conditionBeanSetupper);
+        loadBuriAllRoundStateHistoryList(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
+    }
+    /**
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the setupper for condition-bean of referrer. <br />
+     * About internal policy, the value of primary key(and others too) is treated as case-insensitive. <br />
+     * The condition-bean that the setupper provides have settings before you touch it. It is as follows:
+     * <pre>
+     * cb.query().setInternalPkValue_InScope(pkList);
+     * cb.query().addOrderBy_InternalPkValue_Asc();
+     * </pre>
+     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
+     */
+    public void loadBuriAllRoundStateHistoryList(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
+        xassLRArg(${myEntityListVariableName}, conditionBeanSetupper);
+        loadBuriAllRoundStateHistoryList(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+    }
+    /**
+     * {Refer to overload method that has an argument of the list of entity.}
+     * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param loadReferrerOption The option of load-referrer. (NotNull)
+     */
+    public void loadBuriAllRoundStateHistoryList(${myExtendedObjectClassName} ${myEntityVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+        xassLRArg(${myEntityVariableName}, loadReferrerOption);
+        loadBuriAllRoundStateHistoryList(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
+    }
+    /**
+     * {Refer to overload method that has an argument of condition-bean setupper.}
+     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param loadReferrerOption The option of load-referrer. (NotNull)
+     */
+    public void loadBuriAllRoundStateHistoryList(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+        xassLRArg(${myEntityListVariableName}, loadReferrerOption);
+        if (${myEntityListVariableName}.isEmpty()) { return; }
+        final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
+        helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
+            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity)
+            { return entity.get${table.getPrimaryKeyJavaNameAsOne()}(); }
+            public void callbackBase_setReferrerList(${myExtendedObjectClassName} entity, List<${referrerEntityClassName}> referrerList)
+            { entity.setBuriAllRoundStateHistoryList(referrerList); }
+            public ${referrerCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.newMyConditionBean(); }
+            public void callbackReferrer_queryForeignKeyInScope(${referrerCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) {
+                cb.query().setInternalPkValue_InScope(pkList);
+                cb.query().setInternalDataType_Equal("${glPackageExtendedEntity}.${myExtendedObjectClassName}"); // is a fixed condition!
+            }
+            public void callbackReferrer_queryAddOrderByForeignKeyAsc(${referrerCBClassName} cb)
+            { cb.query().addOrderBy_InternalPkValue_Asc(); }
+            public List<${referrerEntityClassName}> callbackReferrer_selectList(${referrerCBClassName} cb)
+            { return referrerBhv.selectList(cb); }
+            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferrer_getForeignKeyValue(${referrerEntityClassName} entity)
+            { return entity.get${referrer.getLocalColumnJavaNameAsOne()}(); }
+            public void callbackReferrer_setForeignEntity(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} baseEntity)
+            { referrerEntity.set${referrer.foreignPropertyNameInitCap}(baseEntity); }
+        } );
+    }
+
 #end
 #end
     // ===================================================================================

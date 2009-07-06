@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.properties.assistant.TableFinder;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -24,6 +25,8 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     //                                                                      ==========
     /** Log-instance */
     private static final Log _log = LogFactory.getLog(DfBuriProperties.class);
+    private static final String VIEW_ALL_ROUND_STATE = "BURI_ALL_ROUND_STATE";
+    private static final String VIEW_ALL_ROUND_STATE_HISTORY = "BURI_ALL_ROUND_STATE_HISTORY";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -322,7 +325,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
 
     protected boolean createStateViewFk(Map<String, Map<String, String>> fkMap, TableFinder finder, String tableName,
             String entityPackage, String relatedProcess, int identity) {
-        final String viewName = "BURI_ALL_ROUND_STATE";
+        final String viewName = VIEW_ALL_ROUND_STATE;
         final String foreignName = "FK_" + tableName + "_" + viewName + "_" + identity;
         if (fkMap.containsKey(foreignName)) {
             return false;
@@ -362,7 +365,11 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
 
     protected boolean createStateHistoryViewFK(Map<String, Map<String, String>> fkMap, TableFinder finder,
             String tableName, String entityPackage, String relatedProcess, int identity) {
-        final String viewName = "BURI_ALL_ROUND_STATE_HISTORY";
+        if (!hasBuriAllRoundStateHistory(finder)) {
+            // Not error because the history view is not required.
+            return false;
+        }
+        final String viewName = VIEW_ALL_ROUND_STATE_HISTORY;
         final String foreignName = "FK_" + viewName + "_" + tableName + "_" + identity;
         if (fkMap.containsKey(foreignName)) {
             return false;
@@ -399,8 +406,9 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
         return true;
     }
 
-    public static interface TableFinder {
-        public Table findTable(String tableName);
+    public boolean hasBuriAllRoundStateHistory(TableFinder finder) {
+        final String viewName = VIEW_ALL_ROUND_STATE_HISTORY;
+        return finder.findTable(viewName) != null;
     }
 
     // ===================================================================================

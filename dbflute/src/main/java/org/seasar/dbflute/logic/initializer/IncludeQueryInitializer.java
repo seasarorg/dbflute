@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
+import org.seasar.dbflute.properties.assistant.TableFinder;
 
 /**
  * @author jflute
@@ -121,10 +122,6 @@ public class IncludeQueryInitializer {
         msg = msg + "[Include Query Map]" + getLineSeparator() + map + getLineSeparator();
         msg = msg + "* * * * * * * * * */";
         throw new IncludeQueryColumnNotFoundException(msg);
-    }
-
-    public static interface TableFinder {
-        public Table findTable(String name);
     }
 
     protected static class IncludeQueryTableNotFoundException extends RuntimeException {

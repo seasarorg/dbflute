@@ -88,6 +88,7 @@ import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupResource;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
+import org.seasar.dbflute.properties.assistant.TableFinder;
 import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.xml.sax.Attributes;
 
@@ -506,7 +507,7 @@ public class Database {
         // Set up implicit foreign key for Buri before initializing
         // - - - - - - - - - -/
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        buriProperties.setupImplicitAdditionalForeignKey(new DfBuriProperties.TableFinder() {
+        buriProperties.setupImplicitAdditionalForeignKey(new TableFinder() {
             public Table findTable(String tableName) {
                 return getTable(tableName);
             }
@@ -546,7 +547,7 @@ public class Database {
     public void initializeIncludeQuery() {
         IncludeQueryInitializer initializer = new IncludeQueryInitializer();
         initializer.setIncludeQueryProperties(getProperties().getIncludeQueryProperties());
-        initializer.setTableFinder(new IncludeQueryInitializer.TableFinder() {
+        initializer.setTableFinder(new TableFinder() {
             public Table findTable(String name) {
                 return getTable(name);
             }
@@ -1397,6 +1398,14 @@ public class Database {
 
     public List<String> getBuriActionList(String packageName, String processName) {
         return getProperties().getBuriProperties().getActionList(packageName, processName);
+    }
+
+    public boolean hasBuriAllRoundStateHistory() {
+        return getProperties().getBuriProperties().hasBuriAllRoundStateHistory(new TableFinder() {
+            public Table findTable(String name) {
+                return getTable(name);
+            }
+        });
     }
 
     // ===================================================================================
