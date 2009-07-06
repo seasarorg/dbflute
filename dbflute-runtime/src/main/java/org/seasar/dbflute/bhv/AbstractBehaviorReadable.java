@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.bhv;
 
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.BehaviorSelector;
 import org.seasar.dbflute.DBDef;
@@ -118,7 +118,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             return null;
         }
         assertEntitySelectedAsOne(ls, cb);
-        return (Entity)ls.get(0);
+        return (Entity) ls.get(0);
     }
 
     /**
@@ -129,14 +129,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         final List<Entity> ls = readList(cb);
         assertEntityNotDeleted(ls, cb);
         assertEntitySelectedAsOne(ls, cb);
-        return (Entity)ls.get(0);
+        return (Entity) ls.get(0);
     }
 
     // ===================================================================================
     //                                                         Entity Read Internal Helper
     //                                                         ===========================
-    protected <ENTITY extends Entity, CB extends ConditionBean>
-            ENTITY helpSelectEntityInternally(CB cb, InternalSelectEntityCallback<ENTITY, CB> callback) {
+    protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
+            InternalSelectEntityCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
         cb.checkSafetyResult(1);
         List<ENTITY> ls = null;
@@ -149,15 +149,15 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             return null;
         }
         assertEntitySelectedAsOne(ls, cb);
-        return (ENTITY)ls.get(0);
+        return (ENTITY) ls.get(0);
     }
 
     protected static interface InternalSelectEntityCallback<ENTITY extends Entity, CB extends ConditionBean> {
         public List<ENTITY> callbackSelectList(CB cb);
     }
 
-    protected <ENTITY extends Entity, CB extends ConditionBean>
-            ENTITY helpSelectEntityWithDeletedCheckInternally(CB cb, InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
+    protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityWithDeletedCheckInternally(
+            CB cb, InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
         cb.checkSafetyResult(1);
         List<ENTITY> ls = null;
@@ -168,7 +168,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
         assertEntityNotDeleted(ls, cb);
         assertEntitySelectedAsOne(ls, cb);
-        return (ENTITY)ls.get(0);
+        return (ENTITY) ls.get(0);
     }
 
     protected static interface InternalSelectEntityWithDeletedCheckCallback<ENTITY extends Entity, CB extends ConditionBean> {
@@ -193,9 +193,17 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         assertCBNotNull(cb);
         final PagingInvoker<Entity> invoker = new PagingInvoker<Entity>(getTableDbName());
         final PagingHandler<Entity> handler = new PagingHandler<Entity>() {
-            public PagingBean getPagingBean() { return cb; }
-            public int count() { return readCount(cb); }
-            public List<Entity> paging() { return readList(cb); }
+            public PagingBean getPagingBean() {
+                return cb;
+            }
+
+            public int count() {
+                return readCount(cb);
+            }
+
+            public List<Entity> paging() {
+                return readList(cb);
+            }
         };
         return invoker.invokePaging(handler);
     }
@@ -356,45 +364,45 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
 
         protected void throwScalarSelectInvalidColumnSpecificationException() {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "The specified column for scalar select was Invalid!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + " You should call specify().column[TargetColumn]() only once." + getLineSeparator();
-            msg = msg + "  For example:" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Wrong]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
-            msg = msg + "            // *No! It's empty!" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    });" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Wrong]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
-            msg = msg + "            cb.specify().columnMemberBirthday();" + getLineSeparator();
-            msg = msg + "            cb.specify().columnRegisterDatetime(); // *No! It's duplicated!" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    });" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + "    " + getLineSeparator();
-            msg = msg + "    [Good!]" + getLineSeparator();
-            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + getLineSeparator();
-            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + getLineSeparator();
-            msg = msg + "        public void query(MemberCB cb) {" + getLineSeparator();
-            msg = msg + "            cb.specify().columnMemberBirthday(); // *Point!" + getLineSeparator();
-            msg = msg + "        }" + getLineSeparator();
-            msg = msg + "    });" + getLineSeparator();
-            msg = msg + "    - - - - - - - - - -/" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[ConditionBean Type]" + getLineSeparator() + _conditionBean.getClass().getName() + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Result Type]" + getLineSeparator() + _resultType.getName() + getLineSeparator();
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "The specified column for scalar select was Invalid!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
+            msg = msg + "  For example:" + ln();
+            msg = msg + "    " + ln();
+            msg = msg + "    [Wrong]" + ln();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + ln();
+            msg = msg + "        public void query(MemberCB cb) {" + ln();
+            msg = msg + "            // *No! It's empty!" + ln();
+            msg = msg + "        }" + ln();
+            msg = msg + "    });" + ln();
+            msg = msg + "    - - - - - - - - - -/" + ln();
+            msg = msg + "    " + ln();
+            msg = msg + "    [Wrong]" + ln();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + ln();
+            msg = msg + "        public void query(MemberCB cb) {" + ln();
+            msg = msg + "            cb.specify().columnMemberBirthday();" + ln();
+            msg = msg + "            cb.specify().columnRegisterDatetime(); // *No! It's duplicated!" + ln();
+            msg = msg + "        }" + ln();
+            msg = msg + "    });" + ln();
+            msg = msg + "    - - - - - - - - - -/" + ln();
+            msg = msg + "    " + ln();
+            msg = msg + "    [Good!]" + ln();
+            msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+            msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarQuery<MemberCB>() {" + ln();
+            msg = msg + "        public void query(MemberCB cb) {" + ln();
+            msg = msg + "            cb.specify().columnMemberBirthday(); // *Point!" + ln();
+            msg = msg + "        }" + ln();
+            msg = msg + "    });" + ln();
+            msg = msg + "    - - - - - - - - - -/" + ln();
+            msg = msg + ln();
+            msg = msg + "[ConditionBean Type]" + ln() + _conditionBean.getClass().getName() + ln();
+            msg = msg + ln();
+            msg = msg + "[Result Type]" + ln() + _resultType.getName() + ln();
             msg = msg + "* * * * * * * * * */";
             throw new ScalarSelectInvalidColumnSpecificationException(msg);
         }
@@ -402,6 +410,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     public static class ScalarSelectInvalidColumnSpecificationException extends RuntimeException {
         private static final long serialVersionUID = 1L;
+
         public ScalarSelectInvalidColumnSpecificationException(String msg) {
             super(msg);
         }
@@ -440,8 +449,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     public OutsideSqlBasicExecutor outsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
-        return new OutsideSqlBasicExecutor(_behaviorCommandInvoker, getTableDbName()
-                                         , getCurrentDBDef(), getDefaultStatementConfig());
+        return new OutsideSqlBasicExecutor(_behaviorCommandInvoker, getTableDbName(), getCurrentDBDef(),
+                getDefaultStatementConfig());
     }
 
     // ===================================================================================
@@ -452,12 +461,12 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     public java.math.BigDecimal readNextVal() {
         try {
-            final Method method = getClass().getMethod("selectNextVal", new Class[]{});
+            final Method method = getClass().getMethod("selectNextVal", new Class[] {});
             Object sequenceObject = method.invoke(this, new Object[] {});
             if (sequenceObject instanceof java.math.BigDecimal) {
-                return (java.math.BigDecimal)sequenceObject;
+                return (java.math.BigDecimal) sequenceObject;
             }
-            return (java.math.BigDecimal)helpConvertingSequenceObject(java.math.BigDecimal.class, sequenceObject);
+            return (java.math.BigDecimal) helpConvertingSequenceObject(java.math.BigDecimal.class, sequenceObject);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("The table does not have sequence: " + getTableDbName(), e);
         } catch (Exception e) {
@@ -467,15 +476,15 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected Object helpConvertingSequenceObject(Class<?> resultClass, Object sequenceObject) {
         try {
-            final Constructor<?> constructor = resultClass.getConstructor(new Class[]{String.class});
-            return constructor.newInstance(new Object[]{sequenceObject.toString()});
+            final Constructor<?> constructor = resultClass.getConstructor(new Class[] { String.class });
+            return constructor.newInstance(new Object[] { sequenceObject.toString() });
         } catch (NoSuchMethodException e) {
         } catch (Exception e) {
             throw new RuntimeException("The readNextVal() of the table threw the exception: " + getTableDbName(), e);
         }
         try {
-            final Method method = resultClass.getMethod("valueOf", new Class[]{long.class});
-            return method.invoke(null, new Object[]{Long.valueOf(sequenceObject.toString())});
+            final Method method = resultClass.getMethod("valueOf", new Class[] { long.class });
+            return method.invoke(null, new Object[] { Long.valueOf(sequenceObject.toString()) });
         } catch (NoSuchMethodException e) {
         } catch (Exception e) {
             throw new RuntimeException("The readNextVal() of the table threw the exception: " + getTableDbName(), e);
@@ -499,13 +508,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param loadReferrerOption The option of loadReferrer. (NotNull)
      * @param callback The internal call-back of loadReferrer. (NotNull) 
      */
-    protected <LOCAL_ENTITY extends Entity
-             , PK
-             , REFERRER_CB extends ConditionBean
-             , REFERRER_ENTITY extends Entity>
-            void helpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList
-                                         , LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
-                                         , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
+    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> void helpLoadReferrerInternally(
+            List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
+            InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
         doHelpLoadReferrerInternally(localEntityList, loadReferrerOption, callback);
     }
 
@@ -520,13 +525,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param loadReferrerOption The option of loadReferrer. (NotNull)
      * @param callback The internal call-back of loadReferrer. (NotNull) 
      */
-    protected <LOCAL_ENTITY extends Entity
-             , PK
-             , REFERRER_CB extends ConditionBean
-             , REFERRER_ENTITY extends Entity>
-            void doHelpLoadReferrerInternally(List<LOCAL_ENTITY> localEntityList
-                                         , LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption
-                                         , InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
+    protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> void doHelpLoadReferrerInternally(
+            List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
+            InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
 
         // - - - - - - - - - - -
         // Assert pre-condition
@@ -544,8 +545,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         final Map<PK, LOCAL_ENTITY> pkLocalEntityMap = new LinkedHashMap<PK, LOCAL_ENTITY>();
         final List<PK> pkList = new ArrayList<PK>();
         for (LOCAL_ENTITY localEntity : localEntityList) {
-            final PK primaryKeyValue = callback.callbackBase_getPrimaryKeyValue(localEntity);
-            pkList.add(callback.callbackBase_getPrimaryKeyValue(localEntity));
+            final PK primaryKeyValue = callback.getPKVal(localEntity);
+            pkList.add(callback.getPKVal(localEntity));
             pkLocalEntityMap.put(toLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
         }
 
@@ -556,20 +557,20 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         if (loadReferrerOption.getReferrerConditionBean() != null) {
             cb = loadReferrerOption.getReferrerConditionBean();
         } else {
-            cb = callback.callbackReferrer_newMyConditionBean();
+            cb = callback.newMyCB();
         }
 
         // - - - - - - - - - - - - - -
         // Select the list of referrer
         // - - - - - - - - - - - - - -
-        callback.callbackReferrer_queryForeignKeyInScope(cb, pkList);
+        callback.qyFKIn(cb, pkList);
         loadReferrerOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
         if (!loadReferrerOption.isStopOrderByKey() && pkList.size() > 1) {
-            callback.callbackReferrer_queryAddOrderByForeignKeyAsc(cb);
+            callback.qyOdFKAsc(cb);
             cb.getSqlComponentOfOrderByClause().exchangeFirstOrderByElementForLastOne();
         }
         loadReferrerOption.delegateConditionBeanSettingUp(cb);
-        final List<REFERRER_ENTITY> referrerList = callback.callbackReferrer_selectList(cb);
+        final List<REFERRER_ENTITY> referrerList = callback.selRfLs(cb);
         loadReferrerOption.delegateEntitySettingUp(referrerList);
 
         // - - - - - - - - - - - - - - - - - - - - - - - -
@@ -579,7 +580,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         for (REFERRER_ENTITY referrerEntity : referrerList) {
             final PK referrerListKey;
             {
-                final PK foreignKeyValue = callback.callbackReferrer_getForeignKeyValue(referrerEntity);
+                final PK foreignKeyValue = callback.getFKVal(referrerEntity);
                 referrerListKey = toLowerCasePrimaryKeyIfString(foreignKeyValue);
             }
             if (!pkReferrerListMap.containsKey(referrerListKey)) {
@@ -589,7 +590,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
             // for Reverse Reference.
             final LOCAL_ENTITY localEntity = pkLocalEntityMap.get(referrerListKey);
-            callback.callbackReferrer_setForeignEntity(referrerEntity, localEntity);
+            callback.setlcEt(referrerEntity, localEntity);
         }
 
         // - - - - - - - - - - - - - - - - - -
@@ -598,13 +599,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         for (LOCAL_ENTITY localEntity : localEntityList) {
             final PK referrerListKey;
             {
-                final PK primaryKey = callback.callbackBase_getPrimaryKeyValue(localEntity);
+                final PK primaryKey = callback.getPKVal(localEntity);
                 referrerListKey = toLowerCasePrimaryKeyIfString(primaryKey);
             }
             if (pkReferrerListMap.containsKey(referrerListKey)) {
-                callback.callbackBase_setReferrerList(localEntity, pkReferrerListMap.get(referrerListKey));
+                callback.setRfLs(localEntity, pkReferrerListMap.get(referrerListKey));
             } else {
-                callback.callbackBase_setReferrerList(localEntity, new ArrayList<REFERRER_ENTITY>());
+                callback.setRfLs(localEntity, new ArrayList<REFERRER_ENTITY>());
             }
         }
     }
@@ -617,7 +618,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     @SuppressWarnings("unchecked")
     protected <PK> PK toLowerCasePrimaryKeyIfString(PK value) {
-        return (PK)toLowerCaseIfString(value);
+        return (PK) toLowerCaseIfString(value);
     }
 
     /**
@@ -626,40 +627,46 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @param <REFERRER_CB> The type of referrer conditionBean.
      * @param <REFERRER_ENTITY> The type of referrer entity.
      */
-    protected static interface InternalLoadReferrerCallback<LOCAL_ENTITY extends Entity
-                                                          , PK
-                                                          , REFERRER_CB extends ConditionBean
-                                                          , REFERRER_ENTITY extends Entity> {
+    protected static interface InternalLoadReferrerCallback<LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> {
         // For Base
-        public PK callbackBase_getPrimaryKeyValue(LOCAL_ENTITY entity);
-        public void callbackBase_setReferrerList(LOCAL_ENTITY entity, List<REFERRER_ENTITY> referrerList);
+        public PK getPKVal(LOCAL_ENTITY entity); // getPrimaryKeyValue()
+
+        public void setRfLs(LOCAL_ENTITY entity, List<REFERRER_ENTITY> referrerList); // setReferrerList()
 
         // For Referrer
-        public REFERRER_CB callbackReferrer_newMyConditionBean();
-        public void callbackReferrer_queryForeignKeyInScope(REFERRER_CB cb, List<PK> pkList);
-        public void callbackReferrer_queryAddOrderByForeignKeyAsc(REFERRER_CB cb);
-        public List<REFERRER_ENTITY> callbackReferrer_selectList(REFERRER_CB cb);
-        public PK callbackReferrer_getForeignKeyValue(REFERRER_ENTITY entity);
-        public void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
+        public REFERRER_CB newMyCB(); // newMyConditionBean()
+
+        public void qyFKIn(REFERRER_CB cb, List<PK> pkList); // queryForeignKeyInScope()
+
+        public void qyOdFKAsc(REFERRER_CB cb); // queryAddOrderByForeignKeyAsc() 
+
+        public List<REFERRER_ENTITY> selRfLs(REFERRER_CB cb); // selectReferrerList() 
+
+        public PK getFKVal(REFERRER_ENTITY entity); // getForeignKeyValue()
+
+        public void setlcEt(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity); // setLocalEntity()
     }
-    
+
     // assertLoadReferrerArgument() as Internal
     protected void xassLRArg(Entity entity, ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
         assertObjectNotNull("entity(" + getDBMeta().getEntityType().getSimpleName() + ")", entity);
         assertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
     }
-    
-    protected void xassLRArg(List<? extends Entity> entityList, ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
+
+    protected void xassLRArg(List<? extends Entity> entityList,
+            ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
         assertObjectNotNull("List<" + getDBMeta().getEntityType().getSimpleName() + ">", entityList);
         assertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
     }
-    
-    protected void xassLRArg(Entity entity, LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
+
+    protected void xassLRArg(Entity entity,
+            LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
         assertObjectNotNull("entity(" + getDBMeta().getEntityType().getSimpleName() + ")", entity);
         assertObjectNotNull("loadReferrerOption", loadReferrerOption);
     }
-    
-    protected void xassLRArg(List<? extends Entity> entityList, LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
+
+    protected void xassLRArg(List<? extends Entity> entityList,
+            LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
         assertObjectNotNull("List<" + getDBMeta().getEntityType().getSimpleName() + ">", entityList);
         assertObjectNotNull("loadReferrerOption", loadReferrerOption);
     }
@@ -671,22 +678,23 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     private void assertBehaviorSelectorNotNull(String methodName) {
         if (_behaviorSelector == null) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "Not found the selector of behavior as behavior's attribute!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "Please confirm the definition of the selector at your component configuration of DBFlute." + getLineSeparator();
-            msg = msg + "It is precondition that '" + methodName + "()' needs the selector instance." + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();
-            msg = msg + "  _behaviorCommandInvoker : " + _behaviorCommandInvoker + getLineSeparator();
-            msg = msg + "  _behaviorSelector       : " + _behaviorSelector + getLineSeparator();
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "Not found the selector of behavior as behavior's attribute!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "Please confirm the definition of the selector at your component configuration of DBFlute."
+                    + ln();
+            msg = msg + "It is precondition that '" + methodName + "()' needs the selector instance." + ln();
+            msg = msg + ln();
+            msg = msg + "[Your Behavior's Attributes]" + ln();
+            msg = msg + "  _behaviorCommandInvoker : " + _behaviorCommandInvoker + ln();
+            msg = msg + "  _behaviorSelector       : " + _behaviorSelector + ln();
             msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
     }
-    
+
     protected <ELEMENT> List<ELEMENT> xnewLRLs(ELEMENT element) { // newLoadReferrerList() as Internal
         List<ELEMENT> ls = new ArrayList<ELEMENT>(1);
         ls.add(element);
@@ -694,24 +702,43 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     // ===================================================================================
-    //                                                             Pullout Internal Helper
-    //                                                             =======================
-    protected <LOCAL_ENTITY extends Entity, FOREIGN_ENTITY extends Entity>
-            List<FOREIGN_ENTITY> helpPulloutInternally(List<LOCAL_ENTITY> localEntityList, InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> callback) {
+    //                                                            Pull out Internal Helper
+    //                                                            ========================
+    protected <LOCAL_ENTITY extends Entity, FOREIGN_ENTITY extends Entity> List<FOREIGN_ENTITY> helpPulloutInternally(
+            List<LOCAL_ENTITY> localEntityList, InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> callback) {
         assertObjectNotNull("localEntityList", localEntityList);
+        assertObjectNotNull("callback", callback);
         final Set<FOREIGN_ENTITY> foreignSet = new LinkedHashSet<FOREIGN_ENTITY>();
+        final Map<FOREIGN_ENTITY, List<LOCAL_ENTITY>> foreignReferrerMap = new LinkedHashMap<FOREIGN_ENTITY, List<LOCAL_ENTITY>>();
+        final boolean existsReferrer = callback.hasRf();
         for (LOCAL_ENTITY entity : localEntityList) {
-            final FOREIGN_ENTITY foreignEntity = callback.callbackGetForeignEntity(entity);
-            if (foreignEntity == null || foreignSet.contains(foreignEntity)) {
+            final FOREIGN_ENTITY foreignEntity = callback.getFr(entity);
+            if (foreignEntity == null) {
                 continue;
             }
-            foreignSet.add(foreignEntity);
+            if (!foreignSet.contains(foreignEntity)) {
+                foreignSet.add(foreignEntity);
+            }
+            if (existsReferrer) {
+                if (!foreignReferrerMap.containsKey(foreignEntity)) {
+                    foreignReferrerMap.put(foreignEntity, new ArrayList<LOCAL_ENTITY>());
+                }
+                foreignReferrerMap.get(foreignEntity).add(entity);
+            }
+        }
+        final Set<Entry<FOREIGN_ENTITY, List<LOCAL_ENTITY>>> entrySet = foreignReferrerMap.entrySet();
+        for (Entry<FOREIGN_ENTITY, List<LOCAL_ENTITY>> entry : entrySet) {
+            callback.setRfLs(entry.getKey(), entry.getValue());
         }
         return new ArrayList<FOREIGN_ENTITY>(foreignSet);
     }
 
     protected static interface InternalPulloutCallback<LOCAL_ENTITY extends Entity, FOREIGN_ENTITY extends Entity> {
-        public FOREIGN_ENTITY callbackGetForeignEntity(LOCAL_ENTITY entity);
+        FOREIGN_ENTITY getFr(LOCAL_ENTITY entity); // getForeignEntity()
+
+        boolean hasRf(); // hasReferrer()
+
+        void setRfLs(FOREIGN_ENTITY foreignEntity, List<LOCAL_ENTITY> localList); // setReferrerList()
     }
 
     // ===================================================================================
@@ -741,14 +768,15 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
          * @throws java.io.FileNotFoundException The file is not found.
          * @throws java.io.IOException The IO exception occurred.
          */
-        public TokenFileOutputResult outputTokenFile(ConditionBean cb, String filename, TokenFileOutputOption tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
+        public TokenFileOutputResult outputTokenFile(ConditionBean cb, String filename,
+                TokenFileOutputOption tokenFileOutputOption) throws java.io.FileNotFoundException, java.io.IOException {
             assertCBNotNull(cb);
             assertStringNotNullAndNotTrimmedEmpty("filename", filename);
             assertObjectNotNull("tokenFileOutputOption", tokenFileOutputOption);
 
             final List<Entity> ls = readList(cb);
             List<List<String>> rowList = new ArrayList<List<String>>();
-            for (java.util.Iterator<Entity> ite = ls.iterator(); ite.hasNext(); ) {
+            for (java.util.Iterator<Entity> ite = ls.iterator(); ite.hasNext();) {
                 final Entity entity = ite.next();
                 final List<String> valueList = getDBMeta().convertToColumnStringValueList(entity);
                 rowList.add(valueList);
@@ -757,7 +785,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             final FileMakingOption fileMakingOption = tokenFileOutputOption.getFileMakingOption();
             final FileMakingHeaderInfo fileMakingHeaderInfo = new FileMakingHeaderInfo();
             final List<String> columnDbNameList = new ArrayList<String>();
-            for (final java.util.Iterator<ColumnInfo> ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext(); ) {
+            for (final java.util.Iterator<ColumnInfo> ite = getDBMeta().getColumnInfoList().iterator(); ite.hasNext();) {
                 final ColumnInfo columnInfo = ite.next();
                 columnDbNameList.add(columnInfo.getColumnDbName());
             }
@@ -795,6 +823,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         assertCBNotNull(cb);
         return doCallReadCount(cb);
     }
+
     protected abstract int doCallReadCount(ConditionBean cb);
 
     /**
@@ -805,6 +834,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         assertCBNotNull(cb);
         return doCallReadList(cb);
     }
+
     protected abstract List<Entity> doCallReadList(ConditionBean cb);
 
     /**
@@ -820,12 +850,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     public void warmUpCommand() {
         {
             SelectCountCBCommand cmd = createSelectCountCBCommand(newConditionBean());
-            cmd.setInitializeOnly(true); invoke(cmd);
+            cmd.setInitializeOnly(true);
+            invoke(cmd);
         }
         {
-            SelectListCBCommand<? extends Entity> cmd
-                    = createSelectListCBCommand(newConditionBean(), getDBMeta().getEntityType());
-            cmd.setInitializeOnly(true); invoke(cmd);
+            SelectListCBCommand<? extends Entity> cmd = createSelectListCBCommand(newConditionBean(), getDBMeta()
+                    .getEntityType());
+            cmd.setInitializeOnly(true);
+            invoke(cmd);
         }
     }
 
@@ -836,9 +868,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         command.setConditionBean(cb);
         return command;
     }
-    
-    protected <ENTITY extends Entity> SelectCursorCBCommand<ENTITY> createSelectCursorCBCommand(ConditionBean cb
-            , EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) {
+
+    protected <ENTITY extends Entity> SelectCursorCBCommand<ENTITY> createSelectCursorCBCommand(ConditionBean cb,
+            EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectCursorCBCommand");
         final SelectCursorCBCommand<ENTITY> command = xsetupSelectCommand(new SelectCursorCBCommand<ENTITY>());
         command.setConditionBeanType(cb.getClass());
@@ -848,7 +880,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return command;
     }
 
-    protected <ENTITY extends Entity> SelectListCBCommand<ENTITY> createSelectListCBCommand(ConditionBean cb, Class<ENTITY> entityType) {
+    protected <ENTITY extends Entity> SelectListCBCommand<ENTITY> createSelectListCBCommand(ConditionBean cb,
+            Class<ENTITY> entityType) {
         assertBehaviorCommandInvoker("createSelectListCBCommand");
         final SelectListCBCommand<ENTITY> command = xsetupSelectCommand(new SelectListCBCommand<ENTITY>());
         command.setConditionBeanType(cb.getClass());
@@ -865,9 +898,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return command;
     }
 
-    protected <RESULT> SelectScalarCBCommand<RESULT> createSelectScalarCBCommand(ConditionBean cb
-                                                                              , Class<RESULT> resultType
-                                                                              , SqlClause.SelectClauseType selectClauseType) {
+    protected <RESULT> SelectScalarCBCommand<RESULT> createSelectScalarCBCommand(ConditionBean cb,
+            Class<RESULT> resultType, SqlClause.SelectClauseType selectClauseType) {
         assertBehaviorCommandInvoker("createSelectScalarCBCommand");
         final SelectScalarCBCommand<RESULT> command = xsetupSelectCommand(new SelectScalarCBCommand<RESULT>());
         command.setConditionBeanType(cb.getClass());
@@ -895,17 +927,17 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected void assertBehaviorCommandInvoker(String methodName) {
         if (_behaviorCommandInvoker == null) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "Not found the invoker of behavior command as behavior's attributed!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "Please confirm the definition of the invoker at your 'dbflute.dicon'." + getLineSeparator();
-            msg = msg + "It is precondition that '" + methodName + "()' needs the invoker instance." + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();
-            msg = msg + "  _behaviorCommandInvoker : " + _behaviorCommandInvoker + getLineSeparator();
-            msg = msg + "  _behaviorSelector       : " + _behaviorSelector + getLineSeparator();
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "Not found the invoker of behavior command as behavior's attributed!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "Please confirm the definition of the invoker at your 'dbflute.dicon'." + ln();
+            msg = msg + "It is precondition that '" + methodName + "()' needs the invoker instance." + ln();
+            msg = msg + ln();
+            msg = msg + "[Your Behavior's Attributes]" + ln();
+            msg = msg + "  _behaviorCommandInvoker : " + _behaviorCommandInvoker + ln();
+            msg = msg + "  _behaviorSelector       : " + _behaviorSelector + ln();
             msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
@@ -915,6 +947,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     //                                                                Optimistic Lock Info
     //                                                                ====================
     protected abstract boolean hasVersionNoValue(Entity entity);
+
     protected abstract boolean hasUpdateDateValue(Entity entity);
 
     // ===================================================================================
@@ -927,7 +960,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     protected Object toLowerCaseIfString(Object obj) {
         if (obj != null && obj instanceof String) {
-            return ((String)obj).toLowerCase();
+            return ((String) obj).toLowerCase();
         }
         return obj;
     }
@@ -936,7 +969,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * Get the value of line separator.
      * @return The value of line separator. (NotNull)
      */
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 
@@ -945,13 +978,13 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         assertObjectNotNull("entity", entity);
         assertObjectNotNull("clazz", clazz);
         try {
-            return (ENTITY)entity;
+            return (ENTITY) entity;
         } catch (ClassCastException e) {
             String msg = "The entity should be " + clazz.getSimpleName() + " but it was: " + entity.getClass();
             throw new RuntimeException(msg, e);
         }
     }
-    
+
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------
@@ -1007,7 +1040,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             throw new IllegalArgumentException(msg + entity);
         }
     }
-    
+
     // -----------------------------------------------------
     //                                         Assert String
     //                                         -------------
@@ -1019,12 +1052,12 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);
         assertObjectNotNull(variableName, value);
-        if (value.trim().length() ==0) {
+        if (value.trim().length() == 0) {
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
     }
-    
+
     // -----------------------------------------------------
     //                                           Assert List
     //                                           -----------

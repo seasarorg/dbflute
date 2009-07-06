@@ -49,9 +49,6 @@ import org.seasar.dbflute.helper.token.file.FileTokenizingOption;
 import org.seasar.dbflute.helper.token.file.FileTokenizingRowResource;
 import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
 
-
-
-
 /**
  * The abstract class of writable behavior.
  * @author jflute
@@ -183,7 +180,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
             throw new org.seasar.dbflute.exception.EntityAlreadyDeletedException(msg);
         } else if (updatedCount > 1) {
-            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
+            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount="
+                    + updatedCount;
             msg = msg + ": entity=" + entity;
             throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
         }
@@ -193,14 +191,16 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         public int callbackDelegateUpdate(ENTITY entity);
     }
 
-    protected <ENTITY extends Entity> void helpUpdateNonstrictInternally(ENTITY entity, InternalUpdateNonstrictCallback<ENTITY> callback) {
+    protected <ENTITY extends Entity> void helpUpdateNonstrictInternally(ENTITY entity,
+            InternalUpdateNonstrictCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         final int updatedCount = callback.callbackDelegateUpdateNonstrict(entity);
         if (updatedCount == 0) {
             String msg = "The entity was Not Found! it has already been deleted: entity=" + entity;
             throw new org.seasar.dbflute.exception.EntityAlreadyDeletedException(msg);
         } else if (updatedCount > 1) {
-            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount=" + updatedCount;
+            String msg = "The entity was Too Many! it has been duplicated. It should be the only one! But the updatedCount="
+                    + updatedCount;
             msg = msg + ": entity=" + entity;
             throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
         }
@@ -213,8 +213,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     // -----------------------------------------------------
     //                                        InsertOrUpdate
     //                                        --------------
-    protected <ENTITY extends Entity, CB_TYPE extends ConditionBean>
-            void helpInsertOrUpdateInternally(ENTITY entity, InternalInsertOrUpdateCallback<ENTITY, CB_TYPE> callback) {
+    protected <ENTITY extends Entity, CB_TYPE extends ConditionBean> void helpInsertOrUpdateInternally(ENTITY entity,
+            InternalInsertOrUpdateCallback<ENTITY, CB_TYPE> callback) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
             callback.callbackInsert(entity);
@@ -245,12 +245,16 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
     protected static interface InternalInsertOrUpdateCallback<ENTITY extends Entity, CB_TYPE extends ConditionBean> {
         public void callbackInsert(ENTITY entity);
+
         public void callbackUpdate(ENTITY entity);
+
         public CB_TYPE callbackNewMyConditionBean();
+
         public int callbackSelectCount(CB_TYPE cb);
     }
 
-    protected <ENTITY extends Entity> void helpInsertOrUpdateInternally(ENTITY entity, InternalInsertOrUpdateNonstrictCallback<ENTITY> callback) {
+    protected <ENTITY extends Entity> void helpInsertOrUpdateInternally(ENTITY entity,
+            InternalInsertOrUpdateNonstrictCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         if (!entity.hasPrimaryKeyValue()) {
             callback.callbackInsert(entity);
@@ -267,6 +271,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
     protected static interface InternalInsertOrUpdateNonstrictCallback<ENTITY extends Entity> {
         public void callbackInsert(ENTITY entity);
+
         public void callbackUpdateNonstrict(ENTITY entity);
     }
 
@@ -282,7 +287,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
             throw new org.seasar.dbflute.exception.EntityAlreadyDeletedException(msg);
         } else if (deletedCount > 1) {
-            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount="
+                    + deletedCount;
             msg = msg + ": entity=" + entity;
             throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
         }
@@ -292,14 +298,16 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         public int callbackDelegateDelete(ENTITY entity);
     }
 
-    protected <ENTITY extends Entity> void helpDeleteNonstrictInternally(ENTITY entity, InternalDeleteNonstrictCallback<ENTITY> callback) {
+    protected <ENTITY extends Entity> void helpDeleteNonstrictInternally(ENTITY entity,
+            InternalDeleteNonstrictCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
         if (deletedCount == 0) {
             String msg = "The entity was Not Found! The entity has already been deleted: entity=" + entity;
             throw new org.seasar.dbflute.exception.EntityAlreadyDeletedException(msg);
         } else if (deletedCount > 1) {
-            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount="
+                    + deletedCount;
             msg = msg + ": entity=" + entity;
             throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
         }
@@ -309,13 +317,15 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         public int callbackDelegateDeleteNonstrict(ENTITY entity);
     }
 
-    protected <ENTITY extends Entity> void helpDeleteNonstrictIgnoreDeletedInternally(ENTITY entity, InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY> callback) {
+    protected <ENTITY extends Entity> void helpDeleteNonstrictIgnoreDeletedInternally(ENTITY entity,
+            InternalDeleteNonstrictIgnoreDeletedCallback<ENTITY> callback) {
         assertEntityNotNull(entity);
         final int deletedCount = callback.callbackDelegateDeleteNonstrict(entity);
         if (deletedCount == 0) {
             return;
         } else if (deletedCount > 1) {
-            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount=" + deletedCount;
+            String msg = "The deleted entity was duplicated. It should be the only one! But the deletedCount="
+                    + deletedCount;
             msg = msg + ": entity=" + entity;
             throw new org.seasar.dbflute.exception.EntityDuplicatedException(msg);
         }
@@ -401,12 +411,15 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
          * @throws java.io.FileNotFoundException The file is not found.
          * @throws java.io.IOException The IO exception occurred.
          */
-        public TokenFileReflectionResult reflectTokenFile(String filename, TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
+        public TokenFileReflectionResult reflectTokenFile(String filename,
+                TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException,
+                java.io.IOException {
             assertStringNotNullAndNotTrimmedEmpty("filename", filename);
             assertFileTokenReflectionOption(tokenFileReflectionOption);
 
             final TokenFileReflectionResult result = buildTokenFileReflectionResult();
-            final FileTokenizingCallback fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
+            final FileTokenizingCallback fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(
+                    tokenFileReflectionOption, result);
             final FileTokenizingOption fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
             final FileToken fileToken = new FileTokenImpl();
             fileToken.tokenize(filename, fileTokenizingCallback, fileTokenizingOption);
@@ -422,12 +435,15 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
          * @throws java.io.FileNotFoundException The file is not found.
          * @throws java.io.IOException The IO exception occurred.
          */
-        public TokenFileReflectionResult reflectTokenFile(java.io.InputStream inputStream, TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
+        public TokenFileReflectionResult reflectTokenFile(java.io.InputStream inputStream,
+                TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException,
+                java.io.IOException {
             assertObjectNotNull("inputStream", inputStream);
             assertFileTokenReflectionOption(tokenFileReflectionOption);
 
             final TokenFileReflectionResult result = buildTokenFileReflectionResult();
-            final FileTokenizingCallback fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(tokenFileReflectionOption, result);
+            final FileTokenizingCallback fileTokenizingCallback = buildFileTokenReflectionFileTokenizingCallback(
+                    tokenFileReflectionOption, result);
             final FileTokenizingOption fileTokenizingOption = buildFileTokenReflectionFileTokenizingOption(tokenFileReflectionOption);
             final FileToken fileToken = new FileTokenImpl();
             fileToken.tokenize(inputStream, fileTokenizingCallback, fileTokenizingOption);
@@ -450,7 +466,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             return result;
         }
 
-        protected FileTokenizingCallback buildFileTokenReflectionFileTokenizingCallback(TokenFileReflectionOption tokenFileReflectionOption, final TokenFileReflectionResult result) throws java.io.FileNotFoundException, java.io.IOException {
+        protected FileTokenizingCallback buildFileTokenReflectionFileTokenizingCallback(
+                TokenFileReflectionOption tokenFileReflectionOption, final TokenFileReflectionResult result)
+                throws java.io.FileNotFoundException, java.io.IOException {
             assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
 
             final String encoding = tokenFileReflectionOption.getEncoding();
@@ -463,7 +481,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
             final FileTokenizingCallback fileTokenizingCallback = new FileTokenizingCallback() {
                 public void handleRowResource(FileTokenizingRowResource fileTokenizingRowResource) {
-                    final FileTokenizingHeaderInfo fileTokenizingHeaderInfo = fileTokenizingRowResource.getFileTokenizingHeaderInfo();
+                    final FileTokenizingHeaderInfo fileTokenizingHeaderInfo = fileTokenizingRowResource
+                            .getFileTokenizingHeaderInfo();
                     final java.util.List<String> columnNameList = fileTokenizingHeaderInfo.getColumnNameList();
                     final java.util.List<String> valueList = fileTokenizingRowResource.getValueList();
 
@@ -503,7 +522,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             return fileTokenizingCallback;
         }
 
-        protected Entity createEntityByStringValueList(java.util.List<String> columnNameList, java.util.List<String> valueList) {
+        protected Entity createEntityByStringValueList(java.util.List<String> columnNameList,
+                java.util.List<String> valueList) {
             final MapStringBuilder builder = new MapStringBuilderImpl();
             builder.setMsMapMark(MAP_STRING_MAP_MARK);
             builder.setMsStartBrace(MAP_STRING_START_BRACE);
@@ -518,7 +538,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
             return entity;
         }
 
-        protected FileTokenizingOption buildFileTokenReflectionFileTokenizingOption(TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException, java.io.IOException {
+        protected FileTokenizingOption buildFileTokenReflectionFileTokenizingOption(
+                TokenFileReflectionOption tokenFileReflectionOption) throws java.io.FileNotFoundException,
+                java.io.IOException {
             assertObjectNotNull("tokenFileReflectionOption", tokenFileReflectionOption);
 
             final String encoding = tokenFileReflectionOption.getEncoding();
@@ -547,9 +569,12 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Inserted count.
      */
     protected int callCreate(Entity entity) {
-        if (!processBeforeInsert(entity)) { return 1;/*as Normal End*/ }
+        if (!processBeforeInsert(entity)) {
+            return 1;/*as Normal End*/
+        }
         return doCallCreate(entity);
     }
+
     protected abstract int doCallCreate(Entity entity);
 
     /**
@@ -558,7 +583,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeInsert(Entity entity) {
-        if (!determineExecuteInsert(entity)) { return false; }
+        if (!determineExecuteInsert(entity)) {
+            return false;
+        }
         assertEntityNotNull(entity);// If this table use identity, the entity does not have primary-key.
         frameworkFilterEntityOfInsert(entity);
         filterEntityOfInsert(entity);
@@ -575,9 +602,12 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Updated count.
      */
     protected int callModify(Entity entity) {
-        if (!processBeforeUpdate(entity)) { return 1;/*as Normal End*/ }
+        if (!processBeforeUpdate(entity)) {
+            return 1;/*as Normal End*/
+        }
         return doCallModify(entity);
     }
+
     protected abstract int doCallModify(Entity entity);
 
     /**
@@ -586,7 +616,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeUpdate(Entity entity) {
-        if (!determineExecuteUpdate(entity)) { return false; }
+        if (!determineExecuteUpdate(entity)) {
+            return false;
+        }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         frameworkFilterEntityOfUpdate(entity);
         filterEntityOfUpdate(entity);
@@ -602,9 +634,12 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Deleted count.
      */
     protected int callRemove(Entity entity) {
-        if (!processBeforeDelete(entity)) { return 1;/*as Normal End*/ }
+        if (!processBeforeDelete(entity)) {
+            return 1;/*as Normal End*/
+        }
         return doCallRemove(entity);
     }
+
     protected abstract int doCallRemove(Entity entity);
 
     /**
@@ -613,7 +648,9 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @return Execution Determination. (true: execute / false: non)
      */
     protected boolean processBeforeDelete(Entity entity) {
-        if (!determineExecuteDelete(entity)) { return false; }
+        if (!determineExecuteDelete(entity)) {
+            return false;
+        }
         assertEntityNotNullAndHasPrimaryKeyValue(entity);
         frameworkFilterEntityOfDelete(entity);
         filterEntityOfDelete(entity);
@@ -654,17 +691,18 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
     private void assertCommonColumnAutoSetupperNotNull() {
         if (_commonColumnAutoSetupper == null) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "Not found the auto set-upper of common column as behavior's attribute!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "Please confirm the definition of the set-upper at your component configuration of DBFlute." + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Your Behavior's Attributes]" + getLineSeparator();
-            msg = msg + "  _behaviorCommandInvoker   : " + _behaviorCommandInvoker + getLineSeparator();
-            msg = msg + "  _behaviorSelector         : " + _behaviorSelector + getLineSeparator();
-            msg = msg + "  _commonColumnAutoSetupper : " + _commonColumnAutoSetupper + getLineSeparator();
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "Not found the auto set-upper of common column as behavior's attribute!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "Please confirm the definition of the set-upper at your component configuration of DBFlute."
+                    + ln();
+            msg = msg + ln();
+            msg = msg + "[Your Behavior's Attributes]" + ln();
+            msg = msg + "  _behaviorCommandInvoker   : " + _behaviorCommandInvoker + ln();
+            msg = msg + "  _behaviorSelector         : " + _behaviorSelector + ln();
+            msg = msg + "  _commonColumnAutoSetupper : " + _commonColumnAutoSetupper + ln();
             msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
@@ -713,7 +751,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         assertCommonColumnAutoSetupperNotNull();
         setupper.handleCommonColumnOfUpdateIfNeeds(targetEntity);
     }
-    
+
     /**
      * Filter the entity of update.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
@@ -746,7 +784,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      */
     protected void frameworkFilterEntityOfDelete(Entity targetEntity) {
     }
-    
+
     /**
      * Filter the entity of delete.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
@@ -770,6 +808,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         helpFilterBeforeInsertInternally(entityList);
         return doCreateList(entityList);
     }
+
     protected abstract int[] doCreateList(List<Entity> entityList);
 
     /**
@@ -781,6 +820,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         helpFilterBeforeUpdateInternally(entityList);
         return doModifyList(entityList);
     }
+
     protected abstract int[] doModifyList(List<Entity> entityList);
 
     /**
@@ -792,6 +832,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         helpFilterBeforeDeleteInternally(entityList);
         return doRemoveList(entityList);
     }
+
     protected abstract int[] doRemoveList(List<Entity> entityList);
 
     protected void assertEntityHasVersionNoValue(Entity entity) {
@@ -801,18 +842,19 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (hasVersionNoValue(entity)) {
             return;
         }
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The value of 'version no' on the entity was Not Found!" + getLineSeparator() + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the existence of the value of 'version no' on the entity." + getLineSeparator();
-        msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + getLineSeparator();
-        msg = msg + "So 'version no' is required on the entity. " + getLineSeparator();
-        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary." + getLineSeparator() + getLineSeparator();
-        msg = msg + "[Entity]" + getLineSeparator();
-        msg = msg + "entity to string = " + entity + getLineSeparator();
-        msg = msg + "entity to map    = " + entity.getDBMeta().convertToColumnValueMap(entity) + getLineSeparator();
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The value of 'version no' on the entity was Not Found!" + ln() + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the existence of the value of 'version no' on the entity." + ln();
+        msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + ln();
+        msg = msg + "So 'version no' is required on the entity. " + ln();
+        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary."
+                + ln() + ln();
+        msg = msg + "[Entity]" + ln();
+        msg = msg + "entity to string = " + entity + ln();
+        msg = msg + "entity to map    = " + entity.getDBMeta().convertToColumnValueMap(entity) + ln();
+        msg = msg + "* * * * * * * * * */" + ln();
         throw new OptimisticLockColumnValueNullException(msg);
     }
 
@@ -823,23 +865,25 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (hasUpdateDateValue(entity)) {
             return;
         }
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The value of 'update date' on the entity was Not Found!" + getLineSeparator() + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the existence of the value of 'update date' on the entity." + getLineSeparator();
-        msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + getLineSeparator();
-        msg = msg + "So 'update date' is required on the entity. " + getLineSeparator();
-        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary." + getLineSeparator() + getLineSeparator();
-        msg = msg + "[Entity]" + getLineSeparator();
-        msg = msg + "entity to string = " + entity + getLineSeparator();
-        msg = msg + "entity to map    = " + entity.getDBMeta().convertToColumnValueMap(entity) + getLineSeparator();
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The value of 'update date' on the entity was Not Found!" + ln() + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the existence of the value of 'update date' on the entity." + ln();
+        msg = msg + "You called the method in which the check for optimistic lock is indispensable. " + ln();
+        msg = msg + "So 'update date' is required on the entity. " + ln();
+        msg = msg + "In addition, please confirm the necessity of optimistic lock. It might possibly be unnecessary."
+                + ln() + ln();
+        msg = msg + "[Entity]" + ln();
+        msg = msg + "entity to string = " + entity + ln();
+        msg = msg + "entity to map    = " + entity.getDBMeta().convertToColumnValueMap(entity) + ln();
+        msg = msg + "* * * * * * * * * */" + ln();
         throw new OptimisticLockColumnValueNullException(msg);
     }
 
     public static class OptimisticLockColumnValueNullException extends RuntimeException {
         private static final long serialVersionUID = 1L;
+
         public OptimisticLockColumnValueNullException(String msg) {
             super(msg);
         }
@@ -850,9 +894,11 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     //                                                     ===============================
     protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeInsertInternally(List<ENTITY> entityList) {
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
-        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
+        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext();) {
             final ENTITY entity = ite.next();
-            if (!processBeforeInsert(entity)) { continue; }
+            if (!processBeforeInsert(entity)) {
+                continue;
+            }
             filteredList.add(entity);
         }
         return filteredList;
@@ -860,9 +906,11 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
     protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeUpdateInternally(List<ENTITY> entityList) {
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
-        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
+        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext();) {
             final ENTITY entity = ite.next();
-            if (!processBeforeUpdate(entity)) { continue; }
+            if (!processBeforeUpdate(entity)) {
+                continue;
+            }
             filteredList.add(entity);
         }
         return filteredList;
@@ -870,14 +918,16 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
 
     protected <ENTITY extends Entity> List<ENTITY> helpFilterBeforeDeleteInternally(List<ENTITY> entityList) {
         final List<ENTITY> filteredList = new ArrayList<ENTITY>();
-        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext(); ) {
+        for (final Iterator<ENTITY> ite = entityList.iterator(); ite.hasNext();) {
             final ENTITY entity = ite.next();
-            if (!processBeforeDelete(entity)) { continue; }
+            if (!processBeforeDelete(entity)) {
+                continue;
+            }
             filteredList.add(entity);
         }
         return filteredList;
     }
-    
+
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
@@ -924,7 +974,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return xsetupListEntityCommand(new BatchUpdateEntityCommand(), entityList);
     }
 
-    protected BatchUpdateNonstrictEntityCommand createBatchUpdateNonstrictEntityCommand(List<? extends Entity> entityList) {
+    protected BatchUpdateNonstrictEntityCommand createBatchUpdateNonstrictEntityCommand(
+            List<? extends Entity> entityList) {
         assertBehaviorCommandInvoker("createBatchUpdateNonstrictEntityCommand");
         return xsetupListEntityCommand(new BatchUpdateNonstrictEntityCommand(), entityList);
     }
@@ -934,7 +985,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return xsetupListEntityCommand(new BatchDeleteEntityCommand(), entityList);
     }
 
-    protected BatchDeleteNonstrictEntityCommand createBatchDeleteNonstrictEntityCommand(List<? extends Entity> entityList) {
+    protected BatchDeleteNonstrictEntityCommand createBatchDeleteNonstrictEntityCommand(
+            List<? extends Entity> entityList) {
         assertBehaviorCommandInvoker("createBatchDeleteNonstrictEntityCommand");
         return xsetupListEntityCommand(new BatchDeleteNonstrictEntityCommand(), entityList);
     }
@@ -945,7 +997,8 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @param entityList The list of entity. (NotNull, NotEmpty)
      * @return The command of behavior. (NotNull)
      */
-    private <COMMAND extends AbstractListEntityCommand> COMMAND xsetupListEntityCommand(COMMAND command, List<? extends Entity> entityList) {
+    private <COMMAND extends AbstractListEntityCommand> COMMAND xsetupListEntityCommand(COMMAND command,
+            List<? extends Entity> entityList) {
         if (entityList.isEmpty()) {
             String msg = "The argument 'entityList' should not be empty: " + entityList;
             throw new IllegalStateException(msg);
