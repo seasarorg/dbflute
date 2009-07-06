@@ -319,14 +319,14 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         if (${myEntityListVariableName}.isEmpty()) { return; }
         final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
         helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
-            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity) { return entity.get${table.getPrimaryKeyJavaNameAsOne()}(); }
-            public void callbackBase_setReferrerList(${myExtendedObjectClassName} entity, List<${referrerEntityClassName}> referrerList) { entity.set${referrer.referrerPropertyNameInitCap}(referrerList); }
-            public ${referrerCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.newMyConditionBean(); }
-            public void callbackReferrer_queryForeignKeyInScope(${referrerCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) { cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList); }
-            public void callbackReferrer_queryAddOrderByForeignKeyAsc(${referrerCBClassName} cb) { cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc(); }
-            public List<${referrerEntityClassName}> callbackReferrer_selectList(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
-            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferrer_getForeignKeyValue(${referrerEntityClassName} entity) { return entity.get${referrer.getLocalColumnJavaNameAsOne()}(); }
-            public void callbackReferrer_setForeignEntity(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} baseEntity) { referrerEntity.set${referrer.foreignPropertyNameInitCap}(baseEntity); }
+            public ${table.getPrimaryKeyJavaNativeAsOne()} getPKVal(${myExtendedObjectClassName} e) { return e.get${table.getPrimaryKeyJavaNameAsOne()}(); }
+            public void setRfLs(${myExtendedObjectClassName} e, List<${referrerEntityClassName}> ls) { e.set${referrer.referrerPropertyNameInitCap}(ls); }
+            public ${referrerCBClassName} newMyCB() { return referrerBhv.newMyConditionBean(); }
+            public void qyFKIn(${referrerCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> ls) { cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(ls); }
+            public void qyOdFKAsc(${referrerCBClassName} cb) { cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc(); }
+            public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
+            public ${table.getPrimaryKeyJavaNativeAsOne()} getFKVal(${referrerEntityClassName} e) { return e.get${referrer.getLocalColumnJavaNameAsOne()}(); }
+            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le) { re.set${referrer.foreignPropertyNameInitCap}(le); }
         } );
     }
 
@@ -357,12 +357,12 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         if (${myEntityListVariableName}.isEmpty()) { return; }
         final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
         helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
-            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity)
+            public ${table.getPrimaryKeyJavaNativeAsOne()} getPKVal(${myExtendedObjectClassName} entity)
             { return entity.get${table.getPrimaryKeyJavaNameAsOne()}(); }
-            public void callbackBase_setReferrerList(${myExtendedObjectClassName} entity, List<${referrerEntityClassName}> referrerList)
+            public void setRfLs(${myExtendedObjectClassName} entity, List<${referrerEntityClassName}> referrerList)
             { entity.setBuriAllRoundStateHistory_${processName}List(referrerList); }
-            public ${referrerCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.newMyConditionBean(); }
-            public void callbackReferrer_queryForeignKeyInScope(${referrerCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) {
+            public ${referrerCBClassName} newMyCB() { return referrerBhv.newMyConditionBean(); }
+            public void qyFKIn(${referrerCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) {
                 java.util.List<Long> internalPkValueList = new java.util.ArrayList<Long>();
                 for (${table.getPrimaryKeyJavaNativeAsOne()} pk : pkList) {
                     internalPkValueList.add(Long.valueOf(pk.toString()));
@@ -370,14 +370,14 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
                 cb.query().setInternalPkValue_InScope(internalPkValueList);
                 cb.query().setInternalDataType_Equal("${glPackageExtendedEntity}.${myExtendedObjectClassName}"); // is a fixed condition!
             }
-            public void callbackReferrer_queryAddOrderByForeignKeyAsc(${referrerCBClassName} cb)
+            public void qyOdFKAsc(${referrerCBClassName} cb)
             { cb.query().addOrderBy_InternalPkValue_Asc(); }
-            public List<${referrerEntityClassName}> callbackReferrer_selectList(${referrerCBClassName} cb)
+            public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb)
             { return referrerBhv.selectList(cb); }
-            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferrer_getForeignKeyValue(${referrerEntityClassName} entity)
+            public ${table.getPrimaryKeyJavaNativeAsOne()} getFKVal(${referrerEntityClassName} entity)
             { return ${table.getPrimaryKeyJavaNativeAsOne()}.valueOf(entity.getInternalPkValue().toString()); }
-            public void callbackReferrer_setForeignEntity(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} baseEntity)
-            { referrerEntity.set${table.javaName}_${processName}(baseEntity); }
+            public void setlcEt(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} localEntity)
+            { referrerEntity.set${table.javaName}_${processName}(localEntity); }
         } );
     }
 
@@ -387,16 +387,30 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     // ===================================================================================
     //                                                                    Pull out Foreign
     //                                                                    ================
-#foreach ($foreignKeys in $table.foreignKeys)
-#set ($foreignEntityClassName = "${foreignKeys.foreignTableExtendedEntityClassName}")
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
     /**
      * Pull out the list of foreign table '${foreignEntityClassName}'.
      * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
      * @return The list of foreign table. (NotNull)
      */
-    public List<${foreignEntityClassName}> pullout${foreignKeys.foreignPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+    public List<${foreignEntityClassName}> pullout${foreignKey.foreignPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}>() {
-            public ${foreignEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.get${foreignKeys.foreignPropertyNameInitCap}(); } });
+            public ${foreignEntityClassName} getFr(${myExtendedObjectClassName} e) { return e.get${foreignKey.foreignPropertyNameInitCap}(); }
+            public boolean hasRf() { return ${foreignKey.canBeReferrer()}; }
+#if ($foreignKey.canBeReferrer())
+#if ($foreignKey.isOneToOne())
+            public void setRfLs(${foreignEntityClassName} e, List<${myExtendedObjectClassName}> ls)
+            { if (!ls.isEmpty()) { e.set${foreignKey.referrerPropertyNameInitCapAsOne}(ls.get(0)); } }
+#else
+            public void setRfLs(${foreignEntityClassName} e, List<${myExtendedObjectClassName}> ls)
+            { e.set${foreignKey.referrerPropertyNameInitCap}(ls); }
+#end
+#else
+            public void setRfLs(${foreignEntityClassName} e, List<${myExtendedObjectClassName}> ls)
+            { throw new UnsupportedOperationException(); }
+#end
+        });
     }
 #end
 #foreach ($referrer in $table.referrers)
@@ -410,7 +424,11 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      */
     public List<${referrerEntityClassName}> pullout${referrer.referrerPropertyNameInitCapAsOne}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
         return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}>() {
-            public ${referrerEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.get${referrer.referrerPropertyNameInitCapAsOne}(); } });
+            public ${referrerEntityClassName} getFr(${myExtendedObjectClassName} e) { return e.get${referrer.referrerPropertyNameInitCapAsOne}(); }
+            public boolean hasRf() { return ${referrer.canBeReferrer()}; }
+            public void setRfLs(${referrerEntityClassName} e, List<${myExtendedObjectClassName}> ls)
+            { if (!ls.isEmpty()) { e.set${referrer.foreignPropertyNameInitCap}(ls.get(0)); } }
+        });
     }
 #end
 #end
