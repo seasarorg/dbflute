@@ -517,6 +517,51 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
 #end
+#if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
+    // ===================================================================================
+    //                                                                      Buri Interface
+    //                                                                      ==============
+#set ($relatedCBClassName = "${glProjectPrefix}BuriAllRoundStateHistoryCB")
+#set ($relatedCQClassName = "${glProjectPrefix}BuriAllRoundStateHistoryCQ")
+#foreach ($processName in $table.tableProcessForMethodNameList)
+    public void existsBuriAllRoundStateHistory_${processName}(SubQuery<${relatedCBClassName}> subQuery) {
+        assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
+        ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsSubQuery();
+        cb.query().setInternalDataType_Equal("${glPackageExtendedEntity}.${myExtendedObjectClassName}"); subQuery.query(cb);
+        String subQueryPropertyName = keepBuriAllRoundStateHistory_${processName}(cb.query()); // for saving query-value.
+        registerExistsSubQuery(cb.query(), "${table.primaryKeyNameAsOne}", "INTERNAL_PK_VALUE", subQueryPropertyName);
+    }
+    public abstract String keepBuriAllRoundStateHistory_${processName}(${relatedCQClassName} subQuery);
+    protected Map<String, ${relatedCQClassName}> _buriAllRoundStateHistory_${processName}Map;
+    public Map<${subQueryKeepMapGeneric}> getBuriAllRoundStateHistory${processName}() { return _buriAllRoundStateHistory_${processName}Map; }
+    public String keepBuriAllRoundStateHistory${processName}(${relatedCQClassName} subQuery) {
+        if (_buriAllRoundStateHistory_${processName}Map == null) { _buriAllRoundStateHistory_${processName}Map = newLinkedHashMap(); }
+        String key = "subQueryMapKey" + (_buriAllRoundStateHistory_${processName}Map.size() + 1);
+        _buriAllRoundStateHistory_${processName}Map.put(key, subQuery); return "buriAllRoundStateHistory${processName}." + key;
+    }
+
+#end
+#end
+#if ($table.isBuriAllRoundStateHistory())
+    // ===================================================================================
+    //                                                                      Buri Interface
+    //                                                                      ==============
+#foreach ($processName in $table.tableProcessForMethodNameList)
+    public void setStatus_Equal(${glPackagePluginBuri}.${glBuriDef}.${processName}_Status status) {
+        if (statuses == null) { return; }
+        setStatusPathName_Equal(status.path());
+    }
+    public void setStatus_InScope(java.util.List<${glPackagePluginBuri}.${glBuriDef}.${processName}_Status> statusList) {
+        if (statusList == null || statusList.isEmpty()) { return; }
+        java.util.List<String> statusPathList = new java.util.ArrayList<String>();
+        for (${glPackagePluginBuri}.${glBuriDef}.${processName}_Status status : statusList) {
+            statusPathList.add(status.path());
+        }
+        setStatusPathName_InScope(statusPathList);
+    }
+
+#end
+#end
     // ===================================================================================
     //                                                                       Very Internal
     //                                                                       =============
