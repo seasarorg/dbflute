@@ -531,10 +531,9 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
         String subQueryPropertyName = keepBuriAllRoundStateHistory_${processName}(cb.query()); // for saving query-value.
         registerExistsSubQuery(cb.query(), "${table.primaryKeyNameAsOne}", "INTERNAL_PK_VALUE", subQueryPropertyName);
     }
-    public abstract String keepBuriAllRoundStateHistory_${processName}(${relatedCQClassName} subQuery);
     protected Map<String, ${relatedCQClassName}> _buriAllRoundStateHistory_${processName}Map;
-    public Map<${subQueryKeepMapGeneric}> getBuriAllRoundStateHistory${processName}() { return _buriAllRoundStateHistory_${processName}Map; }
-    public String keepBuriAllRoundStateHistory${processName}(${relatedCQClassName} subQuery) {
+    public Map<String, ${relatedCQClassName}> getBuriAllRoundStateHistory${processName}() { return _buriAllRoundStateHistory_${processName}Map; }
+    public String keepBuriAllRoundStateHistory_${processName}(${relatedCQClassName} subQuery) {
         if (_buriAllRoundStateHistory_${processName}Map == null) { _buriAllRoundStateHistory_${processName}Map = newLinkedHashMap(); }
         String key = "subQueryMapKey" + (_buriAllRoundStateHistory_${processName}Map.size() + 1);
         _buriAllRoundStateHistory_${processName}Map.put(key, subQuery); return "buriAllRoundStateHistory${processName}." + key;
@@ -546,21 +545,19 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     // ===================================================================================
     //                                                                      Buri Interface
     //                                                                      ==============
-#foreach ($processName in $table.tableProcessForMethodNameList)
-    public void setStatus_Equal(${glPackagePluginBuri}.${glBuriDef}.${processName}_Status status) {
+    public void setStatus_Equal(${glPackagePluginBuri}.${glBuriDef}.BuriStatus status) {
         if (statuses == null) { return; }
         setStatusPathName_Equal(status.path());
     }
-    public void setStatus_InScope(java.util.List<${glPackagePluginBuri}.${glBuriDef}.${processName}_Status> statusList) {
+    public void setStatus_InScope(java.util.List<${glPackagePluginBuri}.${glBuriDef}.BuriStatus> statusList) {
         if (statusList == null || statusList.isEmpty()) { return; }
         java.util.List<String> statusPathList = new java.util.ArrayList<String>();
-        for (${glPackagePluginBuri}.${glBuriDef}.${processName}_Status status : statusList) {
+        for (${glPackagePluginBuri}.${glBuriDef}.BuriStatus status : statusList) {
             statusPathList.add(status.path());
         }
         setStatusPathName_InScope(statusPathList);
     }
 
-#end
 #end
     // ===================================================================================
     //                                                                       Very Internal
