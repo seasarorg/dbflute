@@ -546,7 +546,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                      Buri Interface
     //                                                                      ==============
     public void setStatus_Equal(${glPackagePluginBuri}.${glBuriDef}.BuriStatus status) {
-        if (statuses == null) { return; }
+        if (status == null) { return; }
         setStatusPathName_Equal(status.path());
     }
     public void setStatus_InScope(java.util.List<${glPackagePluginBuri}.${glBuriDef}.BuriStatus> statusList) {
