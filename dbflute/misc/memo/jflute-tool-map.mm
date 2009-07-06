@@ -120,13 +120,14 @@
 </node>
 <node CREATED="1202978597820" ID="Freemind_Link_881677653" MODIFIED="1202978598686" TEXT="IDE">
 <node CREATED="1186894862265" ID="Freemind_Link_1811408348" MODIFIED="1186894864828" TEXT="Eclipse">
-<node CREATED="1186894865593" FOLDED="true" ID="Freemind_Link_269208490" MODIFIED="1186894867781" TEXT="Plugin">
+<node CREATED="1186894865593" ID="Freemind_Link_269208490" MODIFIED="1186894867781" TEXT="Plugin">
 <node CREATED="1199705905421" FOLDED="true" ID="Freemind_Link_609685317" MODIFIED="1200032132064" TEXT="for Plug-in User">
 <node CREATED="1194938320781" FOLDED="true" ID="Freemind_Link_606292027" MODIFIED="1194938323171" TEXT="Subversion">
-<node CREATED="1199788684687" ID="Freemind_Link_955775091" MODIFIED="1199788700921" TEXT="UpdateSite">
+<node CREATED="1199788684687" FOLDED="true" ID="Freemind_Link_955775091" MODIFIED="1246726500393" TEXT="Update Site">
 <node CREATED="1194938323984" ID="Freemind_Link_1479744119" MODIFIED="1194938324843" TEXT="http://www.polarion.org/projects/subversive/download/1.1/update-site/"/>
+<node CREATED="1246725621634" ID="Freemind_Link_130526574" MODIFIED="1246725622490" TEXT="http://www.polarion.org/projects/subversive/download/eclipse/2.0/update-site/"/>
 </node>
-<node CREATED="1199788796921" FOLDED="true" ID="Freemind_Link_1601781314" MODIFIED="1199788800093" TEXT="*feature">
+<node CREATED="1199788796921" FOLDED="true" ID="Freemind_Link_1601781314" MODIFIED="1246726366823" TEXT="*feature">
 <node CREATED="1199788806812" ID="Freemind_Link_553226703" MODIFIED="1199788819484" TEXT="&#x307e;&#x305a;&#x306f;&#x771f;&#x3063;&#x5148;&#x306b;&#x5165;&#x308c;&#x308b;Plugin"/>
 </node>
 <node CREATED="1199706946156" FOLDED="true" ID="Freemind_Link_1473892935" MODIFIED="1199706951015" TEXT="*ref">
@@ -135,7 +136,7 @@
 </node>
 </node>
 <node CREATED="1199699033703" FOLDED="true" ID="Freemind_Link_1776331644" MODIFIED="1199699038796" TEXT="QuickJUnit">
-<node CREATED="1199788676109" ID="Freemind_Link_1280906576" MODIFIED="1199788726953" TEXT="UpdateSite">
+<node CREATED="1199788676109" ID="Freemind_Link_1280906576" MODIFIED="1246726503785" TEXT="Update Site">
 <node CREATED="1199699171984" ID="Freemind_Link_1396072425" MODIFIED="1199706280015" TEXT="http://quick-junit.sourceforge.jp/updates/3.2"/>
 </node>
 <node CREATED="1199890814397" FOLDED="true" ID="Freemind_Link_248125349" MODIFIED="1199890818185" TEXT="*overview">
@@ -150,18 +151,27 @@
 </node>
 </node>
 </node>
-<node CREATED="1199890603474" FOLDED="true" ID="Freemind_Link_249879309" MODIFIED="1199890605070" TEXT="Dolteng">
-<node CREATED="1199890607561" ID="Freemind_Link_1802693810" MODIFIED="1199890617389" TEXT="UpdateSite">
-<node CREATED="1199890620161" ID="Freemind_Link_813685534" MODIFIED="1199890621140" TEXT="http://eclipse.seasar.org/updates/3.2/"/>
-</node>
-<node CREATED="1199890886081" ID="Freemind_Link_47491506" MODIFIED="1199890890309" TEXT="*overview">
-<node CREATED="1199890891281" ID="Freemind_Link_1850078572" MODIFIED="1199890904021" TEXT="Chura&#x30d7;&#x30ed;&#x30b8;&#x30a7;&#x30af;&#x30c8;&#x306e;&#x652f;&#x63f4;&#x30c4;&#x30fc;&#x30eb;"/>
-<node CREATED="1199890912434" ID="Freemind_Link_198507470" MODIFIED="1199890928336" TEXT="&#x30d7;&#x30ed;&#x30b8;&#x30a7;&#x30af;&#x30c8;&#x306e;&#x4f5c;&#x6210;&#x306a;&#x3069;&#x304c;&#x3067;&#x304d;&#x308b;"/>
-</node>
-</node>
-<node CREATED="1199890624472" ID="Freemind_Link_767774048" MODIFIED="1199890626772" TEXT="EMecha">
-<node CREATED="1199890631248" ID="Freemind_Link_1445629765" MODIFIED="1199890633580" TEXT="UpdateSite">
+<node CREATED="1199890624472" FOLDED="true" ID="Freemind_Link_767774048" MODIFIED="1199890626772" TEXT="EMecha">
+<node CREATED="1199890631248" FOLDED="true" ID="Freemind_Link_1445629765" MODIFIED="1246726615168" TEXT="Update Site">
 <node CREATED="1199890634777" ID="Freemind_Link_987131463" MODIFIED="1204680941671" TEXT="http://eclipse.seasar.org/updates/3.3/"/>
+</node>
+</node>
+<node CREATED="1201912202221" FOLDED="true" ID="Freemind_Link_153102695" MODIFIED="1201912206460" TEXT="M2Eclipse">
+<node CREATED="1201912207035" FOLDED="true" ID="Freemind_Link_1612637941" MODIFIED="1201912213296" TEXT="UpdateSite">
+<node CREATED="1201912213709" ID="Freemind_Link_1791279957" MODIFIED="1201912219528" TEXT="http://m2eclipse.codehaus.org/">
+<node CREATED="1246726411882" ID="Freemind_Link_1152116002" MODIFIED="1246726423877" TEXT="old"/>
+</node>
+<node CREATED="1246726401002" ID="Freemind_Link_1701212495" MODIFIED="1246726401910" TEXT="http://m2eclipse.sonatype.org/update"/>
+</node>
+</node>
+<node CREATED="1246726577922" FOLDED="true" ID="Freemind_Link_1065002364" MODIFIED="1246726579805" TEXT="Q4E">
+<node CREATED="1246726580602" ID="Freemind_Link_510482730" MODIFIED="1246726582509" TEXT="Update Site">
+<node CREATED="1246726583298" ID="Freemind_Link_808541021" MODIFIED="1246726584365" TEXT="http://q4e.googlecode.com/svn/trunk/updatesite/"/>
+</node>
+</node>
+<node CREATED="1246726478839" FOLDED="true" ID="Freemind_Link_14129808" MODIFIED="1246726482706" TEXT="FindBugs">
+<node CREATED="1246726487078" ID="Freemind_Link_1241154158" MODIFIED="1246726492633" TEXT="Update Site">
+<node CREATED="1246726483558" ID="Freemind_Link_1164442705" MODIFIED="1246726484418" TEXT="http://findbugs.cs.umd.edu/eclipse"/>
 </node>
 </node>
 <node CREATED="1200032140283" FOLDED="true" ID="Freemind_Link_778489125" MODIFIED="1200032143357" TEXT="Veloeclipse">
@@ -189,22 +199,7 @@
 <node CREATED="1201874588706" ID="Freemind_Link_1618642340" MODIFIED="1201874590714" TEXT="http://www.kpdus.com/jad.html#download"/>
 </node>
 </node>
-<node CREATED="1201912202221" ID="Freemind_Link_153102695" MODIFIED="1201912206460" TEXT="M2Eclipse">
-<node CREATED="1201912207035" FOLDED="true" ID="Freemind_Link_1612637941" MODIFIED="1201912213296" TEXT="UpdateSite">
-<node CREATED="1201912213709" ID="Freemind_Link_1791279957" MODIFIED="1201912219528" TEXT="http://m2eclipse.codehaus.org/"/>
-</node>
-</node>
-<node CREATED="1201912328875" FOLDED="true" ID="Freemind_Link_101767401" MODIFIED="1201912334596" TEXT="Maven Additional">
-<node CREATED="1201912338820" FOLDED="true" ID="Freemind_Link_752645370" MODIFIED="1201912341397" TEXT="UpdateSite">
-<node CREATED="1201912341954" ID="Freemind_Link_836937116" MODIFIED="1201912343068" TEXT="http://www.skirnir.net/eclipse/updates/3.2/"/>
-</node>
-<node CREATED="1202110867917" FOLDED="true" ID="Freemind_Link_588201210" MODIFIED="1202110869477" TEXT="*tips">
-<node CREATED="1202110907100" FOLDED="true" ID="Freemind_Link_182844726" MODIFIED="1202110919679" TEXT="Synchronize webapp">
-<node CREATED="1202110870362" ID="Freemind_Link_1836395530" MODIFIED="1202110904231" TEXT="Check &apos;Enable Additional Maven Nature&apos;at Project&apos;s Properties"/>
-</node>
-</node>
-</node>
-<node CREATED="1204102967908" FOLDED="true" ID="Freemind_Link_883608309" MODIFIED="1204102971861" TEXT="HTMLEditor">
+<node CREATED="1204102967908" FOLDED="true" ID="Freemind_Link_883608309" MODIFIED="1246726463387" TEXT="Amaterous">
 <node CREATED="1204102982424" FOLDED="true" ID="Freemind_Link_1919861734" MODIFIED="1204103596514" TEXT="DownloadSite">
 <node CREATED="1204102990299" ID="Freemind_Link_1666463951" MODIFIED="1204102990768" TEXT="http://amateras.sourceforge.jp/cgi-bin/fswiki/wiki.cgi?page=EclipseHTMLEditor "/>
 </node>
@@ -213,12 +208,12 @@
 </node>
 </node>
 </node>
-<node CREATED="1186894868500" FOLDED="true" ID="Freemind_Link_1892035377" MODIFIED="1200032137213" TEXT="for Plug-in Developer">
-<node CREATED="1199705838640" FOLDED="true" ID="Freemind_Link_617779571" MODIFIED="1199705842812" TEXT="*ref">
+<node CREATED="1186894868500" ID="Freemind_Link_1892035377" MODIFIED="1200032137213" TEXT="for Plug-in Developer">
+<node CREATED="1199705838640" ID="Freemind_Link_617779571" MODIFIED="1199705842812" TEXT="*ref">
 <node CREATED="1187847265968" ID="Freemind_Link_1172162345" MODIFIED="1187847266656" TEXT="http://www.atmarkit.co.jp/fjava/rensai3/eclipsepde06/eclipsepde06_4.html"/>
 <node CREATED="1186894875671" ID="Freemind_Link_920415166" MODIFIED="1186894876312" TEXT="http://www13.plala.or.jp/observe/PDE/PDEResources.html"/>
 </node>
-<node CREATED="1199882299972" FOLDED="true" ID="Freemind_Link_776235948" MODIFIED="1199882398100" TEXT="*attension">
+<node CREATED="1199882299972" ID="Freemind_Link_776235948" MODIFIED="1199882398100" TEXT="*attension">
 <node CREATED="1199882399266" FOLDED="true" ID="Freemind_Link_127392147" MODIFIED="1199882419882" TEXT="Compile Failure by org.eclipse not found">
 <node CREATED="1199882218131" ID="Freemind_Link_1825175771" MODIFIED="1199882559621" TEXT="You should update &apos;Eclipse Plug-in Development Environment&apos;"/>
 </node>
