@@ -15,8 +15,14 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 
+/**
+ * @author jflute
+ */
 public class DfSchemaInitializerFactory {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected DataSource _dataSource;
     protected DfBasicProperties _basicProperties;
     protected DfDatabaseProperties _databaseProperties;
@@ -28,6 +34,9 @@ public class DfSchemaInitializerFactory {
         FIRST, ONCE_MOCE, ADDTIONAL
     }
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public DfSchemaInitializerFactory(DataSource dataSource, DfBasicProperties basicProperties,
             DfDatabaseProperties databaseProperties, DfReplaceSchemaProperties replaceSchemaProperties,
             InitializeType initializeType) {
@@ -38,44 +47,29 @@ public class DfSchemaInitializerFactory {
         _initializeType = initializeType;
     }
 
+    // ===================================================================================
+    //                                                                              Create
+    //                                                                              ======
     public DfSchemaInitializer createSchemaInitializer() {
         final DfSchemaInitializer initializer;
         if (_basicProperties.isDatabaseMySQL()) {
             initializer = createSchemaInitializerMySQL();
-        } else if (_basicProperties.isDatabaseSqlServer()) {
-            initializer = createSchemaInitializerSqlServer();
         } else if (_basicProperties.isDatabaseOracle()) {
             initializer = createSchemaInitializerOracle();
         } else if (_basicProperties.isDatabaseDB2()) {
             initializer = createSchemaInitializerDB2();
+        } else if (_basicProperties.isDatabaseSqlServer()) {
+            initializer = createSchemaInitializerSqlServer();
         } else {
             initializer = createSchemaInitializerJdbc();
         }
         return initializer;
     }
 
-    protected DfSchemaInitializer createSchemaInitializerMySQL() {
-        final DfSchemaInitializerMySQL initializer = new DfSchemaInitializerMySQL();
-        initializer.setDataSource(_dataSource);
+    protected DfSchemaInitializer createSchemaInitializerJdbc() {
+        final DfSchemaInitializerJdbc initializer = new DfSchemaInitializerJdbc();
+        setupSchemaInitializerJdbcProperties(initializer);
         return initializer;
-    }
-
-    protected void setupDetailExecutionHandling(DfSchemaInitializerMySQL initializer) {
-        initializer.setSuppressTruncateTable(_replaceSchemaProperties.isSuppressTruncateTable());
-        initializer.setSuppressDropForeignKey(_replaceSchemaProperties.isSuppressDropForeignKey());
-        initializer.setSuppressDropTable(_replaceSchemaProperties.isSuppressDropTable());
-    }
-
-    protected DfSchemaInitializer createSchemaInitializerSqlServer() {
-        final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
-        initializer.setDataSource(_dataSource);
-        return initializer;
-    }
-
-    protected void setupDetailExecutionHandling(DfSchemaInitializerSqlServer initializer) {
-        initializer.setSuppressTruncateTable(_replaceSchemaProperties.isSuppressTruncateTable());
-        initializer.setSuppressDropForeignKey(_replaceSchemaProperties.isSuppressDropForeignKey());
-        initializer.setSuppressDropTable(_replaceSchemaProperties.isSuppressDropTable());
     }
 
     protected DfSchemaInitializer createSchemaInitializerOracle() {
@@ -90,8 +84,14 @@ public class DfSchemaInitializerFactory {
         return initializer;
     }
 
-    protected DfSchemaInitializer createSchemaInitializerJdbc() {
-        final DfSchemaInitializerJdbc initializer = new DfSchemaInitializerJdbc();
+    protected DfSchemaInitializer createSchemaInitializerMySQL() {
+        final DfSchemaInitializerMySQL initializer = new DfSchemaInitializerMySQL();
+        setupSchemaInitializerJdbcProperties(initializer);
+        return initializer;
+    }
+
+    protected DfSchemaInitializer createSchemaInitializerSqlServer() {
+        final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
         setupSchemaInitializerJdbcProperties(initializer);
         return initializer;
     }
@@ -101,6 +101,7 @@ public class DfSchemaInitializerFactory {
         setupDetailExecutionHandling(initializer);
         if (_initializeType.equals(InitializeType.FIRST)) { // Normal
             initializer.setSchema(_databaseProperties.getDatabaseSchema());
+            initializer.setDropGenerateTableOnly(_replaceSchemaProperties.isDropGenerateTableOnly());
             return;
         }
 
@@ -113,10 +114,10 @@ public class DfSchemaInitializerFactory {
             }
             initializer.setSchema(schema);
             initializer.setTableNameWithSchema(true); // because it may be other schema!
-            initializer.setOnceMoreDropObjectTypeList(getOnceMoreObjectTypeList());
-            initializer.setOnceMoreDropTableTargetList(getOnceMoreDropTableTargetList());
-            initializer.setOnceMoreDropTableExceptList(getOnceMoreDropTableExceptList());
-            initializer.setOnceMoreDropDropAllTable(isOnceMoreDropAllTable());
+            initializer.setDropObjectTypeList(getOnceMoreObjectTypeList());
+            initializer.setDropTableTargetList(getOnceMoreDropTableTargetList());
+            initializer.setDropTableExceptList(getOnceMoreDropTableExceptList());
+            initializer.setDropGenerateTableOnly(false);
         } else if (_initializeType.equals(InitializeType.ADDTIONAL)) {
             // Here 'Additional'!
             if (additionalDropMap == null) {
@@ -130,10 +131,10 @@ public class DfSchemaInitializerFactory {
             }
             initializer.setSchema(schema);
             initializer.setTableNameWithSchema(true); // because it may be other schema!
-            initializer.setOnceMoreDropObjectTypeList(getAdditionalDropObjectTypeList(additionalDropMap));
-            initializer.setOnceMoreDropTableTargetList(getAdditionalDropTableTargetList(additionalDropMap));
-            initializer.setOnceMoreDropTableExceptList(getAdditionalDropTableExceptList(additionalDropMap));
-            initializer.setOnceMoreDropDropAllTable(isAdditionalDropAllTable(additionalDropMap));
+            initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(additionalDropMap));
+            initializer.setDropTableTargetList(getAdditionalDropTableTargetList(additionalDropMap));
+            initializer.setDropTableExceptList(getAdditionalDropTableExceptList(additionalDropMap));
+            initializer.setDropGenerateTableOnly(false);
         } else {
             String msg = "Unknown initialize type: " + _initializeType;
             throw new IllegalStateException(msg);
@@ -146,6 +147,9 @@ public class DfSchemaInitializerFactory {
         initializer.setSuppressDropTable(_replaceSchemaProperties.isSuppressDropTable());
     }
 
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     protected String getOnceMoreSchema() {
         return _replaceSchemaProperties.getOnceMoreDropDefinitionSchema();
     }

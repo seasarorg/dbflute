@@ -119,14 +119,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                             Logging
     //                                                                             =======
     public boolean isLoggingInsertSql() {
-        String value = (String) getReplaceSchemaDefinitionMap().get("loggingInsertSql");
-        if (value == null) {
-            value = (String) getReplaceSchemaDefinitionMap().get("isLoggingInsertSql");
-            if (value == null) {
-                return true;
-            }
-        }
-        return value.equalsIgnoreCase("true");
+        return isProperty("isLoggingInsertSql", false, getReplaceSchemaDefinitionMap());
     }
 
     // ===================================================================================
@@ -151,6 +144,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         } else {
             return null;
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Drop Table
+    //                                                                          ==========
+    public boolean isDropGenerateTableOnly() {
+        return isProperty("isDropGenerateTableOnly", false, getReplaceSchemaDefinitionMap());
     }
 
     // ===================================================================================
@@ -228,44 +228,37 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     @SuppressWarnings("unchecked")
     public boolean isAdditionalDropAllTable(Map<String, Object> additionalDropMap) {
-        String value = (String) additionalDropMap.get("dropAllTable");
-        if (value == null) {
-            value = (String) additionalDropMap.get("isDropAllTable");
-            if (value == null) {
-                return false;
-            }
-        }
-        return value.equalsIgnoreCase("true");
+        return isProperty("isDropAllTable", false, additionalDropMap);
     }
-    
+
     // ===================================================================================
     //                                                        Suppress Initializing Schema
     //                                                        ============================
     public boolean isSuppressTruncateTable() {
-        return analyzeBooleanProperty("isSuppressTruncateTable", false);
+        return isProperty("isSuppressTruncateTable", false, getReplaceSchemaDefinitionMap());
     }
-    
+
     public boolean isSuppressDropForeignKey() {
-        return analyzeBooleanProperty("isSuppressDropForeignKey", false);
+        return isProperty("isSuppressDropForeignKey", false, getReplaceSchemaDefinitionMap());
     }
-    
+
     public boolean isSuppressDropTable() {
-        return analyzeBooleanProperty("isSuppressDropTable", false);
+        return isProperty("isSuppressDropTable", false, getReplaceSchemaDefinitionMap());
     }
 
     // ===================================================================================
     //                                                                        Other Closet
     //                                                                        ============
     public boolean isAutoCommit() { // It's closet! No useful!
-        return analyzeBooleanProperty("isAutoCommit", true);
+        return isProperty("isAutoCommit", true, getReplaceSchemaDefinitionMap());
     }
 
     public boolean isRollbackOnly() { // It's closet! No useful!
-        return analyzeBooleanProperty("isRollbackOnly", false);
+        return isProperty("isRollbackOnly", false, getReplaceSchemaDefinitionMap());
     }
 
     public boolean isErrorContinue() { // It's closet!
-        return analyzeBooleanProperty("isErrorContinue", true);
+        return isProperty("isErrorContinue", true, getReplaceSchemaDefinitionMap());
     }
 
     /**
@@ -353,39 +346,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     @SuppressWarnings("unchecked")
     public boolean isOnceMoreDropAllTable() {
-        String value = (String) getOnceMoreDropDefinitionMap().get("dropAllTable");
-        if (value == null) {
-            value = (String) getOnceMoreDropDefinitionMap().get("isDropAllTable");
-            if (value == null) {
-                return false;
-            }
-        }
-        return value.equalsIgnoreCase("true");
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected boolean analyzeBooleanProperty(String propertyName, boolean defaultDetermination) {
-        String propString = (String) getReplaceSchemaDefinitionMap().get(propertyName);
-        if (propString == null) {
-            if (propertyName.startsWith("is")) {
-                final String secondString = propertyName.substring("is".length());
-                final String secondProperty = secondString.substring(0, 1).toLowerCase() + secondString.substring(1);
-                final String secondPropString = (String) getReplaceSchemaDefinitionMap().get(secondProperty);
-                if (secondPropString != null) {
-                    propString = secondPropString;
-                }
-            }
-            if (propString == null) {
-                return defaultDetermination;
-            }
-        }
-        if (propString != null && propString.equalsIgnoreCase("true")) {
-            return true;
-        } else {
-            return false;
-        }
+        return isProperty("isDropAllTable", false, getOnceMoreDropDefinitionMap());
     }
 
     // ===================================================================================

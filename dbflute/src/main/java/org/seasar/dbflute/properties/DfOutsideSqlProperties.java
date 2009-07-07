@@ -32,10 +32,6 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return _outsideSqlDefinitionMap;
     }
 
-    public String getProperty(String key, String defaultValue) {
-        return getProperty(key, defaultValue, getOutsideSqlDefinitionMap());
-    }
-
     public boolean isProperty(String key, boolean defaultValue) {
         return isProperty(key, defaultValue, getOutsideSqlDefinitionMap());
     }

@@ -53,16 +53,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected boolean _tableNameWithSchema;
 
-    // /= = = = = = = = = = = =
-    // Attribute for once more!
-    // = = = = = = = = = =/
-    protected List<String> _onceMoreDropObjectTypeList;
+    protected List<String> _dropObjectTypeList;
 
-    protected List<String> _onceMoreDropTableTargetList;
+    protected List<String> _dropTableTargetList;
 
-    protected List<String> _onceMoreDropTableExceptList;
+    protected List<String> _dropTableExceptList;
 
-    protected boolean _onceMoreDropAllTable;
+    protected boolean _dropGenerateTableOnly;
 
     // /= = = = = = = = = = = = =
     // Detail execution handling!
@@ -84,13 +81,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             try {
                 final DatabaseMetaData dbMetaData = conn.getMetaData();
                 final DfTableHandler tableNameHandler = new DfTableHandler() {
-                    // /= = = = = = = = = = = =
-                    // Override for once more!
-                    // = = = = = = = = = =/
                     @Override
                     protected String[] getObjectTypeStringArray() {
-                        if (_onceMoreDropObjectTypeList != null) {
-                            return _onceMoreDropObjectTypeList.toArray(new String[] {});
+                        if (_dropObjectTypeList != null) {
+                            return _dropObjectTypeList.toArray(new String[] {});
                         } else {
                             return super.getObjectTypeStringArray();
                         }
@@ -98,25 +92,27 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
                     @Override
                     protected List<String> getTableTargetList() {
-                        if (_onceMoreDropAllTable) {
-                            return new ArrayList<String>();
-                        }
-                        if (_onceMoreDropTableTargetList != null) {
-                            return _onceMoreDropTableTargetList;
+                        if (_dropTableTargetList != null) {
+                            return _dropTableTargetList;
                         } else {
-                            return super.getTableTargetList();
+                            if (_dropGenerateTableOnly) {
+                                return super.getTableTargetList();
+                            } else {
+                                return new ArrayList<String>();
+                            }
                         }
                     }
 
                     @Override
                     protected List<String> getTableExceptList() {
-                        if (_onceMoreDropAllTable) {
-                            return new ArrayList<String>();
-                        }
-                        if (_onceMoreDropTableExceptList != null) {
-                            return _onceMoreDropTableExceptList;
+                        if (_dropTableExceptList != null) {
+                            return _dropTableExceptList;
                         } else {
-                            return super.getTableExceptList();
+                            if (_dropGenerateTableOnly) {
+                                return super.getTableExceptList();
+                            } else {
+                                return new ArrayList<String>();
+                            }
                         }
                     }
                 };
@@ -219,30 +215,29 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     continue;
                 }
                 final DfForeignKeyHandler handler = new DfForeignKeyHandler() {
-                    // /= = = = = = = = = = = =
-                    // Override for once more!
-                    // = = = = = = = = = =/
                     @Override
                     protected List<String> getTableTargetList() {
-                        if (_onceMoreDropAllTable) {
-                            return new ArrayList<String>();
-                        }
-                        if (_onceMoreDropTableTargetList != null) {
-                            return _onceMoreDropTableTargetList;
+                        if (_dropTableTargetList != null) {
+                            return _dropTableTargetList;
                         } else {
-                            return super.getTableTargetList();
+                            if (_dropGenerateTableOnly) {
+                                return super.getTableTargetList();
+                            } else {
+                                return new ArrayList<String>();
+                            }
                         }
                     }
 
                     @Override
                     protected List<String> getTableExceptList() {
-                        if (_onceMoreDropAllTable) {
-                            return new ArrayList<String>();
-                        }
-                        if (_onceMoreDropTableExceptList != null) {
-                            return _onceMoreDropTableExceptList;
+                        if (_dropTableExceptList != null) {
+                            return _dropTableExceptList;
                         } else {
-                            return super.getTableExceptList();
+                            if (_dropGenerateTableOnly) {
+                                return super.getTableExceptList();
+                            } else {
+                                return new ArrayList<String>();
+                            }
                         }
                     }
                 };
@@ -400,24 +395,20 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         this._tableNameWithSchema = tableNameWithSchema;
     }
 
-    // /= = = = = = = = = = = =
-    // Attribute for once more!
-    // = = = = = = = = = =/
-
-    public void setOnceMoreDropObjectTypeList(List<String> onceMoreDropObjectTypeList) {
-        _onceMoreDropObjectTypeList = onceMoreDropObjectTypeList;
+    public void setDropObjectTypeList(List<String> dropObjectTypeList) {
+        _dropObjectTypeList = dropObjectTypeList;
     }
 
-    public void setOnceMoreDropTableTargetList(List<String> onceMoreDropTableTargetList) {
-        _onceMoreDropTableTargetList = onceMoreDropTableTargetList;
+    public void setDropTableTargetList(List<String> dropTableTargetList) {
+        _dropTableTargetList = dropTableTargetList;
     }
 
-    public void setOnceMoreDropTableExceptList(List<String> onceMoreDropTableExceptList) {
-        _onceMoreDropTableExceptList = onceMoreDropTableExceptList;
+    public void setDropTableExceptList(List<String> dropTableExceptList) {
+        _dropTableExceptList = dropTableExceptList;
     }
 
-    public void setOnceMoreDropDropAllTable(boolean onceMoreDropAllTable) {
-        _onceMoreDropAllTable = onceMoreDropAllTable;
+    public void setDropGenerateTableOnly(boolean dropGenerateTableOnly) {
+        this._dropGenerateTableOnly = dropGenerateTableOnly;
     }
 
     // /= = = = = = = = = = = = =

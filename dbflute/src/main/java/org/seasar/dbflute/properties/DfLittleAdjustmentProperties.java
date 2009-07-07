@@ -31,11 +31,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public String getProperty(String key, String defaultValue) {
-        return getProperty(key, defaultValue, getLittleAdjustmentMap());
+        return getPropertyIfNotBuildProp(key, defaultValue, getLittleAdjustmentMap());
     }
 
     public boolean isProperty(String key, boolean defaultValue) {
-        return isProperty(key, defaultValue, getLittleAdjustmentMap());
+        return isPropertyIfNotBuildProp(key, defaultValue, getLittleAdjustmentMap());
     }
 
     // ===================================================================================

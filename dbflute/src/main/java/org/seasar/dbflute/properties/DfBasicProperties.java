@@ -46,7 +46,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getProperty(String key, String defaultValue) {
-        return getProperty(key, defaultValue, getBasicInfoMap());
+        return getPropertyIfNotBuildProp(key, defaultValue, getBasicInfoMap());
     }
 
     public boolean isProperty(String key, boolean defaultValue) {

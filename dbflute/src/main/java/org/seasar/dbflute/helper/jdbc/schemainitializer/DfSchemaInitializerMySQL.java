@@ -15,170 +15,31 @@
  */
 package org.seasar.dbflute.helper.jdbc.schemainitializer;
 
-import javax.sql.DataSource;
+import java.sql.Connection;
+import java.util.List;
 
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.jdbc.generatedsql.DfGeneratedSqlExecutor;
-import org.seasar.dbflute.helper.jdbc.generatedsql.DfGeneratedSqlExecutorImpl;
-import org.seasar.dbflute.helper.jdbc.generatedsql.DfGeneratedSqlExecutor.DfGeneratedSqlExecuteOption;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
  * @author jflute
  */
-public class DfSchemaInitializerMySQL implements DfSchemaInitializer {
+public class DfSchemaInitializerMySQL extends DfSchemaInitializerJdbc {
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    protected DataSource _dataSource;
-
-    // /= = = = = = = = = = = = =
-    // Detail execution handling!
-    // = = = = = = = = = =/
-    protected boolean _suppressTruncateTable;
-
-    protected boolean _suppressDropForeignKey;
-
-    protected boolean _suppressDropTable;
-    
-    // ===================================================================================
-    //                                                                   Initialize Schema
-    //                                                                   =================
-    public void initializeSchema() {
-        executeObject();
-    }
-
-    protected void executeObject() {
-        if (!_suppressTruncateTable) {
-            truncateTableIfPossible();
-        }
-        if (!_suppressDropForeignKey) {
-            dropForeignKey();
-        }
-        if (!_suppressDropTable) {
-            dropTable();
-        }
-    }
-
-    // -----------------------------------------------------
-    //                                              Truncate
-    //                                              --------
-    protected void truncateTableIfPossible() {
-        final DfGeneratedSqlExecutor generatedSqlExecutor = createGeneratedSqlExecutor();
-        final DfGeneratedSqlExecuteOption option = new DfGeneratedSqlExecuteOption();
-        option.setErrorContinue(true);
-        generatedSqlExecutor.execute(getTruncateTableSql(), "sql", option);
-    }
-
-    protected String getTruncateTableSql() {
-        final String lineSeparator = System.getProperty("line.separator");
-        final StringBuilder sb = new StringBuilder();
-        sb.append("select concat('TRUNCATE TABLE ', table_name, ';') as \"sql\"");
-        sb.append(lineSeparator);
-        sb.append("  from information_schema.tables");
-        sb.append(lineSeparator);
-        final String schema = DfBuildProperties.getInstance().getDatabaseProperties().getDatabaseSchema();
-        if (schema != null) {
-            sb.append(" where table_schema = '" + schema + "' and table_type = 'BASE TABLE';");
-        } else {
-            sb.append(" where table_type = 'BASE TABLE';");
-        }
-        sb.append(lineSeparator);
-        return sb.toString();
-    }
-
-    // -----------------------------------------------------
-    //                                           Foreign Key
-    //                                           -----------
-    protected void dropForeignKey() {
-        final DfGeneratedSqlExecutor generatedSqlExecutor = createGeneratedSqlExecutor();
-        generatedSqlExecutor.execute(getDropForeignKeySql(), "sql");
-    }
-
-    protected String getDropForeignKeySql() {
-        final String lineSeparator = System.getProperty("line.separator");
-        final StringBuilder sb = new StringBuilder();
-        sb.append("select concat('ALTER TABLE ', table_name, ' DROP FOREIGN KEY ', constraint_name, ';') as \"sql\"");
-        sb.append(lineSeparator);
-        sb.append("  from information_schema.table_constraints");
-        sb.append(lineSeparator);
-        final String schema = DfBuildProperties.getInstance().getDatabaseProperties().getDatabaseSchema();
-        if (schema != null) {
-            sb.append(" where table_schema = '" + schema + "' and constraint_type='foreign key';");
-        } else {
-            sb.append(" where constraint_type='foreign key';");
-        }
-        sb.append(lineSeparator);
-        return sb.toString();
-    }
-
-    // -----------------------------------------------------
-    //                                                 Table
-    //                                                 -----
-    protected void dropTable() {
-        final DfGeneratedSqlExecutor generatedSqlExecutor = createGeneratedSqlExecutor();
-        generatedSqlExecutor.execute(getDropTableSql(), "sql");
-    }
-
-    protected String getDropTableSql() {
-        final String lineSeparator = System.getProperty("line.separator");
-        final StringBuilder sb = new StringBuilder();
-        sb.append("select case when table_type = 'VIEW'").append(lineSeparator);
-        sb.append("            then concat('DROP VIEW IF EXISTS ', table_name, ';')").append(lineSeparator);
-        sb.append("            else concat('DROP TABLE IF EXISTS ', table_name, ';')").append(lineSeparator);
-        sb.append("       end as \"sql\"").append(lineSeparator);
-        sb.append("  from information_schema.tables").append(lineSeparator);
-        final String schema = DfBuildProperties.getInstance().getDatabaseProperties().getDatabaseSchema();
-        if (schema != null) {
-            sb.append(" where table_schema = '" + schema + "' and table_type in ('BASE TABLE', 'VIEW');");
-        } else {
-            sb.append(" where table_type in ('BASE TABLE', 'VIEW');");
-        }
-        sb.append(lineSeparator);
-        return sb.toString();
-    }
-
-    // -----------------------------------------------------
-    //                                         Common Helper
-    //                                         -------------
-    protected DfGeneratedSqlExecutor createGeneratedSqlExecutor() {
-        final DfGeneratedSqlExecutorImpl generatedSqlExecutorImpl = new DfGeneratedSqlExecutorImpl();
-        generatedSqlExecutorImpl.setDataSource(_dataSource);
-        return generatedSqlExecutorImpl;
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setDataSource(DataSource dataSource) {
-        _dataSource = dataSource;
-    }
-
-    // /= = = = = = = = = = = = =
-    // Detail execution handling!
-    // = = = = = = = = = =/
-
-    public boolean isSuppressTruncateTable() {
-        return _suppressTruncateTable;
-    }
-
-    public void setSuppressTruncateTable(boolean suppressTruncateTable) {
-        this._suppressTruncateTable = suppressTruncateTable;
-    }
-
-    public boolean isSuppressDropForeignKey() {
-        return _suppressDropForeignKey;
-    }
-
-    public void setSuppressDropForeignKey(boolean suppressDropForeignKey) {
-        this._suppressDropForeignKey = suppressDropForeignKey;
-    }
-
-    public boolean isSuppressDropTable() {
-        return _suppressDropTable;
-    }
-
-    public void setSuppressDropTable(boolean suppressDropTable) {
-        this._suppressDropTable = suppressDropTable;
+    //                                                                    Drop Foreign Key
+    //                                                                    ================
+    @Override
+    protected void dropForeignKey(Connection connection, List<DfTableMetaInfo> tableMetaInfoList) {
+        final DfDropForeignKeyByJdbcCallback callback = new DfDropForeignKeyByJdbcCallback() {
+            public String buildDropForeignKeySql(DfForeignKeyMetaInfo metaInfo) {
+                final String foreignKeyName = metaInfo.getForeignKeyName();
+                final String localTableName = filterTableName(metaInfo.getLocalTableName());
+                final StringBuilder sb = new StringBuilder();
+                sb.append("alter table ").append(localTableName).append(" drop foreign key ").append(foreignKeyName);
+                return sb.toString();
+            }
+        };
+        callbackDropForeignKeyByJdbc(connection, tableMetaInfoList, callback);
     }
 }

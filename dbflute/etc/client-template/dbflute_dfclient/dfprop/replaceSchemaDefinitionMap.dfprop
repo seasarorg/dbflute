@@ -7,6 +7,7 @@
 # o isLoggingInsertSql (NotRequired - Default 'true')
 # o sqlFileEncoding (NotRequired - Default 'UTF-8')
 # o skipSheet (NotRequired - Default '')
+# o isDropGenerateTableOnly (NotRequired - Default 'false')
 # o filterVariablesMap (NotRequired - Default 'map:{}')
 # o additionalDropMapList (NotRequired - Default 'list:{}')
 # o isSuppressTruncateTable (NotRequired - Default 'false')
@@ -19,12 +20,14 @@
 #     ; isLoggingInsertSql = true
 #     ; sqlFileEncoding = UTF-8
 #     ; skipSheet = P.+
+#     ; isDropGenerateTableOnly = false
 #     ; filterVariablesMap = map:{abc=AAA}
 #     ; additionalDropMapList = list:{
 #         ; map:{
 #             ; schema = NEXTEXAMPLEDB
 #             ; objectTypeList = list:{TABLE;VIEW}
-#             ; dropAllTable = true
+#             ; tableExceptList=list:{AAA}
+#             ; tableTargetList=list:{BBB}
 #         }
 #     }
 #     ; isSuppressTruncateTable = true
@@ -66,6 +69,14 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isDropGenerateTableOnly (NotRequired - Default 'false')
+    #  Does it drop only generating target tables that are specified
+    #  in table-target or table-except setting?
+    #
+    #; isDropGenerateTableOnly = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o filterVariablesMap (NotRequired - Default 'map:{}')
     # You can specify the filter variables for DDL.
     # 
@@ -80,7 +91,8 @@ map:{
     #    ; map:{
     #        ; schema = NEXTEXAMPLEDB
     #        ; objectTypeList = list:{TABLE;VIEW}
-    #        ; dropAllTable = true
+    #        ; tableExceptList=list:{FULL_NAME ; prefix:PREFIX_ ; ...}
+    #        ; tableTargetList=list:{FULL_NAME ; prefix:PREFIX_ ; ...}
     #    }
     #}
     # - - - - - - - - - -/
