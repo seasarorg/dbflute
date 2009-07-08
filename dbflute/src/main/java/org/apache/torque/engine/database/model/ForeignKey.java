@@ -260,6 +260,10 @@ public class ForeignKey {
         return _localColumns.size() == 1;
     }
 
+    public boolean isTwoOrMoreKeyFK() {
+        return _localColumns.size() > 1;
+    }
+
     public boolean isSelfReference() {
         return _localTable.getName().equals(_foreignTableName);
     }

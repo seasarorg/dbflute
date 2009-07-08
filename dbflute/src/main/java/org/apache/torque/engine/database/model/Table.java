@@ -1305,6 +1305,19 @@ public class Table {
         return hasForeignKeyOrReferrerAsOne();
     }
 
+    public boolean hasTwoOrMoreKeyReferrer() {
+        List<Column> primaryKeyList = getPrimaryKey();
+        for (Column primaryKey : primaryKeyList) {
+            List<ForeignKey> referrers = primaryKey.getReferrers();
+            for (ForeignKey referrer : referrers) {
+                if (!referrer.isSimpleKeyFK()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     // ===================================================================================
     //                                                                            Referrer
     //                                                                            ========

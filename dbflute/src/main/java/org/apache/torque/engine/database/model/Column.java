@@ -1251,7 +1251,7 @@ public class Column {
         if (isColumnList) {
             obj = ((Column) obj).getName();
         }
-        StringBuffer buf = new StringBuffer((String) obj);
+        StringBuilder buf = new StringBuilder((String) obj);
         for (int i = 1; i < columns.size(); i++) {
             obj = columns.get(i);
             if (isColumnList) {
@@ -1270,7 +1270,7 @@ public class Column {
      * @return string representation in xml
      */
     public String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append("    <column name=\"").append(_name).append('"');
 
         if (_javaName != null) {

@@ -282,7 +282,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
         ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForExistsSubQuery(); subQuery.query(cb);
         String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
-        registerExistsSubQuery(cb.query(), "${col.name}", "${referrer.FirstLocalColumnName}", subQueryPropertyName);
+        registerExistsSubQuery(cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName);
     }
     public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
 #end

@@ -665,11 +665,10 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     // ===================================================================================
     //                                                                        Query Update
     //                                                                        ============
-#if (${table.hasOnlyOnePrimaryKey()})
     /**
      * Query update the several entities. {NoConcurrencyControl}
-     * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyNotRequired}
-     * @param cb Condition-bean. (NotNull)
+     * @param ${myEntityVariableName} The entity that contains update values. (NotNull) {PrimaryKeyNotRequired}
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The updated count.
      */
     public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
@@ -681,14 +680,13 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 
     /**
      * Query delete the several entities. {NoConcurrencyControl}
-     * @param cb Condition-bean. (NotNull)
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
      * @return The deleted count.
      */
     public int queryDelete(${myConditionBeanClassName} cb) {
         assertCBNotNull(cb);
         return invoke(createQueryDeleteCBCommand(cb));
     }
-#end
 #else
 #if ($table.isAvailableNonPrimaryKeyWritable())
 
@@ -697,7 +695,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     //                                                                       =============
     /**
      * Insert.
-     * @param ${myEntityVariableName} Entity. (NotNull)
+     * @param ${myEntityVariableName} The entity for insert. (NotNull)
      */
     public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
         assertEntityNotNull(${myEntityVariableName});
