@@ -16,6 +16,7 @@
 package org.seasar.dbflute.cbean;
 
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,6 +85,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected boolean _forUnion;
     protected boolean _forExistsSubQuery;
     protected boolean _forInScopeSubQuery;
+    
+    /** The map for free parameters. */
+    protected Map<String, Object> _freeParameterMap;
 
     // ===================================================================================
     //                                                                           SqlClause
@@ -887,6 +891,25 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     public void xsetupForInScopeSubQuery() { // Very Internal
         _forInScopeSubQuery = true;
+    }
+    
+    // [DBFlute-0.9.5.2]
+    // ===================================================================================
+    //                                                                      Free Parameter
+    //                                                                      ==============
+    /**
+     * Get the map for free parameters for OGNL.
+     * @return The map for free parameters. (Nullable)
+     */
+    public Map<String, Object> getFreeParameterMap() { // Very Internal
+        return _freeParameterMap;
+    }
+    
+    public void xregisterFreeParameter(String key, Object value) {
+        if (_freeParameterMap == null) {
+            _freeParameterMap = new LinkedHashMap<String, Object>();
+        }
+        _freeParameterMap.put(key, value);
     }
 
     // ===================================================================================
