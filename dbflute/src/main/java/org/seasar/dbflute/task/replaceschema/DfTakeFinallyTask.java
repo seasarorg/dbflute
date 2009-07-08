@@ -320,7 +320,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             final StringBuilder sb = new StringBuilder();
             final String ln = ln();
 
-            sb.append(ln).append("<< Final Information >>");
+            sb.append(ln).append("*Final Information");
 
             // Create Schema
             sb.append(ln).append(" ").append(line);
