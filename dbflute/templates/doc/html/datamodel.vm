@@ -160,12 +160,12 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
   #set ($existTop = false)
 #end
       <tr>
-        <td><a name="${classificationName}Cls"/>${classificationName}</td>
+        <td>${classificationName}</td>
         <td>#if ($existTop && $classificationTopMap.containsKey('topComment'))$classificationTopMap.get('topComment')#else &nbsp;#end</td>
         <td>
           <table class="child">
             <tr>
-              <th>Code</th>
+              <th><a name="${classificationName}Cls"/>Code</th>
               <th>Name</th>
               <th>Alias</th>
               <th>Comment</th>

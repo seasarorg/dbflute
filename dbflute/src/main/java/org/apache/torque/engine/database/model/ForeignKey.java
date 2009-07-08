@@ -336,6 +336,15 @@ public class ForeignKey {
         return localTable.getColumn(columnName).getJavaName();
     }
 
+    public List<String> getLocalColumnJavaNameList() {
+        List<String> resultList = new ArrayList<String>();
+        List<Column> localColumnList = getLocalColumnList();
+        for (Column column : localColumnList) {
+            resultList.add(column.getJavaName());
+        }
+        return resultList;
+    }
+
     public List<Column> getLocalColumnObjectList() {
         final List<String> columnList = getLocalColumns();
         if (columnList == null || columnList.isEmpty()) {

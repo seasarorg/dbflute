@@ -166,10 +166,6 @@ public class DfSchemaInitializerFactory {
         return _replaceSchemaProperties.getOnceMoreDropTableExceptList();
     }
 
-    protected boolean isOnceMoreDropAllTable() {
-        return _replaceSchemaProperties.isOnceMoreDropAllTable();
-    }
-
     protected String getAdditionalDropSchema(Map<String, Object> map) {
         return _replaceSchemaProperties.getAdditionalDropSchema(map);
     }

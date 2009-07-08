@@ -586,7 +586,7 @@ public class Column {
     public boolean hasIndex() { // means this column is contained to one of indexes.
         final List<Index> indexList = getTable().getIndexList();
         for (Index index : indexList) {
-            if (index.hasSameFirstColumn(this)) {
+            if (index.hasSameColumn(this)) {
                 return true;
             }
         }

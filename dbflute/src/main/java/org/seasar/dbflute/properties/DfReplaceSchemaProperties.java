@@ -119,7 +119,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                             Logging
     //                                                                             =======
     public boolean isLoggingInsertSql() {
-        return isProperty("isLoggingInsertSql", false, getReplaceSchemaDefinitionMap());
+        return isProperty("isLoggingInsertSql", true, getReplaceSchemaDefinitionMap());
     }
 
     // ===================================================================================
@@ -342,11 +342,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             throw new IllegalStateException(msg);
         }
         return (List<String>) obj;
-    }
-
-    @SuppressWarnings("unchecked")
-    public boolean isOnceMoreDropAllTable() {
-        return isProperty("isDropAllTable", false, getOnceMoreDropDefinitionMap());
     }
 
     // ===================================================================================
