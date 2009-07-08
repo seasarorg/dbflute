@@ -34,6 +34,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
+import org.seasar.dbflute.exception.IllegalConditionBeanException;
 import org.seasar.dbflute.util.DfAssertUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -1574,11 +1575,6 @@ public abstract class AbstractSqlClause implements SqlClause {
         }
         final String aliasName = getLocalTableAliasName();
         final DBMeta dbmeta = findDBMeta(_tableName);
-        if (dbmeta.hasTwoOrMorePrimaryKeys()) {
-            String msg = "The target table of queryUpdate() should have only one primary key:";
-            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
-            throw new IllegalStateException(msg);
-        }
         final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
         final String selectClause = "select " + aliasName + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
@@ -1604,12 +1600,24 @@ public abstract class AbstractSqlClause implements SqlClause {
             }
             ++index;
         }
-        if (isUpdateSubQueryUseLocalTableSupported()) {
+        if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasTwoOrMorePrimaryKeys()) {
             final String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             sb.append(" where ").append(primaryKeyName);
             sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
             return sb.toString();
         } else {
+            if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
+                String msg = "The queryUpdate() with outer join is unsupported";
+                msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
+                msg = msg + " tableName=" + _tableName;
+                throw new IllegalConditionBeanException(msg);
+            }
+            if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
+                String msg = "The queryUpdate() with union is unsupported";
+                msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
+                msg = msg + " tableName=" + _tableName;
+                throw new IllegalConditionBeanException(msg);
+            }
             String subQuery = filterSubQueryIndent(fromWhereClause);
             subQuery = replaceString(subQuery, aliasName + ".", "");
             subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
@@ -1626,11 +1634,6 @@ public abstract class AbstractSqlClause implements SqlClause {
     public String getClauseQueryDelete() {
         final String aliasName = getLocalTableAliasName();
         final DBMeta dbmeta = findDBMeta(_tableName);
-        if (dbmeta.hasTwoOrMorePrimaryKeys()) {
-            String msg = "The target table of queryDelete() should have only one primary key:";
-            msg = msg + " primaryKeys=" + dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
-            throw new IllegalStateException(msg);
-        }
         final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
         final String selectClause = "select " + aliasName + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
@@ -1640,7 +1643,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereClauseMark(), "");
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
-        if (isUpdateSubQueryUseLocalTableSupported()) {
+        if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasTwoOrMorePrimaryKeys()) {
             final String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             final StringBuilder sb = new StringBuilder();
             String ln = getLineSeparator();
@@ -1648,7 +1651,19 @@ public abstract class AbstractSqlClause implements SqlClause {
             sb.append(" where ").append(primaryKeyName);
             sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
             return sb.toString();
-        } else {
+        } else { // unsupported or two-or-more primary keys
+            if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
+                String msg = "The queryDelete() with outer join is unsupported";
+                msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
+                msg = msg + " tableName=" + _tableName;
+                throw new IllegalConditionBeanException(msg);
+            }
+            if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
+                String msg = "The queryDelete() with union is unsupported";
+                msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
+                msg = msg + " tableName=" + _tableName;
+                throw new IllegalConditionBeanException(msg);
+            }
             String subQuery = filterSubQueryIndent(fromWhereClause);
             subQuery = replaceString(subQuery, aliasName + ".", "");
             subQuery = replaceString(subQuery, " " + aliasName + " ", " ");
