@@ -19,6 +19,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.DataSource;
+
 /**
  * @author jflute
  * @since 0.9.5.2 (2009/07/09 Thursday)
@@ -28,8 +30,8 @@ public class DfSequenceHandlerH2 extends DfSequenceHandlerJdbc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerH2(String schema) {
-        super(schema);
+    public DfSequenceHandlerH2(DataSource dataSource, String schema) {
+        super(dataSource, schema);
     }
 
     // ===================================================================================

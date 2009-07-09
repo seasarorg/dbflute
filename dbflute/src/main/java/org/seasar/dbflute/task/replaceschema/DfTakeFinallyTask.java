@@ -221,16 +221,16 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         final DfSequenceIdentityProperties sequenceProp = getProperties().getSequenceIdentityProperties();
         final Map<String, String> sequenceDefinitionMap = sequenceProp.getSequenceDefinitionMap();
         if (getBasicProperties().isDatabasePostgreSQL()) {
-            final DfSequenceHandlerOracle handler = new DfSequenceHandlerOracle(_schema);
+            final DfSequenceHandlerOracle handler = new DfSequenceHandlerOracle(getDataSource(), _schema);
             handler.incrementSequenceToDataMax(sequenceDefinitionMap);
         } else if (getBasicProperties().isDatabaseOracle()) {
-            final DfSequenceHandlerPostgreSQL handler = new DfSequenceHandlerPostgreSQL(_schema);
+            final DfSequenceHandlerPostgreSQL handler = new DfSequenceHandlerPostgreSQL(getDataSource(), _schema);
             handler.incrementSequenceToDataMax(sequenceDefinitionMap);
         } else if (getBasicProperties().isDatabaseDB2()) {
-            final DfSequenceHandlerDB2 handler = new DfSequenceHandlerDB2(_schema);
+            final DfSequenceHandlerDB2 handler = new DfSequenceHandlerDB2(getDataSource(), _schema);
             handler.incrementSequenceToDataMax(sequenceDefinitionMap);
         } else if (getBasicProperties().isDatabaseH2()) {
-            final DfSequenceHandlerH2 handler = new DfSequenceHandlerH2(_schema);
+            final DfSequenceHandlerH2 handler = new DfSequenceHandlerH2(getDataSource(), _schema);
             handler.incrementSequenceToDataMax(sequenceDefinitionMap);
         } else {
             String databaseName = getBasicProperties().getDatabaseName();

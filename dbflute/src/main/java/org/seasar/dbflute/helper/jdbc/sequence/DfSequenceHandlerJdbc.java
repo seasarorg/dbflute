@@ -52,7 +52,8 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerJdbc(String schema) {
+    public DfSequenceHandlerJdbc(DataSource dataSource, String schema) {
+        _dataSource = dataSource;
         _schema = schema;
     }
 
@@ -140,16 +141,5 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     //                                                                      ==============
     protected String ln() {
         return "\n";
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setDataSource(DataSource dataSource) {
-        _dataSource = dataSource;
-    }
-
-    public void setSchema(String schema) {
-        _schema = schema;
     }
 }

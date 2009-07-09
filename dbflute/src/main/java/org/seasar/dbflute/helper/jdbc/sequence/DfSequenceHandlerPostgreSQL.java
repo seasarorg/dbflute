@@ -23,6 +23,8 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.metadata.DfAutoIncrementHandler;
@@ -46,8 +48,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerPostgreSQL(String schema) {
-        super(schema);
+    public DfSequenceHandlerPostgreSQL(DataSource dataSource, String schema) {
+        super(dataSource, schema);
     }
 
     // ===================================================================================
