@@ -114,7 +114,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     }
 
     protected Integer selectDataMax(Statement statement, String tableName, String primaryKeyName) throws SQLException {
-        ResultSet rs = statement.executeQuery("select max(" + primaryKeyName + ") from " + tableName);
+        ResultSet rs = statement.executeQuery("select max(" + primaryKeyName + ") as MAX_VALUE from " + tableName);
         if (!rs.next()) {
             return null;
         }

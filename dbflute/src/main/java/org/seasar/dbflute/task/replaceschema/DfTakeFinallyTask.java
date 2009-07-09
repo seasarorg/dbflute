@@ -221,10 +221,10 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         final DfSequenceIdentityProperties sequenceProp = getProperties().getSequenceIdentityProperties();
         final Map<String, String> sequenceDefinitionMap = sequenceProp.getSequenceDefinitionMap();
         if (getBasicProperties().isDatabasePostgreSQL()) {
-            final DfSequenceHandlerOracle handler = new DfSequenceHandlerOracle(getDataSource(), _schema);
+            final DfSequenceHandlerPostgreSQL handler = new DfSequenceHandlerPostgreSQL(getDataSource(), _schema);
             handler.incrementSequenceToDataMax(sequenceDefinitionMap);
         } else if (getBasicProperties().isDatabaseOracle()) {
-            final DfSequenceHandlerPostgreSQL handler = new DfSequenceHandlerPostgreSQL(getDataSource(), _schema);
+            final DfSequenceHandlerOracle handler = new DfSequenceHandlerOracle(getDataSource(), _schema);
             handler.incrementSequenceToDataMax(sequenceDefinitionMap);
         } else if (getBasicProperties().isDatabaseDB2()) {
             final DfSequenceHandlerDB2 handler = new DfSequenceHandlerDB2(getDataSource(), _schema);
