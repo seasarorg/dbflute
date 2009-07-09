@@ -122,6 +122,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             }
             executeObject(conn, tableMetaInfoList);
         } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        } finally {
             if (conn != null) {
                 try {
                     conn.close();

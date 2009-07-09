@@ -147,6 +147,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
+    //                                                                  Increment Sequence
+    //                                                                  ==================
+    public boolean isIncrementSequenceToDataMax() {
+        return isProperty("isIncrementSequenceToDataMax", false, getReplaceSchemaDefinitionMap());
+    }
+
+    // ===================================================================================
     //                                                                          Drop Table
     //                                                                          ==========
     public boolean isDropGenerateTableOnly() {

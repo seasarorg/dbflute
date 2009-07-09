@@ -13,12 +13,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
+import org.seasar.dbflute.helper.jdbc.sequence.DfSequenceHandlerOracle;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
@@ -27,6 +29,7 @@ import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
+import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 
 public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
@@ -53,6 +56,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
         beforeTakeFinally();
         takeFinallyResult = takeFinally(runInfo);
+        incrementSequenceToDataMax();
     }
 
     @Override
@@ -205,6 +209,21 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
     }
 
     // --------------------------------------------
+    //                           Increment Sequence
+    //                           ------------------
+    protected void incrementSequenceToDataMax() {
+        if (!getMyProperties().isIncrementSequenceToDataMax()) {
+            return;
+        }
+        DfSequenceIdentityProperties sequenceProp = getProperties().getSequenceIdentityProperties();
+        Map<String, String> sequenceDefinitionMap = sequenceProp.getSequenceDefinitionMap();
+        if (getBasicProperties().isDatabaseOracle()) {
+            DfSequenceHandlerOracle handler = new DfSequenceHandlerOracle(_schema);
+            handler.incrementSequenceToDataMax(sequenceDefinitionMap);
+        }
+    }
+
+    // --------------------------------------------
     //                              Callback Helper
     //                              ---------------
     protected void callbackProcess(String timing, String processCommand) {
@@ -277,6 +296,9 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         }
     }
 
+    // --------------------------------------------
+    //                            Final Information
+    //                            -----------------
     @Override
     protected String getFinalInformation() {
         return buildFinalInformation(takeFinallyResult); // The argument cannot be null!

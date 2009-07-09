@@ -7,6 +7,7 @@
 # o isLoggingInsertSql (NotRequired - Default 'true')
 # o sqlFileEncoding (NotRequired - Default 'UTF-8')
 # o skipSheet (NotRequired - Default '')
+# o isIncrementSequenceToDataMax (NotRequired - Default 'false')
 # o isDropGenerateTableOnly (NotRequired - Default 'false')
 # o filterVariablesMap (NotRequired - Default 'map:{}')
 # o additionalDropMapList (NotRequired - Default 'list:{}')
@@ -20,6 +21,7 @@
 #     ; isLoggingInsertSql = true
 #     ; sqlFileEncoding = UTF-8
 #     ; skipSheet = P.+
+#     ; isIncrementSequenceToDataMax = false
 #     ; isDropGenerateTableOnly = false
 #     ; filterVariablesMap = map:{abc=AAA}
 #     ; additionalDropMapList = list:{
@@ -66,6 +68,14 @@ map:{
     #  You can specify the skip sheet by regular expression
     #
     #; skipSheet = P.+
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isIncrementSequenceToDataMax (NotRequired - Default 'false')
+    #  Does it increment sequence values to max value of table data?
+    #  Referring the property 'sequenceDefinitionMap'.
+    #
+    #; isIncrementSequenceToDataMax = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

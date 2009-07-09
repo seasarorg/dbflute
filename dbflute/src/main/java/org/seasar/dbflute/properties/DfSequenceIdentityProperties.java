@@ -1,11 +1,14 @@
 package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 
 /**
@@ -24,25 +27,38 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     //                                                             Sequence Definition Map
     //                                                             =======================
     protected static final String KEY_sequenceDefinitionMap = "sequenceDefinitionMap";
-    protected Map<String, Object> _sequenceDefinitionMap;
+    protected Map<String, String> _sequenceDefinitionMap;
 
-    protected Map<String, Object> getSequenceDefinitionMap() {
+    public Map<String, String> getSequenceDefinitionMap() {
         if (_sequenceDefinitionMap == null) {
-            _sequenceDefinitionMap = mapProp("torque." + KEY_sequenceDefinitionMap, DEFAULT_EMPTY_MAP);
+            LinkedHashMap<String, String> tmpMap = new LinkedHashMap<String, String>();
+            Map<String, Object> originalMap = mapProp("torque." + KEY_sequenceDefinitionMap, DEFAULT_EMPTY_MAP);
+            Set<Entry<String, Object>> entrySet = originalMap.entrySet();
+            for (Entry<String, Object> entry : entrySet) {
+                String tableName = entry.getKey();
+                Object sequenceValue = entry.getValue();
+                if (!(sequenceValue instanceof String)) {
+                    String msg = "The value of sequence map should be string:";
+                    msg = msg + " sequenceValue=" + sequenceValue + " map=" + originalMap;
+                    throw new DfIllegalPropertyTypeException(msg);
+                }
+                tmpMap.put(tableName, (String) sequenceValue);
+            }
+            _sequenceDefinitionMap = tmpMap;
         }
         return _sequenceDefinitionMap;
     }
 
     public String getSequenceDefinitionMapSequence(String flexibleTableName) {
-        final DfFlexibleMap<String, Object> flmap = new DfFlexibleMap<String, Object>(getSequenceDefinitionMap());
-        return (String) flmap.get(flexibleTableName);
+        final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
+        return flmap.get(flexibleTableName);
     }
 
     /**
      * @param checker The checker for call-back. (NotNull)
      */
     public void checkSequenceDefinitionMap(SequenceDefinitionMapChecker checker) {
-        final Map<String, Object> sequenceDefinitionMap = getSequenceDefinitionMap();
+        final Map<String, String> sequenceDefinitionMap = getSequenceDefinitionMap();
         final Set<String> keySet = sequenceDefinitionMap.keySet();
         final List<String> notFoundTableNameList = new ArrayList<String>();
         for (String tableName : keySet) {
