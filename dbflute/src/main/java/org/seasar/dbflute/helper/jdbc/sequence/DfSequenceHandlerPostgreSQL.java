@@ -20,6 +20,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -66,12 +67,27 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     }
 
     protected void handleSerialTypeSequence() throws SQLException {
-        final DfTableHandler tableHandler = new DfTableHandler();
+        final DfTableHandler tableHandler = new DfTableHandler() {
+            @Override
+            protected List<String> getTableExceptList() {
+                return new ArrayList<String>(); // All table target!
+            }
+
+            @Override
+            protected List<String> getTableTargetList() {
+                return new ArrayList<String>(); // All table target!
+            }
+        };
         final Connection conn = _dataSource.getConnection();
         final DatabaseMetaData metaData = conn.getMetaData();
         final List<DfTableMetaInfo> tableList = tableHandler.getTableList(metaData, _schema);
         final DfUniqueKeyHandler uniqueKeyHandler = new DfUniqueKeyHandler();
-        final DfColumnHandler columnHandler = new DfColumnHandler();
+        final DfColumnHandler columnHandler = new DfColumnHandler() {
+            @Override
+            protected List<String> getSimpleColumnExceptList() {
+                return new ArrayList<String>(); // All column target!
+            }
+        };
         final DfAutoIncrementHandler autoIncrementHandler = new DfAutoIncrementHandler();
         _log.info("...Incrementing serial type sequence");
         for (DfTableMetaInfo tableMetaInfo : tableList) {
