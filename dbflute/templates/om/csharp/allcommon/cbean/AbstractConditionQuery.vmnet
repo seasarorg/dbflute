@@ -591,7 +591,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(subQuery.getTableDbName());
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
         if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
-            if (!typeof(int).IsAssignableFrom(deriveColumnType) && !typeof(int?).IsAssignableFrom(deriveColumnType)) {
+            // Determine as not string and not date because CSharp does not have abstract class of number.
+            if (typeof(String).isAssignableFrom(deriveColumnType) || typeof(DateTime).isAssignableFrom(deriveColumnType)) {
                 throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
             }
         }
@@ -694,18 +695,18 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected void throwQueryDerivedReferrerInvalidColumnSpecificationException(String function) {
-        ConditionBeanContext.ThrowQueryDerivedReferrerInvalidColumnSpecificationException(function);
+        ${glConditionBeanContext}.ThrowQueryDerivedReferrerInvalidColumnSpecificationException(function);
     }
 
     protected void assertQueryDerivedReferrerColumnType(String function, ${glConditionQuery} subQuery, String deriveColumnName, Object value) {
         ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
-        // ...Pending
-        //if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
-        //    if (!typeof(Number).IsAssignableFrom(deriveColumnType)) {
-        //        throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
-        //    }
-        //}
+        if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
+            // Determine as not string and not date because CSharp does not have abstract class of number.
+            if (typeof(String).isAssignableFrom(deriveColumnType) || typeof(DateTime).isAssignableFrom(deriveColumnType)) {
+                throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
+            }
+        }
         if (value != null) {
             Type parameterType = value.GetType();
             if (typeof(String).IsAssignableFrom(deriveColumnType)) {
@@ -713,11 +714,19 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                     throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
                 }
             }
-            //if (typeof(Number).IsAssignableFrom(deriveColumnType)) {
-            //    if (!typeof(Number).IsAssignableFrom(parameterType)) {
-            //        throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
-            //    }
-            //}
+
+            // Check main number type only because CSharp does not have abstract class of number.
+            if (typeof(int).IsAssignableFrom(deriveColumnType)) {
+                if (!typeof(int).IsAssignableFrom(parameterType)) {
+                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
+                }
+            }
+            if (typeof(decimal).IsAssignableFrom(deriveColumnType)) {
+                if (!typeof(decimal).IsAssignableFrom(parameterType)) {
+                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
+                }
+            }
+
             if (typeof(DateTime).IsAssignableFrom(deriveColumnType)) {
                 if (!typeof(DateTime).IsAssignableFrom(parameterType)) {
                     throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
@@ -727,7 +736,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Type deriveColumnType, Object value) {
-        ConditionBeanContext.ThrowQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
+        ${glConditionBeanContext}.ThrowQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
     }
 
     public class QDRFunction<CB> where CB : ${glConditionBean} { // Internal
@@ -846,7 +855,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     public class QDRParameter<CB, PARAMETER> where CB : ${glConditionBean} { // Internal
         protected String _function;
-        protected SubQuery<CB> _subQuery;
+        protected ${glSubQuery}<CB> _subQuery;
         protected QDRSetupper<CB> _setupper;
         public QDRParameter(String function, ${glSubQuery}<CB> subQuery, QDRSetupper<CB> setupper) {
             _function = function;
@@ -1014,21 +1023,22 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected void throwScalarSubQueryInvalidColumnSpecificationException(String function) {
-        ConditionBeanContext.ThrowScalarSubQueryInvalidColumnSpecificationException(function);
+        ${glConditionBeanContext}.ThrowScalarSubQueryInvalidColumnSpecificationException(function);
     }
 
-    protected void assertScalarSubQueryColumnType(String function, ConditionQuery subQuery, String deriveColumnName) {
+    protected void assertScalarSubQueryColumnType(String function, ${glConditionQuery} subQuery, String deriveColumnName) {
         ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
         if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
-            //if (!Number.class.isAssignableFrom(deriveColumnType)) {
-            //    throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
-            //}
+            // Determine as not string and not date because CSharp does not have abstract class of number.
+            if (typeof(String).isAssignableFrom(deriveColumnType) || typeof(DateTime).isAssignableFrom(deriveColumnType)) {
+                throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+            }
         }
     }
 
     protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName, Type deriveColumnType) {
-        ConditionBeanContext.ThrowScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+        ${glConditionBeanContext}.ThrowScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
     }
 
     public class SSQFunction<CB> where CB : ${glConditionBean} { // Internal
