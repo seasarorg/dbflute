@@ -6,6 +6,7 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.*;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import ${glPackageCIQ}.*;
 import ${glPackageCB}.*;
 import ${glPackageCQ}.*;
@@ -37,19 +38,20 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @return Inline query. (NotNull)
      */
     public ${myConditionInlineQueryClassName} inline() {
-        if (_inlineQuery == null) {
-            _inlineQuery = new ${myConditionInlineQueryClassName}(getChildQuery(), getSqlClause(), getAliasName(), getNestLevel(), this);
-        }
+        if (_inlineQuery == null) { _inlineQuery = createInlineQuery(); }
         _inlineQuery.xsetOnClauseInline(false); return _inlineQuery;
     }
-    
+
+    protected ${myConditionInlineQueryClassName} createInlineQuery()
+    { return new ${myConditionInlineQueryClassName}(getChildQuery(), getSqlClause(), getAliasName(), getNestLevel(), this); }
+
     /**
      * Prepare on-clause query. <br />
      * {select ... from ... left outer join ${table.name} on ... and abc = [abc] ...}
      * @return On-clause query. (NotNull)
      */
     public ${myConditionInlineQueryClassName} on() {
-        if (isBaseQuery(this)) { throw new UnsupportedOperationException("Unsupported on-clause for local table!"); }
+        if (isBaseQuery(this)) { throw new IllegalConditionBeanOperationException("On-clause for local table is unavailable!"); }
         ${myConditionInlineQueryClassName} inlineQuery = inline(); inlineQuery.xsetOnClauseInline(true); return inlineQuery;
     }
 
