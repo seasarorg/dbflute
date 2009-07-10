@@ -142,7 +142,7 @@ namespace ${glPackageBaseCB} {
         //                                                                         =======
         protected ${myConditionBeanClassName}Specification _specification;
         public ${myConditionBeanClassName}Specification Specify() {
-            if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(this), _forDerivedReferrer, _forScalarSelect); }
+            if (_specification == null) { _specification = new ${myConditionBeanClassName}Specification(this, new MySpQyCall(this), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
             return _specification;
         }
         protected class MySpQyCall : SpQyCall<${myConditionQueryClassName}> {
@@ -198,7 +198,7 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDerivedReferrer, _forScalarSelect); }
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
             return _${tmpPropertyName};
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
@@ -220,7 +220,7 @@ namespace ${glPackageBaseCB} {
 #set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
         public ${tmpCBClassName}Specification Specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
-            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDerivedReferrer, _forScalarSelect); }
+            if (_${tmpPropertyName} == null) { _${tmpPropertyName} = new ${tmpCBClassName}Specification(_baseCB, new ${tmpPropertyNameInitCap}SpQyCall(_myQyCall), _forDerivedReferrer, _forScalarSelect, _forScalarSubQuery); }
             return _${tmpPropertyName};
         }
 		public class ${tmpPropertyNameInitCap}SpQyCall : SpQyCall<${tmpCQClassName}> {
