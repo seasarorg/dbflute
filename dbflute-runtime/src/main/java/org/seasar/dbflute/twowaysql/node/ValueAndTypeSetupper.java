@@ -22,6 +22,7 @@ import org.seasar.dbflute.cbean.MapParameterBean;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.exception.BindVariableCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.EmbeddedValueCommentNotFoundPropertyException;
+import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.s2dao.beans.TnBeanDesc;
 import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
@@ -141,7 +142,7 @@ public class ValueAndTypeSetupper {
             throwLikeSearchOptionNotFoundException(resourceBean, currentName);
         }
         if (option.isSplit()) {
-            throwOutsideSqlLikeSearchOptionSplitUnsupportedException(option, resourceBean, currentName);
+            throwOutsideSqlLikeSearchOptionSplitUnavailableException(option, resourceBean, currentName);
         }
         return option;
     }
@@ -164,11 +165,11 @@ public class ValueAndTypeSetupper {
     }
 
     // for OutsideSql
-    protected void throwOutsideSqlLikeSearchOptionSplitUnsupportedException(LikeSearchOption option,
+    protected void throwOutsideSqlLikeSearchOptionSplitUnavailableException(LikeSearchOption option,
             Object resourceBean, String currentName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The splitByXxx() of LikeSearchOption is unsupported at OutsideSql!" + ln();
+        msg = msg + "The splitByXxx() of LikeSearchOption is unavailable at OutsideSql!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your method call:" + ln();
@@ -189,7 +190,7 @@ public class ValueAndTypeSetupper {
         msg = msg + ln();
         msg = msg + "[Target ParameterBean]" + ln() + resourceBean + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new UnsupportedOperationException(msg);
+        throw new IllegalOutsideSqlOperationException(msg);
     }
 
     protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, TnPropertyDesc pd) {

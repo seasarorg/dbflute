@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the condition-bean is illegal at the command.
+ * The exception of when you do illegal operation to the condition-bean.
  * @author jflute
  */
-public class IllegalConditionBeanException extends RuntimeException {
+public class IllegalConditionBeanOperationException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class IllegalConditionBeanException extends RuntimeException {
      * Constructor.
      * @param msg Exception message.
      */
-    public IllegalConditionBeanException(String msg) {
+    public IllegalConditionBeanOperationException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class IllegalConditionBeanException extends RuntimeException {
      * @param msg Exception message.
      * @param cause Throwable.
      */
-    public IllegalConditionBeanException(String msg, Throwable cause) {
+    public IllegalConditionBeanOperationException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

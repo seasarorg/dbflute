@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+
 /**
  * SqlClause for Default.
  * @author jflute
@@ -81,8 +83,8 @@ public class SqlClauseDefault extends AbstractSqlClause {
      * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
-        String msg = "LockForUpdate-SQL is unsupported in the database. Sorry...: " + toString();
-        throw new UnsupportedOperationException(msg);
+        String msg = "LockForUpdate-SQL is unavailable in the database. Sorry...: " + toString();
+        throw new IllegalConditionBeanOperationException(msg);
     }
 
     /**

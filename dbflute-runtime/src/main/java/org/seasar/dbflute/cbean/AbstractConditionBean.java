@@ -225,7 +225,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // * * * * * * * *
     /**
      * {@inheritDoc}
-     * @return Determination.
      */
     public boolean isPaging() {
         String msg = "This method is unsupported on ConditionBean!";
@@ -237,7 +236,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // * * * * * * * *
     /**
      * {@inheritDoc}
-     * @return Determination.
      */
     public boolean isCountLater() {
         return false; // as default

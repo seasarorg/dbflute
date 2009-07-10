@@ -34,7 +34,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
-import org.seasar.dbflute.exception.IllegalConditionBeanException;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.util.DfAssertUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -813,7 +813,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             _whereList.set(_whereList.size() - 1, first);
         }
     }
-    
+
     public boolean hasWhereClause() {
         return _whereList != null && !_whereList.isEmpty();
     }
@@ -1053,12 +1053,12 @@ public abstract class AbstractSqlClause implements SqlClause {
     public void addManualOrderToPreviousOrderByElement(ManumalOrderInfo manumalOrderInfo) {
         assertObjectNotNull("manumalOrderInfo", manumalOrderInfo);
         if (hasUnionQuery()) {
-            String msg = "Manual Order with Union is unsupported: " + manumalOrderInfo.getManualValueList();
-            throw new UnsupportedOperationException(msg);
+            String msg = "Manual Order with Union is unavailable: " + manumalOrderInfo.getManualValueList();
+            throw new IllegalConditionBeanOperationException(msg);
         }
         _orderByClause.addManualOrderByElement(manumalOrderInfo);
     }
-    
+
     public boolean hasOrderByClause() {
         return _orderByClause != null && !_orderByClause.isEmpty();
     }
@@ -1615,16 +1615,16 @@ public abstract class AbstractSqlClause implements SqlClause {
             return sb.toString();
         } else {
             if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
-                String msg = "The queryUpdate() with outer join is unsupported";
+                String msg = "The queryUpdate() with outer join is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
                 msg = msg + " tableName=" + _tableName;
-                throw new IllegalConditionBeanException(msg);
+                throw new IllegalConditionBeanOperationException(msg);
             }
             if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
-                String msg = "The queryUpdate() with union is unsupported";
+                String msg = "The queryUpdate() with union is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
                 msg = msg + " tableName=" + _tableName;
-                throw new IllegalConditionBeanException(msg);
+                throw new IllegalConditionBeanOperationException(msg);
             }
             String subQuery = filterSubQueryIndent(fromWhereClause);
             subQuery = replaceString(subQuery, aliasName + ".", "");
@@ -1661,16 +1661,16 @@ public abstract class AbstractSqlClause implements SqlClause {
             return sb.toString();
         } else { // unsupported or two-or-more primary keys
             if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
-                String msg = "The queryDelete() with outer join is unsupported";
+                String msg = "The queryDelete() with outer join is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
                 msg = msg + " tableName=" + _tableName;
-                throw new IllegalConditionBeanException(msg);
+                throw new IllegalConditionBeanOperationException(msg);
             }
             if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
-                String msg = "The queryDelete() with union is unsupported";
+                String msg = "The queryDelete() with union is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
                 msg = msg + " tableName=" + _tableName;
-                throw new IllegalConditionBeanException(msg);
+                throw new IllegalConditionBeanOperationException(msg);
             }
             String subQuery = filterSubQueryIndent(fromWhereClause);
             subQuery = replaceString(subQuery, aliasName + ".", "");

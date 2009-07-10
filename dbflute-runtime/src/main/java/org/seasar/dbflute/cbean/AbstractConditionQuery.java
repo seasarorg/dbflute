@@ -35,6 +35,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -778,9 +779,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
             if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
-                String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
+                String msg = "The derived-referrer is unavailable when no primary key or two-or-more primary keys:";
                 msg = msg + " table=" + subQuery.getTableDbName();
-                throw new UnsupportedOperationException(msg);
+                throw new IllegalConditionBeanOperationException(msg);
             }
             String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
             String selectClause = "select " + tableAliasName + "." + primaryKeyName 
@@ -867,9 +868,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
             DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
             if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
-                String msg = "The derived-referrer is unsupported when no primary key or two-or-more primary keys:";
+                String msg = "The derived-referrer is unavailable when no primary key or two-or-more primary keys:";
                 msg = msg + " table=" + subQuery.getTableDbName();
-                throw new UnsupportedOperationException(msg);
+                throw new IllegalConditionBeanOperationException(msg);
             }
             String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
             String selectClause = "select " + tableAliasName + "." + primaryKeyName 
@@ -1183,9 +1184,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
         if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
-            String msg = "The scalar-sub-query is unsupported when no primary key or two-or-more primary keys:";
+            String msg = "The scalar-sub-query is unavailable when no primary key or two-or-more primary keys:";
             msg = msg + " table=" + subQuery.getTableDbName();
-            throw new UnsupportedOperationException(msg);
+            throw new IllegalConditionBeanOperationException(msg);
         }
         String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
         if (subQuery.getSqlClause().hasUnionQuery()) {

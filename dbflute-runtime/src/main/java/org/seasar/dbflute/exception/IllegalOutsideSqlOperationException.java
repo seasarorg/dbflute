@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the outside-SQL is not found.
+ * The exception of when you do illegal operation to the outside-SQL.
  * @author jflute
  */
-public class OutsideSqlNotFoundException extends RuntimeException {
+public class IllegalOutsideSqlOperationException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class OutsideSqlNotFoundException extends RuntimeException {
      * Constructor.
      * @param msg Exception message.
      */
-    public OutsideSqlNotFoundException(String msg) {
+    public IllegalOutsideSqlOperationException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class OutsideSqlNotFoundException extends RuntimeException {
      * @param msg Exception message.
      * @param cause Throwable.
      */
-    public OutsideSqlNotFoundException(String msg, Throwable cause) {
+    public IllegalOutsideSqlOperationException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }
