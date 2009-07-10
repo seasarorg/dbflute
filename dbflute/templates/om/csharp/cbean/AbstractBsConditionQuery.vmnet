@@ -193,7 +193,7 @@ namespace ${glPackageBaseCQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
         public void xsderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.XSetupForDerivedReferrer(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerSpecifyDerivedReferrer(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
         }
@@ -219,7 +219,7 @@ namespace ${glPackageBaseCQ} {
         }
         public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.XSetupForDerivedReferrer(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query()); // for saving query-value.
             String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
             registerQueryDerivedReferrer(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
@@ -388,7 +388,7 @@ namespace ${glPackageBaseCQ} {
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
         public void xsderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String aliasName) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.XSetupForDerivedReferrer(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query());
             registerSpecifyDerivedReferrer(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, aliasName);
         }
@@ -414,7 +414,7 @@ namespace ${glPackageBaseCQ} {
         }
         public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.XSetupForDerivedReferrer(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query()); // for saving query-value.
             String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
             registerQueryDerivedReferrer(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
@@ -497,7 +497,7 @@ namespace ${glPackageBaseCQ} {
             return xcreateSSQFunction("<");
         }
         
-        protected SSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(final String operand) {
+        protected SSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(String operand) {
             return new SSQFunction<${myConditionBeanClassName}>(delegate(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery) {
                 xscalarSubQuery(function, subQuery, operand);
             });

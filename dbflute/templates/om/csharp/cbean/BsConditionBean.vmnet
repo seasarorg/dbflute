@@ -168,7 +168,8 @@ namespace ${glPackageBaseCB} {
         protected ${tmpCBClassName}Specification _${tmpPropertyName};
 #end
 #end
-        public ${myConditionBeanClassName}Specification(${glConditionBean} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall, bool forDerivedReferrer, bool forScalarSelect)
+        public ${myConditionBeanClassName}Specification(${glConditionBean} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall
+                                                      , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery)
         : base(baseCB, qyCall, forDerivedReferrer, forScalarSelect) { _myQyCall = qyCall; }
 #foreach ($col in $table.columns)
         public void Column${col.javaName}() { doColumn("${col.name}"); }
