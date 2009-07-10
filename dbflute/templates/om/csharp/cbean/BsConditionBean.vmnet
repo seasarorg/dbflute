@@ -170,7 +170,7 @@ namespace ${glPackageBaseCB} {
 #end
         public ${myConditionBeanClassName}Specification(${glConditionBean} baseCB, SpQyCall<${myConditionQueryClassName}> qyCall
                                                       , bool forDerivedReferrer, bool forScalarSelect, bool forScalarSubQuery)
-        : base(baseCB, qyCall, forDerivedReferrer, forScalarSelect) { _myQyCall = qyCall; }
+        : base(baseCB, qyCall, forDerivedReferrer, forScalarSelect, forScalarSubQuery) { _myQyCall = qyCall; }
 #foreach ($col in $table.columns)
         public void Column${col.javaName}() { doColumn("${col.name}"); }
 #end

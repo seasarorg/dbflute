@@ -783,7 +783,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * @param subQuery The sub query of referrer. (NotNull) 
          * @return The parameter for comparing with scalar. (NotNull)
          */
-        public QDRParameter<CB, Object> Xax(${glSubQuery}<CB> subQuery) {
+        public QDRParameter<CB, Object> Max(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, Object>("max", subQuery, _setupper);
         }
         
