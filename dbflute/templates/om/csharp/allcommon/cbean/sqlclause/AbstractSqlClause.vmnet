@@ -510,14 +510,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // ===================================================================================
     //                                                                SelectedSelectColumn
     //                                                                ====================
-    /**
-     * Register selected select column.
-     * 
-     * @param foreignTableAliasName The alias name of foreign table. (NotNull)
-     * @param localTableName The table name of local. (NotNull)
-     * @param foreignPropertyName The property name of foreign table. (NotNull)
-     * @param localRelationPath The path of local relation. (Nullable)
-     */
     public void registerSelectedSelectColumn(String foreignTableAliasName
                                            , String localTableName
                                            , String foreignPropertyName
@@ -685,6 +677,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
             _whereList.set(0, last);
             _whereList.set(_whereList.size() - 1, first);
         }
+    }
+
+    public bool hasWhereClause() {
+        return _whereList != null && _whereList.size() > 0;
     }
 
     // ===================================================================================
@@ -914,6 +910,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
             String caseWhen = "case when " + columnName + " is not null then " + thenNumber + " else " + elseNumber + " end asc";
             return caseWhen + ", " + orderByElementClause;
         }
+    }
+
+    public bool hasOrderByClause() {
+        return _orderByClause != null && !_orderByClause.isEmpty;
     }
 
     // ===================================================================================

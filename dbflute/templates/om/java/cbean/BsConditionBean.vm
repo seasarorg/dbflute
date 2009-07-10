@@ -189,10 +189,6 @@ public class ${myClassName} extends AbstractConditionBean {
         final ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForUnion(); unionQuery.query(cb);
         final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
     }
-
-    public boolean hasUnionQueryOrUnionAllQuery() {
-        return query().hasUnionQueryOrUnionAllQuery();
-    }
 #if ($database.isAvailableDatabaseDependency())
 #if ($database.isDatabaseOracle())
 
@@ -391,6 +387,13 @@ public class ${myClassName} extends AbstractConditionBean {
     protected String getLogDateFormat() { return ${glDBFluteConfig}.getInstance().getLogDateFormat(); }
     @Override
     protected String getLogTimestampFormat() { return ${glDBFluteConfig}.getInstance().getLogTimestampFormat(); }
+
+    // ===================================================================================
+    //                                                          Basic Status Determination
+    //                                                          ==========================
+    public boolean hasUnionQueryOrUnionAllQuery() {
+        return query().hasUnionQueryOrUnionAllQuery();
+    }
 
     // ===================================================================================
     //                                                                            Internal

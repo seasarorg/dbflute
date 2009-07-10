@@ -32,11 +32,6 @@ namespace ${glPackageBaseCommonCBean} {
         ${glConditionQuery} LocalCQ { get; }
 
         // ===============================================================================
-        //                                                                     Union Query
-        //                                                                     ===========
-        bool HasUnionQueryOrUnionAllQuery();
-
-        // ===============================================================================
         //                                                                    Lock Setting
         //                                                                    ============
         $glConditionBean LockForUpdate();
@@ -58,5 +53,12 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                     Display SQL
         //                                                                     ===========
     	String ToDisplaySql();
+
+        // ===============================================================================
+        //                                                      Basic Status Determination
+        //                                                      ==========================
+    	bool HasWhereClause();
+    	bool HasOrderByClause();
+        bool HasUnionQueryOrUnionAllQuery();
     }
 }

@@ -54,11 +54,6 @@ namespace ${glPackageBaseCommonCBean} {
         public abstract ${glConditionQuery} LocalCQ { get; }
 
         // ===============================================================================
-        //                                                                     Union Query
-        //                                                                     ===========
-        public abstract bool HasUnionQueryOrUnionAllQuery();
-
-        // ===============================================================================
         //                                                    Implementation of PagingBean
         //                                                    ============================
         // -------------------------------------------------
@@ -224,6 +219,20 @@ namespace ${glPackageBaseCommonCBean} {
             return ${glConditionBeanContext}.ConvertConditionBean2DisplaySql(this);
         }
     
+        // [DBFlute-0.8.9.2]
+        // ===============================================================================
+        //                                                      Basic Status Determination
+        //                                                      ==========================
+        public virtual bool HasWhereClause() {
+            return this.SqlClause.hasWhereClause();
+        }
+
+        public virtual bool HasOrderByClause() {
+            return this.SqlClause.hasOrderByClause();
+        }
+
+        public abstract bool HasUnionQueryOrUnionAllQuery();
+
         // [DBFlute-0.7.4]
         // ===============================================================================
         //                                                                    Purpose Type

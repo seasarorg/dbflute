@@ -52,6 +52,7 @@ public interface ${myClassName} {
     void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option);
     void registerWhereClause(String clause);
     void exchangeFirstWhereClauseForLastOne();
+    bool hasWhereClause();
 
     // ===================================================================================
     //                                                                         InlineWhere
@@ -93,6 +94,7 @@ public interface ${myClassName} {
 
 	void addNullsFirstToPreviousOrderBy();
 	void addNullsLastToPreviousOrderBy();
+	bool hasOrderByClause();
 	
     // ===================================================================================
     //                                                                               Union
