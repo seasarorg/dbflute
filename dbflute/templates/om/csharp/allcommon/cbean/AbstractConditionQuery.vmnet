@@ -592,7 +592,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
         if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
             // Determine as not string and not date because CSharp does not have abstract class of number.
-            if (typeof(String).isAssignableFrom(deriveColumnType) || typeof(DateTime).isAssignableFrom(deriveColumnType)) {
+            if (typeof(String).IsAssignableFrom(deriveColumnType) || typeof(DateTime).IsAssignableFrom(deriveColumnType)) {
                 throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
             }
         }
@@ -703,7 +703,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
         if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
             // Determine as not string and not date because CSharp does not have abstract class of number.
-            if (typeof(String).isAssignableFrom(deriveColumnType) || typeof(DateTime).isAssignableFrom(deriveColumnType)) {
+            if (typeof(String).IsAssignableFrom(deriveColumnType) || typeof(DateTime).IsAssignableFrom(deriveColumnType)) {
                 throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
             }
         }
@@ -1031,7 +1031,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
         if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
             // Determine as not string and not date because CSharp does not have abstract class of number.
-            if (typeof(String).isAssignableFrom(deriveColumnType) || typeof(DateTime).isAssignableFrom(deriveColumnType)) {
+            if (typeof(String).IsAssignableFrom(deriveColumnType) || typeof(DateTime).IsAssignableFrom(deriveColumnType)) {
                 throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
             }
         }
