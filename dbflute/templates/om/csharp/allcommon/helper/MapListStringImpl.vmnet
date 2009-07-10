@@ -466,18 +466,18 @@ namespace ${glPackageBaseCommonHelper}
             if (mapString == null)
             {
                 String msg = "Argument[mapString] must not be null: ";
-                throw new IllegalArgumentException(msg + "mapString=" + mapString);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg + "mapString=" + mapString);
             }
             mapString = mapString.Trim();
             if (!isStartsWithMapPrefix(mapString))
             {
                 String msg = "Argument[mapString] must start with '" + _mapMark + _startBrace + "': ";
-                throw new IllegalArgumentException(msg + "mapString=" + mapString);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg + "mapString=" + mapString);
             }
             if (!isEndsWithEndMark(mapString))
             {
                 String msg = "Argument[mapString] must end with '" + _endBrace + "': ";
-                throw new IllegalArgumentException(msg + "mapString=" + mapString);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg + "mapString=" + mapString);
             }
 
             int startBraceCount = getDelimiterCount(mapString, _startBrace);
@@ -488,7 +488,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # mapString --> " + mapString;
                 msg = msg + getNewLineAndIndent() + " # startBraceCount --> " + startBraceCount;
                 msg = msg + getNewLineAndIndent() + " # endBraceCount --> " + endBraceCount;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
         }
 
@@ -497,18 +497,18 @@ namespace ${glPackageBaseCommonHelper}
             if (listString == null)
             {
                 String msg = "Argument[listString] must not be null: ";
-                throw new IllegalArgumentException(msg + "liststring=" + listString);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg + "liststring=" + listString);
             }
             listString = listString.Trim();
             if (!isStartsWithListPrefix(listString))
             {
                 string msg = "Argument[listString] must start with '" + _mapMark + "': ";
-                throw new IllegalArgumentException(msg + "listString=" + listString);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg + "listString=" + listString);
             }
             if (!isEndsWithEndMark(listString))
             {
                 string msg = "Argument[listString] must end with '" + _endBrace + "': ";
-                throw new IllegalArgumentException(msg + "listString=" + listString);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg + "listString=" + listString);
             }
 
             int startBraceCount = getDelimiterCount(listString, _startBrace);
@@ -523,7 +523,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
         }
 
@@ -540,7 +540,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
 
             if (equalIndex < 0)
@@ -554,7 +554,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
 
             if (remainderMapString.Length < equalIndex)
@@ -568,7 +568,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
 
             String expectedAsEndMark = remainderMapString.Substring(equalIndex, _equal.Length);
@@ -584,7 +584,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
         }
 
@@ -602,7 +602,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
 
             if (endBraceIndex < 0)
@@ -616,7 +616,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
 
             if (remainderMapString.Length < endBraceIndex)
@@ -630,7 +630,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
 
             String expectedAsEndMark = remainderMapString.Substring(endBraceIndex, _endBrace.Length);
@@ -646,7 +646,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
         }
 
@@ -664,7 +664,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
 
             if (endBraceIndex < 0)
@@ -678,7 +678,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
 
             if (remainderListString.Length < endBraceIndex)
@@ -692,7 +692,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
 
             String expectedAsEndBrace = remainderListString.Substring(endBraceIndex,  _endBrace.Length);
@@ -708,7 +708,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # _endBrace --> " + _endBrace;
                 msg = msg + getNewLineAndIndent() + " # _delimiter --> " + _delimiter;
                 msg = msg + getNewLineAndIndent() + " # _equal --> " + _equal;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
         }
 
@@ -745,7 +745,7 @@ namespace ${glPackageBaseCommonHelper}
             if (targetString == null)
             {
                 string msg = "Argument[targetString] must not be null: " + targetString;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
             targetString = targetString.Trim();
             if (targetString.StartsWith(_mapMark + _startBrace))
@@ -763,7 +763,7 @@ namespace ${glPackageBaseCommonHelper}
             if (targetString == null)
             {
                 string msg = "Argument[targetString] must not be null: " + targetString;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
             targetString = targetString.Trim();
             if (targetString.StartsWith(_listMark + _startBrace))
@@ -781,7 +781,7 @@ namespace ${glPackageBaseCommonHelper}
             if (targetString == null)
             {
                 string msg = "Argument[targetString] must not be null: " + targetString;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
             targetString = targetString.Trim();
             if (targetString.StartsWith(_delimiter))
@@ -799,7 +799,7 @@ namespace ${glPackageBaseCommonHelper}
             if (targetString == null)
             {
                 string msg = "Argument[targetString] must not be null: " + targetString;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
             targetString = targetString.Trim();
             if (targetString.StartsWith(_endBrace))
@@ -817,7 +817,7 @@ namespace ${glPackageBaseCommonHelper}
             if (targetString == null)
             {
                 string msg = "Argument[targetString] must not be null: " + targetString;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
             targetString = targetString.Trim();
             if (targetString.EndsWith(_endBrace))

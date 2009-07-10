@@ -913,7 +913,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     public bool hasOrderByClause() {
-        return _orderByClause != null && !_orderByClause.isEmpty;
+        return _orderByClause != null && !_orderByClause.isEmpty();
     }
 
     // ===================================================================================

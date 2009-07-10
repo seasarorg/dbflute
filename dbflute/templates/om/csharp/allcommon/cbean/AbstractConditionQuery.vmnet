@@ -626,7 +626,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                (Query)DerivedReferrer
     //                                ----------------------
-    protected void registerQueryDerivedReferrer(String function, ConditionQuery subQuery
+    protected void registerQueryDerivedReferrer(String function, ${glConditionQuery} subQuery
                                               , String columnName, String relatedColumnName, String propertyName
                                               , String operand, Object value, String parameterPropertyName) {
         assertObjectNotNull("QueryDerivedReferrer(function)", function);
@@ -651,7 +651,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return getRealColumnName(columnName);
     }
 
-    protected String getQueryDerivedReferrerSubQuerySql(String function, ConditionQuery subQuery
+    protected String getQueryDerivedReferrerSubQuerySql(String function, ${glConditionQuery} subQuery
                                                       , String realColumnName, String relatedColumnName
                                                       , String propertyName, Object value) {
         int subQueryLevel = subQuery.getSubQueryLevel();
@@ -697,7 +697,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         ConditionBeanContext.ThrowQueryDerivedReferrerInvalidColumnSpecificationException(function);
     }
 
-    protected void assertQueryDerivedReferrerColumnType(String function, ConditionQuery subQuery, String deriveColumnName, Object value) {
+    protected void assertQueryDerivedReferrerColumnType(String function, ${glConditionQuery} subQuery, String deriveColumnName, Object value) {
         ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
         Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
         // ...Pending
@@ -730,7 +730,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         ConditionBeanContext.ThrowQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
     }
 
-    public class QDRFunction<CB> where CB : ConditionBean { // Internal
+    public class QDRFunction<CB> where CB : ${glConditionBean} { // Internal
         protected QDRSetupper<CB> _setupper;
         public QDRFunction(QDRSetupper<CB> setupper) {
             _setupper = setupper;
@@ -749,7 +749,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * @param subQuery The sub query of referrer. (NotNull) 
          * @return The parameter for comparing with scalar. (NotNull)
          */
-        public QDRParameter<CB, int> count(SubQuery<CB> subQuery) {
+        public QDRParameter<CB, int> Count(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, int>("count", subQuery, _setupper);
         }
         
@@ -766,7 +766,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * @param subQuery The sub query of referrer. (NotNull) 
          * @return The parameter for comparing with scalar. (NotNull)
          */
-        public QDRParameter<CB, int> countDistinct(SubQuery<CB> subQuery) {
+        public QDRParameter<CB, int> CountDistinct(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, int>("count(distinct", subQuery, _setupper);
         }
 
@@ -783,7 +783,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * @param subQuery The sub query of referrer. (NotNull) 
          * @return The parameter for comparing with scalar. (NotNull)
          */
-        public QDRParameter<CB, Object> max(SubQuery<CB> subQuery) {
+        public QDRParameter<CB, Object> Xax(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, Object>("max", subQuery, _setupper);
         }
         
@@ -800,7 +800,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * @param subQuery The sub query of referrer. (NotNull) 
          * @return The parameter for comparing with scalar. (NotNull)
          */
-        public QDRParameter<CB, Object> min(SubQuery<CB> subQuery) {
+        public QDRParameter<CB, Object> Min(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, Object>("min", subQuery, _setupper);
         }
         
@@ -817,7 +817,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * @param subQuery The sub query of referrer. (NotNull) 
          * @return The parameter for comparing with scalar. (NotNull)
          */
-        public QDRParameter<CB, Object> sum(SubQuery<CB> subQuery) {
+        public QDRParameter<CB, Object> Sum(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, Object>("sum", subQuery, _setupper);
         }
         
@@ -834,21 +834,21 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * @param subQuery The sub query of referrer. (NotNull) 
          * @return The parameter for comparing with scalar. (NotNull)
          */
-        public QDRParameter<CB, Object> avg(SubQuery<CB> subQuery) {
+        public QDRParameter<CB, Object> Avg(${glSubQuery}<CB> subQuery) {
             return new QDRParameter<CB, Object>("avg", subQuery, _setupper);
         }
     }
 
     public delegate void QDRSetupper<CB>(String function
-                                       , SubQuery<CB> subQuery
+                                       , ${glSubQuery}<CB> subQuery
                                        , String operand
-                                       , Object value) where CB : ConditionBean;
+                                       , Object value) where CB : ${glConditionBean};
 
-    public class QDRParameter<CB, PARAMETER> where CB : ConditionBean { // Internal
+    public class QDRParameter<CB, PARAMETER> where CB : ${glConditionBean} { // Internal
         protected String _function;
         protected SubQuery<CB> _subQuery;
         protected QDRSetupper<CB> _setupper;
-        public QDRParameter(String function, SubQuery<CB> subQuery, QDRSetupper<CB> setupper) {
+        public QDRParameter(String function, ${glSubQuery}<CB> subQuery, QDRSetupper<CB> setupper) {
             _function = function;
             _subQuery = subQuery;
             _setupper = setupper;
@@ -867,7 +867,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * </pre> 
          * @param value The value of parameter. (NotNull) 
          */
-        public void equal(PARAMETER value) {
+        public void Equal(PARAMETER value) {
             _setupper.Invoke(_function, _subQuery, "=", value);
         }
         
@@ -884,7 +884,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * </pre> 
          * @param value The value of parameter. (NotNull) 
          */
-        public void greaterThan(PARAMETER value) {
+        public void GreaterThan(PARAMETER value) {
             _setupper.Invoke(_function, _subQuery, ">", value);
         }
         
@@ -901,7 +901,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * </pre> 
          * @param value The value of parameter. (NotNull) 
          */
-        public void lessThan(PARAMETER value) {
+        public void LessThan(PARAMETER value) {
             _setupper.Invoke(_function, _subQuery, "<", value);
         }
         
@@ -918,7 +918,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * </pre> 
          * @param value The value of parameter. (NotNull) 
          */
-        public void greaterEqual(PARAMETER value) {
+        public void GreaterEqual(PARAMETER value) {
             _setupper.Invoke(_function, _subQuery, ">=", value);
         }
         
@@ -935,10 +935,176 @@ public abstract class ${myClassName} : ${glConditionQuery} {
          * </pre> 
          * @param value The value of parameter. (NotNull) 
          */
-        public void lessEqual(PARAMETER value) {
+        public void LessEqual(PARAMETER value) {
             _setupper.Invoke(_function, _subQuery, "<=", value);
         }
     }
+
+    // [DBFlute-0.8.8]
+    // -----------------------------------------------------
+    //                                        ScalarSubQuery
+    //                                        --------------
+    protected void registerScalarSubQuery(String function, ${glConditionQuery} subQuery
+                                        , String propertyName, String operand) {
+        assertObjectNotNull("ScalarSubQuery(" + propertyName + ")", subQuery);
+        
+        // Get the specified column before it disappears at sub-query making.
+        String deriveRealColumnName;
+        {
+            String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+            if (deriveColumnName == null || deriveColumnName.Trim.Length == 0) {
+                throwScalarSubQueryInvalidColumnSpecificationException(function);
+            }
+            deriveRealColumnName = getScalarSubQueryRealColumnName(deriveColumnName);
+        }
+
+        xincrementLocalSubQueryLevelIfNeeds(subQuery);
+        String subQueryClause = getScalarSubQuerySql(function, subQuery, propertyName);
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        String endIndent = "       ";
+        String clause = deriveRealColumnName + " " + operand + " ("
+                      + beginMark + subQueryClause + ln() + endIndent
+                      + ") " + endMark;
+        registerWhereClause(clause);
+    }
+
+    protected String getScalarSubQueryRealColumnName(String columnName) {
+        return getRealColumnName(columnName);
+    }
+
+    protected String getScalarSubQuerySql(String function, ${glConditionQuery} subQuery
+                                        , String propertyName) {
+        int subQueryLevel = subQuery.getSubQueryLevel();
+        String tableAliasName = "dfsublocal_" + subQueryLevel;
+        String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        if (deriveColumnName == null || deriveColumnName.Trim.Length == 0) {
+            throwScalarSubQueryInvalidColumnSpecificationException(function);
+        }
+        assertScalarSubQueryColumnType(function, subQuery, deriveColumnName);
+        subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
+        ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
+        if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
+            String msg = "The scalar-sub-query is unsupported when no primary key or two-or-more primary keys:";
+            msg = msg + " table=" + subQuery.getTableDbName();
+            throw new UnsupportedOperationException(msg);
+        }
+        String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
+        if (subQuery.getSqlClause().hasUnionQuery()) {
+            String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
+            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            String selectClause = "select " + tableAliasName + "." + primaryKeyName
+                                     + ", " + tableAliasName + "." + deriveColumnName;
+            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName
+                                                                     , selectClause, tableAliasName);
+            String mainSql = selectClause + " " + fromWhereClause;
+            return "select " + function + "(dfsubquerymain." + deriveColumnName + ")" + ln()
+                 + "  from (" + beginMark
+                 + mainSql + ln()
+                 + "       ) dfsubquerymain" + endMark;
+        } else {
+            String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
+            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName
+                                                                     , selectClause, tableAliasName);
+            return selectClause + " " + fromWhereClause;
+        }
+    }
+
+    protected void throwScalarSubQueryInvalidColumnSpecificationException(String function) {
+        ConditionBeanContext.ThrowScalarSubQueryInvalidColumnSpecificationException(function);
+    }
+
+    protected void assertScalarSubQueryColumnType(String function, ConditionQuery subQuery, String deriveColumnName) {
+        ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
+        Type deriveColumnType = dbmeta.FindColumnInfo(deriveColumnName).PropertyType;
+        if ("sum".Equals(function.ToLower()) || "avg".Equals(function.ToLower())) {
+            //if (!Number.class.isAssignableFrom(deriveColumnType)) {
+            //    throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+            //}
+        }
+    }
+
+    protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
+        ConditionBeanContext.throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+    }
+
+    public class SSQFunction<CB> where CB : ${glConditionBean} { // Internal
+        protected SSQSetupper<CB> _setupper;
+        public SSQFunction(SSQSetupper<CB> setupper) {
+            _setupper = setupper;
+        }
+
+        /**
+         * Set up the sub query of myself for the scalar 'max'.
+         * <pre>
+         * cb.query().scalar_Equal().max(new SubQuery&lt;PurchaseCB&gt;() {
+         *     public void query(PurchaseCB subCB) {
+         *         subCB.specify().columnPurchasePrice(); // *Point!
+         *         subCB.query().setPaymentCompleteFlg_Equal_True();
+         *     }
+         * });
+         * </pre> 
+         * @param subQuery The sub query of myself. (NotNull) 
+         */
+        public void Max(${glSubQuery}<CB> subQuery) {
+            _setupper.Invoke("max", subQuery);
+        }
+
+        /**
+         * Set up the sub query of myself for the scalar 'min'.
+         * <pre>
+         * cb.query().scalar_Equal().min(new SubQuery&lt;PurchaseCB&gt;() {
+         *     public void query(PurchaseCB subCB) {
+         *         subCB.specify().columnPurchasePrice(); // *Point!
+         *         subCB.query().setPaymentCompleteFlg_Equal_True();
+         *     }
+         * });
+         * </pre> 
+         * @param subQuery The sub query of myself. (NotNull) 
+         */
+        public void Min(${glSubQuery}<CB> subQuery) {
+            _setupper.Invoke("min", subQuery);
+        }
+
+        /**
+         * Set up the sub query of myself for the scalar 'sum'.
+         * <pre>
+         * cb.query().scalar_Equal().sum(new SubQuery&lt;PurchaseCB&gt;() {
+         *     public void query(PurchaseCB subCB) {
+         *         subCB.specify().columnPurchasePrice(); // *Point!
+         *         subCB.query().setPaymentCompleteFlg_Equal_True();
+         *     }
+         * });
+         * </pre> 
+         * @param subQuery The sub query of myself. (NotNull) 
+         */
+        public void Sum(${glSubQuery}<CB> subQuery) {
+            _setupper.Invoke("sum", subQuery);
+        }
+
+        /**
+         * Set up the sub query of myself for the scalar 'avg'.
+         * <pre>
+         * cb.query().scalar_Equal().avg(new SubQuery&lt;PurchaseCB&gt;() {
+         *     public void query(PurchaseCB subCB) {
+         *         subCB.specify().columnPurchasePrice(); // *Point!
+         *         subCB.query().setPaymentCompleteFlg_Equal_True();
+         *     }
+         * });
+         * </pre> 
+         * @param subQuery The sub query of myself. (NotNull) 
+         */
+        public void Avg(${glSubQuery}<CB> subQuery) {
+            _setupper.Invoke("avg", subQuery);
+        }
+    }
+
+    public delegate void SSQSetupper<CB>(String function
+                                       , ${glSubQuery}<CB> subQuery)
+                                       where CB : ${glConditionBean}; // Internal
 
     // -----------------------------------------------------
     //                                       SubQuery Common
