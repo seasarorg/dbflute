@@ -813,6 +813,10 @@ public abstract class AbstractSqlClause implements SqlClause {
             _whereList.set(_whereList.size() - 1, first);
         }
     }
+    
+    public boolean hasWhereClause() {
+        return _whereList != null && !_whereList.isEmpty();
+    }
 
     // ===================================================================================
     //                                                                         InlineWhere
@@ -1053,6 +1057,10 @@ public abstract class AbstractSqlClause implements SqlClause {
             throw new UnsupportedOperationException(msg);
         }
         _orderByClause.addManualOrderByElement(manumalOrderInfo);
+    }
+    
+    public boolean hasOrderByClause() {
+        return _orderByClause != null && !_orderByClause.isEmpty();
     }
 
     // ===================================================================================

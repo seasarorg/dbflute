@@ -203,6 +203,13 @@ public interface SqlClause {
      */
     public void exchangeFirstWhereClauseForLastOne();
 
+    /**
+     * Does it have where clauses? <br />
+     * In-line where clause is NOT contained.
+     * @return Determination.
+     */
+    public boolean hasWhereClause();
+    
     // ===================================================================================
     //                                                                         InlineWhere
     //                                                                         ===========
@@ -260,6 +267,13 @@ public interface SqlClause {
 
     public void addManualOrderToPreviousOrderByElement(ManumalOrderInfo manumalOrderInfo);
 
+    /**
+     * Does it have order-by clauses? <br />
+     * Whether effective or not has no influence.
+     * @return Determination.
+     */
+    public boolean hasOrderByClause();
+    
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====

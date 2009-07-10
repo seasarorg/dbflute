@@ -71,23 +71,25 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /** Safety max result size. */
     protected int _safetyMaxResultSize;
-    
+
     /** The config of statement. (Nullable) */
     protected StatementConfig _statementConfig;
 
     /** Can the paging re-select? */
     protected boolean _canPagingReSelect = true;
-    
-    // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
+
+    /** The map for free parameters. */
+    protected Map<String, Object> _freeParameterMap;
+
+    // -----------------------------------------------------
+    //                                          Purpose Type
+    //                                          ------------
     protected boolean _forDerivedReferrer;
     protected boolean _forScalarSelect;
     protected boolean _forScalarSubQuery;
     protected boolean _forUnion;
     protected boolean _forExistsSubQuery;
     protected boolean _forInScopeSubQuery;
-    
-    /** The map for free parameters. */
-    protected Map<String, Object> _freeParameterMap;
 
     // ===================================================================================
     //                                                                           SqlClause
@@ -136,11 +138,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
             addWhereClauseSimpleFilter(newToEmbeddedSimpleFilter(embeddedColumnInfoSet));
         }
     }
-    
+
     private WhereClauseSimpleFilter newToEmbeddedQuotedSimpleFilter(Set<ColumnInfo> embeddedColumnInfoSet) {
         return new WhereClauseSimpleFilter.WhereClauseToEmbeddedQuotedSimpleFilter(embeddedColumnInfoSet);
     }
-    
+
     private WhereClauseSimpleFilter newToEmbeddedSimpleFilter(Set<ColumnInfo> embeddedColumnInfoSet) {
         return new WhereClauseSimpleFilter.WhereClauseToEmbeddedSimpleFilter(embeddedColumnInfoSet);
     }
@@ -148,7 +150,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     private void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter) {
         this._sqlClause.addWhereClauseSimpleFilter(whereClauseSimpleFilter);
     }
-    
+
     // ===================================================================================
     //                                                                   Accept PrimaryKey
     //                                                                   =================
@@ -193,11 +195,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected long parseDateStringAsMillis(Object value, String propertyName, String typeName) {
         checkTypeString(value, propertyName, typeName);
         try {
-            final String valueString = (String)value;
+            final String valueString = (String) value;
             if (valueString.indexOf("-") >= 0 && valueString.indexOf("-") != valueString.lastIndexOf("-")) {
                 return java.sql.Timestamp.valueOf(valueString).getTime();
             } else {
-                return getParseDateFormat().parse((String)value).getTime();
+                return getParseDateFormat().parse((String) value).getTime();
             }
         } catch (java.text.ParseException e) {
             String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
@@ -253,7 +255,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         fetchFirst(pageSize);
         fetchPage(pageNumber);
     }
-    
+
     /**
      * {@inheritDoc}
      * @param paging Determination.
@@ -529,7 +531,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().lockForUpdate();
         return this;
     }
-    
+
     // ===================================================================================
     //                                                                        Select Count
     //                                                                        ============
@@ -572,7 +574,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public boolean isSelectCountIgnoreFetchScope() {
         return _isSelectCountIgnoreFetchScope;
     }
-    
+
     // [DBFlute-0.7.4]
     // ===================================================================================
     //                                                                             Specify
@@ -595,9 +597,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
          * @param forScalarSubQuery  Is this for scalar sub-query?
          * @param dbmetaProvider The provider of DB meta. (NotNull)
          */
-        protected AbstractSpecification(ConditionBean baseCB, SpQyCall<CQ> qyCall
-                                      , boolean forDerivedReferrer, boolean forScalarSelect, boolean forScalarSubQuery
-                                      , DBMetaProvider dbmetaProvider) {
+        protected AbstractSpecification(ConditionBean baseCB, SpQyCall<CQ> qyCall, boolean forDerivedReferrer,
+                boolean forScalarSelect, boolean forScalarSubQuery, DBMetaProvider dbmetaProvider) {
             _baseCB = baseCB;
             _qyCall = qyCall;
             _forDerivedReferrer = forDerivedReferrer;
@@ -608,7 +609,9 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
         protected void doColumn(String columnName) {
             assertColumn(columnName);
-            if (_query == null) { _query = _qyCall.qy(); }
+            if (_query == null) {
+                _query = _qyCall.qy();
+            }
             if (isRequiredColumnSpecificationEnabled()) {
                 _alreadySpecifyRequiredColumn = true;
                 doSpecifyRequiredColumn();
@@ -628,18 +631,27 @@ public abstract class AbstractConditionBean implements ConditionBean {
         }
 
         protected void assertColumn(String columnName) {
-            if (_query == null && !_qyCall.has()) { throwSpecifyColumnNotSetupSelectColumnException(columnName); }
+            if (_query == null && !_qyCall.has()) {
+                throwSpecifyColumnNotSetupSelectColumnException(columnName);
+            }
         }
 
         protected void assertForeign(String foreignPropertyName) {
-            if (_forDerivedReferrer) { throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName); }
-            if (_forScalarSelect) { throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName); }
-            if (_forScalarSubQuery) { throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName); }
+            if (_forDerivedReferrer) {
+                throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName);
+            }
+            if (_forScalarSelect) {
+                throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName);
+            }
+            if (_forScalarSubQuery) {
+                throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName);
+            }
         }
 
         protected abstract void doSpecifyRequiredColumn();
+
         protected abstract String getTableDbName();
-        
+
         protected void throwSpecifyColumnNotSetupSelectColumnException(String columnName) {
             ConditionBeanContext.throwSpecifyColumnNotSetupSelectColumnException(_baseCB, getTableDbName(), columnName);
         }
@@ -660,12 +672,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
             return DfSystemUtil.getLineSeparator();
         }
     }
-    
+
     protected static interface SpQyCall<CQ extends ConditionQuery> {
-        public boolean has(); 
-        public CQ qy(); 
+        public boolean has();
+
+        public CQ qy();
     }
-    
+
     /**
      * The function of specify derived-referrer.
      * @param <REFERRER_CB> The condition-bean type of referrer.
@@ -677,10 +690,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
         protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
         protected DBMetaProvider _dbmetaProvider;
 
-        public RAFunction(ConditionBean baseCB
-                        , LOCAL_CQ localCQ
-                        , RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper
-                        , DBMetaProvider dbmetaProvider) {
+        public RAFunction(ConditionBean baseCB, LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper,
+                DBMetaProvider dbmetaProvider) {
             _baseCB = baseCB;
             _localCQ = localCQ;
             _querySetupper = querySetupper;
@@ -758,7 +769,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             assertAliasName(aliasName);
             _querySetupper.setup("min", subQuery, _localCQ, aliasName.trim());
         }
-        
+
         /**
          * Set up the sub query of referrer for the scalar 'sum'.
          * <pre>
@@ -776,7 +787,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             assertAliasName(aliasName);
             _querySetupper.setup("sum", subQuery, _localCQ, aliasName.trim());
         }
-        
+
         /**
          * Set up the sub query of referrer for the scalar 'avg'.
          * <pre>
@@ -825,7 +836,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
         protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
             ConditionBeanContext.throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, entityType);
         }
-        
+
         protected String replaceString(String text, String fromText, String toText) {
             return DfStringUtil.replace(text, fromText, toText);
         }
@@ -844,7 +855,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public void configure(StatementConfig statementConfig) {
         _statementConfig = statementConfig;
     }
-    
+
     /**
      * @return The config of statement. (Nullable)
      */
@@ -862,9 +873,48 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public String toDisplaySql() {
         return ConditionBeanContext.convertConditionBean2DisplaySql(this, getLogDateFormat(), getLogTimestampFormat());
     }
+
     protected abstract String getLogDateFormat();
+
     protected abstract String getLogTimestampFormat();
-    
+
+    // [DBFlute-0.9.5.2]
+    // ===================================================================================
+    //                                                          Basic Status Determination
+    //                                                          ==========================
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasWhereClause() {
+        return getSqlClause().hasWhereClause();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasOrderByClause() {
+        return getSqlClause().hasOrderByClause();
+    }
+
+    // [DBFlute-0.9.5.2]
+    // ===================================================================================
+    //                                                                      Free Parameter
+    //                                                                      ==============
+    /**
+     * Get the map for free parameters for OGNL.
+     * @return The map for free parameters. (Nullable)
+     */
+    public Map<String, Object> getFreeParameterMap() { // Very Internal
+        return _freeParameterMap;
+    }
+
+    public void xregisterFreeParameter(String key, Object value) {
+        if (_freeParameterMap == null) {
+            _freeParameterMap = new LinkedHashMap<String, Object>();
+        }
+        _freeParameterMap.put(key, value);
+    }
+
     // [DBFlute-0.7.4]
     // ===================================================================================
     //                                                                        Purpose Type
@@ -892,25 +942,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     public void xsetupForInScopeSubQuery() { // Very Internal
         _forInScopeSubQuery = true;
     }
-    
-    // [DBFlute-0.9.5.2]
-    // ===================================================================================
-    //                                                                      Free Parameter
-    //                                                                      ==============
-    /**
-     * Get the map for free parameters for OGNL.
-     * @return The map for free parameters. (Nullable)
-     */
-    public Map<String, Object> getFreeParameterMap() { // Very Internal
-        return _freeParameterMap;
-    }
-    
-    public void xregisterFreeParameter(String key, Object value) {
-        if (_freeParameterMap == null) {
-            _freeParameterMap = new LinkedHashMap<String, Object>();
-        }
-        _freeParameterMap.put(key, value);
-    }
 
     // ===================================================================================
     //                                                                       Assist Helper
@@ -920,14 +951,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
         assertSetupSelectBeforeUnion(foreignPropertyName);
         String foreignTableAliasName = callback.qf().getRealAliasName();
         String localRelationPath = localCQ().getRelationPath();
-        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, localRelationPath);
+        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
+                localRelationPath);
         getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
     }
-    
+
     protected static interface SsCall {
         public ConditionQuery qf();
     }
-    
+
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
@@ -956,18 +988,18 @@ public abstract class AbstractConditionBean implements ConditionBean {
             throwSetupSelectAfterUnionException(this.getClass().getSimpleName(), foreignPropertyName);
         }
     }
-    
+
     protected void throwSetupSelectAfterUnionException(String className, String foreignPropertyName) {
         ConditionBeanContext.throwSetupSelectAfterUnionException(className, foreignPropertyName, toDisplaySql());
     }
-    
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String initCap(String str) {
         return DfStringUtil.initCap(str);
     }
-    
+
     protected String getLineSeparator() {
         return DfSystemUtil.getLineSeparator();
     }

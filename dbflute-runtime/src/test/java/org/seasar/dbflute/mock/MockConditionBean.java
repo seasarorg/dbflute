@@ -205,4 +205,12 @@ public class MockConditionBean implements ConditionBean {
 
     }
 
+    public boolean hasOrderByClause() {
+        return false;
+    }
+
+    public boolean hasWhereClause() {
+        return false;
+    }
+
 }

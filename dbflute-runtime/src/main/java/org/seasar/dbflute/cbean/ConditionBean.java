@@ -90,20 +90,11 @@ public interface ConditionBean extends PagingBean {
     public ConditionQuery localCQ();
 
     // ===================================================================================
-    //                                                                         Union Query
-    //                                                                         ===========
-    /**
-     * Has union query or union all query?
-     * @return Determination.
-     */
-    public boolean hasUnionQueryOrUnionAllQuery();
-
-    // =====================================================================================
-    //                                                                          Lock Setting
-    //                                                                          ============
+    //                                                                        Lock Setting
+    //                                                                        ============
     /**
      * Lock for update.
-	 * <p>
+     * <p>
      * If you invoke this, your SQL lock target records for update.
      * It depends whether this method supports this on the database type.
      * </p>
@@ -111,9 +102,9 @@ public interface ConditionBean extends PagingBean {
      */
     public ConditionBean lockForUpdate();
 
-    // =====================================================================================
-    //                                                                          Select Count
-    //                                                                          ============
+    // ===================================================================================
+    //                                                                        Select Count
+    //                                                                        ============
     /**
      * Set up various things for select-count-ignore-fetch-scope. {Internal}
      * This method is for INTERNAL. Don't invoke this!
@@ -134,26 +125,49 @@ public interface ConditionBean extends PagingBean {
      * @return Determination.
      */
     public boolean isSelectCountIgnoreFetchScope();
-	
-    // =====================================================================================
-    //                                                                      Statement Config
-    //                                                                      ================
+
+    // ===================================================================================
+    //                                                                    Statement Config
+    //                                                                    ================
     /**
      * @param statementConfig The config of statement. (Nullable)
      */
-	public void configure(StatementConfig statementConfig);
-	
+    public void configure(StatementConfig statementConfig);
+
     /**
      * @return The config of statement. (Nullable)
      */
-	public StatementConfig getStatementConfig();
+    public StatementConfig getStatementConfig();
 
     // ===================================================================================
     //                                                                         Display SQL
     //                                                                         ===========
-	/**
-	 * Convert this conditionBean to SQL for display.
-	 * @return SQL for display. (NotNull and NotEmpty)
-	 */
-	public String toDisplaySql();
+    /**
+     * Convert this conditionBean to SQL for display.
+     * @return SQL for display. (NotNull and NotEmpty)
+     */
+    public String toDisplaySql();
+
+    // ===================================================================================
+    //                                                          Basic Status Determination
+    //                                                          ==========================
+    /**
+     * Does it have where clauses? <br />
+     * In-line where clause is NOT contained.
+     * @return Determination.
+     */
+    public boolean hasWhereClause();
+
+    /**
+     * Does it have order-by clauses? <br />
+     * Whether effective or not has no influence.
+     * @return Determination.
+     */
+    public boolean hasOrderByClause();
+
+    /**
+     * Has union query or union all query?
+     * @return Determination.
+     */
+    public boolean hasUnionQueryOrUnionAllQuery();
 }
