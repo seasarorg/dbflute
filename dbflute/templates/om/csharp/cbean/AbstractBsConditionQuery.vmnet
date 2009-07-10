@@ -213,15 +213,13 @@ namespace ${glPackageBaseCQ} {
             return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
         }
         protected QDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
-            return new QDRFunction<${relatedCBClassName}>(new QDRSetupper<${relatedCBClassName}>() {
-                public void setup(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value) {
-                    xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
-                }
+            return new QDRFunction<${relatedCBClassName}>(delegate(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+                xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
             });
         }
         public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.XSetupForDerivedReferrer(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
             String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
             registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
@@ -410,15 +408,13 @@ namespace ${glPackageBaseCQ} {
             return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
         }
         protected QDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
-            return new QDRFunction<${relatedCBClassName}>(new QDRSetupper<${relatedCBClassName}>() {
-                public void setup(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value) {
-                    xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
-                }
+            return new QDRFunction<${relatedCBClassName}>(delegate(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
+                xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
             });
         }
         public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
-            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.xsetupForDerivedReferrer(); subQuery.Invoke(cb);
+            ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.XSetupForDerivedReferrer(); subQuery.Invoke(cb);
             String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
             String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
             registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);

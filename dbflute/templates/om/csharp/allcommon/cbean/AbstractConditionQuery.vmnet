@@ -839,9 +839,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
     }
 
-    public interface QDRSetupper<CB> where CB : ConditionBean { // Internal
-        void setup(String function, SubQuery<CB> subQuery, String operand, Object value);
-    }
+    public delegate void QDRSetupper<CB>(String function
+                                       , SubQuery<CB> subQuery
+                                       , String operand
+                                       , Object value) where CB : ConditionBean;
 
     public class QDRParameter<CB, PARAMETER> where CB : ConditionBean { // Internal
         protected String _function;
