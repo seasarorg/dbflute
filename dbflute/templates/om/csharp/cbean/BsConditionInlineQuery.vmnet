@@ -169,7 +169,7 @@ namespace ${glPackageCIQ} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
         public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-            throw new UnsupportedOperationException("SpecifyDerivedReferrer at inline() is unsupported! Sorry!");
+            throw new UnsupportedOperationException("(Specify)DerivedReferrer at inline() is unsupported! Sorry!");
         }
 #end
 #end
@@ -181,10 +181,10 @@ namespace ${glPackageCIQ} {
 #set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
-        public String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
             throw new UnsupportedOperationException("(Query)DerivedReferrer at inline() is unsupported! Sorry!");
         }
-        public String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue) {
+        public override String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue) {
             throw new UnsupportedOperationException("(Query)DerivedReferrer at inline() is unsupported! Sorry!");
         }
 #end
@@ -288,7 +288,23 @@ namespace ${glPackageCIQ} {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_SpecifyDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
         public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
-            throw new UnsupportedOperationException("SpecifyDerivedReferrer at inline() is unsupported! Sorry!");
+            throw new UnsupportedOperationException("(Specify)DerivedReferrer at inline() is unsupported! Sorry!");
+        }
+#end
+#end
+#end
+#if (${col.hasSingleKeyReferrer()})
+#foreach ($referrer in $col.singleKeyReferrers)
+#if (!${referrer.isOneToOne()})
+#set ($relatedCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($relatedCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+#set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+#set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
+        public override String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery) {
+            throw new UnsupportedOperationException("(Query)DerivedReferrer at inline() is unsupported! Sorry!");
+        }
+        public override String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue) {
+            throw new UnsupportedOperationException("(Query)DerivedReferrer at inline() is unsupported! Sorry!");
         }
 #end
 #end
