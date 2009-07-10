@@ -220,9 +220,9 @@ namespace ${glPackageBaseCQ} {
         public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.XSetupForDerivedReferrer(); subQuery.Invoke(cb);
-            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query()); // for saving query-value.
             String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
-            registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
+            registerQueryDerivedReferrer(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
         public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue);
@@ -415,9 +415,9 @@ namespace ${glPackageBaseCQ} {
         public void xqderive${referrer.referrerPropertyNameInitCap}(String function, ${glSubQuery}<${relatedCBClassName}> subQuery, String operand, Object value) {
             assertObjectNotNull("subQuery<${relatedCBClassName}>", subQuery);
             ${relatedCBClassName} cb = new ${relatedCBClassName}(); cb.XSetupForDerivedReferrer(); subQuery.Invoke(cb);
-            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.query()); // for saving query-value.
+            String subQueryPropertyName = keep${subQueryPropertyNameInitCap}(cb.Query()); // for saving query-value.
             String parameterPropertyName = keep${subQueryPropertyNameInitCap}Parameter(value);
-            registerQueryDerivedReferrer(function, cb.query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
+            registerQueryDerivedReferrer(function, cb.Query(), "${col.name}", "${referrer.firstLocalColumnName}", subQueryPropertyName, operand, value, parameterPropertyName);
         }
         public abstract String keep${subQueryPropertyNameInitCap}(${relatedCQClassName} subQuery);
         public abstract String keep${subQueryPropertyNameInitCap}Parameter(Object parameterValue);
