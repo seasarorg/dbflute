@@ -2,24 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using ${glPackageBaseCommonJavaLike};
+
 namespace ${glPackageBaseCommonHelper}
 {
-    public class IllegalStateException : ApplicationException
-    {
-        public IllegalStateException(string message)
-            : base(message)
-        {
-        }
-    }
-
-    public class IllegalArgumentException : ApplicationException
-    {
-        public IllegalArgumentException(string message)
-            : base(message)
-        {
-        }
-    }
-
     public class ${glMapListStringImpl} : ${glMapListString}
     {
         public  string NEW_LINE
