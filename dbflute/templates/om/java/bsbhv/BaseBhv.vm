@@ -403,6 +403,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #end
 #end
 #end
+#end
 #if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
 #foreach ($processName in $table.tableProcessForMethodNameList)
 #set ($referrerEntityClassName = "${glProjectPrefix}BuriAllRoundStateHistory")
@@ -452,7 +453,6 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         });
     }
 
-#end
 #end
 #end
     // ===================================================================================
