@@ -313,6 +313,13 @@ namespace ${glPackageCIQ} {
 #end
 #if ($table.hasOnlyOnePrimaryKey())
 
+        // ===================================================================================
+        //                                                                     Scalar SubQuery
+        //                                                                     ===============
+        public override String keepScalarSubQuery(${myConditionQueryClassName} subQuery) {
+            throw new UnsupportedOperationException("ScalarSubQuery at inline() is unsupported! Sorry!");
+        }
+
         // ===============================================================================
         //                                                         Myself InScope SubQuery
         //                                                         =======================

@@ -952,7 +952,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String deriveRealColumnName;
         {
             String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
-            if (deriveColumnName == null || deriveColumnName.Trim.Length == 0) {
+            if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
                 throwScalarSubQueryInvalidColumnSpecificationException(function);
             }
             deriveRealColumnName = getScalarSubQueryRealColumnName(deriveColumnName);
@@ -980,13 +980,13 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
-        if (deriveColumnName == null || deriveColumnName.Trim.Length == 0) {
+        if (deriveColumnName == null || deriveColumnName.Trim().Length == 0) {
             throwScalarSubQueryInvalidColumnSpecificationException(function);
         }
         assertScalarSubQueryColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         ${glDBMeta} dbmeta = findDBMeta(subQuery.getTableDbName());
-        if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
+        if (!dbmeta.HasPrimaryKey || dbmeta.HasTwoOrMorePrimaryKeys) {
             String msg = "The scalar-sub-query is unsupported when no primary key or two-or-more primary keys:";
             msg = msg + " table=" + subQuery.getTableDbName();
             throw new UnsupportedOperationException(msg);
@@ -1027,8 +1027,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
     }
 
-    protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
-        ConditionBeanContext.throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+    protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName, Type deriveColumnType) {
+        ConditionBeanContext.ThrowScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
     }
 
     public class SSQFunction<CB> where CB : ${glConditionBean} { // Internal

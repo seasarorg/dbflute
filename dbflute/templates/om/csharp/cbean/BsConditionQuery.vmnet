@@ -499,6 +499,17 @@ namespace ${glPackageBaseCQ} {
 #end
 #if ($table.hasOnlyOnePrimaryKey())
 
+	    // ===============================================================================
+	    //                                                                 Scalar SubQuery
+	    //                                                                 ===============
+	    protected Map<String, ${myConditionQueryClassName}> _scalarSubQueryMap;
+	    public Map<String, ${myConditionQueryClassName}> ScalarSubQuery { get { return _scalarSubQueryMap; } }
+	    public String keepScalarSubQuery(${myConditionQueryClassName} subQuery) {
+	        if (_scalarSubQueryMap == null) { _scalarSubQueryMap = new LinkedHashMap<String, ${myConditionQueryClassName}>(); }
+	        String key = "subQueryMapKey" + (_scalarSubQueryMap.size() + 1);
+	        _scalarSubQueryMap.put(key, subQuery); return "ScalarSubQuery." + key;
+	    }
+
         // ===============================================================================
         //                                                         Myself InScope SubQuery
         //                                                         =======================

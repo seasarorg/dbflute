@@ -474,6 +474,43 @@ namespace ${glPackageBaseCQ} {
 #end
 #if ($table.hasOnlyOnePrimaryKey())
 
+        // ===================================================================================
+        //                                                                     Scalar SubQuery
+        //                                                                     ===============
+        public SSQFunction<${myConditionBeanClassName}> Scalar_Equal() {
+            return xcreateSSQFunction("=");
+        }
+    
+        public SSQFunction<${myConditionBeanClassName}> Scalar_GreaterEqual() {
+            return xcreateSSQFunction(">=");
+        }
+    
+        public SSQFunction<${myConditionBeanClassName}> Scalar_GreaterThan() {
+            return xcreateSSQFunction(">");
+        }
+    
+        public SSQFunction<${myConditionBeanClassName}> Scalar_LessEqual() {
+            return xcreateSSQFunction("<=");
+        }
+        
+        public SSQFunction<${myConditionBeanClassName}> Scalar_LessThan() {
+            return xcreateSSQFunction("<");
+        }
+        
+        protected SSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(final String operand) {
+            return new SSQFunction<${myConditionBeanClassName}>(delegate(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery) {
+                xscalarSubQuery(function, subQuery, operand);
+            });
+        }
+    
+        protected void xscalarSubQuery(String function, ${glSubQuery}<${myConditionBeanClassName}> subQuery, String operand) {
+            assertObjectNotNull("subQuery<${myConditionBeanClassName}>", subQuery);
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); cb.xsetupForScalarSubQuery(); subQuery.Invoke(cb);
+            String subQueryPropertyName = keepScalarSubQuery(cb.Query()); // for saving query-value.
+            registerScalarSubQuery(function, cb.Query(), subQueryPropertyName, operand);
+        }
+        public abstract String keepScalarSubQuery(${myConditionQueryClassName} subQuery);
+
         // ===============================================================================
         //                                                         MySelf InScope SubQuery
         //                                                         =======================
