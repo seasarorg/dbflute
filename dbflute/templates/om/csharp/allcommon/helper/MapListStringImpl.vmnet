@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using ${glPackageBaseCommonJavaLike};
-
 namespace ${glPackageBaseCommonHelper}
 {
     public class ${glMapListStringImpl} : ${glMapListString}
@@ -156,7 +154,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # remainderString --> " + _remainderString;
                 msg = msg + getNewLineAndIndent() + " # mapString --> " + mapString;
                 msg = msg + getNewLineAndIndent() + " # generatedMap --> " + generatedMap;
-                throw new IllegalStateException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalStateException(msg);
             }
             return generatedMap;
         }
@@ -185,7 +183,7 @@ namespace ${glPackageBaseCommonHelper}
                 msg = msg + getNewLineAndIndent() + " # remainderString --> " + _remainderString;
                 msg = msg + getNewLineAndIndent() + " # listString --> " + listString;
                 msg = msg + getNewLineAndIndent() + " # generatedList --> " + generatedList;
-                throw new IllegalStateException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalStateException(msg);
             }
             return generatedList;
         }
@@ -400,27 +398,27 @@ namespace ${glPackageBaseCommonHelper}
             if (_remainderString == null)
             {
                 String msg = "Argument[remainderString] must not be null: " + _remainderString;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
             removeBothSideSpaceAndTabAndNewLine();
             if (prefixString == null)
             {
                 String msg = "Argument[prefixString] must not be null: " + prefixString;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
             if (_remainderString.Length < prefixString.Length)
             {
                 String msg = "Argument[remainderString] length must be larger than Argument[prefixString] length:";
                 msg = msg + getNewLineAndIndent() + " # remainderString --> " + _remainderString;
                 msg = msg + getNewLineAndIndent() + " # prefixString=" + prefixString;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
             if (!_remainderString.StartsWith(prefixString))
             {
                 String msg = "Argument[remainderString] must start with Argument[prefixString:]";
                 msg = msg + getNewLineAndIndent() + " # remainderString --> " + _remainderString;
                 msg = msg + getNewLineAndIndent() + " # prefixString --> " + prefixString;
-                throw new IllegalArgumentException(msg);
+                throw new ${glPackageBaseCommonJavaLike}.IllegalArgumentException(msg);
             }
             
             _remainderString = _remainderString.Substring(prefixString.Length);
