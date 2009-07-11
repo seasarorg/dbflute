@@ -412,7 +412,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     }
 
     /**
-     * @return The view string with one-nested relations. (NotNull)
+     * @return The view string of basic informations with one-nested relations. (NotNull)
      */
     public String toStringWithRelation() {
         StringBuilder sb = new StringBuilder();
