@@ -1,6 +1,9 @@
 ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
+import java.io.Serializable;
+import javax.persistence.*;
+
 #foreach ($foreignKeys in $table.ForeignKeys)
 #set ($foreignEntityClassName = "${foreignKeys.foreignTable.javaName}")
 import ${myExtendedEntityPackageName}.${foreignEntityClassName};
@@ -45,8 +48,8 @@ import ${myExtendedEntityPackageName}.${referrerEntityClassName};
  * </pre>
  * @author ${database.ClassAuthor}
  */
-@javax.persistence.MappedSuperclass
-public abstract class ${myClassName} implements java.io.Serializable {
+@MappedSuperclass
+public abstract class ${myClassName} implements Serializable {
 
     // ===================================================================================
     //                                                                          Definition
@@ -60,25 +63,25 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #foreach ($col in $table.columns)
     /** Property for ${col.javaBeansRulePropertyName} column. {${col.columnDefinitionLineDisp}} */
 #if ($col.isPrimaryKey())
-    @javax.persistence.Id
+    @Id
 #end
 #if ($col.isIdentity())
-    @javax.persistence.GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 #end
 #if ($col.isJdbcTypeDate())
-    @javax.persistence.Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(javax.persistence.TemporalType.DATE)
 #end
 #if ($col.isJdbcTypeTime())
-    @javax.persistence.Temporal(javax.persistence.TemporalType.TIME)
+    @Temporal(javax.persistence.TemporalType.TIME)
 #end
 #if ($col.isJdbcTypeTimestamp())
-    @javax.persistence.Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
 #end
 #if ($col.isJdbcTypeBlob() && $col.isJdbcTypeClob())
-    @javax.persistence.Lob
+    @Lob
 #end
 #if ($table.isUseVersionNo() && $col.isVersionNo())
-    @javax.persistence.Version
+    @Version
 #end
     public ${col.javaNative} ${col.uncapitalisedJavaName};
     
@@ -86,15 +89,25 @@ public abstract class ${myClassName} implements java.io.Serializable {
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============
-#foreach ($foreignKeys in $table.ForeignKeys)
-#set ($foreignEntityClassName = "${foreignKeys.foreignTable.javaName}")
-    /** Foreign property for ${foreignKeys.foreignTable.name} table. */
-    @javax.persistence.ManyToOne
-#if ($foreignKeys.isSimpleKeyFK())
-    @javax.persistence.JoinColumn(name="${foreignKeys.localColumnNameAsOne}")
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignEntityClassName = "${foreignKey.foreignTable.javaName}")
+    /** Foreign property for ${foreignKey.foreignTable.name} table. */
+    @ManyToOne
+#if ($foreignKey.isSimpleKeyFK())
+    @JoinColumn(name="${foreignKey.localColumnNameAsOne}")
 #end
-    public ${foreignEntityClassName} ${foreignKeys.foreignPropertyName};
+    public ${foreignEntityClassName} ${foreignKey.foreignPropertyName};
 
+#end
+#foreach ($referrer in $table.referrers)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.table.javaName}")
+#if (${referrer.isOneToOne()})
+    /** Foreign property(referrer-as-one) for ${referrerTable.name} table. */
+    @OneToOne(mappedBy = "${referrer.foreignPropertyName}")
+    public ${referrerEntityClassName} ${referrer.referrerPropertyNameAsOneS2Jdbc};
+
+#end
 #end
     // ===================================================================================
     //                                                                      Referrer Table
@@ -102,14 +115,9 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.table.javaName}")
-#if (${referrer.isOneToOne()})
+#if (!${referrer.isOneToOne()})
     /** Referrer property for ${referrerTable.name} table. */
-    @javax.persistence.OneToOne(mappedBy = "${referrer.foreignPropertyName}")
-    public ${referrerEntityClassName} ${referrer.referrerPropertyNameAsOneS2Jdbc};
-
-#else
-    /** Referrer property for ${referrerTable.name} table. */
-    @javax.persistence.OneToMany(mappedBy = "${referrer.foreignPropertyName}")
+    @OneToMany(mappedBy = "${referrer.foreignPropertyName}")
     public java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName};
 
 #end
@@ -127,7 +135,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
         if (other == null || !(other instanceof $myClassName)) { return false; }
         $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.primaryKey)
-        if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
+        if (!helpComparingValue(${col.uncapitalisedJavaName}, otherEntity.${col.uncapitalisedJavaName})) { return false; }
 #end
         return true;
     }
@@ -144,38 +152,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
     public int hashCode() {
         int result = 17;
 #foreach ($col in $table.primaryKey)
-        if (get${col.JavaName}() != null) { result = (31*result) + get${col.JavaName}().hashCode(); }
-#end
-        return result;
-    }
-#else
-    /**
-     * If the all-column value of the other is same as this one, returns true.
-     * @param other Other entity. (Nullable)
-     * @return Comparing result. If other is null, returns false.
-     */
-    public boolean equals(Object other) {
-        if (other == null || !(other instanceof $myClassName)) { return false; }
-        final $myClassName otherEntity = ($myClassName)other;
-#foreach ($col in $table.columns)
-        if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
-#end
-        return true;
-    }
-
-    protected boolean helpComparingValue(Object value1, Object value2) {
-        if (value1 == null && value2 == null) { return true; }
-        return value1 != null && value2 != null && value1.equals(value2);
-    }
-
-    /**
-     * Calculates hash-code from all columns.
-     * @return Hash-code from all columns.
-     */
-    public int hashCode() {
-        int result = 17;
-#foreach ($col in $table.columns)
-        if (get${col.javaName}() != null) { result = (31*result) + get${col.javaName}().hashCode(); }
+        if (${col.uncapitalisedJavaName} != null) { result = (31*result) + ${col.uncapitalisedJavaName}.hashCode(); }
 #end
         return result;
     }
@@ -188,7 +165,7 @@ public abstract class ${myClassName} implements java.io.Serializable {
         String delimiter = ",";
         StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
-        sb.append(delimiter).append(get${col.javaName}());
+        sb.append(delimiter).append(${col.uncapitalisedJavaName});
 #end
         if (sb.length() > 0) { sb.delete(0, delimiter.length()); }
         sb.insert(0, "{").append("}");

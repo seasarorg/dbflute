@@ -49,10 +49,6 @@ public final class DfS2jdbcProperties extends DfAbstractHelperProperties {
         return getEntityPropertyIfNullEmpty("baseEntityPrefix");
     }
 
-    public String getBaseEntitySuffix() {
-        return getEntityPropertyIfNullEmpty("baseEntitySuffix");
-    }
-
     protected String getEntityPropertyRequired(String key) {
         final String value = getEntityProperty(key);
         if (value == null || value.trim().length() == 0) {

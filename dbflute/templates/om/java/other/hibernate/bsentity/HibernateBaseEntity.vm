@@ -2,7 +2,6 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
 import java.io.Serializable;
-import java.util.*;
 import javax.persistence.*;
 
 #if (${table.hasAllCommonColumn()})
@@ -79,7 +78,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     @Id
 #end
 #if ($col.isIdentity())
-    @GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 #end
 #if ($col.isJdbcTypeDate())
     @Temporal(javax.persistence.TemporalType.DATE)
@@ -210,14 +209,16 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============
-#foreach ($foreignKey in $table.ForeignKeys)
-#set ($foreignEntityClassName = "${foreignKeys.foreignTable.javaName}")
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignTable = $foreignKey.foreignTable)
+#set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
     /** ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'. */
     @ManyToOne(fetch=FetchType.${database.hibernateManyToOneFetch})
 #if ($foreignKey.isSimpleKeyFK())
-    @JoinColumn(name="${foreignKeys.localColumnNameAsOne}")
+    @JoinColumn(name="${foreignKey.localColumnNameAsOne}")
 #end
-    protected ${foreignEntityClassName} ${foreignKeys.foreignPropertyName};
+    protected ${foreignEntityClassName} ${foreignVariableName};
 
     /**
      * ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'.
@@ -234,14 +235,13 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
         ${foreignVariableName} = ${foreignKey.foreignPropertyName};
     }
-#end
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerJavaBeansRulePropertyNameAsOne}")
+#set ($referrerVariableName = "_${referrer.referrerJavaBeansRulePropertyNameAsOne}")
 #if (${referrer.isOneToOne()})
     /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. */
     @OneToOne(mappedBy = "${referrer.foreignPropertyName}", fetch=FetchType.${database.hibernateOneToOneFetch})
@@ -262,34 +262,27 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
         ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
     }
-#if ($database.isMakeEntityTraceRelation())
-
-    public ${referrerEntityClassName} trace${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
-        return ${referrerVariableName} != null ? ${referrerVariableName} : new ${referrerEntityClassName}();
-    }
-#end
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
 #end
 #end
-
     // ===================================================================================
     //                                                                      Referrer Table
     //                                                                      ==============
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
-#set ($referrerEntityClassName = "${referrer.table.javaName}")
+#set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
 #if (!${referrer.isOneToOne()})
     /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. */
     @OneToMany(mappedBy = "${referrer.foreignPropertyName}", fetch=FetchType.${database.hibernateOneToManyFetch})
-    protected List<${referrerEntityClassName}> $referrerVariableName;
+    protected java.util.List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
      * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. <br />
      * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
-    public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
-        if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
+    public java.util.List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
         return ${referrerVariableName};
     }
 
@@ -297,7 +290,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (Nullable)
      */
-    public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
+    public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
         ${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 
@@ -393,21 +386,6 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #else
 
 #end
-#if ($database.isMakeEntityS2DaoAnnotation())
-    /** The column annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
-    public static final String ${col.javaBeansRulePropertyName}_COLUMN = "${col.name}";
-
-#end
-#if ($col.isJavaNativeStringClob())
-    /** The value type annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
-    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "stringClobType";
-
-#end
-#if ($col.isJavaNativeBytesOid())
-    /** The value type annotation for S2Dao. {${col.columnDefinitionLineDisp}} */
-    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "bytesOidType";
-
-#end
     /**
      * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($col.isCommentForJavaDocValid())
@@ -427,7 +405,6 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * @param ${col.UncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
-        _modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
         this._${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
     }
 #set ($propertyLoopIndex = $propertyLoopIndex + 1)

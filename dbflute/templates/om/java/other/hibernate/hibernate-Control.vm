@@ -25,7 +25,7 @@ $database.checkProperties()
 ## ===================================================================================
 ##                                                                  Resource Directory
 ##                                                                  ==================
-#set ($glResourceDirectory = ${database.resourceDirectory}/other/hibernate)
+#set ($glResourceDirectory = "${database.resourceDirectory}/other/hibernate")
 
 ## ===================================================================================
 ##                                                                           Extension
@@ -58,15 +58,6 @@ $database.checkProperties()
 #set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
 #set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
 #set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
-
-## ===================================================================================
-##                                                                            Variable
-##                                                                            ========
-#set ($glConditionBeanInitialName = "CB")
-#set ($glConditionQueryInitialName = "CQ")
-#set ($glAttachedCBArgsVariableName = "cb")
-#set ($glParentVariablePrefix = "_parent")
-#set ($glChildrenVariablePrefix = "_children")
 
 ## ===================================================================================
 ##                                                                             Package
@@ -111,18 +102,6 @@ $database.makeDirectory($path)
   $generator.parse("om/${glResourceDirectory}/allcommon/CDef.${glTemplateFileExtension}",$path ,"" ,"")
 #end
 
-#$database.info("    parse('DBCurrent');")
-##set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBCurrent}.${glClassFileExtension}" )
-#$generator.parse("om/${glResourceDirectory}/allcommon/DBCurrent.${glTemplateFileExtension}",$path ,"" ,"")
-
-#$database.info("    parse('DBFluteConfig');")
-##set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteConfig}.${glClassFileExtension}" )
-#$generator.parse("om/${glResourceDirectory}/allcommon/DBFluteConfig.${glTemplateFileExtension}",$path ,"" ,"")
-
-#$database.info("    parse('DBMetaInstanceHandler');")
-##set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBMetaInstanceHandler}.${glClassFileExtension}" )
-#$generator.parse("om/${glResourceDirectory}/allcommon/DBMetaInstanceHandler.${glTemplateFileExtension}",$path,"", "")
-
 $database.info("    parse('EntityDefinedCommonColumn');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntityDefinedCommonColumn}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/EntityDefinedCommonColumn.${glTemplateFileExtension}",$path ,"", "")
@@ -139,12 +118,12 @@ $database.info("}")
 
   #set ($path = $strings.getPackageAsPath(${myBaseEntityPackageName}))
   $database.makeDirectory($path)
-  
+
   #set ($path = $strings.getPackageAsPath(${myExtendedEntityPackageName}))
   $database.makeDirectory($path)
 
   #foreach ($table in $database.tables)
-    #set ($myBaseObjectClassName = "${database.hibernateBaseEntityPrefix}${table.javaName}${database.hibernateBaseEntitySuffix}")
+    #set ($myBaseObjectClassName = "${database.hibernateBaseEntityPrefix}${table.javaName}")
     #set ($myExtendedObjectClassName = "${table.javaName}")
 
     $database.debug("    parse('${myExtendedObjectClassName}')")

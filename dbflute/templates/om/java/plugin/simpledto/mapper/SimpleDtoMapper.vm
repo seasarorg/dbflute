@@ -113,7 +113,7 @@ public class ${myClassName} {
 #end
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameInitCap}")
 #set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
 #if (${referrer.isOneToOne()})
         if (${table.uncapitalisedJavaName}.get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() != null) {

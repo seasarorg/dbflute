@@ -262,7 +262,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignTable = $foreignKey.foreignTable)
 #set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
-#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
 #if ($database.isMakeEntityS2DaoAnnotation())
     public static final int ${foreignKey.foreignJavaBeansRulePropertyName}_RELNO = ${table.resolveForeignIndex($foreignKey)};
     public static final String ${foreignKey.foreignJavaBeansRulePropertyName}_RELKEYS = "$foreignKey.relationKeysCommaString";
@@ -298,7 +298,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerJavaBeansRulePropertyNameAsOne}")
+#set ($referrerVariableName = "_${referrer.referrerJavaBeansRulePropertyNameAsOne}")
 #if (${referrer.isOneToOne()})
 #if ($database.isMakeEntityS2DaoAnnotation())
     public static final int ${referrer.referrerJavaBeansRulePropertyNameAsOne}_RELNO = ${table.resolveReferrerIndexAsOne($referrer)};
@@ -340,7 +340,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if (!${referrer.isOneToOne()})
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.refererTableExtendedEntityClassName}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
     /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. */
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
@@ -366,7 +366,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
 #foreach ($processName in $table.tableProcessForMethodNameList)
 #set ($referrerEntityClassName = "${glProjectPrefix}BuriAllRoundStateHistory")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}BuriAllRoundStateHistory_${processName}")
+#set ($referrerVariableName = "_buriAllRoundStateHistory_${processName}")
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
     public List<${referrerEntityClassName}> getBuriAllRoundStateHistory_${processName}List() {

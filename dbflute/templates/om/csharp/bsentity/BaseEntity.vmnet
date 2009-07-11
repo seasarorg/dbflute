@@ -210,7 +210,7 @@ namespace ${myExtendedEntityPackageName} {
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignTable = $foreignKey.foreignTable)
 #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKey.foreignTable.JavaName}")
-#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyNameInitCap}")
         protected ${foreignEntityClassName} ${foreignVariableName};
 
         /// <summary>${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignPropertyNameInitCap}'.</summary>
@@ -226,7 +226,7 @@ namespace ${myExtendedEntityPackageName} {
 #if (${referrer.isOneToOne()})
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameAsOne}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
         protected ${referrerEntityClassName} ${referrerVariableName};
 
         /// <summary>${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerPropertyNameInitCapAsOne}'.</summary>
@@ -249,7 +249,7 @@ namespace ${myExtendedEntityPackageName} {
 #if (!${referrer.isOneToOne()})
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.ReferrerPropertyNameInitCap}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameInitCap}")
         protected IList<${referrerEntityClassName}> $referrerVariableName;
 
         /// <summary>${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerPropertyNameInitCap}'.</summary>

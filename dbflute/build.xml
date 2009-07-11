@@ -47,6 +47,7 @@
 	<property name="dbflute.ymir.example.dir" value="${workspace.base}/dbflute-ymir-example"/>
 	<property name="dbflute.sastruts.example.dir" value="${workspace.base}/dbflute-sastruts-example"/>
 	<property name="dbflute.buri.example.dir" value="${workspace.base}/dbflute-buri-example"/>
+	<property name="dbflute.hibernate.example.dir" value="${workspace.base}/dbflute-hibernate-example"/>
 	<property name="dbflute.s2jdbc.example.dir" value="${workspace.base}/dbflute-s2jdbc-example"/>
 	<property name="dbflute.flex.example.dir" value="${workspace.base}/dbflute-flexserver-example"/>
 
@@ -247,6 +248,10 @@
 
 	<target name="reflect-mac-ymir" depends="deploy-dist" description="==> reflect to ymir example">
 	  	<copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	</target>
+
+	<target name="reflect-mac-hibernate" depends="deploy-dist" description="==> reflect to hibernate example">
+	  	<copy todir="${dbflute.hibernate.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
 	<target name="reflect-mac-s2jdbc" depends="deploy-dist" description="==> reflect to s2jdbc example">

@@ -68,8 +68,6 @@ $database.initializeClassificationDeployment()
 #set ($glConditionBeanInitialName = "CB")
 #set ($glConditionQueryInitialName = "CQ")
 #set ($glAttachedCBArgsVariableName = "cb")
-#set ($glParentVariablePrefix = "_parent")
-#set ($glChildrenVariablePrefix = "_children")
 
 ## ===================================================================================
 ##                                                                             Package

@@ -65,6 +65,7 @@ import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
 import org.seasar.dbflute.logic.sqlfile.SqlFileNameResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
+import org.seasar.dbflute.properties.DfHibernateProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfS2jdbcProperties;
@@ -163,6 +164,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.info("* * * * * * * * * * * * * * *");
             final String control = littleProp.getAlternateSql2EntityControl();
             _log.info("...Using alternate control: " + control);
+            setControlTemplate(control);
+            return;
+        }
+        final DfHibernateProperties hibernateProperties = DfBuildProperties.getInstance().getHibernateProperties();
+        if (hibernateProperties.hasHibernateDefinition()) {
+            _log.info("* * * * * * * * * * *");
+            _log.info("* Process Hibernate *");
+            _log.info("* * * * * * * * * * *");
+            final String control = "om/java/other/hibernate/hibernate-sql2entity-Control.vm";
+            _log.info("...Using hibernate control: " + control);
             setControlTemplate(control);
             return;
         }

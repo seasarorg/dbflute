@@ -47,15 +47,6 @@ $database.initializeIncludeQuery()
 #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
 
 ## ===================================================================================
-##                                                                            Variable
-##                                                                            ========
-#set ($glConditionBeanInitialName = "CB")
-#set ($glConditionQueryInitialName = "CQ")
-#set ($glAttachedCBArgsVariableName = "cb")
-#set ($glParentVariablePrefix = "_parent")
-#set ($glChildrenVariablePrefix = "_children")
-
-## ===================================================================================
 ##                                                                             Package
 ##                                                                             =======
 ## [Common]
@@ -143,7 +134,7 @@ $database.initializeIncludeQuery()
   $database.makeDirectory($path)
 
   #foreach ($table in $database.tables)
-    #set ($myBaseObjectClassName = "${database.s2jdbcBaseEntityPrefix}${table.javaName}${database.s2jdbcBaseEntitySuffix}")
+    #set ($myBaseObjectClassName = "${database.s2jdbcBaseEntityPrefix}${table.javaName}")
     #set ($myExtendedObjectClassName = "${table.javaName}")
 
     $database.debug("    parse('${myExtendedObjectClassName}')")

@@ -52,7 +52,7 @@ public class $myClassName {
     //                                                                       Foreign Table
     //                                                                       =============
 #foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKey.foreignPropertyNameInitCap}")
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
 #set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKey.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
     private var ${foreignVariableName}:${foreignEntityClassName};
 
@@ -67,7 +67,7 @@ public class $myClassName {
 #end
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
 #if ($referrer.isOneToOne())
     private var ${referrerVariableName}:${referrerEntityClassName};
 
@@ -85,7 +85,7 @@ public class $myClassName {
     //                                                                      ==============
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
 #set ($referrerEntityLongClassName = "${referrerEntityClassName}")
 #if (!${referrer.isOneToOne()})
     ${referrerEntityClassName};

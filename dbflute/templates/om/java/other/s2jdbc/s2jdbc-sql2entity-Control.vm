@@ -56,16 +56,9 @@
   #set ($glPackageExtendedEntity = "${database.extendedEntityPackage}")
 #end
 
-## [Other]
-#set ($glConditionBeanInitialName = "CB")
-#set ($glConditionQueryInitialName = "CQ")
-#set ($glAttachedCBArgsVariableName = "cb")
-#set ($glParentVariablePrefix = "_parent")
-#set ($glChildrenVariablePrefix = "_children")
-
 ## -----------------------------------------------------------------------------------------------------
-##                                                                                 Parse cutomize entity
-##                                                                                 ---------------------
+##                                                                                Parse customize entity
+##                                                                                ----------------------
 ## Setup output directory.
 $database.enableSql2EntityOutputDirectory()
 
@@ -85,7 +78,7 @@ $database.debug("public void parseCustomizeEntity() {")
 $database.debug("    final List<String> tableNameList = getTableList();")
 $database.debug("    for (String tableName : tableNameList) {")
 #foreach ($table in $database.tableList)
-  #set ($myBaseObjectClassName = "${database.s2jdbcBaseEntityPrefix}${table.javaName}${database.s2jdbcBaseEntitySuffix}")
+  #set ($myBaseObjectClassName = "${database.s2jdbcBaseEntityPrefix}${table.javaName}")
   #set ($myBaseEntityPackageName = "${glPackageBaseCustomizeEntity}")
   #set ($myExtendedObjectClassName = "${table.javaName}")
   #set ($myExtendedEntityPackageName = "${glPackageExtendedCustomizeEntity}")
@@ -125,7 +118,7 @@ $database.debug("    for (DfParameterBeanMetaData parameterBean : parameterBeanL
   #foreach ($pmbMetaData in $database.pmbMetaDataList)
     #set ($pmbClassName = "$pmbMetaData.className")
     #set ($pmbSuperClassName = "$pmbMetaData.superClassName")
-    #set ($myBaseParameterBeanClassName = "${database.s2jdbcBaseEntityPrefix}${pmbClassName}${database.s2jdbcBaseEntitySuffix}")
+    #set ($myBaseParameterBeanClassName = "${database.s2jdbcBaseEntityPrefix}${pmbClassName}")
     #set ($myExtendedParameterBeanClassName = "${pmbClassName}")
 
     $database.debug("        parseBaseParameterBean(parameterBean);     // ${myBaseParameterBeanClassName}")

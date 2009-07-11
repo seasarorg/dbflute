@@ -1605,6 +1605,18 @@ public class Database {
         return getProperties().getHibernateProperties().hasHibernateDefinition();
     }
 
+    public String getHibernateBaseEntityPackage() {
+        return getBaseEntityPackage();
+    }
+
+    public String getHibernateExtendedEntityPackage() {
+        return getExtendedEntityPackage();
+    }
+
+    public String getHibernateBaseEntityPrefix() {
+        return getBasePrefix();
+    }
+
     public String getHibernateManyToOneFetch() {
         return getProperties().getHibernateProperties().getManyToOneFetch();
     }
@@ -1612,7 +1624,7 @@ public class Database {
     public String getHibernateOneToOneFetch() {
         return getProperties().getHibernateProperties().getOneToOneFetch();
     }
-    
+
     public String getHibernateOneToManyFetch() {
         return getProperties().getHibernateProperties().getOneToManyFetch();
     }
@@ -1634,10 +1646,6 @@ public class Database {
 
     public String getS2jdbcBaseEntityPrefix() {
         return getProperties().getS2jdbcProperties().getBaseEntityPrefix();
-    }
-
-    public String getS2jdbcBaseEntitySuffix() {
-        return getProperties().getS2jdbcProperties().getBaseEntitySuffix();
     }
 
     // ===================================================================================

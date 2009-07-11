@@ -159,7 +159,6 @@ namespace ${glPackageExtendedBhv} {
 #set ($referrerBhvClassName = "")
 #set ($referrerBhvClassName = "${referrerEntityClassName}Bhv")
 #set ($referrerCBClassName = "${referrerEntityClassName}${glConditionBeanInitialName}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
 #set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
 #set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
 #set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, IList<${referrerEntityClassName}>")

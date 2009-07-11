@@ -67,33 +67,33 @@ public abstract class $myClassName implements java.io.Serializable {
     //                                                                       Foreign Table
     //                                                                       =============
 #set ($foreignKeysIndex = 0)
-#foreach ($foreignKeys in $table.foreignKeys)
-#set ($foreignVariableName = "${glParentVariablePrefix}${foreignKeys.foreignPropertyNameInitCap}")
-#set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKeys.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+#set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${foreignKey.foreignTable.javaName}${database.simpleDtoExtendedDtoSuffix}")
     /** The entity of foreign table. */
     protected ${foreignEntityClassName} ${foreignVariableName};
 
     /**
-     * Get the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}. {without lazyload}
+     * Get the entity of foreign table of ${foreignKey.foreignJavaBeansRulePropertyName}. {without lazyload}
      * @return The entity of foreign table. (Nullable: If the foreign key does not have NotNull-constraint, please check null.)
      */
-    public ${foreignEntityClassName} get${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}() {
+    public ${foreignEntityClassName} get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() {
         return ${foreignVariableName};
     }
 
     /**
-     * Set the entity of foreign table of ${foreignKeys.foreignJavaBeansRulePropertyName}.
-     * @param ${foreignKeys.foreignPropertyName} The entity of foreign table. (Nullable)
+     * Set the entity of foreign table of ${foreignKey.foreignJavaBeansRulePropertyName}.
+     * @param ${foreignKey.foreignPropertyName} The entity of foreign table. (Nullable)
      */
-    public void set${foreignKeys.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKeys.foreignPropertyName}) {
-        this.${foreignVariableName} = ${foreignKeys.foreignPropertyName};
+    public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
+        this.${foreignVariableName} = ${foreignKey.foreignPropertyName};
     }
 
 #end
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
 #set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
 #if (${referrer.isOneToOne()})
     /** The entity of referrer-as-one table. */
     protected ${referrerEntityClassName} ${referrerVariableName};
@@ -124,7 +124,7 @@ public abstract class $myClassName implements java.io.Serializable {
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
 #set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
-#set ($referrerVariableName = "${glChildrenVariablePrefix}${referrer.referrerPropertyNameInitCap}")
+#set ($referrerVariableName = "${referrer.referrerPropertyName}")
 #if (!${referrer.isOneToOne()})
     /** The list of referrer table '${referrer.table.name}'. */
     protected List<${referrerEntityClassName}> $referrerVariableName;
