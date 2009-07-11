@@ -30,6 +30,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDependencyInjectionProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
+import org.seasar.dbflute.properties.DfHibernateProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
@@ -204,6 +205,13 @@ public final class DfBuildProperties {
     //                                              --------
     public DfFlexDtoProperties getFlexDtoProperties() {
         return getHandler().getFlexDtoProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                             Hibernate
+    //                                             ---------
+    public DfHibernateProperties getHibernateProperties() {
+        return getHandler().getHibernateProperties(getProperties());
     }
 
     // -----------------------------------------------------

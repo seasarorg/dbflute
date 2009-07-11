@@ -11,19 +11,16 @@ import ${myExtendedEntityPackageName}.${referrerEntityClassName};
 #end
 
 /**
- * Entity for ${table.name} table.
+ * The entity of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
  * <pre>
  * [primary-key]
  *     ${table.primaryKeyNameCommaString}
  * 
- * [column-property]
+ * [column]
  *     ${table.columnNameCommaString}
- * 
- * [foreign-property]
- *     ${table.foreignPropertyNameCommaString}
- * 
- * [referrer-property]
- *     ${table.referrerPropertyNameCommaString}
  * 
  * [sequence]
  *     ${table.definedSequenceName}
@@ -31,14 +28,23 @@ import ${myExtendedEntityPackageName}.${referrerEntityClassName};
  * [identity]
  *     ${table.identityColumnName}
  * 
- * [update-date]
- *     ${table.updateDateColumnName}
- * 
  * [version-no]
  *     ${table.versionNoColumnName}
+ * 
+ * [foreign-table]
+ *     ${table.foreignTableNameCommaString}
+ * 
+ * [referrer-table]
+ *     ${table.referrerTableNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
  * </pre>
  * @author ${database.ClassAuthor}
- */${database.outputSuppressWarningsAfterLineSeparator()}
+ */
 @javax.persistence.MappedSuperclass
 public abstract class ${myClassName} implements java.io.Serializable {
 
@@ -114,15 +120,14 @@ public abstract class ${myClassName} implements java.io.Serializable {
 #if ($table.hasPrimaryKey())
     /**
      * If the primary-key of the other is same as this one, returns true.
-     * @param other Other entity. (Nullable: If null, return false)
+     * @param other Other entity.
      * @return Comparing result.
      */
-    @Override
     public boolean equals(Object other) {
         if (other == null || !(other instanceof $myClassName)) { return false; }
-        final $myClassName otherEntity = ($myClassName)other;
+        $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.primaryKey)
-        if (!helpComparingValue(${col.uncapitalisedJavaName}, otherEntity.${col.uncapitalisedJavaName})) { return false; }
+        if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
 #end
         return true;
     }
@@ -133,31 +138,59 @@ public abstract class ${myClassName} implements java.io.Serializable {
     }
 
     /**
-     * @return Hash-code from primary-keys.
+     * Calculates hash-code from primary-key.
+     * @return Hash-code from primary-key.
      */
-    @Override
     public int hashCode() {
-        int result = 0;
+        int result = 17;
 #foreach ($col in $table.primaryKey)
-        if (this.${col.uncapitalisedJavaName} != null) { result = result + ${col.uncapitalisedJavaName}.hashCode(); }
+        if (get${col.JavaName}() != null) { result = (31*result) + get${col.JavaName}().hashCode(); }
+#end
+        return result;
+    }
+#else
+    /**
+     * If the all-column value of the other is same as this one, returns true.
+     * @param other Other entity. (Nullable)
+     * @return Comparing result. If other is null, returns false.
+     */
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof $myClassName)) { return false; }
+        final $myClassName otherEntity = ($myClassName)other;
+#foreach ($col in $table.columns)
+        if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
+#end
+        return true;
+    }
+
+    protected boolean helpComparingValue(Object value1, Object value2) {
+        if (value1 == null && value2 == null) { return true; }
+        return value1 != null && value2 != null && value1.equals(value2);
+    }
+
+    /**
+     * Calculates hash-code from all columns.
+     * @return Hash-code from all columns.
+     */
+    public int hashCode() {
+        int result = 17;
+#foreach ($col in $table.columns)
+        if (get${col.javaName}() != null) { result = (31*result) + get${col.javaName}().hashCode(); }
 #end
         return result;
     }
 #end
 
     /**
-     * @return The expression of columns. (NotNull)
+     * @return The view string of all columns. (NotNull)
      */
-    @Override
     public String toString() {
-        final String delimiter = ",";
-        final StringBuffer sb = new StringBuffer();
-
-#foreach ($col in $table.Columns)
-        sb.append(delimiter).append(${col.uncapitalisedJavaName});
+        String delimiter = ",";
+        StringBuilder sb = new StringBuilder();
+#foreach ($col in $table.columns)
+        sb.append(delimiter).append(get${col.javaName}());
 #end
-
-        sb.delete(0, delimiter.length());
+        if (sb.length() > 0) { sb.delete(0, delimiter.length()); }
         sb.insert(0, "{").append("}");
         return sb.toString();
     }

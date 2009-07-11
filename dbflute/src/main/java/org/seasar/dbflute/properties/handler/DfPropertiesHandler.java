@@ -15,6 +15,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDependencyInjectionProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfFlexDtoProperties;
+import org.seasar.dbflute.properties.DfHibernateProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
@@ -50,7 +51,7 @@ public final class DfPropertiesHandler {
     public static DfPropertiesHandler getInstance() {
         return _insntace;
     }
-    
+
     public void reload() { // for Test
         _insntace = new DfPropertiesHandler();
     }
@@ -130,12 +131,12 @@ public final class DfPropertiesHandler {
         }
         return _behaviorFilterProperties;
     }
-    
+
     // -----------------------------------------------------
     //                                                  Buri
     //                                                  ----
     protected DfBuriProperties _buriProperties;
-    
+
     public DfBuriProperties getBuriProperties(Properties prop) {
         if (_buriProperties == null) {
             _buriProperties = new DfBuriProperties(prop);
@@ -216,6 +217,18 @@ public final class DfPropertiesHandler {
     }
 
     // -----------------------------------------------------
+    //                                             Hibernate
+    //                                             ---------
+    protected DfHibernateProperties _hibernateProperties;
+
+    public DfHibernateProperties getHibernateProperties(Properties prop) {
+        if (_hibernateProperties == null) {
+            _hibernateProperties = new DfHibernateProperties(prop);
+        }
+        return _hibernateProperties;
+    }
+
+    // -----------------------------------------------------
     //                                         Include Query
     //                                         -------------
     protected DfIncludeQueryProperties _includeQueryProperties;
@@ -250,12 +263,12 @@ public final class DfPropertiesHandler {
         }
         return _multipleFKPropertyProperties;
     }
-    
+
     // -----------------------------------------------------
     //                                            OutsideSql
     //                                            ----------
     protected DfOptimisticLockProperties _optimisticLockProperties;
-    
+
     public DfOptimisticLockProperties getOptimisticLockProperties(Properties prop) {
         if (_optimisticLockProperties == null) {
             _optimisticLockProperties = new DfOptimisticLockProperties(prop);

@@ -1599,6 +1599,25 @@ public class Database {
     }
 
     // ===================================================================================
+    //                                                                Hibernate Properties
+    //                                                                ====================
+    public boolean hasHibernateDefinition() {
+        return getProperties().getHibernateProperties().hasHibernateDefinition();
+    }
+
+    public String getHibernateManyToOneFetch() {
+        return getProperties().getHibernateProperties().getManyToOneFetch();
+    }
+
+    public String getHibernateOneToOneFetch() {
+        return getProperties().getHibernateProperties().getOneToOneFetch();
+    }
+    
+    public String getHibernateOneToManyFetch() {
+        return getProperties().getHibernateProperties().getOneToManyFetch();
+    }
+
+    // ===================================================================================
     //                                                                   S2JDBC Properties
     //                                                                   =================
     public boolean hasS2jdbcDefinition() {
