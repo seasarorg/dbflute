@@ -6,7 +6,7 @@ namespace ${glPackageBaseCommonHelper} {
 
     /// <summary>
     /// The interface of map-string-builder.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     public interface ${glMapStringBuilder} {// Thank you koyak!
 

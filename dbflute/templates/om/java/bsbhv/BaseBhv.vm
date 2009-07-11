@@ -77,7 +77,7 @@ import ${glPackageCB}.*;
  * [referrer-property]
  *     ${table.referrerPropertyNameCommaString}
  * </pre>
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendClassName} {
 

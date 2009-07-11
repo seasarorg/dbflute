@@ -7,7 +7,7 @@ namespace ${glPackageBaseCommonCBean} {
 
     /// <summary>
     /// The condition-bean as interface.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     public interface ${glOrderByBean} : ${glSelectResource} {
 

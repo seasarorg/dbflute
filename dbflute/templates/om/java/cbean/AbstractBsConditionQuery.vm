@@ -15,7 +15,7 @@ import ${glPackageCQ}.*;
 
 /**
  * The abstract condition-query of ${table.name}.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public abstract class ${myClassName} extends AbstractConditionQuery {
 

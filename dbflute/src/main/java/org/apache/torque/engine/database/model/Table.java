@@ -1192,9 +1192,9 @@ public class Table {
             return foreignKey.getForeignJavaBeansRulePropertyName();
         } else {
             if (oneToOne) {
-                return foreignKey.getRefererJavaBeansRulePropertyNameAsOne();
+                return foreignKey.getReferrerJavaBeansRulePropertyNameAsOne();
             } else {
-                return foreignKey.getRefererJavaBeansRulePropertyName();
+                return foreignKey.getReferrerJavaBeansRulePropertyName();
             }
         }
     }
@@ -1293,16 +1293,8 @@ public class Table {
         return hasForeignKey() || hasReferrer();
     }
 
-    public boolean hasForeignKeyOrReferer() {
-        return hasForeignKeyOrReferrer();
-    }
-
     public boolean hasForeignKeyOrReferrerAsOne() {
         return hasForeignKey() || hasReferrerAsOne();
-    }
-
-    public boolean hasForeignKeyOrRefererAsOne() {
-        return hasForeignKeyOrReferrerAsOne();
     }
 
     public boolean hasTwoOrMoreKeyReferrer() {

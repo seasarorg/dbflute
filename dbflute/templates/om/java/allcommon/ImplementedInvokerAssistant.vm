@@ -27,7 +27,7 @@ import org.seasar.framework.util.DisposableUtil;
 #end
 
 /**
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 

@@ -39,7 +39,7 @@ import ${myExtendedEntityPackageName}.*;
  * [referrer-property]
  *     ${table.referrerPropertyNameCommaString}
  * </pre>
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public abstract class $myClassName implements java.io.Serializable {
 
@@ -92,8 +92,8 @@ public abstract class $myClassName implements java.io.Serializable {
 #end
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-#set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
-#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+#set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
 #if (${referrer.isOneToOne()})
     /** The entity of referrer-as-one table. */
     protected ${referrerEntityClassName} ${referrerVariableName};
@@ -103,7 +103,7 @@ public abstract class $myClassName implements java.io.Serializable {
      * @return The entity of referrer-as-one table. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
      * @exception IllegalStateException When the size of the referrer table list is duplicate.
      */
-    public ${referrerEntityClassName} get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() {
+    public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
         return ${referrerVariableName};
     }
 
@@ -123,7 +123,7 @@ public abstract class $myClassName implements java.io.Serializable {
     //                                                                      ==============
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-#set ($referrerCBClassName = "${referrer.refererTableExtendedConditionBeanClassName}")
+#set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($referrerVariableName = "${referrer.referrerPropertyName}")
 #if (!${referrer.isOneToOne()})
     /** The list of referrer table '${referrer.table.name}'. */
@@ -133,7 +133,7 @@ public abstract class $myClassName implements java.io.Serializable {
      * Get the list of referrer table. {without lazyload} <br />
      * @return The list of referrer table. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
-    public List<${referrerEntityClassName}> get${referrer.refererJavaBeansRulePropertyNameInitCap}() {
+    public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
 #if (!$database.isOneToManyReturnNullIfNonSelect())
         if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
 #end
@@ -144,7 +144,7 @@ public abstract class $myClassName implements java.io.Serializable {
      * Set the list of referrer table.
      * @param ${referrer.referrerPropertyName} The list of referrer table. (Nullable)
      */
-    public void set${referrer.refererJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
+    public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
         ${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 

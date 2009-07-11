@@ -8,7 +8,7 @@ import ${glPackageCQ}.${myConditionQueryClassName};
 
 /**
  * The nest select set-upper of ${table.name}.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${myClassName} {
 
@@ -39,8 +39,8 @@ public class ${myClassName} {
     //                                                          ==========================
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
-#set ($tmpPropertyName = "${referrer.reffererPropertyNameAsOne}")
-#set ($tmpPropertyNameInitCap = "${referrer.reffererPropertyNameInitCapAsOne}")
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
     public ${referrer.referrerTableNestSelectSetupperClassName} with${tmpPropertyNameInitCap}() {
         _query.doNss(new ${myConditionQueryClassName}.NssCall() { public ConditionQuery qf() { return _query.query${tmpPropertyNameInitCap}(); }});
 		return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.query${tmpPropertyNameInitCap}());

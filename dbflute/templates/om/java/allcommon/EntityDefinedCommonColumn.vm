@@ -4,7 +4,7 @@ import org.seasar.dbflute.Entity;
 
 /**
  * The interface of entity defined common columns.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public interface ${glEntityDefinedCommonColumn} extends Entity {
 #foreach ($columnName in ${database.commonColumnNameList})

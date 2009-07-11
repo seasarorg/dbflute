@@ -8,7 +8,7 @@ import ${myExtendedDaoCursorPackageName}.${myExtendedTypeSafeCursorClassName};
 
 /**
  * The cursor handler of ${table.name}.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public abstract class ${myClassName} implements CursorHandler {
 

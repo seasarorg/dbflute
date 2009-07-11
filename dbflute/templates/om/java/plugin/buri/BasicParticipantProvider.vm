@@ -8,7 +8,7 @@ import org.escafe.buri.engine.ParticipantContext;
 import org.escafe.buri.engine.ParticipantProvider;
 
 /**
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glBasicParticipantProvider} implements ParticipantProvider {
 

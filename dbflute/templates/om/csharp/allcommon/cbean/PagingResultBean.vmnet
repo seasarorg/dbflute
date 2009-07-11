@@ -12,7 +12,7 @@ namespace ${glPackageBaseCommonCBean} {
 
     /// <summary>
     /// The paging-result-bean of ${myClassName}.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     [System.Serializable]
     public class ${myClassName}<ENTITY> : ${glListResultBean}<ENTITY> {

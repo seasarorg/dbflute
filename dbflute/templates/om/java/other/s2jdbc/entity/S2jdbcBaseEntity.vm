@@ -46,7 +46,7 @@ import ${myExtendedEntityPackageName}.${referrerEntityClassName};
  * [referrer-property]
  *     ${table.referrerPropertyNameCommaString}
  * </pre>
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 @MappedSuperclass
 public abstract class ${myClassName} implements Serializable {

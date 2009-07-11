@@ -13,7 +13,7 @@ namespace ${glPackageExtendedParameterBean} {
 
     /// <summary>
     /// The parametaer-bean of ${pmbClassName}.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     [System.Serializable]
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))

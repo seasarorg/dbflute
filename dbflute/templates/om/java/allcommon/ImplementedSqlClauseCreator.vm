@@ -7,7 +7,7 @@ import org.seasar.dbflute.dbmeta.DBMetaProvider;
 
 /**
  * The creator of SQL clause.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 

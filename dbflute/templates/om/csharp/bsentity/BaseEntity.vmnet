@@ -56,7 +56,7 @@ namespace ${myExtendedEntityPackageName} {
     /// [referrer-property]
     ///     ${table.referrerPropertyNameCommaString}
     /// ]]>
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     [Seasar.Dao.Attrs.Table("${table.AnnotationTableName}")]
 #if ($table.isUseUpdateDate())
@@ -351,16 +351,74 @@ namespace ${myExtendedEntityPackageName} {
         }
 #end
 
-        public override String ToString() {
-            String delimiter = ",";
-            StringBuilder sb = new StringBuilder();
+	    public override String ToString() {
+	        return "${myClassName}:" + BuildColumnString() + BuildRelationString();
+	    }
+
+	    protected String BuildColumnString() {
+	        String c = ",";
+	        StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
-            sb.Append(delimiter).Append(this.${col.javaName});
+        	sb.Append(c).Append(this.${col.javaName});
 #end
-            if (sb.Length > 0) { sb.Remove(0, delimiter.Length); }
-            sb.Insert(0, "{").Append("}");
-            return sb.ToString();
-        }
+	        if (sb.Length > 0) { sb.Remove(0, c.Length); }
+	        sb.Insert(0, "{").Append("}");
+	        return sb.ToString();
+	    }
+
+	    protected String BuildRelationString() {
+#if ($table.hasRelation())
+	        StringBuilder sb = new StringBuilder();
+	        String c = ",";
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+        	if (${foreignVariableName} != null) { sb.Append(c).Append("${foreignKey.foreignPropertyName}"); }
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+        	if (${referrerVariableName} != null) { sb.Append(c).Append("${referrer.referrerPropertyNameAsOne}"); }
+#end
+#end
+#foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+        	if (${referrerVariableName} != null && ${referrerVariableName}.Count > 0)
+        	{ sb.Append(c).Append("${referrer.referrerPropertyName}"); }
+#end
+#end
+	        if (sb.Length > 0) { sb.Remove(0, c.Length).Insert(0, "(").Append(")"); }
+	        return sb.ToString();
+#else
+        	return "";
+#end
+    	}
+
+    	public String ToStringWithRelation() {
+	        StringBuilder sb = new StringBuilder();
+	        sb.Append(ToString());
+#if ($table.hasRelation())
+        	String ln = "\n  ";
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+        	if (${foreignVariableName} != null) { sb.Append(ln).Append(${foreignVariableName}); }
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+        	if (${referrerVariableName} != null) { sb.Append(ln).Append(${referrerVariableName}); }
+#end
+#end
+#foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+        	if (${referrerVariableName} != null)
+        	{ foreach (Object obj in ${referrerVariableName}) { sb.Append(ln).Append(obj); } }
+#end
+#end
+#end
+        	return sb.ToString();
+    	}
         #endregion
 
         // ===============================================================================

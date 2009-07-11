@@ -120,7 +120,7 @@ namespace ${myDBMetaPackageName} {
 #foreach ($column in $referrer.foreignColumnList)
             map.put(Column${column.javaBeansRulePropertyNameInitCap}, ${referrer.referrerTableDBMetaClassName}.GetInstance().Column${referrer.getLocalColumnByForeignColumn(${column}).javaBeansRulePropertyNameInitCap});
 #end
-            return cfi("${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
+            return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}", this, ${referrer.referrerTableDBMetaClassName}.GetInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
         }}
 #end
 #end

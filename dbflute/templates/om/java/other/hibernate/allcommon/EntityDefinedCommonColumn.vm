@@ -2,7 +2,7 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 /**
  * The interface of entity defined common columns.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public interface ${glEntityDefinedCommonColumn} {
 #foreach ($columnName in ${database.commonColumnNameList})

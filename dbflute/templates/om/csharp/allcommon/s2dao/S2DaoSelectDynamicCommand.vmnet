@@ -24,7 +24,7 @@ using ${glPackageBaseCommonUtil};
 namespace ${glPackageBaseCommonS2Dao} {
 
     /**
-     * @author ${database.ClassAuthor}
+     * @author ${database.classAuthor}
      */
     public class ${glSelectDynamicCommand} : SelectDynamicCommand {
 

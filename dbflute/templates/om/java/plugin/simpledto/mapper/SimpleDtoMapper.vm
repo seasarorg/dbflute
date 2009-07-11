@@ -38,7 +38,7 @@ import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
  * [version-no]
  *     ${table.versionNoColumnName}
  * </pre>
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${myClassName} {
 
@@ -113,19 +113,18 @@ public class ${myClassName} {
 #end
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-#set ($referrerVariableName = "_${referrer.referrerPropertyNameInitCap}")
 #set ($foreignEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
 #if (${referrer.isOneToOne()})
-        if (${table.uncapitalisedJavaName}.get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}() != null) {
-            ${glPackageExtendedEntity}.${referrer.referrerTableExtendedEntityClassName} relationEntity = ${table.uncapitalisedJavaName}.get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}();
+        if (${table.uncapitalisedJavaName}.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() != null) {
+            ${glPackageExtendedEntity}.${referrer.referrerTableExtendedEntityClassName} relationEntity = ${table.uncapitalisedJavaName}.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}();
             String relationKey = "${foreignKey.foreignTable.name}@" + relationEntity.getDBMeta().extractPrimaryKeyMapString(relationEntity);
             Object cachedDto = _relationDtoMap.get(relationKey);
             if (cachedDto != null) {
-                dto.set${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}((${myExtendedEntityPackageName}.${foreignEntityClassName})cachedDto);
+                dto.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}((${myExtendedEntityPackageName}.${foreignEntityClassName})cachedDto);
             } else {
                 ${foreignEntityClassName}Mapper mapper = new ${foreignEntityClassName}Mapper(_relationDtoMap);
-                dto.set${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}(mapper.map(relationEntity));
-                _relationDtoMap.put(relationKey, dto.get${referrer.refererJavaBeansRulePropertyNameAsOneInitCap}());
+                dto.set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(mapper.map(relationEntity));
+                _relationDtoMap.put(relationKey, dto.get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}());
             }
         };
 #else

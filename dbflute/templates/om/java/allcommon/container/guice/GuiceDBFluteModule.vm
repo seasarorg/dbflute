@@ -10,7 +10,7 @@ import org.seasar.dbflute.bhv.core.InvokerAssistant;
 import ${glPackageExtendedBhv}.*;
 
 /**
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glDBFluteModule} extends AbstractModule {
 

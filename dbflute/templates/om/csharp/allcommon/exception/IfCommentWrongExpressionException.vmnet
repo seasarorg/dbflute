@@ -6,7 +6,7 @@ namespace ${glPackageBaseCommonException} {
 
     /// <summary>
     /// The exception of when the IF comment has a wrong expression about outsideSql.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     public class ${glIfCommentWrongExpressionException} : SystemException {
 

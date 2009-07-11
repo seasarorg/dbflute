@@ -12,7 +12,7 @@ import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 
 /**
  * The DB meta of ${table.name}. (Singleton)
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${myClassName} extends AbstractDBMeta {
 
@@ -112,7 +112,7 @@ public class ${myClassName} extends AbstractDBMeta {
         map.put(column${column.javaBeansRulePropertyNameInitCap}(), ${referrer.referrerTableDBMetaClassName}.getInstance().column${yourColumn.javaBeansRulePropertyNameInitCap}());
 #end
 #end
-        return cfi("${referrer.refererJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
+        return cfi("${referrer.referrerJavaBeansRulePropertyNameAsOne}", this, ${referrer.referrerTableDBMetaClassName}.getInstance(), map, ${table.resolveReferrerIndexAsOne($referrer)}, ${referrer.isOneToOne()});
     }
 #end
 #end

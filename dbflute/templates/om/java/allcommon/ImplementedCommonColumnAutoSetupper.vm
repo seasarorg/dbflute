@@ -9,7 +9,7 @@ import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 
 /**
  * The basic implementation of the auto set-upper of common column.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAutoSetupper {
 #if ($database.isExistCommonColumnSetupElement())

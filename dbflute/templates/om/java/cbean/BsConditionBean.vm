@@ -21,7 +21,7 @@ import ${glPackageNss}.*;
 
 /**
  * The base condition-bean of ${table.name}.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${myClassName} extends AbstractConditionBean {
 

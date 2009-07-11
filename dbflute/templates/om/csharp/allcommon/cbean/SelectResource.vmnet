@@ -7,7 +7,7 @@ namespace ${glPackageBaseCommonCBean} {
 
     /// <summary>
     /// The select-resource as marker-interface.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     public interface ${glSelectResource} {
     }

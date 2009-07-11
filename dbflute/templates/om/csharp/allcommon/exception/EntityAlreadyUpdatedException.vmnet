@@ -6,7 +6,7 @@ namespace ${glPackageBaseCommonException} {
 
     /// <summary>
     /// The exception of when the entity has already been updated by other thread.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     public class ${glEntityAlreadyUpdatedException} : NotSingleRowUpdatedRuntimeException {
 

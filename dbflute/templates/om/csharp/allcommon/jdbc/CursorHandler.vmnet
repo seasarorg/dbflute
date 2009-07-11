@@ -6,7 +6,7 @@ namespace ${glPackageBaseCommonJdbc} {
 
     /// <summary>
     /// The handler of cursor.
-    /// Author : ${database.ClassAuthor}
+    /// Author : ${database.classAuthor}
     /// </summary>
     public interface ${glCursorHandler} {
 

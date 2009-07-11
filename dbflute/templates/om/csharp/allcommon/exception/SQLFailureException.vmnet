@@ -6,7 +6,7 @@ namespace ${glPackageBaseCommonException} {
 
     /// <summary>
     /// The exception of when the SQL failed to execute.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     public class ${glSQLFailureException} : SystemException {
 

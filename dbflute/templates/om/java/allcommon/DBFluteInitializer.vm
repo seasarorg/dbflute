@@ -24,7 +24,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 #end
 
 /**
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glDBFluteInitializer} {
 

@@ -13,7 +13,7 @@ import ${glPackageCQ}.*;
 
 /**
  * The base condition-query of ${table.name}.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 
@@ -373,7 +373,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     //                                                                         Union Query
     //                                                                         ===========
     protected void reflectRelationOnUnionQuery(ConditionQuery baseQueryAsSuper, ConditionQuery unionQueryAsSuper) {
-#if ($table.hasForeignKeyOrRefererAsOne())
+#if ($table.hasForeignKeyOrReferrerAsOne())
         ${myConditionQueryClassName} baseQuery = (${myConditionQueryClassName})baseQueryAsSuper;
         ${myConditionQueryClassName} unionQuery = (${myConditionQueryClassName})unionQueryAsSuper;
 #end

@@ -209,30 +209,6 @@ public class ForeignKey {
         return getTable().getNestSelectSetupperTerminalClassName();
     }
 
-    public String getRefererTableExtendedEntityClassName() {
-        return getReferrerTableExtendedEntityClassName();
-    }
-
-    public String getRefererTableExtendedBehaviorClassName() {
-        return getReferrerTableExtendedBehaviorClassName();
-    }
-
-    public String getRefererTableDBMetaClassName() {
-        return getReferrerTableDBMetaClassName();
-    }
-
-    public String getRefererTableExtendedConditionBeanClassName() {
-        return getReferrerTableExtendedConditionBeanClassName();
-    }
-
-    public String getRefererTableExtendedConditionQueryClassName() {
-        return getReferrerTableExtendedConditionQueryClassName();
-    }
-
-    public String getRefererTableNestSelectSetupperClassName() {
-        return getReferrerTableNestSelectSetupperClassName();
-    }
-
     // ===================================================================================
     //                                                                       Determination
     //                                                                       =============
@@ -649,33 +625,13 @@ public class ForeignKey {
         return getReferrerPropertyName(false);
     }
 
-    public String getRefererPropertyName() {
-        return getReferrerPropertyName();
-    }
-
-    public String getReffererPropertyName() {
-        return getReferrerPropertyName();
-    }
-
     public String getReferrerJavaBeansRulePropertyName() {
         return getReferrerPropertyName(true);
-    }
-
-    public String getReffererJavaBeansRulePropertyName() {
-        return getReferrerJavaBeansRulePropertyName();
-    }
-
-    public String getRefererJavaBeansRulePropertyName() {
-        return getReferrerJavaBeansRulePropertyName();
     }
 
     public String getReferrerJavaBeansRulePropertyNameInitCap() {
         final String referrerPropertyName = getReferrerPropertyName(true);
         return initCap(referrerPropertyName);
-    }
-
-    public String getRefererJavaBeansRulePropertyNameInitCap() {
-        return getReferrerJavaBeansRulePropertyNameInitCap();
     }
 
     public String getReferrerPropertyName(boolean isJavaBeansRule) {
@@ -720,36 +676,12 @@ public class ForeignKey {
         }
     }
 
-    public String getRefererPropertyName(boolean isJavaBeansRule) {
-        return getReferrerPropertyName(isJavaBeansRule);
-    }
-
-    public String getReffererPropertyName(boolean isJavaBeansRule) {
-        return getReferrerPropertyName(isJavaBeansRule);
-    }
-
     public String getReferrerPropertyNameAsOne() {
         return getReferrerPropertyNameAsOne(false);
     }
 
-    public String getReffererPropertyNameAsOne() {
-        return getReferrerPropertyNameAsOne();
-    }
-
     public String getReferrerJavaBeansRulePropertyNameAsOne() {
         return getReferrerPropertyNameAsOne(true);
-    }
-
-    public String getReffererJavaBeansRulePropertyNameAsOne() {
-        return getReferrerJavaBeansRulePropertyNameAsOne();
-    }
-
-    public String getRefererJavaBeansRulePropertyNameAsOne() {
-        return getReferrerJavaBeansRulePropertyNameAsOne();
-    }
-
-    public String getRefererJavaBeansRulePropertyNameAsOneInitCap() {
-        return initCap(getReffererPropertyNameAsOne(true));
     }
 
     public String getReferrerJavaBeansRulePropertyNameAsOneInitCap() {
@@ -780,39 +712,19 @@ public class ForeignKey {
         }
     }
 
-    protected String getReffererPropertyNameAsOne(boolean isJavaBeansRule) {
-        return getReferrerPropertyNameAsOne(isJavaBeansRule);
-    }
-
     public String getForeignPropertyNameInitCap() {
         final String foreignPropertyName = getForeignPropertyName();
         return foreignPropertyName.substring(0, 1).toUpperCase() + foreignPropertyName.substring(1);
     }
 
     public String getReferrerPropertyNameInitCap() {
-        final String reffererPropertyName = getRefererPropertyName();
-        return reffererPropertyName.substring(0, 1).toUpperCase() + reffererPropertyName.substring(1);
-    }
-
-    public String getReffererPropertyNameInitCap() {
-        return getReferrerPropertyNameInitCap();
-    }
-
-    public String getRefererPropertyNameInitCap() {
-        return getReferrerPropertyNameInitCap();
+        final String referrerPropertyName = getReferrerPropertyName();
+        return referrerPropertyName.substring(0, 1).toUpperCase() + referrerPropertyName.substring(1);
     }
 
     public String getReferrerPropertyNameInitCapAsOne() {
         final String referrerPropertyName = getReferrerPropertyNameAsOne();
         return referrerPropertyName.substring(0, 1).toUpperCase() + referrerPropertyName.substring(1);
-    }
-
-    public String getReffererPropertyNameInitCapAsOne() {
-        return getReferrerPropertyNameInitCapAsOne();
-    }
-
-    public String getRefererPropertyNameInitCapAsOne() {
-        return getReferrerPropertyNameInitCapAsOne();
     }
 
     // For S2JDBC
@@ -891,7 +803,7 @@ public class ForeignKey {
 
     /**
      * Returns ChildrenTable-BeanSetupString. [setRcvlcqNo_Suffix(getRcvlcqNo()).setSprlptTp_Suffix(getSprlptTp());]
-     * Abount ForeginKey that Table#getRefferer() returns, Local means children.
+     * Abount ForeginKey that Table#getReferrer() returns, Local means children.
      * @param setterSuffix Setter suffix(_Equal and _IsNotNull and so on...).
      * @return Generated string.
      */
@@ -934,28 +846,6 @@ public class ForeignKey {
                 result = localName + ":" + foreignName;
             } else {
                 result = result + ", " + localName + ":" + foreignName;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * @return String.
-     * @deprecated
-     */
-    public String getRelationKeysCommaStringForOneToOneRefferer() {
-        final List<Column> foreignColumnList = getForeignColumnObjectList();
-        String result = "";
-        for (final Iterator<Column> ite = foreignColumnList.iterator(); ite.hasNext();) {
-            final Column foreignCol = (Column) ite.next();
-            final Column localCol = (Column) getForeignLocalColumnObjectMapping().get(foreignCol);
-            final String foreignName = foreignCol.getName();
-            final String localName = localCol.getName();
-
-            if ("".equals(result)) {
-                result = foreignName + ":" + localName;
-            } else {
-                result = result + ", " + foreignName + ":" + localName;
             }
         }
         return result;

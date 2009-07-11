@@ -180,11 +180,11 @@ namespace ${glPackageExtendedBhv} {
             if (${myEntityListVariableName}.Count == 0) { return; }
             ${referrerBhvClassName} referrerBhv = xgetBSFLR().Select<${referrerBhvClassName}>();
             HelpLoadReferrerInternally<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>
-                    (${myEntityListVariableName}, loadReferrerOption, new MyInternalLoad${referrer.reffererPropertyNameInitCap}Callback(referrerBhv));
+                    (${myEntityListVariableName}, loadReferrerOption, new MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback(referrerBhv));
         }
         protected class MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback : InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}> {
             protected ${referrerBhvClassName} referrerBhv;
-            public MyInternalLoad${referrer.reffererPropertyNameInitCap}Callback(${referrerBhvClassName} referrerBhv) { this.referrerBhv = referrerBhv; }
+            public MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback(${referrerBhvClassName} referrerBhv) { this.referrerBhv = referrerBhv; }
             public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity) { return entity.${table.getPrimaryKeyJavaNameAsOne()}; }
             public void callbackBase_setReferrerList(${myExtendedObjectClassName} entity, IList<${referrerEntityClassName}> referrerList) { entity.${referrer.referrerPropertyNameInitCap} = referrerList; }
             public ${referrerCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.NewMyConditionBean(); }

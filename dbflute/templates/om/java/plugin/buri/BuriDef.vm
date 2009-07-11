@@ -7,7 +7,7 @@ import org.seasar.dbflute.Entity;
 
 /**
  * The definition of Buri.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glBuriDef} {
 

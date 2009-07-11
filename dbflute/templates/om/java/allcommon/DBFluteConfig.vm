@@ -10,7 +10,7 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glDBFluteConfig} {
 

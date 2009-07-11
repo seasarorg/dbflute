@@ -6,7 +6,7 @@ namespace ${glPackageBaseCommonException} {
 
     /// <summary>
     /// The exception when the entity has been duplicated.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     public class ${glEntityDuplicatedException} : SystemException {
 

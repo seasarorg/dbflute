@@ -33,7 +33,7 @@ import ${myExtendedEntityPackageName}.*;
  * [referrer-property]
  *     ${table.referrerPropertyNameCommaString}
  * </pre>
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 #if ($table.isFlexDtoBindable())
 [Bindable]
@@ -67,16 +67,16 @@ public class $myClassName {
 #end
 #foreach ($referrer in $table.referrers)
 #set ($referrerEntityClassName = "${database.simpleDtoExtendedDtoPrefix}${referrer.table.javaName}${database.simpleDtoExtendedDtoSuffix}")
-#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
 #if ($referrer.isOneToOne())
     private var ${referrerVariableName}:${referrerEntityClassName};
 
-    public function get ${referrer.refererJavaBeansRulePropertyNameAsOne}():${referrerEntityClassName} {
+    public function get ${referrer.referrerJavaBeansRulePropertyNameAsOne}():${referrerEntityClassName} {
         return ${referrerVariableName};
     }
 
-    public function set ${referrer.refererJavaBeansRulePropertyNameAsOne}(${referrer.refererJavaBeansRulePropertyNameAsOne}:${referrerEntityClassName}):void {
-        ${referrerVariableName} = ${referrer.refererJavaBeansRulePropertyNameAsOne};
+    public function set ${referrer.referrerJavaBeansRulePropertyNameAsOne}(${referrer.referrerJavaBeansRulePropertyNameAsOne}:${referrerEntityClassName}):void {
+        ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
     }
 #end
 #end
@@ -91,12 +91,12 @@ public class $myClassName {
     ${referrerEntityClassName};
     protected var ${referrerVariableName}:Array;/* of the entity '${referrerEntityClassName}'. */
 
-    public function get ${referrer.refererJavaBeansRulePropertyName}():Array {
+    public function get ${referrer.referrerJavaBeansRulePropertyName}():Array {
         if (${referrerVariableName} == null) { ${referrerVariableName} = new Array(); }
         return ${referrerVariableName};
     }
 
-    public function set ${referrer.refererJavaBeansRulePropertyName}(${referrer.referrerPropertyName}:Array):void {
+    public function set ${referrer.referrerJavaBeansRulePropertyName}(${referrer.referrerPropertyName}:Array):void {
         this.${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 

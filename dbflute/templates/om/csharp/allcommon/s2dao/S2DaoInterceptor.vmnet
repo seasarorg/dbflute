@@ -614,33 +614,29 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected void LogReturn(IMethodInvocation invocation, Type retType, Object ret, DateTime before, DateTime after) {
             MethodBase method = invocation.Method;
             try {
-                String daoResultPrefix = "===========/ [" + ${glTraceViewUtil}.ConvertToPerformanceView(before, after) + " - ";
+                String daoResultPrefix = "===========/ [" + ${glTraceViewUtil}.ConvertToPerformanceView(before, after) + " ";
                 if (typeof(System.Collections.IList).IsAssignableFrom(retType) || (ret != null && ret is System.Collections.IList)) {
                     if (ret == null) {
-                        Log(daoResultPrefix + "Selected list: null]");
+                        Log(daoResultPrefix + "(null)]");
                     } else {
 					    System.Collections.IList ls = (System.Collections.IList)ret;
                         if (ls.Count == 0) {
-                            Log(daoResultPrefix + "Selected list: 0]");
-                        } else if (ls.Count == 1 && ls[0] is int) {
-                            Log(daoResultPrefix + "Selected count: " + ls[0] + "]");
+                            Log(daoResultPrefix + "(0)]");
+                        } else if (ls.Count == 1) {
+                            Log(daoResultPrefix + "(1) result=" + ls[0] + "]");
                         } else {
-                            Log(daoResultPrefix + "Selected list: " + ls.Count + " first=" + ls[0] + "]");
+                            Log(daoResultPrefix + "(" + ls.Count + ") first=" + ls[0] + "]");
                         }
                     }
                 } else if (typeof(${glEntity}).IsAssignableFrom(retType)) {
                     if (ret == null) {
-                        Log(daoResultPrefix + "Selected entity: null" + "]");
+                        Log(daoResultPrefix + "(null)" + "]");
                     } else {
                         ${glEntity} entity = (${glEntity})ret;
-                        Log(daoResultPrefix + "Selected entity: " + entity + "]");
+                        Log(daoResultPrefix + "(1) result=" + entity + "]");
                     }
                 } else {
-                    if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
-                        Log(daoResultPrefix + "Selected count: " + ret + "]");
-                    } else {
-                        Log(daoResultPrefix + "Result: " + ret + "]");
-                    }
+                    Log(daoResultPrefix + "result=" + ret + "]");
                 }
                 Log(" ");
             } catch (Exception e) {

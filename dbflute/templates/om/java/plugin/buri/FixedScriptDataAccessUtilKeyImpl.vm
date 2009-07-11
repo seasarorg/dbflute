@@ -8,7 +8,7 @@ import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 
 /**
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glFixedScriptDataAccessUtilKeyImpl} extends ScriptDataAccessUtilLongKeyImpl {
 

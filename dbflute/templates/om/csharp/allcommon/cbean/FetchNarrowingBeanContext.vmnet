@@ -10,7 +10,7 @@ namespace ${glPackageBaseCommonCBean} {
 /**
  * FetchNarrowing-Bean context. (referring to s2pager)
  * 
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
     public static class ${glFetchNarrowingBeanContext} {
 

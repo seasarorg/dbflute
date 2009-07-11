@@ -5,7 +5,7 @@ namespace ${glPackageBaseCommonException} {
 
     /// <summary>
     /// The exception of when the entity already exists on the database.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     public class ${glEntityAlreadyExistsException} : ${glSQLFailureException} {
 

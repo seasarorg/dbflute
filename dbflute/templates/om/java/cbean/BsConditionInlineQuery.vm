@@ -14,7 +14,7 @@ import ${glPackageCQ}.*;
 
 /**
  * The condition-inline-query of ${table.name}.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
 

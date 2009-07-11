@@ -51,7 +51,7 @@ $database.initializeClassificationDeployment()
 
 ## [Allcommon-DBMetaInfo]
 #set ($glForeignInfo = "${glProjectPrefix}ForeignInfo")
-#set ($glRefererInfoName = "${glProjectPrefix}RefererInfo")
+#set ($glReferrerInfoName = "${glProjectPrefix}ReferrerInfo")
 #set ($glRelationInfo = "${glProjectPrefix}RelationInfo")
 #set ($glUniqueInfo = "${glProjectPrefix}UniqueInfo")
 #set ($glColumnInfo = "${glProjectPrefix}ColumnInfo")

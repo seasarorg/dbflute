@@ -9,7 +9,7 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
  * The cursor of ${table.name}.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${myClassName} {
 

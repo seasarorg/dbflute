@@ -9,7 +9,7 @@ import ${glPackageBaseParameterBean}.${myBaseParameterBeanClassName};
  * You can implement your original methods here.
  * This class remains when re-generating.
  * </p>
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${myClassName} extends ${myBaseParameterBeanClassName} {
 }

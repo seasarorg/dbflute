@@ -6,7 +6,7 @@ namespace ${glPackageBaseCommonCBean} {
 
     /// <summary>
     /// The bean of paging.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     public interface ${glPagingBean} : ${glFetchNarrowingBean}, ${glOrderByBean} {
 

@@ -3,7 +3,7 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 
 /**
  * The parameter-bean of ${pmbClassName}.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
 

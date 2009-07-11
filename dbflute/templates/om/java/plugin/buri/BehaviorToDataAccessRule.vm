@@ -20,7 +20,7 @@ import org.seasar.framework.container.S2Container;
 /**
  * The data access rule for Buri by behavior of DBFlute. <br />
  * It is precondition that the entity of DBFlute is not enhanced.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule {
 

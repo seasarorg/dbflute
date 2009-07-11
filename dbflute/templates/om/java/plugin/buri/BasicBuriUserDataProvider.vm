@@ -5,7 +5,7 @@ import org.seasar.dbflute.AccessContext;
 import org.escafe.buri.engine.IdentityInfo;
 
 /**
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glBasicBuriUserDataProvider} implements ${glBuriDef}.BuriUserDataProvider {
 

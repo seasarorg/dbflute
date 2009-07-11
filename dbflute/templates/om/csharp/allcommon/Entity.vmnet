@@ -8,7 +8,7 @@ namespace ${glPackageBaseCommon} {
 
     /// <summary>
     /// The interface of entity.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     public interface ${glEntity} {
 
@@ -50,7 +50,7 @@ namespace ${glPackageBaseCommon} {
 
     /// <summary>
     /// The modified properties of entity.
-    /// Author: ${database.ClassAuthor}
+    /// Author: ${database.classAuthor}
     /// </summary>
     [System.Serializable]
     public class EntityModifiedProperties {

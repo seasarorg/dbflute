@@ -14,7 +14,7 @@ import org.seasar.dbflute.util.DfAssertUtil;
 
 /**
  * The handler of the instance of DB meta.
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
 

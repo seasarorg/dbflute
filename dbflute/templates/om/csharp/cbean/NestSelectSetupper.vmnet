@@ -35,8 +35,8 @@ namespace ${glPackageNss} {
         //                                                      ==========================
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
-#set ($tmpPropertyName = "${referrer.ReffererPropertyNameInitCapAsOne}")
-#set ($tmpPropertyNameInitCap = "${referrer.ReffererPropertyNameInitCapAsOne}")
+#set ($tmpPropertyName = "${referrer.referrerPropertyNameInitCapAsOne}")
+#set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
         public ${referrer.referrerTableNestSelectSetupperClassName} With${tmpPropertyNameInitCap}() {
             _query.doNss(delegate() { return _query.Query${tmpPropertyNameInitCap}(); });
             return new ${referrer.referrerTableNestSelectSetupperClassName}(_query.Query${tmpPropertyNameInitCap}());

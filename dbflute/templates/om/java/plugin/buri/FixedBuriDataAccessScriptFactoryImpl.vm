@@ -12,7 +12,7 @@ import org.seasar.coffee.dataaccess.DataAccessUtil;
 import org.seasar.coffee.script.ScriptFactory;
 
 /**
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 public class ${glFixedBuriDataAccessScriptFactoryImpl} extends BuriDataAccessFactoryImpl {
 

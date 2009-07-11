@@ -9,7 +9,7 @@ import ${myBaseEntityPackageName}.${myBaseObjectClassName};
  * You can implement your original methods here.
  * This class remains when re-generating.
  * </p>
- * @author ${database.ClassAuthor}
+ * @author ${database.classAuthor}
  */
 [RemoteClass(alias="${myRemoteSimpleDtoClassName}")]
 public class $myClassName extends ${myBaseObjectClassName} {
