@@ -61,9 +61,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
-import org.seasar.dbflute.properties.DfHibernateProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.properties.DfS2jdbcProperties;
 import org.seasar.dbflute.task.bs.DfAbstractDbMetaTexenTask;
 
 /**
@@ -96,26 +94,6 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
             _log.info("* * * * * * * * * * * * * * *");
             final String control = littleProp.getAlternateGenerateControl();
             _log.info("...Using alternate control: " + control);
-            setControlTemplate(control);
-            return;
-        }
-        final DfHibernateProperties hibernateProperties = DfBuildProperties.getInstance().getHibernateProperties();
-        if (hibernateProperties.hasHibernateDefinition()) {
-            _log.info("* * * * * * * * * * *");
-            _log.info("* Process Hibernate *");
-            _log.info("* * * * * * * * * * *");
-            final String control = "om/java/other/hibernate/hibernate-Control.vm";
-            _log.info("...Using hibernate control: " + control);
-            setControlTemplate(control);
-            return;
-        }
-        final DfS2jdbcProperties jdbcProperties = DfBuildProperties.getInstance().getS2jdbcProperties();
-        if (jdbcProperties.hasS2jdbcDefinition()) {
-            _log.info("* * * * * * * * * *");
-            _log.info("* Process S2JDBC  *");
-            _log.info("* * * * * * * * * *");
-            final String control = "om/java/other/s2jdbc/s2jdbc-Control.vm";
-            _log.info("...Using s2jdbc control: " + control);
             setControlTemplate(control);
             return;
         }
