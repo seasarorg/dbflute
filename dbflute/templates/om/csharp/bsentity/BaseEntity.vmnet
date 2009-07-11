@@ -210,7 +210,7 @@ namespace ${myExtendedEntityPackageName} {
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignTable = $foreignKey.foreignTable)
 #set ($foreignEntityClassName = "${glProjectPrefix}${foreignKey.foreignTable.JavaName}")
-#set ($foreignVariableName = "_${foreignKey.foreignPropertyNameInitCap}")
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
         protected ${foreignEntityClassName} ${foreignVariableName};
 
         /// <summary>${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignPropertyNameInitCap}'.</summary>
@@ -249,7 +249,7 @@ namespace ${myExtendedEntityPackageName} {
 #if (!${referrer.isOneToOne()})
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${glProjectPrefix}${referrer.table.JavaName}")
-#set ($referrerVariableName = "_${referrer.referrerPropertyNameInitCap}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         protected IList<${referrerEntityClassName}> $referrerVariableName;
 
         /// <summary>${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerPropertyNameInitCap}'.</summary>
@@ -398,22 +398,22 @@ namespace ${myExtendedEntityPackageName} {
 	        StringBuilder sb = new StringBuilder();
 	        sb.Append(ToString());
 #if ($table.hasRelation())
-        	String ln = "\n  ";
+        	String l = "\n  ";
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
-        	if (${foreignVariableName} != null) { sb.Append(ln).Append(${foreignVariableName}); }
+        	if (${foreignVariableName} != null) { sb.Append(l).Append(${foreignVariableName}); }
 #end
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-        	if (${referrerVariableName} != null) { sb.Append(ln).Append(${referrerVariableName}); }
+        	if (${referrerVariableName} != null) { sb.Append(l).Append(${referrerVariableName}); }
 #end
 #end
 #foreach ($referrer in $table.referrers)
 #if (!${referrer.isOneToOne()})
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         	if (${referrerVariableName} != null)
-        	{ foreach (Object obj in ${referrerVariableName}) { sb.Append(ln).Append(obj); } }
+        	{ foreach (Object obj in ${referrerVariableName}) { sb.Append(l).Append(obj); } }
 #end
 #end
 #end

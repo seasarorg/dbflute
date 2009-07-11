@@ -570,22 +570,22 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         StringBuilder sb = new StringBuilder();
         sb.append(toString());
 #if ($table.hasRelation())
-        String ln = "\n  ";
+        String l = "\n  ";
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
-        if (${foreignVariableName} != null) { sb.append(ln).append(${foreignVariableName}); }
+        if (${foreignVariableName} != null) { sb.append(l).append(${foreignVariableName}); }
 #end
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-        if (${referrerVariableName} != null) { sb.append(ln).append(${referrerVariableName}); }
+        if (${referrerVariableName} != null) { sb.append(l).append(${referrerVariableName}); }
 #end
 #end
 #foreach ($referrer in $table.referrers)
 #if (!${referrer.isOneToOne()})
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
         if (${referrerVariableName} != null)
-        { for (Object obj : ${referrerVariableName}) { sb.append(ln).append(obj); } }
+        { for (Object obj : ${referrerVariableName}) { sb.append(l).append(obj); } }
 #end
 #end
 #end
