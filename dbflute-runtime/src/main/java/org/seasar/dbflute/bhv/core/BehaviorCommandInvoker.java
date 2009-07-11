@@ -612,42 +612,34 @@ public class BehaviorCommandInvoker {
     protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
             long before, long after) {
         try {
-            final String daoResultPrefix = "===========/ [" + TraceViewUtil.convertToPerformanceView(after - before)
-                    + " - ";
+            final String prefix = "===========/ [" + TraceViewUtil.convertToPerformanceView(after - before) + " ";
             if (List.class.isAssignableFrom(retType)) {
                 if (ret == null) {
-                    log(daoResultPrefix + "Selected list: null]");
+                    log(prefix + "(null)]");
                 } else {
                     final List<?> ls = (java.util.List<?>) ret;
                     if (ls.isEmpty()) {
-                        log(daoResultPrefix + "Selected list: 0]");
-                    } else if (ls.size() == 1 && ls.get(0) instanceof Number) {
-                        log(daoResultPrefix + "Selected count: " + ls.get(0) + "]");
+                        log(prefix + "(0)]");
+                    } else if (ls.size() == 1) {
+                        log(prefix + "(1) result=" + ls.get(0) + "]");
                     } else {
-                        log(daoResultPrefix + "Selected list: " + ls.size() + " first=" + ls.get(0) + "]");
+                        log(prefix + "(" + ls.size() + ") first=" + ls.get(0) + "]");
                     }
                 }
             } else if (Entity.class.isAssignableFrom(retType)) {
                 if (ret == null) {
-                    log(daoResultPrefix + "Selected entity: null" + "]");
+                    log(prefix + "(null)" + "]");
                 } else {
                     final Entity entity = (Entity) ret;
-                    log(daoResultPrefix + "Selected entity: " + entity + "]");
-                }
-            } else if (Entity.class.isAssignableFrom(retType)) {
-                if (ret == null) {
-                    log(daoResultPrefix + "Selected entity: null" + "]");
-                } else {
-                    final Entity entity = (Entity) ret;
-                    log(daoResultPrefix + "Selected entity: " + entity + "]");
+                    log(prefix + "(1) result=" + entity + "]");
                 }
             } else if (int[].class.isAssignableFrom(retType)) {
-                if (ret == null) {
-                    log(daoResultPrefix + "Selected entity: null" + "]");
+                if (ret == null) { // basically not come here
+                    log(prefix + "(null)" + "]");
                 } else {
                     final int[] resultArray = (int[]) ret;
                     if (resultArray.length == 0) {
-                        log(daoResultPrefix + "All updated count: 0]");
+                        log(prefix + "all-updated=(0)]");
                     } else {
                         final StringBuilder sb = new StringBuilder();
                         boolean resultExpressionScope = true;
@@ -670,15 +662,11 @@ public class BehaviorCommandInvoker {
                             ++loopCount;
                         }
                         sb.insert(0, "{").append("}");
-                        log(daoResultPrefix + "All updated count: " + resultCount + " result=" + sb + "]");
+                        log(prefix + "all-updated=(" + resultCount + ") result=" + sb + "]");
                     }
                 }
             } else {
-                if (behaviorCommand.isSelectCount()) {
-                    log(daoResultPrefix + "Selected count: " + ret + "]");
-                } else {
-                    log(daoResultPrefix + "Result: " + ret + "]");
-                }
+                log(prefix + "result=" + ret + "]");
             }
             log(" ");
         } catch (RuntimeException e) {
