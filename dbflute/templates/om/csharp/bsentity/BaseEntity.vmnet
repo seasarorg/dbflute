@@ -405,7 +405,6 @@ namespace ${myExtendedEntityPackageName} {
             sb.Insert(0, "{").Append("}");
             return sb.ToString();
         }
-
         private String xbuildRelationString() {
 #if ($table.hasRelation())
             StringBuilder sb = new StringBuilder();
