@@ -1,5 +1,6 @@
 #
-# @since DBFlute-0.9.0
+# Use the mode before DBFlute-0.9.0
+# because it does not use DBFlute runtime.
 #
 #set ($database = $schemaData.database)
 $database.enableGenerateOutputDirectory()
