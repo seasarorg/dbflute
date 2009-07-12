@@ -393,7 +393,7 @@ namespace ${myExtendedEntityPackageName} {
             if (name != null) { sb.Append(name).Append(column || relation ? ":" : ""); }
             if (column) { sb.Append(xbuildColumnString()); }
             if (relation) { sb.Append(xbuildRelationString()); }
-            return sb.toString();
+            return sb.ToString();
         }
         private String xbuildColumnString() {
             String c = ",";
