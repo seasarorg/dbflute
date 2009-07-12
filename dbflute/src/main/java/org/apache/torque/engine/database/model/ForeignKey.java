@@ -680,6 +680,14 @@ public class ForeignKey {
         return getReferrerPropertyNameAsOne(false);
     }
 
+    public String getReferrerPropertyNameAsOneInitCap() {
+        return initCap(getReferrerPropertyNameAsOne());
+    }
+
+    public String getReferrerPropertyNameInitCapAsOne() {
+        return getReferrerPropertyNameAsOneInitCap();
+    }
+
     public String getReferrerJavaBeansRulePropertyNameAsOne() {
         return getReferrerPropertyNameAsOne(true);
     }
@@ -719,11 +727,6 @@ public class ForeignKey {
 
     public String getReferrerPropertyNameInitCap() {
         final String referrerPropertyName = getReferrerPropertyName();
-        return referrerPropertyName.substring(0, 1).toUpperCase() + referrerPropertyName.substring(1);
-    }
-
-    public String getReferrerPropertyNameInitCapAsOne() {
-        final String referrerPropertyName = getReferrerPropertyNameAsOne();
         return referrerPropertyName.substring(0, 1).toUpperCase() + referrerPropertyName.substring(1);
     }
 
