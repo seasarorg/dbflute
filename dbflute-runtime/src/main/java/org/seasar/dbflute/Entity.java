@@ -123,4 +123,20 @@ public interface Entity {
             _propertiesSet.remove(propertyName);
         }
     }
+
+    // ===================================================================================
+    //                                                                      Display String
+    //                                                                      ==============
+    /**
+     * @return The display string of basic informations with one-nested relation values. (NotNull)
+     */
+    public String toStringWithRelation();
+
+    /**
+     * @param name The name for display. (Nullable: If it's null, it does not have a name)
+     * @param column Does it contains column values or not?
+     * @param relation Does it contains relation existences or not?
+     * @return The display string for this entity. (NotNull)
+     */
+    public String buildDisplayString(String name, boolean column, boolean relation);
 }

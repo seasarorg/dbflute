@@ -621,9 +621,9 @@ public class BehaviorCommandInvoker {
                     if (ls.isEmpty()) {
                         log(prefix + "(0)]");
                     } else if (ls.size() == 1) {
-                        log(prefix + "(1) result=" + ls.get(0) + "]");
+                        log(prefix + "(1) result=" + buildResultString(ls.get(0)) + "]");
                     } else {
-                        log(prefix + "(" + ls.size() + ") first=" + ls.get(0) + "]");
+                        log(prefix + "(" + ls.size() + ") first=" + buildResultString(ls.get(0)) + "]");
                     }
                 }
             } else if (Entity.class.isAssignableFrom(retType)) {
@@ -631,7 +631,7 @@ public class BehaviorCommandInvoker {
                     log(prefix + "(null)" + "]");
                 } else {
                     final Entity entity = (Entity) ret;
-                    log(prefix + "(1) result=" + entity + "]");
+                    log(prefix + "(1) result=" + buildResultString(entity) + "]");
                 }
             } else if (int[].class.isAssignableFrom(retType)) {
                 if (ret == null) { // basically not come here
@@ -674,6 +674,18 @@ public class BehaviorCommandInvoker {
             msg = msg + behaviorCommand + " retType=" + retType;
             msg = msg + " ret=" + ret;
             throw e;
+        }
+    }
+
+    protected String buildResultString(Object obj) {
+        if (obj instanceof Entity) {
+            Entity entity = (Entity) obj;
+
+            // The name for display is null
+            // because you can know it other execute status logs.
+            return entity.buildDisplayString(null, true, true);
+        } else {
+            return obj != null ? obj.toString() : "null";
         }
     }
 
