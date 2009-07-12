@@ -623,9 +623,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                         if (ls.Count == 0) {
                             Log(daoResultPrefix + "(0)]");
                         } else if (ls.Count == 1) {
-                            Log(daoResultPrefix + "(1) result=" + ls[0] + "]");
+                            Log(daoResultPrefix + "(1) result=" + BuildResultString(ls[0]) + "]");
                         } else {
-                            Log(daoResultPrefix + "(" + ls.Count + ") first=" + ls[0] + "]");
+                            Log(daoResultPrefix + "(" + ls.Count + ") first=" + BuildResultString(ls[0]) + "]");
                         }
                     }
                 } else if (typeof(${glEntity}).IsAssignableFrom(retType)) {
@@ -633,7 +633,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                         Log(daoResultPrefix + "(null)" + "]");
                     } else {
                         ${glEntity} entity = (${glEntity})ret;
-                        Log(daoResultPrefix + "(1) result=" + entity + "]");
+                        Log(daoResultPrefix + "(1) result=" + BuildResultString(entity) + "]");
                     }
                 } else {
                     Log(daoResultPrefix + "result=" + ret + "]");
@@ -644,6 +644,18 @@ namespace ${glPackageBaseCommonS2Dao} {
                 msg = msg + " ret=" + ret;
                 _log.Warn(msg, e);
                 throw;
+            }
+        }
+
+        protected String BuildResultString(Object obj) {
+            if (obj is ${glEntity}) {
+                ${glEntity} entity = (${glEntity}) obj;
+
+                // The name for display is null
+                // because you can know it other execute status logs.
+                return entity.BuildDisplayString(null, true, true);
+            } else {
+                return obj != null ? obj.ToString() : "null";
             }
         }
 

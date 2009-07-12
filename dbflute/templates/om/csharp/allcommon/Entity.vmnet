@@ -34,18 +34,24 @@ namespace ${glPackageBaseCommon} {
         ${glDBMeta} DBMeta { get; }
 
         // ===============================================================================
-        //                                                             Modified Properties
-        //                                                             ===================
-        IDictionary<String, Object> ModifiedPropertyNames { get; }
-        void ClearModifiedPropertyNames();
-
-        // ===============================================================================
         //                                                                   Determination
         //                                                                   =============
         /// <summary>
         /// Has primary-key value? (readonly)
         /// </summary>
         bool HasPrimaryKeyValue { get; }
+
+        // ===============================================================================
+        //                                                             Modified Properties
+        //                                                             ===================
+        IDictionary<String, Object> ModifiedPropertyNames { get; }
+        void ClearModifiedPropertyNames();
+
+        // ===============================================================================
+        //                                                                  Display String
+        //                                                                  ==============
+        String ToStringWithRelation();
+        String BuildDisplayString(String name, bool column, bool relation);
     }
 
     /// <summary>

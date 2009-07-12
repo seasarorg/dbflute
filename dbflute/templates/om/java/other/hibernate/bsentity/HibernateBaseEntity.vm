@@ -364,15 +364,63 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #end
 
     /**
-     * @return The view string of all columns and relation existences. (NotNull)
+     * @return The display string of all columns and relation existences. (NotNull)
      */
     public String toString() {
-        return getClass().getSimpleName() + ":"
-             + buildColumnString() + buildRelationString()
-             + "@" + Integer.toHexString(hashCode());
+        return buildDisplayString(getClass().getSimpleName(), true, true);
     }
 
-    protected String buildColumnString() {
+    /**
+     * @return The display string of basic informations with one-nested relation values. (NotNull)
+     */
+    public String toStringWithRelation() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(toString());
+#if ($table.hasRelation())
+        String l = "\n  ";
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+        if (${foreignVariableName} != null)
+        { sb.append(l).append(xbRDS(${foreignVariableName}, "${foreignKey.foreignPropertyName}")); }
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+        if (${referrerVariableName} != null)
+        { sb.append(l).append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOne}")); }
+#end
+#end
+#foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+        if (${referrerVariableName} != null) { for (Entity e : ${referrerVariableName})
+        { if (e != null) { sb.append(l).append(xbRDS(e, "${referrer.referrerPropertyName}")); } } }
+#end
+#end
+#end
+        return sb.toString();
+    }
+#if ($table.hasRelation())
+    private String xbRDS(Entity e, String name) { // buildRelationDisplayString()
+        return e.buildDisplayString(name, true, true);
+    }
+#end
+
+    /**
+     * @param name The name for display. (Nullable: If it's null, it does not have a name)
+     * @param column Does it contains column values or not?
+     * @param relation Does it contains relation existences or not?
+     * @return The display string for this entity. (NotNull)
+     */
+    public String buildDisplayString(String name, boolean column, boolean relation) {
+        StringBuilder sb = new StringBuilder();
+        if (name != null) { sb.append(name).append(column || relation ? ":" : ""); }
+        if (column) { sb.append(xbuildColumnString()); }
+        if (relation) { sb.append(xbuildRelationString()); }
+        sb.append("@").append(Integer.toHexString(hashCode()));
+        return sb.toString();
+    }
+    private String xbuildColumnString() {
         String c = ",";
         StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
@@ -382,8 +430,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
         sb.insert(0, "{").append("}");
         return sb.toString();
     }
-
-    protected String buildRelationString() {
+    private String xbuildRelationString() {
 #if ($table.hasRelation())
         StringBuilder sb = new StringBuilder();
         String c = ",";
@@ -409,35 +456,6 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #else
         return "";
 #end
-    }
-
-    /**
-     * @return The view string of basic informations with one-nested relations. (NotNull)
-     */
-    public String toStringWithRelation() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(toString());
-#if ($table.hasRelation())
-        String l = "\n  ";
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
-        if (${foreignVariableName} != null) { sb.append(l).append(${foreignVariableName}); }
-#end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
-#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-        if (${referrerVariableName} != null) { sb.append(l).append(${referrerVariableName}); }
-#end
-#end
-#foreach ($referrer in $table.referrers)
-#if (!${referrer.isOneToOne()})
-#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
-        if (${referrerVariableName} != null)
-        { for (Object obj : ${referrerVariableName}) { sb.append(l).append(obj); } }
-#end
-#end
-#end
-        return sb.toString();
     }
 
 #set ($propertyLoopIndex = 0)

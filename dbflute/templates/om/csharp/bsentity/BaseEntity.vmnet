@@ -351,74 +351,88 @@ namespace ${myExtendedEntityPackageName} {
         }
 #end
 
-	    public override String ToString() {
-	        return "${myClassName}:" + BuildColumnString() + BuildRelationString();
-	    }
+        public override String ToString() {
+            return "${myClassName}:" + xbuildColumnString() + xbuildRelationString();
+        }
 
-	    protected String BuildColumnString() {
-	        String c = ",";
-	        StringBuilder sb = new StringBuilder();
+        public String ToStringWithRelation() {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(ToString());
+#if ($table.hasRelation())
+            String l = "\n  ";
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+            if (${foreignVariableName} != null)
+            { sb.Append(l).Append(xbRDS(${foreignVariableName}, "${foreignKey.foreignPropertyNameInitCap}")); }
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+            if (${referrerVariableName} != null)
+            { sb.Append(l).Append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOneInitCap}")); }
+#end
+#end
+#foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+            if (${referrerVariableName} != null) { foreach (${glEntity} e in ${referrerVariableName})
+            { if (e != null) { sb.Append(l).Append(xbRDS(e, "${referrer.referrerPropertyNameInitCap}")); } } }
+#end
+#end
+#end
+            return sb.ToString();
+        }
+#if ($table.hasRelation())
+        private String xbRDS(${glEntity} e, String name) { // buildRelationDisplayString()
+            return e.BuildDisplayString(name, true, true);
+        }
+#end
+
+        public String BuildDisplayString(String name, bool column, bool relation) {
+            StringBuilder sb = new StringBuilder();
+            if (name != null) { sb.Append(name).Append(column || relation ? ":" : ""); }
+            if (column) { sb.Append(xbuildColumnString()); }
+            if (relation) { sb.Append(xbuildRelationString()); }
+            return sb.toString();
+        }
+        private String xbuildColumnString() {
+            String c = ",";
+            StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
-        	sb.Append(c).Append(this.${col.javaName});
+            sb.Append(c).Append(this.${col.javaName});
 #end
-	        if (sb.Length > 0) { sb.Remove(0, c.Length); }
-	        sb.Insert(0, "{").Append("}");
-	        return sb.ToString();
-	    }
+            if (sb.Length > 0) { sb.Remove(0, c.Length); }
+            sb.Insert(0, "{").Append("}");
+            return sb.ToString();
+        }
 
-	    protected String BuildRelationString() {
+        private String xbuildRelationString() {
 #if ($table.hasRelation())
-	        StringBuilder sb = new StringBuilder();
-	        String c = ",";
+            StringBuilder sb = new StringBuilder();
+            String c = ",";
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
-        	if (${foreignVariableName} != null) { sb.Append(c).Append("${foreignKey.foreignPropertyName}"); }
+            if (${foreignVariableName} != null) { sb.Append(c).Append("${foreignKey.foreignPropertyNameInitCap}"); }
 #end
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
 #set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-        	if (${referrerVariableName} != null) { sb.Append(c).Append("${referrer.referrerPropertyNameAsOne}"); }
+            if (${referrerVariableName} != null) { sb.Append(c).Append("${referrer.referrerPropertyNameAsOneInitCap}"); }
 #end
 #end
 #foreach ($referrer in $table.referrers)
 #if (!${referrer.isOneToOne()})
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
-        	if (${referrerVariableName} != null && ${referrerVariableName}.Count > 0)
-        	{ sb.Append(c).Append("${referrer.referrerPropertyName}"); }
+            if (${referrerVariableName} != null && ${referrerVariableName}.Count > 0)
+            { sb.Append(c).Append("${referrer.referrerPropertyNameInitCap}"); }
 #end
 #end
-	        if (sb.Length > 0) { sb.Remove(0, c.Length).Insert(0, "(").Append(")"); }
-	        return sb.ToString();
+            if (sb.Length > 0) { sb.Remove(0, c.Length).Insert(0, "(").Append(")"); }
+            return sb.ToString();
 #else
-        	return "";
+            return "";
 #end
-    	}
-
-    	public String ToStringWithRelation() {
-	        StringBuilder sb = new StringBuilder();
-	        sb.Append(ToString());
-#if ($table.hasRelation())
-        	String l = "\n  ";
-#foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
-        	if (${foreignVariableName} != null) { sb.Append(l).Append(${foreignVariableName}); }
-#end
-#foreach ($referrer in $table.referrers)
-#if (${referrer.isOneToOne()})
-#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
-        	if (${referrerVariableName} != null) { sb.Append(l).Append(${referrerVariableName}); }
-#end
-#end
-#foreach ($referrer in $table.referrers)
-#if (!${referrer.isOneToOne()})
-#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
-        	if (${referrerVariableName} != null)
-        	{ foreach (Object obj in ${referrerVariableName}) { sb.Append(l).Append(obj); } }
-#end
-#end
-#end
-        	return sb.ToString();
-    	}
+        }
         #endregion
 
         // ===============================================================================
