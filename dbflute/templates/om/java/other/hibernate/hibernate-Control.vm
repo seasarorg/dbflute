@@ -49,15 +49,8 @@ $database.checkProperties()
 ## [AllCommon]
 #set ($glAccessContext = "${glProjectPrefix}AccessContext")
 #set ($glCDef = "${glProjectPrefix}CDef")
-#set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
-#set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
-#set ($glDBFluteInitializer = "${glProjectPrefix}DBFluteInitializer")
+#set ($glEntity = "${glProjectPrefix}Entity")
 #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
-#set ($glImplementedBehaviorSelector = "${glProjectPrefix}ImplementedBehaviorSelector")
-#set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}ImplementedCommonColumnAutoSetupper")
-#set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
-#set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
-#set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
 
 ## ===================================================================================
 ##                                                                             Package
@@ -101,6 +94,10 @@ $database.makeDirectory($path)
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCDef}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/allcommon/CDef.${glTemplateFileExtension}",$path ,"" ,"")
 #end
+
+$database.info("    parse('Entity');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntity}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/Entity.${glTemplateFileExtension}",$path ,"", "")
 
 $database.info("    parse('EntityDefinedCommonColumn');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntityDefinedCommonColumn}.${glClassFileExtension}" )

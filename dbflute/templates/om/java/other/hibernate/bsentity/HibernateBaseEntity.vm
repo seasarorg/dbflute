@@ -4,7 +4,7 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 import java.io.Serializable;
 import javax.persistence.*;
 
-#if (${table.hasAllCommonColumn()})
+#if ($table.hasAllCommonColumn())
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #end
 #if ($table.hasClassification())
@@ -22,7 +22,7 @@ import ${myExtendedEntityPackageName}.${referrerEntityClassName};
 #if (${table.hasAllCommonColumn()})
   #set ($myEntityInterfaceName = "${glEntityDefinedCommonColumn}, Serializable")
 #else
-  #set ($myEntityInterfaceName = "Serializable")
+  #set ($myEntityInterfaceName = "${glPackageBaseCommon}.${glEntity}, Serializable")
 #end
 
 /**
@@ -81,13 +81,13 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 #end
 #if ($col.isJdbcTypeDate())
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(TemporalType.DATE)
 #end
 #if ($col.isJdbcTypeTime())
-    @Temporal(javax.persistence.TemporalType.TIME)
+    @Temporal(TemporalType.TIME)
 #end
 #if ($col.isJdbcTypeTimestamp())
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.TIMESTAMP)
 #end
 #if ($col.isJdbcTypeBlob() && $col.isJdbcTypeClob())
     @Lob
@@ -393,7 +393,8 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #foreach ($referrer in $table.referrers)
 #if (!${referrer.isOneToOne()})
 #set ($referrerVariableName = "_${referrer.referrerPropertyName}")
-        if (${referrerVariableName} != null) { for (Entity e : ${referrerVariableName})
+        if (${referrerVariableName} != null)
+        { for (${glPackageBaseCommon}.${glEntity} e : ${referrerVariableName})
         { if (e != null) { sb.append(l).append(xbRDS(e, "${referrer.referrerPropertyName}")); } } }
 #end
 #end
@@ -401,7 +402,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
         return sb.toString();
     }
 #if ($table.hasRelation())
-    private String xbRDS(Entity e, String name) { // buildRelationDisplayString()
+    private String xbRDS(${glPackageBaseCommon}.${glEntity} e, String name) { // buildRelationDisplayString()
         return e.buildDisplayString(name, true, true);
     }
 #end
