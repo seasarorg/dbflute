@@ -287,8 +287,8 @@ namespace ${myExtendedEntityPackageName} {
 #if (${table.hasAllCommonColumn()})
 
         // ===============================================================================
-        //                                                       Common Column Auto Filter
-        //                                                       =========================
+        //                                                          Common Column Handling
+        //                                                          ======================
         public virtual void EnableCommonColumnAutoSetup() {
             _canCommonColumnAutoSetup = true;
         }

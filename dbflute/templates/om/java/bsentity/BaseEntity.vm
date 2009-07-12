@@ -412,8 +412,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if (${table.hasAllCommonColumn()})
     
     // ===================================================================================
-    //                                                           Common Column Auto Filter
-    //                                                           =========================
+    //                                                              Common Column Handling
+    //                                                              ======================
     /**
      * Enable common column auto set up. {for after disable because the default is enabled}
      */

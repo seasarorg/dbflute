@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 #if ($table.hasAllCommonColumn())
+import ${glPackageBaseCommon}.${glCommonColumnAutoSetupper};
 import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
 #end
 #if ($table.hasClassification())
@@ -72,6 +73,9 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    // -----------------------------------------------------
+    //                                                Column
+    //                                                ------
 #foreach ($col in $table.columns)
     /** Property for ${col.javaBeansRulePropertyName} column. {${col.columnDefinitionLineDisp}} */
 #if ($col.isPrimaryKey())
@@ -97,6 +101,14 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #end
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
     
+#end
+#if ($table.hasAllCommonColumn())
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
+    /** Is common column auto set up effective? */
+    protected boolean _canCommonColumnAutoSetup = true;
+
 #end
     // ===================================================================================
     //                                                          Classification Classifying
@@ -296,6 +308,49 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
 #end
 #end
+#if ($table.hasAllCommonColumn())
+    // ===================================================================================
+    //                                                              Common Column Handling
+    //                                                              ======================
+    @PrePersist
+    public void doPrePersist() {
+        ${glCommonColumnAutoSetupper} setupper = createCommonColumnAutoSetupper();
+        setupper.handleCommonColumnOfInsertIfNeeds(this);
+    }
+
+    @PreUpdate
+    public void doPreUpdate() {
+        ${glCommonColumnAutoSetupper} setupper = createCommonColumnAutoSetupper();
+        setupper.handleCommonColumnOfUpdateIfNeeds(this);
+    }
+
+    protected ${glCommonColumnAutoSetupper} createCommonColumnAutoSetupper() {
+        return new ${glCommonColumnAutoSetupper}();
+    }
+
+    /**
+     * Enable common column auto set up. {for after disable because the default is enabled}
+     */
+    public void enableCommonColumnAutoSetup() {
+        _canCommonColumnAutoSetup = true;
+    }
+
+    /**
+     * Disables auto set-up of common columns.
+     */
+    public void disableCommonColumnAutoSetup() {
+        _canCommonColumnAutoSetup = false;
+    }
+    
+    /**
+     * Can the entity set up common column by auto?
+     * @return Determination.
+     */
+    public boolean canCommonColumnAutoSetup() { // for Framework
+        return _canCommonColumnAutoSetup;
+    }
+
+#end
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -425,7 +480,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
         String c = ",";
         StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
-        sb.append(c).append(get${col.javaName}());
+        sb.append(c).append(_${col.uncapitalisedJavaName});
 #end
         if (sb.length() > 0) { sb.delete(0, c.length()); }
         sb.insert(0, "{").append("}");

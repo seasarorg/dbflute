@@ -7,7 +7,6 @@ $database.enableGenerateOutputDirectory()
 ## - - - - - - - - - - - -
 ## Initialize properties.
 ## - - - - - - - - - - - -
-$database.initializeVersion(90)
 $database.initializeAdditionalPrimaryKey()
 $database.initializeAdditionalForeignKey()
 $database.initializeClassificationDeployment()
@@ -49,6 +48,7 @@ $database.checkProperties()
 ## [AllCommon]
 #set ($glAccessContext = "${glProjectPrefix}AccessContext")
 #set ($glCDef = "${glProjectPrefix}CDef")
+#set ($glCommonColumnAutoSetupper = "${glProjectPrefix}CommonColumnAutoSetupper")
 #set ($glEntity = "${glProjectPrefix}Entity")
 #set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
 
@@ -89,11 +89,19 @@ $database.info("public void parseAllCommon() {")
 #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
 $database.makeDirectory($path)
 
+$database.info("    parse('AccessContext');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glAccessContext}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/AccessContext.${glTemplateFileExtension}",$path ,"", "")
+
 #if ($database.hasClassificationDefinitionMap())
   $database.info("    parse('CDef');")
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCDef}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/allcommon/CDef.${glTemplateFileExtension}",$path ,"" ,"")
 #end
+
+$database.info("    parse('CommonColumnAutoSetupper');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCommonColumnAutoSetupper}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
 
 $database.info("    parse('Entity');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntity}.${glClassFileExtension}" )
