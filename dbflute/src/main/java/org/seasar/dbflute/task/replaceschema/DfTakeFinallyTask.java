@@ -218,6 +218,12 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         if (!getMyProperties().isIncrementSequenceToDataMax()) {
             return;
         }
+        _log.info("");
+        _log.info("* * * * * * * * * * **");
+        _log.info("*                    *");
+        _log.info("* Increment Sequence *");
+        _log.info("*                    *");
+        _log.info("* * * * * * * * * * **");
         final DfSequenceIdentityProperties sequenceProp = getProperties().getSequenceIdentityProperties();
         final Map<String, String> sequenceDefinitionMap = sequenceProp.getSequenceDefinitionMap();
         if (getBasicProperties().isDatabasePostgreSQL()) {
