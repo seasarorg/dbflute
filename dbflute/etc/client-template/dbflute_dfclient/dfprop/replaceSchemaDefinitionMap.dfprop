@@ -23,6 +23,7 @@
 #     ; sqlFileEncoding = UTF-8
 #     ; skipSheet = P.+
 #     ; isIncrementSequenceToDataMax = false
+#     ; isSuppressBatchUpdate = false
 #     ; isDropGenerateTableOnly = false
 #     ; filterVariablesMap = map:{abc=AAA}
 #     ; additionalDropMapList = list:{
