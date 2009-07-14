@@ -61,6 +61,10 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         return getMyProperties().isLoggingInsertSql();
     }
 
+    public boolean isSuppressBatchUpdate() {
+        return getMyProperties().isSuppressBatchUpdate();
+    }
+
     protected DfReplaceSchemaProperties getMyProperties() {
         return DfBuildProperties.getInstance().getReplaceSchemaProperties();
     }
@@ -142,6 +146,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
             xlsDataHandler = new DfXlsDataHandlerImpl();
         }
         xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
+        xlsDataHandler.setSuppressBatchUpdate(isSuppressBatchUpdate());
         xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
         xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
         xlsDataHandler.writeSeveralData(directoryPath, getDataSource());

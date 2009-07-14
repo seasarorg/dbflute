@@ -154,6 +154,13 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
+    //                                                               Suppress Batch Update
+    //                                                               =====================
+    public boolean isSuppressBatchUpdate() {
+        return isProperty("isSuppressBatchUpdate", false, getReplaceSchemaDefinitionMap());
+    }
+
+    // ===================================================================================
     //                                                                          Drop Table
     //                                                                          ==========
     public boolean isDropGenerateTableOnly() {

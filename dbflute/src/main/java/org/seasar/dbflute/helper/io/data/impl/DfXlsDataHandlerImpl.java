@@ -78,6 +78,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     /** The pattern of skip sheet. (Nullable) */
     protected Pattern _skipSheetPattern;
 
+    /** Does it suppress batch updates? */
+    protected boolean _suppressBatchUpdate;
+
     /** The cache map of meta info. The key is table name. */
     protected Map<String, DfFlexibleMap<String, DfColumnMetaInfo>> _metaInfoCacheMap = new HashMap<String, DfFlexibleMap<String, DfColumnMetaInfo>>();
 
@@ -99,6 +102,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     //                                                                               =====
     public void writeSeveralData(String dataDirectoryName, final DataSource dataSource) {
         final List<File> xlsList = getXlsList(dataDirectoryName);
+        final boolean useBatchUpdate = !_suppressBatchUpdate;
 
         for (File file : xlsList) {
             _log.info("");
@@ -240,7 +244,11 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                             ps.setString(bindCount, value);
                             bindCount++;
                         }
-                        ps.addBatch();
+                        if (useBatchUpdate) {
+                            ps.addBatch();
+                        } else {
+                            ps.execute();
+                        }
                     }
                     if (ps == null) {
                         String msg = "The statement should not be null:";
@@ -248,7 +256,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                         msg = msg + " rowSize=" + dataTable.getRowSize();
                         throw new IllegalStateException(msg);
                     }
-                    ps.executeBatch();
+                    if (useBatchUpdate) {
+                        ps.execute();
+                    }
                 } catch (SQLException e) {
                     final SQLException nextEx = e.getNextException();
                     if (nextEx != null && !e.equals(nextEx)) {
@@ -532,6 +542,14 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
 
     public void setLoggingInsertSql(boolean loggingInsertSql) {
         this._loggingInsertSql = loggingInsertSql;
+    }
+
+    public boolean isSuppressBatchUpdate() {
+        return _suppressBatchUpdate;
+    }
+
+    public void setSuppressBatchUpdate(boolean suppressBatchUpdate) {
+        this._suppressBatchUpdate = suppressBatchUpdate;
     }
 
     public String getSchemaName() {

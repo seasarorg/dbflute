@@ -8,6 +8,7 @@
 # o sqlFileEncoding (NotRequired - Default 'UTF-8')
 # o skipSheet (NotRequired - Default '')
 # o isIncrementSequenceToDataMax (NotRequired - Default 'false')
+# o isSuppressBatchUpdate (NotRequired - Default 'false')
 # o isDropGenerateTableOnly (NotRequired - Default 'false')
 # o filterVariablesMap (NotRequired - Default 'map:{}')
 # o additionalDropMapList (NotRequired - Default 'list:{}')
@@ -76,6 +77,16 @@ map:{
     #  Referring the property 'sequenceDefinitionMap'.
     #
     #; isIncrementSequenceToDataMax = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isSuppressBatchUpdate (NotRequired - Default 'false')
+    #  Does it suppress batch update at loading data?
+    #  When you have a data error, you may get details for the error
+    #  by this property changing. Because it is possible that
+    #  the BatchUpdateException information is very short for debug.
+    #
+    #; isSuppressBatchUpdate = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
