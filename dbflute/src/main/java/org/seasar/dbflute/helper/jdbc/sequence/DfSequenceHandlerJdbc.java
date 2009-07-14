@@ -79,6 +79,11 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
                 }
                 String primaryKeyName = pkList.get(0);
                 Statement statement = conn.createStatement();
+                Integer count = selectCount(statement, tableName);
+                if (count == null || count == 0) {
+                    // It is not necessary to increment because the table has no data.
+                    continue;
+                }
                 Integer actualValue = selectDataMax(statement, tableName, primaryKeyName);
                 if (actualValue == null) {
                     // It is not necessary to increment because the table has no data.
@@ -111,6 +116,14 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
                 _log.info("    " + tableName + ": pk=" + pkList);
             }
         }
+    }
+
+    protected Integer selectCount(Statement statement, String tableName) throws SQLException {
+        ResultSet rs = statement.executeQuery("select count(*) from " + tableName);
+        if (!rs.next()) {
+            return null;
+        }
+        return rs.getInt(1);
     }
 
     protected Integer selectDataMax(Statement statement, String tableName, String primaryKeyName) throws SQLException {

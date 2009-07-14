@@ -118,8 +118,15 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
             }
             final String sequenceName = excludedPrefixString.substring(0, endIndex);
             Statement statement = conn.createStatement();
-            String sql = "select setval('" + sequenceName + "', (select max(" + primaryKeyName + ") from " + tableName
-                    + "))";
+
+            Integer count = selectCount(statement, tableName);
+            if (count == null || count == 0) {
+                // It is not necessary to increment because the table has no data.
+                continue;
+            }
+
+            String sql = "select setval('" + sequenceName + "', (select max(" + primaryKeyName + ")";
+            sql = sql + " from " + tableName + "))";
             _log.info(sql);
             statement.execute(sql);
         }
