@@ -257,7 +257,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                         throw new IllegalStateException(msg);
                     }
                     if (useBatchUpdate) {
-                        ps.execute();
+                        ps.executeBatch();
                     }
                 } catch (SQLException e) {
                     final SQLException nextEx = e.getNextException();
