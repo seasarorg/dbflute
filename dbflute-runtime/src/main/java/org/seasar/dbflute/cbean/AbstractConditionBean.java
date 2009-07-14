@@ -69,17 +69,20 @@ public abstract class AbstractConditionBean implements ConditionBean {
         _sqlClause = createSqlClause();
     }
 
-    /** Safety max result size. */
-    protected int _safetyMaxResultSize;
+    /** Safety max result size. {Internal} */
+    private int _safetyMaxResultSize;
 
-    /** The config of statement. (Nullable) */
-    protected StatementConfig _statementConfig;
+    /** The configuration of statement. {Internal} (Nullable) */
+    private StatementConfig _statementConfig;
 
-    /** Can the paging re-select? */
-    protected boolean _canPagingReSelect = true;
+    /** Can the paging re-select? {Internal} */
+    private boolean _canPagingReSelect = true;
 
-    /** The map for free parameters. */
-    protected Map<String, Object> _freeParameterMap;
+    /** The map for free parameters. {Internal} (Nullable) */
+    private Map<String, Object> _freeParameterMap;
+
+    /** The synchronizer of union query. {Internal} (Nullable) */
+    private UnionQuery<ConditionBean> _unionQuerySynchronizer;
 
     // -----------------------------------------------------
     //                                          Purpose Type
@@ -906,11 +909,38 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return _freeParameterMap;
     }
 
+    /**
+     * {Internal}
+     * @param key The key for the parameter. (NotNull)
+     * @param value The value for the parameter. (Nullable)
+     */
     public void xregisterFreeParameter(String key, Object value) {
         if (_freeParameterMap == null) {
             _freeParameterMap = new LinkedHashMap<String, Object>();
         }
         _freeParameterMap.put(key, value);
+    }
+
+    // [DBFlute-0.9.5.2]
+    // ===================================================================================
+    //                                                                  Query Synchronizer
+    //                                                                  ==================
+    /**
+     * {Internal}
+     * @param unionCB The condition-bean for union. (NotNull)
+     */
+    protected void xsyncUQ(ConditionBean unionCB) { // synchronizeUnionQuery()
+        if (_unionQuerySynchronizer != null) {
+            _unionQuerySynchronizer.query(unionCB);
+        }
+    }
+
+    /**
+     * {Internal}
+     * @param unionQuerySynchronizer THe synchronizer of union query. (Nullable)
+     */
+    public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {
+        _unionQuerySynchronizer = unionQuerySynchronizer;
     }
 
     // [DBFlute-0.7.4]

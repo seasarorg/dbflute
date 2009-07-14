@@ -49,6 +49,7 @@ import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.PagingResultBean;
 import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.cbean.ScalarQuery;
+import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;
@@ -527,7 +528,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     protected <LOCAL_ENTITY extends Entity, PK, REFERRER_CB extends ConditionBean, REFERRER_ENTITY extends Entity> void doHelpLoadReferrerInternally(
             List<LOCAL_ENTITY> localEntityList, LoadReferrerOption<REFERRER_CB, REFERRER_ENTITY> loadReferrerOption,
-            InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
+            final InternalLoadReferrerCallback<LOCAL_ENTITY, PK, REFERRER_CB, REFERRER_ENTITY> callback) {
 
         // - - - - - - - - - - -
         // Assert pre-condition
@@ -564,6 +565,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         // Select the list of referrer
         // - - - - - - - - - - - - - -
         callback.qyFKIn(cb, pkList);
+        cb.xregisterUnionQuerySynchronizer(new UnionQuery<ConditionBean>() {
+            public void query(ConditionBean unionCB) {
+                @SuppressWarnings("unchecked")
+                REFERRER_CB referrerUnionCB = (REFERRER_CB) unionCB;
+                // for when application uses union query in condition-bean set-upper.
+                callback.qyFKIn(referrerUnionCB, pkList);
+            }
+        });
         loadReferrerOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
         if (!loadReferrerOption.isStopOrderByKey() && pkList.size() > 1) {
             callback.qyOdFKAsc(cb);

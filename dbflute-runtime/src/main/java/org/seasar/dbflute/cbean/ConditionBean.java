@@ -170,4 +170,14 @@ public interface ConditionBean extends PagingBean {
      * @return Determination.
      */
     public boolean hasUnionQueryOrUnionAllQuery();
+
+    // ===================================================================================
+    //                                                                      Free Parameter
+    //                                                                      ==============
+    public void xregisterFreeParameter(String key, Object value);
+
+    // ===================================================================================
+    //                                                                  Query Synchronizer
+    //                                                                  ==================
+    public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer);
 }

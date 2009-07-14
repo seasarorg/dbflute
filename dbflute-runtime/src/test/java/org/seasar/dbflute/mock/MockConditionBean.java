@@ -6,6 +6,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.OrderByBean;
 import org.seasar.dbflute.cbean.PagingBean;
+import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -101,108 +102,86 @@ public class MockConditionBean implements ConditionBean {
     }
 
     public int getFetchStartIndex() {
-
         return 0;
     }
 
     public int getPageEndIndex() {
-
         return 0;
     }
 
     public int getPageStartIndex() {
-
         return 0;
     }
 
     public boolean isCountLater() {
-
         return false;
     }
 
     public boolean isFetchScopeEffective() {
-
         return false;
     }
 
     public boolean isPaging() {
-
         return false;
     }
 
     public void paging(int pageSize, int pageNumber) {
-
     }
 
     public void xsetPaging(boolean paging) {
-
     }
 
     public int getFetchNarrowingLoopCount() {
-
         return 0;
     }
 
     public int getFetchNarrowingSkipStartIndex() {
-
         return 0;
     }
 
     public int getSafetyMaxResultSize() {
-
         return 0;
     }
 
     public void ignoreFetchNarrowing() {
-
     }
 
     public boolean isFetchNarrowingEffective() {
-
         return false;
     }
 
     public boolean isFetchNarrowingLoopCountEffective() {
-
         return false;
     }
 
     public boolean isFetchNarrowingSkipStartIndexEffective() {
-
         return false;
     }
 
     public void restoreIgnoredFetchNarrowing() {
-
     }
 
     public OrderByBean clearOrderBy() {
-
         return null;
     }
 
     public String getOrderByClause() {
-
         return null;
     }
 
     public OrderByClause getSqlComponentOfOrderByClause() {
-
         return null;
     }
 
     public OrderByBean ignoreOrderBy() {
-
         return null;
     }
 
     public OrderByBean makeOrderByEffective() {
-
         return null;
     }
 
     public void checkSafetyResult(int safetyMaxResultSize) {
-
     }
 
     public boolean hasOrderByClause() {
@@ -213,4 +192,9 @@ public class MockConditionBean implements ConditionBean {
         return false;
     }
 
+    public void xregisterFreeParameter(String key, Object value) {
+    }
+
+    public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {
+    }
 }
