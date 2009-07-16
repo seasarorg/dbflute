@@ -547,7 +547,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         final List<PK> pkList = new ArrayList<PK>();
         for (LOCAL_ENTITY localEntity : localEntityList) {
             final PK primaryKeyValue = callback.getPKVal(localEntity);
-            pkList.add(callback.getPKVal(localEntity));
+            pkList.add(primaryKeyValue);
             pkLocalEntityMap.put(toLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
         }
 
