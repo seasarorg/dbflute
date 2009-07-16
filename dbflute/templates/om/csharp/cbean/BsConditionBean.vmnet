@@ -78,12 +78,14 @@ namespace ${glPackageBaseCB} {
         //                                                                     Union Query
         //                                                                     ===========
 	    public virtual void Union(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
-            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Invoke(cb);
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+            cb.xsetupForUnion(); xsyncUQ(cb); unionQuery.Invoke(cb);
 		    ${myConditionQueryClassName} cq = cb.Query(); Query().xsetUnionQuery(cq);
         }
 
 	    public virtual void UnionAll(${glUnionQuery}<${myConditionBeanClassName}> unionQuery) {
-            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}(); unionQuery.Invoke(cb);
+            ${myConditionBeanClassName} cb = new ${myConditionBeanClassName}();
+            cb.xsetupForUnion(); xsyncUQ(cb); unionQuery.Invoke(cb);
 		    ${myConditionQueryClassName} cq = cb.Query(); Query().xsetUnionAllQuery(cq);
 	    }
 
