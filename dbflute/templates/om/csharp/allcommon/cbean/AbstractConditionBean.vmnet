@@ -22,7 +22,7 @@ namespace ${glPackageBaseCommonCBean} {
         protected ${glStatementConfig} _statementConfig;
         protected bool _canPagingReSelect = true;
         private Map<String, Object> _freeParameterMap;
-        private UnionQuery<ConditionBean> _unionQuerySynchronizer;
+        private ${glUnionQuery}<${glConditionBean}> _unionQuerySynchronizer;
     
         // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
         protected bool _forDerivedReferrer;
