@@ -84,18 +84,13 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if ($col.isIdentity())
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 #end
-#if ($col.isJdbcTypeDate())
-#end
-#if ($col.isJdbcTypeTime())
-#end
-#if ($col.isJdbcTypeTimestamp())
-#end
 #if ($col.isJdbcTypeBlob() && $col.isJdbcTypeClob())
     @Lob
 #end
 #if ($table.isUseVersionNo() && $col.isVersionNo())
     @Version
 #end
+    @Column(name="${col.name}")
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
     
 #end

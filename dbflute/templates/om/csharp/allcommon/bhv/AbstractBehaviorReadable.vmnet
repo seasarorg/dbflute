@@ -236,7 +236,7 @@ namespace ${glPackageBaseCommonBhv} {
             // Select the list of referrer
             // - - - - - - - - - - - - - -
             callback.qyFKIn(cb, pkList);
-            cb.xregisterUnionQuerySynchronizer(delegate(ConditionBean unionCB) {
+            cb.xregisterUnionQuerySynchronizer(delegate(${glConditionBean} unionCB) {
                 REFERRER_CB referrerUnionCB = (REFERRER_CB) unionCB;
                 // for when application uses union query in condition-bean set-upper.
                 callback.qyFKIn(referrerUnionCB, pkList);
@@ -276,7 +276,7 @@ namespace ${glPackageBaseCommonBhv} {
             foreach (LOCAL_ENTITY localEntity in localEntityList) {
                 PK referrerListKey;
                 {
-                    PK primaryKey = callback.callbackBase_getPrimaryKeyValue(localEntity);
+                    PK primaryKey = callback.getPKVal(localEntity);
                     referrerListKey = ToLowerCasePrimaryKeyIfString(primaryKey);
                 }
                 if (pkReferrerListMap.ContainsKey(referrerListKey)) {
@@ -357,7 +357,7 @@ namespace ${glPackageBaseCommonBhv} {
             AssertObjectNotNull("localEntityList", localEntityList);
             IList<FOREIGN_ENTITY> foreignList = new List<FOREIGN_ENTITY>();
             foreach (LOCAL_ENTITY entity in localEntityList) {
-                FOREIGN_ENTITY foreignEntity = callback.callbackGetForeignEntity(entity);
+                FOREIGN_ENTITY foreignEntity = callback.getFr(entity);
                 if (foreignEntity == null || foreignList.Contains(foreignEntity)) {
                     continue;
                 }

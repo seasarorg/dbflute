@@ -254,13 +254,13 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                              Query Synchronizer
         //                                                              ==================
-        protected void xsyncUQ(ConditionBean unionCB) { // synchronizeUnionQuery()
+        protected void xsyncUQ(${glConditionBean} unionCB) { // synchronizeUnionQuery()
             if (_unionQuerySynchronizer != null) {
                 _unionQuerySynchronizer.Invoke(unionCB);
             }
         }
 
-        public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {
+        public void xregisterUnionQuerySynchronizer(${glUnionQuery}<${glConditionBean}> unionQuerySynchronizer) {
             _unionQuerySynchronizer = unionQuerySynchronizer;
         }
 

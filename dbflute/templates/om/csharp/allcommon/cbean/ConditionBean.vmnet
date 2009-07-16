@@ -60,5 +60,10 @@ namespace ${glPackageBaseCommonCBean} {
     	bool HasWhereClause();
     	bool HasOrderByClause();
         bool HasUnionQueryOrUnionAllQuery();
+        
+        // ===============================================================================
+        //                                                              Query Synchronizer
+        //                                                              ==================
+        void xregisterUnionQuerySynchronizer(${glUnionQuery}<${glConditionBean}> unionQuerySynchronizer);
     }
 }
