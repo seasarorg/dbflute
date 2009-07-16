@@ -801,7 +801,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 
             if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
-                cb.XSetupSelectCountIgnoreFetchScope();
+                cb.xsetupSelectCountIgnoreFetchScope();
             } else {
                 ${glFetchNarrowingBeanContext}.SetFetchNarrowingBeanOnThread(cb);
             }
@@ -815,7 +815,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return;
             }
             if (IsSelectCountIgnoreFetchScopeMethod(invocation)) {
-                cb.XAfterCareSelectCountIgnoreFetchScope();
+                cb.xafterCareSelectCountIgnoreFetchScope();
             }
         }
 

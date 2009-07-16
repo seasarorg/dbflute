@@ -39,8 +39,8 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                    Select Count
         //                                                                    ============
-        ${glConditionBean} XSetupSelectCountIgnoreFetchScope();
-        ${glConditionBean} XAfterCareSelectCountIgnoreFetchScope();
+        ${glConditionBean} xsetupSelectCountIgnoreFetchScope();
+        ${glConditionBean} xafterCareSelectCountIgnoreFetchScope();
         bool IsSelectCountIgnoreFetchScope();
 		
         // ===============================================================================

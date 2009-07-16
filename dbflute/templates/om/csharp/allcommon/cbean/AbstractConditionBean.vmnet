@@ -21,7 +21,9 @@ namespace ${glPackageBaseCommonCBean} {
         protected int _safetyMaxResultSize;
         protected ${glStatementConfig} _statementConfig;
         protected bool _canPagingReSelect = true;
-
+        private Map<String, Object> _freeParameterMap;
+        private UnionQuery<ConditionBean> _unionQuerySynchronizer;
+    
         // [DBFlute-0.7.4] @jflute -- At the future, I'll implement some check logics by these purpose types.
         protected bool _forDerivedReferrer;
         protected bool _forScalarSelect;
@@ -177,7 +179,7 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                    Select Count
         //                                                                    ============
-        public ${glConditionBean} XSetupSelectCountIgnoreFetchScope() {
+        public ${glConditionBean} xsetupSelectCountIgnoreFetchScope() {
             _isSelectCountIgnoreFetchScope = true;
 
             this.SqlClause.classifySelectClauseType(SelectClauseType.COUNT);
@@ -186,7 +188,7 @@ namespace ${glPackageBaseCommonCBean} {
             return this;
         }
 
-        public ${glConditionBean} XAfterCareSelectCountIgnoreFetchScope() {
+        public ${glConditionBean} xafterCareSelectCountIgnoreFetchScope() {
             _isSelectCountIgnoreFetchScope = false;
 
             this.SqlClause.rollbackSelectClauseType();
@@ -200,7 +202,6 @@ namespace ${glPackageBaseCommonCBean} {
         public bool IsSelectCountIgnoreFetchScope() {
             return _isSelectCountIgnoreFetchScope;
         }
-
 
         // ===============================================================================
         //                                                                Statement Config
@@ -233,6 +234,35 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         public abstract bool HasUnionQueryOrUnionAllQuery();
+
+        // [DBFlute-0.8.9.2]
+        // ===============================================================================
+        //                                                                  Free Parameter
+        //                                                                  ==============
+        public Map<String, Object> FreeParameterMap { get { // Very Internal
+            return _freeParameterMap;
+        }}
+
+        public void xregisterFreeParameter(String key, Object value) {
+            if (_freeParameterMap == null) {
+                _freeParameterMap = new LinkedHashMap<String, Object>();
+            }
+            _freeParameterMap.put(key, value);
+        }
+
+        // [DBFlute-0.8.9.2]
+        // ===============================================================================
+        //                                                              Query Synchronizer
+        //                                                              ==================
+        protected void xsyncUQ(ConditionBean unionCB) { // synchronizeUnionQuery()
+            if (_unionQuerySynchronizer != null) {
+                _unionQuerySynchronizer.Invoke(unionCB);
+            }
+        }
+
+        public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {
+            _unionQuerySynchronizer = unionQuerySynchronizer;
+        }
 
         // [DBFlute-0.7.4]
         // ===============================================================================
