@@ -85,13 +85,10 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 #end
 #if ($col.isJdbcTypeDate())
-    @Temporal(TemporalType.DATE)
 #end
 #if ($col.isJdbcTypeTime())
-    @Temporal(TemporalType.TIME)
 #end
 #if ($col.isJdbcTypeTimestamp())
-    @Temporal(TemporalType.TIMESTAMP)
 #end
 #if ($col.isJdbcTypeBlob() && $col.isJdbcTypeClob())
     @Lob

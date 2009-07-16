@@ -185,14 +185,14 @@ namespace ${glPackageExtendedBhv} {
         protected class MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback : InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}> {
             protected ${referrerBhvClassName} referrerBhv;
             public MyInternalLoad${referrer.referrerPropertyNameInitCap}Callback(${referrerBhvClassName} referrerBhv) { this.referrerBhv = referrerBhv; }
-            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackBase_getPrimaryKeyValue(${myExtendedObjectClassName} entity) { return entity.${table.getPrimaryKeyJavaNameAsOne()}; }
-            public void callbackBase_setReferrerList(${myExtendedObjectClassName} entity, IList<${referrerEntityClassName}> referrerList) { entity.${referrer.referrerPropertyNameInitCap} = referrerList; }
-            public ${referrerCBClassName} callbackReferrer_newMyConditionBean() { return referrerBhv.NewMyConditionBean(); }
-            public void callbackReferrer_queryForeignKeyInScope(${referrerCBClassName} cb, IList<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) { cb.Query().Set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList); }
-            public void callbackReferrer_queryAddOrderByForeignKeyAsc(${referrerCBClassName} cb) { cb.Query().AddOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc(); }
-            public IList<${referrerEntityClassName}> callbackReferrer_selectList(${referrerCBClassName} cb) { return referrerBhv.SelectList(cb); }
-            public ${table.getPrimaryKeyJavaNativeAsOne()} callbackReferrer_getForeignKeyValue(${referrerEntityClassName} entity) { return entity.${referrer.getLocalColumnJavaNameAsOne()}; }
-            public void callbackReferrer_setForeignEntity(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} baseEntity) { referrerEntity.${referrer.foreignPropertyNameInitCap} = baseEntity; }
+            public ${table.getPrimaryKeyJavaNativeAsOne()} getPKVal(${myExtendedObjectClassName} e) { return e.${table.getPrimaryKeyJavaNameAsOne()}; }
+            public void setRfLs(${myExtendedObjectClassName} e, IList<${referrerEntityClassName}> ls) { e.${referrer.referrerPropertyNameInitCap} = ls; }
+            public ${referrerCBClassName} newMyCB() { return referrerBhv.NewMyConditionBean(); }
+            public void qyFKIn(${referrerCBClassName} cb, IList<${table.getPrimaryKeyJavaNativeAsOne()}> ls) { cb.Query().Set${referrer.getLocalColumnJavaNameAsOne()}_InScope(ls); }
+            public void qyOdFKAsc(${referrerCBClassName} cb) { cb.Query().AddOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc(); }
+            public IList<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.SelectList(cb); }
+            public ${table.getPrimaryKeyJavaNativeAsOne()} getFKVal(${referrerEntityClassName} e) { return e.${referrer.getLocalColumnJavaNameAsOne()}; }
+            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} be) { re.${referrer.foreignPropertyNameInitCap} = be; }
         }
 #end
 #end
@@ -209,7 +209,7 @@ namespace ${glPackageExtendedBhv} {
             return HelpPulloutInternally<${myExtendedObjectClassName}, ${foreignEntityClassName}>(${myEntityListVariableName}, new MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback());
         }
         protected class MyInternalPullout${foreignKeys.foreignPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}> {
-            public ${foreignEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.${foreignKeys.foreignPropertyNameInitCap}; }
+            public ${foreignEntityClassName} getFr(${myExtendedObjectClassName} entity) { return entity.${foreignKeys.foreignPropertyNameInitCap}; }
         }
 #end
 #foreach ($referrer in $table.referrers)
@@ -220,7 +220,7 @@ namespace ${glPackageExtendedBhv} {
             return HelpPulloutInternally<${myExtendedObjectClassName}, ${referrerEntityClassName}>(${myEntityListVariableName}, new MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback());
         }
         protected class MyInternalPullout${referrer.referrerPropertyNameInitCap}Callback : InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}> {
-            public ${referrerEntityClassName} callbackGetForeignEntity(${myExtendedObjectClassName} entity) { return entity.${referrer.referrerPropertyNameInitCapAsOne}; }
+            public ${referrerEntityClassName} getFr(${myExtendedObjectClassName} entity) { return entity.${referrer.referrerPropertyNameInitCapAsOne}; }
         }
   #end
 #end

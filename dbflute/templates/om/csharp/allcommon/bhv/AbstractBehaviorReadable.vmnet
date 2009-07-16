@@ -215,8 +215,8 @@ namespace ${glPackageBaseCommonBhv} {
             IDictionary<PK, LOCAL_ENTITY> pkLocalEntityMap = new Dictionary<PK, LOCAL_ENTITY>();
             IList<PK> pkList = new List<PK>();
             foreach (LOCAL_ENTITY localEntity in localEntityList) {
-                PK primaryKeyValue = callback.callbackBase_getPrimaryKeyValue(localEntity);
-                pkList.Add(callback.callbackBase_getPrimaryKeyValue(localEntity));
+                PK primaryKeyValue = callback.getPKVal(localEntity);
+                pkList.Add(primaryKeyValue);
                 if (!pkLocalEntityMap.ContainsKey(primaryKeyValue)) {
                     pkLocalEntityMap.Add(ToLowerCasePrimaryKeyIfString(primaryKeyValue), localEntity);
                 }
@@ -229,20 +229,25 @@ namespace ${glPackageBaseCommonBhv} {
             if (loadReferrerOption.ReferrerConditionBean != null) {
                 cb = loadReferrerOption.ReferrerConditionBean;
             } else {
-                cb = callback.callbackReferrer_newMyConditionBean();
+                cb = callback.newMyCB();
             }
 
             // - - - - - - - - - - - - - -
             // Select the list of referrer
             // - - - - - - - - - - - - - -
-            callback.callbackReferrer_queryForeignKeyInScope(cb, pkList);
+            callback.qyFKIn(cb, pkList);
+            cb.xregisterUnionQuerySynchronizer(delegate(ConditionBean unionCB) {
+                REFERRER_CB referrerUnionCB = (REFERRER_CB) unionCB;
+                // for when application uses union query in condition-bean set-upper.
+                callback.qyFKIn(referrerUnionCB, pkList);
+            });
             loadReferrerOption.delegateKeyConditionExchangingFirstWhereClauseForLastOne(cb);
             if (!loadReferrerOption.isStopOrderByKey() && pkList.Count > 1) {
-                callback.callbackReferrer_queryAddOrderByForeignKeyAsc(cb);
+                callback.qyOdFKAsc(cb);
                 cb.SqlComponentOfOrderByClause.exchangeFirstOrderByElementForLastOne();
             }
             loadReferrerOption.delegateConditionBeanSettingUp(cb);
-            IList<REFERRER_ENTITY> referrerList = callback.callbackReferrer_selectList(cb);
+            IList<REFERRER_ENTITY> referrerList = callback.selRfLs(cb);
             loadReferrerOption.delegateEntitySettingUp(referrerList);
 
             // - - - - - - - - - - - - - - - - - - - - - - - -
@@ -252,7 +257,7 @@ namespace ${glPackageBaseCommonBhv} {
             foreach (REFERRER_ENTITY referrerEntity in referrerList) {
                 PK referrerListKey;
                 {
-                    PK foreignKeyValue = callback.callbackReferrer_getForeignKeyValue(referrerEntity);
+                    PK foreignKeyValue = callback.getFKVal(referrerEntity);
                     referrerListKey = ToLowerCasePrimaryKeyIfString(foreignKeyValue);
                 }
                 if (!pkReferrerListMap.ContainsKey(referrerListKey)) {
@@ -262,7 +267,7 @@ namespace ${glPackageBaseCommonBhv} {
 
                 // for Reverse Reference.
                 LOCAL_ENTITY localEntity = pkLocalEntityMap[referrerListKey];
-                callback.callbackReferrer_setForeignEntity(referrerEntity, localEntity);
+                callback.setlcEt(referrerEntity, localEntity);
             }
 
             // - - - - - - - - - - - - - - - - - -
@@ -275,9 +280,9 @@ namespace ${glPackageBaseCommonBhv} {
                     referrerListKey = ToLowerCasePrimaryKeyIfString(primaryKey);
                 }
                 if (pkReferrerListMap.ContainsKey(referrerListKey)) {
-                    callback.callbackBase_setReferrerList(localEntity, pkReferrerListMap[referrerListKey]);
+                    callback.setRfLs(localEntity, pkReferrerListMap[referrerListKey]);
                 } else {
-                    callback.callbackBase_setReferrerList(localEntity, new List<REFERRER_ENTITY>());
+                    callback.setRfLs(localEntity, new List<REFERRER_ENTITY>());
                 }
             }
         }
@@ -303,16 +308,16 @@ namespace ${glPackageBaseCommonBhv} {
                      where REFERRER_CB : ${glConditionBean}
                      where REFERRER_ENTITY : ${glEntity} {
             // For Base
-            PK callbackBase_getPrimaryKeyValue(LOCAL_ENTITY entity);
-            void callbackBase_setReferrerList(LOCAL_ENTITY entity, IList<REFERRER_ENTITY> referrerList);
+            PK getPKVal(LOCAL_ENTITY entity); // getPrimaryKeyValue()
+            void setRfLs(LOCAL_ENTITY entity, IList<REFERRER_ENTITY> referrerList); // setReferrerList()
 
             // For Referrer
-            REFERRER_CB callbackReferrer_newMyConditionBean();
-            void callbackReferrer_queryForeignKeyInScope(REFERRER_CB cb, IList<PK> pkList);
-            void callbackReferrer_queryAddOrderByForeignKeyAsc(REFERRER_CB cb);
-            IList<REFERRER_ENTITY> callbackReferrer_selectList(REFERRER_CB cb);
-            PK callbackReferrer_getForeignKeyValue(REFERRER_ENTITY entity);
-            void callbackReferrer_setForeignEntity(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity);
+            REFERRER_CB newMyCB(); // newMyConditionBean()
+            void qyFKIn(REFERRER_CB cb, IList<PK> pkList); // queryForeignKeyInScope()
+            void qyOdFKAsc(REFERRER_CB cb); // queryAddOrderByForeignKeyAsc()
+            IList<REFERRER_ENTITY> selRfLs(REFERRER_CB cb); // selectReferrerList()
+            PK getFKVal(REFERRER_ENTITY entity); // getForeignKeyValue()
+            void setlcEt(REFERRER_ENTITY referrerEntity, LOCAL_ENTITY localEntity); // setLocalEntity()
         }
     
         protected ${glBehaviorSelector} xgetBSFLR() { // GetBehaviorSelectorForLoadReferrer() as Internal
@@ -362,7 +367,7 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         protected interface InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> where LOCAL_ENTITY : ${glEntity} where FOREIGN_ENTITY : ${glEntity} {
-            FOREIGN_ENTITY callbackGetForeignEntity(LOCAL_ENTITY entity);
+            FOREIGN_ENTITY getFr(LOCAL_ENTITY entity); // getForeignEntity()
         }
 
         // ===============================================================================
