@@ -135,7 +135,6 @@ namespace ${myExtendedEntityPackageName} {
 #end
 #end
 #end
-
         #endregion
 
         // ===============================================================================
@@ -172,7 +171,6 @@ namespace ${myExtendedEntityPackageName} {
 #end
 #end
 #end
-
         #endregion
 
         // ===============================================================================
