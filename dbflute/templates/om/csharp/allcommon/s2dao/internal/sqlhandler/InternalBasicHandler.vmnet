@@ -258,6 +258,30 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             }
         }
 
+        // ===================================================================================
+        //                                                                       Assist Helper
+        //                                                                       =============
+        // It needs this method if the target database does not support line comment.
+        protected String RemoveLineComment(String sql) { // With removing CR!
+            if (sql == null || sql.Trim().Length == 0) {
+                return sql;
+            }
+            StringBuilder sb = new StringBuilder();
+            String[] lines = sql.Split("\n");
+            foreach (String line in lines) {
+                if (line == null) {
+                    continue;
+                }
+                line = line.ReplaceAll("\r", ""); // Remove CR!
+                if (line.StartsWith("--")) {
+                    continue;
+                }
+                sb.Append(line).Append("\n");
+            }
+            String filteredSql = sb.ToString();
+            return filteredSql.Substring(0, filteredSql.LastIndexOf("\n"));
+        }
+
         // ===============================================================================
         //                                                                  General Helper
         //                                                                  ==============
@@ -275,7 +299,11 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
 
         public String Sql {
             get { return _sql; }
+#if ($database.isDatabaseMSAccess())
+            set { _sql = RemoveLineComment(value); }
+#else
             set { _sql = value; }
+#end
         }
 
         public ICommandFactory CommandFactory {
