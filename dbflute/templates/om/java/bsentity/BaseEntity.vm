@@ -654,7 +654,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
         _modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
-        this._${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
+        this._${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
     }
 #set ($propertyLoopIndex = $propertyLoopIndex + 1)
 #end
