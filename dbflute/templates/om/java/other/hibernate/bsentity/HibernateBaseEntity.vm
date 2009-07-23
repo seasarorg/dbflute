@@ -77,6 +77,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     //                                                Column
     //                                                ------
 #foreach ($col in $table.columns)
+#if (!$col.isForeignKey())
     /** Property for ${col.javaBeansRulePropertyName} column. {${col.columnDefinitionLineDisp}} */
 #if ($col.isPrimaryKey())
     @Id
@@ -91,16 +92,9 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     @Version
 #end
     @Column(name="${col.name}")
-    protected ${col.javaNative} _${col.uncapitalisedJavaName};
+    protected ${col.javaNative} ${col.uncapitalisedJavaName};
     
 #end
-#if ($table.hasAllCommonColumn())
-    // -----------------------------------------------------
-    //                                              Internal
-    //                                              --------
-    /** Is common column auto set up effective? */
-    protected boolean _canCommonColumnAutoSetup = true;
-
 #end
     // ===================================================================================
     //                                                          Classification Classifying
@@ -121,11 +115,11 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      */
     public void classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
 #if ($col.isJavaNativeStringObject())
-        set${col.javaName}(cls != null ? cls.code() : null);
+        //set${col.javaName}(cls != null ? cls.code() : null);
 #elseif ($col.isJavaNativeValueOfAbleNObject())
-        set${col.javaName}(cls != null ? ${col.javaNative}.valueOf(cls.code()) : null);
+        //set${col.javaName}(cls != null ? ${col.javaNative}.valueOf(cls.code()) : null);
 #else
-        set${col.javaName}(cls != null ? new ${col.javaNative}(cls.code()) : null);
+        //set${col.javaName}(cls != null ? new ${col.javaNative}(cls.code()) : null);
 #end
     }
 
@@ -159,7 +153,8 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * @return The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
      */
     public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
-        return ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+        //return ${glCDef}.${col.classificationName}.codeOf(${col.uncapitalisedJavaName});
+        return null;
     }
 
 #foreach ($classificationMap in $col.classificationMapList)
@@ -216,7 +211,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #foreach ($foreignKey in $table.foreignKeys)
 #set ($foreignTable = $foreignKey.foreignTable)
 #set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
-#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+#set ($foreignVariableName = "${foreignKey.foreignPropertyName}")
     /** ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'. */
     @ManyToOne(fetch=FetchType.${database.hibernateManyToOneFetch})
 #if ($foreignKey.isSimpleKeyFK())
@@ -237,7 +232,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * @param ${foreignKey.foreignPropertyName} The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (Nullable)
      */
     public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
-        ${foreignVariableName} = ${foreignKey.foreignPropertyName};
+        this.${foreignVariableName} = ${foreignKey.foreignPropertyName};
     }
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
@@ -245,7 +240,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
-#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+#set ($referrerVariableName = "${referrer.referrerPropertyNameAsOne}")
 #if (${referrer.isOneToOne()})
     /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. */
     @OneToOne(mappedBy = "${referrer.foreignPropertyName}", fetch=FetchType.${database.hibernateOneToOneFetch})
@@ -264,7 +259,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
-        ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
+        this.${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
     }
 
 #set ($foreignKeyIndex = $foreignKeyIndex + 1)
@@ -276,7 +271,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #foreach ($referrer in $table.referrers)
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
-#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+#set ($referrerVariableName = "${referrer.referrerPropertyName}")
 #if (!${referrer.isOneToOne()})
     /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. */
     @OneToMany(mappedBy = "${referrer.foreignPropertyName}", fetch=FetchType.${database.hibernateOneToManyFetch})
@@ -295,7 +290,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (Nullable)
      */
     public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
-        ${referrerVariableName} = ${referrer.referrerPropertyName};
+        this.${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 
 #end
@@ -320,28 +315,6 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
         return new ${glCommonColumnAutoSetupper}();
     }
 
-    /**
-     * Enable common column auto set up. {for after disable because the default is enabled}
-     */
-    public void enableCommonColumnAutoSetup() {
-        _canCommonColumnAutoSetup = true;
-    }
-
-    /**
-     * Disables auto set-up of common columns.
-     */
-    public void disableCommonColumnAutoSetup() {
-        _canCommonColumnAutoSetup = false;
-    }
-    
-    /**
-     * Can the entity set up common column by auto?
-     * @return Determination.
-     */
-    public boolean canCommonColumnAutoSetup() { // for Framework
-        return _canCommonColumnAutoSetup;
-    }
-
 #end
     // ===================================================================================
     //                                                                      Basic Override
@@ -356,7 +329,9 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
         if (other == null || !(other instanceof $myClassName)) { return false; }
         $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.primaryKey)
+#if (!$col.isForeignKey())
         if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
+#end
 #end
         return true;
     }
@@ -373,7 +348,9 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     public int hashCode() {
         int result = 17;
 #foreach ($col in $table.primaryKey)
+#if (!$col.isForeignKey())
         if (get${col.JavaName}() != null) { result = (31*result) + get${col.JavaName}().hashCode(); }
+#end
 #end
         return result;
     }
@@ -387,7 +364,9 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
         if (other == null || !(other instanceof $myClassName)) { return false; }
         final $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.columns)
+#if (!$col.isForeignKey())
         if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
+#end
 #end
         return true;
     }
@@ -404,7 +383,9 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     public int hashCode() {
         int result = 17;
 #foreach ($col in $table.columns)
+#if (!$col.isForeignKey())
         if (get${col.javaName}() != null) { result = (31*result) + get${col.javaName}().hashCode(); }
+#end
 #end
         return result;
     }
@@ -426,20 +407,20 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if ($table.hasRelation())
         String l = "\n  ";
 #foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+#set ($foreignVariableName = "${foreignKey.foreignPropertyName}")
         if (${foreignVariableName} != null)
         { sb.append(l).append(xbRDS(${foreignVariableName}, "${foreignKey.foreignPropertyName}")); }
 #end
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
-#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+#set ($referrerVariableName = "${referrer.referrerPropertyNameAsOne}")
         if (${referrerVariableName} != null)
         { sb.append(l).append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOne}")); }
 #end
 #end
 #foreach ($referrer in $table.referrers)
 #if (!${referrer.isOneToOne()})
-#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+#set ($referrerVariableName = "${referrer.referrerPropertyName}")
         if (${referrerVariableName} != null)
         { for (${glPackageBaseCommon}.${glEntity} e : ${referrerVariableName})
         { if (e != null) { sb.append(l).append(xbRDS(e, "${referrer.referrerPropertyName}")); } } }
@@ -472,7 +453,9 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
         String c = ",";
         StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
-        sb.append(c).append(_${col.uncapitalisedJavaName});
+#if (!$col.isForeignKey())
+        sb.append(c).append(${col.uncapitalisedJavaName});
+#end
 #end
         if (sb.length() > 0) { sb.delete(0, c.length()); }
         sb.insert(0, "{").append("}");
@@ -483,18 +466,18 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
         StringBuilder sb = new StringBuilder();
         String c = ",";
 #foreach ($foreignKey in $table.foreignKeys)
-#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+#set ($foreignVariableName = "${foreignKey.foreignPropertyName}")
         if (${foreignVariableName} != null) { sb.append(c).append("${foreignKey.foreignPropertyName}"); }
 #end
 #foreach ($referrer in $table.referrers)
 #if (${referrer.isOneToOne()})
-#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+#set ($referrerVariableName = "${referrer.referrerPropertyNameAsOne}")
         if (${referrerVariableName} != null) { sb.append(c).append("${referrer.referrerPropertyNameAsOne}"); }
 #end
 #end
 #foreach ($referrer in $table.referrers)
 #if (!${referrer.isOneToOne()})
-#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+#set ($referrerVariableName = "${referrer.referrerPropertyName}")
         if (${referrerVariableName} != null && !${referrerVariableName}.isEmpty())
         { sb.append(c).append("${referrer.referrerPropertyName}"); }
 #end
@@ -508,6 +491,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 
 #set ($propertyLoopIndex = 0)
 #foreach ($col in $table.columns)
+#if (!$col.isForeignKey())
 #if ($propertyLoopIndex == 0)
     // ===================================================================================
     //                                                                            Accessor
@@ -523,7 +507,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * @return The value of the column '${col.name}'. (Nullable)
      */
     public ${col.JavaNative} get${col.javaName}() {
-        return _${col.uncapitalisedJavaName};
+        return ${col.uncapitalisedJavaName};
     }
 
     /**
@@ -534,9 +518,10 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * @param ${col.UncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
-        this._${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
+        this.${col.UncapitalisedJavaName} = ${col.UncapitalisedJavaName};
     }
 #set ($propertyLoopIndex = $propertyLoopIndex + 1)
+#end
 #end
 #if ($table.hasAllCommonColumn())
 #foreach ($columnName in ${database.commonColumnNameConvertionList})

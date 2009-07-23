@@ -19,9 +19,10 @@ public class ${glCommonColumnAutoSetupper} {
             return;
         }
         final ${glEntityDefinedCommonColumn} entity = (${glEntityDefinedCommonColumn})targetEntity;
-        if (!entity.canCommonColumnAutoSetup()) {
-            return;
-        }
+        // Not supported yet
+        //if (!entity.canCommonColumnAutoSetup()) {
+        //    return;
+        //}
 #foreach ($columnName in ${database.commonColumnNameList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($entityCommonColumnMap = ${database.commonColumnMap})
@@ -55,9 +56,10 @@ public class ${glCommonColumnAutoSetupper} {
             return;
         }
         final ${glEntityDefinedCommonColumn} entity = (${glEntityDefinedCommonColumn})targetEntity;
-        if (!entity.canCommonColumnAutoSetup()) {
-            return;
-        }
+        // Not supported yet
+        //if (!entity.canCommonColumnAutoSetup()) {
+        //    return;
+        //}
 #foreach ($columnName in ${database.commonColumnNameList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($entityCommonColumnMap = ${database.CommonColumnMap})

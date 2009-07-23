@@ -1,6 +1,8 @@
 ${database.allClassCopyright}package ${myExtendedEntityPackageName};
 #set ($myClassName = "${myExtendedObjectClassName}")
 
+import javax.persistence.*;
+
 import ${myBaseEntityPackageName}.${myBaseObjectClassName};
 
 /**
@@ -11,7 +13,8 @@ import ${myBaseEntityPackageName}.${myBaseObjectClassName};
  * </p>
  * @author ${database.classAuthor}
  */
-@javax.persistence.Entity
+@Entity
+@Table(name="${table.name}")
 public class ${myClassName} extends ${myBaseObjectClassName} {
 
     /** Serial version UID. (Default) */
