@@ -2,6 +2,9 @@ ${database.allClassCopyright}package ${myBaseEntityPackageName};
 #set ($myClassName = "${myBaseObjectClassName}")
 
 import java.io.Serializable;
+#if ($table.hasReferrerAsMany())
+import java.util.List;
+#end
 import javax.persistence.*;
 
 #if ($table.hasAllCommonColumn())
@@ -96,6 +99,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     
 #end
 #end
+#if ($table.hasClassification())
     // ===================================================================================
     //                                                          Classification Classifying
     //                                                          ==========================
@@ -219,6 +223,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #end
 #end
 #end
+#end
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============
@@ -227,7 +232,11 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
 #set ($foreignVariableName = "${foreignKey.foreignPropertyName}")
     /** ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'. */
+#if ($foreignKey.isOneToOne())
+    @OneToOne(fetch=FetchType.${database.hibernateManyToOneFetch})
+#else
     @ManyToOne(fetch=FetchType.${database.hibernateManyToOneFetch})
+#end
 #if ($foreignKey.isSimpleKeyFK())
     @JoinColumn(name="${foreignKey.localColumnNameAsOne}")
 #end
@@ -255,7 +264,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #set ($referrerTable = $referrer.table)
 #set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
 #set ($referrerVariableName = "${referrer.referrerPropertyNameAsOne}")
-#if (${referrer.isOneToOne()})
+#if ($referrer.isOneToOne())
     /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. */
     @OneToOne(mappedBy = "${referrer.foreignPropertyName}", fetch=FetchType.${database.hibernateOneToOneFetch})
     protected ${referrerEntityClassName} ${referrerVariableName};
@@ -289,13 +298,13 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if (!${referrer.isOneToOne()})
     /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. */
     @OneToMany(mappedBy = "${referrer.foreignPropertyName}", fetch=FetchType.${database.hibernateOneToManyFetch})
-    protected java.util.List<${referrerEntityClassName}> $referrerVariableName;
+    protected List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
      * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. <br />
      * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
      */
-    public java.util.List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
+    public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
         return ${referrerVariableName};
     }
 
@@ -303,7 +312,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
      * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (Nullable)
      */
-    public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
+    public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
         this.${referrerVariableName} = ${referrer.referrerPropertyName};
     }
 

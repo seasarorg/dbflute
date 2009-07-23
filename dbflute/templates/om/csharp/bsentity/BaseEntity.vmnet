@@ -95,13 +95,15 @@ namespace ${myExtendedEntityPackageName} {
         //                                                                          DBMeta
         //                                                                          ======
         public ${glDBMeta} DBMeta { get { return ${myDBMetaClassName}.GetInstance(); } }
+
 #else
         // ===============================================================================
         //                                                                          DBMeta
         //                                                                          ======
         public ${glDBMeta} DBMeta { get { return ${glDBMetaInstanceHandler}.FindDBMeta(TableDbName); } }
-#end
 
+#end
+#if ($table.hasClassification())
         // ===============================================================================
         //                                                      Classification Classifying
         //                                                      ==========================
@@ -239,6 +241,7 @@ namespace ${myExtendedEntityPackageName} {
 #end
         #endregion
 
+#end
         // ===============================================================================
         //                                                               Referrer Property
         //                                                               =================
