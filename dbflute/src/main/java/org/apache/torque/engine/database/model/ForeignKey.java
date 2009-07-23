@@ -434,25 +434,12 @@ public class ForeignKey {
     // ==========================================================================================
     //                                                                  Get Column Mapping Method
     //                                                                  =========================
-
     public DfFlexibleMap<String, String> getLocalForeignMapping() {
         return _localForeignMap;
-        // This comment-out for FlexibleMap 
-        //        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
-        //        for (int i = 0; i < _localColumns.size(); i++) {
-        //            resultHash.put(_localColumns.get(i), _foreignColumns.get(i));
-        //        }
-        //        return resultHash;
     }
 
     public DfFlexibleMap<String, String> getForeignLocalMapping() {
         return _foreignLocalMap;
-        // This comment-out for FlexibleMap 
-        //        final Hashtable<String, String> resultHash = new Hashtable<String, String>();
-        //        for (int i = 0; i < _localColumns.size(); i++) {
-        //            resultHash.put(_foreignColumns.get(i), _localColumns.get(i));
-        //        }
-        //        return resultHash;
     }
 
     /**
