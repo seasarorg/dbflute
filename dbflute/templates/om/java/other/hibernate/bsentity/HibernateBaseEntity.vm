@@ -114,12 +114,24 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
      */
     public void classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
+#if ($col.isForeignKey())
+        final ${col.foreignKey.foreignTable.extendedEntityClassName} entity = new ${col.foreignKey.foreignTable.extendedEntityClassName}();
 #if ($col.isJavaNativeStringObject())
-        //set${col.javaName}(cls != null ? cls.code() : null);
-#elseif ($col.isJavaNativeValueOfAbleNObject())
-        //set${col.javaName}(cls != null ? ${col.javaNative}.valueOf(cls.code()) : null);
+        entity.set${col.foreignKey.foreignTable.primaryKeyJavaNameAsOne}(cls.code());
+#elseif ($col.isJavaNativeValueOfAbleObject())
+        entity.set${col.foreignKey.foreignTable.primaryKeyJavaNameAsOne}(${col.javaNative}.valueOf(cls.code()));
 #else
-        //set${col.javaName}(cls != null ? new ${col.javaNative}(cls.code()) : null);
+        entity.set${col.foreignKey.foreignTable.primaryKeyJavaNameAsOne}(new ${col.javaNative}(cls.code()));
+#end
+        set${col.foreignKey.foreignJavaBeansRulePropertyNameInitCap}(entity);
+#else
+#if ($col.isJavaNativeStringObject())
+        set${col.javaName}(cls != null ? cls.code() : null);
+#elseif ($col.isJavaNativeValueOfAbleNObject())
+        set${col.javaName}(cls != null ? ${col.javaNative}.valueOf(cls.code()) : null);
+#else
+        set${col.javaName}(cls != null ? new ${col.javaNative}(cls.code()) : null);
+#end
 #end
     }
 
@@ -153,8 +165,11 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * @return The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
      */
     public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
-        //return ${glCDef}.${col.classificationName}.codeOf(${col.uncapitalisedJavaName});
-        return null;
+#if ($col.isForeignKey())
+        return ${glCDef}.${col.classificationName}.codeOf(get${col.foreignKey.foreignJavaBeansRulePropertyNameInitCap}().get${col.foreignKey.foreignTable.primaryKeyJavaNameAsOne}());
+#else
+        return ${glCDef}.${col.classificationName}.codeOf(${col.uncapitalisedJavaName});
+#end
     }
 
 #foreach ($classificationMap in $col.classificationMapList)
@@ -178,7 +193,6 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     // ===================================================================================
     //                                                           Classification Name/Alias
     //                                                           =========================
-#set ($isUseHelpGettingFromClassificationMap = false)
 #foreach ($col in $table.Columns)
 #if (${col.hasClassification()})
 #if (${col.hasClassificationName()})

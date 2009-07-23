@@ -1131,7 +1131,7 @@ public class Column {
         return _columnHandler.isPostgreSQLBytesOid(dbTypeName);
     }
 
-    public boolean isJavaNativeValueOfAbleNObject() { // Java Only: valueOf-able
+    public boolean isJavaNativeValueOfAbleObject() { // Java Only: valueOf-able
         List<Object> list = Arrays.asList(new Object[] { "Integer", "Long", "Short", "Byte", "Boolean", "Character" });
         return containsAsEndsWith(getJavaNative(), list);
     }

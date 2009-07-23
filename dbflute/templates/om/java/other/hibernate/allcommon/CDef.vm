@@ -9,6 +9,21 @@ import java.util.Map;
  */
 public interface ${glCDef} {
 
+    /**
+     * @return The code of the classification. (NotNull)
+     */
+    String code();
+
+    /**
+     * @return The name of the classification. (NotNull)
+     */
+    String name();
+
+    /**
+     * @return The code of the classification. (Nullable: when an alias is not specified in its setting)
+     */
+    String alias();
+
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
 #set ($existTop = false)

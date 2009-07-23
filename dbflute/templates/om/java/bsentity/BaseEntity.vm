@@ -168,7 +168,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     public void classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
 #if ($col.isJavaNativeStringObject())
         set${col.javaName}(cls != null ? cls.code() : null);
-#elseif ($col.isJavaNativeValueOfAbleNObject())
+#elseif ($col.isJavaNativeValueOfAbleObject())
         set${col.javaName}(cls != null ? ${col.javaNative}.valueOf(cls.code()) : null);
 #else
         set${col.javaName}(cls != null ? new ${col.javaNative}(cls.code()) : null);
@@ -229,7 +229,6 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     // ===================================================================================
     //                                                           Classification Name/Alias
     //                                                           =========================
-#set ($isUseHelpGettingFromClassificationMap = false)
 #foreach ($col in $table.Columns)
 #if (${col.hasClassification()})
 #if (${col.hasClassificationName()})
