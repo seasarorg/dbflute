@@ -212,12 +212,12 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
 #foreach ($classificationMap in $col.classificationMapList)
     /**
-     * Is the value of the column '${col.uncapitalisedJavaName}' '${classificationMap.get('name')}'? <br />
+     * Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
      * $database.buildClassificationApplicationComment($classificationMap)
-     * <pre>
+     * <p>
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!
-     * </pre>
+     * </p>
      * @return Determination.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
