@@ -240,7 +240,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return (List<String>) obj;
     }
 
-    @SuppressWarnings("unchecked")
     public boolean isAdditionalDropAllTable(Map<String, Object> additionalDropMap) {
         return isProperty("isDropAllTable", false, additionalDropMap);
     }

@@ -48,7 +48,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
             final Set<String> fisrtKeySet = generatedMap.keySet();
             for (Object foreignName : fisrtKeySet) {// FK Loop!
                 final Object firstValue = generatedMap.get(foreignName);
-                if (!(firstValue instanceof Map)) {
+                if (!(firstValue instanceof Map<?, ?>)) {
                     String msg = "The value type should be Map: tableName=" + foreignName + " property=CustomizeDao";
                     msg = msg + " actualType=" + firstValue.getClass() + " actualValue=" + firstValue;
                     throw new IllegalStateException(msg);

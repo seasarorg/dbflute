@@ -261,7 +261,7 @@ public class XmlToAppData extends DefaultHandler {
      * When parsing multiple files that use nested <external-schema> tags we
      * need to use a stack to remember some values.
      */
-    private static class ParseStackElement {
+    protected static class ParseStackElement {
         private String currentPackage;
         private String currentXmlFile;
         private boolean firstPass;

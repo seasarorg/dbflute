@@ -37,7 +37,7 @@ public final class DfAdditionalPrimaryKeyProperties extends DfAbstractHelperProp
             final Set<String> fisrtKeySet = generatedMap.keySet();
             for (Object primaryName : fisrtKeySet) {// PK Loop!
                 final Object firstValue = generatedMap.get(primaryName);
-                if (!(firstValue instanceof Map)) {
+                if (!(firstValue instanceof Map<?, ?>)) {
                     String msg = "The value type should be Map: tableName=" + primaryName + " property=CustomizeDao";
                     msg = msg + " actualType=" + firstValue.getClass() + " actualValue=" + firstValue;
                     throw new IllegalStateException(msg);

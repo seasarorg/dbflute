@@ -2,10 +2,8 @@ package org.seasar.dbflute.logic.jdbcdl;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.net.URL;
 
 import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.util.DfResourceUtil;
 
 /**
  * @author jflute
@@ -43,13 +41,13 @@ public class DfJDBCDriverDownloadHandler {
             throw new UnsupportedOperationException("Now making");
         }
 
-        if (!needsDownload(jdbcDriverFileName, downloadDir)) {
-            return;
-        }
-        final String urlString = urlBase + "/" + jdbcDriverFileName;
-        final String outputFileName = downloadDir + "/" + jdbcDriverFileName;
-        final URL url = DfResourceUtil.createURL(urlString);
-        DfResourceUtil.makeFileAndClose(url, outputFileName);
+        //        if (!needsDownload(jdbcDriverFileName, downloadDir)) {
+        //            return;
+        //        }
+        //        final String urlString = urlBase + "/" + jdbcDriverFileName;
+        //        final String outputFileName = downloadDir + "/" + jdbcDriverFileName;
+        //        final URL url = DfResourceUtil.createURL(urlString);
+        //        DfResourceUtil.makeFileAndClose(url, outputFileName);
     }
 
     protected boolean needsDownload(String jdbcDriverFileName, String downloadDir) {

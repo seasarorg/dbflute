@@ -115,14 +115,14 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     }
 
     protected void assertPackageValueIsMap(Object packageValue) {
-        if (!(packageValue instanceof Map)) {
+        if (!(packageValue instanceof Map<?, ?>)) {
             String msg = "The type of package value should be Map: " + packageValue;
             throw new IllegalStateException(msg);
         }
     }
 
     protected void assertProcessValueIsMap(Object processValue) {
-        if (!(processValue instanceof Map)) {
+        if (!(processValue instanceof Map<?, ?>)) {
             String msg = "The type of process value should be Map: " + processValue;
             throw new IllegalStateException(msg);
         }
@@ -204,7 +204,7 @@ public final class DfBuriProperties extends DfAbstractHelperProperties {
     }
 
     protected void assertProcessMappingValueIsList(Object processMappingValue) {
-        if (!(processMappingValue instanceof List)) {
+        if (!(processMappingValue instanceof List<?>)) {
             String msg = "The type of process mapping value should be List: " + processMappingValue;
             throw new IllegalStateException(msg);
         }

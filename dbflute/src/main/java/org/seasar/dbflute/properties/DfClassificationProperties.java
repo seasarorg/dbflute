@@ -150,7 +150,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             // Handle classification elements.
             // - - - - - - - - - - - - - - - -
             final Object value = plainClassificationDefinitionMap.get(classificationName);
-            if (!(value instanceof List)) {
+            if (!(value instanceof List<?>)) {
                 String msg = "A value of map for classification definition should be list for classification:";
                 msg = msg + " classificationName=" + classificationName;
                 msg = msg + " type=" + value.getClass() + " value=" + value;
@@ -159,7 +159,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             final List<?> plainList = (List<?>) value;
             final List<Map<String, String>> elementList = new ArrayList<Map<String, String>>();
             for (Object element : plainList) {
-                if (!(element instanceof Map)) {
+                if (!(element instanceof Map<?, ?>)) {
                     String msg = "An element of list for classification should be map for classification element:";
                     msg = msg + " classificationName=" + classificationName;
                     msg = msg + " type=" + element.getClass() + " element=" + element;
@@ -281,7 +281,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         {
             final Object exceptCodeObj = (String) elementMap.get("exceptCodeList");
             if (exceptCodeObj != null) {
-                if (!(exceptCodeObj instanceof java.util.List)) {
+                if (!(exceptCodeObj instanceof List<?>)) {
                     String msg = "'exceptCodeList' should be java.util.List! But: " + exceptCodeObj.getClass();
                     msg = msg + " value=" + exceptCodeObj + " " + _classificationDefinitionMap;
                     throw new IllegalStateException(msg);
@@ -530,7 +530,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         final Set<String> deploymentMapkeySet = map.keySet();
         for (String tableName : deploymentMapkeySet) {
             final Object value = map.get(tableName);
-            if (value instanceof Map) {
+            if (value instanceof Map<?, ?>) {
                 @SuppressWarnings("unchecked")
                 final Map<String, String> tmpMap = (Map<String, String>) value;
                 final Set<String> tmpMapKeySet = tmpMap.keySet();

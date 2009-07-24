@@ -73,7 +73,7 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         Map<String, Object> map = getDependencyInjectionMap();
         Object obj = map.get(key);
         if (obj != null) {
-            if (!(obj instanceof Map)) {
+            if (!(obj instanceof Map<?, ?>)) {
                 String msg = "The key's value should be map:";
                 msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
                 throw new IllegalStateException(msg);
