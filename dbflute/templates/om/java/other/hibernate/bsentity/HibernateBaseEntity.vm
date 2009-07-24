@@ -418,7 +418,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
      * @return The display string of all columns and relation existences. (NotNull)
      */
     public String toString() {
-        return buildDisplayString(getClass().getSimpleName(), true, true);
+        return buildDisplayString(getClass().getSimpleName(), true, false);
     }
 
     /**
