@@ -180,7 +180,7 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
             return false;
         }
         if (_selectedList == null) {
-            return false;
+            return false; // basically unreachable
         }
         if (other instanceof ListResultBean<?>) {
             return _selectedList.equals(((ListResultBean<?>) other).getSelectedList());
