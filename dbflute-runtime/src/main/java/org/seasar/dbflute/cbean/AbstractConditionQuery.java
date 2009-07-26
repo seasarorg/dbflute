@@ -469,7 +469,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         registerLikeSearchQuery(key, value, cvalue, colName, option);
     }
 
-    @SuppressWarnings("deprecation")
     protected void registerLikeSearchQuery(ConditionKey key
                                          , String value
                                          , ConditionValue cvalue
@@ -1752,7 +1751,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (col == null) {
             return null;
         }
-        if (col instanceof List) {
+        if (col instanceof List<?>) {
             return filterRemoveNullOrEmptyValueFromList((List<PROPERTY_TYPE>)col);
         }
         return filterRemoveNullOrEmptyValueFromList(new ArrayList<PROPERTY_TYPE>(col));

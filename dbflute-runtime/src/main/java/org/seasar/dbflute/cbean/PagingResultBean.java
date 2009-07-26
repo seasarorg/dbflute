@@ -311,7 +311,7 @@ public class PagingResultBean<ENTITY> extends ListResultBean<ENTITY> {
         if (!equals) {
             return false;
         }
-        if (!(other instanceof PagingResultBean)) {
+        if (!(other instanceof PagingResultBean<?>)) {
             return false;
         }
         PagingResultBean<?> otherBean = (PagingResultBean<?>) other;

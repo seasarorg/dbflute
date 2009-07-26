@@ -153,7 +153,6 @@ public class ConditionBeanContext {
     // ===================================================================================
     //                                                                        Cool Classes
     //                                                                        ============
-    @SuppressWarnings("unused")
     public static void loadCoolClasses() {
         boolean debugEnabled = false; // If you watch the log, set this true.
         // Against the ClassLoader Headache!

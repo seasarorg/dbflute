@@ -42,7 +42,7 @@ public class AbstractDBMetaTest extends PlainTestCase {
         assertEquals(MockClassification.BAR, actual);
     }
 
-    private static enum MockClassification implements Classification {
+    protected static enum MockClassification implements Classification {
         FOO, BAR;
         public String alias() {
             return null;

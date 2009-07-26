@@ -45,7 +45,7 @@ public class ParenBindVariableNode extends AbstractNode {
     //                                                                              ======
     public void accept(CommandContext ctx) {
         Object var = DfOgnlUtil.getValue(parsedExpression, ctx);
-        if (var instanceof List) {
+        if (var instanceof List<?>) {
             bindArray(ctx, ((List<?>) var).toArray());
         } else if (var == null) {
             return;

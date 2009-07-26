@@ -176,13 +176,13 @@ public class ListResultBean<ENTITY> implements List<ENTITY>, Serializable {
         if (other == null) {
             return false;
         }
-        if (!(other instanceof List)) {
+        if (!(other instanceof List<?>)) {
             return false;
         }
         if (_selectedList == null) {
             return false;
         }
-        if (other instanceof ListResultBean) {
+        if (other instanceof ListResultBean<?>) {
             return _selectedList.equals(((ListResultBean<?>) other).getSelectedList());
         } else {
             return _selectedList.equals(other);

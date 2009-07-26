@@ -450,7 +450,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
-    private static class SimpleMemberPmb {
+    protected static class SimpleMemberPmb {
         protected Integer memberId;
         protected String memberName;
 

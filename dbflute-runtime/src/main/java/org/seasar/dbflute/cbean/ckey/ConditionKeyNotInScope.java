@@ -45,7 +45,7 @@ public class ConditionKeyNotInScope extends ConditionKey {
         if (value == null) {
             return false;
         }
-        if (value instanceof List && ((List<?>) value).isEmpty()) {
+        if (value instanceof List<?> && ((List<?>) value).isEmpty()) {
             return false;
         }
         return true;

@@ -771,7 +771,7 @@ public class BehaviorCommandInvoker {
     //                                                                       =============
     protected void assertRetType(Class<?> retType, Object ret) {
         if (List.class.isAssignableFrom(retType)) {
-            if (ret != null && !(ret instanceof List)) {
+            if (ret != null && !(ret instanceof List<?>)) {
                 String msg = "The retType is difference from actual return: ";
                 msg = msg + "retType=" + retType + " ret.getClass()=" + ret.getClass() + " ref=" + ret;
                 throw new IllegalStateException(msg);

@@ -60,7 +60,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
         List<?> list = null;
         if (args[0] instanceof Object[]) {
             list = Arrays.asList((Object[]) args[0]);
-        } else if (args[0] instanceof List) {
+        } else if (args[0] instanceof List<?>) {
             list = (List<?>) args[0];
         }
         if (list == null) {
@@ -80,7 +80,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
         List<?> list = null;
         if (args[0] instanceof Object[]) {
             list = Arrays.asList((Object[]) args[0]);
-        } else if (args[0] instanceof List) {
+        } else if (args[0] instanceof List<?>) {
             list = (List<?>) args[0];
         }
         if (list == null) {
