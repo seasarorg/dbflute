@@ -207,7 +207,7 @@ public class ${myClassName} extends AbstractConditionBean {
     }
 
     protected org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql xhelpGettingSqlClausePostgreSql() {
-        return (org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause();
+        return (org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql)getSqlClause();
     }
 #end
 #if ($database.isDatabaseOracle())
