@@ -192,21 +192,39 @@ public class ${myClassName} extends AbstractConditionBean {
         final ${myConditionQueryClassName} cq = cb.query(); query().xsetUnionAllQuery(cq);
     }
 #if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabasePostgreSQL())
+
+    // ===================================================================================
+    //                                                                           Lock Wait
+    //                                                                           =========
+    public ConditionBean lockForUpdateNoWait()
+    { if (xhelpIsSqlClausePostgreSql()) { xhelpGettingSqlClausePostgreSql().lockForUpdateNoWait(); } return this; }
+    public ConditionBean lockForUpdateWait(int waitSec)
+    { if (xhelpIsSqlClausePostgreSql()) { xhelpGettingSqlClausePostgreSql().lockForUpdateWait(waitSec); } return this; }
+
+    protected boolean xhelpIsSqlClausePostgreSql() {
+        return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql;
+    }
+
+    protected org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql xhelpGettingSqlClausePostgreSql() {
+        return (org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause();
+    }
+#end
 #if ($database.isDatabaseOracle())
 
     // ===================================================================================
     //                                                                           Lock Wait
     //                                                                           =========
     public ConditionBean lockForUpdateNoWait()
-    { if (helpIsSqlClauseOracle()) { helpGettingSqlClauseOracle().lockForUpdateNoWait(); } return this; }
+    { if (xhelpIsSqlClauseOracle()) { xhelpGettingSqlClauseOracle().lockForUpdateNoWait(); } return this; }
     public ConditionBean lockForUpdateWait(int waitSec)
-    { if (helpIsSqlClauseOracle()) { helpGettingSqlClauseOracle().lockForUpdateWait(waitSec); } return this; }
+    { if (xhelpIsSqlClauseOracle()) { xhelpGettingSqlClauseOracle().lockForUpdateWait(waitSec); } return this; }
 
-    protected boolean helpIsSqlClauseOracle() {
+    protected boolean xhelpIsSqlClauseOracle() {
         return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle;
     }
 
-    protected org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle helpGettingSqlClauseOracle() {
+    protected org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle xhelpGettingSqlClauseOracle() {
         return (org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause();
     }
 #end
@@ -217,16 +235,16 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                     Isolation Level
     //                                                                     ===============
     // *Database Dependency
-    public void lockWithRR() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithRR(); } }
-    public void lockWithRS() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithRS(); } }
-    public void lockWithCS() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithCS(); } }
-    public void lockWithUR() { if (helpIsSqlClauseDb2()) { helpGettingSqlClauseDb2().lockWithUR(); } }
+    public void lockWithRR() { if (xhelpIsSqlClauseDb2()) { xhelpGettingSqlClauseDb2().lockWithRR(); } }
+    public void lockWithRS() { if (xhelpIsSqlClauseDb2()) { xhelpGettingSqlClauseDb2().lockWithRS(); } }
+    public void lockWithCS() { if (xhelpIsSqlClauseDb2()) { xhelpGettingSqlClauseDb2().lockWithCS(); } }
+    public void lockWithUR() { if (xhelpIsSqlClauseDb2()) { xhelpGettingSqlClauseDb2().lockWithUR(); } }
 
-    protected boolean helpIsSqlClauseDb2() {
+    protected boolean xhelpIsSqlClauseDb2() {
         return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2;
     }
 
-    protected org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2 helpGettingSqlClauseDb2() {
+    protected org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2 xhelpGettingSqlClauseDb2() {
         return (org.seasar.dbflute.cbean.sqlclause.SqlClauseDb2)getSqlClause();
     }
 #end
