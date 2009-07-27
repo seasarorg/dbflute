@@ -123,9 +123,10 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
         return this;
     }
 
-    public SqlClause lockForUpdateWait(int waitSec) {
-        lockForUpdate();
-        _lockSqlSuffix = _lockSqlSuffix + " wait " + waitSec;
-        return this;
-    }
+    // The clause 'for update wait' is unsupported at PostgreSQL.
+    //public SqlClause lockForUpdateWait(int waitSec) {
+    //    lockForUpdate();
+    //    _lockSqlSuffix = _lockSqlSuffix + " wait " + waitSec;
+    //    return this;
+    //}
 }
