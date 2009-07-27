@@ -21,12 +21,18 @@ package org.seasar.dbflute.cbean.sqlclause;
  */
 public class SqlClausePostgreSql extends AbstractSqlClause {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** String of fetch-scope as sql-suffix. */
     protected String _fetchScopeSqlSuffix = "";
 
     /** String of lock as sql-suffix. */
     protected String _lockSqlSuffix = "";
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      * @param tableName Table name. (NotNull)
@@ -35,6 +41,9 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
         super(tableName);
     }
 
+    // ===================================================================================
+    //                                                                 FetchScope Override
+    //                                                                 ===================
     /**
      * {@inheritDoc}
      */
@@ -56,6 +65,9 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
         _fetchScopeSqlSuffix = "";
     }
 
+    // ===================================================================================
+    //                                                                       Lock Override
+    //                                                                       =============
     /**
      * {@inheritDoc}
      * 
@@ -66,6 +78,9 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                       Hint Override
+    //                                                                       =============
     /**
      * {@inheritDoc}
      * @return Select-hint. (NotNull)
@@ -96,5 +111,21 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
      */
     protected String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
+    }
+
+    // [DBFlute-0.9.5.2]
+    // ===================================================================================
+    //                                                                 Database Dependency
+    //                                                                 ===================
+    public SqlClause lockForUpdateNoWait() {
+        lockForUpdate();
+        _lockSqlSuffix = _lockSqlSuffix + " nowait";
+        return this;
+    }
+
+    public SqlClause lockForUpdateWait(int waitSec) {
+        lockForUpdate();
+        _lockSqlSuffix = _lockSqlSuffix + " wait " + waitSec;
+        return this;
     }
 }

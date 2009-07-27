@@ -52,16 +52,16 @@ public class SqlClauseOracle extends AbstractSqlClause {
     //                                                          ==========================
     @Override
     protected String buildUnionClause(String selectClause) {
-	
-	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	    // Remove select-hint comment from select clause of union
-		// for fetch-scope with union().
-	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Remove select-hint comment from select clause of union
+        // for fetch-scope with union().
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
         selectClause = replaceString(selectClause, SELECT_HINT, "");
         return super.buildUnionClause(selectClause);
     }
-	
+
     // ===================================================================================
     //                                                                 FetchScope Override
     //                                                                 ===================
@@ -79,7 +79,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
         if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
             return;
         }
-		String ln = getLineSeparator();
+        String ln = getLineSeparator();
         _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (" + ln + "select";
         _fetchScopeSqlSuffix = "";
         if (isFetchStartIndexSupported()) {
@@ -115,7 +115,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
             final String primaryKeyColumnName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
             _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + primaryKeyColumnName;
         } else {
-            final String randomColumnName = ((ColumnInfo)dbmeta.getColumnInfoList().get(0)).getColumnDbName();
+            final String randomColumnName = ((ColumnInfo) dbmeta.getColumnInfoList().get(0)).getColumnDbName();
             _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + randomColumnName;
         }
         return this;
@@ -155,7 +155,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
     protected String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
-    
+
     // ===================================================================================
     //                                                                 Database Dependency
     //                                                                 ===================
@@ -164,7 +164,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
         _lockSqlSuffix = _lockSqlSuffix + " nowait";
         return this;
     }
-    
+
     public SqlClause lockForUpdateWait(int waitSec) {
         lockForUpdate();
         _lockSqlSuffix = _lockSqlSuffix + " wait " + waitSec;
@@ -187,13 +187,13 @@ public class SqlClauseOracle extends AbstractSqlClause {
     public WhereClauseArranger createFullTextSearchClauseArranger() {
         return new FullTextSearchClauseArranger();
     }
-    
+
     protected static class FullTextSearchClauseArranger implements WhereClauseArranger {
         public String arrange(String columnName, String operand, String bindExpression, String rearOption) {
             return "contains(" + columnName + ", " + bindExpression + ") > 0";
         }
     }
-    
+
     public String escapeFullTextSearchValue(String conditionValue) {
         if (conditionValue.contains("}")) {
             conditionValue = replaceString(conditionValue, "}", "}}");
