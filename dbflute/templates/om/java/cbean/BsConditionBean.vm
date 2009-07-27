@@ -199,8 +199,6 @@ public class ${myClassName} extends AbstractConditionBean {
     //                                                                           =========
     public ConditionBean lockForUpdateNoWait()
     { if (xhelpIsSqlClausePostgreSql()) { xhelpGettingSqlClausePostgreSql().lockForUpdateNoWait(); } return this; }
-    public ConditionBean lockForUpdateWait(int waitSec)
-    { if (xhelpIsSqlClausePostgreSql()) { xhelpGettingSqlClausePostgreSql().lockForUpdateWait(waitSec); } return this; }
 
     protected boolean xhelpIsSqlClausePostgreSql() {
         return getSqlClause() instanceof org.seasar.dbflute.cbean.sqlclause.SqlClausePostgreSql;
