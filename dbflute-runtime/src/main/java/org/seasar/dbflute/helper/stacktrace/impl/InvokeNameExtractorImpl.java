@@ -47,7 +47,7 @@ public class InvokeNameExtractorImpl implements InvokeNameExtractor {
         int foundIndex = -1; // The minus one means 'Not Found'.
         int foundFirstIndex = -1; // The minus one means 'Not Found'.
         boolean onTarget = false;
-        for (int i=resource.getStartIndex(); i < _stackTrace.length; i++) {
+        for (int i = resource.getStartIndex(); i < _stackTrace.length; i++) {
             final StackTraceElement element = _stackTrace[i];
             if (i > resource.getStartIndex() + resource.getLoopSize()) {
                 break;
@@ -74,7 +74,11 @@ public class InvokeNameExtractorImpl implements InvokeNameExtractor {
                     foundFirstIndex = i;
                 }
                 onTarget = true;
-                continue;
+                if (resource.isBreakAtFirstElement()) {
+                    break;
+                } else {
+                    continue;
+                }
             }
             if (onTarget) {
                 break;

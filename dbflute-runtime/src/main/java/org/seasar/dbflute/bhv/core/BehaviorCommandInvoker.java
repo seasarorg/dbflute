@@ -456,7 +456,7 @@ public class BehaviorCommandInvoker {
     }
 
     protected InvokeNameResult extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
-        final List<String> suffixList = Arrays.asList(new String[] { "Page", "Action" });
+        final List<String> suffixList = Arrays.asList(new String[] { "Page", "Action", "Test" });
         final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
             public boolean isTargetElement(String className, String methodName) {
                 return isClassNameEndsWith(className, suffixList);
@@ -476,6 +476,10 @@ public class BehaviorCommandInvoker {
 
             public int getLoopSize() {
                 return 25;
+            }
+
+            public boolean isBreakAtFirstElement() {
+                return true;
             }
         };
         return extractInvokeName(resource, stackTrace);
@@ -504,6 +508,10 @@ public class BehaviorCommandInvoker {
 
             public int getLoopSize() {
                 return loopSize >= 0 ? loopSize : 25;
+            }
+
+            public boolean isBreakAtFirstElement() {
+                return true;
             }
         };
         return extractInvokeName(resource, stackTrace);
@@ -547,6 +555,10 @@ public class BehaviorCommandInvoker {
 
             public int getLoopSize() {
                 return 25;
+            }
+
+            public boolean isBreakAtFirstElement() {
+                return false;
             }
         };
         return extractInvokeName(resource, stackTrace);
