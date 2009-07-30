@@ -15,6 +15,9 @@
  */
 package org.seasar.dbflute.helper.stacktrace.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractor;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
@@ -36,36 +39,38 @@ public class InvokeNameExtractorImpl implements InvokeNameExtractor {
      * @param resource the call-back resource for invoke-name-extracting. (NotNull)
      * @return Invoke name. (NotNull: If not found, returns empty string.)
      */
-    public InvokeNameResult extractInvokeName(InvokeNameExtractingResource resource) {
+    public List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource) {
         if (_stackTrace == null) {
             String msg = "The attribute 'stackTrace' should not be null: resource=" + resource;
             throw new IllegalStateException(msg);
         }
-        String targetSimpleClassName = null;
-        String targetMethodName = null;
+        final List<InvokeNameResult> resultList = new ArrayList<InvokeNameResult>();
+        String simpleClassName = null;
+        String methodName = null;
         int lineNumber = 0;
         int foundIndex = -1; // The minus one means 'Not Found'.
         int foundFirstIndex = -1; // The minus one means 'Not Found'.
         boolean onTarget = false;
+        boolean existsDuplicate = false;
         for (int i = resource.getStartIndex(); i < _stackTrace.length; i++) {
             final StackTraceElement element = _stackTrace[i];
             if (i > resource.getStartIndex() + resource.getLoopSize()) {
                 break;
             }
-            final String className = element.getClassName();
-            if (className.startsWith("sun.") || className.startsWith("java.")) {
+            final String currentClassName = element.getClassName();
+            if (currentClassName.startsWith("sun.") || currentClassName.startsWith("java.")) {
                 if (onTarget) {
                     break;
                 }
                 continue;
             }
-            final String methodName = element.getMethodName();
-            if (resource.isTargetElement(className, methodName)) {
-                if (methodName.equals("invoke")) {
+            final String currentMethodName = element.getMethodName();
+            if (resource.isTargetElement(currentClassName, currentMethodName)) {
+                if (currentMethodName.equals("invoke")) {
                     continue;
                 }
-                targetSimpleClassName = className.substring(className.lastIndexOf(".") + 1);
-                targetMethodName = methodName;
+                simpleClassName = currentClassName.substring(currentClassName.lastIndexOf(".") + 1);
+                methodName = currentMethodName;
                 if (resource.isUseAdditionalInfo()) {
                     lineNumber = element.getLineNumber();
                 }
@@ -74,29 +79,41 @@ public class InvokeNameExtractorImpl implements InvokeNameExtractor {
                     foundFirstIndex = i;
                 }
                 onTarget = true;
-                if (resource.isBreakAtFirstElement()) {
-                    break;
+                if (resultList.isEmpty()) { // first element
+                    resultList.add(createResult(resource, simpleClassName, methodName, lineNumber, foundIndex,
+                            foundFirstIndex));
                 } else {
-                    continue;
+                    existsDuplicate = true;
                 }
+                continue;
             }
             if (onTarget) {
                 break;
             }
         }
+        if (simpleClassName == null) {
+            return new ArrayList<InvokeNameResult>();
+        }
+        if (existsDuplicate) {
+            resultList
+                    .add(createResult(resource, simpleClassName, methodName, lineNumber, foundIndex, foundFirstIndex));
+        }
+        return resultList;
+    }
+
+    protected InvokeNameResult createResult(InvokeNameExtractingResource resource, String simpleClassName,
+            String methodName, int lineNumber, int foundIndex, int foundFirstIndex) {
         final InvokeNameResult result = new InvokeNameResult();
-        if (targetSimpleClassName == null) {
-            result.beEmptyResult(); // Not Found! It sets empty result.
-            return result;
-        }
-        final String filteredClassName = resource.filterSimpleClassName(targetSimpleClassName);
-        result.setSimpleClassName(resource.filterSimpleClassName(targetSimpleClassName));
-        result.setMethodName(targetMethodName);
+        final String filteredSimpleClassName = resource.filterSimpleClassName(simpleClassName);
+        result.setSimpleClassName(filteredSimpleClassName);
+        result.setMethodName(methodName);
+        final String invokeName;
         if (lineNumber > 0) {
-            result.setInvokeName(filteredClassName + "." + targetMethodName + "():" + lineNumber + " --> ");
+            invokeName = filteredSimpleClassName + "." + methodName + "():" + lineNumber + " -> ";
         } else {
-            result.setInvokeName(filteredClassName + "." + targetMethodName + "() --> ");
+            invokeName = filteredSimpleClassName + "." + methodName + "() -> ";
         }
+        result.setInvokeName(invokeName);
         result.setFoundIndex(foundIndex);
         result.setFoundFirstIndex(foundFirstIndex);
         return result;

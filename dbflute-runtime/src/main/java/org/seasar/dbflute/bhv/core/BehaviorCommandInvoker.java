@@ -34,6 +34,7 @@ import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.TraceViewUtil;
 
@@ -314,15 +315,18 @@ public class BehaviorCommandInvoker {
     //                                                                      ==============
     protected <RESULT> void logInvocation(BehaviorCommand<RESULT> behaviorCommand) {
         final StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        final InvokeNameResult behaviorResult = extractBehaviorInvokeName(stackTrace);
-        filterBehaviorResult(behaviorCommand, behaviorResult);
+        final List<InvokeNameResult> behaviorResultList = extractBehaviorInvoke(stackTrace);
+        filterBehaviorResult(behaviorCommand, behaviorResultList);
 
+        final InvokeNameResult headBehaviorResult;
         final String invokeClassName;
         final String invokeMethodName;
-        if (!behaviorResult.isEmptyResult()) {
-            invokeClassName = behaviorResult.getSimpleClassName();
-            invokeMethodName = behaviorResult.getMethodName();
+        if (!behaviorResultList.isEmpty()) {
+            headBehaviorResult = findHeadInvokeResult(behaviorResultList);
+            invokeClassName = headBehaviorResult.getSimpleClassName();
+            invokeMethodName = headBehaviorResult.getMethodName();
         } else {
+            headBehaviorResult = null;
             invokeClassName = behaviorCommand.getTableDbName();
             invokeMethodName = behaviorCommand.getCommandName();
         }
@@ -335,11 +339,13 @@ public class BehaviorCommandInvoker {
         final String equalBorder = buildFitBorder("", "=", expWithoutKakko, false);
         final String callerExpression = expWithoutKakko + "()";
 
-        log("/=====================================================" + equalBorder + "==");
-        log("                                                      " + callerExpression);
-        log("                                                      " + equalBorder + "=/");
-
-        logPath(behaviorCommand, stackTrace, behaviorResult);
+        final String frameBase = "/=====================================================";
+        final String spaceBase = "                                                      ";
+        log(frameBase + equalBorder + "==");
+        log(spaceBase + callerExpression);
+        log(spaceBase + equalBorder + "=/");
+        final String invokePath = buildInvokePath(behaviorCommand, stackTrace, headBehaviorResult);
+        log(invokePath);
 
         if (behaviorCommand.isOutsideSql() && !behaviorCommand.isProcedure()) {
             final OutsideSqlContext outsideSqlContext = getOutsideSqlContext();
@@ -351,43 +357,73 @@ public class BehaviorCommandInvoker {
     }
 
     protected <RESULT> void filterBehaviorResult(BehaviorCommand<RESULT> behaviorCommand,
-            InvokeNameResult behaviorResult) {
-        final String simpleClassName = behaviorResult.getSimpleClassName();
-        if (simpleClassName == null) {
-            return;
-        }
-        if (simpleClassName.contains("Behavior") && simpleClassName.endsWith("$SLFunction")) {
-            final String behaviorClassName = findBehaviorClassNameFromDBMeta(behaviorCommand.getTableDbName());
-            behaviorResult.setSimpleClassName(behaviorClassName);
-            behaviorResult.setMethodName("scalarSelect()." + behaviorResult.getMethodName());
+            List<InvokeNameResult> behaviorResultList) {
+        for (InvokeNameResult behaviorResult : behaviorResultList) {
+            final String simpleClassName = behaviorResult.getSimpleClassName();
+            if (simpleClassName == null) {
+                return;
+            }
+            if (simpleClassName.contains("Behavior") && simpleClassName.endsWith("$SLFunction")) {
+                final String behaviorClassName = findBehaviorClassNameFromDBMeta(behaviorCommand.getTableDbName());
+                behaviorResult.setSimpleClassName(behaviorClassName);
+                behaviorResult.setMethodName("scalarSelect()." + behaviorResult.getMethodName());
+            }
         }
     }
 
-    protected <RESULT> void logPath(BehaviorCommand<RESULT> behaviorCommand, StackTraceElement[] stackTrace,
+    protected <RESULT> String buildInvokePath(BehaviorCommand<RESULT> behaviorCommand, StackTraceElement[] stackTrace,
             InvokeNameResult behaviorResult) {
-        final int bhvNextIndex = behaviorResult.getNextStartIndex();
-        final InvokeNameResult clientResult = extractClientInvokeName(stackTrace, bhvNextIndex);
-        final int clientFirstIndex = clientResult.getFoundFirstIndex();
-        final InvokeNameResult byPassResult = extractByPassInvokeName(stackTrace, bhvNextIndex, clientFirstIndex
-                - bhvNextIndex);
+        final int bhvNextIndex = behaviorResult != null ? behaviorResult.getNextStartIndex() : -1;
 
-        final String clientInvokeName = clientResult.getInvokeName();
-        final String byPassInvokeName = byPassResult.getInvokeName();
-        final String behaviorInvokeName = behaviorResult.getInvokeName();
-        if (clientInvokeName.trim().length() == 0 && byPassInvokeName.trim().length() == 0) {
-            return;
+        // Extract client result
+        final List<InvokeNameResult> clientResultList = extractClientInvoke(stackTrace, bhvNextIndex);
+        final InvokeNameResult headClientResult = findHeadInvokeResult(clientResultList);
+
+        // Extract by-pass result
+        final int clientFirstIndex = headClientResult != null ? headClientResult.getFoundFirstIndex() : -1;
+        final int byPassLoopSize = clientFirstIndex - bhvNextIndex;
+        final List<InvokeNameResult> byPassResultList = extractByPassInvoke(stackTrace, bhvNextIndex, byPassLoopSize);
+        final InvokeNameResult headByPassResult = findHeadInvokeResult(byPassResultList);
+
+        if (headClientResult == null && headByPassResult == null) { // when both are not found
+            return null;
         }
+
+        final String clientInvokeName = headClientResult != null ? headClientResult.getInvokeName() : "";
+        final String byPassInvokeName = headByPassResult != null ? headByPassResult.getInvokeName() : "";
 
         // Save client invoke name for error message.
-        if (!clientResult.isEmptyResult()) {
+        if (clientInvokeName.trim().length() > 0) {
             putObjectToMapContext("df:ClientInvokeName", clientInvokeName);
         }
+
         // Save by-pass invoke name for error message.
-        if (!byPassResult.isEmptyResult()) {
+        if (byPassInvokeName.trim().length() > 0) {
             putObjectToMapContext("df:ByPassInvokeName", byPassInvokeName);
         }
 
-        log(clientInvokeName + byPassInvokeName + behaviorInvokeName + "...");
+        final StringBuilder sb = new StringBuilder();
+        sb.append(clientInvokeName);
+        sb.append(findTailInvokeName(clientResultList));
+        sb.append(byPassInvokeName);
+        sb.append(findTailInvokeName(byPassResultList));
+        sb.append("...");
+        return sb.toString();
+    }
+
+    protected InvokeNameResult findHeadInvokeResult(List<InvokeNameResult> resultList) {
+        if (!resultList.isEmpty()) {
+            // The latest element is the very head invoking.
+            return resultList.get(resultList.size() - 1);
+        }
+        return null;
+    }
+
+    protected String findTailInvokeName(List<InvokeNameResult> resultList) {
+        if (resultList.size() > 1) {
+            return resultList.get(0).getInvokeName();
+        }
+        return "";
     }
 
     protected <RESULT> String buildInvocationExpressionWithoutKakko(BehaviorCommand<RESULT> behaviorCommand,
@@ -455,8 +491,9 @@ public class BehaviorCommandInvoker {
         return sb.toString();
     }
 
-    protected InvokeNameResult extractClientInvokeName(StackTraceElement[] stackTrace, final int startIndex) {
-        final List<String> suffixList = Arrays.asList(new String[] { "Page", "Action", "Test" });
+    protected List<InvokeNameResult> extractClientInvoke(StackTraceElement[] stackTrace, final int startIndex) {
+        final String[] names = new String[] { "Page", "Action", "Test" };
+        final List<String> suffixList = Arrays.asList(names);
         final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
             public boolean isTargetElement(String className, String methodName) {
                 return isClassNameEndsWith(className, suffixList);
@@ -477,18 +514,14 @@ public class BehaviorCommandInvoker {
             public int getLoopSize() {
                 return 25;
             }
-
-            public boolean isBreakAtFirstElement() {
-                return true;
-            }
         };
         return extractInvokeName(resource, stackTrace);
     }
 
-    protected InvokeNameResult extractByPassInvokeName(StackTraceElement[] stackTrace, final int startIndex,
+    protected List<InvokeNameResult> extractByPassInvoke(StackTraceElement[] stackTrace, final int startIndex,
             final int loopSize) {
-        final List<String> suffixList = Arrays
-                .asList(new String[] { "Service", "ServiceImpl", "Facade", "FacadeImpl" });
+        final String[] names = new String[] { "Service", "ServiceImpl", "Facade", "FacadeImpl", "Logic", "LogicImpl" };
+        final List<String> suffixList = Arrays.asList(names);
         final InvokeNameExtractingResource resource = new InvokeNameExtractingResource() {
             public boolean isTargetElement(String className, String methodName) {
                 return isClassNameEndsWith(className, suffixList);
@@ -509,17 +542,13 @@ public class BehaviorCommandInvoker {
             public int getLoopSize() {
                 return loopSize >= 0 ? loopSize : 25;
             }
-
-            public boolean isBreakAtFirstElement() {
-                return true;
-            }
         };
         return extractInvokeName(resource, stackTrace);
     }
 
-    protected InvokeNameResult extractBehaviorInvokeName(StackTraceElement[] stackTrace) {
-        final List<String> suffixList = Arrays.asList(new String[] { "Bhv", "BehaviorReadable", "BehaviorWritable",
-                "PagingInvoker" });
+    protected List<InvokeNameResult> extractBehaviorInvoke(StackTraceElement[] stackTrace) {
+        final String[] names = new String[] { "Bhv", "BehaviorReadable", "BehaviorWritable", "PagingInvoker" };
+        final List<String> suffixList = Arrays.asList(names);
         final List<String> keywordList = Arrays
                 .asList(new String[] { "Bhv$", "BehaviorReadable$", "BehaviorWritable$" });
         final List<String> ousideSql1List = Arrays.asList(new String[] { "OutsideSql" });
@@ -556,10 +585,6 @@ public class BehaviorCommandInvoker {
             public int getLoopSize() {
                 return 25;
             }
-
-            public boolean isBreakAtFirstElement() {
-                return false;
-            }
         };
         return extractInvokeName(resource, stackTrace);
     }
@@ -585,9 +610,10 @@ public class BehaviorCommandInvoker {
     /**
      * @param resource the call-back resource for invoke-name-extracting. (NotNull)
      * @param stackTrace Stack log. (NotNull)
-     * @return The result of invoke name. (NotNull: If not found, returns empty string.)
+     * @return The list of result of invoke name. (NotNull: If not found, returns empty string.)
      */
-    protected InvokeNameResult extractInvokeName(InvokeNameExtractingResource resource, StackTraceElement[] stackTrace) {
+    protected List<InvokeNameResult> extractInvokeName(InvokeNameExtractingResource resource,
+            StackTraceElement[] stackTrace) {
         final InvokeNameExtractorImpl extractor = new InvokeNameExtractorImpl();
         extractor.setStackTrace(stackTrace);
         return extractor.extractInvokeName(resource);
@@ -765,6 +791,13 @@ public class BehaviorCommandInvoker {
     protected void toBeDisposable() {
         assertInvokerAssistant();
         _invokerAssistant.toBeDisposable();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

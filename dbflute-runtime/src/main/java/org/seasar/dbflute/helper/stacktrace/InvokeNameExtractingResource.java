@@ -20,15 +20,13 @@ package org.seasar.dbflute.helper.stacktrace;
  */
 public interface InvokeNameExtractingResource {
 
-    public boolean isTargetElement(String className, String methodName);
+    boolean isTargetElement(String className, String methodName);
 
-    public String filterSimpleClassName(String simpleClassName);
+    String filterSimpleClassName(String simpleClassName);
 
-    public boolean isUseAdditionalInfo();
+    boolean isUseAdditionalInfo();
 
-    public int getStartIndex();
+    int getStartIndex();
 
-    public int getLoopSize();
-
-    public boolean isBreakAtFirstElement();
+    int getLoopSize();
 }
