@@ -272,7 +272,11 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     public String removeCommonColumnSetupInvokingMark(String logic) {
-        return filterInvokingLogic(logic.substring("$".length()));
+        String filtered = filterInvokingLogic(logic.substring("$".length()));
+        if (!filtered.trim().endsWith(";")) {
+            filtered = filtered + ";";
+        }
+        return filtered;
     }
 
     protected String filterInvokingLogic(String logic) {

@@ -32,12 +32,14 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
 #foreach ($classificationMap in $classificationList)
 
     /**
-     * Classify the value of ${uncapitalisedJavaName} as ${classificationMap.get('name')}.
+     * Classify the value of ${uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void classify${javaName}${classificationMap.get('name')}();
 
     /**
-     * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'?
+     * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
      * <p>
      * The difference of capital letters and small letters is NOT distinguished.
      * If the value is null, this method returns false!

@@ -59,11 +59,7 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
         if (!entity.canCommonColumnAutoSetup()) {
             return;
         }
-        if (_log.isDebugEnabled()) {
-            String msg = "...Filtering entity of INSERT about the column columns of " + entity.getTableDbName();
-            msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity, "{", "}", ", ", "=");
-            _log.debug(msg);
-        }
+        log(entity, "INSERT");
 #foreach ($columnName in ${database.commonColumnNameList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($entityCommonColumnMap = ${database.commonColumnMap})
@@ -100,11 +96,7 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
         if (!entity.canCommonColumnAutoSetup()) {
             return;
         }
-        if (_log.isDebugEnabled()) {
-            String msg = "...Filtering entity of UPDATE about the column columns of " + entity.getTableDbName();
-            msg = msg + ": entity=" + entity.getDBMeta().extractPrimaryKeyMapString(entity, "{", "}", ", ", "=");
-            _log.debug(msg);
-        }
+        log(entity, "UPDATE");
 #foreach ($columnName in ${database.commonColumnNameList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($entityCommonColumnMap = ${database.CommonColumnMap})
@@ -126,5 +118,11 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
 #end
 #end
 #end
+    }
+
+    protected void log(${glEntityDefinedCommonColumn} entity, String keyword) {
+        if (_log.isDebugEnabled()) {
+            _log.debug("...Setting up column columns of " + entity.getTableDbName() + " before " + keyword + "!");
+        }
     }
 }

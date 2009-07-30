@@ -215,7 +215,7 @@ namespace ${glPackageBaseCommonBhv} {
                 return;
             }
             if (_log.IsDebugEnabled) {
-                _log.Debug("...Filtering entity of INSERT about the column columns of " + this.TableDbName);
+                _log.Debug("...Setting up column columns of " + this.TableDbName + " before INSERT!");
             }
 #foreach ($columnName in ${database.commonColumnNameList})
   #set ($entityCommonColumnMap = ${database.CommonColumnMap})
@@ -278,7 +278,7 @@ namespace ${glPackageBaseCommonBhv} {
                 return;
             }
             if (_log.IsDebugEnabled) {
-                _log.Debug("...Filtering entity of UPDATE about the column columns of " + this.TableDbName);
+                _log.Debug("...Setting up column columns of " + this.TableDbName + " before UPDATE!");
             }
 #foreach ($columnName in ${database.commonColumnNameList})
   #set ($entityCommonColumnMap = ${database.CommonColumnMap})
