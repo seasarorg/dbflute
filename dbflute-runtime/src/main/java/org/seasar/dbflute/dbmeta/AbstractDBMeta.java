@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.dbmeta;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -189,23 +190,12 @@ public abstract class AbstractDBMeta implements DBMeta {
             if (_columnInfoList != null) {
                 return _columnInfoList;
             }
-            Method[] methods = this.getClass().getMethods();
-            _columnInfoList = newArrayList();
-            String prefix = "column";
-            Class<ColumnInfo> returnType = ColumnInfo.class;
-            Object[] args = new Object[] {};
-            try {
-                for (Method method : methods) {
-                    if (method.getName().startsWith(prefix) && returnType.equals(method.getReturnType())) {
-                        _columnInfoList.add((ColumnInfo) method.invoke(this, args));
-                    }
-                }
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
+            _columnInfoList = ccil();
             return _columnInfoList;
         }
     }
+
+    protected abstract List<ColumnInfo> ccil(); // createColumnInfoList()
 
     /**
      * Get the flexible map of column information.
@@ -284,14 +274,14 @@ public abstract class AbstractDBMeta implements DBMeta {
         } catch (NoSuchMethodException e) {
             String msg = "Not found foreign by foreignPropertyName: foreignPropertyName=" + foreignPropertyName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
+            throw new IllegalStateException(msg, e);
         }
         try {
             return (ForeignInfo) method.invoke(this, new Object[] {});
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
+            throw new IllegalStateException(e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalStateException(e.getCause());
         }
     }
 
@@ -379,20 +369,20 @@ public abstract class AbstractDBMeta implements DBMeta {
     public ReferrerInfo findReferrerInfo(String referrerPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("referrerPropertyName", referrerPropertyName);
         final String methodName = buildRelationInfoGetterMethodNameInitCap("referrer", referrerPropertyName);
-        java.lang.reflect.Method method = null;
+        Method method = null;
         try {
             method = this.getClass().getMethod(methodName, new Class[] {});
         } catch (NoSuchMethodException e) {
             String msg = "Not found referrer by referrerPropertyName: referrerPropertyName=" + referrerPropertyName;
             msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
+            throw new IllegalStateException(msg, e);
         }
         try {
             return (ReferrerInfo) method.invoke(this, new Object[] {});
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
+            throw new IllegalStateException(e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalStateException(e.getCause());
         }
     }
 
@@ -1073,25 +1063,25 @@ public abstract class AbstractDBMeta implements DBMeta {
                 constructor = targetType.getConstructor(new Class[] { argType });
             } catch (SecurityException e) {
                 String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new RuntimeException(msg, e);
+                throw new IllegalStateException(msg, e);
             } catch (NoSuchMethodException e) {
                 String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new RuntimeException(msg, e);
+                throw new IllegalStateException(msg, e);
             }
             try {
                 return constructor.newInstance(new Object[] { arg });
             } catch (IllegalArgumentException e) {
                 String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new RuntimeException(msg, e);
+                throw new IllegalStateException(msg, e);
             } catch (InstantiationException e) {
                 String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new RuntimeException(msg, e);
+                throw new IllegalStateException(msg, e);
             } catch (IllegalAccessException e) {
                 String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new RuntimeException(msg, e);
-            } catch (java.lang.reflect.InvocationTargetException e) {
+                throw new IllegalStateException(msg, e);
+            } catch (InvocationTargetException e) {
                 String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new RuntimeException(msg, e);
+                throw new IllegalStateException(msg, e.getCause());
             }
         }
     }
