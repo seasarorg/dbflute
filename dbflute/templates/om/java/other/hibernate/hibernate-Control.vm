@@ -92,25 +92,25 @@ $database.makeDirectory($path)
 
 $database.info("    parse('AccessContext');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glAccessContext}.${glClassFileExtension}" )
-$generator.parse("om/${glResourceDirectory}/allcommon/AccessContext.${glTemplateFileExtension}",$path ,"", "")
+$generator.parse("om/${glResourceDirectory}/allcommon/HibernateAccessContext.${glTemplateFileExtension}",$path ,"", "")
 
 #if ($database.hasClassificationDefinitionMap())
   $database.info("    parse('CDef');")
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCDef}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/CDef.${glTemplateFileExtension}",$path ,"" ,"")
+  $generator.parse("om/${glResourceDirectory}/allcommon/HibernateCDef.${glTemplateFileExtension}",$path ,"" ,"")
 #end
 
 $database.info("    parse('CommonColumnAutoSetupper');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCommonColumnAutoSetupper}.${glClassFileExtension}" )
-$generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
+$generator.parse("om/${glResourceDirectory}/allcommon/HibernateCommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
 
 $database.info("    parse('Entity');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntity}.${glClassFileExtension}" )
-$generator.parse("om/${glResourceDirectory}/allcommon/Entity.${glTemplateFileExtension}",$path ,"", "")
+$generator.parse("om/${glResourceDirectory}/allcommon/HibernateEntity.${glTemplateFileExtension}",$path ,"", "")
 
 $database.info("    parse('EntityDefinedCommonColumn');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntityDefinedCommonColumn}.${glClassFileExtension}" )
-$generator.parse("om/${glResourceDirectory}/allcommon/EntityDefinedCommonColumn.${glTemplateFileExtension}",$path ,"", "")
+$generator.parse("om/${glResourceDirectory}/allcommon/HibernateEntityDefinedCommonColumn.${glTemplateFileExtension}",$path ,"", "")
 
 $database.info("}")
 
