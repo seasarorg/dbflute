@@ -279,6 +279,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             _selectIndexMap = new HashMap<String, Integer>();
         }
 
+        // Columns of local table.
         for (ColumnInfo columnInfo : columnInfoList) {
             String columnName = columnInfo.getColumnDbName();
 
@@ -315,15 +316,18 @@ public abstract class AbstractSqlClause implements SqlClause {
             sb.append(realColumnName).append(" as ").append(onQueryName);
             _selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
         }
+
+        // Columns of foreign tables.
         Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
         for (String tableAliasName : tableAliasNameSet) {
             Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
             Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
-
-            Map<String, String> foreginSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap
-                    .get(tableAliasName) : null;
+            Map<String, String> foreginSpecifiedMap = null;
+            if (_specifiedSelectColumnMap != null) {
+                foreginSpecifiedMap = _specifiedSelectColumnMap.get(tableAliasName);
+            }
             boolean existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
-
+            boolean finishedForeignIndent = false;
             for (SelectedSelectColumnInfo selectColumnInfo : selectColumnInfoList) {
                 if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnName())) {
                     continue;
@@ -338,6 +342,10 @@ public abstract class AbstractSqlClause implements SqlClause {
                     onQueryName = buildSelectIndexAliasName(selectIndex);
                 } else {
                     onQueryName = columnAliasName;
+                }
+                if (!finishedForeignIndent) {
+                    sb.append(getLineSeparator()).append("     ");
+                    finishedForeignIndent = true;
                 }
                 sb.append(", ").append(realColumnName).append(" as ").append(onQueryName);
                 _selectClauseRealColumnAliasMap.put(realColumnName, onQueryName);
