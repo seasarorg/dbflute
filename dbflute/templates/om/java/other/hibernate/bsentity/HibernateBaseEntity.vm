@@ -104,6 +104,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
     //                                              Internal
     //                                              --------
     /** Is common column auto set up effective? */
+    @Transient
     protected boolean _canCommonColumnAutoSetup = true;
 
 #end
@@ -306,6 +307,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #if (!${referrer.isOneToOne()})
     /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. */
     @OneToMany(mappedBy = "${referrer.foreignPropertyName}", fetch=FetchType.${database.hibernateOneToManyFetch})
+    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
     protected List<${referrerEntityClassName}> $referrerVariableName;
 
     /**
