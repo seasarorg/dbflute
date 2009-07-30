@@ -228,6 +228,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         Map<String, String> localSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(getLocalTableAliasName()) : null;
         bool existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
         
+        // Columns of local table.
         foreach (${glColumnInfo} columnInfo in columnInfoList) {
             String columnName = columnInfo.ColumnDbName;
             
@@ -256,23 +257,28 @@ public abstract class ${myClassName} : ${glSqlClause} {
             sb.append(realColumnName).append(" as ").append(columnName);
             _selectClauseRealColumnAliasMap.put(realColumnName, columnName);
         }
+        
+        // Columns of foreign tables.
         Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
         foreach (String tableAliasName in tableAliasNameSet) {
             Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
             Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
-
-            // [DBFlute-0.7.4]
-            Map<String, String> foreginSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(tableAliasName) : null;
+            Map<String, String> foreginSpecifiedMap = null;
+            if (_specifiedSelectColumnMap != null) {
+                foreginSpecifiedMap = _specifiedSelectColumnMap.get(tableAliasName);
+            }
             bool existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
-
+            bool finishedForeignIndent = false;
             foreach (SelectedSelectColumnInfo selectColumnInfo in selectColumnInfoList) {
-                String realColumnName = selectColumnInfo.buildRealColumnName();
-
-                // [DBFlute-0.7.4]
                 if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnName())) {
                     continue;
                 }
 
+                String realColumnName = selectColumnInfo.buildRealColumnName();
+                if (!finishedForeignIndent) {
+                    sb.append(getLineSeparator()).append("     ");
+                    finishedForeignIndent = true;
+                }
                 sb.append(", ").append(realColumnName).append(" as ").append(selectColumnInfo.getColumnAliasName());
                 _selectClauseRealColumnAliasMap.put(realColumnName, selectColumnInfo.getColumnAliasName());
             }

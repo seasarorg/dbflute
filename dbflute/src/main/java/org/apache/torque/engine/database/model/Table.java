@@ -733,9 +733,7 @@ public class Table {
     //                                                 Basic
     //                                                 -----
     /**
-     * A utility function to create a new column from attrib and add it to this
-     * table.
-     *
+     * A utility function to create a new column from attrib and add it to this table.
      * @param attrib xml attributes for the column to add
      * @return the added column
      */
@@ -750,7 +748,6 @@ public class Table {
     /**
      * Adds a new column to the column list and set the
      * parent table of the column to the current table
-     *
      * @param col the column to add
      */
     public void addColumn(Column col) {
@@ -790,6 +787,19 @@ public class Table {
         for (int i = 0; i < size; i++) {
             final Column col = (Column) ls.get(i);
             sb.append(", ").append(col.getName());
+        }
+        sb.delete(0, ", ".length());
+        return sb.toString();
+    }
+
+    public String getPropertyNameCommaString() {
+        final StringBuilder sb = new StringBuilder();
+
+        final List<Column> ls = _columnList;
+        int size = ls.size();
+        for (int i = 0; i < size; i++) {
+            final Column col = (Column) ls.get(i);
+            sb.append(", ").append(col.getJavaBeansRulePropertyName());
         }
         sb.delete(0, ", ".length());
         return sb.toString();

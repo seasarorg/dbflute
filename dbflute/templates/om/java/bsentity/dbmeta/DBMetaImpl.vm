@@ -47,6 +47,14 @@ public class ${myClassName} extends AbstractDBMeta {
     public ColumnInfo column${col.javaBeansRulePropertyNameInitCap}() { return _column${col.javaBeansRulePropertyNameInitCap}; }
 #end
 
+    protected List<ColumnInfo> ccil() {
+        List<ColumnInfo> ls = newArrayList();
+#foreach ($col in $table.columns)
+        ls.add(column${col.javaBeansRulePropertyNameInitCap}());
+#end
+        return ls;
+    }
+
     { initializeInformationResource(); }
 
     // ===================================================================================
