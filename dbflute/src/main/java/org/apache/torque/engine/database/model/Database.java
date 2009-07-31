@@ -1242,6 +1242,10 @@ public class Database {
         return getClassificationProperties().buildClassificationCodeNameAliasVariables(classificationMap);
     }
 
+    public boolean isTableClassification(String classificationName) {
+        return getClassificationProperties().isTableClassification(classificationName);
+    }
+
     // --------------------------------------
     //                             Deployment
     //                             ----------

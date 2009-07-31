@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +43,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final List<DfClassificationInfo> _tableClassificationList = new ArrayList<DfClassificationInfo>();
+    protected final Map<String, DfClassificationInfo> _tableClassificationMap = new LinkedHashMap<String, DfClassificationInfo>();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -185,7 +186,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
 
                     // Save for auto deployment if it is NOT suppressAutoDeploy.
                     if (!isTableClassificationSuppressAutoDeploy(elementMap)) {
-                        _tableClassificationList.add(classificationInfo);
+                        _tableClassificationMap.put(classificationName, classificationInfo);
                     }
                     continue;
                 }
@@ -214,6 +215,10 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     protected boolean isTableClassificationSuppressAutoDeploy(Map<?, ?> elementMap) {
         final String suppressAutoDeploy = (String) elementMap.get("suppressAutoDeploy");
         return suppressAutoDeploy != null && suppressAutoDeploy.equalsIgnoreCase("true");
+    }
+
+    public boolean isTableClassification(String classificationName) {
+        return _tableClassificationMap.containsKey(classificationName);
     }
 
     // -----------------------------------------------------
@@ -577,7 +582,9 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
             }
         }
         initializeClassificationDefinition();
-        for (DfClassificationInfo info : _tableClassificationList) {
+        final Set<Entry<String, DfClassificationInfo>> tableClassificationEntrySet = _tableClassificationMap.entrySet();
+        for (Entry<String, DfClassificationInfo> entry : tableClassificationEntrySet) {
+            final DfClassificationInfo info = entry.getValue();
             final Map<String, String> columnClsMap = getColumnClsMap(deploymentMap, info.getTable());
             final String classificationName = info.getClassificationName();
             registerColumnClsIfNeeds(columnClsMap, info.getCode(), classificationName);

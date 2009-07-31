@@ -1609,6 +1609,14 @@ public class Column {
         return database.hasClassification(getTableName(), getName());
     }
 
+    public boolean isTableClassification() {
+        if (!hasClassification()) {
+            return false;
+        }
+        final Database database = getTable().getDatabase();
+        return database.isTableClassification(getClassificationName());
+    }
+
     public boolean hasClassificationName() {
         final Database database = getTable().getDatabase();
         if (_sql2EntityTableName != null && database.hasClassificationName(_sql2EntityTableName, getName())) {

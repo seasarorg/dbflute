@@ -231,7 +231,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     // ===================================================================================
     //                                                           Classification Name/Alias
     //                                                           =========================
-#foreach ($col in $table.Columns)
+#foreach ($col in $table.columns)
 #if ($col.hasClassification())
 #if ($col.hasClassificationName())
     /**
