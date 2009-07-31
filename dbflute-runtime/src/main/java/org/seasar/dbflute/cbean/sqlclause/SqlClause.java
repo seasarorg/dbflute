@@ -492,6 +492,12 @@ public interface SqlClause {
     public String getSpecifiedColumnNameAsOne();
 
     /**
+     * Get the name of only one specified column with alias name.
+     * @return The name of only one specified column with alias name. (Nullable: If it's not found or duplicated, it returns null)
+     */
+    public String getSpecifiedColumnRealNameAsOne();
+
+    /**
      * Remove the only one specified column.
      * @return The only one specified column with alias name. (Nullable: If it's not found or duplicated, it returns null)
      */

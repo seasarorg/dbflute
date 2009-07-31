@@ -12,6 +12,9 @@ import org.seasar.dbflute.util.DfSystemUtil;
  */
 public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected ConditionBean _baseCB;
     protected HpSpQyCall<CQ> _qyCall;
     protected CQ _query;
@@ -22,6 +25,9 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     protected boolean _forGeneralOneSpecificaion;
     protected DBMetaProvider _dbmetaProvider;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * @param baseCB The condition-bean of base level. (NotNull)
      * @param qyCall The call-back for condition-query. (NotNull)
@@ -40,6 +46,9 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
         _dbmetaProvider = dbmetaProvider;
     }
 
+    // ===================================================================================
+    //                                                                Column Specification
+    //                                                                ====================
     protected void doColumn(String columnName) {
         assertColumn(columnName);
         if (_query == null) {
@@ -60,25 +69,20 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
     }
 
     protected boolean isRequiredColumnSpecificationEnabled() {
-        if (_forGeneralOneSpecificaion) {
-            return false;
-        }
-        return !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery && !_alreadySpecifyRequiredColumn;
+        return !_forGeneralOneSpecificaion && !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery
+                && !_alreadySpecifyRequiredColumn;
     }
 
     protected void assertColumn(String columnName) {
-        if (_forGeneralOneSpecificaion) {
+        if (_forGeneralOneSpecificaion || _forDerivedReferrer) {
             return;
         }
-        if (_query == null && !_qyCall.has()) {
+        if (_query == null && !_qyCall.has()) { // setupSelect check!
             throwSpecifyColumnNotSetupSelectColumnException(columnName);
         }
     }
 
     protected void assertForeign(String foreignPropertyName) {
-        if (_forDerivedReferrer) {
-            throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName);
-        }
         if (_forScalarSelect) {
             throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName);
         }
@@ -91,6 +95,9 @@ public abstract class HpAbstractSpecification<CQ extends ConditionQuery> {
 
     protected abstract String getTableDbName();
 
+    // ===================================================================================
+    //                                                                  Exception Handling
+    //                                                                  ==================
     protected void throwSpecifyColumnNotSetupSelectColumnException(String columnName) {
         ConditionBeanContext.throwSpecifyColumnNotSetupSelectColumnException(_baseCB, getTableDbName(), columnName);
     }

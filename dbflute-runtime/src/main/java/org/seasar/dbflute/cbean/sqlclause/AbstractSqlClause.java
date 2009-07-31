@@ -1577,14 +1577,24 @@ public abstract class AbstractSqlClause implements SqlClause {
         return null;
     }
 
+    public String getSpecifiedColumnRealNameAsOne() {
+        return doGetSpecifiedColumnRealNameAsOne(false);
+    }
+
     public String removeSpecifiedColumnRealNameAsOne() {
+        return doGetSpecifiedColumnRealNameAsOne(true);
+    }
+
+    private String doGetSpecifiedColumnRealNameAsOne(boolean remove) {
         if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
             String tableAliasName = _specifiedSelectColumnMap.keySet().iterator().next();
             Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
             if (elementMap != null && elementMap.size() == 1) {
                 String columnName = elementMap.keySet().iterator().next();
                 String realName = tableAliasName + "." + columnName;
-                elementMap.remove(columnName);
+                if (remove) {
+                    elementMap.remove(columnName);
+                }
                 return realName;
             }
         }

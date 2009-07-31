@@ -765,11 +765,24 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                                                         , String propertyName, String aliasName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
-        String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
-        if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
+        String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        if (specifiedColumnName == null || specifiedColumnName.trim().length() == 0) {
             throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
         }
-        assertSpecifyDerivedReferrerColumnType(function, subQuery, deriveColumnName);
+        String deriveColumnName;
+        {
+            String specifiedColumnRealName = subQuery.getSqlClause().getSpecifiedColumnRealNameAsOne();
+            if (!specifiedColumnRealName.startsWith(subQuery.getSqlClause().getLocalTableAliasName())) {
+                // The column is on related table.
+                deriveColumnName = specifiedColumnRealName;
+            } else {
+                // The column is on local table.
+                deriveColumnName = tableAliasName + "." + specifiedColumnName;
+                
+                // Assert about column type when local table only.
+                assertSpecifyDerivedReferrerColumnType(function, subQuery, deriveColumnName);
+            }
+        }
         subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         String connect = xbuildFunctionConnector(function);
         if (subQuery.getSqlClause().hasUnionQuery()) {
@@ -785,17 +798,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
             String selectClause = "select " + tableAliasName + "." + primaryKeyName 
                                      + ", " + tableAliasName + "." + relatedColumnName
-                                     + ", " + tableAliasName + "." + deriveColumnName;
+                                     + ", " + deriveColumnName;
             String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                      , selectClause, tableAliasName);
             String mainSql = selectClause + " " + fromWhereClause;
             String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
-            return "select " + function + connect + "dfsubquerymain." + deriveColumnName + ")" + ln()
+            return "select " + function + connect + "dfsubquerymain." + specifiedColumnName + ")" + ln()
                  + "  from (" + beginMark
                  + mainSql + ln()
                  + "       ) dfsubquerymain" + endMark + ln() + " where " + joinCondition;
         } else {
-            String selectClause = "select " + function + connect + tableAliasName + "." + deriveColumnName + ")";
+            String selectClause = "select " + function + connect + deriveColumnName + ")";
             String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                            , selectClause, tableAliasName, realColumnName);
             return selectClause + " " + fromWhereClause;
@@ -807,6 +820,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void assertSpecifyDerivedReferrerColumnType(String function, ConditionQuery subQuery, String deriveColumnName) {
+        if (deriveColumnName.contains(".")) {
+            deriveColumnName = deriveColumnName.substring(deriveColumnName.lastIndexOf(".") + ".".length());
+        }
         final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
         final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
@@ -854,11 +870,24 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                                                       , String propertyName, Object value) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
-        String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
-        if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
+        String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        if (specifiedColumnName == null || specifiedColumnName.trim().length() == 0) {
             throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
         }
-        assertQueryDerivedReferrerColumnType(function, subQuery, deriveColumnName, value);
+        String deriveColumnName;
+        {
+            String specifiedColumnRealName = subQuery.getSqlClause().getSpecifiedColumnRealNameAsOne();
+            if (!specifiedColumnRealName.startsWith(subQuery.getSqlClause().getLocalTableAliasName())) {
+                // the column is on related table.
+                deriveColumnName = specifiedColumnRealName;
+            } else {
+                // the column is on local table.
+                deriveColumnName = tableAliasName + "." + specifiedColumnName;
+                
+                // Assert about column type when local table only.
+                assertQueryDerivedReferrerColumnType(function, subQuery, deriveColumnName, value);
+            }
+        }
         subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
         String connect = xbuildFunctionConnector(function);
         if (subQuery.getSqlClause().hasUnionQuery()) {
@@ -874,17 +903,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
             String selectClause = "select " + tableAliasName + "." + primaryKeyName 
                                      + ", " + tableAliasName + "." + relatedColumnName
-                                     + ", " + tableAliasName + "." + deriveColumnName;
+                                     + ", " + deriveColumnName;
             String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                      , selectClause, tableAliasName);
             String mainSql = selectClause + " " + fromWhereClause;
             String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
-            return "select " + function + connect + "dfsubquerymain." + deriveColumnName + ")" + ln()
+            return "select " + function + connect + "dfsubquerymain." + specifiedColumnName + ")" + ln()
                  + "  from (" + beginMark
                  + mainSql + ln()
                  + "       ) dfsubquerymain" + endMark + ln() + " where " + joinCondition;
         } else {
-            String selectClause = "select " + function + connect + tableAliasName + "." + deriveColumnName + ")";
+            String selectClause = "select " + function + connect + deriveColumnName + ")";
             String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
                                                                            , selectClause, tableAliasName, realColumnName);
             return selectClause + " " + fromWhereClause;
@@ -896,6 +925,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void assertQueryDerivedReferrerColumnType(String function, ConditionQuery subQuery, String deriveColumnName, Object value) {
+        if (deriveColumnName.contains(".")) {
+            deriveColumnName = deriveColumnName.substring(deriveColumnName.lastIndexOf(".") + ".".length());
+        }
         DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
         Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
@@ -925,215 +957,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType, Object value) {
         ConditionBeanContext.throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
-    }
-
-    public static class QDRFunction<CB extends ConditionBean> { // Internal
-        protected QDRSetupper<CB> _setupper;
-        public QDRFunction(QDRSetupper<CB> setupper) {
-            _setupper = setupper;
-        }
-        
-        /**
-         * Set up the sub query of referrer for the scalar 'count'.
-         * <pre>
-         * cb.query().scalarPurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchaseId(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
-         * @return The parameter for comparing with scalar. (NotNull)
-         */
-        public QDRParameter<CB, Integer> count(SubQuery<CB> subQuery) {
-            return new QDRParameter<CB, Integer>("count", subQuery, _setupper);
-        }
-        
-        /**
-         * Set up the sub query of referrer for the scalar 'count(with distinct)'.
-         * <pre>
-         * cb.query().scalarPurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
-         * @return The parameter for comparing with scalar. (NotNull)
-         */
-        public QDRParameter<CB, Integer> countDistinct(SubQuery<CB> subQuery) {
-            return new QDRParameter<CB, Integer>("count(distinct", subQuery, _setupper);
-        }
-
-        /**
-         * Set up the sub query of referrer for the scalar 'max'.
-         * <pre>
-         * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
-         * @return The parameter for comparing with scalar. (NotNull)
-         */
-        public QDRParameter<CB, Object> max(SubQuery<CB> subQuery) {
-            return new QDRParameter<CB, Object>("max", subQuery, _setupper);
-        }
-        
-        /**
-         * Set up the sub query of referrer for the scalar 'min'.
-         * <pre>
-         * cb.query().scalarPurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
-         * @return The parameter for comparing with scalar. (NotNull)
-         */
-        public QDRParameter<CB, Object> min(SubQuery<CB> subQuery) {
-            return new QDRParameter<CB, Object>("min", subQuery, _setupper);
-        }
-        
-        /**
-         * Set up the sub query of referrer for the scalar 'sum'.
-         * <pre>
-         * cb.query().scalarPurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
-         * @return The parameter for comparing with scalar. (NotNull)
-         */
-        public QDRParameter<CB, Number> sum(SubQuery<CB> subQuery) {
-            return new QDRParameter<CB, Number>("sum", subQuery, _setupper);
-        }
-        
-        /**
-         * Set up the sub query of referrer for the scalar 'avg'.
-         * <pre>
-         * cb.query().scalarPurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).greaterEqual(123); // *Don't forget the parameter!
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull) 
-         * @return The parameter for comparing with scalar. (NotNull)
-         */
-        public QDRParameter<CB, Number> avg(SubQuery<CB> subQuery) {
-            return new QDRParameter<CB, Number>("avg", subQuery, _setupper);
-        }
-    }
-
-    protected static interface QDRSetupper<CB extends ConditionBean> { // Internal
-        public void setup(String function, SubQuery<CB> subQuery, String operand, Object value);
-    }
-
-    public static class QDRParameter<CB extends ConditionBean, PARAMETER> { // Internal
-        protected String _function;
-        protected SubQuery<CB> _subQuery;
-        protected QDRSetupper<CB> _setupper;
-        public QDRParameter(String function, SubQuery<CB> subQuery, QDRSetupper<CB> setupper) {
-            _function = function;
-            _subQuery = subQuery;
-            _setupper = setupper;
-        }
-
-        /**
-         * Set up the operand 'equal' and the value of parameter. <br />
-         * The type of the parameter should be same as the type of target column. 
-         * <pre>
-         * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // If the type is Integer...
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).equal(123); // This parameter should be Integer!
-         * </pre> 
-         * @param value The value of parameter. (NotNull) 
-         */
-        public void equal(PARAMETER value) {
-            _setupper.setup(_function, _subQuery, "=", value);
-        }
-        
-        /**
-         * Set up the operand 'greaterThan' and the value of parameter. <br />
-         * The type of the parameter should be same as the type of target column. 
-         * <pre>
-         * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // If the type is Integer...
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).greaterThan(123); // This parameter should be Integer!
-         * </pre> 
-         * @param value The value of parameter. (NotNull) 
-         */
-        public void greaterThan(PARAMETER value) {
-            _setupper.setup(_function, _subQuery, ">", value);
-        }
-        
-        /**
-         * Set up the operand 'lessThan' and the value of parameter. <br />
-         * The type of the parameter should be same as the type of target column. 
-         * <pre>
-         * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // If the type is Integer...
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).lessThan(123); // This parameter should be Integer!
-         * </pre> 
-         * @param value The value of parameter. (NotNull) 
-         */
-        public void lessThan(PARAMETER value) {
-            _setupper.setup(_function, _subQuery, "<", value);
-        }
-        
-        /**
-         * Set up the operand 'greaterEqual' and the value of parameter. <br />
-         * The type of the parameter should be same as the type of target column. 
-         * <pre>
-         * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // If the type is Integer...
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).greaterEqual(123); // This parameter should be Integer!
-         * </pre> 
-         * @param value The value of parameter. (NotNull) 
-         */
-        public void greaterEqual(PARAMETER value) {
-            _setupper.setup(_function, _subQuery, ">=", value);
-        }
-        
-        /**
-         * Set up the operand 'lessEqual' and the value of parameter. <br />
-         * The type of the parameter should be same as the type of target column. 
-         * <pre>
-         * cb.query().scalarPurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // If the type is Integer...
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }).lessEqual(123); // This parameter should be Integer!
-         * </pre> 
-         * @param value The value of parameter. (NotNull) 
-         */
-        public void lessEqual(PARAMETER value) {
-            _setupper.setup(_function, _subQuery, "<=", value);
-        }
     }
 
     // [DBFlute-0.8.8]
@@ -1225,81 +1048,6 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
         ConditionBeanContext.throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
-    }
-
-    public static class SSQFunction<CB extends ConditionBean> { // Internal
-        protected SSQSetupper<CB> _setupper;
-        public SSQFunction(SSQSetupper<CB> setupper) {
-            _setupper = setupper;
-        }
-
-        /**
-         * Set up the sub query of myself for the scalar 'max'.
-         * <pre>
-         * cb.query().scalar_Equal().max(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * });
-         * </pre> 
-         * @param subQuery The sub query of myself. (NotNull) 
-         */
-        public void max(SubQuery<CB> subQuery) {
-            _setupper.setup("max", subQuery);
-        }
-
-        /**
-         * Set up the sub query of myself for the scalar 'min'.
-         * <pre>
-         * cb.query().scalar_Equal().min(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * });
-         * </pre> 
-         * @param subQuery The sub query of myself. (NotNull) 
-         */
-        public void min(SubQuery<CB> subQuery) {
-            _setupper.setup("min", subQuery);
-        }
-
-        /**
-         * Set up the sub query of myself for the scalar 'sum'.
-         * <pre>
-         * cb.query().scalar_Equal().sum(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * });
-         * </pre> 
-         * @param subQuery The sub query of myself. (NotNull) 
-         */
-        public void sum(SubQuery<CB> subQuery) {
-            _setupper.setup("sum", subQuery);
-        }
-
-        /**
-         * Set up the sub query of myself for the scalar 'avg'.
-         * <pre>
-         * cb.query().scalar_Equal().avg(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * });
-         * </pre> 
-         * @param subQuery The sub query of myself. (NotNull) 
-         */
-        public void avg(SubQuery<CB> subQuery) {
-            _setupper.setup("avg", subQuery);
-        }
-    }
-
-    protected static interface SSQSetupper<CB extends ConditionBean> { // Internal
-        public void setup(String function, SubQuery<CB> subQuery);
     }
 
     // -----------------------------------------------------
