@@ -990,6 +990,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     String xCB() { return ${myConditionBeanClassName}.class.getName(); }
     String xCQ() { return ${myConditionQueryClassName}.class.getName(); }
     String xLSO() { return LikeSearchOption.class.getName(); }
+    String xSSQS() { return HpSSQSetupper.class.getName(); }
 #if ($database.isDatabaseMSAccess())
     @Override
     protected boolean xsuppressEscape() { return true; } // bacause MS-Access does not support escape
