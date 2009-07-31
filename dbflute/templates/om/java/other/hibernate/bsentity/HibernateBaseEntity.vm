@@ -234,6 +234,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #end
 #end
 #end
+#end
     // ===================================================================================
     //                                                                       Foreign Table
     //                                                                       =============

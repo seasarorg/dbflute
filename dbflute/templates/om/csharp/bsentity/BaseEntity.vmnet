@@ -201,6 +201,7 @@ namespace ${myExtendedEntityPackageName} {
 #end
 #end
 #end
+#end
         #endregion
 
 #end
