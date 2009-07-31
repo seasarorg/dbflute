@@ -15,12 +15,12 @@
  */
 package org.seasar.dbflute.cbean;
 
-import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.WhereClauseSimpleFilter;
@@ -576,289 +576,49 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return _isSelectCountIgnoreFetchScope;
     }
 
-    // [DBFlute-0.7.4]
+    // [DBFlute-0.9.5.3]
     // ===================================================================================
     //                                                                             Specify
     //                                                                             =======
-    protected static abstract class AbstractSpecification<CQ extends ConditionQuery> {
-        protected ConditionBean _baseCB;
-        protected SpQyCall<CQ> _qyCall;
-        protected CQ _query;
-        protected boolean _forDerivedReferrer;
-        protected boolean _forScalarSelect;
-        protected boolean _forScalarSubQuery;
-        protected boolean _alreadySpecifyRequiredColumn;
-        protected DBMetaProvider _dbmetaProvider;
+    protected abstract HpAbstractSpecification<? extends ConditionQuery> localSp();
 
-        /**
-         * @param baseCB The condition-bean of base level. (NotNull)
-         * @param qyCall The call-back for condition-query. (NotNull)
-         * @param forDerivedReferrer Is this for derive referrer?
-         * @param forScalarSelect Is this for scalar select?
-         * @param forScalarSubQuery  Is this for scalar sub-query?
-         * @param dbmetaProvider The provider of DB meta. (NotNull)
-         */
-        protected AbstractSpecification(ConditionBean baseCB, SpQyCall<CQ> qyCall, boolean forDerivedReferrer,
-                boolean forScalarSelect, boolean forScalarSubQuery, DBMetaProvider dbmetaProvider) {
-            _baseCB = baseCB;
-            _qyCall = qyCall;
-            _forDerivedReferrer = forDerivedReferrer;
-            _forScalarSelect = forScalarSelect;
-            _forScalarSubQuery = forScalarSubQuery;
-            _dbmetaProvider = dbmetaProvider;
+    // [DBFlute-0.9.5.3]
+    // ===================================================================================
+    //                                                                        Column Query
+    //                                                                        ============
+    protected <CB extends ConditionBean> void xcolqy(CB cb, SpecifyQuery<CB> leftSp, SpecifyQuery<CB> rightSp,
+            String operand) {
+        // Specify left column
+        leftSp.specify(cb);
+        String leftColumn = cb.getSqlClause().removeSpecifiedColumnRealNameAsOne();
+        if (leftColumn == null) {
+            ConditionBeanContext.throwColumnQueryInvalidColumnSpecificationException();
+        }
+        // Specify right column
+        cb.getSqlClause().clearSpecifiedSelectColumn(); // recycle
+        rightSp.specify(cb);
+        String rightColumn = cb.getSqlClause().removeSpecifiedColumnRealNameAsOne();
+        if (rightColumn == null) {
+            ConditionBeanContext.throwColumnQueryInvalidColumnSpecificationException();
         }
 
-        protected void doColumn(String columnName) {
-            assertColumn(columnName);
-            if (_query == null) {
-                _query = _qyCall.qy();
-            }
-            if (isRequiredColumnSpecificationEnabled()) {
-                _alreadySpecifyRequiredColumn = true;
-                doSpecifyRequiredColumn();
-            }
-            String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
-            final String tableAliasName;
-            if (_query.isBaseQuery(_query)) {
-                tableAliasName = _baseCB.getSqlClause().getLocalTableAliasName();
-            } else {
-                tableAliasName = _baseCB.getSqlClause().resolveJoinAliasName(relationPath, _query.getNestLevel());
-            }
-            _baseCB.getSqlClause().specifySelectColumn(tableAliasName, columnName);
-        }
-
-        protected boolean isRequiredColumnSpecificationEnabled() {
-            return !_forDerivedReferrer && !_forScalarSelect && !_forScalarSubQuery && !_alreadySpecifyRequiredColumn;
-        }
-
-        protected void assertColumn(String columnName) {
-            if (_query == null && !_qyCall.has()) {
-                throwSpecifyColumnNotSetupSelectColumnException(columnName);
-            }
-        }
-
-        protected void assertForeign(String foreignPropertyName) {
-            if (_forDerivedReferrer) {
-                throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName);
-            }
-            if (_forScalarSelect) {
-                throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName);
-            }
-            if (_forScalarSubQuery) {
-                throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName);
-            }
-        }
-
-        protected abstract void doSpecifyRequiredColumn();
-
-        protected abstract String getTableDbName();
-
-        protected void throwSpecifyColumnNotSetupSelectColumnException(String columnName) {
-            ConditionBeanContext.throwSpecifyColumnNotSetupSelectColumnException(_baseCB, getTableDbName(), columnName);
-        }
-
-        protected void throwDerivedReferrerInvalidForeignSpecificationException(String foreignPropertyName) {
-            ConditionBeanContext.throwDerivedReferrerInvalidForeignSpecificationException(foreignPropertyName);
-        }
-
-        protected void throwScalarSelectInvalidForeignSpecificationException(String foreignPropertyName) {
-            ConditionBeanContext.throwScalarSelectInvalidForeignSpecificationException(foreignPropertyName);
-        }
-
-        protected void throwScalarSubQueryInvalidForeignSpecificationException(String foreignPropertyName) {
-            ConditionBeanContext.throwScalarSubQueryInvalidForeignSpecificationException(foreignPropertyName);
-        }
-
-        protected String getLineSeparator() {
-            return DfSystemUtil.getLineSeparator();
-        }
+        // Register where clause
+        String clause = leftColumn + " " + operand + " " + rightColumn;
+        getSqlClause().registerWhereClause(clause);
     }
 
-    protected static interface SpQyCall<CQ extends ConditionQuery> {
-        public boolean has();
-
-        public CQ qy();
-    }
-
+    // ===================================================================================
+    //                                                                    Statement Config
+    //                                                                    ================
     /**
-     * The function of specify derived-referrer.
-     * @param <REFERRER_CB> The condition-bean type of referrer.
-     * @param <LOCAL_CQ> The condition-query type of local.
-     */
-    public static class RAFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> {
-        protected ConditionBean _baseCB;
-        protected LOCAL_CQ _localCQ;
-        protected RAQSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
-        protected DBMetaProvider _dbmetaProvider;
-
-        public RAFunction(ConditionBean baseCB, LOCAL_CQ localCQ, RAQSetupper<REFERRER_CB, LOCAL_CQ> querySetupper,
-                DBMetaProvider dbmetaProvider) {
-            _baseCB = baseCB;
-            _localCQ = localCQ;
-            _querySetupper = querySetupper;
-            _dbmetaProvider = dbmetaProvider;
-        }
-
-        /**
-         * Set up the sub query of referrer for the scalar 'count'.
-         * <pre>
-         * cb.specify().derivePurchaseList().count(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchaseId(); // *Point! (Basically PK)
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }, \"PAID_PURCHASE_COUNT\");
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull)
-         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-         */
-        public void count(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-            assertAliasName(aliasName);
-            _querySetupper.setup("count", subQuery, _localCQ, aliasName.trim());
-        }
-
-        /**
-         * Set up the sub query of referrer for the scalar 'count(with distinct)'.
-         * <pre>
-         * cb.specify().derivePurchaseList().countDistinct(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnProductId(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }, \"PAID_PURCHASE_PRODUCT_KIND_COUNT\");
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull)
-         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-         */
-        public void countDistinct(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-            assertAliasName(aliasName);
-            _querySetupper.setup("count(distinct", subQuery, _localCQ, aliasName.trim());
-        }
-
-        /**
-         * Set up the sub query of referrer for the scalar 'max'.
-         * <pre>
-         * cb.specify().derivePurchaseList().max(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchaseDatetime(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }, \"LATEST_PURCHASE_DATETIME\");
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull)
-         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-         */
-        public void max(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-            assertAliasName(aliasName);
-            _querySetupper.setup("max", subQuery, _localCQ, aliasName.trim());
-        }
-
-        /**
-         * Set up the sub query of referrer for the scalar 'min'.
-         * <pre>
-         * cb.specify().derivePurchaseList().min(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchaseDatetime(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }, \"LATEST_PURCHASE_DATETIME\");
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull)
-         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-         */
-        public void min(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-            assertAliasName(aliasName);
-            _querySetupper.setup("min", subQuery, _localCQ, aliasName.trim());
-        }
-
-        /**
-         * Set up the sub query of referrer for the scalar 'sum'.
-         * <pre>
-         * cb.specify().derivePurchaseList().sum(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }, \"SUMMARY_PURCHASE_PRICE\");
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull)
-         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-         */
-        public void sum(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-            assertAliasName(aliasName);
-            _querySetupper.setup("sum", subQuery, _localCQ, aliasName.trim());
-        }
-
-        /**
-         * Set up the sub query of referrer for the scalar 'avg'.
-         * <pre>
-         * cb.specify().derivePurchaseList().avg(new SubQuery&lt;PurchaseCB&gt;() {
-         *     public void query(PurchaseCB subCB) {
-         *         subCB.specify().columnPurchasePrice(); // *Point!
-         *         subCB.query().setPaymentCompleteFlg_Equal_True();
-         *     }
-         * }, \"AVERAGE_PURCHASE_PRICE\");
-         * </pre> 
-         * @param subQuery The sub query of referrer. (NotNull)
-         * @param aliasName The alias of the name. The property should exists on the entity. (NotNull)
-         */
-        public void avg(SubQuery<REFERRER_CB> subQuery, String aliasName) {
-            assertAliasName(aliasName);
-            _querySetupper.setup("avg", subQuery, _localCQ, aliasName.trim());
-        }
-
-        protected void assertAliasName(String aliasName) {
-            if (aliasName == null || aliasName.trim().length() == 0) {
-                throwSpecifyDerivedReferrerInvalidAliasNameException();
-            }
-            String tableDbName = _baseCB.getTableDbName();
-            DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
-            Method[] methods = dbmeta.getEntityType().getMethods();
-            String targetMethodName = "set" + replaceString(aliasName, "_", "").toLowerCase();
-            boolean existsSetterMethod = false;
-            for (Method method : methods) {
-                if (!method.getName().startsWith("set")) {
-                    continue;
-                }
-                if (targetMethodName.equals(method.getName().toLowerCase())) {
-                    existsSetterMethod = true;
-                    break;
-                }
-            }
-            if (!existsSetterMethod) {
-                throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
-            }
-        }
-
-        protected void throwSpecifyDerivedReferrerInvalidAliasNameException() {
-            ConditionBeanContext.throwSpecifyDerivedReferrerInvalidAliasNameException(_localCQ);
-        }
-
-        protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
-            ConditionBeanContext.throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, entityType);
-        }
-
-        protected String replaceString(String text, String fromText, String toText) {
-            return DfStringUtil.replace(text, fromText, toText);
-        }
-    }
-
-    public static interface RAQSetupper<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> {
-        public void setup(String function, SubQuery<REFERRER_CB> subQuery, LOCAL_CQ cq, String aliasName);
-    }
-
-    // =====================================================================================
-    //                                                                      Statement Config
-    //                                                                      ================
-    /**
-     * @param statementConfig The config of statement. (Nullable)
+     * @param statementConfig The configuration of statement. (Nullable)
      */
     public void configure(StatementConfig statementConfig) {
         _statementConfig = statementConfig;
     }
 
     /**
-     * @return The config of statement. (Nullable)
+     * @return The configuration of statement. (Nullable)
      */
     public StatementConfig getStatementConfig() {
         return _statementConfig;

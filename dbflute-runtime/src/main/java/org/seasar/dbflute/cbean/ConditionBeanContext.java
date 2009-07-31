@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.exception.ColumnQueryInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.DerivedReferrerInvalidForeignSpecificationException;
 import org.seasar.dbflute.exception.EntityAlreadyDeletedException;
 import org.seasar.dbflute.exception.EntityDuplicatedException;
@@ -351,7 +352,7 @@ public class ConditionBeanContext {
     public static void throwSpecifyDerivedReferrerInvalidAliasNameException(ConditionQuery localCQ) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The alias name for specify derived-referrer was Invalid!" + ln();
+        msg = msg + "The alias name for specify derived-referrer was INVALID!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "You should set valid alias name. {NotNull, NotEmpty}" + ln();
@@ -424,7 +425,7 @@ public class ConditionBeanContext {
     public static void throwSpecifyDerivedReferrerInvalidColumnSpecificationException(String function, String aliasName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The specified the column for derived-referrer was Invalid!" + ln();
+        msg = msg + "The specified the column for derived-referrer was INVALID!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
@@ -568,7 +569,7 @@ public class ConditionBeanContext {
     public static void throwQueryDerivedReferrerInvalidColumnSpecificationException(String function) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The specified the column for derived-referrer was Invalid!" + ln();
+        msg = msg + "The specified the column for derived-referrer was INVALID!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
@@ -674,7 +675,7 @@ public class ConditionBeanContext {
     public static void throwScalarSubQueryInvalidColumnSpecificationException(String function) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The specified the column for derived-referrer was Invalid!" + ln();
+        msg = msg + "The specified the column for derived-referrer was INVALID!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
@@ -735,6 +736,56 @@ public class ConditionBeanContext {
         msg = msg + "[Derive Column]" + ln() + deriveColumnName + "(" + deriveColumnType.getName() + ")" + ln();
         msg = msg + "* * * * * * * * * */";
         throw new ScalarSubQueryUnmatchedColumnTypeException(msg);
+    }
+
+    // -----------------------------------------------------
+    //                                          Column Query
+    //                                          ------------
+    public static void throwColumnQueryInvalidColumnSpecificationException() {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The specified the column for column query was INVALID!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    " + ln();
+        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+        msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
+        msg = msg + "        public void specify(MemberCB cb) {" + ln();
+        msg = msg + "            // *No! It's empty!" + ln();
+        msg = msg + "        }" + ln();
+        msg = msg + "    }).lessThan...;" + ln();
+        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + "    " + ln();
+        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+        msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
+        msg = msg + "        public void specify(MemberCB cb) {" + ln();
+        msg = msg + "            cb.specify().columnMemberName();" + ln();
+        msg = msg + "            cb.specify().columnBirthdate();" + ln();
+        msg = msg + "        }" + ln();
+        msg = msg + "    }).lessThan...;" + ln();
+        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + "    " + ln();
+        msg = msg + "    [Good!]" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+        msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
+        msg = msg + "        public void specify(MemberCB cb) {" + ln();
+        msg = msg + "            cb.specify().columnBirthdate();" + ln();
+        msg = msg + "        }" + ln();
+        msg = msg + "    }).lessThan(new SpecifyQuery<MemberCB>() {" + ln();
+        msg = msg + "        public void specify(MemberCB cb) {" + ln();
+        msg = msg + "            cb.specify().columnFormalizedDatetime();" + ln();
+        msg = msg + "        }" + ln();
+        msg = msg + "    }" + ln();
+        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new ColumnQueryInvalidColumnSpecificationException(msg);
     }
 
     // -----------------------------------------------------

@@ -75,6 +75,9 @@ public abstract class AbstractSqlClause implements SqlClause {
     /** Specified select column map. map:{ tableAliasName = map:{ columnName : null } } (Nullable: This is lazy-loaded) */
     protected Map<String, Map<String, String>> _specifiedSelectColumnMap; // [DBFlute-0.7.4]
 
+    /** Specified select column map for backup. map:{ tableAliasName = map:{ columnName : null } } (Nullable: This is lazy-loaded) */
+    protected Map<String, Map<String, String>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
+
     /** Specified derive sub-query map. (Nullable: This is lazy-loaded) */
     protected Map<String, String> _specifiedDeriveSubQueryMap; // [DBFlute-0.7.4]
 
@@ -1565,13 +1568,36 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     public String getSpecifiedColumnNameAsOne() {
         if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
-            Map<String, String> elementMap = _specifiedSelectColumnMap.get(_specifiedSelectColumnMap.keySet()
-                    .iterator().next());
+            String tableAliasName = _specifiedSelectColumnMap.keySet().iterator().next();
+            Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
             if (elementMap != null && elementMap.size() == 1) {
                 return elementMap.keySet().iterator().next();
             }
         }
         return null;
+    }
+
+    public String removeSpecifiedColumnRealNameAsOne() {
+        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
+            String tableAliasName = _specifiedSelectColumnMap.keySet().iterator().next();
+            Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+            if (elementMap != null && elementMap.size() == 1) {
+                String columnName = elementMap.keySet().iterator().next();
+                String realName = tableAliasName + "." + columnName;
+                elementMap.remove(columnName);
+                return realName;
+            }
+        }
+        return null;
+    }
+
+    public void backupSpecifiedSelectColumn() {
+        _backupSpecifiedSelectColumnMap = _specifiedSelectColumnMap;
+    }
+
+    public void restoreSpecifiedSelectColumn() {
+        _specifiedSelectColumnMap = _backupSpecifiedSelectColumnMap;
+        _backupSpecifiedSelectColumnMap = null;
     }
 
     public void clearSpecifiedSelectColumn() {

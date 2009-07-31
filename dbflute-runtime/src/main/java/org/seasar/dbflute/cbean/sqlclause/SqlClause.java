@@ -168,7 +168,7 @@ public interface SqlClause {
     public SqlClause makeInnerJoinEffective();
 
     public SqlClause backToOuterJoin();
-    
+
     public String getFixedConditionKey();
 
     // ===================================================================================
@@ -209,7 +209,7 @@ public interface SqlClause {
      * @return Determination.
      */
     public boolean hasWhereClause();
-    
+
     // ===================================================================================
     //                                                                         InlineWhere
     //                                                                         ===========
@@ -273,7 +273,7 @@ public interface SqlClause {
      * @return Determination.
      */
     public boolean hasOrderByClause();
-    
+
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====
@@ -490,6 +490,22 @@ public interface SqlClause {
      * @return The name of only one specified column. (Nullable: If it's not found or duplicated, it returns null)
      */
     public String getSpecifiedColumnNameAsOne();
+
+    /**
+     * Remove the only one specified column.
+     * @return The only one specified column with alias name. (Nullable: If it's not found or duplicated, it returns null)
+     */
+    public String removeSpecifiedColumnRealNameAsOne();
+
+    /**
+     * Back up specified select columns.
+     */
+    public void backupSpecifiedSelectColumn();
+
+    /**
+     * Restore specified select columns.
+     */
+    public void restoreSpecifiedSelectColumn();
 
     /**
      * Clear specified select columns.
