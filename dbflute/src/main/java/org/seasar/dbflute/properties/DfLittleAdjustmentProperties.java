@@ -99,6 +99,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isMakeEntityS2DaoAnnotation", false);
     }
 
+    public boolean isMakeEntityTableClassificationNameAlias() { // It's closet!
+        return isProperty("isMakeEntityTableClassificationNameAlias", false);
+    }
+
     // ===================================================================================
     //                                                                            Behavior
     //                                                                            ========

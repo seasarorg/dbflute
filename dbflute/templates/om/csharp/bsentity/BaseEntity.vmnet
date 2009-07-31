@@ -180,8 +180,9 @@ namespace ${myExtendedEntityPackageName} {
         //                                                       =========================
         #region Classification Name/Alias
 #foreach ($col in $table.Columns)
-#if (${col.hasClassification()})
-#if (${col.hasClassificationName()})
+#if ($col.hasClassification())
+#if (!$col.isTableClassification() || $database.isMakeEntityTableClassificationNameAlias())
+#if ($col.hasClassificationName())
         public String ${col.javaName}Name {
             get {
                 ${glCDef}.${col.classificationName} cls = ${col.javaName}As${col.classificationName};

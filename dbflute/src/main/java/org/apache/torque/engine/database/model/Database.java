@@ -1320,6 +1320,10 @@ public class Database {
     public boolean isMakeEntityS2DaoAnnotation() {
         return getProperties().getLittleAdjustmentProperties().isMakeEntityS2DaoAnnotation();
     }
+    
+    public boolean isMakeEntityTableClassificationNameAlias() {
+        return getProperties().getLittleAdjustmentProperties().isMakeEntityTableClassificationNameAlias();
+    }
 
     public boolean isMakeFlatExpansion() {
         return getProperties().getLittleAdjustmentProperties().isMakeFlatExpansion();

@@ -233,6 +233,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                                           =========================
 #foreach ($col in $table.columns)
 #if ($col.hasClassification())
+#if (!$col.isTableClassification() || $database.isMakeEntityTableClassificationNameAlias())
 #if ($col.hasClassificationName())
     /**
      * Get the value of the column '${col.uncapitalisedJavaName}' as classification name.
@@ -254,6 +255,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return cls != null ? cls.alias() : null;
     }
 
+#end
 #end
 #end
 #end
