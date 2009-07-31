@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -122,12 +123,17 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    /**
+     * Find DB meta. <br />
+     * Basically this method should be called when initializing only.
+     * @return DB meta. (Nullable: If the entity does not its DB meta)
+     */
     protected DBMeta findDBMeta() {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - 
         // Cannot use the handler of DBMeta instance
         // because the customize-entity is contained to find here.
         // - - - - - - - - - -/
-        // DBMetaInstanceHandler.findDBMeta(_tableDbName);
+        //DBMetaInstanceHandler.findDBMeta(_tableDbName);
 
         final Class<?> beanType = _entityType;
         if (beanType == null) {
@@ -147,17 +153,38 @@ public abstract class AbstractEntityCommand extends AbstractBehaviorCommand<Inte
         return entity.getDBMeta();
     }
 
+    /**
+     * Get persistent property names. <br />
+     * Basically this method should be called when initializing only.
+     * @param bmd The bean meta data. (NotNull)
+     * @return Persistent property names. (NotNull)
+     */
     protected String[] getPersistentPropertyNames(TnBeanMetaData bmd) {
-        final List<String> nameList = new ArrayList<String>();
+        final DBMeta dbmeta = findDBMeta();
+        if (dbmeta != null) {
+            final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+            final List<String> propertyNameList = new ArrayList<String>();
+            for (ColumnInfo columnInfo : columnInfoList) {
+                propertyNameList.add(columnInfo.getPropertyName());
+            }
+            return propertyNameList.toArray(new String[] {});
+        } else {
+            // when the entity does not have its DB meta.
+            return createNonOrderedPropertyNames(bmd);
+        }
+    }
+
+    private String[] createNonOrderedPropertyNames(TnBeanMetaData bmd) {
+        final List<String> propertyNameList = new ArrayList<String>();
         final Map<String, TnPropertyType> propertyTypeMap = bmd.getPropertyTypeMap();
         final Set<Entry<String, TnPropertyType>> entrySet = propertyTypeMap.entrySet();
         for (Entry<String, TnPropertyType> entry : entrySet) {
             final TnPropertyType pt = entry.getValue();
             if (pt.isPersistent()) {
-                nameList.add(pt.getPropertyName());
+                propertyNameList.add(pt.getPropertyName());
             }
         }
-        return nameList.toArray(new String[nameList.size()]);
+        return propertyNameList.toArray(new String[propertyNameList.size()]);
     }
 
     // ===================================================================================

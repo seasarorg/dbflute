@@ -70,6 +70,7 @@ public class InvokeNameExtractorImpl implements InvokeNameExtractor {
                     continue;
                 }
                 simpleClassName = currentClassName.substring(currentClassName.lastIndexOf(".") + 1);
+                simpleClassName = resource.filterSimpleClassName(simpleClassName);
                 methodName = currentMethodName;
                 if (resource.isUseAdditionalInfo()) {
                     lineNumber = element.getLineNumber();
@@ -80,8 +81,7 @@ public class InvokeNameExtractorImpl implements InvokeNameExtractor {
                 }
                 onTarget = true;
                 if (resultList.isEmpty()) { // first element
-                    resultList.add(createResult(resource, simpleClassName, methodName, lineNumber, foundIndex,
-                            foundFirstIndex));
+                    resultList.add(createResult(simpleClassName, methodName, lineNumber, foundIndex, foundFirstIndex));
                 } else {
                     existsDuplicate = true;
                 }
@@ -95,23 +95,21 @@ public class InvokeNameExtractorImpl implements InvokeNameExtractor {
             return new ArrayList<InvokeNameResult>();
         }
         if (existsDuplicate) {
-            resultList
-                    .add(createResult(resource, simpleClassName, methodName, lineNumber, foundIndex, foundFirstIndex));
+            resultList.add(createResult(simpleClassName, methodName, lineNumber, foundIndex, foundFirstIndex));
         }
         return resultList;
     }
 
-    protected InvokeNameResult createResult(InvokeNameExtractingResource resource, String simpleClassName,
-            String methodName, int lineNumber, int foundIndex, int foundFirstIndex) {
+    private InvokeNameResult createResult(String simpleClassName, String methodName, int lineNumber, int foundIndex,
+            int foundFirstIndex) {
         final InvokeNameResult result = new InvokeNameResult();
-        final String filteredSimpleClassName = resource.filterSimpleClassName(simpleClassName);
-        result.setSimpleClassName(filteredSimpleClassName);
+        result.setSimpleClassName(simpleClassName);
         result.setMethodName(methodName);
         final String invokeName;
         if (lineNumber > 0) {
-            invokeName = filteredSimpleClassName + "." + methodName + "():" + lineNumber + " -> ";
+            invokeName = simpleClassName + "." + methodName + "():" + lineNumber + " -> ";
         } else {
-            invokeName = filteredSimpleClassName + "." + methodName + "() -> ";
+            invokeName = simpleClassName + "." + methodName + "() -> ";
         }
         result.setInvokeName(invokeName);
         result.setFoundIndex(foundIndex);
