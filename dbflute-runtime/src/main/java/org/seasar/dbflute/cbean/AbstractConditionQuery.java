@@ -854,7 +854,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
         String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
-        String parameter = "/*dto." + getLocationBase(parameterPropertyName) + "*/" + value;
+        String parameter = "/*dto." + getLocationBase(parameterPropertyName) + "*/null";
         String clause = "(" + beginMark
                       + subQueryClause + ln() + endIndent
                       + ") " + operand + " " + parameter + " " + endMark;
