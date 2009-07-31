@@ -4,6 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseCQ};
 import java.util.Collection;
 
 import org.seasar.dbflute.cbean.*;
+import org.seasar.dbflute.cbean.chelper.*;
 import org.seasar.dbflute.cbean.ckey.*;
 import org.seasar.dbflute.cbean.coption.*;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
@@ -340,11 +341,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
-    public QDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+    public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
-    protected QDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
-        return new QDRFunction<${relatedCBClassName}>(new QDRSetupper<${relatedCBClassName}>() {
+    protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
+        return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
             public void setup(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value) {
                 xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
             }
@@ -606,11 +607,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #set ($subQueryPropertyNameInitCap = "${tmpJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 #set ($subQueryPropertyName = "${tmpUncapitalisedJavaName}_QueryDerivedReferrer_${referrer.referrerPropertyNameInitCap}")
 
-    public QDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
+    public HpQDRFunction<${relatedCBClassName}> derived${referrer.referrerPropertyNameInitCap}() {
         return xcreateQDRFunction${referrer.referrerPropertyNameInitCap}();
     }
-    protected QDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
-        return new QDRFunction<${relatedCBClassName}>(new QDRSetupper<${relatedCBClassName}>() {
+    protected HpQDRFunction<${relatedCBClassName}> xcreateQDRFunction${referrer.referrerPropertyNameInitCap}() {
+        return new HpQDRFunction<${relatedCBClassName}>(new HpQDRSetupper<${relatedCBClassName}>() {
             public void setup(String function, SubQuery<${relatedCBClassName}> subQuery, String operand, Object value) {
                 xqderive${referrer.referrerPropertyNameInitCap}(function, subQuery, operand, value);
             }
@@ -777,28 +778,28 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     // ===================================================================================
     //                                                                     Scalar SubQuery
     //                                                                     ===============
-    public SSQFunction<${myConditionBeanClassName}> scalar_Equal() {
+    public HpSSQFunction<${myConditionBeanClassName}> scalar_Equal() {
         return xcreateSSQFunction("=");
     }
 
-    public SSQFunction<${myConditionBeanClassName}> scalar_GreaterEqual() {
+    public HpSSQFunction<${myConditionBeanClassName}> scalar_GreaterEqual() {
         return xcreateSSQFunction(">=");
     }
 
-    public SSQFunction<${myConditionBeanClassName}> scalar_GreaterThan() {
+    public HpSSQFunction<${myConditionBeanClassName}> scalar_GreaterThan() {
         return xcreateSSQFunction(">");
     }
 
-    public SSQFunction<${myConditionBeanClassName}> scalar_LessEqual() {
+    public HpSSQFunction<${myConditionBeanClassName}> scalar_LessEqual() {
         return xcreateSSQFunction("<=");
     }
     
-    public SSQFunction<${myConditionBeanClassName}> scalar_LessThan() {
+    public HpSSQFunction<${myConditionBeanClassName}> scalar_LessThan() {
         return xcreateSSQFunction("<");
     }
     
-    protected SSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(final String operand) {
-        return new SSQFunction<${myConditionBeanClassName}>(new SSQSetupper<${myConditionBeanClassName}>() {
+    protected HpSSQFunction<${myConditionBeanClassName}> xcreateSSQFunction(final String operand) {
+        return new HpSSQFunction<${myConditionBeanClassName}>(new HpSSQSetupper<${myConditionBeanClassName}>() {
             public void setup(String function, SubQuery<${myConditionBeanClassName}> subQuery) {
                 xscalarSubQuery(function, subQuery, operand);
             }

@@ -331,6 +331,7 @@ public class ${myClassName} extends AbstractConditionBean {
                              , DBMetaProvider dbmetaProvider)
         { super(baseCB, qyCall, forDeriveReferrer, forScalarSelect, forScalarSubQuery, dbmetaProvider); _myQyCall = qyCall; }
 #foreach ($col in $table.columns)
+        /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
         public void column${col.javaName}() { doColumn("${col.name}"); }
 #end
         protected void doSpecifyRequiredColumn() {
@@ -357,6 +358,10 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
 #set ($tmpCBClassName = "${fk.foreignTableExtendedConditionBeanClassName}")
 #set ($tmpCQClassName = "${fk.foreignTableExtendedConditionQueryClassName}")
+        /**
+         * ${fk.foreignTable.aliasExpression}${fk.foreignTable.name} as '${fk.foreignJavaBeansRulePropertyName}'.
+         * @return Next specification. (NotNull)
+         */
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
@@ -379,6 +384,10 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCapAsOne}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($tmpCQClassName = "${referrer.referrerTableExtendedConditionQueryClassName}")
+        /**
+         * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
+         * @return Next specification. (NotNull)
+         */
         public ${tmpCBClassName}.HpSpecification specify${tmpPropertyNameInitCap}() {
             assertForeign("${tmpPropertyName}");
             if (_${tmpPropertyName} == null) {
@@ -398,6 +407,10 @@ public class ${myClassName} extends AbstractConditionBean {
 #set ($tmpPropertyNameInitCap = "${referrer.referrerPropertyNameInitCap}")
 #set ($tmpCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
 #set ($tmpLocalCQClassName = "${referrer.foreignTableExtendedConditionQueryClassName}")
+        /**
+         * ${referrer.table.aliasExpression}${referrer.table.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+         * @return Function. (NotNull)
+         */
         public HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}> derived${tmpPropertyNameInitCap}() {
             return new HpSDRFunction<${tmpCBClassName}, ${tmpLocalCQClassName}>(_baseCB, _myQyCall.qy(), new HpSDRSetupper<${tmpCBClassName}, ${tmpLocalCQClassName}>() {
                 public void setup(String function, SubQuery<${tmpCBClassName}> subQuery, ${tmpLocalCQClassName} cq, String aliasName) {
