@@ -1,9 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseCommon};
 
-#if ($database.isExistCommonColumnSetupElement())
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-#end
+
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 
