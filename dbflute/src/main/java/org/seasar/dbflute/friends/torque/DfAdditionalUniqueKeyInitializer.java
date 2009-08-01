@@ -53,8 +53,8 @@ public class DfAdditionalUniqueKeyInitializer {
     }
 
     // ===================================================================================
-    //                                                                AdditionalUniqueKey
-    //                                                                ====================
+    //                                                                 AdditionalUniqueKey
+    //                                                                 ===================
     public void initializeAdditionalUniqueKey() {
         _log.info("/=======================================");
         _log.info("...Initializing additional unique keys.");
@@ -68,6 +68,7 @@ public class DfAdditionalUniqueKeyInitializer {
             assertColumnList(tableName, columnNameList);
             final Table table = getTable(tableName);
             final Unique unique = new Unique();
+            unique.setAdditional(true);
             unique.setName(uniqueKeyName);
             unique.setTable(table);
             for (String columnName : columnNameList) {

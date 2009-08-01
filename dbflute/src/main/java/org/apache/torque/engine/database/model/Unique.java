@@ -66,6 +66,14 @@ import java.util.Set;
  */
 public class Unique extends Index {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _additional;
+
+    // ===================================================================================
+    //                                                                 Override for Unique
+    //                                                                 ===================
     /**
      * Returns <code>true</code>.
      * @return true
@@ -90,5 +98,16 @@ public class Unique extends Index {
         }
         result.append(" </unique>\n");
         return result.toString();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public boolean isAdditional() {
+        return _additional;
+    }
+
+    public void setAdditional(boolean additional) {
+        _additional = additional;
     }
 }

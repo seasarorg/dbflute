@@ -515,6 +515,20 @@ public class Column {
         return false;
     }
 
+    public boolean isUniqueAllAdditional() {
+        final List<Unique> uniqueList = getTable().getUniqueList();
+        boolean exists = false;
+        for (Unique unique : uniqueList) {
+            if (unique.hasSameColumn(this)) {
+                exists = true;
+                if (!unique.isAdditional()) {
+                    return false;
+                }
+            }
+        }
+        return exists;
+    }
+
     public boolean hasOnlyOneColumnUnique() {
         final List<Unique> uniqueList = getTable().getUniqueList();
         for (Unique unique : uniqueList) {
