@@ -199,7 +199,13 @@ public class TnValueTypes {
             return OBJECT;
         }
         for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
-            final ValueType valueType = getValueType0(c);
+            final ValueType valueType = getRegisteredValueType(c);
+            if (valueType != null) {
+                return valueType;
+            }
+        }
+        if (Classification.class.isAssignableFrom(clazz)) {
+            final ValueType valueType = getRegisteredValueType(Classification.class);
             if (valueType != null) {
                 return valueType;
             }
@@ -211,7 +217,7 @@ public class TnValueTypes {
         return OBJECT;
     }
 
-    private static ValueType getValueType0(Class<?> clazz) {
+    private static ValueType getRegisteredValueType(Class<?> clazz) {
         return types.get(clazz);
     }
 
@@ -280,7 +286,7 @@ public class TnValueTypes {
             Method valueOfMethod = (Method) valueOfMethods.get(i);
             if (valueOfMethod.getParameterTypes()[0] == valueMethod.getReturnType()) {
                 Class<?> baseClass = valueMethod.getReturnType();
-                ValueType baseValueType = getValueType0(baseClass);
+                ValueType baseValueType = getRegisteredValueType(baseClass);
                 if (baseValueType == null) {
                     return null;
                 }
