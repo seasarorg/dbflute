@@ -6,7 +6,7 @@
 # Specification:
 # map: {
 #     [classification-name] = list:{
-#         ; map:{topComment=[comment]; dataType=[String or Number]}
+#         ; map:{topComment=[comment]; dataType=[String(default) or Number]}
 #         ; map:{code=[code]; name=[name]; alias=[alias]; comment=[comment]}
 #         ; map:{
 #             ; table=[table-name]
@@ -14,7 +14,7 @@
 #             ; alias=[column-name for alias]; comment=[column-name for comment]}
 #             ; where=[condition for select]; orderBy=[column-name for ordering]
 #             ; exceptCodeList=[the list of except code]
-#             ; suppressAutoDeploy=[true or false](default false)
+#             ; suppressAutoDeploy=[true or false(default)]
 #         }
 #     }
 # }
@@ -29,10 +29,16 @@ map:{
     #}
     #; MemberStatus = list:{
     #    ; map:{topComment=会員の状態を示す; dataType=String}
-    #    ; map:{
-    #        ; table=MEMBER_STATUS
-    #        ; code=MEMBER_STATUS_CODE;name=MEMBER_STATUS_NAME;orderBy=DISPLAY_ORDER
-    #    }
+    #    ; map:{topComment=入会から退会までの会員のステータスを示す}
+    #    ; map:{code=PRV;name=Provisional;alias=仮会員  ;comment=入会直後のステータスで一部のサイトサービスが利用可能}
+    #    ; map:{code=FML;name=Formalized ;alias=正式会員;comment=正式な会員としてサイトサービスが利用可能}
+    #    ; map:{code=WDL;name=Withdrawal ;alias=退会会員;comment=退会が確定した会員でサイトサービスはダメ}
+    #
+    #    # If you use table classification, specify like this:
+    #    #; map:{
+    #    #    ; table=MEMBER_STATUS
+    #    #    ; code=MEMBER_STATUS_CODE;name=MEMBER_STATUS_NAME;orderBy=DISPLAY_ORDER
+    #    #}
     #}
 }
 # ----------------/
