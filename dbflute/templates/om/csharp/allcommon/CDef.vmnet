@@ -57,19 +57,13 @@ namespace ${glPackageBaseCommon} {
                 }
                 return values;
             }}
-            public override int GetHashCode() {
-                return 7 + _code.GetHashCode();
-            }
+            public override int GetHashCode() { return 7 + _code.GetHashCode(); }
             public override bool Equals(Object obj) {
-                if (!(obj is ${classificationName})) {
-                    return false;
-                }
+                if (!(obj is ${classificationName})) { return false; }
                 ${classificationName} cls = (${classificationName})obj;
                 return _code.ToLower().Equals(cls.Code.ToLower());
             }
-            public override String ToString() {
-                return "{" + _code + ":" + _name + ":" + _alias + "}"; 
-            }
+            public override String ToString() { return _code; }
         }
 
 #end

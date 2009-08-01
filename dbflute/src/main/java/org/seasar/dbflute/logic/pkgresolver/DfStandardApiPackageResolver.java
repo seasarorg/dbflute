@@ -1,6 +1,7 @@
 package org.seasar.dbflute.logic.pkgresolver;
 
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -51,6 +52,12 @@ public class DfStandardApiPackageResolver {
             if (typeName.startsWith("IList<") && typeName.endsWith(">")) {
                 return "System.Collections.Generic." + typeName;
             }
+        }
+        if (typeName.startsWith("$$CDef$$")) {
+            String pkg = prop.getBaseCommonPackage();
+            String prefix = prop.getProjectPrefix();
+            typeName = DfStringUtil.replace(typeName, "$$CDef$$", pkg + "." + prefix + "CDef");
+            return typeName;
         }
         return typeName;
     }

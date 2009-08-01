@@ -49,6 +49,7 @@ public interface ${glCDef} extends Classification {
             if (code == null) { return null; } if (code instanceof ${classificationName}) { return (${classificationName})code; }
             return _codeValueMap.get(code.toString().toLowerCase());
         }
+        @Override public String toString() { return _code; }
     }
 
 #end
