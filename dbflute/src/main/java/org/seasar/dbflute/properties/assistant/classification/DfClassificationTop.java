@@ -15,17 +15,17 @@ public class DfClassificationTop {
     //                                                                          Definition
     //                                                                          ==========
     public static final String KEY_TOP_COMMENT = "topComment";
-    public static final String KEY_VALUE_TYPE = "valueType";
+    public static final String KEY_DATA_TYPE = "dataType";
 
-    public static final String VALUE_TYPE_STRING = "String";
-    public static final String VALUE_TYPE_INTEGER = "Integer";
+    public static final String DATA_TYPE_STRING = "String";
+    public static final String DATA_TYPE_NUMBER = "Number";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected String _classificationName;
     protected String _topComment;
-    protected String _valueType;
+    protected String _dataType;
     protected String _relatedColumnName;
     protected List<DfClassificationElement> _elementList = new ArrayList<DfClassificationElement>();
 
@@ -33,10 +33,10 @@ public class DfClassificationTop {
     //                                                                              Accept
     //                                                                              ======
     public void acceptClassificationTopElementMap(Map<?, ?> elementMap) {
-        acceptTopMap(elementMap, KEY_TOP_COMMENT, KEY_VALUE_TYPE);
+        acceptTopMap(elementMap, KEY_TOP_COMMENT, KEY_DATA_TYPE);
     }
 
-    protected void acceptTopMap(Map<?, ?> elementMap, String commentKey, String valueTypeKey) {
+    protected void acceptTopMap(Map<?, ?> elementMap, String commentKey, String dataTypeKey) {
         // topComment
         final String topComment = (String) elementMap.get(commentKey);
         if (topComment == null) {
@@ -45,9 +45,9 @@ public class DfClassificationTop {
         }
         this._topComment = topComment;
 
-        // valueType
-        final String valueType = (String) elementMap.get(valueTypeKey);
-        this._valueType = valueType;
+        // dataType
+        final String dataType = (String) elementMap.get(dataTypeKey);
+        this._dataType = dataType;
     }
 
     // ===================================================================================
@@ -55,7 +55,8 @@ public class DfClassificationTop {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + _classificationName + ", " + _topComment + ", " + _relatedColumnName + ", " + _elementList + "}";
+        return "{" + _classificationName + ", " + _topComment + ", " + _dataType + ", " + _relatedColumnName + ", "
+                + _elementList + "}";
     }
 
     // ===================================================================================
@@ -77,12 +78,12 @@ public class DfClassificationTop {
         this._topComment = topComment;
     }
 
-    public String getValueType() {
-        return _valueType;
+    public String getDataType() {
+        return _dataType;
     }
 
-    public void setValueType(String valueType) {
-        _valueType = valueType;
+    public void setDataType(String dataType) {
+        _dataType = dataType;
     }
 
     public String getRelatedColumnName() {

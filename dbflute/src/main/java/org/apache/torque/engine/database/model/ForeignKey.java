@@ -1020,8 +1020,8 @@ public class ForeignKey {
         final Map<String, Map<String, String>> topMap = getClassificationProperties()
                 .getClassificationTopDefinitionMap();
         final Map<String, String> map = topMap.get(classificationName);
-        final String valueType = map.get(DfClassificationTop.KEY_VALUE_TYPE);
-        if (valueType == null || !valueType.equalsIgnoreCase(DfClassificationTop.VALUE_TYPE_INTEGER)) {
+        final String dataType = map.get(DfClassificationTop.KEY_DATA_TYPE);
+        if (dataType == null || !dataType.equalsIgnoreCase(DfClassificationTop.DATA_TYPE_NUMBER)) {
             code = "'" + code + "'";
         }
         return code;
