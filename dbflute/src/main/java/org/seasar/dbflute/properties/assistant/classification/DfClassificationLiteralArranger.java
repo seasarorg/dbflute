@@ -7,13 +7,13 @@ import java.util.Map;
  * @author jflute
  * @since 0.9.5.1 (2009/07/03 Friday)
  */
-public class DfClassificationLiteralSetupper {
+public class DfClassificationLiteralArranger {
 
     @SuppressWarnings("unchecked")
-    public void setup(String classificationName, Map elementMap, List<Map<String, String>> elementList) {
-        final String codeKey = DfClassificationInfo.KEY_CODE;
-        final String nameKey = DfClassificationInfo.KEY_NAME;
-        final String aliasKey = DfClassificationInfo.KEY_ALIAS;
+    public void arrange(String classificationName, Map elementMap, List<Map<String, String>> elementList) {
+        final String codeKey = DfClassificationElement.KEY_CODE;
+        final String nameKey = DfClassificationElement.KEY_NAME;
+        final String aliasKey = DfClassificationElement.KEY_ALIAS;
 
         final String code = (String) elementMap.get(codeKey);
         if (code == null) {

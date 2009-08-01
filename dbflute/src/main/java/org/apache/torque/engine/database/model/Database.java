@@ -1189,14 +1189,6 @@ public class Database {
     // --------------------------------------
     //                             Definition
     //                             ----------
-    public String getClassificationTopCodeVariableNamePrefix() {
-        return getClassificationProperties().getClassificationTopCodeVariableNamePrefix();
-    }
-
-    public String getClassificationCodeVariableNamePrefix() {
-        return getClassificationProperties().getClassificationCodeVariableNamePrefix();
-    }
-
     public Map<String, Map<String, String>> getClassificationTopDefinitionMap() {
         return getClassificationProperties().getClassificationTopDefinitionMap();
     }
@@ -1320,7 +1312,7 @@ public class Database {
     public boolean isMakeEntityS2DaoAnnotation() {
         return getProperties().getLittleAdjustmentProperties().isMakeEntityS2DaoAnnotation();
     }
-    
+
     public boolean isMakeEntityTableClassificationNameAlias() {
         return getProperties().getLittleAdjustmentProperties().isMakeEntityTableClassificationNameAlias();
     }

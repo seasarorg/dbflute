@@ -12,7 +12,8 @@ import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.seasar.dbflute.properties.assistant.classification.DfClassificationInfo;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 
 /**
  * @author jflute
@@ -35,24 +36,6 @@ public class DfClassificationPropertiesTest {
 
         // ## Act ##
         final boolean actual = prop.hasClassification("MEMBER_STATUS", "MEMBER_STATUS_CODE");
-
-        // ## Assert ##
-        Assert.assertTrue(actual);
-    }
-
-    @Test
-    public void test_hasClassification_IgnoreCase() throws Exception {
-        // ## Arrange ##
-        final Map<String, Map<String, String>> deploymentMap = new LinkedHashMap<String, Map<String, String>>();
-        {
-            final Map<String, String> columnClassificationMap = new LinkedHashMap<String, String>();
-            columnClassificationMap.put("MEMBER_STATUS_CODE", "MemberStatus");
-            deploymentMap.put("MEMBER_STATUS", columnClassificationMap);
-        }
-        final DfClassificationProperties prop = createClassificationProperties(deploymentMap);
-
-        // ## Act ##
-        final boolean actual = prop.hasClassification("member_status", "member_status_code");
 
         // ## Assert ##
         Assert.assertTrue(actual);
@@ -147,17 +130,17 @@ public class DfClassificationPropertiesTest {
 
         // ## Act & Assert ##
         assertFalse(prop.isElementMapClassificationMeta(elementMap));
-        elementMap.put(DfClassificationInfo.KEY_TOP_CODE, "foo");
-        assertTrue(prop.isElementMapClassificationMeta(elementMap));
-        elementMap.put(DfClassificationInfo.KEY_TOP_COMMENT, "bar");
-        assertTrue(prop.isElementMapClassificationMeta(elementMap));
-        elementMap.put(DfClassificationInfo.KEY_TOP_CODE, null);
-        assertTrue(prop.isElementMapClassificationMeta(elementMap));
-        elementMap.put(DfClassificationInfo.KEY_TOP_COMMENT, null);
+        elementMap.put(DfClassificationTop.KEY_VALUE_TYPE, "foo");
         assertFalse(prop.isElementMapClassificationMeta(elementMap));
-        elementMap.put(DfClassificationInfo.KEY_CODE, "foo");
+        elementMap.put(DfClassificationTop.KEY_TOP_COMMENT, "bar");
+        assertTrue(prop.isElementMapClassificationMeta(elementMap));
+        elementMap.put(DfClassificationTop.KEY_VALUE_TYPE, null);
+        assertTrue(prop.isElementMapClassificationMeta(elementMap));
+        elementMap.put(DfClassificationTop.KEY_TOP_COMMENT, null);
         assertFalse(prop.isElementMapClassificationMeta(elementMap));
-        elementMap.put(DfClassificationInfo.KEY_TOP_CODE, "foo");
+        elementMap.put(DfClassificationElement.KEY_CODE, "foo");
+        assertFalse(prop.isElementMapClassificationMeta(elementMap));
+        elementMap.put(DfClassificationTop.KEY_TOP_COMMENT, "foo");
         assertTrue(prop.isElementMapClassificationMeta(elementMap));
     }
 

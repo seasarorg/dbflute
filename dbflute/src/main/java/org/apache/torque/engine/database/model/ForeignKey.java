@@ -60,15 +60,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
 import org.seasar.dbflute.friends.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
+import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.xml.sax.Attributes;
 
@@ -947,22 +952,79 @@ public class ForeignKey {
             if (typeStartIndex >= typeEndIndex) {
                 continue;
             }
+
             String parameterType = peace.substring(typeStartIndex + "(".length(), typeEndIndex);
-            parameterType = filterDynamicFixedConditionParameterType(parameterType);
-            String parameterName = peace.substring(0, typeStartIndex);
-            _dynamicFixedConditionMap.put(parameterName, parameterType);
-            final String parameterMapName = "parameterMap" + getForeignPropertyNameInitCap();
-            final String after = "/*$$locationBase$$." + parameterMapName + "." + parameterName + "*/";
-            fixedConditionReplacementMap.put("/*" + peace + "*/", after);
+            if (peace.startsWith("$cls")) {
+                // Not Dynamic (Embedded)
+                final String code = extractFixedConditionEmbeddedCommentClasification(peace, parameterType);
+                final String expression = "/*" + peace + "*/";
+
+                // Remove test value because of hard code.
+                fixedConditionReplacementMap.put(expression + "null", expression);
+                fixedConditionReplacementMap.put(expression + "Null", expression);
+                fixedConditionReplacementMap.put(expression + "NULL", expression);
+
+                fixedConditionReplacementMap.put(expression, code);
+            } else {
+                // Really Dynamic (Bind)
+                parameterType = filterDynamicFixedConditionParameterType(parameterType);
+                final String parameterName = peace.substring(0, typeStartIndex);
+                _dynamicFixedConditionMap.put(parameterName, parameterType);
+                final String parameterMapName = "parameterMap" + getForeignPropertyNameInitCap();
+                final String after = "/*$$locationBase$$." + parameterMapName + "." + parameterName + "*/";
+                fixedConditionReplacementMap.put("/*" + peace + "*/", after);
+            }
         }
         if (fixedConditionReplacementMap.isEmpty()) {
             return;
         }
-        final Set<String> keySet = fixedConditionReplacementMap.keySet();
-        for (String key : keySet) {
-            final String value = fixedConditionReplacementMap.get(key);
-            _fixedCondition = DfStringUtil.replace(_fixedCondition, key, value);
+        final Set<Entry<String, String>> replaceSet = fixedConditionReplacementMap.entrySet();
+        for (Entry<String, String> replaceEntry : replaceSet) {
+            final String key = replaceEntry.getKey();
+            final String value = replaceEntry.getValue();
+            _fixedCondition = replace(_fixedCondition, key, value);
         }
+    }
+
+    protected String extractFixedConditionEmbeddedCommentClasification(String peace, String parameterType) {
+        if (!parameterType.contains(".")) {
+            String msg = "The classification expression should be 'classificationName.elementName':";
+            msg = msg + " expression=" + parameterType + " embeddedComment=" + peace;
+            throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
+        }
+        final String classificationName = parameterType.substring(0, parameterType.indexOf("."));
+        final String elementName = parameterType.substring(parameterType.indexOf(".") + ".".length());
+        final Map<String, List<Map<String, String>>> definitionMap = getClassificationProperties()
+                .getClassificationDefinitionMap();
+        final List<Map<String, String>> elementMapList = definitionMap.get(classificationName);
+        if (elementMapList == null) {
+            String msg = "The classification name was NOT FOUND:";
+            msg = msg + " classificationName=" + classificationName + " embeddedComment=" + peace;
+            msg = msg + " classificationList=" + definitionMap.keySet();
+            throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
+        }
+        String code = null;
+        for (Map<String, String> elementMap : elementMapList) {
+            String name = elementMap.get(DfClassificationElement.KEY_NAME);
+            if (elementName.equals(name)) {
+                code = elementMap.get(DfClassificationElement.KEY_CODE);
+                break;
+            }
+        }
+        if (code == null) {
+            String msg = "The classification element name was NOT FOUND:";
+            msg = msg + " elementName=" + elementName + " embeddedComment=" + peace;
+            msg = msg + " elementMapList=" + elementMapList;
+            throw new DfFixedConditionInvalidClassificationEmbeddedCommentException(msg);
+        }
+        final Map<String, Map<String, String>> topMap = getClassificationProperties()
+                .getClassificationTopDefinitionMap();
+        final Map<String, String> map = topMap.get(classificationName);
+        final String valueType = map.get(DfClassificationTop.KEY_VALUE_TYPE);
+        if (valueType == null || !valueType.equalsIgnoreCase(DfClassificationTop.VALUE_TYPE_INTEGER)) {
+            code = "'" + code + "'";
+        }
+        return code;
     }
 
     protected String filterDynamicFixedConditionParameterType(String parameterType) {
@@ -1019,8 +1081,27 @@ public class ForeignKey {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    protected String replace(String text, String fromText, String toText) {
+        return DfStringUtil.replace(text, fromText, toText);
+    }
+
     protected String initCap(String str) {
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
+        return DfStringUtil.initCap(str);
+    }
+
+    protected String initUncap(String str) {
+        return DfStringUtil.initUncap(str);
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    protected DfClassificationProperties getClassificationProperties() {
+        return DfBuildProperties.getInstance().getClassificationProperties();
     }
 
     // ===================================================================================
