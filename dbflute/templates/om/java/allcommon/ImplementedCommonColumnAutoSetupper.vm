@@ -11,7 +11,6 @@ import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
  * @author ${database.classAuthor}
  */
 public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAutoSetupper {
-#if ($database.isExistCommonColumnSetupElement())
 
     // =====================================================================================
     //                                                                            Definition
@@ -19,6 +18,7 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(${glImplementedCommonColumnAutoSetupper}.class);
 
+#if ($database.isExistCommonColumnSetupElement())
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
@@ -39,9 +39,9 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
     public void set${resource.propertyNameInitCap}(${resource.className} ${resource.propertyName}) {
         this.${resource.propertyVariableName} = ${resource.propertyName};
     }
-#end
-#end
 
+#end
+#end
     // =====================================================================================
     //                                                                                Set up
     //                                                                                ======

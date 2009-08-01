@@ -20,6 +20,7 @@ import java.util.Properties;
 import org.seasar.dbflute.properties.DfAdditionalForeignKeyProperties;
 import org.seasar.dbflute.properties.DfAdditionalPrimaryKeyProperties;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
+import org.seasar.dbflute.properties.DfAdditionalUniqueKeyProperties;
 import org.seasar.dbflute.properties.DfAllClassCopyrightProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
@@ -142,6 +143,13 @@ public final class DfBuildProperties {
     //                                      ----------------
     public DfAdditionalTableProperties getAdditionalTableProperties() {
         return getHandler().getAdditionalTableProperties(getProperties());
+    }
+
+    // -----------------------------------------------------
+    //                                 Additional Unique Key
+    //                                 ---------------------
+    public DfAdditionalUniqueKeyProperties getAdditionalUniqueKeyProperties() {
+        return getHandler().getAdditionalUniqueKeyProperties(getProperties());
     }
 
     // -----------------------------------------------------

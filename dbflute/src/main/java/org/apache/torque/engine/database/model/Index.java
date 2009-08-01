@@ -61,8 +61,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.xml.sax.Attributes;
 
@@ -75,9 +73,6 @@ public class Index {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    /** Log instance. */
-    private static Log log = LogFactory.getLog(Index.class);
-
     public static final Integer FIRST_POSITION = Integer.valueOf(1);
 
     // ===================================================================================
@@ -91,43 +86,6 @@ public class Index {
 
     /** The map of index columns. {ordinalPosition : columnName} */
     private final Map<Integer, String> _indexColumnMap = new LinkedHashMap<Integer, String>();
-
-    // ===================================================================================
-    //                                                                         Constructor
-    //                                                                         ===========
-    /**
-     * Creates a new instance with default characteristics (no name or
-     * parent table, small column list size allocation, non-unique).
-     */
-    public Index() {
-    }
-
-    /**
-     * Creates a new instance for the list of columns composing an
-     * index.  Otherwise performs as {@link #Index()}.
-     * @param table The table this index is associated with.
-     * @param indexColumns The list of {@link
-     * org.apache.torque.engine.database.model.Column} objects which
-     * make up this index.  Cannot be empty.
-     * @exception EngineException Error generating name.
-     * @see #Index()
-     */
-    protected Index(Table table, List<Column> indexColumns) throws EngineException { // Unused on DBFlute
-        this();
-        setTable(table);
-        if (indexColumns.isEmpty()) {
-            throw new EngineException("Cannot create a new Index using an empty list Column object: " + table);
-        }
-        int index = 1;
-        for (Column column : indexColumns) {
-            _indexColumnMap.put(Integer.valueOf(index), column.getName());
-            ++index;
-        }
-        createName();
-        if (log.isDebugEnabled()) {
-            log.debug("Created Index named " + getName() + " with " + indexColumns.size() + " columns");
-        }
-    }
 
     // ===================================================================================
     //                                                                       Assist Helper
@@ -266,18 +224,10 @@ public class Index {
 
     /**
      * Set the name of this index.
-     * @param name the name of this index
+     * @param indexName the name of this index
      */
-    public void setName(String name) {
-        this._indexName = name;
-    }
-
-    /**
-     * Set the parent Table of the index
-     * @param parent the table
-     */
-    public void setTable(Table parent) {
-        _table = parent;
+    public void setName(String indexName) {
+        this._indexName = indexName;
     }
 
     /**
@@ -288,7 +238,25 @@ public class Index {
         return _table;
     }
 
+    /**
+     * Set the parent Table of the index
+     * @param parent the table
+     */
+    public void setTable(Table parent) {
+        _table = parent;
+    }
+
     public Map<Integer, String> getIndexColumnMap() {
         return _indexColumnMap;
+    }
+
+    public void addColumn(String columnName) {
+        Integer position;
+        if (_indexColumnMap.isEmpty()) {
+            position = FIRST_POSITION;
+        } else {
+            position = Integer.valueOf(_indexColumnMap.size() + 1);
+        }
+        _indexColumnMap.put(position, columnName);
     }
 }

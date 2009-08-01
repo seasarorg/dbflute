@@ -2,10 +2,8 @@
 #set ($database = $schemaData.database)
 $database.enableGenerateOutputDirectory()
 
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-## Initialize CustomizeDao and AdditionalForeignKey and ClassificationDeployment and IncludeQuery.
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 $database.initializeAdditionalPrimaryKey()
+$database.initializeAdditionalUniqueKey()
 $database.initializeAdditionalForeignKey()
 $database.initializeClassificationDeployment()
 $database.initializeIncludeQuery()

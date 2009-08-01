@@ -10,8 +10,9 @@ import java.util.StringTokenizer;
 
 /**
  * @author jflute
+ * @since 0.9.5.3 (2009/08/01 Saturday)
  */
-public final class DfAdditionalPrimaryKeyProperties extends DfAbstractHelperProperties {
+public final class DfAdditionalUniqueKeyProperties extends DfAbstractHelperProperties {
 
     // ===================================================================================
     //                                                                         Constructor
@@ -20,22 +21,22 @@ public final class DfAdditionalPrimaryKeyProperties extends DfAbstractHelperProp
      * Constructor.
      * @param prop Properties. (NotNull)
      */
-    public DfAdditionalPrimaryKeyProperties(Properties prop) {
+    public DfAdditionalUniqueKeyProperties(Properties prop) {
         super(prop);
     }
 
     // ===================================================================================
-    //                                                             additionalPrimaryKeyMap
+    //                                                             additionalUniqueKeyMap
     //                                                             =======================
-    public static final String KEY_additionalPrimaryKeyMap = "additionalPrimaryKeyMap";
-    protected Map<String, Map<String, String>> _additionalPrimaryKeyMap;
+    public static final String KEY_additionalUniqueKeyMap = "additionalUniqueKeyMap";
+    protected Map<String, Map<String, String>> _additionalUniqueKeyMap;
 
-    public Map<String, Map<String, String>> getAdditionalPrimaryKeyMap() {
-        if (_additionalPrimaryKeyMap == null) {
-            _additionalPrimaryKeyMap = new LinkedHashMap<String, Map<String, String>>();
-            final Map<String, Object> generatedMap = mapProp("torque." + KEY_additionalPrimaryKeyMap, DEFAULT_EMPTY_MAP);
+    public Map<String, Map<String, String>> getAdditionalUniqueKeyMap() {
+        if (_additionalUniqueKeyMap == null) {
+            _additionalUniqueKeyMap = new LinkedHashMap<String, Map<String, String>>();
+            final Map<String, Object> generatedMap = mapProp("torque." + KEY_additionalUniqueKeyMap, DEFAULT_EMPTY_MAP);
             final Set<String> fisrtKeySet = generatedMap.keySet();
-            for (Object primaryName : fisrtKeySet) { // PK Loop!
+            for (Object primaryName : fisrtKeySet) {// PK Loop!
                 final Object firstValue = generatedMap.get(primaryName);
                 if (!(firstValue instanceof Map<?, ?>)) {
                     String msg = "The value type should be Map: tableName=" + primaryName + " property=CustomizeDao";
@@ -52,39 +53,39 @@ public final class DfAdditionalPrimaryKeyProperties extends DfAbstractHelperProp
                     }
                     if (!(componentName instanceof String)) {
                         String msg = "The key type should be String: foreignName=" + primaryName;
-                        msg = msg + " property=additionalPrimaryKey";
+                        msg = msg + " property=additionalUniqueKey";
                         msg = msg + " actualType=" + componentName.getClass() + " actualKey=" + componentName;
                         throw new IllegalStateException(msg);
                     }
                     if (!(secondValue instanceof String)) {
                         String msg = "The value type should be String: foreignName=" + primaryName;
-                        msg = msg + " property=additionalPrimaryKey";
+                        msg = msg + " property=additionalUniqueKey";
                         msg = msg + " actualType=" + secondValue.getClass() + " actualValue=" + secondValue;
                         throw new IllegalStateException(msg);
                     }
                     genericForeignDefinitiontMap.put((String) componentName, (String) secondValue);
                 }
-                _additionalPrimaryKeyMap.put((String) primaryName, genericForeignDefinitiontMap);
+                _additionalUniqueKeyMap.put((String) primaryName, genericForeignDefinitiontMap);
             }
         }
-        return _additionalPrimaryKeyMap;
+        return _additionalUniqueKeyMap;
     }
 
     // ===================================================================================
     //                                                                      Finding Helper
     //                                                                      ==============
-    public String findTableName(String primaryName) {
-        final Map<String, String> componentMap = getAdditionalPrimaryKeyMap().get(primaryName);
+    public String findTableName(String uniqueName) {
+        final Map<String, String> componentMap = getAdditionalUniqueKeyMap().get(uniqueName);
         return componentMap.get("tableName");
     }
 
-    protected String findColumnName(String primaryName) {
-        final Map<String, String> componentMap = getAdditionalPrimaryKeyMap().get(primaryName);
+    protected String findColumnName(String uniqueName) {
+        final Map<String, String> componentMap = getAdditionalUniqueKeyMap().get(uniqueName);
         return componentMap.get("columnName");
     }
 
-    public List<String> findColumnNameList(String primaryName) {
-        final String property = findColumnName(primaryName);
+    public List<String> findColumnNameList(String uniqueName) {
+        final String property = findColumnName(uniqueName);
         if (property == null || property.trim().length() == 0) {
             return null;
         }

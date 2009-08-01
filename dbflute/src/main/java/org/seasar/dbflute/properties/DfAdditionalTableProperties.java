@@ -26,21 +26,44 @@ public final class DfAdditionalTableProperties extends DfAbstractHelperPropertie
     public static final String KEY_additionalTableMap = "additionalTableMap";
     protected Map<String, Object> _additionalTableMap;
 
-    // map: {
-    //     [table-name] = map:{
-    //         columnMap = map:{
-    //             [column-name] = map:{
-    //                 type = [column-JDBC-type] ; required = [true or false]
-    //                 ; size = [column-size]
-    //                 ; primaryKey = [true or false] ; autoIncrement = [true or false]
-    //             }
-    //             [column-name] = map:{
-    //                 type = [column-JDBC-type] ; required = [true or false]
-    //                 ; size = [column-size]
-    //             }
-    //         }
-    //     }
+    // # /---------------------------------------------------------------------------
+    // # additionalTableMap: (NotRequired - Default 'map:{}')
+    // # 
+    // # This property is valid at only JDBC task and is Final Weapon.
+    // # Basically you don't need this because DBFlute can get the meta information
+    // # of tables from your actual database through JDBC!
+    // # 
+    // # The size and primaryKey and autoIncrement of column is NOT required. 
+    // # 
+    // # Specification:     
+    // # map: {
+    // #     [table-name] = map:{
+    // #         columnMap = map:{
+    // #             [column-name] = map:{
+    // #                 type = [column-JDBC-type] ; required = [true or false]
+    // #                 ; size = [column-size]
+    // #                 ; primaryKey = [true or false] ; autoIncrement = [true or false]
+    // #             }
+    // #             [column-name] = map:{
+    // #                 type = [column-JDBC-type] ; required = [true or false]
+    // #                 ; size = [column-size]
+    // #             }
+    // #         }
+    // #     }
+    // # }
+    // # 
+    // # *The line that starts with '#' means comment-out.
+    // #
+    // map:{
+    //     #; vendor_additional_table = map:{
+    //     #    ; columnMap = map:{
+    //     #        test_id = map:{ type = INTEGER ; required = true ; primaryKey = true ; autoIncrement = true}
+    //     #        test_name = map:{ type = VARCHAR ; required = true ; size = 123 }
+    //     #    }
+    //     #}
     // }
+    // # ----------------/
+
     public Map<String, Object> getAdditionalTableMap() {
         if (_additionalTableMap == null) {
             _additionalTableMap = mapProp("torque." + KEY_additionalTableMap, DEFAULT_EMPTY_MAP);

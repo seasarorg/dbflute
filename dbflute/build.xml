@@ -21,10 +21,11 @@
 
 	<property name="deploy.base" value="../dbflute-temporary-deploy/dbflute"/>
 	<property name="dbflute.deploy.dir" value="${deploy.base}/dbflute-${version}"/>
+	<property name="dbflute.www.download.dir" value="${workspace.base}/dbflute-www/download"/>
 
 	<!-- Basic Examples -->
-	<property name="dbflute.www.download.dir" value="${workspace.base}/dbflute-www/download"/>
 	<property name="dbflute.basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
+	<property name="dbflute.tricky.example.dir" value="${workspace.base}/dbflute-tricky-example"/>
 
 	<!-- Container Examples -->
 	<property name="dbflute.spring.example.dir" value="${workspace.base}/dbflute-spring-example"/>
@@ -220,6 +221,10 @@
 
 	<target name="reflect-mac-basic" depends="deploy-dist" description="==> reflect to basic application">
 	  	<copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	</target>
+
+	<target name="reflect-mac-tricky" depends="deploy-dist" description="==> reflect to tricky example">
+	  	<copy todir="${dbflute.tricky.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
 	<target name="reflect-mac-spring" depends="deploy-dist" description="==> reflect to spring application">

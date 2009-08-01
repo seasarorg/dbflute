@@ -74,6 +74,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseConfig;
 import org.seasar.dbflute.friends.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.friends.torque.DfAdditionalPrimaryKeyInitializer;
+import org.seasar.dbflute.friends.torque.DfAdditionalUniqueKeyInitializer;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.metadata.DfProcedureHandler.DfProcedureColumnType;
@@ -493,6 +494,14 @@ public class Database {
     public void initializeAdditionalPrimaryKey() {
         final DfAdditionalPrimaryKeyInitializer initializer = new DfAdditionalPrimaryKeyInitializer(this);
         initializer.initializeAdditionalPrimaryKey();
+    }
+
+    // -----------------------------------------------------
+    //                                   AdditionalUniqueKey
+    //                                   -------------------
+    public void initializeAdditionalUniqueKey() {
+        final DfAdditionalUniqueKeyInitializer initializer = new DfAdditionalUniqueKeyInitializer(this);
+        initializer.initializeAdditionalUniqueKey();
     }
 
     // -----------------------------------------------------

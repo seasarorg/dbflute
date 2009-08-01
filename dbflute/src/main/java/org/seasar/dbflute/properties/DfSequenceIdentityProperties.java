@@ -115,6 +115,32 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     protected static final String KEY_identityDefinitionMap = "identityDefinitionMap";
     protected Map<String, Object> _identityDefinitionMap;
 
+    // # /---------------------------------------------------------------------------
+    // # identityDefinitionMap: (Default 'map:{}')
+    // # 
+    // # The relation mappings between identity and column of table.
+    // # Basically you don't need this property because DBFlute
+    // # can get the information about identity from JDBC automatically.
+    // # The table names and column names are treated as case insensitive.
+    // # 
+    // # Example:
+    // # map:{
+    // #     ; PURCHASE     = PURCHASE_ID
+    // #     ; MEMBER       = MEMBER_ID
+    // #     ; MEMBER_LOGIN = MEMBER_LOGIN_ID
+    // #     ; PRODUCT      = PRODUCT_ID
+    // # }
+    // #
+    // # *The line that starts with '#' means comment-out.
+    // #
+    // map:{
+    //     #; PURCHASE     = PURCHASE_ID
+    //     #; MEMBER       = MEMBER_ID
+    //     #; MEMBER_LOGIN = MEMBER_LOGIN_ID
+    //     #; PRODUCT      = PRODUCT_ID
+    // }
+    // # ----------------/
+
     protected Map<String, Object> getIdentityDefinitionMap() {
         if (_identityDefinitionMap == null) {
             _identityDefinitionMap = mapProp("torque." + KEY_identityDefinitionMap, DEFAULT_EMPTY_MAP);
