@@ -55,5 +55,9 @@ public class AbstractDBMetaTest extends PlainTestCase {
         public static MockClassification codeOf(Object obj) {
             return obj instanceof String && obj.equals("bar") ? BAR : null;
         }
+
+        public DataType dataType() {
+            return null;
+        }
     }
 }

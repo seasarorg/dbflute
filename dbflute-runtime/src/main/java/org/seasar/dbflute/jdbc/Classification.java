@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.jdbc;
 
-
 /**
  * The definition of classification. <br />
  * It's an internal interface for DBFlute runtime.
@@ -37,4 +36,17 @@ public interface Classification {
      * @return The code of the classification. (Nullable: when an alias is not specified in its setting)
      */
     String alias();
+
+    /**
+     * @return The data type of the classification. (NotNull)
+     */
+    DataType dataType();
+
+    /**
+     * The data type of a classification.
+     * @author jflute
+     */
+    public enum DataType {
+        String, Number;
+    }
 }

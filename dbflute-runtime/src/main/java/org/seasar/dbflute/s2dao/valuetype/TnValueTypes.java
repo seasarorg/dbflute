@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
@@ -46,6 +47,7 @@ import org.seasar.dbflute.s2dao.valuetype.registered.BinaryType;
 import org.seasar.dbflute.s2dao.valuetype.registered.BooleanType;
 import org.seasar.dbflute.s2dao.valuetype.registered.ByteType;
 import org.seasar.dbflute.s2dao.valuetype.registered.CharacterType;
+import org.seasar.dbflute.s2dao.valuetype.registered.ClassificationType;
 import org.seasar.dbflute.s2dao.valuetype.registered.DoubleType;
 import org.seasar.dbflute.s2dao.valuetype.registered.FloatType;
 import org.seasar.dbflute.s2dao.valuetype.registered.IntegerType;
@@ -69,7 +71,7 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    // Basic
+    // Registered
     public final static ValueType STRING = new StringType();
     public final static ValueType CHARACTER = new CharacterType();
     public final static ValueType BYTE = new ByteType();
@@ -87,6 +89,7 @@ public class TnValueTypes {
     public final static ValueType BINARY_STREAM = new BinaryStreamType();
     public final static ValueType BOOLEAN = new BooleanType();
     public final static ValueType UUID = new UUIDType();
+    public final static ValueType CLASSIFICATION = new ClassificationType(); // DBFlute original class
     public final static ValueType OBJECT = new ObjectType();
 
     // Plug-in
@@ -140,6 +143,7 @@ public class TnValueTypes {
         registerValueType(boolean.class, BOOLEAN);
         registerValueType(Boolean.class, BOOLEAN);
         registerValueType(UUID.class, UUID);
+        registerValueType(Classification.class, CLASSIFICATION); // DBFlute original class
 
         // Because object type is to be handle as special type.
         //registerValueType(Object.class, OBJECT);
