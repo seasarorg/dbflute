@@ -13,14 +13,17 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.jdbc.metadata.identity;
+package org.seasar.dbflute.logic.metadata.synonym;
 
 import java.util.Map;
 
+import org.seasar.dbflute.logic.metadata.info.DfSynonymMetaInfo;
+
 /**
  * @author jflute
+ * @since 0.9.3 (2009/02/24 Tuesday)
  */
-public interface DfIdentityExtractor {
+public interface DfSynonymExtractor {
 
-    public Map<String, String> extractIdentityMap();
+    Map<String, DfSynonymMetaInfo> extractSynonymMap();
 }

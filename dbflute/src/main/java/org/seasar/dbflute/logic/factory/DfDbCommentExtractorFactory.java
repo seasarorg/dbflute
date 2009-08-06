@@ -2,8 +2,8 @@ package org.seasar.dbflute.logic.factory;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor;
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorOracle;
+import org.seasar.dbflute.logic.metadata.comment.DfDbCommentExtractor;
+import org.seasar.dbflute.logic.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**

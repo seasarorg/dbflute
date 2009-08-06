@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.helper.jdbc.schemainitializer;
 
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.metadata.info.DfTableMetaInfo;
 
 /**
  * The schema initializer for DB2.

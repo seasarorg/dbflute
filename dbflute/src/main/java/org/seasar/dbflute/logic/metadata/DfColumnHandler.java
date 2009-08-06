@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.jdbc.metadata;
+package org.seasar.dbflute.logic.metadata;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -26,10 +26,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.logic.mapping.DfJdbcTypeMapper;
 import org.seasar.dbflute.logic.mapping.DfJdbcTypeMapper.Resource;
+import org.seasar.dbflute.logic.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**

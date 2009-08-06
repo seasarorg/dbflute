@@ -28,10 +28,10 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.jdbc.metadata.DfForeignKeyHandler;
-import org.seasar.dbflute.helper.jdbc.metadata.DfTableHandler;
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.metadata.DfForeignKeyHandler;
+import org.seasar.dbflute.logic.metadata.DfTableHandler;
+import org.seasar.dbflute.logic.metadata.info.DfForeignKeyMetaInfo;
+import org.seasar.dbflute.logic.metadata.info.DfTableMetaInfo;
 
 /**
  * The schema initializer with JDBC.
