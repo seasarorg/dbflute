@@ -28,7 +28,9 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfAssertionFailureCountNotExistsException;
 import org.seasar.dbflute.exception.DfAssertionFailureCountNotZeroException;
+import org.seasar.dbflute.exception.DfAssertionFailureListNotExistsException;
 import org.seasar.dbflute.exception.DfAssertionFailureListNotZeroException;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 
@@ -63,8 +65,12 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             if (isValidAssertSql()) {
                 if (isAssertCountZero(sql)) {
                     assertCountZero(statement, sql);
+                } else if (isAssertCountExists(sql)) {
+                    assertCountExists(statement, sql);
                 } else if (isAssertListZero(sql)) {
                     assertListZero(statement, sql);
+                } else if (isAssertListExists(sql)) {
+                    assertListExists(statement, sql);
                 } else {
                     statement.execute(sql);
                 }
@@ -152,15 +158,37 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         return false; // as default!
     }
 
+    // ===================================================================================
+    //                                                                Assert Determination
+    //                                                                ====================
     protected boolean isAssertCountZero(String sql) {
         return sql.contains("--") && sql.contains("#df:assertCountZero#");
+    }
+
+    protected boolean isAssertCountExists(String sql) {
+        return sql.contains("--") && sql.contains("#df:assertCountExists#");
     }
 
     protected boolean isAssertListZero(String sql) {
         return sql.contains("--") && sql.contains("#df:assertListZero#");
     }
 
+    protected boolean isAssertListExists(String sql) {
+        return sql.contains("--") && sql.contains("#df:assertListExists#");
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Result
+    //                                                                       =============
     protected void assertCountZero(Statement statement, String sql) throws SQLException {
+        assertCount(statement, sql, false);
+    }
+
+    protected void assertCountExists(Statement statement, String sql) throws SQLException {
+        assertCount(statement, sql, false);
+    }
+
+    protected void assertCount(Statement statement, String sql, boolean exists) throws SQLException {
         ResultSet rs = null;
         try {
             rs = statement.executeQuery(sql);
@@ -169,8 +197,14 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 count = rs.getInt(1);
                 break;
             }
-            if (count > 0) {
-                throwAssertionFailureCountNotZeroException(sql, count);
+            if (exists) {
+                if (count == 0) {
+                    throwAssertionFailureCountNotExistsException(sql, count);
+                }
+            } else {
+                if (count > 0) {
+                    throwAssertionFailureCountNotZeroException(sql, count);
+                }
             }
         } finally {
             if (rs != null) {
@@ -180,6 +214,14 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     }
 
     protected void assertListZero(Statement statement, String sql) throws SQLException {
+        assertList(statement, sql, false);
+    }
+
+    protected void assertListExists(Statement statement, String sql) throws SQLException {
+        assertList(statement, sql, true);
+    }
+
+    protected void assertList(Statement statement, String sql, boolean exists) throws SQLException {
         ResultSet rs = null;
         try {
             rs = statement.executeQuery(sql);
@@ -195,8 +237,14 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 resultList.add(recordMap);
                 ++count;
             }
-            if (count > 0) {
-                throwAssertionFailureListNotZeroException(sql, count, resultList);
+            if (exists) {
+                if (count == 0) {
+                    throwAssertionFailureListNotExistsException(sql, count, resultList);
+                }
+            } else {
+                if (count > 0) {
+                    throwAssertionFailureListNotZeroException(sql, count, resultList);
+                }
             }
         } finally {
             if (rs != null) {
@@ -208,7 +256,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     protected void throwAssertionFailureCountNotZeroException(String sql, int resultCount) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL of 'select count' returned NOT ZERO!" + ln();
+        msg = msg + "The SQL expects ZERO but the result is NOT ZERO!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your test data!" + ln();
@@ -222,11 +270,28 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         throw new DfAssertionFailureCountNotZeroException(msg);
     }
 
+    protected void throwAssertionFailureCountNotExistsException(String sql, int resultCount) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The SQL expects EXISTS but the result is NOT EXISTS!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your test data!" + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL File]" + ln() + _srcFile + ln();
+        msg = msg + ln();
+        msg = msg + "[Executed SQL]" + ln() + sql + ln();
+        msg = msg + ln();
+        msg = msg + "[Result Count]" + ln() + resultCount + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new DfAssertionFailureCountNotExistsException(msg);
+    }
+
     protected void throwAssertionFailureListNotZeroException(String sql, int resultCount,
             List<Map<String, String>> resultList) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL of 'select count' returned NOT ZERO!" + ln();
+        msg = msg + "The SQL expects ZERO but the result is NOT ZERO!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your test data!" + ln();
@@ -243,5 +308,28 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         }
         msg = msg + "* * * * * * * * * */";
         throw new DfAssertionFailureListNotZeroException(msg);
+    }
+
+    protected void throwAssertionFailureListNotExistsException(String sql, int resultCount,
+            List<Map<String, String>> resultList) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The SQL expects EXISTS but the result is NOT EXISTS!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your test data!" + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL File]" + ln() + _srcFile + ln();
+        msg = msg + ln();
+        msg = msg + "[Executed SQL]" + ln() + sql + ln();
+        msg = msg + ln();
+        msg = msg + "[Result Count]" + ln() + resultCount + ln();
+        msg = msg + ln();
+        msg = msg + "[Result List]" + ln();
+        for (Map<String, String> recordMap : resultList) {
+            msg = msg + recordMap + ln();
+        }
+        msg = msg + "* * * * * * * * * */";
+        throw new DfAssertionFailureListNotExistsException(msg);
     }
 }
