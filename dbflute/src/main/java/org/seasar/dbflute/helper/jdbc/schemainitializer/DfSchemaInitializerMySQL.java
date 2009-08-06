@@ -18,8 +18,8 @@ package org.seasar.dbflute.helper.jdbc.schemainitializer;
 import java.sql.Connection;
 import java.util.List;
 
-import org.seasar.dbflute.helper.metadata.info.DfForeignKeyMetaInfo;
-import org.seasar.dbflute.helper.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
  * @author jflute

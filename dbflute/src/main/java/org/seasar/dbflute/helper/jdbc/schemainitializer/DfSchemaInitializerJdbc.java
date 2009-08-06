@@ -28,8 +28,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.metadata.info.DfForeignKeyMetaInfo;
-import org.seasar.dbflute.helper.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.logic.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.logic.metadata.DfTableHandler;
 

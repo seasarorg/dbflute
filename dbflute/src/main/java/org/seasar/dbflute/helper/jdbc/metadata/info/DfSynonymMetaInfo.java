@@ -13,14 +13,14 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.metadata.info;
+package org.seasar.dbflute.helper.jdbc.metadata.info;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.helper.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 
 /**
  * @author jflute

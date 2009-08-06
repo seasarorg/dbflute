@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
-import org.seasar.dbflute.helper.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 
 /**
  * @author jflute

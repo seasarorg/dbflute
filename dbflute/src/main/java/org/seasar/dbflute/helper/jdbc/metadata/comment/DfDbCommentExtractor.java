@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.metadata.comment;
+package org.seasar.dbflute.helper.jdbc.metadata.comment;
 
 import java.util.Map;
 import java.util.Set;

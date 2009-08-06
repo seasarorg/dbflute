@@ -53,7 +53,7 @@ import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
 import org.seasar.dbflute.helper.io.data.DfXlsDataHandler;
 import org.seasar.dbflute.helper.io.text.DfMapStringFileReader;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
-import org.seasar.dbflute.helper.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 
 /**
  * @author jflute
