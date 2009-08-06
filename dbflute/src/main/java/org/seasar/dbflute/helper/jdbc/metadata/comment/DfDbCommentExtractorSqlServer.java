@@ -31,7 +31,9 @@ public class DfDbCommentExtractorSqlServer extends DfDbCommentExtractorBase {
     //                                                                    ================
     protected List<UserTabComments> selectUserTabComments(Connection conn, Set<String> tableSet) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select objtype as OBJECT_TYPE, objname as TABLE_NAME, value as COMMENTS");
+        sb.append("select cast(objtype as nvarchar(500)) as OBJECT_TYPE");
+        sb.append(", cast(objname as nvarchar(500)) as TABLE_NAME");
+        sb.append(", cast(value as nvarchar(4000)) as COMMENTS");
         sb.append(" from fn_listextendedproperty");
         sb.append("('MS_Description', '").append(_schema).append("'");
         sb.append(", 'dbo', 'table', default, default, default)");
@@ -53,7 +55,8 @@ public class DfDbCommentExtractorSqlServer extends DfDbCommentExtractorBase {
     protected String buildUserColCommentsSql(String tableName) {
         final StringBuilder sb = new StringBuilder();
         sb.append("select '").append(tableName).append("' as TABLE_NAME");
-        sb.append(", objname as COLUMN_NAME, value as COMMENTS");
+        sb.append(", cast(objname as nvarchar(500)) as COLUMN_NAME");
+        sb.append(", cast(value as nvarchar(4000)) as COMMENTS");
         sb.append(" from fn_listextendedproperty");
         sb.append("('MS_Description', '").append(_schema).append("'");
         sb.append(", 'dbo', 'table', '").append(tableName).append(", 'column', default)");

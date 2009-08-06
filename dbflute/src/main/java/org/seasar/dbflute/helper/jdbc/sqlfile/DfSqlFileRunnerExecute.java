@@ -250,7 +250,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                     for (Map<String, String> recordMap : resultList) {
                         result = result + recordMap + ln();
                     }
-                    _log.info(result);
+                    _log.info(result.trim());
                 }
             } else {
                 if (count > 0) {
