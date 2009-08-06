@@ -147,6 +147,10 @@ public class DfJdbcTypeMapper {
     public boolean isPostgreSQLBytesOid(final String dbTypeName) {
         return _resource.isDatabasePostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
     }
+    
+    public boolean isUUID(final String dbTypeName) {
+        return "uuid".equalsIgnoreCase(dbTypeName);
+    }
 
     protected boolean isOtherType(final int jdbcDefValue) {
         return Types.OTHER == jdbcDefValue;

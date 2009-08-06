@@ -82,6 +82,7 @@ import org.seasar.dbflute.logic.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.initializer.IncludeQueryInitializer;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
+import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionFinder;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -90,7 +91,6 @@ import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupResource;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.properties.assistant.TableFinder;
-import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
 import org.xml.sax.Attributes;
 
 /**

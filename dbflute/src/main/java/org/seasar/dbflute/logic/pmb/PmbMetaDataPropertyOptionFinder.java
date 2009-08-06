@@ -2,18 +2,22 @@ package org.seasar.dbflute.logic.pmb;
 
 import java.util.Map;
 
-import org.seasar.dbflute.task.DfSql2EntityTask.DfParameterBeanMetaData;
-
 /**
  * @author jflute
  * @since 0.6.3 (2008/02/05 Tuesday)
  */
 public class PmbMetaDataPropertyOptionFinder {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _className;
     protected String _propertyName;
-    Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
+    protected Map<String, DfParameterBeanMetaData> _pmbMetaDataMap;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public PmbMetaDataPropertyOptionFinder(String className, String propertyName,
             Map<String, DfParameterBeanMetaData> pmbMetaDataMap) {
         _className = className;
@@ -21,6 +25,9 @@ public class PmbMetaDataPropertyOptionFinder {
         _pmbMetaDataMap = pmbMetaDataMap;
     }
 
+    // ===================================================================================
+    //                                                                         Find Option
+    //                                                                         ===========
     public String findPmbMetaDataPropertyOption(String className, String propertyName) {
         final DfParameterBeanMetaData meta = _pmbMetaDataMap.get(_className);
         if (meta == null) {

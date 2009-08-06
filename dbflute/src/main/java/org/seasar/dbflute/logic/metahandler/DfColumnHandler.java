@@ -254,6 +254,6 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     }
 
     public boolean isUUID(final String dbTypeName) {
-        return "uuid".equalsIgnoreCase(dbTypeName);
+        return getJdbcTypeMapper().isUUID(dbTypeName);
     }
 }
