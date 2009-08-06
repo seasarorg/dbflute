@@ -36,7 +36,7 @@ public class DfDbCommentExtractorSqlServer extends DfDbCommentExtractorBase {
         sb.append(", cast(value as nvarchar(4000)) as COMMENTS");
         sb.append(" from fn_listextendedproperty");
         sb.append("('MS_Description', 'schema', '").append(_schema).append("'");
-        sb.append(", 'dbo', 'table', default, default, default)");
+        sb.append(", 'table', default, default, default)");
         sb.append(" order by TABLE_NAME asc");
         final String sql = sb.toString();
         return doSelectUserTabComments(sql, conn, tableSet);
@@ -59,7 +59,7 @@ public class DfDbCommentExtractorSqlServer extends DfDbCommentExtractorBase {
         sb.append(", cast(value as nvarchar(4000)) as COMMENTS");
         sb.append(" from fn_listextendedproperty");
         sb.append("('MS_Description', 'schema', '").append(_schema).append("'");
-        sb.append(", 'table', '").append(tableName).append(", 'column', default)");
+        sb.append(", 'table', '").append(tableName).append("', 'column', default)");
         sb.append(" order by TABLE_NAME asc, COLUMN_NAME asc");
         return sb.toString();
     }
