@@ -30,7 +30,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.logic.metadata.DfUniqueKeyHandler;
+import org.seasar.dbflute.logic.metahandler.DfUniqueKeyHandler;
 
 /**
  * @author jflute

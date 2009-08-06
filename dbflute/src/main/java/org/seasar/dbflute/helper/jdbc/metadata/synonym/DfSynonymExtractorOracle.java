@@ -41,11 +41,11 @@ import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.logic.metadata.DfAutoIncrementHandler;
-import org.seasar.dbflute.logic.metadata.DfForeignKeyHandler;
-import org.seasar.dbflute.logic.metadata.DfIndexHandler;
-import org.seasar.dbflute.logic.metadata.DfTableHandler;
-import org.seasar.dbflute.logic.metadata.DfUniqueKeyHandler;
+import org.seasar.dbflute.logic.metahandler.DfAutoIncrementHandler;
+import org.seasar.dbflute.logic.metahandler.DfForeignKeyHandler;
+import org.seasar.dbflute.logic.metahandler.DfIndexHandler;
+import org.seasar.dbflute.logic.metahandler.DfTableHandler;
+import org.seasar.dbflute.logic.metahandler.DfUniqueKeyHandler;
 
 /**
  * @author jflute

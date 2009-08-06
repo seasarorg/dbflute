@@ -80,7 +80,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.initializer.IncludeQueryInitializer;
-import org.seasar.dbflute.logic.metadata.DfProcedureHandler.DfProcedureColumnType;
+import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionFinder;

@@ -30,10 +30,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.logic.metadata.DfAutoIncrementHandler;
-import org.seasar.dbflute.logic.metadata.DfColumnHandler;
-import org.seasar.dbflute.logic.metadata.DfTableHandler;
-import org.seasar.dbflute.logic.metadata.DfUniqueKeyHandler;
+import org.seasar.dbflute.logic.metahandler.DfAutoIncrementHandler;
+import org.seasar.dbflute.logic.metahandler.DfColumnHandler;
+import org.seasar.dbflute.logic.metahandler.DfTableHandler;
+import org.seasar.dbflute.logic.metahandler.DfUniqueKeyHandler;
 
 /**
  * @author jflute
