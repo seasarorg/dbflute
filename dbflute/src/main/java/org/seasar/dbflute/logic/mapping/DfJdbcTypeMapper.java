@@ -18,19 +18,13 @@ package org.seasar.dbflute.logic.mapping;
 import java.sql.Types;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
+import org.seasar.dbflute.exception.DfJDBCTypeNotFoundException;
 
 /**
  * @author jflute
  */
 public class DfJdbcTypeMapper {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfJdbcTypeMapper.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -101,16 +95,16 @@ public class DfJdbcTypeMapper {
         if (!isOtherType(jdbcDefValue)) {
             try {
                 return getJdbcType(jdbcDefValue);
-            } catch (RuntimeException e) {
-                String msg = "Not found the sqlTypeCode in TypeMap: jdbcDefValue=";
-                msg = msg + jdbcDefValue + " message=" + e.getMessage();
-                _log.warn(msg);
+            } catch (DfJDBCTypeNotFoundException ignored) {
             }
         }
 
         // * * * * * *
         // Priority 4
         // * * * * * *
+        // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Here is coming if the JDBC type is OTHER or is not found in TypeMap.
+        // - - - - - - - - - -/
         if (dbTypeName == null) {
             return getVarcharJdbcType();
         } else if (dbTypeName.toLowerCase().contains("varchar")) {
@@ -124,9 +118,9 @@ public class DfJdbcTypeMapper {
         } else if (dbTypeName.toLowerCase().contains("clob")) {
             return getClobJdbcType();
         } else if (_resource.isTargetLanguageJava() && dbTypeName.toLowerCase().contains("uuid")) {
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+            // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // This is for Java only because the type has not been checked yet on C#.
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+            // - - - - - - - - - -/
 
             // [UUID Headache]: The reason why UUID type has not been supported yet on JDBC.
             return TypeMap.UUID;

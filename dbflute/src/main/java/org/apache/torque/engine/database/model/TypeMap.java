@@ -62,6 +62,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfJDBCTypeNotFoundException;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -363,19 +364,22 @@ public class TypeMap {
     // ===================================================================================
     //                                                                           JDBC Type
     //                                                                           =========
+    /**
+     * @param jdbcDefValue The JDBC definition value. (NotNull)
+     * @return The type as JDBC. (Nullable: If the jdbcDefValue is OTHER type)
+     */
     public static String findJdbcTypeByJdbcDefValue(Integer jdbcDefValue) {
         // Make sure the we are initialized.
         if (!_initialized) {
             initialize();
         }
         if (java.sql.Types.OTHER == jdbcDefValue) {
-            String msg = "The jdbcType is unsupported: jdbcType=java.sql.Types.OTHER(" + jdbcDefValue + ")";
-            throw new UnsupportedOperationException(msg);
+            return null;
         }
         if (!_jdbcDefValueToJdbcTypeMap.containsKey(jdbcDefValue)) {
             String msg = "_jdbcDefValueToJdbcTypeMap doesn't contain the type as key: ";
             msg = msg + "key=" + jdbcDefValue + " map=" + _jdbcDefValueToJdbcTypeMap;
-            throw new IllegalStateException(msg);
+            throw new DfJDBCTypeNotFoundException(msg);
         }
         return _jdbcDefValueToJdbcTypeMap.get(jdbcDefValue);
     }
@@ -388,7 +392,7 @@ public class TypeMap {
         if (!_jdbcTypeToJdbcDefValueMap.containsKey(jdbcType)) {
             String msg = "_jdbcTypeToJdbcDefValueMap doesn't contain the type as key: ";
             msg = msg + "key=" + jdbcType + " map=" + _jdbcTypeToJdbcDefValueMap;
-            throw new IllegalStateException(msg);
+            throw new DfJDBCTypeNotFoundException(msg);
         }
         return _jdbcTypeToJdbcDefValueMap.get(jdbcType);
     }
