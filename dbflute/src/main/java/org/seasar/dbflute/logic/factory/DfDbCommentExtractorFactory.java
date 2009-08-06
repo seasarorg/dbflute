@@ -4,6 +4,7 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorOracle;
+import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorSqlServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**
@@ -33,6 +34,11 @@ public class DfDbCommentExtractorFactory {
     public DfDbCommentExtractor createDbCommentExtractor() {
         if (_basicProperties.isDatabaseOracle()) {
             final DfDbCommentExtractorOracle extractor = new DfDbCommentExtractorOracle();
+            extractor.setDataSource(_dataSource);
+            extractor.setSchema(_schema);
+            return extractor;
+        } else if (_basicProperties.isDatabaseSqlServer()) {
+            final DfDbCommentExtractorSqlServer extractor = new DfDbCommentExtractorSqlServer();
             extractor.setDataSource(_dataSource);
             extractor.setSchema(_schema);
             return extractor;

@@ -203,7 +203,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 if (count == 0) {
                     throwAssertionFailureCountNotExistsException(sql, count);
                 } else {
-                    String result = "[RESULT]: count=" + count + ln();
+                    String result = "[RESULT]: count=" + count;
                     _log.info(result);
                 }
             } else {
