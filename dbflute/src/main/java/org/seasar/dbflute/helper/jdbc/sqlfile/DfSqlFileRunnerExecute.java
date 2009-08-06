@@ -187,7 +187,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     }
 
     protected void assertCountExists(Statement statement, String sql) throws SQLException {
-        assertCount(statement, sql, false);
+        assertCount(statement, sql, true);
     }
 
     protected void assertCount(Statement statement, String sql, boolean exists) throws SQLException {
