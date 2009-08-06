@@ -84,14 +84,14 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
 
         Reader reader = null;
-        Connection connection = null;
+        Connection conn = null;
         Statement statement = null;
         try {
             reader = newInputStreamReader();
             final List<String> sqlList = extractSqlList(reader);
 
-            connection = getConnection();
-            statement = newStatement(connection);
+            conn = getConnection();
+            statement = newStatement(conn);
             for (String sql : sqlList) {
                 if (!isTargetSql(sql)) {
                     continue;
@@ -101,47 +101,55 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 traceSql(realSql);
                 execSQL(statement, realSql);
             }
-            if (!connection.getAutoCommit()) {
+            Boolean autoCommit = null;
+            try {
+                autoCommit = conn.getAutoCommit();
+            } catch (SQLException continued) {
+                // Because it it possible that the connection would have already closed.
+                _log.warn("Connection#getAutoCommit() says: " + continued.getMessage());
+            }
+            if (autoCommit != null && !autoCommit) {
                 if (_runInfo.isRollbackOnly()) {
-                    connection.rollback();
+                    conn.rollback();
                 } else {
-                    connection.commit();
+                    conn.commit();
                 }
             }
         } catch (SQLException e) {
             throw new BuildException("Transaction#runTransaction() threw the exception!", e);
         } finally {
+            Boolean autoCommit = null;
             try {
-                if (connection != null && !connection.getAutoCommit()) {
-                    connection.rollback();
+                autoCommit = conn.getAutoCommit();
+            } catch (SQLException continued) {
+            }
+            try {
+                if (autoCommit != null && conn != null && !conn.getAutoCommit()) {
+                    conn.rollback();
                 }
             } catch (SQLException ignored) {
-                _log.warn("Connection#rollback() threw the exception!", ignored);
             }
             try {
                 if (statement != null) {
                     statement.close();
                 }
             } catch (SQLException ignored) {
-                _log.warn("Statement#close() threw the exception!", ignored);
             } finally {
                 statement = null;
             }
             try {
-                if (connection != null) {
-                    connection.close();
+                if (conn != null) {
+                    conn.close();
                 }
             } catch (SQLException ignored) {
-                _log.warn("Connection#close() threw the exception!", ignored);
             } finally {
-                connection = null;
+                conn = null;
             }
             try {
                 if (reader != null) {
                     reader.close();
                 }
             } catch (IOException ignored) {
-                _log.warn("Reader#close() threw the exception: " + reader, ignored);
             } finally {
                 reader = null;
             }
