@@ -125,17 +125,17 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         sb.append(ln());
         sb.append(sql).append(ln());
         e.getSQLState();
-        sb.append("- - - - - - - - ").append(ln());
+        sb.append("- - - - - - - - - -").append(ln());
         sb.append(extractMessage(e)).append(ln());
         buildAdditionalErrorInfo(sb, e).append(ln());
         SQLException nextEx = e.getNextException();
         if (nextEx != null) {
-            sb.append("- - - - - - - - ").append(ln());
+            sb.append("- - - - - - - - - -").append(ln());
             sb.append(extractMessage(nextEx)).append(ln());
             buildAdditionalErrorInfo(sb, nextEx).append(ln());
             SQLException nextNextEx = nextEx.getNextException();
             if (nextNextEx != null) {
-                sb.append("- - - - - - - - ").append(ln());
+                sb.append("- - - - - - - - - -").append(ln());
                 sb.append(extractMessage(nextNextEx)).append(ln());
                 buildAdditionalErrorInfo(sb, nextNextEx).append(ln());
             }
