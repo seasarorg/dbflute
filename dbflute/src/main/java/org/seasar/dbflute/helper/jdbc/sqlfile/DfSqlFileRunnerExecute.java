@@ -202,6 +202,9 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             if (exists) {
                 if (count == 0) {
                     throwAssertionFailureCountNotExistsException(sql, count);
+                } else {
+                    String result = "[RESULT]: count=" + count + ln();
+                    _log.info(result);
                 }
             } else {
                 if (count > 0) {
@@ -231,7 +234,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             final int columnCount = metaData.getColumnCount();
             final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
             int count = 0;
-            while (rs.next()) {// One loop only!
+            while (rs.next()) { // One loop only!
                 Map<String, String> recordMap = new LinkedHashMap<String, String>();
                 for (int i = 1; i <= columnCount; i++) {
                     recordMap.put(metaData.getColumnName(i), rs.getString(i));
@@ -242,6 +245,12 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             if (exists) {
                 if (count == 0) {
                     throwAssertionFailureListNotExistsException(sql, count, resultList);
+                } else {
+                    String result = "[RESULT]: count=" + count + ln();
+                    for (Map<String, String> recordMap : resultList) {
+                        result = result + recordMap + ln();
+                    }
+                    _log.info(result);
                 }
             } else {
                 if (count > 0) {

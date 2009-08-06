@@ -161,7 +161,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                          Check Object
     //                                          ------------
     protected StringSet _refTableCheckSet;
-    
+
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
@@ -569,7 +569,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                     // *Synonym Processing is after loading synonyms.
                 }
             } catch (RuntimeException ignored) {
-                _log.debug("Failed to extract table comments: extractor=" + extractor, ignored);
+                _log.info("Failed to extract table comments: extractor=" + extractor, ignored);
             }
             try {
                 if (_columnCommentAllMap == null) {
@@ -578,7 +578,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                     _columnCommentAllMap.putAll(extractor.extractColumnComment(tableSet)); // Merge
                 }
             } catch (RuntimeException ignored) {
-                _log.debug("Failed to extract column comments: extractor=" + extractor, ignored);
+                _log.info("Failed to extract column comments: extractor=" + extractor, ignored);
             }
         }
     }
@@ -830,7 +830,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 sb.append(ln()).append(" " + key + " = " + _synonymMap.get(key));
             }
             _log.info(sb.toString());
-        } catch (Exception ignored) {
+        } catch (RuntimeException ignored) {
             _log.info("DfSynonymExtractor.extractSynonymMap() threw the exception!", ignored);
         }
     }
