@@ -3,8 +3,8 @@ package org.seasar.dbflute.logic.factory;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.helper.StringSet;
-import org.seasar.dbflute.logic.metadata.synonym.DfSynonymExtractor;
-import org.seasar.dbflute.logic.metadata.synonym.DfSynonymExtractorOracle;
+import org.seasar.dbflute.helper.metadata.synonym.DfSynonymExtractor;
+import org.seasar.dbflute.helper.metadata.synonym.DfSynonymExtractorOracle;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 

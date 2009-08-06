@@ -26,10 +26,10 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.StringSet;
+import org.seasar.dbflute.helper.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.helper.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.logic.mapping.DfJdbcTypeMapper;
 import org.seasar.dbflute.logic.mapping.DfJdbcTypeMapper.Resource;
-import org.seasar.dbflute.logic.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.properties.DfTypeMappingProperties;
 
 /**

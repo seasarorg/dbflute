@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.metadata.identity;
+package org.seasar.dbflute.helper.metadata.identity;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

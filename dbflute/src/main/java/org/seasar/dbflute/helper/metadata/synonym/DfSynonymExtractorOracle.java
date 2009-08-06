@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.metadata.synonym;
+package org.seasar.dbflute.helper.metadata.synonym;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -34,18 +34,18 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.metadata.comment.DfDbCommentExtractorOracle;
+import org.seasar.dbflute.helper.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.seasar.dbflute.helper.metadata.comment.DfDbCommentExtractor.UserTabComments;
+import org.seasar.dbflute.helper.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.helper.metadata.info.DfForeignKeyMetaInfo;
+import org.seasar.dbflute.helper.metadata.info.DfSynonymMetaInfo;
+import org.seasar.dbflute.helper.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.logic.metadata.DfAutoIncrementHandler;
 import org.seasar.dbflute.logic.metadata.DfForeignKeyHandler;
 import org.seasar.dbflute.logic.metadata.DfIndexHandler;
 import org.seasar.dbflute.logic.metadata.DfTableHandler;
 import org.seasar.dbflute.logic.metadata.DfUniqueKeyHandler;
-import org.seasar.dbflute.logic.metadata.comment.DfDbCommentExtractorOracle;
-import org.seasar.dbflute.logic.metadata.comment.DfDbCommentExtractor.UserColComments;
-import org.seasar.dbflute.logic.metadata.comment.DfDbCommentExtractor.UserTabComments;
-import org.seasar.dbflute.logic.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.metadata.info.DfForeignKeyMetaInfo;
-import org.seasar.dbflute.logic.metadata.info.DfSynonymMetaInfo;
-import org.seasar.dbflute.logic.metadata.info.DfTableMetaInfo;
 
 /**
  * @author jflute

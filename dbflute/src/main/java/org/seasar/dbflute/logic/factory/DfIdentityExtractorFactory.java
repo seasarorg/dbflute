@@ -2,8 +2,8 @@ package org.seasar.dbflute.logic.factory;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.logic.metadata.identity.DfIdentityExtractor;
-import org.seasar.dbflute.logic.metadata.identity.DfIdentityExtractorDB2;
+import org.seasar.dbflute.helper.metadata.identity.DfIdentityExtractor;
+import org.seasar.dbflute.helper.metadata.identity.DfIdentityExtractorDB2;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**

@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.logic.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.helper.metadata.info.DfTableMetaInfo;
 
 /**
  * This class generates an XML schema of an existing database from JDBC meta data.

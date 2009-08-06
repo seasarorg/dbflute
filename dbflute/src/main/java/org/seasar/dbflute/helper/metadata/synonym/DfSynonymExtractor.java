@@ -13,11 +13,11 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.logic.metadata.synonym;
+package org.seasar.dbflute.helper.metadata.synonym;
 
 import java.util.Map;
 
-import org.seasar.dbflute.logic.metadata.info.DfSynonymMetaInfo;
+import org.seasar.dbflute.helper.metadata.info.DfSynonymMetaInfo;
 
 /**
  * @author jflute
