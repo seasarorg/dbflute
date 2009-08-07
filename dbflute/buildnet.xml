@@ -5,8 +5,8 @@
 	<!--                                          ==================================== -->
 
 	<!-- Version -->
-	<property name="version" value="0.8.9.3"/>
-	<property name="internal.version" value="${version}"/>
+	<property name="version" value="0.8.9.4"/>
+	<property name="internal.version" value="${version}-SNAPSHOT"/>
 
 	<!-- Directories and Module Files -->
 	<property name="dbflute.dist" value="dist/net"/>
