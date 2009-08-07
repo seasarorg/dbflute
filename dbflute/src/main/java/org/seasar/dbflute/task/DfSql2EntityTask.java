@@ -302,12 +302,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         // for Customize Entity
                         String entityName = getEntityName(sql);
                         if (entityName != null) {
-                            entityName = resolveEntityNameIfNeeds(entityName, _srcFile);
+                            entityName = resolveEntityNameIfNeeds(entityName, _sqlFile);
                             _entityInfoMap.put(entityName, columnJdbcTypeMap);
                             if (isCursor(sql)) {
                                 _cursorInfoMap.put(entityName, new Object());
                             }
-                            _entitySqlFileMap.put(entityName, _srcFile);
+                            _entitySqlFileMap.put(entityName, _sqlFile);
                             _primaryKeyMap.put(entityName, getPrimaryKeyColumnNameList(sql));
                         }
                     }
@@ -341,7 +341,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
                         msg = msg + "It failed to execute the SQL!" + ln();
                         msg = msg + ln();
-                        msg = msg + "[SQL File]" + ln() + _srcFile + ln();
+                        msg = msg + "[SQL File]" + ln() + _sqlFile + ln();
                         msg = msg + ln();
                         msg = msg + "[Executed SQL]" + ln() + sql + ln();
                         msg = msg + ln();
@@ -361,7 +361,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         throw new DfSQLExecutionFailureException(msg, e);
                     }
                     _log.warn("Failed to execute: " + sql, e);
-                    _exceptionInfoMap.put(_srcFile.getName(), e.getMessage() + ln() + sql);
+                    _exceptionInfoMap.put(_sqlFile.getName(), e.getMessage() + ln() + sql);
                 } finally {
                     if (rs != null) {
                         try {
@@ -384,7 +384,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     if (nameIndex <= 0) {
                         String msg = "The customize entity element should be [typeName columnName].";
                         msg = msg + " But: element=" + element;
-                        msg = msg + " srcFile=" + _srcFile;
+                        msg = msg + " srcFile=" + _sqlFile;
                         throw new IllegalStateException(msg);
                     }
                     final String typeName = resolvePackageName(element.substring(0, nameIndex).trim());
@@ -427,7 +427,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     {
                         String className = (idx >= 0) ? classDefinition.substring(0, idx) : classDefinition;
                         className = className.trim();
-                        className = resolvePmbNameIfNeeds(className, _srcFile);
+                        className = resolvePmbNameIfNeeds(className, _sqlFile);
                         pmbMetaData.setClassName(className);
                     }
                     if (idx >= 0) {
@@ -457,7 +457,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     if (nameIndex <= 0) {
                         String msg = "The parameter bean element should be [typeName propertyName].";
                         msg = msg + " But: element=" + element;
-                        msg = msg + " srcFile=" + _srcFile;
+                        msg = msg + " srcFile=" + _sqlFile;
                         throw new IllegalStateException(msg);
                     }
                     final String typeName = resolvePackageName(element.substring(0, nameIndex).trim());
@@ -466,7 +466,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     if (optionIndex == 0) {
                         String msg = "The parameter bean element should be [typeName propertyName:option].";
                         msg = msg + " But: element=" + element;
-                        msg = msg + " srcFile=" + _srcFile;
+                        msg = msg + " srcFile=" + _sqlFile;
                         throw new IllegalStateException(msg);
                     }
                     if (optionIndex > 0) {

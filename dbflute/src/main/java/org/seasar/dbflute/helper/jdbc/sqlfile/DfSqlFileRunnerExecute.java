@@ -15,23 +15,13 @@
  */
 package org.seasar.dbflute.helper.jdbc.sqlfile;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.DfAssertionFailureCountNotExistsException;
-import org.seasar.dbflute.exception.DfAssertionFailureCountNotZeroException;
-import org.seasar.dbflute.exception.DfAssertionFailureListNotExistsException;
-import org.seasar.dbflute.exception.DfAssertionFailureListNotZeroException;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 
 /**
@@ -46,6 +36,11 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     private static Log _log = LogFactory.getLog(DfSqlFileRunnerExecute.class);
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected DfSqlFileRunnerDispatcher _dispatcher;
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfSqlFileRunnerExecute(DfRunnerInformation runInfo, DataSource dataSource) {
@@ -57,25 +52,14 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     //                                                                         ===========
     /**
      * Execute the SQL statement.
-     * @param statement Statement. (NotNull)
+     * @param stmt Statement. (NotNull)
      * @param sql SQL. (NotNull)
      */
-    protected void execSQL(Statement statement, String sql) {
+    protected void execSQL(Statement stmt, String sql) {
         try {
-            if (isValidAssertSql()) {
-                if (isAssertCountZero(sql)) {
-                    assertCountZero(statement, sql);
-                } else if (isAssertCountExists(sql)) {
-                    assertCountExists(statement, sql);
-                } else if (isAssertListZero(sql)) {
-                    assertListZero(statement, sql);
-                } else if (isAssertListExists(sql)) {
-                    assertListExists(statement, sql);
-                } else {
-                    statement.execute(sql);
-                }
-            } else {
-                statement.execute(sql);
+            final boolean dispatched = dispatch(stmt, sql);
+            if (!dispatched) {
+                stmt.execute(sql);
             }
             _goodSqlCount++;
         } catch (SQLException e) {
@@ -88,7 +72,7 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
             msg = msg + "It failed to execute the SQL!" + ln();
             msg = msg + ln();
-            msg = msg + "[SQL File]" + ln() + _srcFile + ln();
+            msg = msg + "[SQL File]" + ln() + _sqlFile + ln();
             msg = msg + ln();
             msg = msg + "[Executed SQL]" + ln() + sql + ln();
             msg = msg + ln();
@@ -115,6 +99,10 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
             msg = msg + "* * * * * * * * * */";
             throw new DfSQLExecutionFailureException(msg, e);
         }
+    }
+
+    protected boolean dispatch(Statement stmt, String sql) throws SQLException {
+        return _dispatcher != null && _dispatcher.dispatch(_sqlFile, stmt, sql);
     }
 
     protected void showContinueWarnLog(SQLException e, String sql) {
@@ -156,191 +144,14 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
         return sb;
     }
 
-    protected boolean isValidAssertSql() {
-        return false; // as default!
-    }
-
     // ===================================================================================
-    //                                                                Assert Determination
-    //                                                                ====================
-    protected boolean isAssertCountZero(String sql) {
-        return sql.contains("--") && sql.contains("#df:assertCountZero#");
+    //                                                                            Accessor
+    //                                                                            ========
+    public DfSqlFileRunnerDispatcher getDispatcher() {
+        return _dispatcher;
     }
 
-    protected boolean isAssertCountExists(String sql) {
-        return sql.contains("--") && sql.contains("#df:assertCountExists#");
-    }
-
-    protected boolean isAssertListZero(String sql) {
-        return sql.contains("--") && sql.contains("#df:assertListZero#");
-    }
-
-    protected boolean isAssertListExists(String sql) {
-        return sql.contains("--") && sql.contains("#df:assertListExists#");
-    }
-
-    // ===================================================================================
-    //                                                                       Assert Result
-    //                                                                       =============
-    protected void assertCountZero(Statement statement, String sql) throws SQLException {
-        assertCount(statement, sql, false);
-    }
-
-    protected void assertCountExists(Statement statement, String sql) throws SQLException {
-        assertCount(statement, sql, true);
-    }
-
-    protected void assertCount(Statement statement, String sql, boolean exists) throws SQLException {
-        ResultSet rs = null;
-        try {
-            rs = statement.executeQuery(sql);
-            int count = 0;
-            while (rs.next()) {// One loop only!
-                count = rs.getInt(1);
-                break;
-            }
-            if (exists) {
-                if (count == 0) {
-                    throwAssertionFailureCountNotExistsException(sql, count);
-                } else {
-                    String result = "[RESULT]: count=" + count;
-                    _log.info(result);
-                }
-            } else {
-                if (count > 0) {
-                    throwAssertionFailureCountNotZeroException(sql, count);
-                }
-            }
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-        }
-    }
-
-    protected void assertListZero(Statement statement, String sql) throws SQLException {
-        assertList(statement, sql, false);
-    }
-
-    protected void assertListExists(Statement statement, String sql) throws SQLException {
-        assertList(statement, sql, true);
-    }
-
-    protected void assertList(Statement statement, String sql, boolean exists) throws SQLException {
-        ResultSet rs = null;
-        try {
-            rs = statement.executeQuery(sql);
-            final ResultSetMetaData metaData = rs.getMetaData();
-            final int columnCount = metaData.getColumnCount();
-            final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
-            int count = 0;
-            while (rs.next()) { // One loop only!
-                Map<String, String> recordMap = new LinkedHashMap<String, String>();
-                for (int i = 1; i <= columnCount; i++) {
-                    recordMap.put(metaData.getColumnName(i), rs.getString(i));
-                }
-                resultList.add(recordMap);
-                ++count;
-            }
-            if (exists) {
-                if (count == 0) {
-                    throwAssertionFailureListNotExistsException(sql, count, resultList);
-                } else {
-                    String result = "[RESULT]: count=" + count + ln();
-                    for (Map<String, String> recordMap : resultList) {
-                        result = result + recordMap + ln();
-                    }
-                    _log.info(result.trim());
-                }
-            } else {
-                if (count > 0) {
-                    throwAssertionFailureListNotZeroException(sql, count, resultList);
-                }
-            }
-        } finally {
-            if (rs != null) {
-                rs.close();
-            }
-        }
-    }
-
-    protected void throwAssertionFailureCountNotZeroException(String sql, int resultCount) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects ZERO but the result is NOT ZERO!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your test data!" + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL File]" + ln() + _srcFile + ln();
-        msg = msg + ln();
-        msg = msg + "[Executed SQL]" + ln() + sql + ln();
-        msg = msg + ln();
-        msg = msg + "[Result Count]" + ln() + resultCount + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new DfAssertionFailureCountNotZeroException(msg);
-    }
-
-    protected void throwAssertionFailureCountNotExistsException(String sql, int resultCount) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects EXISTS but the result is NOT EXISTS!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your test data!" + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL File]" + ln() + _srcFile + ln();
-        msg = msg + ln();
-        msg = msg + "[Executed SQL]" + ln() + sql + ln();
-        msg = msg + ln();
-        msg = msg + "[Result Count]" + ln() + resultCount + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new DfAssertionFailureCountNotExistsException(msg);
-    }
-
-    protected void throwAssertionFailureListNotZeroException(String sql, int resultCount,
-            List<Map<String, String>> resultList) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects ZERO but the result is NOT ZERO!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your test data!" + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL File]" + ln() + _srcFile + ln();
-        msg = msg + ln();
-        msg = msg + "[Executed SQL]" + ln() + sql + ln();
-        msg = msg + ln();
-        msg = msg + "[Result Count]" + ln() + resultCount + ln();
-        msg = msg + ln();
-        msg = msg + "[Result List]" + ln();
-        for (Map<String, String> recordMap : resultList) {
-            msg = msg + recordMap + ln();
-        }
-        msg = msg + "* * * * * * * * * */";
-        throw new DfAssertionFailureListNotZeroException(msg);
-    }
-
-    protected void throwAssertionFailureListNotExistsException(String sql, int resultCount,
-            List<Map<String, String>> resultList) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The SQL expects EXISTS but the result is NOT EXISTS!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your test data!" + ln();
-        msg = msg + ln();
-        msg = msg + "[SQL File]" + ln() + _srcFile + ln();
-        msg = msg + ln();
-        msg = msg + "[Executed SQL]" + ln() + sql + ln();
-        msg = msg + ln();
-        msg = msg + "[Result Count]" + ln() + resultCount + ln();
-        msg = msg + ln();
-        msg = msg + "[Result List]" + ln();
-        for (Map<String, String> recordMap : resultList) {
-            msg = msg + recordMap + ln();
-        }
-        msg = msg + "* * * * * * * * * */";
-        throw new DfAssertionFailureListNotExistsException(msg);
+    public void setDispatcher(DfSqlFileRunnerDispatcher dispatcher) {
+        this._dispatcher = dispatcher;
     }
 }

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,11 +28,14 @@ import org.seasar.dbflute.helper.jdbc.sequence.DfSequenceHandlerOracle;
 import org.seasar.dbflute.helper.jdbc.sequence.DfSequenceHandlerPostgreSQL;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan.FireResult;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
+import org.seasar.dbflute.logic.dataassert.DfDataAssertHandler;
+import org.seasar.dbflute.logic.dataassert.DfDataAssertProvider;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 
@@ -127,7 +132,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
     protected DfSqlFileRunner getSqlFileRunner4TakeFinally(final DfRunnerInformation runInfo) {
         final DfReplaceSchemaProperties prop = getMyProperties();
-        return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
+        final DfSqlFileRunnerExecute runnerExecute = new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
             @Override
             protected String filterSql(String sql) {
                 sql = super.filterSql(sql);
@@ -149,12 +154,20 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             protected String getTerminater4Tool() {
                 return resolveTerminater4Tool();
             }
-
-            @Override
-            protected boolean isValidAssertSql() {
+        };
+        runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
+            public boolean dispatch(File sqlFile, Statement stmt, String sql) throws SQLException {
+                final String dataLoadingType = getMyProperties().getDataLoadingType();
+                final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(dataLoadingType);
+                final DfDataAssertHandler dataAssertHandler = dataAssertProvider.provideDataAssertHandler(sql);
+                if (dataAssertHandler == null) {
+                    return false;
+                }
+                dataAssertHandler.handle(sqlFile, stmt, sql);
                 return true;
             }
-        };
+        });
+        return runnerExecute;
     }
 
     protected List<File> getTakeFinallySqlFileList() {

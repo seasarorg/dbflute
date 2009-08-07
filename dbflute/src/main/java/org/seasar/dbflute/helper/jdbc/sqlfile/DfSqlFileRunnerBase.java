@@ -54,7 +54,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     //                                                                           =========
     protected final DfRunnerInformation _runInfo;
     protected DataSource _dataSource;
-    protected File _srcFile;
+    protected File _sqlFile;
     protected DfSqlFileRunnerResult _result = new DfSqlFileRunnerResult(); // is an empty result as default
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
@@ -67,10 +67,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         _dataSource = dataSource;
     }
 
-    public void prepare(File src) {
-        this._srcFile = src;
+    public void prepare(File sqlFile) {
+        this._sqlFile = sqlFile;
         _result = new DfSqlFileRunnerResult();
-        _result.setSrcFile(src);
+        _result.setSrcFile(sqlFile);
     }
 
     // ===================================================================================
@@ -79,7 +79,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     public DfSqlFileRunnerResult runTransaction() {
         _goodSqlCount = 0;
         _totalSqlCount = 0;
-        if (_srcFile == null) {
+        if (_sqlFile == null) {
             throw new BuildException("Attribute[_srcFile] must not be null.");
         }
 
@@ -179,9 +179,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     protected InputStreamReader newInputStreamReader() {
         try {
             final String encoding = _runInfo.isEncodingNull() ? "UTF-8" : _runInfo.getEncoding();
-            return new InputStreamReader(new FileInputStream(_srcFile), encoding);
+            return new InputStreamReader(new FileInputStream(_sqlFile), encoding);
         } catch (FileNotFoundException e) {
-            throw new BuildException("The file does not exist: " + _srcFile, e);
+            throw new BuildException("The file does not exist: " + _sqlFile, e);
         } catch (UnsupportedEncodingException e) {
             throw new BuildException("The encoding is unsupported: " + _runInfo.getEncoding(), e);
         }
