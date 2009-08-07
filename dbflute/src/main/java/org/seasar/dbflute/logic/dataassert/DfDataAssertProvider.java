@@ -18,7 +18,7 @@ import org.seasar.dbflute.exception.DfAssertionFailureCountNotExistsException;
 import org.seasar.dbflute.exception.DfAssertionFailureCountNotZeroException;
 import org.seasar.dbflute.exception.DfAssertionFailureListNotExistsException;
 import org.seasar.dbflute.exception.DfAssertionFailureListNotZeroException;
-import org.seasar.dbflute.exception.DfAssertionFailureInvalidMarkException;
+import org.seasar.dbflute.exception.DfAssertionInvalidMarkException;
 
 /**
  * @author jflute
@@ -92,7 +92,7 @@ public class DfDataAssertProvider {
             String rearString = sql.substring(keyIndex + currentKey.length());
             if (!rearString.contains(terminator)) {
                 String msg = "The data assert mark should ends '" + terminator + "':" + ln() + sql;
-                throw new DfAssertionFailureInvalidMarkException(msg);
+                throw new DfAssertionInvalidMarkException(msg);
             }
             if (rearString.startsWith(terminator)) {
                 return entry.getValue();
@@ -113,7 +113,7 @@ public class DfDataAssertProvider {
                 }
             } else {
                 String msg = "The unknown option was found: option={" + option + "}" + ln() + sql;
-                throw new DfAssertionFailureInvalidMarkException(msg);
+                throw new DfAssertionInvalidMarkException(msg);
             }
         }
         return null; // when not found
