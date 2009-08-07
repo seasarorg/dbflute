@@ -19,6 +19,7 @@ import org.seasar.dbflute.exception.DfAssertionFailureCountNotZeroException;
 import org.seasar.dbflute.exception.DfAssertionFailureListNotExistsException;
 import org.seasar.dbflute.exception.DfAssertionFailureListNotZeroException;
 import org.seasar.dbflute.exception.DfAssertionInvalidMarkException;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -80,43 +81,57 @@ public class DfDataAssertProvider {
         }
         final String starter = "#df:";
         final String terminator = "#";
-        final String optionMark = "@";
-        Set<Entry<String, DfDataAssertHandler>> entrySet = _assertHandlerMap.entrySet();
+        final String typeAtMark = "@";
+
+        // Resolve comment spaces.
+        sql = DfStringUtil.replace(sql, "-- #", "--#");
+
+        final Set<Entry<String, DfDataAssertHandler>> entrySet = _assertHandlerMap.entrySet();
+        DfDataAssertHandler defaultHandler = null;
         for (Entry<String, DfDataAssertHandler> entry : entrySet) {
             final String key = entry.getKey();
-            final String currentKey = starter + key;
-            if (!sql.contains("--" + currentKey) && !sql.contains("-- " + currentKey)) {
+
+            // Find plain mark.
+            final String firstMark = "--" + starter + key + terminator;
+            if (sql.contains(firstMark)) {
+                return entry.getValue();
+            }
+
+            // Find with data loading type.
+            final String secondMark = "--" + starter + key + typeAtMark + _dataLoadingType + terminator;
+            if (sql.contains(secondMark)) {
+                return entry.getValue();
+            }
+
+            // Set up default handler with check.
+            final String thirdMark = "--" + starter + key;
+            final int keyIndex = sql.indexOf(thirdMark);
+            if (keyIndex < 0) {
                 continue;
             }
-            final int keyIndex = sql.indexOf(currentKey);
-            String rearString = sql.substring(keyIndex + currentKey.length());
+            String rearString = sql.substring(keyIndex + thirdMark.length());
+            if (rearString.contains(ln())) {
+                rearString = rearString.substring(0, rearString.indexOf(ln()));
+            }
             if (!rearString.contains(terminator)) {
                 String msg = "The data assert mark should ends '" + terminator + "':" + ln() + sql;
                 throw new DfAssertionInvalidMarkException(msg);
             }
-            if (rearString.startsWith(terminator)) {
-                return entry.getValue();
-            }
             final String option = rearString.substring(0, rearString.indexOf(terminator));
-            if (option.startsWith(optionMark)) {
-                final String specifiedDataLoadingType = option.substring(optionMark.length());
-                if (_dataLoadingType.equals(specifiedDataLoadingType)) {
-                    return entry.getValue();
-                } else {
-                    return new DfDataAssertHandler() {
-                        public void handle(File sqlFile, Statement stmt, String sql) throws SQLException {
-                            String msg = "...Skipping for the different dataLoadingType:";
-                            msg = msg + " " + currentKey + option + terminator;
-                            _log.info(msg);
-                        }
-                    };
-                }
+            if (option.startsWith(typeAtMark)) {
+                defaultHandler = new DfDataAssertHandler() {
+                    public void handle(File sqlFile, Statement stmt, String sql) throws SQLException {
+                        String msg = "...Skipping for the different dataLoadingType:";
+                        msg = msg + " " + thirdMark + option + terminator;
+                        _log.info(msg);
+                    }
+                };
             } else {
-                String msg = "The unknown option was found: option={" + option + "}" + ln() + sql;
+                String msg = "Unknown option '" + option + "':" + ln() + sql;
                 throw new DfAssertionInvalidMarkException(msg);
             }
         }
-        return null; // when not found
+        return defaultHandler; // when not found
     }
 
     // ===================================================================================

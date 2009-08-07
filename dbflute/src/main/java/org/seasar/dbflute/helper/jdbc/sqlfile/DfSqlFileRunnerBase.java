@@ -165,6 +165,9 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     protected void traceSql(String sql) {
+        if (sql.contains(ln())) {
+            sql = ln() + sql;
+        }
         _log.info(sql);
     }
 
