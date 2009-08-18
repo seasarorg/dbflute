@@ -370,13 +370,25 @@ namespace ${glPackageExtendedBhv} {
 
 #if ($table.isWritable())
         protected int DelegateInsert(${myExtendedObjectClassName} e) { if (!ProcessBeforeInsert(e)) { return 1; } return this.Dao.Insert(e); }
-        protected int DelegateUpdate(${myExtendedObjectClassName} e) { if (!ProcessBeforeUpdate(e)) { return 1; } return this.Dao.UpdateModifiedOnly(e); }
+        protected int DelegateUpdate(${myExtendedObjectClassName} e)
 #if ($table.hasOptimisticLock())
-        protected int DelegateUpdateNonstrict(${myExtendedObjectClassName} e) { if (!ProcessBeforeUpdate(e)) { return 1; } return this.Dao.UpdateNonstrictModifiedOnly(e); }
+        { if (!ProcessBeforeUpdate(e)) { return 1; } return this.Dao.UpdateModifiedOnly(e); }
+#else
+        { if (!ProcessBeforeUpdate(e)) { return 1; } return this.Dao.UpdateNonstrictModifiedOnly(e); }
 #end
-        protected int DelegateDelete(${myExtendedObjectClassName} e) { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.Delete(e); }
 #if ($table.hasOptimisticLock())
-        protected int DelegateDeleteNonstrict(${myExtendedObjectClassName} e) { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.DeleteNonstrict(e); }
+        protected int DelegateUpdateNonstrict(${myExtendedObjectClassName} e)
+        { if (!ProcessBeforeUpdate(e)) { return 1; } return this.Dao.UpdateNonstrictModifiedOnly(e); }
+#end
+        protected int DelegateDelete(${myExtendedObjectClassName} e)
+#if ($table.hasOptimisticLock())
+        { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.Delete(e); }
+#else
+        { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.DeleteNonstrict(e); }
+#end
+#if ($table.hasOptimisticLock())
+        protected int DelegateDeleteNonstrict(${myExtendedObjectClassName} e)
+        { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.DeleteNonstrict(e); }
 #end
         protected override int DoCallCreate(${glEntity} e) { return this.DelegateInsert((${myExtendedObjectClassName})e); }
         protected override int DoCallModify(${glEntity} e) { return this.DelegateUpdate((${myExtendedObjectClassName})e); }
