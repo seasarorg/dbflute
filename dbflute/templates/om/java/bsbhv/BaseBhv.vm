@@ -908,14 +908,22 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     { if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e)); }
     protected int doCallCreate(Entity entity) {return delegateInsert(downcast(entity)); }
     protected int delegateUpdate(${myExtendedObjectClassName} e)
+#if ($table.hasOptimisticLock())
     { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e)); }
+#else
+    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
+#end
     protected int doCallModify(Entity entity) { return delegateUpdate(downcast(entity)); }
 #if ($table.hasOptimisticLock())
     protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e)
     { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
 #end
     protected int delegateDelete(${myExtendedObjectClassName} e)
+#if ($table.hasOptimisticLock())
     { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteEntityCommand(e)); }
+#else
+    { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e)); }
+#end
     protected int doCallRemove(Entity entity) { return delegateDelete(downcast(entity)); }
 #if ($table.hasOptimisticLock())
     protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e)
@@ -927,7 +935,11 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     @SuppressWarnings("unchecked")
     protected int[] doCreateList(List<Entity> ls) { return delegateInsertList((List)ls); }
     protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls)
+#if ($table.hasOptimisticLock())
     { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
+#else
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
+#end
     @SuppressWarnings("unchecked")
     protected int[] doModifyList(List<Entity> ls) { return delegateUpdateList((List)ls); }
 #if ($table.hasOptimisticLock())
@@ -935,7 +947,11 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
 #end
     protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls)
+#if ($table.hasOptimisticLock())
     { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
+#else
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
+#end
     @SuppressWarnings("unchecked")
     protected int[] doRemoveList(List<Entity> ls) { return delegateDeleteList((List)ls); }
 #if ($table.hasOptimisticLock())
