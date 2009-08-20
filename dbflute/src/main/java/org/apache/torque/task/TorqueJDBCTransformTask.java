@@ -502,10 +502,11 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
-        final int jdbcType = columnMetaInfo.getJdbcDefValue();
+        //final int jdbcType = columnMetaInfo.getJdbcDefValue();
         final int columnSize = columnMetaInfo.getColumnSize();
         final int decimalDigits = columnMetaInfo.getDecimalDigits();
-        if (columnSize > 0 && isColumnSizeValidSqlType(jdbcType)) {
+        //if (columnSize > 0 && isColumnSizeValidSqlType(jdbcType)) {
+        if (columnSize > 0) {
             if (decimalDigits > 0) {
                 columnElement.setAttribute("size", columnSize + ", " + decimalDigits);
             } else {
@@ -514,10 +515,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
     }
 
-    protected boolean isColumnSizeValidSqlType(int sqlTypeCode) {
-        return sqlTypeCode == Types.CHAR || sqlTypeCode == Types.VARCHAR || sqlTypeCode == Types.LONGVARCHAR
-                || sqlTypeCode == Types.DECIMAL || sqlTypeCode == Types.NUMERIC;
-    }
+    //protected boolean isColumnSizeValidSqlType(int sqlTypeCode) {
+    //    return sqlTypeCode == Types.CHAR || sqlTypeCode == Types.VARCHAR || sqlTypeCode == Types.LONGVARCHAR
+    //            || sqlTypeCode == Types.DECIMAL || sqlTypeCode == Types.NUMERIC;
+    //}
 
     // ===================================================================================
     //                                                                   Meta Data Handler
