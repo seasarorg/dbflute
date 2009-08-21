@@ -123,6 +123,9 @@
 			<zipfileset prefix="etc/client-template" dir="etc/client-template">
 				<include name="dbflute_dfclient.zip"/>
 			</zipfileset>
+	      	<zipfileset prefix="etc/license" dir="etc/license">
+	          	<include name="*.txt"/>
+	      	</zipfileset>
 			<zipfileset prefix="lib/forExecute" dir="${dbflute.dist}">
 				<include name="${dbflute.jar.file}"/>
 			</zipfileset>
