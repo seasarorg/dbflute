@@ -282,20 +282,36 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                          Value Type
     //                                                                          ==========
-	public void registerValueType(Class<?> keyType, ValueType valueType) {
+	public void registerBasicValueType(Class<?> keyType, ValueType valueType) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
-		    _log.info("...Registering valueType: keyType=" + keyType + " valueType=" + valueType);
+		    _log.info("...Registering basic valueType: keyType=" + keyType + " valueType=" + valueType);
 		}
-	    TnValueTypes.registerValueType(keyType, valueType);
+	    TnValueTypes.registerBasicValueType(keyType, valueType);
 	}
 
-	public void removeValueType(Class<?> keyType) {
+	public void removeBasicValueType(Class<?> keyType) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
-		    _log.info("...Removing valueType: keyType=" + keyType);
+		    _log.info("...Removing basic valueType: keyType=" + keyType);
 		}
-	    TnValueTypes.unregisterValueType(keyType);
+	    TnValueTypes.removeBasicValueType(keyType);
+	}
+
+	public void registerPluginValueType(String keyName, ValueType valueType) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Registering plug-in valueType: keyName=" + keyName + " valueType=" + valueType);
+		}
+	    TnValueTypes.registerPluginValueType(keyName, valueType);
+	}
+
+	public void removePluginValueType(String keyName) {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Removing plug-in valueType: keyName=" + keyName);
+		}
+	    TnValueTypes.removePluginValueType(keyName);
 	}
 
     // ===================================================================================
