@@ -233,6 +233,36 @@ public class ${glDBFluteConfig} {
 		}
 	    _disableSelectIndex = disableSelectIndex;
 	}
+	
+    // ===================================================================================
+    //                                                                 Database Dependency
+    //                                                                 ===================
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabasePostgreSQL())
+    // -----------------------------------------------------
+    //                              Full-Text Search Operand
+    //                              ------------------------
+    public org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch getFullTextSearchOperand() {
+        return _fullTextSearchOperand;
+    }
+
+    public void useDefaultFullTextSearchOperand() {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Using fullTextSearchOperand: Default");
+		}
+        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH; 
+    }
+
+    public void useOldFullTextSearchOperand() {
+	    assertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Using fullTextSearchOperand: Old");
+		}
+        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.OLD_FULL_TEXT_SEARCH; 
+    }
+#end
+#end
 
     // ===================================================================================
     //                                                                      Internal Debug
@@ -267,36 +297,6 @@ public class ${glDBFluteConfig} {
 		}
 	    TnValueTypes.unregisterValueType(keyType);
 	}
-	
-    // ===================================================================================
-    //                                                                 Database Dependency
-    //                                                                 ===================
-#if ($database.isAvailableDatabaseDependency())
-#if ($database.isDatabasePostgreSQL())
-    // -----------------------------------------------------
-    //                              Full-Text Search Operand
-    //                              ------------------------
-    public org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch getFullTextSearchOperand() {
-        return _fullTextSearchOperand;
-    }
-
-    public void useDefaultFullTextSearchOperand() {
-	    assertNotLocked();
-		if (_log.isInfoEnabled()) {
-		    _log.info("...Using fullTextSearchOperand: Default");
-		}
-        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH; 
-    }
-
-    public void useOldFullTextSearchOperand() {
-	    assertNotLocked();
-		if (_log.isInfoEnabled()) {
-		    _log.info("...Using fullTextSearchOperand: Old");
-		}
-        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.OLD_FULL_TEXT_SEARCH; 
-    }
-#end
-#end
 
     // ===================================================================================
     //                                                                  Configuration Lock
@@ -330,7 +330,10 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                 Configuration Clear
     //                                                                 ===================
-	public void clear() { // the only properties that update OK while executing
+    /**
+     * Clear your original configuration without ValueType.
+     */
+	public void clear() {
 	    _defaultStatementConfig = null;
 	    _queryLogLevelInfo = false;
 	    _executeStatusLogLevelInfo = false;
@@ -340,6 +343,11 @@ public class ${glDBFluteConfig} {
 	    _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
 	    _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
 	    _disableSelectIndex = false;
+#if ($database.isAvailableDatabaseDependency())
+#if ($database.isDatabasePostgreSQL())
+        _fullTextSearchOperand = org.seasar.dbflute.dbway.WayOfPostgreSQL.OperandOfLikeSearch.FULL_TEXT_SEARCH;
+#end
+#end
 		_internalDebug = false;
 	}
 }
