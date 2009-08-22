@@ -105,7 +105,7 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private static Map<Class<?>, ValueType> types = new ConcurrentHashMap<Class<?>, ValueType>();
+    private static Map<Class<?>, ValueType> basicValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
     private static Map<String, ValueType> pluginValueTypeMap = new ConcurrentHashMap<String, ValueType>();
     private static Method isEnumMethod;
 
@@ -116,34 +116,34 @@ public class TnValueTypes {
     private static Map<String, ValueType> valueTypeCache = new ConcurrentHashMap<String, ValueType>(50);
 
     static {
-        registerValueType(String.class, STRING);
-        registerValueType(char.class, CHARACTER);
-        registerValueType(Character.class, CHARACTER);
-        registerValueType(byte.class, BYTE);
-        registerValueType(Byte.class, BYTE);
-        registerValueType(short.class, SHORT);
-        registerValueType(Short.class, SHORT);
-        registerValueType(int.class, INTEGER);
-        registerValueType(Integer.class, INTEGER);
-        registerValueType(long.class, LONG);
-        registerValueType(Long.class, LONG);
-        registerValueType(float.class, FLOAT);
-        registerValueType(Float.class, FLOAT);
-        registerValueType(double.class, DOUBLE);
-        registerValueType(Double.class, DOUBLE);
-        registerValueType(BigInteger.class, BIGINTEGER);
-        registerValueType(BigDecimal.class, BIGDECIMAL);
-        registerValueType(java.sql.Date.class, SQLDATE);
-        registerValueType(java.sql.Time.class, TIME);
-        registerValueType(java.util.Date.class, TIMESTAMP);
-        registerValueType(Timestamp.class, TIMESTAMP);
-        registerValueType(Calendar.class, TIMESTAMP);
-        registerValueType(BYTE_ARRAY_CLASS, BINARY);
-        registerValueType(InputStream.class, BINARY_STREAM);
-        registerValueType(boolean.class, BOOLEAN);
-        registerValueType(Boolean.class, BOOLEAN);
-        registerValueType(UUID.class, UUID);
-        registerValueType(Classification.class, CLASSIFICATION); // DBFlute original class
+        registerBasicValueType(String.class, STRING);
+        registerBasicValueType(char.class, CHARACTER);
+        registerBasicValueType(Character.class, CHARACTER);
+        registerBasicValueType(byte.class, BYTE);
+        registerBasicValueType(Byte.class, BYTE);
+        registerBasicValueType(short.class, SHORT);
+        registerBasicValueType(Short.class, SHORT);
+        registerBasicValueType(int.class, INTEGER);
+        registerBasicValueType(Integer.class, INTEGER);
+        registerBasicValueType(long.class, LONG);
+        registerBasicValueType(Long.class, LONG);
+        registerBasicValueType(float.class, FLOAT);
+        registerBasicValueType(Float.class, FLOAT);
+        registerBasicValueType(double.class, DOUBLE);
+        registerBasicValueType(Double.class, DOUBLE);
+        registerBasicValueType(BigInteger.class, BIGINTEGER);
+        registerBasicValueType(BigDecimal.class, BIGDECIMAL);
+        registerBasicValueType(java.sql.Date.class, SQLDATE);
+        registerBasicValueType(java.sql.Time.class, TIME);
+        registerBasicValueType(java.util.Date.class, TIMESTAMP);
+        registerBasicValueType(Timestamp.class, TIMESTAMP);
+        registerBasicValueType(Calendar.class, TIMESTAMP);
+        registerBasicValueType(BYTE_ARRAY_CLASS, BINARY);
+        registerBasicValueType(InputStream.class, BINARY_STREAM);
+        registerBasicValueType(boolean.class, BOOLEAN);
+        registerBasicValueType(Boolean.class, BOOLEAN);
+        registerBasicValueType(UUID.class, UUID);
+        registerBasicValueType(Classification.class, CLASSIFICATION); // DBFlute original class
 
         // Because object type is to be handle as special type.
         //registerValueType(Object.class, OBJECT);
@@ -166,22 +166,44 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                            Register
     //                                                                            ========
-    public static void registerValueType(Class<?> clazz, ValueType valueType) {
-        types.put(clazz, valueType);
-    }
-
-    public static void unregisterValueType(Class<?> clazz) {
-        types.remove(clazz);
+    /**
+     * Register the basic value type.
+     * @param keyType The key as type. (NotNull)
+     * @param valueType The value type. (NotNull)
+     */
+    public static void registerBasicValueType(Class<?> keyType, ValueType valueType) {
+        assertObjectNotNull("keyType", keyType);
+        assertObjectNotNull("valueType", valueType);
+        basicValueTypeMap.put(keyType, valueType);
     }
 
     /**
-     * @param valueTypeName The name of value type. (NotNull)
+     * Remove the basic value type.
+     * @param keyType The key as type. (NotNull)
+     */
+    public static void removeBasicValueType(Class<?> keyType) {
+        assertObjectNotNull("keyType", keyType);
+        basicValueTypeMap.remove(keyType);
+    }
+
+    /**
+     * Register the plug-in value type.
+     * @param keyName The key as name. (NotNull)
      * @param valueType The value type. (NotNull)
      */
-    public static void registerPluginValueType(String valueTypeName, ValueType valueType) {
-        assertObjectNotNull("valueTypeName", valueTypeName);
+    public static void registerPluginValueType(String keyName, ValueType valueType) {
+        assertObjectNotNull("keyName", keyName);
         assertObjectNotNull("valueType", valueType);
-        pluginValueTypeMap.put(valueTypeName, valueType);
+        pluginValueTypeMap.put(keyName, valueType);
+    }
+
+    /**
+     * Remove the plug-in value type.
+     * @param keyName The key as name. (NotNull)
+     */
+    public static void removePluginValueType(String keyName) {
+        assertObjectNotNull("keyName", keyName);
+        pluginValueTypeMap.remove(keyName);
     }
 
     // ===================================================================================
@@ -218,7 +240,7 @@ public class TnValueTypes {
     }
 
     private static ValueType getRegisteredValueType(Class<?> clazz) {
-        return types.get(clazz);
+        return basicValueTypeMap.get(clazz);
     }
 
     /**
