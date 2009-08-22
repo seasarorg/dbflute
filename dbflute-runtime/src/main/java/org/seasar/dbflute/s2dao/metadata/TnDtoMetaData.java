@@ -23,11 +23,25 @@ import java.util.Map;
  */
 public interface TnDtoMetaData {
 
-    public Class<?> getBeanClass();
+    Class<?> getBeanClass();
 
-    public Map<String, TnPropertyType> getPropertyTypeMap();
+    /**
+     * Get the map of property type. The key is property name as case insensitive.
+     * @return The map of property type. (NotNull)
+     */
+    Map<String, TnPropertyType> getPropertyTypeMap();
 
-    public TnPropertyType getPropertyType(String propertyName);
+    /**
+     * Get the property type by the key as case insensitive.
+     * @param propertyName The name of property. (NotNull)
+     * @return The type of property. (Nullable)
+     */
+    TnPropertyType getPropertyType(String propertyName);
 
-    public boolean hasPropertyType(String propertyName);
+    /**
+     * Does it has the property type by the key as case insensitive.
+     * @param propertyName The name of property. (NotNull)
+     * @return Determination.
+     */
+    boolean hasPropertyType(String propertyName);
 }

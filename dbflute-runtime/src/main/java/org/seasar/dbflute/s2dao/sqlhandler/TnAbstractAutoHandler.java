@@ -17,7 +17,6 @@ package org.seasar.dbflute.s2dao.sqlhandler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,20 +93,6 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         }
         postUpdateBean(bean, ret);
         return ret;
-    }
-
-    protected void bindArgs(PreparedStatement ps, Object[] args, ValueType[] valueTypes) {
-        if (args == null) {
-            return;
-        }
-        for (int i = 0; i < args.length; ++i) {
-            ValueType valueType = valueTypes[i];
-            try {
-                valueType.bindValue(ps, i + 1, args[i]);
-            } catch (SQLException e) {
-                handleSQLException(e, ps);
-            }
-        }
     }
 
     protected EntityAlreadyUpdatedException createEntityAlreadyUpdatedException(Object bean, int rows) {

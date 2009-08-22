@@ -68,7 +68,9 @@ public class QueryUpdateEntityCBCommand extends AbstractEntityCommand {
     //                                                               =====================
     public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        return _tableDbName + ":" + getCommandName() + "(" + _entityType.getSimpleName() + ", " + _conditionBeanType.getSimpleName() + ")";
+        String main = _tableDbName + ":" + getCommandName();
+        String type = "(" + _entityType.getSimpleName() + ", " + _conditionBeanType.getSimpleName() + ")";
+        return main + type;
     }
 
     public SqlExecutionCreator createSqlExecutionCreator() {
@@ -81,7 +83,9 @@ public class QueryUpdateEntityCBCommand extends AbstractEntityCommand {
     }
 
     protected SqlExecution createQueryUpdateEntityCBExecution(Class<? extends ConditionBean> cbType) {
-        return new TnUpdateQueryAutoDynamicCommand(_dataSource, _statementFactory);
+        TnUpdateQueryAutoDynamicCommand sqlCommand = new TnUpdateQueryAutoDynamicCommand(_dataSource, _statementFactory);
+        sqlCommand.setBeanMetaData(createBeanMetaData());
+        return sqlCommand;
     }
 
     public Object[] getSqlExecutionArgument() {

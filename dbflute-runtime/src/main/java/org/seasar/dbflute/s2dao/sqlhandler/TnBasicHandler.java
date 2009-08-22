@@ -72,17 +72,51 @@ public class TnBasicHandler {
     // -----------------------------------------------------
     //                                    Arguments Handling
     //                                    ------------------
-    protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
+    /**
+     * @param ps Prepared statement. (NotNull)
+     * @param args The arguments for binding. (Nullable)
+     * @param valueTypes The types of binding value. (NotNull)
+     */
+    protected void bindArgs(PreparedStatement ps, Object[] args, ValueType[] valueTypes) {
         if (args == null) {
             return;
         }
-        for (int i = 0; i < args.length; ++i) {
-            final ValueType valueType = findValueType(args[i], argTypes[i]);
-            try {
+        try {
+            for (int i = 0; i < args.length; ++i) {
+                final ValueType valueType = valueTypes[i];
                 valueType.bindValue(ps, i + 1, args[i]);
-            } catch (SQLException e) {
-                handleSQLException(e, ps);
             }
+        } catch (SQLException e) {
+            handleSQLException(e, ps);
+        }
+    }
+
+    /**
+     * @param ps Prepared statement. (NotNull)
+     * @param args The arguments for binding. (Nullable)
+     * @param argTypes The types of arguments. (NotNull)
+     */
+    protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes) {
+        bindArgs(ps, args, argTypes, 0);
+    }
+
+    /**
+     * @param ps Prepared statement. (NotNull)
+     * @param args The arguments for binding. (Nullable)
+     * @param argTypes The types of arguments. (NotNull)
+     * @param beginIndex The index for beginning of binding.
+     */
+    protected void bindArgs(PreparedStatement ps, Object[] args, Class<?>[] argTypes, int beginIndex) {
+        if (args == null) {
+            return;
+        }
+        try {
+            for (int i = beginIndex; i < args.length; ++i) {
+                final ValueType valueType = findValueType(args[i], argTypes[i]);
+                valueType.bindValue(ps, i + 1, args[i]);
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, ps);
         }
     }
 
@@ -120,15 +154,15 @@ public class TnBasicHandler {
         // [SqlLogHandler]
         final SqlLogHandler sqlLogHandler = getSqlLogHander();
         final boolean existsSqlLogHandler = sqlLogHandler != null;
-        
+
         // [SqlResultHandler]
         final SqlResultHandler sqlResultHander = getSqlResultHander();
         final boolean existsSqlResultHandler = sqlResultHander != null;
-        
+
         // [SqlLogRegistry]
         final Object sqlLogRegistry = TnSqlLogRegistry.findContainerSqlLogRegistry();
         final boolean existsSqlLogRegistry = sqlLogRegistry != null;
-        
+
         if (isLogEnabled() || existsSqlLogHandler || existsSqlResultHandler || existsSqlLogRegistry) {
             final String displaySql = getDisplaySql(args);
             if (isLogEnabled()) {
@@ -175,7 +209,7 @@ public class TnBasicHandler {
         }
         return CallbackContext.getCallbackContextOnThread().getSqlResultHandler();
     }
-    
+
     protected boolean isContainsLineSeparatorInSql() {
         return sql != null ? sql.contains(getLineSeparator()) : false;
     }
@@ -355,9 +389,9 @@ public class TnBasicHandler {
         // Because the MS-Access does not support line comments.
         return isCurrentDBDef(DBDef.MSAccess);
     }
-    
+
     protected boolean isCurrentDBDef(DBDef currentDBDef) {
-	    return ResourceContext.isCurrentDBDef(currentDBDef);
+        return ResourceContext.isCurrentDBDef(currentDBDef);
     }
 
     public StatementFactory getStatementFactory() {

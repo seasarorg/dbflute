@@ -25,7 +25,6 @@ import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.node.Node;
-import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -96,12 +95,5 @@ public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
             node.accept(context);
         }
         return context;
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String getLineSeparator() {
-        return DfSystemUtil.getLineSeparator();
     }
 }

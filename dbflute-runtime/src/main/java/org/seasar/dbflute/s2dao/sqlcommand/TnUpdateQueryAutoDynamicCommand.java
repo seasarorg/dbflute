@@ -16,7 +16,9 @@
 package org.seasar.dbflute.s2dao.sqlcommand;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,6 +31,8 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
@@ -47,6 +51,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     //                                                                           =========
     protected DataSource dataSource;
     protected StatementFactory statementFactory;
+    private TnBeanMetaData beanMetaData;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -64,13 +69,15 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         Entity entity = extractEntityWithCheck(args);
         String[] argNames = new String[] { "dto", "entity" };
         Class<?>[] argTypes = new Class<?>[] { cb.getClass(), entity.getClass() };
-        String twoWaySql = buildQueryUpdateTwoWaySql(cb, entity);
+        List<TnPropertyType> propertyTypeList = new ArrayList<TnPropertyType>();
+        String twoWaySql = buildQueryUpdateTwoWaySql(entity, cb, propertyTypeList);
         if (twoWaySql == null) {
             return 0; // No execute!
         }
         CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
         TnCommandContextHandler handler = createCommandContextHandler(context);
         handler.setLoggingMessageSqlArgs(context.getBindVariables());
+        handler.setPropertyTypeList(propertyTypeList);
         int rows = handler.execute(args);
         return Integer.valueOf(rows);
     }
@@ -110,17 +117,19 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     }
 
     /**
-     * @param cb Condition-bean. (NotNull)
      * @param entity Entity. (NotNull)
+     * @param cb Condition-bean. (NotNull)
+     * @param propertyTypeList The list of property type. (NotNull, ShouldBeEmpty)
      * @return The two-way SQL of query update. (Nullable: If the set of modified properties is empty, return null.)
      */
-    protected String buildQueryUpdateTwoWaySql(ConditionBean cb, Entity entity) {
+    protected String buildQueryUpdateTwoWaySql(Entity entity, ConditionBean cb, List<TnPropertyType> propertyTypeList) {
         Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
         DBMeta dbmeta = entity.getDBMeta();
         Set<String> modifiedPropertyNames = entity.getModifiedPropertyNames();
         if (modifiedPropertyNames.isEmpty()) {
             return null;
         }
+        Map<String, TnPropertyType> propertyTypeMap = beanMetaData.getPropertyTypeMap();
         String currentPropertyName = null;
         try {
             for (String propertyName : modifiedPropertyNames) {
@@ -131,6 +140,10 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
                 Object value = getter.invoke(entity, (Object[]) null);
                 if (value != null) {
                     columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
+
+                    // Add property type
+                    TnPropertyType propertyType = propertyTypeMap.get(propertyName);
+                    propertyTypeList.add(propertyType);
                 } else {
                     columnParameterMap.put(columnName, "null");
                 }
@@ -145,7 +158,12 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
                 Method setter = columnInfo.findSetter();
                 setter.invoke(entity, ResourceContext.getAccessTimestamp());
                 String columnName = columnInfo.getColumnDbName();
-                columnParameterMap.put(columnName, "/*entity." + columnInfo.getPropertyName() + "*/null");
+                String propertyName = columnInfo.getPropertyName();
+                columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
+
+                // Add property type
+                TnPropertyType propertyType = propertyTypeMap.get(propertyName);
+                propertyTypeList.add(propertyType);
             }
         } catch (Exception e) {
             throwQueryUpdateFailureException(cb, entity, currentPropertyName, e);
@@ -154,24 +172,24 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     }
 
     protected void throwQueryUpdateFailureException(ConditionBean cb, Entity entity, String propertyName, Exception e) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "queryUpdate() failed to execute!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the parameter comment logic." + getLineSeparator();
-        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + getLineSeparator();
-        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Doubtful Property Name]" + getLineSeparator() + propertyName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[ConditionBean]" + getLineSeparator() + cb + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Entity]" + getLineSeparator() + entity + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Exception Message]" + getLineSeparator() + e.getMessage() + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "queryUpdate() failed to execute!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the parameter comment logic." + ln();
+        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
+        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + ln();
+        msg = msg + "[Doubtful Property Name]" + ln() + propertyName + ln();
+        msg = msg + ln();
+        msg = msg + "[ConditionBean]" + ln() + cb + ln();
+        msg = msg + ln();
+        msg = msg + "[Entity]" + ln() + entity + ln();
+        msg = msg + ln();
+        msg = msg + "[Exception Message]" + ln() + e.getMessage() + ln();
         msg = msg + "* * * * * * * * * */";
         throw new QueryUpdateFailureException(msg, e);
     }
@@ -200,7 +218,18 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public TnBeanMetaData getBeanMetaData() {
+        return beanMetaData;
+    }
+
+    public void setBeanMetaData(TnBeanMetaData beanMetaData) {
+        this.beanMetaData = beanMetaData;
     }
 }
