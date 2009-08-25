@@ -282,6 +282,12 @@ public class ${glDBFluteConfig} {
     // ===================================================================================
     //                                                                          Value Type
     //                                                                          ==========
+    /**
+     * Register the basic value type. <br />
+     * This setting is shared by other DBFlute projects in the same class loader. 
+     * @param keyType The type as key. (NotNull)
+     * @param valueType The basic value type. (NotNull)
+     */
 	public void registerBasicValueType(Class<?> keyType, ValueType valueType) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
@@ -298,6 +304,12 @@ public class ${glDBFluteConfig} {
 	    TnValueTypes.removeBasicValueType(keyType);
 	}
 
+    /**
+     * Register the plug-in value type. <br />
+     * This setting is shared by other DBFlute projects in the same class loader.
+     * @param keyName The name as key. (NotNull)
+     * @param valueType The plug-in value type. (NotNull)
+     */
 	public void registerPluginValueType(String keyName, ValueType valueType) {
 	    assertNotLocked();
 		if (_log.isInfoEnabled()) {
