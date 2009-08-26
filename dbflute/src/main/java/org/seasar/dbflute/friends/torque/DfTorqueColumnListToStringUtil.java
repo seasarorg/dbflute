@@ -48,11 +48,8 @@ public class DfTorqueColumnListToStringUtil {
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
             final Column pk = (Column) ite.next();
             final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
-            if (sb.length() > 0) {
-                sb.append(";");
-            }
             sb.append("assertObjectNotNull(\"").append(uncapitalisedJavaName).append("\", ");
-            sb.append(uncapitalisedJavaName).append(")");
+            sb.append(uncapitalisedJavaName).append(");");
         }
         return sb.toString();
     }
@@ -93,6 +90,34 @@ public class DfTorqueColumnListToStringUtil {
             }
         }
         return result;
+    }
+
+    public static String getColumnArgsConditionSetupString(List<Column> columnList) {
+        validateColumnList(columnList);
+
+        final StringBuilder sb = new StringBuilder();
+        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
+            Column pk = (Column) ite.next();
+            final String javaName = pk.getJavaName();
+            final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
+            final String setterString = "cb.query().set" + javaName + "_Equal(" + uncapitalisedJavaName + ");";
+            sb.append(setterString);
+        }
+        return sb.toString();
+    }
+
+    public static String getColumnArgsConditionSetupStringCSharp(List<Column> columnList) {
+        validateColumnList(columnList);
+
+        final StringBuilder sb = new StringBuilder();
+        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
+            Column pk = (Column) ite.next();
+            final String javaName = pk.getJavaName();
+            final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
+            final String setterString = "cb.Query().Set" + javaName + "_Equal(" + uncapitalisedJavaName + ");";
+            sb.append(setterString);
+        }
+        return sb.toString();
     }
 
     public static String getColumnNameCommaString(List<Column> columnList) {

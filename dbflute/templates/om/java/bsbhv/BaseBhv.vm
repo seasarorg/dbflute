@@ -178,8 +178,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
             public List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
     }
-
 #if ($table.hasPrimaryKey())
+
     /* (non-javadoc)
      * Select the entity with deleted check. {by primary-key value}
      * @param primaryKey The keys of primary.
@@ -189,10 +189,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      */
     public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.primaryKeyArgsString}) {
         ${table.primaryKeyArgsAssertString};
-        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
-        ${table.getPrimaryKeyArgsSetupString('entity')}
-        final ${myConditionBeanClassName} cb = newMyConditionBean();
-        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        ${table.primaryKeyArgsConditionSetupString}
         return selectEntityWithDeletedCheck(cb);
     }
 #end

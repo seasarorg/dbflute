@@ -1665,7 +1665,7 @@ public class Table {
     }
 
     /**
-     * Returns primaryKeyArgsAssertString. [assertObjectNotNull("rcvlcqNo", rcvlcqNo); assert...]
+     * Returns primaryKeyArgsAssertString. [assertObjectNotNull("rcvlcqNo", rcvlcqNo); assert...;]
      * @return The value of primaryKeyArgsAssertString. (NotNull)
      */
     public String getPrimaryKeyArgsAssertString() {
@@ -1721,6 +1721,22 @@ public class Table {
      */
     public String getPrimaryKeyArgsSetupStringCSharp(String beanName) {
         return DfTorqueColumnListToStringUtil.getColumnArgsSetupStringCSharp(beanName, getPrimaryKey());
+    }
+
+    /**
+     * Returns primaryKeyArgsConditionSetupString. [cb.query().setRcvlcqNo_Equal(rcvlcqNo);cb.query()...;]
+     * @return The value of primaryKeyArgsConditionSetupString. (NotNull)
+     */
+    public String getPrimaryKeyArgsConditionSetupString() {
+        return DfTorqueColumnListToStringUtil.getColumnArgsConditionSetupString(getPrimaryKey());
+    }
+
+    /**
+     * Returns primaryKeyArgsConditionSetupStringCSharp. [cb.Query().SetRcvlcqNo_Equal(rcvlcqNo);cb.Query()...;]
+     * @return The value of primaryKeyArgsConditionSetupStringCSharp. (NotNull)
+     */
+    public String getPrimaryKeyArgsConditionSetupStringCSharp() {
+        return DfTorqueColumnListToStringUtil.getColumnArgsConditionSetupStringCSharp(getPrimaryKey());
     }
 
     /**
