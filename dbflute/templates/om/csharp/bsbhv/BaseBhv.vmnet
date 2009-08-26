@@ -103,11 +103,19 @@ namespace ${glPackageExtendedBhv} {
         }
 #if ($table.hasPrimaryKey())
 
+        public virtual ${myExtendedObjectClassName} SelectByPKValue(${table.primaryKeyArgsString}) {
+            return SelectEntity(BuildPKCB(${table.primaryKeyArgsCallingString}));
+        }
+
         public virtual ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.primaryKeyArgsString}) {
-            ${table.primaryKeyArgsAssertStringCSharp};
+            return SelectEntityWithDeletedCheck(BuildPKCB(${table.primaryKeyArgsCallingString}));
+        }
+
+        private ${myExtendedObjectClassName} BuildPKCB(${table.primaryKeyArgsString}) {
+            ${table.primaryKeyArgsAssertStringCSharp}
             ${myConditionBeanClassName} cb = NewMyConditionBean();
             ${table.primaryKeyArgsConditionSetupStringCSharp}
-            return SelectEntityWithDeletedCheck(cb);
+            return cb;            
         }
 #end
         #endregion

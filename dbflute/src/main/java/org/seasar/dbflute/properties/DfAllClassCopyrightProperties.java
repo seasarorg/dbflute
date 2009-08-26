@@ -24,10 +24,10 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
         }
         String prop = stringProp("torque.allClassCopyright", "");
 
-        // All line separator should be CR + LF
-        // because Source Code uses CR + LF. (2009/04/28)
+        final String sourceCodeLineSeparator = getBasicProperties().getSourceCodeLineSeparator();
         prop = DfStringUtil.replace(prop, "\r\n", "\n");
-        prop = DfStringUtil.replace(prop, "\n", "\r\n");
+        prop = DfStringUtil.replace(prop, "\n", sourceCodeLineSeparator);
+
         _copyright = prop;
         return _copyright;
     }

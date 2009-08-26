@@ -66,7 +66,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public String getDatabaseName() {
         return getProperty("database", "");
     }
-    
+
     public boolean isDatabaseMySQL() {
         return getDatabaseName().equalsIgnoreCase("mysql");
     }
@@ -86,11 +86,11 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isDatabaseSqlServer() {
         return getDatabaseName().equalsIgnoreCase("mssql");
     }
-    
+
     public boolean isDatabaseDerby() {
         return getDatabaseName().equalsIgnoreCase("derby");
     }
-    
+
     public boolean isDatabaseH2() {
         return getDatabaseName().equalsIgnoreCase("h2");
     }
@@ -180,20 +180,19 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     public boolean isTargetContainerLucy() {
         return getTargetContainerName().trim().equalsIgnoreCase("lucy");
     }
-    
+
     public boolean isTargetContainerGuice() {
         return getTargetContainerName().trim().equalsIgnoreCase("guice");
     }
-    
+
     public boolean isTargetContainerSlim3() {
         return getTargetContainerName().trim().equalsIgnoreCase("slim3");
     }
 
     protected void checkContainer(String containerName) {
         containerName = containerName.toLowerCase();
-        if (!containerName.equals("seasar") && !containerName.equals("spring")
-                && !containerName.equals("lucy") && !containerName.equals("guice")
-                && !containerName.equals("slim3")) {
+        if (!containerName.equals("seasar") && !containerName.equals("spring") && !containerName.equals("lucy")
+                && !containerName.equals("guice") && !containerName.equals("slim3")) {
             String msg = "The targetContainer should be 'seasar' or 'spring' or 'lucy' or 'guice' or 'slim3':";
             msg = msg + " targetContainer=" + containerName;
             throw new IllegalStateException(msg);
@@ -329,6 +328,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                        ============
     public String getClassAuthor() {
         return getProperty("classAuthor", "DBFlute(AutoGenerator)");
+    }
+
+    // ===================================================================================
+    //                                                          Source Code Line Separator
+    //                                                          ==========================
+    public String getSourceCodeLineSeparator() {
+        return "\r\n"; // Source Code uses CR + LF. (at 0.9.5.4)
     }
 
     // ===================================================================================

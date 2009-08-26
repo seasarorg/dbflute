@@ -159,7 +159,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     /**
      * Select the entity by the condition-bean.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
-     * @return The selected entity. (Nullalble)
+     * @return The selected entity. (Nullable: If the condition has no data, it returns null)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectEntity(final ${myConditionBeanClassName} cb) {
@@ -180,18 +180,32 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     }
 #if ($table.hasPrimaryKey())
 
-    /* (non-javadoc)
-     * Select the entity with deleted check. {by primary-key value}
-     * @param primaryKey The keys of primary.
+    /**
+     * Select the entity by the primary-key value.
+     * ${table.primaryKeyArgsJavaDocString}
+     * @return The selected entity. (Nullable: If the primary-key value has no data, it returns null)
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     */
+    public ${myExtendedObjectClassName} selectByPKValue(${table.primaryKeyArgsString}) {
+        return selectEntity(buildPKCB(${table.primaryKeyArgsCallingString}));
+    }
+
+    /**
+     * Select the entity by the primary-key value with deleted check.
+     * ${table.primaryKeyArgsJavaDocString}
      * @return The selected entity. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
     public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.primaryKeyArgsString}) {
-        ${table.primaryKeyArgsAssertString};
+        return selectEntityWithDeletedCheck(buildPKCB(${table.primaryKeyArgsCallingString}));
+    }
+
+    private ${myConditionBeanClassName} buildPKCB(${table.primaryKeyArgsString}) {
+        ${table.primaryKeyArgsAssertString}
         ${myConditionBeanClassName} cb = newMyConditionBean();
         ${table.primaryKeyArgsConditionSetupString}
-        return selectEntityWithDeletedCheck(cb);
+        return cb;
     }
 #end
 

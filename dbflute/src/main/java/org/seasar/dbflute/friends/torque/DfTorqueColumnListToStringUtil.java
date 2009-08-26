@@ -41,27 +41,39 @@ public class DfTorqueColumnListToStringUtil {
         return sb.toString();
     }
 
-    public static String getColumnArgsAssertString(List<Column> columnList) {
+    public static String getColumnArgsJavaDocString(List<Column> columnList, String ln) {
         validateColumnList(columnList);
 
         final StringBuilder sb = new StringBuilder();
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
             final Column pk = (Column) ite.next();
             final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
-            sb.append("assertObjectNotNull(\"").append(uncapitalisedJavaName).append("\", ");
-            sb.append(uncapitalisedJavaName).append(");");
+            if (sb.length() > 0) {
+                sb.append(ln).append("     * ");
+            }
+            sb.append("@param ").append(uncapitalisedJavaName);
+            sb.append(" The one of primary key. (NotNull)");
         }
         return sb.toString();
     }
 
+    public static String getColumnArgsAssertString(List<Column> columnList) {
+        return doGetColumnArgsAssertString(columnList, false);
+    }
+
     public static String getColumnArgsAssertStringCSharp(List<Column> columnList) {
+        return doGetColumnArgsAssertString(columnList, true);
+    }
+
+    private static String doGetColumnArgsAssertString(List<Column> columnList, boolean initCap) {
         validateColumnList(columnList);
 
         final StringBuilder sb = new StringBuilder();
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
             final Column pk = (Column) ite.next();
             final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
-            sb.append("AssertObjectNotNull(\"").append(uncapitalisedJavaName).append("\", ");
+            sb.append(initCap ? "A" : "a").append("ssertObjectNotNull(\"");
+            sb.append(uncapitalisedJavaName).append("\", ");
             sb.append(uncapitalisedJavaName).append(");");
         }
         return sb.toString();

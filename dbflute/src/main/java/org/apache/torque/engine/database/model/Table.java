@@ -1656,12 +1656,24 @@ public class Table {
         }
     }
 
+    // -----------------------------------------------------
+    //                                      Arguments String
+    //                                      ----------------
     /**
      * Returns primaryKeyArgsString. [BigDecimal rcvlcqNo, String sprlptTp]
      * @return The value of primaryKeyArgsString. (NotNull)
      */
     public String getPrimaryKeyArgsString() {
         return DfTorqueColumnListToStringUtil.getColumnArgsString(getPrimaryKey());
+    }
+
+    /**
+     * Returns primaryKeyArgsJavaDocString. [AtMarkparam rcvlcqNo The one of primary key. (NotNull)...]
+     * @return The value of primaryKeyArgsJavaDocString. (NotNull)
+     */
+    public String getPrimaryKeyArgsJavaDocString() {
+        final String ln = getProperties().getBasicProperties().getSourceCodeLineSeparator();
+        return DfTorqueColumnListToStringUtil.getColumnArgsJavaDocString(getPrimaryKey(), ln);
     }
 
     /**
@@ -1678,23 +1690,6 @@ public class Table {
      */
     public String getPrimaryKeyArgsAssertStringCSharp() {
         return DfTorqueColumnListToStringUtil.getColumnArgsAssertStringCSharp(getPrimaryKey());
-    }
-
-    /**
-     * Returns primaryKeyWhereStringWithSqlComment. [BigDecimal rcvlcqNo, String sprlptTp]
-     * @return The value of primaryKeyWhereStringWithSqlComment. (NotNull)
-     */
-    public String getPrimaryKeyWhereStringWithSqlComment() {
-        final StringBuilder sb = new StringBuilder();
-        final List<Column> pk = getPrimaryKey();
-        for (Column column : pk) {
-            sb.append(" and ");
-            sb.append(getName()).append(".").append(column.getName()).append(" = /*");
-            sb.append(column.getUncapitalisedJavaName()).append("*/null");
-        }
-        sb.delete(0, " and ".length());
-
-        return sb.toString();
     }
 
     /**
@@ -1748,39 +1743,38 @@ public class Table {
     }
 
     /**
-     * Returns PrimaryKeyNameCommaString. [RCVLCQ_NO, SPRLPT_TP]
-     * @return Generated string.
+     * Returns primaryKeyArgsCallingString. [rcvlcqNo, sprlptTp]
+     * @return The value of primaryKeyArgsCallingString. (NotNull)
      */
-    public String getPrimaryKeyNameCommaString() {
-        return DfTorqueColumnListToStringUtil.getColumnNameCommaString(getPrimaryKey());
+    public String getPrimaryKeyArgsCallingString() {
+        return getPrimaryKeyUncapitalisedJavaNameCommaString();
     }
 
+    // -----------------------------------------------------
+    //                               ParameterComment String
+    //                               -----------------------
     /**
-     * Returns PrimaryKeyUncapitalisedJavaNameCommaString. [rcvlcqNo, sprlptTp]
-     * @return Generated string.
+     * Returns primaryKeyWhereStringWithSqlComment. [BigDecimal rcvlcqNo, String sprlptTp]
+     * @return The value of primaryKeyWhereStringWithSqlComment. (NotNull)
      */
-    public String getPrimaryKeyUncapitalisedJavaNameCommaString() {
-        return DfTorqueColumnListToStringUtil.getColumnUncapitalisedJavaNameCommaString(getPrimaryKey());
+    public String getPrimaryKeyWhereStringWithSqlComment() {
+        final StringBuilder sb = new StringBuilder();
+        final List<Column> pk = getPrimaryKey();
+        for (Column column : pk) {
+            sb.append(" and ");
+            sb.append(getName()).append(".").append(column.getName()).append(" = /*");
+            sb.append(column.getUncapitalisedJavaName()).append("*/null");
+        }
+        sb.delete(0, " and ".length());
+
+        return sb.toString();
     }
 
+    // -----------------------------------------------------
+    //                                       Order-By String
+    //                                       ---------------
     /**
-     * Returns PrimaryKeyJavaNameCommaString. [RcvlcqNo, SprlptTp]
-     * @return Generated string.
-     */
-    public String getPrimaryKeyJavaNameCommaString() {
-        return DfTorqueColumnListToStringUtil.getColumnJavaNameCommaString(getPrimaryKey());
-    }
-
-    /**
-     * Returns PrimaryKeyGetterCommaString. [getRcvlcqNo(), getSprlptTp()]
-     * @return Generated string.
-     */
-    public String getPrimaryKeyGetterCommaString() {
-        return DfTorqueColumnListToStringUtil.getColumnGetterCommaString(getPrimaryKey());
-    }
-
-    /**
-     * Returns PrimaryKeyOrderByAscString. [RCVLCQ_NO asc, SPRLPT_TP asc]
+     * Returns primaryKeyOrderByAscString. [RCVLCQ_NO asc, SPRLPT_TP asc]
      * @return Generated string.
      */
     public String getPrimaryKeyOrderByAscString() {
@@ -1788,15 +1782,18 @@ public class Table {
     }
 
     /**
-     * Returns PrimaryKeyOrderByDescString. [RCVLCQ_NO asc, SPRLPT_TP asc]
+     * Returns primaryKeyOrderByDescString. [RCVLCQ_NO asc, SPRLPT_TP asc]
      * @return Generated string.
      */
     public String getPrimaryKeyOrderByDescString() {
         return DfTorqueColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "desc");
     }
 
+    // -----------------------------------------------------
+    //                                        Display String
+    //                                        --------------
     /**
-     * Returns PrimaryKeyDispValueString. [value-value-value...]
+     * Returns primaryKeyDispValueString. [value-value-value...]
      * @return Generated string.
      */
     public String getPrimaryKeyDispValueString() {
@@ -1804,13 +1801,51 @@ public class Table {
     }
 
     /**
-     * Returns PrimaryKeyDispValueString. [value-value-value...]
+     * Returns primaryKeyDispValueString. [value-value-value...]
      * @return Generated string.
      */
     public String getPrimaryKeyDispValueStringByGetterInitCap() {
         return DfTorqueColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "Get");
     }
 
+    // -----------------------------------------------------
+    //                                    Basic Comma String
+    //                                    ------------------
+    /**
+     * Returns primaryKeyNameCommaString. [RCVLCQ_NO, SPRLPT_TP]
+     * @return Generated string.
+     */
+    public String getPrimaryKeyNameCommaString() {
+        return DfTorqueColumnListToStringUtil.getColumnNameCommaString(getPrimaryKey());
+    }
+
+    /**
+     * Returns primaryKeyUncapitalisedJavaNameCommaString. [rcvlcqNo, sprlptTp]
+     * @return Generated string.
+     */
+    public String getPrimaryKeyUncapitalisedJavaNameCommaString() {
+        return DfTorqueColumnListToStringUtil.getColumnUncapitalisedJavaNameCommaString(getPrimaryKey());
+    }
+
+    /**
+     * Returns primaryKeyJavaNameCommaString. [RcvlcqNo, SprlptTp]
+     * @return Generated string.
+     */
+    public String getPrimaryKeyJavaNameCommaString() {
+        return DfTorqueColumnListToStringUtil.getColumnJavaNameCommaString(getPrimaryKey());
+    }
+
+    /**
+     * Returns primaryKeyGetterCommaString. [getRcvlcqNo(), getSprlptTp()]
+     * @return Generated string.
+     */
+    public String getPrimaryKeyGetterCommaString() {
+        return DfTorqueColumnListToStringUtil.getColumnGetterCommaString(getPrimaryKey());
+    }
+
+    // -----------------------------------------------------
+    //                                         Determination
+    //                                         -------------
     /**
      * Determine whether this table has a primary key.
      * @return Determination.
