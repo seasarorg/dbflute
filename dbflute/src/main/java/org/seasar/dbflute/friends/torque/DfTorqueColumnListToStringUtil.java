@@ -33,11 +33,26 @@ public class DfTorqueColumnListToStringUtil {
             final Column pk = (Column) ite.next();
             final String javaNative = pk.getJavaNative();
             final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
-            if ("".equals(sb.toString())) {
-                sb.append(javaNative).append(" ").append(uncapitalisedJavaName);
-            } else {
-                sb.append(", ").append(javaNative).append(" ").append(uncapitalisedJavaName);
+            if (sb.length() > 0) {
+                sb.append(", ");
             }
+            sb.append(javaNative).append(" ").append(uncapitalisedJavaName);
+        }
+        return sb.toString();
+    }
+
+    public static String getColumnArgsAssertString(List<Column> columnList) {
+        validateColumnList(columnList);
+
+        final StringBuilder sb = new StringBuilder();
+        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
+            final Column pk = (Column) ite.next();
+            final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
+            if (sb.length() > 0) {
+                sb.append(";");
+            }
+            sb.append("assertObjectNotNull(\"").append(uncapitalisedJavaName).append("\", ");
+            sb.append(uncapitalisedJavaName).append(")");
         }
         return sb.toString();
     }

@@ -187,7 +187,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
-    public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.PrimaryKeyArgsString}) {
+    public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.primaryKeyArgsString}) {
+        ${table.primaryKeyArgsAssertString};
         ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
         ${table.getPrimaryKeyArgsSetupString('entity')}
         final ${myConditionBeanClassName} cb = newMyConditionBean();
