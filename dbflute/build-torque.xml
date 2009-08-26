@@ -20,8 +20,9 @@
   <property name="build.properties" value="build.properties"/>
   <property name="torque.contextProperties" value="${build.properties}"/>
   <property file="${torque.contextProperties}"/>
-  <property name="lib.dir" value="lib/forExecute"/>
+  <property name="lib.dir" value="lib"/>
   <property name="torque.lib.dir" value="${lib.dir}"/>
+  <property name="app.lib.dir" value="../applib"/>
   <property name="class.root" value="target/classes"/>
 
   <!--
@@ -32,11 +33,12 @@
     do a general inclusion of the torque.lib.dir to catch any drivers.
   -->
   <path id="torque-classpath">
-    <dirset dir=".">
-      <include name="log"/>
-    </dirset>
     <fileset dir="${torque.lib.dir}">
       <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="${app.lib.dir}">
+      <include name="**/*.jar"/>
+      <include name="**/*.properties"/>
     </fileset>
     <dirset dir=".">
       <include name="${class.root}"/>

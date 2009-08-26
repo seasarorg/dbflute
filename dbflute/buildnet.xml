@@ -125,18 +125,16 @@
 			</zipfileset>
 	      	<zipfileset prefix="etc/license" dir="etc/license">
 	          	<include name="*.txt"/>
+				<exclude name="Derby_License.txt"/>
 	      	</zipfileset>
-			<zipfileset prefix="lib/forExecute" dir="${dbflute.dist}">
+			<zipfileset prefix="lib" dir="${dbflute.dist}">
 				<include name="${dbflute.jar.file}"/>
 			</zipfileset>
-			<zipfileset prefix="lib/forExecute" dir="lib/forExecute">
+			<zipfileset prefix="lib" dir="lib/forExecute">
 				<include name="*.jar"/>
 				<include name="*.zip"/>
 				<exclude name="derby-*.jar"/>
 				<exclude name="h2-*.jar"/>
-			</zipfileset>
-			<zipfileset prefix="log" dir="log">
-				<include name="readme.txt"/>
 			</zipfileset>
 			<zipfileset prefix="output/doc" dir="output/doc">
 				<include name="readme.txt"/>

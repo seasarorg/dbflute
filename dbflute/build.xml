@@ -153,15 +153,12 @@
 	      	<zipfileset prefix="etc/license" dir="etc/license">
 	          	<include name="*.txt"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="lib/forExecute" dir="dist">
+	      	<zipfileset prefix="lib" dir="dist">
 	          	<include name="${dbflute.jar.file}"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="lib/forExecute" dir="lib/forExecute">
+	      	<zipfileset prefix="lib" dir="lib/forExecute">
 	          	<include name="*.jar"/>
 	          	<include name="*.zip"/>
-	      	</zipfileset>
-	      	<zipfileset prefix="log" dir="log">
-	          	<include name="readme.txt"/>
 	      	</zipfileset>
 	      	<zipfileset prefix="output/doc" dir="output/doc">
 	          	<include name="readme.txt"/>
