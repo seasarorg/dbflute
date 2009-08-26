@@ -111,7 +111,7 @@ namespace ${glPackageExtendedBhv} {
             return SelectEntityWithDeletedCheck(BuildPKCB(${table.primaryKeyArgsCallingString}));
         }
 
-        private ${myExtendedObjectClassName} BuildPKCB(${table.primaryKeyArgsString}) {
+        private ${myConditionBeanClassName} BuildPKCB(${table.primaryKeyArgsString}) {
             ${table.primaryKeyArgsAssertStringCSharp}
             ${myConditionBeanClassName} cb = NewMyConditionBean();
             ${table.primaryKeyArgsConditionSetupStringCSharp}
