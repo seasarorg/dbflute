@@ -103,7 +103,7 @@ namespace ${glPackageExtendedBhv} {
         }
 #if ($table.hasPrimaryKey())
 
-        public ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.primaryKeyArgsString}) {
+        public virtual ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.primaryKeyArgsString}) {
             ${table.primaryKeyArgsAssertStringCSharp};
             ${myConditionBeanClassName} cb = NewMyConditionBean();
             ${table.primaryKeyArgsConditionSetupStringCSharp}
