@@ -54,6 +54,19 @@ public class DfTorqueColumnListToStringUtil {
         return sb.toString();
     }
 
+    public static String getColumnArgsAssertStringCSharp(List<Column> columnList) {
+        validateColumnList(columnList);
+
+        final StringBuilder sb = new StringBuilder();
+        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
+            final Column pk = (Column) ite.next();
+            final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
+            sb.append("AssertObjectNotNull(\"").append(uncapitalisedJavaName).append("\", ");
+            sb.append(uncapitalisedJavaName).append(");");
+        }
+        return sb.toString();
+    }
+
     public static String getColumnArgsSetupString(String beanName, List<Column> columnList) {
         validateColumnList(columnList);
         final String beanPrefix = (beanName != null ? beanName + "." : "");

@@ -1673,6 +1673,14 @@ public class Table {
     }
 
     /**
+     * Returns primaryKeyArgsAssertStringCSharp. [AssertObjectNotNull("rcvlcqNo", rcvlcqNo); assert...;]
+     * @return The value of primaryKeyArgsAssertStringCSharp. (NotNull)
+     */
+    public String getPrimaryKeyArgsAssertStringCSharp() {
+        return DfTorqueColumnListToStringUtil.getColumnArgsAssertStringCSharp(getPrimaryKey());
+    }
+
+    /**
      * Returns primaryKeyWhereStringWithSqlComment. [BigDecimal rcvlcqNo, String sprlptTp]
      * @return The value of primaryKeyWhereStringWithSqlComment. (NotNull)
      */

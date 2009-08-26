@@ -101,6 +101,15 @@ namespace ${glPackageExtendedBhv} {
             AssertEntitySelectedAsOne(ls, cb);
             return (${myExtendedObjectClassName})ls[0];
         }
+#if ($table.hasPrimaryKey())
+
+        public ${myExtendedObjectClassName} SelectByPKValueWithDeletedCheck(${table.primaryKeyArgsString}) {
+            ${table.primaryKeyArgsAssertStringCSharp};
+            ${myConditionBeanClassName} cb = newMyConditionBean();
+            ${table.primaryKeyArgsConditionSetupStringCSharp}
+            return SelectEntityWithDeletedCheck(cb);
+        }
+#end
         #endregion
 
         // ===============================================================================
