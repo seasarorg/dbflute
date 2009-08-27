@@ -22,6 +22,7 @@
   <property file="${torque.contextProperties}"/>
   <property name="lib.dir" value="lib"/>
   <property name="torque.lib.dir" value="${lib.dir}"/>
+  <property name="logprop.dir" value="etc/logprop"/>
   <property name="class.root" value="target/classes"/>
 
   <!--
@@ -32,9 +33,9 @@
     do a general inclusion of the torque.lib.dir to catch any drivers.
   -->
   <path id="torque-classpath">
-    <!-- The log4j.properties -->
+    <!-- The log4j.properties (should be valid at first) -->
     <dirset dir=".">
-      <include name="etc/logprop"/>
+      <include name="${logprop.dir}"/>
     </dirset>
 
   	<!-- Embedded Libraries -->
