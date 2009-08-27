@@ -63,23 +63,23 @@
     Do forward declarations of all of our tasks to
     centralize them and clean up the targets.
   -->
-  <taskdef name="torque-jdbc-transform" classpathref="torque-classpath"
+  <taskdef name="df-jdbc" classpathref="torque-classpath"
     classname="org.apache.torque.task.TorqueJDBCTransformTask"/>
-  <taskdef name="torque-doc" classpathref="torque-classpath"
+  <taskdef name="df-doc" classpathref="torque-classpath"
     classname="org.apache.torque.task.TorqueDocumentationTask"/>
-  <taskdef name="torque-data-model" classpathref="torque-classpath"
+  <taskdef name="df-generate" classpathref="torque-classpath"
     classname="org.apache.torque.task.TorqueDataModelTask"/>
-  <taskdef name="torque-sql2entity" classpathref="torque-classpath"
+  <taskdef name="df-sql2entity" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
-  <taskdef name="torque-outside-sql-test" classpathref="torque-classpath"
+  <taskdef name="df-outside-sql-test" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.DfOutsideSqlTestTask"/>
 
   <!-- ReplaceSchema -->
-  <taskdef name="torque-create-schema" classpathref="torque-classpath"
+  <taskdef name="df-create-schema" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.replaceschema.DfCreateSchemaTask"/>
-  <taskdef name="torque-load-data" classpathref="torque-classpath"
+  <taskdef name="df-load-data" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.replaceschema.DfLoadDataTask"/>
-  <taskdef name="torque-take-finally" classpathref="torque-classpath"
+  <taskdef name="df-take-finally" classpathref="torque-classpath"
     classname="org.seasar.dbflute.task.replaceschema.DfTakeFinallyTask"/>
 
   <!--
@@ -134,12 +134,12 @@
     <echo message="outputFile        = ${torque.schema.dir}/project-schema-${torque.project}.xml"/>
     <echo message="+-----------------+"/>
 
-    <torque-jdbc-transform
+    <df-jdbc
       contextProperties="${torque.contextProperties}"
       outputFile="${torque.schema.dir}/project-schema-${torque.project}.xml"
       environmentType="${dfenv}"
     >
-    </torque-jdbc-transform>
+    </df-jdbc>
   </target>
 
   <!-- ******************************************************************************* -->
@@ -176,7 +176,7 @@
   </target>
 
   <target name="om-classpath" if="torque.internal.useClasspath">
-    <torque-data-model
+    <df-generate
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.om}"
       schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
@@ -184,11 +184,11 @@
       outputFile="report.${torque.project}.om.generation"
       useClasspath="${torque.useClasspath}"
       environmentType="${dfenv}">
-    </torque-data-model>
+    </df-generate>
   </target>
 
   <target name="om-template" unless="torque.internal.useClasspath">
-    <torque-data-model
+    <df-generate
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.om}"
       schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
@@ -196,7 +196,7 @@
       outputFile="report.${torque.project}.om.generation"
       templatePath="${torque.templatePath}"
       environmentType="${dfenv}">
-    </torque-data-model>
+    </df-generate>
   </target>
 
   <!-- ******************************************************************************* -->
@@ -217,7 +217,7 @@
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
-    <torque-doc
+    <df-doc
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.doc}"
       schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
@@ -227,7 +227,7 @@
       templatePath="${torque.templatePath}"
       useClasspath="${torque.useClasspath}"
       environmentType="${dfenv}">
-    </torque-doc>
+    </df-doc>
   </target>
 
   <!-- ******************************************************************************* -->
@@ -245,21 +245,21 @@
       <format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
     </tstamp>
 
-    <torque-create-schema
+    <df-create-schema
         contextProperties="${torque.contextProperties}"
   	    validTaskEndInformation="false"
         environmentType="${dfenv}">
-    </torque-create-schema>
-    <torque-load-data
+    </df-create-schema>
+    <df-load-data
         contextProperties="${torque.contextProperties}"
         validTaskEndInformation="false"
         environmentType="${dfenv}">
-    </torque-load-data>
-    <torque-take-finally
+    </df-load-data>
+    <df-take-finally
         contextProperties="${torque.contextProperties}"
         beforeTimestamp="${now.date}"
         environmentType="${dfenv}">
-    </torque-take-finally>
+    </df-take-finally>
   </target>
 
   <target name="outside-sql-test" description="==> outside-sql-test">
@@ -270,8 +270,8 @@
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
   	
-    <torque-outside-sql-test contextProperties="${torque.contextProperties}" environmentType="${dfenv}">
-    </torque-outside-sql-test>
+    <df-outside-sql-test contextProperties="${torque.contextProperties}" environmentType="${dfenv}">
+    </df-outside-sql-test>
   </target>
 
   <target name="sql2entity" description="==> sql2entity">
@@ -282,7 +282,7 @@
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
 
-    <torque-sql2entity
+    <df-sql2entity
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.sql2entity}"
       schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
@@ -290,7 +290,7 @@
       outputFile="report.${torque.project}.sql2entity.generation"
       templatePath="${torque.templatePath}"
       environmentType="${dfenv}">
-    </torque-sql2entity>
+    </df-sql2entity>
   </target>
 
 </project>
