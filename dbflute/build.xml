@@ -153,6 +153,9 @@
 	      	<zipfileset prefix="etc/license" dir="etc/license">
 	          	<include name="*.txt"/>
 	      	</zipfileset>
+	      	<zipfileset prefix="etc/logprop" dir="etc/logprop">
+	          	<include name="log4j.properties"/>
+	      	</zipfileset>
 	      	<zipfileset prefix="lib" dir="dist">
 	          	<include name="${dbflute.jar.file}"/>
 	      	</zipfileset>

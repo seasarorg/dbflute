@@ -32,14 +32,26 @@
     know which jar that will be, after we've got all of our specific, version-safe jars,
     do a general inclusion of the torque.lib.dir to catch any drivers.
   -->
+  <condition property="have.dfextlib">
+    <available file="${dfext.lib.dir}" />
+  </condition>
   <path id="torque-classpath">
+    <!-- For log4j.properties -->
+    <dirset dir=".">
+      <include name="etc/logprop"/>
+    </dirset>
+
+    <!-- Extension Libraries -->
+    <fileset dir="${dfext.lib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+
+    <!-- Embedded Libraries -->
     <fileset dir="${torque.lib.dir}">
       <include name="**/*.jar"/>
     </fileset>
-    <fileset dir="${dfext.lib.dir}">
-      <include name="**/*.jar"/>
-      <include name="**/*.properties"/>
-    </fileset>
+
+    <!-- [Unused on DBFlute] -->
     <dirset dir=".">
       <include name="${class.root}"/>
     </dirset>
