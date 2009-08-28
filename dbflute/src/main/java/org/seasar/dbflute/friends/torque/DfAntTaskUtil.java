@@ -155,21 +155,21 @@ public final class DfAntTaskUtil {
     }
 
     public static String getDisplayTaskName(String taskName) {
-        if (taskName.endsWith("jdbc-transform")) {
+        if (taskName.endsWith("df-jdbc")) {
             return "JDBC";
-        } else if (taskName.endsWith("doc")) {
+        } else if (taskName.equals("df-doc")) {
             return "Doc";
-        } else if (taskName.endsWith("data-model")) {
+        } else if (taskName.equals("df-generate")) {
             return "Generate";
-        } else if (taskName.endsWith("sql2entity")) {
+        } else if (taskName.equals("df-sql2entity")) {
             return "Sql2Entity";
-        } else if (taskName.endsWith("outside-sql-test")) {
+        } else if (taskName.equals("df-outside-sql-test")) {
             return "OutsideSqlTest";
-        } else if (taskName.endsWith("create-schema")) {
+        } else if (taskName.equals("df-create-schema")) {
             return "ReplaceSchema";
-        } else if (taskName.endsWith("load-data")) {
+        } else if (taskName.equals("df-load-data")) {
             return "ReplaceSchema";
-        } else if (taskName.endsWith("take-finally")) {
+        } else if (taskName.equals("df-take-finally")) {
             return "ReplaceSchema";
         } else {
             return taskName;

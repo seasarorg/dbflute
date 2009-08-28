@@ -241,10 +241,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ *************************************/");
         _log.info("$ ");
 
-        if (tableList.isEmpty()) {
-            throwTableNotFoundException();
-        }
-
         // Initialize the set collection for reference table check.
         // This should be executed before handling foreign keys.
         _refTableCheckSet = StringSet.createAsCaseInsensitive();
@@ -435,7 +431,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             _databaseNode.appendChild(tableElement);
         } // End of Table Loop
 
-        setupAddtionalTableIfNeeds(); // since 0.8.0
+        final boolean exists = setupAddtionalTableIfNeeds(); // since 0.8.0
+        if (tableList.isEmpty() && !exists) {
+            throwTableNotFoundException();
+        }
         _doc.appendChild(_databaseNode);
     }
 
@@ -843,7 +842,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                    Additional Table
     //                                                                    ================
-    protected void setupAddtionalTableIfNeeds() { // since 0.8.0
+    protected boolean setupAddtionalTableIfNeeds() { // since 0.8.0
+        boolean exists = false;
         final String tableType = "TABLE";
         final DfAdditionalTableProperties prop = new DfAdditionalTableProperties(getProperties().getProperties());
         final Map<String, Object> tableMap = prop.getAdditionalTableMap();
@@ -878,8 +878,10 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 }
                 tableElement.appendChild(columnElement);
             }
+            exists = true;
             _databaseNode.appendChild(tableElement);
         }
+        return exists;
     }
 
     // ===================================================================================
