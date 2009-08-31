@@ -845,7 +845,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected boolean setupAddtionalTableIfNeeds() { // since 0.8.0
         boolean exists = false;
         final String tableType = "TABLE";
-        final DfAdditionalTableProperties prop = new DfAdditionalTableProperties(getProperties().getProperties());
+        final DfAdditionalTableProperties prop = getProperties().getAdditionalTableProperties();
         final Map<String, Object> tableMap = prop.getAdditionalTableMap();
         final Set<String> tableNameKey = tableMap.keySet();
         for (String tableName : tableNameKey) {
@@ -866,7 +866,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 final boolean primaryKey = prop.isColumnPrimaryKey(tableName, columnName);
                 final boolean autoIncrement = prop.isColumnAutoIncrement(tableName, columnName);
                 columnElement.setAttribute("type", columnType);
-                columnElement.setAttribute("required", String.valueOf(required));
+                if (required) {
+                    columnElement.setAttribute("required", String.valueOf(required));
+                }
                 if (columnSize != null && columnSize.trim().length() > 0) {
                     columnElement.setAttribute("size", columnSize);
                 }

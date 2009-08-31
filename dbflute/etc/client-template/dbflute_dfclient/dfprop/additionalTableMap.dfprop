@@ -5,20 +5,19 @@
 # You should use this when JDBC can not provide table information
 # and when you have no table but call stored procedures only.
 # 
-# The elements 'size' and 'primaryKey' and 'autoIncrement' is NOT required. 
+# The element 'type' is only required. 
 # 
 # Specification:
 # map: {
 #     [table-name] = map:{
 #         columnMap = map:{
 #             [column-name] = map:{
-#                 type = [column-JDBC-type] ; required = [true or false]
-#                 ; size = [column-size]
+#                 type = [column-JDBC-type]
+#                 ; required = [true or false] ; size = [column-size]
 #                 ; primaryKey = [true or false] ; autoIncrement = [true or false]
 #             }
 #             [column-name] = map:{
-#                 type = [column-JDBC-type] ; required = [true or false]
-#                 ; size = [column-size]
+#                 type = [column-JDBC-type]
 #             }
 #         }
 #     }
@@ -31,6 +30,7 @@ map:{
     #    ; columnMap = map:{
     #        FOO_ID = map:{ type = INTEGER ; required = true ; primaryKey = true ; autoIncrement = true}
     #        FOO_NAME = map:{ type = VARCHAR ; required = true ; size = 123 }
+    #        FOO_DATE = map:{ type = DATE }
     #    }
     #}
 }
