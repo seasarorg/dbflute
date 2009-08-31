@@ -3,7 +3,7 @@
 # 
 # This property is valid at only JDBC task.
 # You should use this when JDBC can not provide table information
-# and when you have no table but call stored procedures only(with dummy table).
+# and when you have no table but call stored procedures only.
 # 
 # The elements 'size' and 'primaryKey' and 'autoIncrement' is NOT required. 
 # 

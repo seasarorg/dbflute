@@ -9,6 +9,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
 import org.seasar.dbflute.jdbc.HandlingDataSourceWrapper;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
 #if ($database.isTargetContainerSeasar())
@@ -133,7 +134,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 
     protected StatementFactory createStatementFactory() {
         final TnStatementFactoryImpl factory = new TnStatementFactoryImpl();
-        factory.setDefaultStatementConfig(${glDBFluteConfig}.getInstance().getDefaultStatementConfig());
+        factory.setDefaultStatementConfig(assistDefaultStatementConfig());
         factory.setInternalDebug(${glDBFluteConfig}.getInstance().isInternalDebug());
         return factory;
     }
@@ -197,6 +198,13 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                                     -----------------
     public String assistSqlFileEncoding() {
         return "${database.sqlFileEncoding}";
+    }
+
+    // -----------------------------------------------------
+    //                               Statement Configuration
+    //                               -----------------------
+    public StatementConfig assistDefaultStatementConfig() {
+        return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
     }
 
     // ===================================================================================

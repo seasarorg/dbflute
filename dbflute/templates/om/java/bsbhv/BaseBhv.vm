@@ -25,9 +25,6 @@ import org.seasar.dbflute.dbmeta.hierarchy.HierarchyArranger;
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchyBasicRequest;
 import org.seasar.dbflute.dbmeta.hierarchy.HierarchyRequest;
 #end
-import org.seasar.dbflute.jdbc.StatementConfig;
-import ${glPackageBaseCommon}.${glDBCurrent};
-import ${glPackageBaseCommon}.${glDBFluteConfig};
 #if ($table.isBuriTarget())
 import ${glPackagePluginBuri}.${glBuriDef};
 #end
@@ -110,22 +107,6 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
     public ${myConditionBeanClassName} newMyConditionBean() { return new ${myConditionBeanClassName}(); }
 
-    // ===================================================================================
-    //                                                                       Current DBDef
-    //                                                                       =============
-    @Override
-    protected DBDef getCurrentDBDef() {
-        return ${glDBCurrent}.getInstance().currentDBDef();
-    }
-
-    // ===================================================================================
-    //                                                             Default StatementConfig
-    //                                                             =======================
-    @Override
-    protected StatementConfig getDefaultStatementConfig() {
-        return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
-    }
-    
     // ===================================================================================
     //                                                                        Count Select
     //                                                                        ============
