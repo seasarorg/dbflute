@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.seasar.dbflute.BehaviorSelector;
-import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.batch.TokenFileOutputOption;
 import org.seasar.dbflute.bhv.batch.TokenFileOutputResult;
@@ -56,7 +55,6 @@ import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingSimpleFacade;
 import org.seasar.dbflute.helper.token.file.impl.FileMakingSimpleFacadeImpl;
-import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -73,16 +71,6 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     /** Behavior-selector instance. It's basically referred at loadReferrer. (Required for loadReferrer) */
     protected BehaviorSelector _behaviorSelector;
-
-    // ===================================================================================
-    //                                                                       Current DBDef
-    //                                                                       =============
-    protected abstract DBDef getCurrentDBDef();
-
-    // ===================================================================================
-    //                                                             Default StatementConfig
-    //                                                             =======================
-    protected abstract StatementConfig getDefaultStatementConfig();
 
     // ===================================================================================
     //                                                                       Basic Get All
@@ -450,8 +438,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     public OutsideSqlBasicExecutor outsideSql() {
         assertBehaviorCommandInvoker("outsideSql");
-        return new OutsideSqlBasicExecutor(_behaviorCommandInvoker, getTableDbName(), getCurrentDBDef(),
-                getDefaultStatementConfig());
+        return _behaviorCommandInvoker.createOutsideSqlBasicExecutor(getTableDbName());
     }
 
     // ===================================================================================

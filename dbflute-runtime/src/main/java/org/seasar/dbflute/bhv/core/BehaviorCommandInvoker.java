@@ -21,8 +21,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.CallbackContext;
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
+import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBeanContext;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -31,6 +33,7 @@ import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
 import org.seasar.dbflute.helper.stacktrace.impl.InvokeNameExtractorImpl;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.SqlResultInfo;
+import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -46,6 +49,7 @@ import org.seasar.dbflute.util.TraceViewUtil;
  *   o isExecutionCacheEmpty();
  *   o getExecutionCacheSize();
  *   o injectComponentProperty(BehaviorCommandComponentSetup behaviorCommand);
+ *   o createOutsideSqlBasicExecutor(String tableDbName);
  *   o invoke(BehaviorCommand behaviorCommand);
  * </pre>
  * @author jflute
@@ -105,6 +109,19 @@ public class BehaviorCommandInvoker {
     protected String getSqlFileEncoding() {
         assertInvokerAssistant();
         return _invokerAssistant.assistSqlFileEncoding();
+    }
+
+    // ===================================================================================
+    //                                                                          OutsideSql
+    //                                                                          ==========
+    /**
+     * @param tableDbName The DB name of table. (NotNull)
+     * @return The basic executor of outside SQL. (NotNull) 
+     */
+    public OutsideSqlBasicExecutor createOutsideSqlBasicExecutor(String tableDbName) {
+        final DBDef dbDef = _invokerAssistant.assistCurrentDBDef();
+        final StatementConfig statementConfig = _invokerAssistant.assistDefaultStatementConfig();
+        return new OutsideSqlBasicExecutor(this, tableDbName, dbDef, statementConfig);
     }
 
     // ===================================================================================
