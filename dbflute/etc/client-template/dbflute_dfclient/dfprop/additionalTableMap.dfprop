@@ -1,0 +1,65 @@
+# /---------------------------------------------------------------------------
+# additionalTableMap: (NotRequired - Default 'map:{}')
+# 
+# This property is valid at only JDBC task.
+# You should use this when JDBC can not provide table information
+# and when you have no table but call stored procedures only(with dummy table).
+# 
+# The elements 'size' and 'primaryKey' and 'autoIncrement' is NOT required. 
+# 
+# Specification:
+# map: {
+#     [table-name] = map:{
+#         columnMap = map:{
+#             [column-name] = map:{
+#                 type = [column-JDBC-type] ; required = [true or false]
+#                 ; size = [column-size]
+#                 ; primaryKey = [true or false] ; autoIncrement = [true or false]
+#             }
+#             [column-name] = map:{
+#                 type = [column-JDBC-type] ; required = [true or false]
+#                 ; size = [column-size]
+#             }
+#         }
+#     }
+# }
+# 
+# *The line that starts with '#' means comment-out.
+#
+map:{
+    #; FOO_TABLE = map:{
+    #    ; columnMap = map:{
+    #        FOO_ID = map:{ type = INTEGER ; required = true ; primaryKey = true ; autoIncrement = true}
+    #        FOO_NAME = map:{ type = VARCHAR ; required = true ; size = 123 }
+    #    }
+    #}
+}
+# ----------------/
+#
+# Reference for JDBC Type with Mapping as follows:
+# --------------------------------------------------------
+# | JDBC Type     | Java Native          | CSharp Native |
+# | ------------------------------------------------------
+# | CHAR          | java.lang.String     | String        |
+# | VARCHAR       | java.lang.String     | String        |
+# | LONGVARCHAR   | java.lang.String     | String        |
+# | NUMERIC       | java.math.BigDecimal | decimal?      |
+# | DECIMAL       | java.math.BigDecimal | decimal?      |
+# | BIT           | java.lang.Boolean    | bool?         |
+# | BOOLEAN       | java.lang.Boolean    | bool?         |
+# | TINYINT       | java.lang.Integer    | int?          |
+# | SMALLINT      | java.lang.Integer    | int?          |
+# | INTEGER       | java.lang.Integer    | int?          |
+# | BIGINT        | java.lang.Long       | long?         |
+# | REAL          | java.math.BigDecimal | decimal?      |
+# | FLOAT         | java.math.BigDecimal | decimal?      |
+# | DOUBLE        | java.math.BigDecimal | decimal?      |
+# | BINARY        | byte[]               | byte[]        |
+# | VARBINARY     | byte[]               | byte[]        |
+# | LONGVARBINARY | byte[]               | byte[]        |
+# | DATE          | java.util.Date       | DateTime?     |
+# | TIME          | java.sql.Time        | DateTime?     |
+# | TIMESTAMP     | java.sql.Timestamp   | DateTime?     |
+# | ARRAY         | *Unsupported         | *Unsupported  |
+# | UUID          | java.util.UUID       | *Unsupported  |
+# --------------------------------------------------------
