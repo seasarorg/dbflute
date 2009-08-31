@@ -24,7 +24,6 @@ import org.seasar.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.seasar.dbflute.s2dao.procedure.TnProcedureMetaDataFactory;
 import org.seasar.dbflute.s2dao.sqlcommand.TnProcedureCommand;
 
-
 /**
  * The behavior command for OutsideSql.execute().
  * @author jflute

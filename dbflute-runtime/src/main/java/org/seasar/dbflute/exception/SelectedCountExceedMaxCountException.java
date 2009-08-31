@@ -17,7 +17,6 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception when selected count exceeds max count.
- * 
  * @author jflute
  */
 public class SelectedCountExceedMaxCountException extends RuntimeException {
@@ -34,7 +33,7 @@ public class SelectedCountExceedMaxCountException extends RuntimeException {
     /**
      * Constructor.
      * 
-     * @param msg Exception message.
+     * @param msg Exception message. (NotNull)
      * @param maxCount Max count.
      * @param selectedCount Selected count.
      */
@@ -46,7 +45,6 @@ public class SelectedCountExceedMaxCountException extends RuntimeException {
 
     /**
      * Get selected count.
-     * 
      * @return Selected count.
      */
     public int getSelectedCount() {
@@ -55,7 +53,6 @@ public class SelectedCountExceedMaxCountException extends RuntimeException {
 
     /**
      * Get max count.
-     * 
      * @return Max count.
      */
     public int getMaxCount() {

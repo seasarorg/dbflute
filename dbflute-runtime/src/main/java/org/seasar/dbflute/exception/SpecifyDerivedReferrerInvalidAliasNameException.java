@@ -26,7 +26,7 @@ public class SpecifyDerivedReferrerInvalidAliasNameException extends RuntimeExce
 
     /**
      * Constructor.
-     * @param msg Exception message.
+     * @param msg Exception message. (NotNull)
      */
     public SpecifyDerivedReferrerInvalidAliasNameException(String msg) {
         super(msg);
@@ -34,8 +34,8 @@ public class SpecifyDerivedReferrerInvalidAliasNameException extends RuntimeExce
 
     /**
      * Constructor.
-     * @param msg Exception message.
-     * @param cause Throwable.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
      */
     public SpecifyDerivedReferrerInvalidAliasNameException(String msg, Throwable cause) {
         super(msg, cause);

@@ -35,7 +35,7 @@ public class EmbeddedValueCommentNotFoundPropertyException extends RuntimeExcept
     /**
      * Constructor.
      * @param msg Exception message. (NotNull)
-     * @param cause Throwable.
+     * @param cause Throwable. (NotNull)
      */
     public EmbeddedValueCommentNotFoundPropertyException(String msg, Throwable cause) {
         super(msg, cause);

@@ -26,7 +26,7 @@ public class OutsideSqlNotFoundException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message.
+     * @param msg Exception message. (NotNull)
      */
     public OutsideSqlNotFoundException(String msg) {
         super(msg);
@@ -34,8 +34,8 @@ public class OutsideSqlNotFoundException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message.
-     * @param cause Throwable.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
      */
     public OutsideSqlNotFoundException(String msg, Throwable cause) {
         super(msg, cause);

@@ -17,7 +17,6 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the required likeSearchOption is not found.
- * 
  * @author jflute
  */
 public class LikeSearchOptionNotFoundException extends RuntimeException {
@@ -27,8 +26,7 @@ public class LikeSearchOptionNotFoundException extends RuntimeException {
 
     /**
      * Constructor.
-     * 
-     * @param msg Exception message.
+     * @param msg Exception message. (NotNull)
      */
     public LikeSearchOptionNotFoundException(String msg) {
         super(msg);
@@ -36,9 +34,8 @@ public class LikeSearchOptionNotFoundException extends RuntimeException {
 
     /**
      * Constructor.
-     * 
-     * @param msg Exception message.
-     * @param cause Throwable.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
      */
     public LikeSearchOptionNotFoundException(String msg, Throwable cause) {
         super(msg, cause);

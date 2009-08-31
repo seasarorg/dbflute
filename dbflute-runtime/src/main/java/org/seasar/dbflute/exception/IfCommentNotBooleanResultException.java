@@ -38,7 +38,7 @@ public class IfCommentNotBooleanResultException extends IfCommentWrongExpression
      * Constructor.
      * 
      * @param msg Exception message. (NotNull)
-     * @param cause Throwable.
+     * @param cause Throwable. (NotNull)
      */
     public IfCommentNotBooleanResultException(String msg, Throwable cause) {
         super(msg, cause);

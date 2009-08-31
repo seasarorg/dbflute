@@ -35,7 +35,7 @@ public class BindVariableCommentNotFoundPropertyException extends RuntimeExcepti
     /**
      * Constructor.
      * @param msg Exception message. (NotNull)
-     * @param cause Throwable.
+     * @param cause Throwable. (NotNull)
      */
     public BindVariableCommentNotFoundPropertyException(String msg, Throwable cause) {
         super(msg, cause);

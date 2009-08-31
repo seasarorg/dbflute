@@ -26,7 +26,7 @@ public class SpecifyDerivedReferrerInvalidColumnSpecificationException extends R
 
     /**
      * Constructor.
-     * @param msg Exception message.
+     * @param msg Exception message. (NotNull)
      */
     public SpecifyDerivedReferrerInvalidColumnSpecificationException(String msg) {
         super(msg);
@@ -34,8 +34,8 @@ public class SpecifyDerivedReferrerInvalidColumnSpecificationException extends R
 
     /**
      * Constructor.
-     * @param msg Exception message.
-     * @param cause Throwable.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
      */
     public SpecifyDerivedReferrerInvalidColumnSpecificationException(String msg, Throwable cause) {
         super(msg, cause);

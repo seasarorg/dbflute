@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -29,6 +30,7 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.exception.QueryUpdateFailureException;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -165,16 +167,20 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
                 TnPropertyType propertyType = propertyTypeMap.get(propertyName);
                 propertyTypeList.add(propertyType);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throwQueryUpdateFailureException(cb, entity, currentPropertyName, e);
+        } catch (IllegalAccessException e) {
+            throwQueryUpdateFailureException(cb, entity, currentPropertyName, e);
+        } catch (InvocationTargetException e) {
+            throwQueryUpdateFailureException(cb, entity, currentPropertyName, e.getCause());
         }
         return cb.getSqlClause().getClauseQueryUpdate(columnParameterMap);
     }
 
-    protected void throwQueryUpdateFailureException(ConditionBean cb, Entity entity, String propertyName, Exception e) {
+    protected void throwQueryUpdateFailureException(ConditionBean cb, Entity entity, String propertyName, Throwable e) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "queryUpdate() failed to execute!" + ln();
+        msg = msg + "Failed to execute query-update!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm the parameter comment logic." + ln();
@@ -192,14 +198,6 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         msg = msg + "[Exception Message]" + ln() + e.getMessage() + ln();
         msg = msg + "* * * * * * * * * */";
         throw new QueryUpdateFailureException(msg, e);
-    }
-
-    public static class QueryUpdateFailureException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public QueryUpdateFailureException(String msg, Exception e) {
-            super(msg, e);
-        }
     }
 
     protected CommandContext createCommandContext(String twoWaySql, String[] argNames, Class<?>[] argTypes,

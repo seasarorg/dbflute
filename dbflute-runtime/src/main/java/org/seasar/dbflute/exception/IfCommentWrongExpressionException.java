@@ -35,7 +35,7 @@ public class IfCommentWrongExpressionException extends RuntimeException {
     /**
      * Constructor.
      * @param msg Exception message. (NotNull)
-     * @param cause Throwable.
+     * @param cause Throwable. (NotNull)
      */
     public IfCommentWrongExpressionException(String msg, Throwable cause) {
         super(msg, cause);

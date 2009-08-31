@@ -17,7 +17,6 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the entity has already been deleted by other thread.
- * 
  * @author jflute
  */
 public class EntityAlreadyDeletedException extends RecordHasAlreadyBeenDeletedException {
@@ -27,8 +26,7 @@ public class EntityAlreadyDeletedException extends RecordHasAlreadyBeenDeletedEx
 
     /**
      * Constructor.
-     * 
-     * @param msg Exception message.
+     * @param msg Exception message. (NotNull)
      */
     public EntityAlreadyDeletedException(String msg) {
         super(msg);

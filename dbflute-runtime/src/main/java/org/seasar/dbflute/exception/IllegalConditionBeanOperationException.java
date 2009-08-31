@@ -26,7 +26,7 @@ public class IllegalConditionBeanOperationException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message.
+     * @param msg Exception message. (NotNull)
      */
     public IllegalConditionBeanOperationException(String msg) {
         super(msg);
@@ -34,8 +34,8 @@ public class IllegalConditionBeanOperationException extends RuntimeException {
 
     /**
      * Constructor.
-     * @param msg Exception message.
-     * @param cause Throwable.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
      */
     public IllegalConditionBeanOperationException(String msg, Throwable cause) {
         super(msg, cause);

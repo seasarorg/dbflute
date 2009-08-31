@@ -18,7 +18,6 @@ package org.seasar.dbflute.exception;
 /**
  * The exception when the record has overlapped.
  * This class is old.
- * 
  * @author jflute
  */
 public class RecordHasOverlappedException extends RuntimeException {
@@ -28,8 +27,7 @@ public class RecordHasOverlappedException extends RuntimeException {
 
     /**
      * Constructor.
-     * 
-     * @param msg Exception message.
+     * @param msg Exception message. (NotNull)
      */
     public RecordHasOverlappedException(String msg) {
         super(msg);
@@ -37,9 +35,8 @@ public class RecordHasOverlappedException extends RuntimeException {
 
     /**
      * Constructor.
-     * 
-     * @param msg Exception message.
-     * @param cause Throwable.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
      */
     public RecordHasOverlappedException(String msg, Throwable cause) {
         super(msg, cause);

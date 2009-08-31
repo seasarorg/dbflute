@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the method of set-up-select is invoked after invoking the method of union.
+ * The exception of when executing query-update is failed.
  * @author jflute
  */
-public class SetupSelectAfterUnionException extends RuntimeException {
+public class QueryUpdateFailureException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class SetupSelectAfterUnionException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public SetupSelectAfterUnionException(String msg) {
+    public QueryUpdateFailureException(String msg) {
         super(msg);
     }
 
@@ -37,7 +37,7 @@ public class SetupSelectAfterUnionException extends RuntimeException {
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */
-    public SetupSelectAfterUnionException(String msg, Throwable cause) {
+    public QueryUpdateFailureException(String msg, Throwable cause) {
         super(msg, cause);
     }
 }

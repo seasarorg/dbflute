@@ -26,7 +26,7 @@ public class SpecifiedDerivedOrderByAliasNameNotFoundException extends RuntimeEx
 
     /**
      * Constructor.
-     * @param msg Exception message.
+     * @param msg Exception message. (NotNull)
      */
     public SpecifiedDerivedOrderByAliasNameNotFoundException(String msg) {
         super(msg);
@@ -34,8 +34,8 @@ public class SpecifiedDerivedOrderByAliasNameNotFoundException extends RuntimeEx
 
     /**
      * Constructor.
-     * @param msg Exception message.
-     * @param cause Throwable.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
      */
     public SpecifiedDerivedOrderByAliasNameNotFoundException(String msg, Throwable cause) {
         super(msg, cause);
