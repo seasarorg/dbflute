@@ -4,6 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer.LN_MARK_PLAIN;
+import static org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer.LN_MARK_XML;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,5 +133,36 @@ public class DfClassificationResourceAnalyzerTest {
                 assertNull(element.getComment());
             }
         }
+    }
+
+    @Test
+    public void test_containsLineSeparatorMark() {
+        // ## Arrange ##
+        final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
+
+        // ## Act & Assert ##
+        assertFalse(analyzer.containsLineSeparatorMark("foobar"));
+        assertFalse(analyzer.containsLineSeparatorMark("foo\nbar"));
+        assertTrue(analyzer.containsLineSeparatorMark("foo" + LN_MARK_PLAIN + "bar"));
+        assertTrue(analyzer.containsLineSeparatorMark("foo" + LN_MARK_XML + "bar"));
+        assertTrue(analyzer.containsLineSeparatorMark("foo" + LN_MARK_PLAIN + LN_MARK_XML + "bar"));
+    }
+
+    @Test
+    public void test_tokenizedLineSeparatorMark() {
+        // ## Arrange ##
+        final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
+        final String plain = LN_MARK_PLAIN;
+        final String xml = LN_MARK_XML;
+
+        // ## Act & Assert ##
+        assertEquals("foobar", analyzer.tokenizedLineSeparatorMark("foobar").get(0));
+        assertEquals("foo", analyzer.tokenizedLineSeparatorMark("foo" + plain + "bar").get(0));
+        assertEquals("bar", analyzer.tokenizedLineSeparatorMark("foo" + plain + "bar").get(1));
+        assertEquals("foo", analyzer.tokenizedLineSeparatorMark("foo" + xml + "bar").get(0));
+        assertEquals("bar", analyzer.tokenizedLineSeparatorMark("foo" + xml + "bar").get(1));
+        assertEquals("foo", analyzer.tokenizedLineSeparatorMark("foo" + xml + "&" + plain + "bar").get(0));
+        assertEquals("&", analyzer.tokenizedLineSeparatorMark("foo" + xml + "&" + plain + "bar").get(1));
+        assertEquals("bar", analyzer.tokenizedLineSeparatorMark("foo" + plain + "&" + xml + "bar").get(2));
     }
 }

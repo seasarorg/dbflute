@@ -18,6 +18,7 @@ import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
 import org.seasar.dbflute.util.DfNameHintUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -29,8 +30,10 @@ public class DfClassificationResourceAnalyzer {
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfClassificationResourceAnalyzer.class);
-    
-    private static final String DEFAULT_ENCODING = "UTF-8";
+
+    protected static final String DEFAULT_ENCODING = "UTF-8";
+    protected static final String LN_MARK_PLAIN = "\\n";
+    protected static final String LN_MARK_XML = "&#xA;";
 
     // ===================================================================================
     //                                                                             Analyze
@@ -326,11 +329,13 @@ public class DfClassificationResourceAnalyzer {
     //                                                                      General Helper
     //                                                                      ==============
     protected boolean containsLineSeparatorMark(String line) {
-        return line.contains("&#xA;");
+        return line.contains(LN_MARK_PLAIN) || line.contains(LN_MARK_XML);
     }
 
     protected List<String> tokenizedLineSeparatorMark(String line) {
-        return tokenize(line, "&#xA;");
+        final String baseMark = LN_MARK_PLAIN;
+        line = DfStringUtil.replace(line, LN_MARK_XML, baseMark);
+        return tokenize(line, baseMark);
     }
 
     protected java.util.List<String> tokenize(String value, String delimiter) {
