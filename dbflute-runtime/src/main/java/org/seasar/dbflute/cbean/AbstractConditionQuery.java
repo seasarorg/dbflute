@@ -95,8 +95,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     /** The path of relation. */
     protected String _relationPath;
 
-    /** The query of child. */
-    protected final ConditionQuery _childQuery;
+    /** The referrer query. */
+    protected final ConditionQuery _referrerQuery;
 
     // -----------------------------------------------------
     //                                                Inline
@@ -109,13 +109,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param childQuery Child query. (Nullable: If null, this is base instance.)
-     * @param sqlClause SQL clause instance. (NotNull)
-     * @param aliasName My alias name. (NotNull)
-     * @param nestLevel Nest level.
+     * @param referrerQuery The instance of referrer query. (Nullable: If null, this is base query)
+     * @param sqlClause The instance of SQL clause. (NotNull)
+     * @param aliasName The alias name for this query. (NotNull)
+     * @param nestLevel The nest level of this query. (If zero, this is base query)
      */
-    public AbstractConditionQuery(ConditionQuery childQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
-        _childQuery = childQuery;
+    public AbstractConditionQuery(ConditionQuery referrerQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
+        _referrerQuery = referrerQuery;
         _sqlClause = sqlClause;
         _aliasName = aliasName;
         _nestLevel = nestLevel;
@@ -138,11 +138,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                  Important Accessor
     //                                                                  ==================
     /**
-     * Get child query.
-     * @return Child query. (Nullable)
+     * {@inheritDoc}
      */
-    public ConditionQuery getChildQuery() {
-        return _childQuery;
+    public ConditionQuery getReferrerQuery() {
+        return _referrerQuery;
     }
 
     /**
@@ -183,7 +182,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return Determination.
      */
     public boolean isBaseQuery(ConditionQuery query) {
-        return (query.getChildQuery() == null);
+        return (query.getReferrerQuery() == null);
     }
 
     /**
@@ -280,7 +279,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 }
                 sb.insert(0, CQ_PROPERTY + initCap(foreignPropertyName) + ".");
             }
-            query = query.getChildQuery();
+            query = query.getReferrerQuery();
         }
         return sb.toString();
     }

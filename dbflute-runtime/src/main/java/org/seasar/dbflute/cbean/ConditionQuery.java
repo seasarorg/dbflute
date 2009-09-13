@@ -53,10 +53,10 @@ public interface ConditionQuery {
     public String getRealColumnName(String columnName);
 
     /**
-     * Get child query.
-     * @return Child query. (Nullable)
+     * Get the referrer query.
+     * @return The referrer query. (Nullable: If null, this is base query)
      */
-    public ConditionQuery getChildQuery();
+    public ConditionQuery getReferrerQuery();
 
     /**
      * Get sql clause.
