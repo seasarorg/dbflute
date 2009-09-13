@@ -17,7 +17,7 @@ public interface ${glConditionQuery} {
     // ===================================================================================
     //                                                                  Important Accessor
     //                                                                  ==================
-    ${glConditionQuery} getChildQuery();
+    ${glConditionQuery} getReferrerQuery();
     ${glSqlClause} getSqlClause();
     String getAliasName();
     String getRealAliasName();

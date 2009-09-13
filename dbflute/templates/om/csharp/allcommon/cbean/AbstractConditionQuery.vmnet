@@ -51,7 +51,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                          ------------
     protected String _foreignPropertyName;
     protected String _relationPath;
-    protected readonly ${glConditionQuery} _childQuery;
+    protected readonly ${glConditionQuery} _referrerQuery;
 
     // -----------------------------------------------------
     //                                                Inline
@@ -62,7 +62,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                                                         Constructor
     //                                                                         ===========
     public ${myClassName}(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
-        _childQuery = childQuery;
+        _referrerQuery = childQuery;
         _sqlClause = sqlClause;
         _aliasName = aliasName;
         _nestLevel = nestLevel;
@@ -77,8 +77,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // ===================================================================================
     //                                                                  Important Accessor
     //                                                                  ==================
-    public ${glConditionQuery} getChildQuery() {
-        return _childQuery;
+    public ${glConditionQuery} getReferrerQuery() {
+        return _referrerQuery;
     }
 
     public ${glSqlClause} getSqlClause() {
@@ -98,7 +98,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     public bool isBaseQuery(${glConditionQuery} query) {
-        return (query.getChildQuery() == null);
+        return (query.getReferrerQuery() == null);
     }
 
 	public int getSubQueryLevel() {
@@ -170,7 +170,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 }
                 sb.insert(0, CQ_PROPERTY + initCap(foreignPropertyName) + ".");
             }
-            query = query.getChildQuery();
+            query = query.getReferrerQuery();
         }
         return sb.toString();
     }

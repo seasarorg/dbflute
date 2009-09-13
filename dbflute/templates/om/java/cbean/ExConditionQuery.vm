@@ -20,13 +20,13 @@ public class ${myClassName} extends ${myBaseConditionQueryClassName} {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param childQuery Child query as abstract class. (Nullable: If null, this is base instance.)
-     * @param sqlClause SQL clause instance. (NotNull)
-     * @param aliasName My alias name. (NotNull)
-     * @param nestLevel Nest level.
+     * @param referrerQuery The instance of referrer query. (Nullable: If null, this is base query)
+     * @param sqlClause The instance of SQL clause. (NotNull)
+     * @param aliasName The alias name for this query. (NotNull)
+     * @param nestLevel The nest level of this query. (If zero, this is base query)
      */
-    public ${myClassName}(ConditionQuery childQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
-        super(childQuery, sqlClause, aliasName, nestLevel);
+    public ${myClassName}(ConditionQuery referrerQuery, SqlClause sqlClause, String aliasName, int nestLevel) {
+        super(referrerQuery, sqlClause, aliasName, nestLevel);
     }
 	
     // ===================================================================================

@@ -43,7 +43,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
     }
 
     protected ${myConditionInlineQueryClassName} createInlineQuery()
-    { return new ${myConditionInlineQueryClassName}(getChildQuery(), getSqlClause(), getAliasName(), getNestLevel(), this); }
+    { return new ${myConditionInlineQueryClassName}(getReferrerQuery(), getSqlClause(), getAliasName(), getNestLevel(), this); }
 
     /**
      * Prepare on-clause query. <br />
