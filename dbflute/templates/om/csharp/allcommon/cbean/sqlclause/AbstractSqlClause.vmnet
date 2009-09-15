@@ -71,7 +71,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected List<UnionQueryInfo> _unionQueryInfoList;
 
     /** Is order-by effective? Default value is false. */
-    protected bool _isOrderByEffective = false;
+    protected bool _orderByEffective = false;
 
     // -----------------------------------------------------
     //                                        Fetch Property
@@ -86,13 +86,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected int _fetchPageNumber = 1;
 
     /** Is fetch-narrowing effective? Default value is false. */
-    protected bool _isFetchScopeEffective = false;
+    protected bool _fetchScopeEffective = false;
 
     // -----------------------------------------------------
     //                               AdditionalConditionAsOr
     //                               -----------------------
     /** Is additional condition as or effective?*/
-    protected bool _isAdditionalConditionAsOrEffective = false;
+    protected bool _additionalConditionAsOrEffective = false;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -152,7 +152,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         unionClause = replaceString(unionClause, getUnionWhereFirstConditionMark(), "");// Required!
         
         sb.append(unionClause);
-        if (_isOrderByEffective && !_orderByClause.isEmpty()) {
+        if (_orderByEffective && !_orderByClause.isEmpty()) {
             sb.append(" ");
             sb.append(getOrderByClause());
         }
@@ -757,15 +757,15 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                                             AdditionalConditionAsOr
     //                                                             =======================
     public void makeAdditionalConditionAsOrEffective() {
-        _isAdditionalConditionAsOrEffective = true;
+        _additionalConditionAsOrEffective = true;
     }
 
     public void ignoreAdditionalConditionAsOr() {
-        _isAdditionalConditionAsOrEffective = false;
+        _additionalConditionAsOrEffective = false;
     }
 
     protected void arrangeWhereListAdditionalConditionAsOr(List<String> whereList) {
-        if (_isAdditionalConditionAsOrEffective) {
+        if (_additionalConditionAsOrEffective) {
             if (whereList.size() < 2) {
                 String msg = "The whereList should have two more elements when the isAdditionalConditionAsOrEffective is true: " + toString();
                 throw new IllegalStateException(msg);
@@ -789,25 +789,25 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     public ${glSqlClause} clearOrderBy() {
-        _isOrderByEffective = false;
+        _orderByEffective = false;
         _orderByClause.clear();
         return this;
     }
 
     public ${glSqlClause} ignoreOrderBy() {
-        _isOrderByEffective = false;
+        _orderByEffective = false;
         return this;
     }
 
     public ${glSqlClause} makeOrderByEffective() {
         if (!_orderByClause.isEmpty()) {
-            _isOrderByEffective = true;
+            _orderByEffective = true;
         }
         return this;
     }
 
     public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc) {
-        _isOrderByEffective = true;
+        _orderByEffective = true;
         if (!_orderByClause.isSameOrderByColumn(orderByProperty)) {
             clearOrderBy();
             registerOrderBy(orderByProperty, registeredOrderByProperty, ascOrDesc);
@@ -818,7 +818,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, bool ascOrDesc) {
         try {
-            _isOrderByEffective = true;
+            _orderByEffective = true;
             List<String> orderByList = new ArrayList<String>();
             {
                 String[] splitArray = orderByProperty.Split('/');
@@ -844,7 +844,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 String orderBy = ite.next();
                 String registeredOrderBy = (String)registeredOrderByList.get(count);
 
-                _isOrderByEffective = true;
+                _orderByEffective = true;
                 String aliasName = null;
                 String columnName = null;
                 String registeredAliasName = null;
@@ -969,7 +969,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
      * @return this. (NotNull)
      */
     public ${glSqlClause} fetchFirst(int fetchSize) {
-        _isFetchScopeEffective = true;
+        _fetchScopeEffective = true;
         if (fetchSize <= 0) {
             String msg = "Argument[fetchSize] must be plus: " + fetchSize;
             throw new IllegalArgumentException(msg);
@@ -988,7 +988,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
      * @return this. (NotNull)
      */
     public ${glSqlClause} fetchScope(int fetchStartIndex, int fetchSize) {
-        _isFetchScopeEffective = true;
+        _fetchScopeEffective = true;
         if (fetchStartIndex < 0) {
             String msg = "Argument[fetchStartIndex] must be plus or zero: " + fetchStartIndex;
             throw new IllegalArgumentException(msg);
@@ -1007,7 +1007,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
      * @return this. (NotNull)
      */
     public ${glSqlClause} fetchPage(int fetchPageNumber) {
-        _isFetchScopeEffective = true;
+        _fetchScopeEffective = true;
         if (fetchPageNumber <= 0) {
             fetchPageNumber = 1;
         }
@@ -1082,11 +1082,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     public virtual bool isFetchScopeEffective() {
-        return _isFetchScopeEffective;
+        return _fetchScopeEffective;
     }
 
     public virtual ${glSqlClause} ignoreFetchScope() {
-        _isFetchScopeEffective = false;
+        _fetchScopeEffective = false;
         doClearFetchPageClause();
         return this;
     }
@@ -1123,7 +1123,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     public virtual bool isFetchNarrowingEffective() {
-        return _isFetchScopeEffective;
+        return _fetchScopeEffective;
     }
 
     // ===================================================================================
