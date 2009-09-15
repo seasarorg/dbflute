@@ -115,7 +115,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     protected List<UnionQueryInfo> _unionQueryInfoList;
 
     /** Is order-by effective? Default value is false. */
-    protected boolean _isOrderByEffective = false;
+    protected boolean _orderByEffective = false;
 
     // -----------------------------------------------------
     //                                        Fetch Property
@@ -130,13 +130,13 @@ public abstract class AbstractSqlClause implements SqlClause {
     protected int _fetchPageNumber = 1;
 
     /** Is fetch-narrowing effective? Default value is false. */
-    protected boolean _isFetchScopeEffective = false;
+    protected boolean _fetchScopeEffective = false;
 
     // -----------------------------------------------------
     //                               AdditionalConditionAsOr
     //                               -----------------------
     /** Is additional condition as or effective?*/
-    protected boolean _isAdditionalConditionAsOrEffective = false;
+    protected boolean _additionalConditionAsOrEffective = false;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -201,7 +201,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         unionClause = replaceString(unionClause, getUnionWhereFirstConditionMark(), "");// Required!
 
         sb.append(unionClause);
-        if (_isOrderByEffective && !_orderByClause.isEmpty()) {
+        if (_orderByEffective && !_orderByClause.isEmpty()) {
             sb.append(" ");
             sb.append(getOrderByClause());
         }
@@ -900,15 +900,15 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                                             AdditionalConditionAsOr
     //                                                             =======================
     public void makeAdditionalConditionAsOrEffective() {
-        _isAdditionalConditionAsOrEffective = true;
+        _additionalConditionAsOrEffective = true;
     }
 
     public void ignoreAdditionalConditionAsOr() {
-        _isAdditionalConditionAsOrEffective = false;
+        _additionalConditionAsOrEffective = false;
     }
 
     protected void arrangeWhereListAdditionalConditionAsOr(List<String> whereList) {
-        if (_isAdditionalConditionAsOrEffective) {
+        if (_additionalConditionAsOrEffective) {
             if (whereList.size() < 2) {
                 String msg = "The whereList should have two more elements when the isAdditionalConditionAsOrEffective is true: "
                         + toString();
@@ -934,26 +934,26 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     public SqlClause clearOrderBy() {
-        _isOrderByEffective = false;
+        _orderByEffective = false;
         _orderByClause.clear();
         return this;
     }
 
     public SqlClause makeOrderByEffective() {
         if (!_orderByClause.isEmpty()) {
-            _isOrderByEffective = true;
+            _orderByEffective = true;
         }
         return this;
     }
 
     public SqlClause ignoreOrderBy() {
-        _isOrderByEffective = false;
+        _orderByEffective = false;
         return this;
     }
 
     public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty,
             boolean ascOrDesc) {
-        _isOrderByEffective = true;
+        _orderByEffective = true;
         if (!_orderByClause.isSameOrderByColumn(orderByProperty)) {
             clearOrderBy();
             registerOrderBy(orderByProperty, registeredOrderByProperty, ascOrDesc);
@@ -964,7 +964,7 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc) {
         try {
-            _isOrderByEffective = true;
+            _orderByEffective = true;
             final List<String> orderByList = new ArrayList<String>();
             {
                 final StringTokenizer st = new StringTokenizer(orderByProperty, "/");
@@ -990,7 +990,7 @@ public abstract class AbstractSqlClause implements SqlClause {
                 String orderBy = ite.next();
                 String registeredOrderBy = (String) registeredOrderByList.get(count);
 
-                _isOrderByEffective = true;
+                _orderByEffective = true;
                 String aliasName = null;
                 String columnName = null;
                 String registeredAliasName = null;
@@ -1125,7 +1125,7 @@ public abstract class AbstractSqlClause implements SqlClause {
      * @return this. (NotNull)
      */
     public SqlClause fetchFirst(int fetchSize) {
-        _isFetchScopeEffective = true;
+        _fetchScopeEffective = true;
         if (fetchSize <= 0) {
             String msg = "Argument[fetchSize] should be plus: " + fetchSize;
             throw new IllegalArgumentException(msg);
@@ -1144,7 +1144,7 @@ public abstract class AbstractSqlClause implements SqlClause {
      * @return this. (NotNull)
      */
     public SqlClause fetchScope(int fetchStartIndex, int fetchSize) {
-        _isFetchScopeEffective = true;
+        _fetchScopeEffective = true;
         if (fetchStartIndex < 0) {
             String msg = "Argument[fetchStartIndex] must be plus or zero: " + fetchStartIndex;
             throw new IllegalArgumentException(msg);
@@ -1163,7 +1163,7 @@ public abstract class AbstractSqlClause implements SqlClause {
      * @return this. (NotNull)
      */
     public SqlClause fetchPage(int fetchPageNumber) {
-        _isFetchScopeEffective = true;
+        _fetchScopeEffective = true;
         if (fetchPageNumber <= 0) {
             fetchPageNumber = 1;
         }
@@ -1244,11 +1244,11 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     public boolean isFetchScopeEffective() {
-        return _isFetchScopeEffective;
+        return _fetchScopeEffective;
     }
 
     public SqlClause ignoreFetchScope() {
-        _isFetchScopeEffective = false;
+        _fetchScopeEffective = false;
         doClearFetchPageClause();
         return this;
     }
@@ -1300,7 +1300,7 @@ public abstract class AbstractSqlClause implements SqlClause {
      * @return Determination.
      */
     public boolean isFetchNarrowingEffective() {
-        return _isFetchScopeEffective;
+        return _fetchScopeEffective;
     }
 
     // ===================================================================================
