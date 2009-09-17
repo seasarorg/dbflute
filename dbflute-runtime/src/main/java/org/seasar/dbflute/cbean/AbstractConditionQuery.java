@@ -501,6 +501,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         } else {
             // As 'or' Condition
+            final boolean orQueryEffective = getSqlClause().isOrQueryEffective();
             for (int i = 0; i < strArray.length; i++) {
                 final String currentValue = strArray[i];
                 if (i == 0) {
@@ -510,7 +511,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     invokeQueryLikeSearch(colName, currentValue, option);
                 }
             }
-            getSqlClause().ignoreOrQuery();
+            if (!orQueryEffective) {
+                getSqlClause().ignoreOrQuery();
+            }
         }
     }
 

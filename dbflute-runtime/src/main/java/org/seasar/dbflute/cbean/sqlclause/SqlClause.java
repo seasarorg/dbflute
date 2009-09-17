@@ -241,6 +241,12 @@ public interface SqlClause {
      */
     public void ignoreOrQuery();
 
+    /**
+     * Is or-query effective?
+     * @return Determination.
+     */
+    public boolean isOrQueryEffective();
+
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======

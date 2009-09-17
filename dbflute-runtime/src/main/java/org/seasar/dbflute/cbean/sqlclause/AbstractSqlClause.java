@@ -133,10 +133,10 @@ public abstract class AbstractSqlClause implements SqlClause {
     protected boolean _fetchScopeEffective = false;
 
     // -----------------------------------------------------
-    //                               AdditionalConditionAsOr
-    //                               -----------------------
-    /** Is additional condition as or effective?*/
-    protected boolean _asOrQueryEffective = false;
+    //                                               OrQuery
+    //                                               -------
+    /** Is or-query effective?*/
+    protected boolean _orQueryEffective = false;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -900,15 +900,19 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                                                             OrQuery
     //                                                                             =======
     public void makeOrQueryEffective() {
-        _asOrQueryEffective = true;
+        _orQueryEffective = true;
     }
 
     public void ignoreOrQuery() {
-        _asOrQueryEffective = false;
+        _orQueryEffective = false;
+    }
+
+    public boolean isOrQueryEffective() {
+        return _orQueryEffective;
     }
 
     protected void arrangeWhereListAsOrQuery(List<String> whereList) {
-        if (!_asOrQueryEffective) {
+        if (!_orQueryEffective) {
             return;
         }
         if (whereList.size() < 2) {
