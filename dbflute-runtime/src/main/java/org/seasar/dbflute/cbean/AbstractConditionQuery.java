@@ -418,13 +418,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                         setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
                     } else {
                         if (asOr) { // As 'or' Condition
-                            getSqlClause().makeAdditionalConditionAsOrEffective();
+                            getSqlClause().makeOrQueryEffective();
                         }
                         invokeQuery(colName, key.getConditionKey(), currentValue);
                     }
                 }
                 if (asOr) {
-                    getSqlClause().ignoreAdditionalConditionAsOr();
+                    getSqlClause().ignoreOrQuery();
                 }
             } else {
                 setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
@@ -506,11 +506,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 if (i == 0) {
                     setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
                 } else {
-                    getSqlClause().makeAdditionalConditionAsOrEffective();
+                    getSqlClause().makeOrQueryEffective();
                     invokeQueryLikeSearch(colName, currentValue, option);
                 }
             }
-            getSqlClause().ignoreAdditionalConditionAsOr();
+            getSqlClause().ignoreOrQuery();
         }
     }
 

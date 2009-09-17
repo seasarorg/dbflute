@@ -229,11 +229,17 @@ public interface SqlClause {
     public void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline);
 
     // ===================================================================================
-    //                                                             AdditionalConditionAsOr
-    //                                                             =======================
-    public void makeAdditionalConditionAsOrEffective();
+    //                                                                             OrQuery
+    //                                                                             =======
+    /**
+     * Make or-query effective.
+     */
+    public void makeOrQueryEffective();
 
-    public void ignoreAdditionalConditionAsOr();
+    /**
+     * Ignore or-query.
+     */
+    public void ignoreOrQuery();
 
     // ===================================================================================
     //                                                                             OrderBy

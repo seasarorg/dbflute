@@ -102,7 +102,7 @@ public abstract class ConditionKey {
      * @param value Condition value. (NotNull)
      * @return this.
      */
-    public ConditionKey addWhereClause(java.util.List<String> conditionList, String columnName, ConditionValue value) {
+    public ConditionKey addWhereClause(List<String> conditionList, String columnName, ConditionValue value) {
         if (value == null) {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=null this.toString()=" + toString());
@@ -119,7 +119,8 @@ public abstract class ConditionKey {
      * @param option Condition option. (NotNull)
      * @return this.
      */
-    public ConditionKey addWhereClause(java.util.List<String> conditionList, String columnName, ConditionValue value, ConditionOption option) {
+    public ConditionKey addWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+            ConditionOption option) {
         if (value == null) {
             String msg = "Argument[value] must not be null:";
             throw new IllegalArgumentException(msg + " value=null this.toString()=" + toString());
@@ -143,7 +144,8 @@ public abstract class ConditionKey {
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value, ConditionOption option);
+    abstract protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+            ConditionOption option);
 
     // ===================================================================================
     //                                                                     Condition Value
@@ -172,7 +174,8 @@ public abstract class ConditionKey {
      * @param option Condition option. (NotNull)
      * @return Condition value. (The same as argument[conditionValue]) (NotNull)
      */
-    public ConditionValue setupConditionValue(ConditionValue conditionValue, Object value, String location, ConditionOption option) {
+    public ConditionValue setupConditionValue(ConditionValue conditionValue, Object value, String location,
+            ConditionOption option) {
         if (conditionValue == null) {
             String msg = "Argument[conditionValue] must not be null:";
             throw new IllegalArgumentException(msg + " value=" + value + " this.toString()=" + toString());
@@ -196,7 +199,8 @@ public abstract class ConditionKey {
      * @param location Location. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    abstract protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location, ConditionOption option);
+    abstract protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
+            ConditionOption option);
 
     // ===================================================================================
     //                                                                         Bind Clause
@@ -246,7 +250,7 @@ public abstract class ConditionKey {
     protected String buildBindExpression(String location, String dummyValue) {
         return "/*dto." + location + "*/" + dummyValue;
     }
-    
+
     /**
      * Get wild-card.
      * @return Wild-card.
@@ -275,7 +279,7 @@ public abstract class ConditionKey {
      */
     public boolean equals(Object other) {
         if (other instanceof ConditionKey) {
-            if (this.getConditionKey().equals(((ConditionKey)other).getConditionKey())) {
+            if (this.getConditionKey().equals(((ConditionKey) other).getConditionKey())) {
                 return true;
             }
         }

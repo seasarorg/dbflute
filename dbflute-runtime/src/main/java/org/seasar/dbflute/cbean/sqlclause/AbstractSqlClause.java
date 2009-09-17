@@ -100,12 +100,12 @@ public abstract class AbstractSqlClause implements SqlClause {
     protected Map<String, LeftOuterJoinInfo> _outerJoinMap = new LinkedHashMap<String, LeftOuterJoinInfo>();
 
     /** Is inner-join effective? Default value is false. */
-    protected boolean _isInnerJoinEffective = false;
+    protected boolean _innerJoinEffective = false;
 
     /** The list of where clause. */
     protected List<String> _whereList = new ArrayList<String>();
 
-    /** Inline where list for BaseTable. */
+    /** The list of in-line where clause for base table. */
     protected List<String> _baseTableInlineWhereList = new ArrayList<String>();
 
     /** The clause of order-by. (NotNull) */
@@ -136,7 +136,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                               AdditionalConditionAsOr
     //                               -----------------------
     /** Is additional condition as or effective?*/
-    protected boolean _additionalConditionAsOrEffective = false;
+    protected boolean _asOrQueryEffective = false;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -702,19 +702,19 @@ public abstract class AbstractSqlClause implements SqlClause {
         joinInfo.setAliasName(aliasName);
         joinInfo.setJoinTableName(joinTableName);
         joinInfo.setJoinOnMap(joinOnMap);
-        if (_isInnerJoinEffective) { // basically false
+        if (_innerJoinEffective) { // basically false
             joinInfo.setInnerJoin(true);
         }
         _outerJoinMap.put(aliasName, joinInfo);
     }
 
     public SqlClause makeInnerJoinEffective() {
-        _isInnerJoinEffective = true;
+        _innerJoinEffective = true;
         return this;
     }
 
     public SqlClause backToOuterJoin() {
-        _isInnerJoinEffective = false;
+        _innerJoinEffective = false;
         return this;
     }
 
@@ -799,7 +799,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     public void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         key.addWhereClause(_whereList, columnFullName, value);
-        arrangeWhereListAdditionalConditionAsOr(_whereList);
+        arrangeWhereListAsOrQuery(_whereList);
     }
 
     public void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value,
@@ -807,13 +807,13 @@ public abstract class AbstractSqlClause implements SqlClause {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         assertObjectNotNull("option of " + columnFullName, option);
         key.addWhereClause(_whereList, columnFullName, value, option);
-        arrangeWhereListAdditionalConditionAsOr(_whereList);
+        arrangeWhereListAsOrQuery(_whereList);
     }
 
     public void registerWhereClause(String clause) {
         assertStringNotNullAndNotTrimmedEmpty("clause", clause);
         _whereList.add(clause);
-        arrangeWhereListAdditionalConditionAsOr(_whereList);
+        arrangeWhereListAsOrQuery(_whereList);
     }
 
     public void exchangeFirstWhereClauseForLastOne() {
@@ -835,7 +835,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         key.addWhereClause(_baseTableInlineWhereList, columnName, value);
-        arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
+        arrangeWhereListAsOrQuery(_baseTableInlineWhereList);
     }
 
     public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value,
@@ -843,7 +843,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         assertObjectNotNull("option of " + columnName, option);
         key.addWhereClause(_baseTableInlineWhereList, columnName, value, option);
-        arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
+        arrangeWhereListAsOrQuery(_baseTableInlineWhereList);
     }
 
     public void registerBaseTableInlineWhereClause(String value) {
@@ -860,7 +860,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         } else {
             key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value);
         }
-        arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+        arrangeWhereListAsOrQuery(joinInfo.getInlineWhereClauseList());
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
@@ -870,10 +870,10 @@ public abstract class AbstractSqlClause implements SqlClause {
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo) _outerJoinMap.get(aliasName);
         if (onClauseInline) {
             key.addWhereClause(joinInfo.getAdditionalOnClauseList(), aliasName + "." + columnName, value, option);
-            arrangeWhereListAdditionalConditionAsOr(joinInfo.getAdditionalOnClauseList());
+            arrangeWhereListAsOrQuery(joinInfo.getAdditionalOnClauseList());
         } else {
             key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value, option);
-            arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+            arrangeWhereListAsOrQuery(joinInfo.getInlineWhereClauseList());
         }
     }
 
@@ -882,10 +882,10 @@ public abstract class AbstractSqlClause implements SqlClause {
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo) _outerJoinMap.get(aliasName);
         if (onClauseInline) {
             joinInfo.addAdditionalOnClause(value);
-            arrangeWhereListAdditionalConditionAsOr(joinInfo.getAdditionalOnClauseList());
+            arrangeWhereListAsOrQuery(joinInfo.getAdditionalOnClauseList());
         } else {
             joinInfo.addInlineWhereClause(value);
-            arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+            arrangeWhereListAsOrQuery(joinInfo.getInlineWhereClauseList());
         }
     }
 
@@ -897,32 +897,34 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     // ===================================================================================
-    //                                                             AdditionalConditionAsOr
-    //                                                             =======================
-    public void makeAdditionalConditionAsOrEffective() {
-        _additionalConditionAsOrEffective = true;
+    //                                                                             OrQuery
+    //                                                                             =======
+    public void makeOrQueryEffective() {
+        _asOrQueryEffective = true;
     }
 
-    public void ignoreAdditionalConditionAsOr() {
-        _additionalConditionAsOrEffective = false;
+    public void ignoreOrQuery() {
+        _asOrQueryEffective = false;
     }
 
-    protected void arrangeWhereListAdditionalConditionAsOr(List<String> whereList) {
-        if (_additionalConditionAsOrEffective) {
-            if (whereList.size() < 2) {
-                String msg = "The whereList should have two more elements when the isAdditionalConditionAsOrEffective is true: "
-                        + toString();
-                throw new IllegalStateException(msg);
-            }
-            final String lastWhereClause = (String) whereList.remove(whereList.size() - 1);
-            final String preWhereClause = (String) whereList.remove(whereList.size() - 1);
-            if (preWhereClause.startsWith("(") && preWhereClause.endsWith(")")) {
-                final String plainClause = preWhereClause.substring("(".length(), preWhereClause.length()
-                        - ")".length());
-                whereList.add("(" + plainClause + " or " + lastWhereClause + ")");
-            } else {
-                whereList.add("(" + preWhereClause + " or " + lastWhereClause + ")");
-            }
+    protected void arrangeWhereListAsOrQuery(List<String> whereList) {
+        if (!_asOrQueryEffective) {
+            return;
+        }
+        if (whereList.size() < 2) {
+            return;
+        }
+        final String or = getLineSeparator() + "    or ";
+        final String newClause = (String) whereList.remove(whereList.size() - 1);
+        final String preClause = (String) whereList.remove(whereList.size() - 1);
+        if (preClause.startsWith("(") && preClause.contains(or) && preClause.endsWith(")")) {
+            // Since the second times
+            final int markLen = "(".length();
+            final String plainClause = preClause.substring(markLen, preClause.length() - markLen);
+            whereList.add("(" + plainClause + or + newClause + ")");
+        } else {
+            // At first
+            whereList.add("(" + preClause + or + newClause + ")");
         }
     }
 

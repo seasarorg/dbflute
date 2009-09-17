@@ -584,8 +584,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     // [DBFlute-0.9.5.3]
     // ===================================================================================
-    //                                                                        Column Query
-    //                                                                        ============
+    //                                                                         ColumnQuery
+    //                                                                         ===========
     protected <CB extends ConditionBean> void xcolqy(CB cb, SpecifyQuery<CB> leftSp, SpecifyQuery<CB> rightSp,
             String operand) {
         // Specify left column
@@ -607,9 +607,22 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().registerWhereClause(clause);
     }
 
+    // [DBFlute-0.9.5.5]
     // ===================================================================================
-    //                                                                    Statement Config
-    //                                                                    ================
+    //                                                                             OrQuery
+    //                                                                             =======
+    protected <CB extends ConditionBean> void xorQ(CB cb, OrQuery<CB> orQuery) {
+        getSqlClause().makeOrQueryEffective();
+        try {
+            orQuery.query(cb);
+        } finally {
+            getSqlClause().ignoreOrQuery();
+        }
+    }
+
+    // ===================================================================================
+    //                                                                     StatementConfig
+    //                                                                     ===============
     /**
      * @param statementConfig The configuration of statement. (Nullable)
      */
@@ -625,8 +638,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // ===================================================================================
-    //                                                                         Display SQL
-    //                                                                         ===========
+    //                                                                          DisplaySQL
+    //                                                                          ==========
     /**
      * Convert this conditionBean to SQL for display.
      * @return SQL for display. (NotNull and NotEmpty)
