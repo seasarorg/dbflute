@@ -6,6 +6,7 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.AbstractConditionBean;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionQuery;
+import org.seasar.dbflute.cbean.OrQuery;
 import org.seasar.dbflute.cbean.SpecifyQuery;
 import org.seasar.dbflute.cbean.SubQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
@@ -251,8 +252,8 @@ public class ${myClassName} extends AbstractConditionBean {
 #end
 
     // ===================================================================================
-    //                                                                        Setup Select
-    //                                                                        ============
+    //                                                                         SetupSelect
+    //                                                                         ===========
 #foreach ($fk in $table.foreignKeys)
 #set ($tmpPropertyName = "${fk.foreignPropertyName}")
 #set ($tmpPropertyNameInitCap = "${fk.foreignPropertyNameInitCap}")
@@ -426,8 +427,8 @@ public class ${myClassName} extends AbstractConditionBean {
 
     // [DBFlute-0.9.5.3]
     // ===================================================================================
-    //                                                                        Column Query
-    //                                                                        ============
+    //                                                                         ColumnQuery
+    //                                                                         ===========
     /**
      * @param leftSpecifyQuery The specify-query for left column. (NotNull)
      * @return The object for setting up operand and right column. (NotNull)
@@ -445,9 +446,17 @@ public class ${myClassName} extends AbstractConditionBean {
         });
     }
 
+    // [DBFlute-0.9.5.5]
     // ===================================================================================
-    //                                                                         Display SQL
-    //                                                                         ===========
+    //                                                                             OrQuery
+    //                                                                             =======
+    public void orQuery(OrQuery<${myConditionBeanClassName}> orQuery) {
+        xorQ((${myConditionBeanClassName})this, orQuery);
+    }
+
+    // ===================================================================================
+    //                                                                          DisplaySQL
+    //                                                                          ==========
     @Override
     protected String getLogDateFormat() { return ${glDBFluteConfig}.getInstance().getLogDateFormat(); }
     @Override

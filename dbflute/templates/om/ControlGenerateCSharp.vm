@@ -159,6 +159,7 @@ $database.checkProperties()
 #set ($glScalarQuery = "${glProjectPrefix}ScalarQuery")
 #set ($glSubQuery = "${glProjectPrefix}SubQuery")
 #set ($glUnionQuery = "${glProjectPrefix}UnionQuery")
+#set ($glOrQuery = "${glProjectPrefix}OrQuery")
 
 ## [Allcommon-ConditionBean-Option]
 #set ($glConditionOption = "${glProjectPrefix}ConditionOption")
@@ -746,6 +747,10 @@ $generator.parse("om/${glResourceDirectory}/allcommon/cbean/SubQuery.${glTemplat
 $database.info("    parse('UnionQuery')")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glUnionQuery}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/cbean/UnionQuery.${glTemplateFileExtension}",$path ,"", "")
+
+$database.info("    parse('OrQuery')")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBean})}${glOrQuery}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/cbean/OrQuery.${glTemplateFileExtension}",$path ,"", "")
 
 #set ($path = $database.getPackageAsPath(${glPackageBaseCommonCBean}))
 $database.makeDirectory($path)

@@ -65,10 +65,11 @@ public interface ${myClassName} {
     void registerOuterJoinInlineWhereClause(String aliasName, String value, bool onClauseInline);
 
     // ===================================================================================
-    //                                                             AdditionalConditionAsOr
-    //                                                             =======================
-    void makeAdditionalConditionAsOrEffective();
-    void ignoreAdditionalConditionAsOr();
+    //                                                                             OrQuery
+    //                                                                             =======
+    void makeOrQueryEffective();
+    void ignoreOrQuery();
+    bool isOrQueryEffective();
 
     // ===================================================================================
     //                                                                             OrderBy
@@ -152,19 +153,19 @@ public interface ${myClassName} {
 	String getUnionSelectClauseMark();
 	String getUnionWhereClauseMark();
 	String getUnionWhereFirstConditionMark();
-	
+
     // =====================================================================================
     //                                                            Where Clause Simple Filter
     //                                                            ==========================
     // void addWhereClauseSimpleFilter(${glWhereClauseSimpleFilter} whereClauseSimpleFilter);
-	
+
     // =====================================================================================
     //                                                                 Selected Foreign Info
     //                                                                 =====================
 	bool isSelectedForeignInfoEmpty();
 	bool hasSelectedForeignInfo(String relationPath);
 	void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
-	
+
     // ===================================================================================
     //                                                                    Sub Query Indent
     //                                                                    ================
@@ -181,21 +182,20 @@ public interface ${myClassName} {
     bool hasSpecifiedDeriveSubQuery(String aliasName);
     String getSpecifiedColumnNameAsOne();
     void clearSpecifiedSelectColumn();
-    
+
     // [DBFlute-0.7.9]
     // ===================================================================================
     //                                                                        Query Update
     //                                                                        ============
     String getClauseQueryUpdate(Map<String, String> columnParameterMap);
     String getClauseQueryDelete();
-    
+
     // [DBFlute-0.8.6]
     // ===================================================================================
     //                                                                  Select Clause Type
     //                                                                  ==================
     void classifySelectClauseType(SelectClauseType selectClauseType);
     void rollbackSelectClauseType();
-
 }
 
     public class SelectClauseType {

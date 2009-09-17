@@ -89,10 +89,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected bool _fetchScopeEffective = false;
 
     // -----------------------------------------------------
-    //                               AdditionalConditionAsOr
-    //                               -----------------------
-    /** Is additional condition as or effective?*/
-    protected bool _additionalConditionAsOrEffective = false;
+    //                                               OrQuery
+    //                                               -------
+    /** Is or-query effective?*/
+    protected bool _orQueryEffective = false;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -660,20 +660,20 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         key.addWhereClause(_whereList, columnFullName, value);
-        arrangeWhereListAdditionalConditionAsOr(_whereList);
+        arrangeWhereListAsOrQuery(_whereList);
     }
 
     public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         assertObjectNotNull("option of " + columnFullName, option);
         key.addWhereClause(_whereList, columnFullName, value, option);
-        arrangeWhereListAdditionalConditionAsOr(_whereList);
+        arrangeWhereListAsOrQuery(_whereList);
     }
 
     public void registerWhereClause(String clause) {
         assertStringNotNullAndNotTrimmedEmpty("clause", clause);
         _whereList.add(clause);
-        arrangeWhereListAdditionalConditionAsOr(_whereList);
+        arrangeWhereListAsOrQuery(_whereList);
     }
 
     public void exchangeFirstWhereClauseForLastOne() {
@@ -695,14 +695,14 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         key.addWhereClause(_baseTableInlineWhereList, columnName, value);
-        arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
+        arrangeWhereListAsOrQuery(_baseTableInlineWhereList);
     }
 
     public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         assertObjectNotNull("option of " + columnName, option);
         key.addWhereClause(_baseTableInlineWhereList, columnName, value, option);
-        arrangeWhereListAdditionalConditionAsOr(_baseTableInlineWhereList);
+        arrangeWhereListAsOrQuery(_baseTableInlineWhereList);
     }
 
     public void registerBaseTableInlineWhereClause(String value) {
@@ -718,7 +718,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         } else {
             key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value);
         }
-        arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+        arrangeWhereListAsOrQuery(joinInfo.getInlineWhereClauseList());
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option, bool onClauseInline) {
@@ -727,10 +727,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
          LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
         if (onClauseInline) {
             key.addWhereClause(joinInfo.getAdditionalOnClauseList(), aliasName + "." + columnName, value, option);
-            arrangeWhereListAdditionalConditionAsOr(joinInfo.getAdditionalOnClauseList());
+            arrangeWhereListAsOrQuery(joinInfo.getAdditionalOnClauseList());
         } else {
             key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value, option);
-            arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+            arrangeWhereListAsOrQuery(joinInfo.getInlineWhereClauseList());
         }
     }
 
@@ -739,10 +739,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
          LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
         if (onClauseInline) {
             joinInfo.addAdditionalOnClause(value);
-            arrangeWhereListAdditionalConditionAsOr(joinInfo.getAdditionalOnClauseList());
+            arrangeWhereListAsOrQuery(joinInfo.getAdditionalOnClauseList());
         } else {
             joinInfo.addInlineWhereClause(value);
-            arrangeWhereListAdditionalConditionAsOr(joinInfo.getInlineWhereClauseList());
+            arrangeWhereListAsOrQuery(joinInfo.getInlineWhereClauseList());
         }
     }
 
@@ -754,30 +754,35 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     // ===================================================================================
-    //                                                             AdditionalConditionAsOr
-    //                                                             =======================
-    public void makeAdditionalConditionAsOrEffective() {
-        _additionalConditionAsOrEffective = true;
+    //                                                                             OrQuery
+    //                                                                             =======
+    public void makeOrQueryEffective() {
+        _orQueryEffective = true;
     }
 
-    public void ignoreAdditionalConditionAsOr() {
-        _additionalConditionAsOrEffective = false;
+    public void ignoreOrQuery() {
+        _orQueryEffective = false;
     }
 
-    protected void arrangeWhereListAdditionalConditionAsOr(List<String> whereList) {
-        if (_additionalConditionAsOrEffective) {
-            if (whereList.size() < 2) {
-                String msg = "The whereList should have two more elements when the isAdditionalConditionAsOrEffective is true: " + toString();
-                throw new IllegalStateException(msg);
-            }
-             String lastWhereClause = (String)whereList.remove(whereList.size() - 1);
-             String preWhereClause = (String)whereList.remove(whereList.size() - 1);
-            if (preWhereClause.StartsWith("(") && preWhereClause.EndsWith(")")) {
-                String plainClause = preWhereClause.Substring("(".Length, preWhereClause.Length - ")".Length);
-                whereList.add("(" + plainClause + " or " + lastWhereClause + ")");
-            } else {
-                whereList.add("(" + preWhereClause + " or " + lastWhereClause + ")");
-            }
+    public bool isOrQueryEffective() {
+        return _orQueryEffective;
+    }
+
+    protected void arrangeWhereListAsOrQuery(List<String> whereList) {
+        if (!_orQueryEffective) {
+            return;
+        }
+        if (whereList.size() < 2) {
+            return;
+        }
+        String or = getLineSeparator() + "    or ";
+        String newClause = (String)whereList.remove(whereList.size() - 1);
+        String preClause = (String)whereList.remove(whereList.size() - 1);
+        if (preClause.StartsWith("(") && preClause.Contains(or) && preClause.EndsWith(")")) {
+            String plainClause = preClause.Substring("(".Length, preClause.Length - ")".Length);
+            whereList.add("(" + plainClause + " or " + newClause + ")");
+        } else {
+            whereList.add("(" + preClause + " or " + newClause + ")");
         }
     }
 

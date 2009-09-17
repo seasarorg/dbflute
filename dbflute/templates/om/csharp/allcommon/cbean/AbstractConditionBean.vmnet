@@ -204,6 +204,18 @@ namespace ${glPackageBaseCommonCBean} {
         }
 
         // ===============================================================================
+        //                                                                         OrQuery
+        //                                                                         =======
+        protected <CB> void xorQ(CB cb, ${glOrQuery}<CB> orQuery) where CB : ConditionBean {
+            this.SqlClause.makeOrQueryEffective();
+            try {
+                orQuery.Invoke(cb);
+            } finally {
+                this.SqlClause.ignoreOrQuery();
+            }
+        }
+
+        // ===============================================================================
         //                                                                Statement Config
         //                                                                ================
         public void Configure(${glStatementConfig} statementConfig) {

@@ -152,6 +152,14 @@ namespace ${glPackageBaseCB} {
 			public MySpQyCall(${myClassName} myCB) { _myCB = myCB; }
     		public bool has() { return true; } public ${myConditionQueryClassName} qy() { return _myCB.Query(); }
     	}
+
+        // [DBFlute-0.8.9.5]
+        // ===============================================================================
+        //                                                                         OrQuery
+        //                                                                         =======
+        public void OrQuery(OrQuery<${myConditionBeanClassName}> orQuery) {
+            xorQ((${myConditionBeanClassName})this, orQuery);
+        }
     }
 	
     public class ${myConditionBeanClassName}Specification : AbstractSpecification<${myConditionQueryClassName}> {
