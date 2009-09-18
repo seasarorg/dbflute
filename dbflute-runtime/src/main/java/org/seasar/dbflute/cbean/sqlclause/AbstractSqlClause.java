@@ -923,8 +923,9 @@ public abstract class AbstractSqlClause implements SqlClause {
         final String preClause = (String) whereList.remove(whereList.size() - 1);
         if (preClause.startsWith("(") && preClause.contains(or) && preClause.endsWith(")")) {
             // Since the second times
-            final int markLen = "(".length();
-            final String plainClause = preClause.substring(markLen, preClause.length() - markLen);
+            final int beginLen = "(".length();
+            final int endLen = ")".length();
+            final String plainClause = preClause.substring(beginLen, preClause.length() - endLen);
             whereList.add("(" + plainClause + or + newClause + ")");
         } else {
             // At first
