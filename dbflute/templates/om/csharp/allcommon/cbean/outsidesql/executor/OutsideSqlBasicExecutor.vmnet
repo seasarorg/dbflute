@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonJdbc};
+using ${glPackageBaseCommonUtil};
 
 namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
 
@@ -31,15 +32,20 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         //                                                                          ======
 #if (!$database.isCompatibleOutsideSqlResultOldStyle())
         public ${glListResultBean}<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
-            IList<ENTITY> resultList = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY));
+            IList<ENTITY> resultList = ToGenericList(_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY)));
             return new ${glResultBeanBuilder}<ENTITY>(_tableDbName).BuildListResultBean(resultList);
             
         }
 #else
         public IList<ENTITY> SelectList<ENTITY>(String path, Object pmb) {
-            return (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY));
+            return ToGenericList(_outsideSqlDao.SelectList(path, pmb, CreateOutsideSqlOption(), typeof(ENTITY)));
         }
 #end
+
+        protected IList<ENTITY> ToGenericList<ENTITY>(System.Collections.IList plainList) {
+            return ${glDfCollectionUtil}.ToGenericList(plainList);
+        }
+
         // ===============================================================================
         //                                                                         Execute
         //                                                                         =======

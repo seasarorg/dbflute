@@ -30,7 +30,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         //                                                                          Select
         //                                                                          ======
         public ENTITY SelectEntity<ENTITY>(String path, PARAMETER_BEAN pmb) {
-            IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
+            IList<ENTITY> ls = ToGenericList(_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY)));
             if (ls.Count == 0) {
                 return default(ENTITY);
             }
@@ -41,7 +41,7 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         }
 
         public ENTITY SelectEntityWithDeletedCheck<ENTITY>(String path, PARAMETER_BEAN pmb) {
-            IList<ENTITY> ls = (IList<ENTITY>)_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY));
+            IList<ENTITY> ls = ToGenericList(_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY)));
             if (ls == null || ls.Count == 0) {
                 ThrowEntityAlreadyDeletedException(BuildSearch4LogString<ENTITY>(path, pmb));
             }
@@ -49,6 +49,10 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
                 ThrowEntityDuplicatedException(ls.Count + "", BuildSearch4LogString<ENTITY>(path, pmb), null);
             }
             return ls[0];
+        }
+
+        protected IList<ENTITY> ToGenericList<ENTITY>(System.Collections.IList plainList) {
+            return ${glDfCollectionUtil}.ToGenericList(plainList);
         }
 
         protected String BuildSearch4LogString<ENTITY>(String path, PARAMETER_BEAN pmb) {

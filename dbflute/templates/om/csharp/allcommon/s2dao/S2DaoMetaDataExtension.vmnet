@@ -404,7 +404,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected IDataReaderHandler CreateSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(IBeanMetaData specifiedBeanMetaData, Type customizeEntityType) {
             IValueType valueType = ValueTypes.GetValueType(customizeEntityType);
             if (valueType == null || !valueType.Equals(ValueTypes.OBJECT)) {
-                return new InternalObjectGenericListResultSetHandler(customizeEntityType, valueType);
+                // Non generic because it cannot add the null value to generic list by abstract type.
+                return new InternalObjectListResultSetHandler(customizeEntityType, valueType);
             }
             InternalRowCreator rowCreator = CreateInternalRowCreator(specifiedBeanMetaData); // For performance turning!
             InternalRelationRowCreator relationRowCreator = CreateInternalRelationRowCreator(specifiedBeanMetaData);
@@ -418,6 +419,22 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         protected InternalRelationRowCreator CreateInternalRelationRowCreator(IBeanMetaData bmd) {
             return new InternalRelationRowCreator();
+        }
+
+        public class InternalObjectListResultSetHandler : IDataReaderHandler {
+            private Type _beanType;
+            private IValueType _valueType;
+            public InternalObjectGenericListResultSetHandler(Type beanType, IValueType valueType) {
+                this._beanType = beanType;
+                this._valueType = valueType;
+            }
+            public object Handle(IDataReader dataReader) {
+                System.Collections.IList resultList = new System.Collections.ArrayList();
+                while (dataReader.Read()) {
+                    resultList.Add(_valueType.GetValue(dataReader, 0)); // It's zero origin.
+                }
+                return resultList;
+            }
         }
 
         public class InternalObjectGenericListResultSetHandler : IDataReaderHandler {
