@@ -32,17 +32,17 @@ namespace ${glPackageBaseCommonCBeanOutsidesqlExecutor} {
         //                                                                          ======
 #if (!$database.isCompatibleOutsideSqlResultOldStyle())
         public ${glListResultBean}<ENTITY> SelectList<ENTITY>(String path, ${glPagingBean} pmb) {
-            IList<ENTITY> resultList = ToGenericList(_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY)));
+            IList<ENTITY> resultList = ToGenericList<ENTITY>(_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY)));
             return new ${glResultBeanBuilder}<ENTITY>(_tableDbName).BuildListResultBean(resultList);
         }
 #else
         public IList<ENTITY> SelectList<ENTITY>(String path, ${glPagingBean} pmb) {
-            return ToGenericList(_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY)));
+            return ToGenericList<ENTITY>(_outsideSqlDao.SelectList(path, pmb, _outsideSqlOption, typeof(ENTITY)));
         }
 #end
 
         protected IList<ENTITY> ToGenericList<ENTITY>(System.Collections.IList plainList) {
-            return ${glDfCollectionUtil}.ToGenericList(plainList);
+            return ${glDfCollectionUtil}.ToGenericList<ENTITY>(plainList);
         }
 
         public ${glPagingResultBean}<ENTITY> SelectPage<ENTITY>(String path, ${glPagingBean} pmb) {

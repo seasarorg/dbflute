@@ -424,7 +424,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         public class InternalObjectListResultSetHandler : IDataReaderHandler {
             private Type _beanType;
             private IValueType _valueType;
-            public InternalObjectGenericListResultSetHandler(Type beanType, IValueType valueType) {
+            public InternalObjectListResultSetHandler(Type beanType, IValueType valueType) {
                 this._beanType = beanType;
                 this._valueType = valueType;
             }
