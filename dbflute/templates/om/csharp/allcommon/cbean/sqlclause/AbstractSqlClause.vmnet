@@ -779,10 +779,14 @@ public abstract class ${myClassName} : ${glSqlClause} {
         String newClause = (String)whereList.remove(whereList.size() - 1);
         String preClause = (String)whereList.remove(whereList.size() - 1);
         if (preClause.StartsWith("(") && preClause.Contains(or) && preClause.EndsWith(")")) {
-            String plainClause = preClause.Substring("(".Length, preClause.Length - ")".Length);
-            whereList.add("(" + plainClause + " or " + newClause + ")");
+            // Since the second times
+            int beginLen = "(".Length;
+            int endLen = ")".Length;
+            String plainClause = preClause.Substring(beginLen, preClause.Length - (beginLen + endLen));
+            whereList.add("(" + plainClause + or + newClause + ")");
         } else {
-            whereList.add("(" + preClause + " or " + newClause + ")");
+            // At first
+            whereList.add("(" + preClause + or + newClause + ")");
         }
     }
 
