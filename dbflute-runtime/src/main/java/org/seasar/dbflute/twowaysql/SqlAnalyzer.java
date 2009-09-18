@@ -42,10 +42,10 @@ public class SqlAnalyzer {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String specifiedSql;
-    protected boolean blockNullParameter;
-    protected SqlTokenizer tokenizer;
-    protected Stack<Node> nodeStack = new Stack<Node>();
+    protected String _specifiedSql;
+    protected boolean _blockNullParameter;
+    protected SqlTokenizer _tokenizer;
+    protected Stack<Node> _nodeStack = new Stack<Node>();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -55,9 +55,9 @@ public class SqlAnalyzer {
         if (sql.endsWith(";")) {
             sql = sql.substring(0, sql.length() - 1);
         }
-        specifiedSql = sql;
-        this.blockNullParameter = blockNullParameter;
-        tokenizer = new SqlTokenizer(sql);
+        _specifiedSql = sql;
+        _blockNullParameter = blockNullParameter;
+        _tokenizer = new SqlTokenizer(sql);
     }
 
     // ===================================================================================
@@ -65,14 +65,14 @@ public class SqlAnalyzer {
     //                                                                               =====
     public Node parse() {
         push(new ContainerNode());
-        while (SqlTokenizer.EOF != tokenizer.next()) {
+        while (SqlTokenizer.EOF != _tokenizer.next()) {
             parseToken();
         }
         return pop();
     }
 
     protected void parseToken() {
-        switch (tokenizer.getTokenType()) {
+        switch (_tokenizer.getTokenType()) {
         case SqlTokenizer.SQL:
             parseSql();
             break;
@@ -89,7 +89,7 @@ public class SqlAnalyzer {
     }
 
     protected void parseSql() {
-        String sql = tokenizer.getToken();
+        String sql = _tokenizer.getToken();
         if (isElseMode()) {
             sql = replaceString(sql, "--", "");
         }
@@ -116,7 +116,7 @@ public class SqlAnalyzer {
     }
 
     protected void parseComment() {
-        final String comment = tokenizer.getToken();
+        final String comment = _tokenizer.getToken();
         if (isTargetComment(comment)) {
             if (isIfComment(comment)) {
                 parseIf();
@@ -131,13 +131,13 @@ public class SqlAnalyzer {
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // [UnderReview]: Should I resolve bind character on scope comment(normal comment)?
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            String before = tokenizer.getBefore();
+            String before = _tokenizer.getBefore();
             peek().addChild(createSqlNode(before.substring(before.lastIndexOf("/*"))));
         }
     }
 
     protected void parseIf() {
-        final String condition = tokenizer.getToken().substring(2).trim();
+        final String condition = _tokenizer.getToken().substring(2).trim();
         if (DfStringUtil.isEmpty(condition)) {
             throwIfCommentConditionNotFoundException();
         }
@@ -159,9 +159,9 @@ public class SqlAnalyzer {
         msg = msg + "    before (x) -- /*IF*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
         msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
         msg = msg + ln();
-        msg = msg + "[IF Comment Expression]" + ln() + tokenizer.getToken() + ln();
+        msg = msg + "[IF Comment Expression]" + ln() + _tokenizer.getToken() + ln();
         msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
+        msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IfCommentConditionNotFoundException(msg);
     }
@@ -174,8 +174,8 @@ public class SqlAnalyzer {
     }
 
     protected void parseEnd() {
-        while (SqlTokenizer.EOF != tokenizer.next()) {
-            if (tokenizer.getTokenType() == SqlTokenizer.COMMENT && isEndComment(tokenizer.getToken())) {
+        while (SqlTokenizer.EOF != _tokenizer.next()) {
+            if (_tokenizer.getTokenType() == SqlTokenizer.COMMENT && isEndComment(_tokenizer.getToken())) {
                 pop();
                 return;
             }
@@ -196,7 +196,7 @@ public class SqlAnalyzer {
         msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
         msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
         msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
+        msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new EndCommentNotFoundException(msg);
     }
@@ -210,12 +210,12 @@ public class SqlAnalyzer {
         final ElseNode elseNode = new ElseNode();
         ifNode.setElseNode(elseNode);
         push(elseNode);
-        tokenizer.skipWhitespace();
+        _tokenizer.skipWhitespace();
     }
 
     protected void parseCommentBindVariable() {
-        final String expr = tokenizer.getToken();
-        final String s = tokenizer.skipToken();
+        final String expr = _tokenizer.getToken();
+        final String s = _tokenizer.skipToken();
         if (expr.startsWith("$")) {
             peek().addChild(createEmbeddedValueNode(expr.substring(1), s));// Extension!
         } else {
@@ -224,25 +224,25 @@ public class SqlAnalyzer {
     }
 
     protected void parseBindVariable() {
-        final String expr = tokenizer.getToken();
+        final String expr = _tokenizer.getToken();
         peek().addChild(createBindVariableNode(expr, null));// Extension!
     }
 
     protected Node pop() {
-        return (Node) nodeStack.pop();
+        return (Node) _nodeStack.pop();
     }
 
     protected Node peek() {
-        return (Node) nodeStack.peek();
+        return (Node) _nodeStack.peek();
     }
 
     protected void push(Node node) {
-        nodeStack.push(node);
+        _nodeStack.push(node);
     }
 
     protected boolean isElseMode() {
-        for (int i = 0; i < nodeStack.size(); ++i) {
-            if (nodeStack.get(i) instanceof ElseNode) {
+        for (int i = 0; i < _nodeStack.size(); ++i) {
+            if (_nodeStack.get(i) instanceof ElseNode) {
                 return true;
             }
         }
@@ -266,15 +266,15 @@ public class SqlAnalyzer {
     }
 
     protected AbstractNode createBindVariableNode(String expr, String testValue) {// Extension!
-        return new BindVariableNode(expr, testValue, specifiedSql, blockNullParameter);
+        return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
     }
 
     protected AbstractNode createEmbeddedValueNode(String expr, String testValue) {// Extension!
-        return new EmbeddedValueNode(expr, testValue, specifiedSql, blockNullParameter);
+        return new EmbeddedValueNode(expr, testValue, _specifiedSql, _blockNullParameter);
     }
 
     protected ContainerNode createIfNode(String expr) { // Extension!
-        return new IfNode(expr, specifiedSql);
+        return new IfNode(expr, _specifiedSql);
     }
 
     protected SqlNode createSqlNode(String sql) {
