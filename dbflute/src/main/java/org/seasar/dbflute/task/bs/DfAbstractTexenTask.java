@@ -561,7 +561,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
         if (specifiedSqlFile != null) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("Specified SQL File = " + specifiedSqlFile);
+            _log.info("Specified SQL file: " + specifiedSqlFile);
             _log.info("- - - - - - - - - -/");
             _log.info(" ");
         }
