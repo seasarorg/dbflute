@@ -270,7 +270,10 @@
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
   	
-    <df-outside-sql-test contextProperties="${torque.contextProperties}" environmentType="${dfenv}">
+    <df-outside-sql-test
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+        specifiedSqlFile="${dfsql}">
     </df-outside-sql-test>
   </target>
 
@@ -283,13 +286,14 @@
     <echo message="+-----------------------------------------------+"/>
 
     <df-sql2entity
-      contextProperties="${torque.contextProperties}"
-      controlTemplate="${torque.template.sql2entity}"
-      schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
-      outputDirectory="${torque.java.dir}"
-      outputFile="report.${torque.project}.sql2entity.generation"
-      templatePath="${torque.templatePath}"
-      environmentType="${dfenv}">
+        contextProperties="${torque.contextProperties}"
+        controlTemplate="${torque.template.sql2entity}"
+        schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
+        outputDirectory="${torque.java.dir}"
+        outputFile="report.${torque.project}.sql2entity.generation"
+        templatePath="${torque.templatePath}"
+        environmentType="${dfenv}"
+        specifiedSqlFile="${dfsql}">
     </df-sql2entity>
   </target>
 

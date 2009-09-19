@@ -16,22 +16,24 @@
 package org.seasar.dbflute.task;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
-import org.seasar.dbflute.task.bs.DfAbstractInvokeSqlDirectoryTask;
+import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
  */
-public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
+public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
 
     // ===================================================================================
     //                                                                          Definition
@@ -42,6 +44,7 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** The count of non-target SQL. */
     protected int _nonTargetSqlCount;
 
     // ===================================================================================
@@ -51,7 +54,6 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
     protected void doExecute() {
         super.doExecute();
         if (_nonTargetSqlCount > 0) {
-            _log.info(" ");
             _log.info("/* * * * * * * * * * * * *");
             _log.info("Non target SQL count = " + _nonTargetSqlCount);
             _log.info("* * * * * * * * * */");
@@ -64,9 +66,21 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
         runInfo.setEncoding(getProperties().getOutsideSqlProperties().getSqlFileEncoding());
     }
 
-    @Override
-    protected List<File> getSqlFileList() {
-        return collectSqlFileList();
+    protected List<File> getTargetSqlFileList() {
+        final List<File> sqlFileList = collectSqlFileList();
+        final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
+        if (specifiedSqlFile != null) {
+            final List<File> filteredList = new ArrayList<File>();
+            for (File sqlFile : sqlFileList) {
+                final String fileName = sqlFile.getName();
+                if (specifiedSqlFile.equals(fileName)) {
+                    filteredList.add(sqlFile);
+                }
+            }
+            return filteredList;
+        } else {
+            return sqlFileList;
+        }
     }
 
     @Override
@@ -175,5 +189,12 @@ public class DfOutsideSqlTestTask extends DfAbstractInvokeSqlDirectoryTask {
     //                                                                       =============
     protected DfJdbcDeterminer createJdbcDeterminer() {
         return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setSpecifiedSqlFile(String specifiedSqlFile) {
+        DfSpecifiedSqlFile.getInstance().setSpecifiedSqlFile(specifiedSqlFile);
     }
 }

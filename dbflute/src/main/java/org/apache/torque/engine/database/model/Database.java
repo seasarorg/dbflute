@@ -137,6 +137,7 @@ public class Database {
     //                                                 -----
     protected String _databaseType;
     protected String _defaultJavaNamingMethod;
+    protected boolean _skipDeleteOldClass;
 
     // [Unused on DBFlute]
     // protected String _pkg;
@@ -583,20 +584,24 @@ public class Database {
     //                                                              Delete Old Table Class
     //                                                              ======================
     public void deleteOldTableClass() {
-        if (!getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
+        if (_skipDeleteOldClass) {
             return;
         }
-        final DfOldClassHandler handler = createOldClassHandler();
-        handler.deleteOldTableClass();
+        if (getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
+            final DfOldClassHandler handler = createOldClassHandler();
+            handler.deleteOldTableClass();
+        }
     }
 
     public void deleteOldCustomizeClass() {
-        if (!getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
+        if (_skipDeleteOldClass) {
             return;
         }
-        final DfOldClassHandler handler = createOldClassHandler();
-        handler.setPmbMetaDataMap(_pmbMetaDataMap);
-        handler.deleteOldCustomizeClass();
+        if (getProperties().getLittleAdjustmentProperties().isDeleteOldTableClass()) {
+            final DfOldClassHandler handler = createOldClassHandler();
+            handler.setPmbMetaDataMap(_pmbMetaDataMap);
+            handler.deleteOldCustomizeClass();
+        }
     }
 
     protected DfOldClassHandler createOldClassHandler() {
@@ -1941,5 +1946,9 @@ public class Database {
 
     public void setPmbMetaDataMap(Map<String, DfParameterBeanMetaData> pmbMetaDataMap) {
         _pmbMetaDataMap = pmbMetaDataMap;
+    }
+
+    public void setSkipDeleteOldClass(boolean skipDeleteOldClass) {
+        _skipDeleteOldClass = skipDeleteOldClass;
     }
 }

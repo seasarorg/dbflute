@@ -11,6 +11,6 @@ export MY_PROPERTIES_PATH=build-${MY_PROJECT_NAME}.properties
 echo "/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
 echo "Execute {Outsite-Sql-Test}."
 echo "nnnnnnnnnn/"
-sh $DBFLUTE_HOME/etc/cmd/_df-outside-sql-test.sh $MY_PROPERTIES_PATH
+sh $DBFLUTE_HOME/etc/cmd/_df-outside-sql-test.sh $MY_PROPERTIES_PATH $1
 
 

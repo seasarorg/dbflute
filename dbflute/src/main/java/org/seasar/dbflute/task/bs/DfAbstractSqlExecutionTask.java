@@ -18,15 +18,24 @@ package org.seasar.dbflute.task.bs;
 import java.io.File;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
+import org.seasar.dbflute.task.DfSql2EntityTask;
 
 /**
  * @author jflute
  */
-public abstract class DfAbstractInvokeSqlDirectoryTask extends DfAbstractTask {
+public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
 
     // ===================================================================================
     //                                                                          DataSource
@@ -43,7 +52,18 @@ public abstract class DfAbstractInvokeSqlDirectoryTask extends DfAbstractTask {
     protected void doExecute() {
         final DfRunnerInformation runInfo = createRunnerInformation();
         final DfSqlFileFireMan fireMan = newSqlFileFireMan();
-        fireMan.execute(getSqlFileRunner(runInfo), getSqlFileList());
+        final List<File> sqlFileList = getTargetSqlFileList();
+        fireMan.execute(getSqlFileRunner(runInfo), sqlFileList);
+
+        _log.info(" ");
+        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+        _log.info("Target SQL files: " + sqlFileList.size());
+        _log.info(" ");
+        for (File sqlFile : sqlFileList) {
+            _log.info("  " + sqlFile.getName());
+        }
+        _log.info("- - - - - - - - - -/");
+        _log.info(" ");
     }
 
     protected DfSqlFileFireMan newSqlFileFireMan() {
@@ -65,14 +85,11 @@ public abstract class DfAbstractInvokeSqlDirectoryTask extends DfAbstractTask {
 
     protected abstract void customizeRunnerInformation(DfRunnerInformation runInfo);
 
-    // ===================================================================================
-    //                                                                        For Override
-    //                                                                        ============
     protected DfSqlFileRunnerExecute getSqlFileRunner(final DfRunnerInformation runInfo) {
         return new DfSqlFileRunnerExecute(runInfo, getDataSource());
     }
 
-    protected List<File> getSqlFileList() {
+    protected List<File> getTargetSqlFileList() {
         return new DfSqlFileGetter().getSqlFileList(getSqlDirectory());
     }
 

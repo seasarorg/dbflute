@@ -11,6 +11,6 @@ export MY_PROPERTIES_PATH=build-${MY_PROJECT_NAME}.properties
 echo "/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
 echo "Execute {Sql2Entity}."
 echo "nnnnnnnnnn/"
-sh $DBFLUTE_HOME/etc/cmd/_df-sql2entity.sh $MY_PROPERTIES_PATH
+sh $DBFLUTE_HOME/etc/cmd/_df-sql2entity.sh $MY_PROPERTIES_PATH $1
 
 

@@ -42,6 +42,7 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.friends.torque.DfSchemaXmlReader;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
@@ -128,13 +129,23 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         final DfSqlFileRunner runner = createSqlFileRunner(runInfo);
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
-        final List<File> sqlFileList = collectSqlFileList();
+        final List<File> sqlFileList = getTargetSqlFileList();
         fireMan.execute(runner, sqlFileList);
 
         setupProcedure();
 
         fireSuperExecute();
-        setupBehaviorQueryPath(sqlFileList);
+        setupBehaviorQueryPath();
+
+        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+        _log.info("Target SQL files: " + sqlFileList.size());
+        _log.info(" ");
+        for (File sqlFile : sqlFileList) {
+            _log.info("  " + sqlFile.getName());
+        }
+        _log.info("- - - - - - - - - -/");
+        _log.info(" ");
+
         showSkippedFileInformation();
         handleNotFoundResult(sqlFileList);
         handleException();
@@ -199,6 +210,23 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                   Executing Element
     //                                                                   =================
+    protected List<File> getTargetSqlFileList() {
+        final List<File> sqlFileList = collectSqlFileList();
+        final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
+        if (specifiedSqlFile != null) {
+            final List<File> filteredList = new ArrayList<File>();
+            for (File sqlFile : sqlFileList) {
+                final String fileName = sqlFile.getName();
+                if (specifiedSqlFile.equals(fileName)) {
+                    filteredList.add(sqlFile);
+                }
+            }
+            return filteredList;
+        } else {
+            return sqlFileList;
+        }
+    }
+
     /**
      * Create SQL file runner.
      * @param runInfo Run information. (NotNull)
@@ -894,10 +922,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                 Behavior Query Path
     //                                                                 ===================
-    /**
-     * @param sqlFileList The list of SQL file. (NotNull)
-     */
-    protected void setupBehaviorQueryPath(List<File> sqlFileList) {
+    protected void setupBehaviorQueryPath() {
+        final List<File> sqlFileList = collectSqlFileList();
         final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper(getProperties());
         setupper.setupBehaviorQueryPath(sqlFileList);
     }
@@ -909,6 +935,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final Database database = new Database();
         database.setSql2EntitySchemaData(_schemaData);
         database.setPmbMetaDataMap(_pmbMetaDataMap);
+        database.setSkipDeleteOldClass(DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile() != null);
 
         final Set<String> entityNameSet = _entityInfoMap.keySet();
         for (String entityName : entityNameSet) {
@@ -1095,5 +1122,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                            ========
     public void setSchemaXml(String schemaXml) { // for getting schema
         _schemaXml = schemaXml;
+    }
+
+    public void setSpecifiedSqlFile(String specifiedSqlFile) {
+        DfSpecifiedSqlFile.getInstance().setSpecifiedSqlFile(specifiedSqlFile);
     }
 }
