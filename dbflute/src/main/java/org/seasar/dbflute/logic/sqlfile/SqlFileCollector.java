@@ -1,6 +1,7 @@
 package org.seasar.dbflute.logic.sqlfile;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -16,19 +17,19 @@ import org.seasar.dbflute.task.DfSql2EntityTask;
  * @since 0.7.9 (2008/08/29 Friday)
  */
 public class SqlFileCollector {
-    
+
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSql2EntityTask.class);
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     protected String _sqlDirectory;
     protected DfBasicProperties _basicProperties;
-    
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -36,28 +37,33 @@ public class SqlFileCollector {
         _sqlDirectory = sqlDirectory;
         _basicProperties = basicProperties;
     }
-    
+
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                             Collect
+    //                                                                             =======
     public List<File> collectSqlFileList() {
         final String sqlDirectory = _sqlDirectory;
-        final File file = new File(sqlDirectory);
+        final File dir = new File(sqlDirectory);
         final List<File> sqlFileList;
-        if (file.exists()) {
+        if (dir.exists()) {
             sqlFileList = collectSqlFile(sqlDirectory);
             final String srcMainResources = replaceSrcMainJavaToSrcMainResources(sqlDirectory);
-            try {
-                sqlFileList.addAll(collectSqlFile(srcMainResources));
-            } catch (Exception e) {
-                _log.info("Not found sql directory on resources: " + srcMainResources);
+            if (!sqlDirectory.equals(srcMainResources)) {
+                try {
+                    sqlFileList.addAll(collectSqlFile(srcMainResources));
+                } catch (Exception e) {
+                    _log.info("Not found sql directory on resources: " + srcMainResources);
+                }
             }
         } else {
             if (containsSrcMainJava(sqlDirectory)) {
+                sqlFileList = new ArrayList<File>();
                 final String srcMainResources = replaceSrcMainJavaToSrcMainResources(sqlDirectory);
-                sqlFileList = collectSqlFile(srcMainResources);
+                if (!sqlDirectory.equals(srcMainResources)) {
+                    sqlFileList.addAll(collectSqlFile(srcMainResources));
+                }
             } else {
-                String msg = "The sqlDirectory does not exist: " + file;
+                String msg = "The sqlDirectory does not exist: " + dir;
                 throw new IllegalStateException(msg);
             }
         }

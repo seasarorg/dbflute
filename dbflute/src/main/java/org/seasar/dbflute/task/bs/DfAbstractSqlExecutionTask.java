@@ -22,7 +22,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.task.DfSql2EntityTask;
 
@@ -51,7 +50,7 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
     @Override
     protected void doExecute() {
         final DfRunnerInformation runInfo = createRunnerInformation();
-        final DfSqlFileFireMan fireMan = newSqlFileFireMan();
+        final DfSqlFileFireMan fireMan = createSqlFileFireMan();
         final List<File> sqlFileList = getTargetSqlFileList();
         fireMan.execute(getSqlFileRunner(runInfo), sqlFileList);
         showTargetSqlFileInformation(sqlFileList);
@@ -60,7 +59,7 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                   Executing Element
     //                                                                   =================
-    protected DfSqlFileFireMan newSqlFileFireMan() {
+    protected DfSqlFileFireMan createSqlFileFireMan() {
         return new DfSqlFileFireMan();
     }
 
@@ -79,13 +78,9 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
 
     protected abstract void customizeRunnerInformation(DfRunnerInformation runInfo);
 
-    protected DfSqlFileRunnerExecute getSqlFileRunner(final DfRunnerInformation runInfo) {
-        return new DfSqlFileRunnerExecute(runInfo, getDataSource());
-    }
+    protected abstract DfSqlFileRunnerExecute getSqlFileRunner(DfRunnerInformation runInfo);
 
-    protected List<File> getTargetSqlFileList() {
-        return new DfSqlFileGetter().getSqlFileList(getSqlDirectory());
-    }
+    protected abstract List<File> getTargetSqlFileList();
 
     protected abstract String getSqlDirectory();
 
