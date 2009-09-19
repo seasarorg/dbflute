@@ -37,6 +37,10 @@ public class DfSpecifiedSqlFile {
     }
 
     public void setSpecifiedSqlFile(String specifiedSqlFile) {
+        System.out.println("***********************");
+        System.out.println("specifiedSqlFile=" + specifiedSqlFile);
+        System.out.println("***********************");
+
         if (specifiedSqlFile == null || specifiedSqlFile.trim().length() == 0) {
             return;
         }
