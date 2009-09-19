@@ -37,7 +37,10 @@ public class DfSpecifiedSqlFile {
     }
 
     public void setSpecifiedSqlFile(String specifiedSqlFile) {
-        if (specifiedSqlFile == null || specifiedSqlFile.trim().length() == 0 || specifiedSqlFile.equals("${dfsql}")) {
+        if (specifiedSqlFile == null || specifiedSqlFile.trim().length() == 0) {
+            return;
+        }
+        if (specifiedSqlFile.startsWith("$") || specifiedSqlFile.startsWith("%")) {
             return;
         }
         _specifiedSqlFile = specifiedSqlFile;
