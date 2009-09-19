@@ -53,13 +53,13 @@ namespace ${glPackageBaseCommonS2Dao} {
             _annotationReader = AnnotationReaderFactory.CreateDaoAnnotationReader(_daoType);
             _beanType = _annotationReader.GetBeanType();
             _dbms = GetDbms(_dataSource);
-			
-			// Initialize bean-meta-data!
+            
+            // Initialize bean-meta-data!
             BeanMetaDataCacheHandler handler = new BeanMetaDataCacheHandler(_beanMetaDataCacheMap);
             _beanMetaData = handler.FindOrCreateCachedMetaIfNeeds(_beanType, _annotationReaderFactory, _dbMetaData, _dbms);
-			if (_beanMetaData == null) {
-			    _beanMetaData = new BeanMetaDataCacheExtension(_beanType, _annotationReaderFactory, false);// Don't use cache!
-			}
+            if (_beanMetaData == null) {
+                _beanMetaData = new BeanMetaDataCacheExtension(_beanType, _annotationReaderFactory, false);// Don't use cache!
+            }
 
             // For lazy initializing methods!
             // SetupSqlCommand();
@@ -234,7 +234,7 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected override AbstractSqlCommand CreateInsertAutoDynamicCommand(MethodInfo methodInfo, IDataSource dataSource, ICommandFactory commandFactory, IBeanMetaData beanMetaData, string[] propertyNames) {
             return new ${glInternalInsertAutoDynamicCommand}(dataSource, commandFactory, beanMetaData, propertyNames);
         }
-		
+        
         protected override void SetupUpdateMethodByAuto(MethodInfo mi) {
             if (IsFirstArgumentConditionBean(mi)) {
                 ISqlCommand cmd = new ${glInternalUpdateQueryAutoDynamicCommand}(_dataSource, _commandFactory);
@@ -272,7 +272,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             cmd.IsCheckSingleRowUpdate = !IsNonstrictMethod(method);
             return cmd;
         }
-		
+        
         // -------------------------------------------------
         //                                     Common Helper
         //                                     -------------
@@ -370,9 +370,9 @@ namespace ${glPackageBaseCommonS2Dao} {
                 Type retType = method.ReturnType;
                 if (retType.IsGenericType && (retType.GetGenericTypeDefinition().Equals(typeof(System.Collections.Generic.IList<>)))) {
                     myDataReaderHandler = CreateSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(myBeanMetaData, customizeEntityType);
-				} else if (retType.Equals(typeof(System.Collections.IList))) {
-				    // For the problem about DynamicProxy unsupporting generic method!
-					myDataReaderHandler = CreateSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(myBeanMetaData, customizeEntityType);
+                } else if (retType.Equals(typeof(System.Collections.IList))) {
+                    // For the problem about DynamicProxy unsupporting generic method!
+                    myDataReaderHandler = CreateSpecifiedOutsideSqlCustomizeBeanListResultSetHandler(myBeanMetaData, customizeEntityType);
                 } else {
                     throw new NotSupportedException("The return type of method is unsupported: method.ReturnType=" + method.ReturnType);
                 }
@@ -495,7 +495,7 @@ namespace ${glPackageBaseCommonS2Dao} {
                     throw new SystemException(msg);
                 }
                 Object arg = args[1];
-				return base.Execute(new Object[]{arg});
+                return base.Execute(new Object[]{arg});
             }
         }
 
@@ -579,18 +579,18 @@ namespace ${glPackageBaseCommonS2Dao} {
         protected override IRelationRowCreator CreateRelationRowCreator() {
             return new InternalRelationRowCreator();
         }
-		
+        
         // ===============================================================================
         //                                                               ADO.NET Delegator
         //                                                               =================
-		protected IDbms GetDbms(IDataSource dataSource) {
-		    try {
-		        return DbmsManager.GetDbms(dataSource);
-		    } catch (Exception e) {
-		        new DbExceptionHandler().HandleDbException(e, null);
-		        return null; // Unreachable!
-		    }
-		}
+        protected IDbms GetDbms(IDataSource dataSource) {
+            try {
+                return DbmsManager.GetDbms(dataSource);
+            } catch (Exception e) {
+                new DbExceptionHandler().HandleDbException(e, null);
+                return null; // Unreachable!
+            }
+        }
 
         // ===============================================================================
         //                                                                   Assist Helper
@@ -616,8 +616,8 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
     }
 
-	public class BeanMetaDataDBFluteDBMetaExtension : BeanMetaDataImpl {
-	    protected ${glPackageBaseCommonJavaLike}.List<IPropertyType> _primaryKeyList = new ${glPackageBaseCommonJavaLike}.ArrayList<IPropertyType>();
+    public class BeanMetaDataDBFluteDBMetaExtension : BeanMetaDataImpl {
+        protected ${glPackageBaseCommonJavaLike}.List<IPropertyType> _primaryKeyList = new ${glPackageBaseCommonJavaLike}.ArrayList<IPropertyType>();
         public BeanMetaDataDBFluteDBMetaExtension() 
             : base() {
         }
@@ -709,28 +709,28 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
         protected override void SetupDatabaseMetaData(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
             if (IsEntity(beanType)) {
-			    SetupPrimaryKeyExtension(beanType, dbMetaData, dbms);
-			    return;
-			}
+                SetupPrimaryKeyExtension(beanType, dbMetaData, dbms);
+                return;
+            }
             base.SetupDatabaseMetaData(beanType, dbMetaData, dbms);
         }
-		protected void SetupPrimaryKeyExtension(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
-		    // = = = = = = = = = = = = = = = = = = = = = = =
-		    // Set up _primaryKeys and _identifierGenerator!
-		    // = = = = = = = = = = = = = = = = = = = = = = =
-			if (_primaryKeys == null || _primaryKeys.Length == 0) {
+        protected void SetupPrimaryKeyExtension(Type beanType, IDatabaseMetaData dbMetaData, IDbms dbms) {
+            // = = = = = = = = = = = = = = = = = = = = = = =
+            // Set up _primaryKeys and _identifierGenerator!
+            // = = = = = = = = = = = = = = = = = = = = = = =
+            if (_primaryKeys == null || _primaryKeys.Length == 0) {
                 _primaryKeys = new String[_primaryKeyList.size()];
                 int index = 0;
                 foreach (IPropertyType pt in _primaryKeyList) {
                     _primaryKeys[index] = pt.ColumnName;
                     ++index;
                 }
-			}
-			if (_identifierGenerator == null) {
+            }
+            if (_identifierGenerator == null) {
                 _identifierGenerator = Seasar.Dao.Id.IdentifierGeneratorFactory.CreateIdentifierGenerator(null, dbms);
-			}
-		}
-		protected bool IsEntity(Type beanType) {
+            }
+        }
+        protected bool IsEntity(Type beanType) {
             return typeof(${glEntity}).IsAssignableFrom(beanType);
         }
         public override bool HasModifiedPropertyNamesPropertyName {
@@ -764,18 +764,18 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
     }
-	
+    
     public class BeanMetaDataCacheExtension : BeanMetaDataDBFluteDBMetaExtension {
-	    protected Map<Type, IBeanMetaData> _metaMap;
-	    protected int _nestNo;
-		
+        protected Map<Type, IBeanMetaData> _metaMap;
+        protected int _nestNo;
+        
         public BeanMetaDataCacheExtension(Type beanType, IAnnotationReaderFactory annotationReaderFactory, bool relation) 
             : base() {
             this.BeanType = beanType;
             this._relation = relation;
             this.AnnotationReaderFactory = annotationReaderFactory;
         }
-		
+        
         public override void Initialize(IDatabaseMetaData dbMetaData, IDbms dbms) {
             if (_metaMap != null) {
                 BeanMetaDataCacheHandler handler = new BeanMetaDataCacheHandler(_metaMap);
@@ -794,9 +794,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (_metaMap != null) {
                 BeanMetaDataCacheHandler handler = new BeanMetaDataCacheHandler(_metaMap);
                 IBeanMetaData cachedBmd = handler.FindOrCreateCachedMetaIfNeeds(propertyInfo.PropertyType, AnnotationReaderFactory, dbMetaData, dbms);
-				if (cachedBmd != null) {
-				    return cachedBmd;
-				}
+                if (cachedBmd != null) {
+                    return cachedBmd;
+                }
             }
             bool isRelation = false;
             if (this.NestNo > 0) {
@@ -807,7 +807,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             bmdExt.Initialize(dbMetaData, dbms);
             return bmdExt;
         }
-		
+        
         public Map<Type, IBeanMetaData> MetaMap {
             get { return _metaMap; }
             set { _metaMap = value; }
@@ -833,7 +833,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             get { return false; }
         }
     }
-	
+
     public class BeanMetaDataCacheHandler {
         protected Map<Type, IBeanMetaData> _metaMap;
         public BeanMetaDataCacheHandler(Map<Type, IBeanMetaData> metaMap) {

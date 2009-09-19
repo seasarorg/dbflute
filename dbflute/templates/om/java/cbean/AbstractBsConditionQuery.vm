@@ -905,7 +905,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
                 throw new IllegalArgumentException(msg);
             }
             if (index > 0) {
-                getSqlClause().makeAdditionalConditionAsOrEffective();
+                getSqlClause().makeOrQueryEffective();
             }
             invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
                 @Override
@@ -915,7 +915,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
             });
             ++index;
         }
-        getSqlClause().ignoreAdditionalConditionAsOr();
+        getSqlClause().ignoreOrQuery();
     }
 #end
 #if ($database.isDatabaseOracle())
@@ -962,7 +962,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
                 throw new IllegalArgumentException(msg);
             }
             if (index > 0) {
-                getSqlClause().makeAdditionalConditionAsOrEffective();
+                getSqlClause().makeOrQueryEffective();
             }
             invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
                 @Override
@@ -973,7 +973,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
             });
             ++index;
         }
-        getSqlClause().ignoreAdditionalConditionAsOr();
+        getSqlClause().ignoreOrQuery();
     }
 
     protected String escapeFullTextSearchValue(String conditionValue) {
