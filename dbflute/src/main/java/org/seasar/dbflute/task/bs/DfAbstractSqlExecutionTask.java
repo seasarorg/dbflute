@@ -54,18 +54,12 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
         final DfSqlFileFireMan fireMan = newSqlFileFireMan();
         final List<File> sqlFileList = getTargetSqlFileList();
         fireMan.execute(getSqlFileRunner(runInfo), sqlFileList);
-
-        _log.info(" ");
-        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info("Target SQL files: " + sqlFileList.size());
-        _log.info(" ");
-        for (File sqlFile : sqlFileList) {
-            _log.info("  " + sqlFile.getName());
-        }
-        _log.info("- - - - - - - - - -/");
-        _log.info(" ");
+        showTargetSqlFileInformation(sqlFileList);
     }
 
+    // ===================================================================================
+    //                                                                   Executing Element
+    //                                                                   =================
     protected DfSqlFileFireMan newSqlFileFireMan() {
         return new DfSqlFileFireMan();
     }
@@ -100,4 +94,18 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
     protected abstract boolean isErrorContinue();
 
     protected abstract boolean isRollbackOnly();
+
+    // ===================================================================================
+    //                                                                SQL File Information
+    //                                                                ====================
+    protected void showTargetSqlFileInformation(List<File> sqlFileList) {
+        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+        _log.info("Target SQL files: " + sqlFileList.size());
+        _log.info(" ");
+        for (File sqlFile : sqlFileList) {
+            _log.info("  " + sqlFile.getName());
+        }
+        _log.info("- - - - - - - - - -/");
+        _log.info(" ");
+    }
 }

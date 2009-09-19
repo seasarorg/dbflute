@@ -137,15 +137,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         fireSuperExecute();
         setupBehaviorQueryPath();
 
-        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-        _log.info("Target SQL files: " + sqlFileList.size());
-        _log.info(" ");
-        for (File sqlFile : sqlFileList) {
-            _log.info("  " + sqlFile.getName());
-        }
-        _log.info("- - - - - - - - - -/");
-        _log.info(" ");
-
+        showTargetSqlFileInformation(sqlFileList);
         showSkippedFileInformation();
         handleNotFoundResult(sqlFileList);
         handleException();

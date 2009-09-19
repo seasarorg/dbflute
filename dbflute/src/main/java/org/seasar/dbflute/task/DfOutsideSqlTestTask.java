@@ -54,9 +54,16 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     protected void doExecute() {
         super.doExecute();
         if (_nonTargetSqlCount > 0) {
-            _log.info("/* * * * * * * * * * * * *");
+            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
             _log.info("Non target SQL count = " + _nonTargetSqlCount);
-            _log.info("* * * * * * * * * */");
+            _log.info("- - - - - - - - - -/");
+            _log.info(" ");
+        }
+        final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
+        if (specifiedSqlFile != null) {
+            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+            _log.info("Specified SQL File = " + specifiedSqlFile);
+            _log.info("- - - - - - - - - -/");
             _log.info(" ");
         }
     }
@@ -66,6 +73,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
         runInfo.setEncoding(getProperties().getOutsideSqlProperties().getSqlFileEncoding());
     }
 
+    @Override
     protected List<File> getTargetSqlFileList() {
         final List<File> sqlFileList = collectSqlFileList();
         final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
@@ -182,6 +190,18 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     @Override
     protected boolean isRollbackOnly() {
         return true;
+    }
+
+    @Override
+    protected void showTargetSqlFileInformation(List<File> sqlFileList) {
+        super.showTargetSqlFileInformation(sqlFileList);
+        final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
+        if (specifiedSqlFile != null) {
+            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+            _log.info("Specified SQL File = " + specifiedSqlFile);
+            _log.info("- - - - - - - - - -/");
+            _log.info(" ");
+        }
     }
 
     // ===================================================================================

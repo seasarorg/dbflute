@@ -42,6 +42,7 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.texen.ant.TexenTask;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfEnvironmentType;
+import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.friends.torque.DfAntTaskUtil;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.friends.velocity.DfOriginalLog4JLogSystem;
@@ -541,6 +542,28 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             }
         } else {
             return null;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                SQL File Information
+    //                                                                ====================
+    protected void showTargetSqlFileInformation(List<File> sqlFileList) {
+        _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+        _log.info("Target SQL files: " + sqlFileList.size());
+        _log.info(" ");
+        for (File sqlFile : sqlFileList) {
+            _log.info("  " + sqlFile.getName());
+        }
+        _log.info("- - - - - - - - - -/");
+        _log.info(" ");
+
+        final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
+        if (specifiedSqlFile != null) {
+            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+            _log.info("Specified SQL File = " + specifiedSqlFile);
+            _log.info("- - - - - - - - - -/");
+            _log.info(" ");
         }
     }
 

@@ -32,19 +32,18 @@ public class DfSpecifiedSqlFile {
         return _instance;
     }
 
+    /**
+     * @return The name of specified SQL file. (Null-able)
+     */
     public String getSpecifiedSqlFile() {
         return _specifiedSqlFile;
     }
 
     public void setSpecifiedSqlFile(String specifiedSqlFile) {
-        System.out.println("***********************");
-        System.out.println("specifiedSqlFile=" + specifiedSqlFile);
-        System.out.println("***********************");
-
         if (specifiedSqlFile == null || specifiedSqlFile.trim().length() == 0) {
             return;
         }
-        if (specifiedSqlFile.startsWith("$") || specifiedSqlFile.startsWith("%")) {
+        if (specifiedSqlFile.equals("${dfsql}")) {
             return;
         }
         _specifiedSqlFile = specifiedSqlFile;
