@@ -45,6 +45,9 @@ public class DfEnvironmentType {
     }
 
     public void setEnvironmentType(String environmentType) {
+        System.out.println("***********************");
+        System.out.println("environmentType=" + environmentType);
+        System.out.println("***********************");
         if (environmentType == null || environmentType.trim().length() == 0) {
             return;
         }
