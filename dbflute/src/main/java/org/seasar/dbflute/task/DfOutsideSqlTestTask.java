@@ -53,19 +53,6 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     @Override
     protected void doExecute() {
         super.doExecute();
-        if (_nonTargetSqlCount > 0) {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("Non target SQL count = " + _nonTargetSqlCount);
-            _log.info("- - - - - - - - - -/");
-            _log.info(" ");
-        }
-        final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
-        if (specifiedSqlFile != null) {
-            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
-            _log.info("Specified SQL File = " + specifiedSqlFile);
-            _log.info("- - - - - - - - - -/");
-            _log.info(" ");
-        }
     }
 
     @Override
@@ -195,6 +182,12 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     @Override
     protected void showTargetSqlFileInformation(List<File> sqlFileList) {
         super.showTargetSqlFileInformation(sqlFileList);
+        if (_nonTargetSqlCount > 0) {
+            _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
+            _log.info("Non target SQL count = " + _nonTargetSqlCount);
+            _log.info("- - - - - - - - - -/");
+            _log.info(" ");
+        }
         final String specifiedSqlFile = DfSpecifiedSqlFile.getInstance().getSpecifiedSqlFile();
         if (specifiedSqlFile != null) {
             _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");

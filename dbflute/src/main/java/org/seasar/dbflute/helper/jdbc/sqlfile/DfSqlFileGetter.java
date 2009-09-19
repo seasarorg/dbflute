@@ -29,7 +29,7 @@ public class DfSqlFileGetter {
     //                                                                           Attribute
     //                                                                           =========
     protected FileFilter _sqlFileFileter;
-    
+
     protected FileFilter _directoryOnlyFilter;
 
     // ===================================================================================
@@ -38,40 +38,40 @@ public class DfSqlFileGetter {
     public List<File> getSqlFileList(String sqlDirectory) {
         final List<File> fileList = new ArrayList<File>();
         {
-            final File file = new File(sqlDirectory);
-            if (!file.exists()) {
-                String msg = "The sqlDirectory does not exist: " + file;
+            final File dir = new File(sqlDirectory);
+            if (!dir.exists()) {
+                String msg = "The sqlDirectory does not exist: " + dir;
                 throw new IllegalStateException(msg);
             }
-            if (!file.isDirectory()) {
-                String msg = "The sqlDirectory should be directory. but file...: " + file;
+            if (!dir.isDirectory()) {
+                String msg = "The sqlDirectory should be directory. but file...: " + dir;
                 throw new IllegalStateException(msg);
             }
-            registerFile(fileList, file);
+            registerFile(fileList, dir);
         }
         return fileList;
     }
 
-    protected void registerFile(List<File> fileList, File file) {
+    protected void registerFile(List<File> fileList, File dir) {
         final FileFilter sqlFileFileter;
         if (_sqlFileFileter != null) {
             sqlFileFileter = _sqlFileFileter;
         } else {
             sqlFileFileter = createDefaultSqlFileFileFilter();
         }
-        final File[] sqlFiles = file.listFiles(sqlFileFileter);
+        final File[] sqlFiles = dir.listFiles(sqlFileFileter);
+        for (final File sqlFile : sqlFiles) {
+            fileList.add(sqlFile);
+        }
         final FileFilter directoryOnlyFilter;
         if (_sqlFileFileter != null) {
             directoryOnlyFilter = _directoryOnlyFilter;
         } else {
             directoryOnlyFilter = createDefaultDirectoryOnlyFileFilter();
         }
-        final File[] directories = file.listFiles(directoryOnlyFilter);
-        for (final File sqlFile : sqlFiles) {
-            fileList.add(sqlFile);
-        }
-        for (final File dir : directories) {
-            registerFile(fileList, dir);
+        final File[] directories = dir.listFiles(directoryOnlyFilter);
+        for (final File subdir : directories) {
+            registerFile(fileList, subdir);
         }
     }
 
@@ -85,7 +85,7 @@ public class DfSqlFileGetter {
             }
         };
     }
-    
+
     protected boolean acceptSqlFile(File file) {
         return file.getName().toLowerCase().endsWith(".sql");
     }

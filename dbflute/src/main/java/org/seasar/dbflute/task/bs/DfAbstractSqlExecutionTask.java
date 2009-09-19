@@ -99,6 +99,7 @@ public abstract class DfAbstractSqlExecutionTask extends DfAbstractTask {
     //                                                                SQL File Information
     //                                                                ====================
     protected void showTargetSqlFileInformation(List<File> sqlFileList) {
+        _log.info(" ");
         _log.info("/- - - - - - - - - - - - - - - - - - - - - - - -");
         _log.info("Target SQL files: " + sqlFileList.size());
         _log.info(" ");
