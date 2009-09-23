@@ -2,8 +2,8 @@ ${database.allClassCopyright}package ${glPackageBaseCommon};
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.lang.reflect.Method;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -22,12 +22,12 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     //                                                                        Resource Map
     //                                                                        ============
     /** Table DB-name instance map. */
-    protected static final Map<String, DBMeta> _tableDbNameInstanceMap = newConcurrentHashMap();
+    protected static final Map<String, DBMeta> _tableDbNameInstanceMap = newHashMap();
 
     /** The map of table DB name and class name. This is for initialization. */
     protected static final Map<String, String> _tableDbNameClassNameMap;
     static {
-        final Map<String, String> tmpMap = newConcurrentHashMap();
+        final Map<String, String> tmpMap = newHashMap();
 #foreach ($table in $database.tables)
         tmpMap.put("${table.name}", "${table.DBMetaFullClassName}");
 #end
@@ -44,11 +44,13 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     }
 
     /**
-     * @return The initialized map that contains all instances of DB meta. (NotNull & NotEmpty)
+     * @return The copied initialized map that contains all instances of DB meta. (NotNull & NotEmpty)
      */
     public static Map<String, DBMeta> getDBMetaMap() {
         initializeDBMetaMap();
-        return _tableDbNameInstanceMap;
+        final Map<String, DBMeta> copiedMap = newHashMap();
+        copiedMap.putAll(_tableDbNameInstanceMap);
+        return copiedMap;
     }
 
     /**
@@ -58,14 +60,16 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
         if (isInitialized()) {
             return;
         }
-        final Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
-        for (String tableDbName : tableDbNameSet) {
-            findDBMeta(tableDbName); // Initialize!
-        }
-        if (!isInitialized()) {
-            String msg = "Failed to initialize tableDbNameInstanceMap:";
-            msg = msg + " tableDbNameInstanceMap=" + _tableDbNameInstanceMap;
-            throw new IllegalStateException(msg);
+        synchronized (_tableDbNameInstanceMap) {
+            final Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
+            for (String tableDbName : tableDbNameSet) {
+                findDBMeta(tableDbName); // Initialize!
+            }
+            if (!isInitialized()) {
+                String msg = "Failed to initialize tableDbNameInstanceMap:";
+                msg = msg + " tableDbNameInstanceMap=" + _tableDbNameInstanceMap;
+                throw new IllegalStateException(msg);
+            }
         }
     }
 
@@ -74,7 +78,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     }
 
     // ===================================================================================
-    //                                                                         Main Method
+    //                                                                         Find DBMeta
     //                                                                         ===========
     /**
      * Find DB meta by table flexible name.
@@ -97,6 +101,9 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
         return dbmeta;
     }
 
+    // ===================================================================================
+    //                                                                       By Table Name
+    //                                                                       =============
     /**
      * @param tableFlexibleName The flexible name of table. (NotNull)
      * @return The instance of DB meta. (Nullable: If the DB meta is not found, it returns null)
@@ -122,19 +129,24 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
         assertStringNotNullAndNotTrimmedEmpty("tableDbName", tableDbName);
         return getCachedDBMeta(tableDbName);
     }
-    
-    protected static DBMeta getCachedDBMeta(String tableName) {// For lazy-load! Thank you koyak!
-        if (_tableDbNameInstanceMap.containsKey(tableName)) {
-            return _tableDbNameInstanceMap.get(tableName);
+
+    // ===================================================================================
+    //                                                                       Cached DBMeta
+    //                                                                       =============
+    protected static DBMeta getCachedDBMeta(String tableName) { // For lazy-load! Thank you koyak!
+        DBMeta dbmeta = _tableDbNameInstanceMap.get(tableName);
+        if (dbmeta != null) {
+            return dbmeta;
         }
         synchronized (_tableDbNameInstanceMap) {
-            if (_tableDbNameInstanceMap.containsKey(tableName)) {
-                return _tableDbNameInstanceMap.get(tableName);
+            dbmeta = _tableDbNameInstanceMap.get(tableName);
+            if (dbmeta != null) {
+                return dbmeta;
             }
             String entityName = _tableDbNameClassNameMap.get(tableName);
             _tableDbNameInstanceMap.put(tableName, getDBMeta(entityName));
+            return _tableDbNameInstanceMap.get(tableName);
         }
-        return _tableDbNameInstanceMap.get(tableName);
     }
 
     protected static DBMeta getDBMeta(String className) {
@@ -171,8 +183,8 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected static <KEY, VALUE> ConcurrentHashMap<KEY, VALUE> newConcurrentHashMap() {
-        return new ConcurrentHashMap<KEY, VALUE>();
+    protected static <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {
+        return new HashMap<KEY, VALUE>();
     }
 
     // -----------------------------------------------------
