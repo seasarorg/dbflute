@@ -44,13 +44,14 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     }
 
     /**
-     * @return The copied initialized map that contains all instances of DB meta. (NotNull & NotEmpty)
+     * Get the unmodifiable map of DB meta.
+     * @return The unmodifiable map that contains all instances of DB meta. (NotNull & NotEmpty)
      */
-    public static Map<String, DBMeta> getDBMetaMap() {
+    public static Map<String, DBMeta> getUnmodifiableDBMetaMap() {
         initializeDBMetaMap();
-        final Map<String, DBMeta> copiedMap = newHashMap();
-        copiedMap.putAll(_tableDbNameInstanceMap);
-        return copiedMap;
+        synchronized (_tableDbNameInstanceMap) {
+            return Collections.unmodifiableMap(_tableDbNameInstanceMap);
+        }
     }
 
     /**

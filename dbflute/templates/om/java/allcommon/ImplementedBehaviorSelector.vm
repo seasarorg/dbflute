@@ -113,7 +113,7 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
      * Initialize condition-bean meta data. <br />
      */
     public void initializeConditionBeanMetaData() {
-        final Map<String, DBMeta> dbmetaMap = ${glDBMetaInstanceHandler}.getDBMetaMap();
+        final Map<String, DBMeta> dbmetaMap = ${glDBMetaInstanceHandler}.getUnmodifiableDBMetaMap();
         final Collection<DBMeta> dbmetas = dbmetaMap.values();
         long before = 0;
         if (_log.isInfoEnabled()) {
