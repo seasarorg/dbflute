@@ -28,7 +28,7 @@ namespace ${glPackageBaseCommon} {
         //                                                                      Initialize
         //                                                                      ==========
         public void InitializeConditionBeanMetaData() {
-            Map<String, ${glDBMeta}> dbmetaMap = ${glDBMetaInstanceHandler}.GetDBMetaMap();
+            Map<String, ${glDBMeta}> dbmetaMap = ${glDBMetaInstanceHandler}.GetUnmodifiableDBMetaMap();
             Collection<${glDBMeta}> dbmetas = dbmetaMap.values();
             DateTime? before = null;
             if (_log.IsInfoEnabled) {

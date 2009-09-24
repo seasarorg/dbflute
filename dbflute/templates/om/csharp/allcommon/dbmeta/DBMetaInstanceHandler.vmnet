@@ -12,8 +12,8 @@ namespace ${glPackageBaseCommonDBMeta} {
     public class ${myClassName} {
 
         // ===============================================================================
-        //                                                                      Definition
-        //                                                                      ==========
+        //                                                                    Resource Map
+        //                                                                    ============
         protected static readonly Map<String, ${glDBMeta}> _tableDbNameInstanceMap = new HashMap<String, ${glDBMeta}>();
         protected static readonly Map<String, String> _tableDbNameClassNameMap;
         protected static readonly Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
@@ -66,24 +66,32 @@ namespace ${glPackageBaseCommonDBMeta} {
             return type;
         }
 
-        // Returns the initialized map that contains all instances of dbmeta. (NotNull & NotEmpty)
-        public static Map<String, ${glDBMeta}> GetDBMetaMap() {
+        // Returns the unmodifiable map that contains all instances of DB meta. (NotNull & NotEmpty)
+        public static Map<String, ${glDBMeta}> GetUnmodifiableDBMetaMap() {
             InitializeDBMetaMap();
-            return _tableDbNameInstanceMap;
+            lock (_tableDbNameInstanceMap) {
+                Map<String, ${glDBMeta}> copiedMap = new HashMap<String, ${glDBMeta}>();
+                foreach (String tableDbName in _tableDbNameInstanceMap) {
+                    copiedMap.put(tableDbName, _tableDbNameInstanceMap[tableDbName]);
+                }
+                return copiedMap;
+            }
         }
-    
+
         protected static void InitializeDBMetaMap() {
             if (IsInitialized) {
                 return;
             }
-            Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
-            foreach (String tableDbName in tableDbNameSet) {
-                FindDBMeta(tableDbName); // Initialize!
-            }
-            if (!IsInitialized) {
-                String msg = "Failed to initialize tableDbNameInstanceMap:";
-                msg = msg + " tableDbNameInstanceMap=" + _tableDbNameInstanceMap;
-                throw new IllegalStateException(msg);
+            lock (_tableDbNameInstanceMap) {
+                Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
+                foreach (String tableDbName in tableDbNameSet) {
+                    FindDBMeta(tableDbName); // Initialize!
+                }
+                if (!IsInitialized) {
+                    String msg = "Failed to initialize tableDbNameInstanceMap:";
+                    msg = msg + " tableDbNameInstanceMap=" + _tableDbNameInstanceMap;
+                    throw new IllegalStateException(msg);
+                }
             }
         }
 
@@ -92,7 +100,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         }}
 
         // ===============================================================================
-        //                                                                     Main Method
+        //                                                                     Find DBMeta
         //                                                                     ===========
         /// <summary>
         /// Find dbmeta by table flexible-name.
@@ -131,6 +139,9 @@ namespace ${glPackageBaseCommonDBMeta} {
             throw new DBMetaNotFoundException(msg);
         }
 
+        // ===============================================================================
+        //                                                                   By Table Name
+        //                                                                   =============
         protected static ${glDBMeta} ByTableDbName(String tableDbName) {
             AssertObjectNotNull("tableDbName", tableDbName);
             try {
@@ -141,18 +152,23 @@ namespace ${glPackageBaseCommonDBMeta} {
             }
         }
 
-        protected static ${glDBMeta} GetCachedDBMeta(String tableName) {// For lazy-load! Thank you koyak!
-            if (_tableDbNameInstanceMap.containsKey(tableName)) {
-                return _tableDbNameInstanceMap.get(tableName);
+        // ===============================================================================
+        //                                                                   Cached DBMeta
+        //                                                                   =============
+        protected static ${glDBMeta} GetCachedDBMeta(String tableName) { // For lazy-load! Thank you koyak!
+            ${glDBMeta} dbmeta = _tableDbNameInstanceMap.get(tableName);
+            if (dbmeta != null) {
+                return dbmeta;
             }
             lock (_tableDbNameInstanceMap) {
-                if (_tableDbNameInstanceMap.containsKey(tableName)) {
-                    return _tableDbNameInstanceMap.get(tableName);
+                dbmeta = _tableDbNameInstanceMap.get(tableName);
+                if (dbmeta != null) {
+                    return dbmeta;
                 }
                 String entityName = _tableDbNameClassNameMap.get(tableName);
                 _tableDbNameInstanceMap.put(tableName, GetDBMeta(entityName));
+                return _tableDbNameInstanceMap.get(tableName);
             }
-            return _tableDbNameInstanceMap.get(tableName);
         }
 
         // ===============================================================================
