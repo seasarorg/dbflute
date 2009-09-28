@@ -148,11 +148,29 @@ public class DfClassificationResourceAnalyzerTest {
     }
 
     @Test
-    public void test_tokenizedLineSeparatorMark() {
+    public void test_tokenizedLineSeparatorMark_base16() {
         // ## Arrange ##
         final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
         final String plain = LN_MARK_PLAIN;
         final String xml = "&#x0D;&#x0A;";
+
+        // ## Act & Assert ##
+        assertEquals("foobar", analyzer.tokenizedLineSeparatorMark("foobar").get(0));
+        assertEquals("foo", analyzer.tokenizedLineSeparatorMark("foo" + plain + "bar").get(0));
+        assertEquals("bar", analyzer.tokenizedLineSeparatorMark("foo" + plain + "bar").get(1));
+        assertEquals("foo", analyzer.tokenizedLineSeparatorMark("foo" + xml + "bar").get(0));
+        assertEquals("bar", analyzer.tokenizedLineSeparatorMark("foo" + xml + "bar").get(1));
+        assertEquals("foo", analyzer.tokenizedLineSeparatorMark("foo" + xml + "&" + plain + "bar").get(0));
+        assertEquals("&", analyzer.tokenizedLineSeparatorMark("foo" + xml + "&" + plain + "bar").get(1));
+        assertEquals("bar", analyzer.tokenizedLineSeparatorMark("foo" + plain + "&" + xml + "bar").get(2));
+    }
+
+    @Test
+    public void test_tokenizedLineSeparatorMark_base10() {
+        // ## Arrange ##
+        final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
+        final String plain = LN_MARK_PLAIN;
+        final String xml = "&#13;";
 
         // ## Act & Assert ##
         assertEquals("foobar", analyzer.tokenizedLineSeparatorMark("foobar").get(0));

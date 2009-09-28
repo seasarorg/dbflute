@@ -40,12 +40,19 @@ public class DfClassificationResourceAnalyzer {
     protected List<String> _additionalLineSeparatorList;
     {
         final List<String> additionalLineSeparatorList = new ArrayList<String>();
+        // base-16
         additionalLineSeparatorList.add("&#x0D;&#x0A;");
-        additionalLineSeparatorList.add("&#xD;&#xA;");
         additionalLineSeparatorList.add("&#x0A;");
-        additionalLineSeparatorList.add("&#xA;");
         additionalLineSeparatorList.add("&#x0D;");
+        additionalLineSeparatorList.add("&#xD;&#xA;");
+        additionalLineSeparatorList.add("&#xA;");
         additionalLineSeparatorList.add("&#xD;");
+
+        // base-10
+        additionalLineSeparatorList.add("&#13;&#10;");
+        additionalLineSeparatorList.add("&#13;");
+        additionalLineSeparatorList.add("&#10;");
+
         _additionalLineSeparatorList = additionalLineSeparatorList;
     }
 
