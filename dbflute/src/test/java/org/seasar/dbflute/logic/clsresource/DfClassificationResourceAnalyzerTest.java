@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer.LN_MARK_PLAIN;
-import static org.seasar.dbflute.logic.clsresource.DfClassificationResourceAnalyzer.LN_MARK_XML;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,8 +143,8 @@ public class DfClassificationResourceAnalyzerTest {
         assertFalse(analyzer.containsLineSeparatorMark("foobar"));
         assertFalse(analyzer.containsLineSeparatorMark("foo\nbar"));
         assertTrue(analyzer.containsLineSeparatorMark("foo" + LN_MARK_PLAIN + "bar"));
-        assertTrue(analyzer.containsLineSeparatorMark("foo" + LN_MARK_XML + "bar"));
-        assertTrue(analyzer.containsLineSeparatorMark("foo" + LN_MARK_PLAIN + LN_MARK_XML + "bar"));
+        assertTrue(analyzer.containsLineSeparatorMark("foo&#xA;bar"));
+        assertTrue(analyzer.containsLineSeparatorMark("foo" + LN_MARK_PLAIN + "&#x0A;bar"));
     }
 
     @Test
@@ -153,7 +152,7 @@ public class DfClassificationResourceAnalyzerTest {
         // ## Arrange ##
         final DfClassificationResourceAnalyzer analyzer = new DfClassificationResourceAnalyzer();
         final String plain = LN_MARK_PLAIN;
-        final String xml = LN_MARK_XML;
+        final String xml = "&#x0D;&#x0A;";
 
         // ## Act & Assert ##
         assertEquals("foobar", analyzer.tokenizedLineSeparatorMark("foobar").get(0));

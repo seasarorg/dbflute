@@ -33,7 +33,27 @@ public class DfClassificationResourceAnalyzer {
 
     protected static final String DEFAULT_ENCODING = "UTF-8";
     protected static final String LN_MARK_PLAIN = "\\n";
-    protected static final String LN_MARK_XML = "&#xA;";
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected List<String> _additionalLineSeparatorList;
+    {
+        final List<String> additionalLineSeparatorList = new ArrayList<String>();
+        additionalLineSeparatorList.add("&#x0D;&#x0A;");
+        additionalLineSeparatorList.add("&#xD;&#xA;");
+        additionalLineSeparatorList.add("&#x0A;");
+        additionalLineSeparatorList.add("&#xA;");
+        additionalLineSeparatorList.add("&#x0D;");
+        additionalLineSeparatorList.add("&#xD;");
+        _additionalLineSeparatorList = additionalLineSeparatorList;
+    }
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public DfClassificationResourceAnalyzer() {
+    }
 
     // ===================================================================================
     //                                                                             Analyze
@@ -329,19 +349,40 @@ public class DfClassificationResourceAnalyzer {
     //                                                                      General Helper
     //                                                                      ==============
     protected boolean containsLineSeparatorMark(String line) {
-        return line.contains(LN_MARK_PLAIN) || line.contains(LN_MARK_XML);
+        if (line.contains(LN_MARK_PLAIN)) {
+            return true;
+        }
+        for (String lineSeparator : _additionalLineSeparatorList) {
+            if (line.contains(lineSeparator)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected List<String> tokenizedLineSeparatorMark(String line) {
         final String baseMark = LN_MARK_PLAIN;
-        line = DfStringUtil.replace(line, LN_MARK_XML, baseMark);
+        for (String lineSeparator : _additionalLineSeparatorList) {
+            line = DfStringUtil.replace(line, lineSeparator, baseMark);
+        }
         return tokenize(line, baseMark);
     }
 
-    protected java.util.List<String> tokenize(String value, String delimiter) {
+    protected List<String> tokenize(String value, String delimiter) {
         final LineToken lineToken = new LineTokenImpl();
         final LineTokenizingOption lineTokenizingOption = new LineTokenizingOption();
         lineTokenizingOption.setDelimiter(delimiter);
         return lineToken.tokenize(value, lineTokenizingOption);
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setAdditionalLineSeparatorList(List<String> additionalLineSeparatorList) {
+        if (additionalLineSeparatorList == null) {
+            String msg = "The argument [additionalLineSeparatorList] should not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        this._additionalLineSeparatorList = additionalLineSeparatorList;
     }
 }
