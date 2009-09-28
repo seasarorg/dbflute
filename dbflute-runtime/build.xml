@@ -55,14 +55,6 @@
     	  tofile="../dbflute-basic-example/lib/sources/dbflute-runtime-${version}-sources.jar"
     	  overwrite="true"/>
 
-    <delete file="../dbflute-tricky-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-tricky-example/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-    	  tofile="../dbflute-tricky-example/lib/sources/dbflute-runtime-${version}-sources.jar"
-    	  overwrite="true"/>
-
     <delete file="../dbflute-spring-example/lib/dbflute-runtime-*.jar"/>
     <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
     	  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
@@ -118,6 +110,14 @@
     <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
     	  tofile="../dbflute-clientsql-example/lib/sources/dbflute-runtime-${version}-sources.jar"
     	  overwrite="true"/>
+  	
+    <delete file="../dbflute-tricky-example/lib/dbflute-runtime-*.jar"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
+    	  tofile="../dbflute-tricky-example/lib/dbflute-runtime-${version}.jar"
+    	  overwrite="true"/>
+    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
+    	  tofile="../dbflute-tricky-example/lib/sources/dbflute-runtime-${version}-sources.jar"
+    	  overwrite="true"/>
   </target>
 
   <target name="reflect-mac-basic">
@@ -146,14 +146,6 @@
     	  overwrite="true"/>
     <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
     	  tofile="../dbflute-basic-example/lib/sources/dbflute-runtime-${version}-sources.jar"
-    	  overwrite="true"/>
-
-    <delete file="../dbflute-tricky-example/lib/dbflute-runtime-*.jar"/>
-    <copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-    	  tofile="../dbflute-tricky-example/lib/dbflute-runtime-${version}.jar"
-    	  overwrite="true"/>
-    <copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-    	  tofile="../dbflute-tricky-example/lib/sources/dbflute-runtime-${version}-sources.jar"
     	  overwrite="true"/>
 
     <delete file="../dbflute-spring-example/lib/dbflute-runtime-*.jar"/>
