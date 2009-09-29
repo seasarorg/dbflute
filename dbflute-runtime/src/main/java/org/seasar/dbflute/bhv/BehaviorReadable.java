@@ -66,6 +66,7 @@ public interface BehaviorReadable {
     /**
      * Get count all.
      * @return Count all.
+     * @deprecated Sorry! Please use selectCount(emptyCB)
      */
     public int getCountAll();
 

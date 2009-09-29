@@ -78,6 +78,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     /**
      * Get count all.
      * @return Count all.
+     * @deprecated Sorry! Please use selectCount(emptyCB)
      */
     public int getCountAll() {
         return callGetCountAll();
