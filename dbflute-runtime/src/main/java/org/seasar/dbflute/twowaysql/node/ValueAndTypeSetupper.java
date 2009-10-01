@@ -16,6 +16,7 @@
 package org.seasar.dbflute.twowaysql.node;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.MapParameterBean;
@@ -24,9 +25,9 @@ import org.seasar.dbflute.exception.BindVariableCommentNotFoundPropertyException
 import org.seasar.dbflute.exception.EmbeddedValueCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
-import org.seasar.dbflute.s2dao.beans.TnBeanDesc;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
-import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.TnBeanDesc;
+import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -39,16 +40,16 @@ public class ValueAndTypeSetupper {
     //                                                                           Attribute
     //                                                                           =========
     protected String _expression;
-    protected String[] _names;
+    protected List<String> _nameList;
     protected String _specifiedSql;
     protected boolean _bind;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ValueAndTypeSetupper(String expression, String[] names, String specifiedSql, boolean bind) {
+    public ValueAndTypeSetupper(String expression, List<String> nameList, String specifiedSql, boolean bind) {
         this._expression = expression;
-        this._names = names;
+        this._nameList = nameList;
         this._specifiedSql = specifiedSql;
         this._bind = bind;
     }
@@ -64,11 +65,11 @@ public class ValueAndTypeSetupper {
         LikeSearchOption likeSearchOption = null;
         String rearOption = null;
 
-        for (int pos = 1; pos < _names.length; ++pos) {
+        for (int pos = 1; pos < _nameList.size(); ++pos) {
             if (value == null) {
                 break;
             }
-            final String currentName = _names[pos];
+            final String currentName = _nameList.get(pos);
             if (pos == 1) {// at the First Loop
                 final TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(clazz);
                 if (hasLikeSearchOption(beanDesc, currentName)) {
@@ -77,8 +78,8 @@ public class ValueAndTypeSetupper {
             }
             if (Map.class.isInstance(value)) {
                 final Map<?, ?> map = (Map<?, ?>) value;
-                value = map.get(_names[pos]);
-                if (isLastLoop4LikeSearch(pos, likeSearchOption) && isValidStringValue(value)) {// at the Last Loop
+                value = map.get(_nameList.get(pos));
+                if (isLastLoop4LikeSearch(pos, likeSearchOption) && isValidStringValue(value)) { // at the Last Loop
                     value = likeSearchOption.generateRealValue((String) value);
                     rearOption = likeSearchOption.getRearOption();
                 }
@@ -89,7 +90,7 @@ public class ValueAndTypeSetupper {
             if (beanDesc.hasPropertyDesc(currentName)) {
                 final TnPropertyDesc pd = beanDesc.getPropertyDesc(currentName);
                 value = getPropertyValue(clazz, value, currentName, pd);
-                if (isLastLoop4LikeSearch(pos, likeSearchOption) && isValidStringValue(value)) {// at the Last Loop
+                if (isLastLoop4LikeSearch(pos, likeSearchOption) && isValidStringValue(value)) { // at the Last Loop
                     value = likeSearchOption.generateRealValue((String) value);
                     rearOption = likeSearchOption.getRearOption();
                 }
@@ -106,7 +107,7 @@ public class ValueAndTypeSetupper {
             if (pos == 1 && MapParameterBean.class.isAssignableFrom(clazz)) {
                 final MapParameterBean pmb = (MapParameterBean) value;
                 final Map<String, Object> map = pmb.getParameterMap();
-                final Object elementValue = (map != null ? map.get(_names[pos]) : null);
+                final Object elementValue = (map != null ? map.get(_nameList.get(pos)) : null);
                 if (elementValue != null) {
                     value = elementValue;
                     clazz = value.getClass();
@@ -122,7 +123,7 @@ public class ValueAndTypeSetupper {
 
     // for OutsideSql
     protected boolean isLastLoop4LikeSearch(int pos, LikeSearchOption likeSearchOption) {
-        return _names.length == (pos + 1) && likeSearchOption != null;
+        return _nameList.size() == (pos + 1) && likeSearchOption != null;
     }
 
     protected boolean isValidStringValue(Object value) {

@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.beans.exception;
+package org.seasar.dbflute.helper.beans.exception;
 
 /**
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnPropertyNotFoundRuntimeException extends RuntimeException {
+public class TnIllegalPropertyRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,9 +27,9 @@ public class TnPropertyNotFoundRuntimeException extends RuntimeException {
 
     private String propertyName;
 
-    public TnPropertyNotFoundRuntimeException(Class<?> componentClass, String propertyName) {
-        super("The property was not found: class=" + componentClass.getName() + " property=" + propertyName);
-        this.targetClass = componentClass;
+    public TnIllegalPropertyRuntimeException(Class<?> targetClass, String propertyName, Throwable cause) {
+        super("The property was illegal: class=" + targetClass.getName() + " property=" + propertyName, cause);
+        this.targetClass = targetClass;
         this.propertyName = propertyName;
     }
 

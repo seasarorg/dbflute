@@ -25,10 +25,10 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.helper.beans.TnBeanDesc;
+import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.s2dao.beans.TnBeanDesc;
-import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 

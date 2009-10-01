@@ -13,12 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.beans;
+package org.seasar.dbflute.helper.beans;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.seasar.dbflute.s2dao.beans.exception.TnIllegalPropertyRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.TnIllegalPropertyRuntimeException;
 
 /**
  * {Refers to Seasar and Extends its class}

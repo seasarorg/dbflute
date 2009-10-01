@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.seasar.dbflute.s2dao.beans.TnBeanDesc;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
-import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.TnBeanDesc;
+import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;

@@ -24,10 +24,10 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
+import org.seasar.dbflute.helper.beans.TnPropertyDesc;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.util.DfTypeUtil;

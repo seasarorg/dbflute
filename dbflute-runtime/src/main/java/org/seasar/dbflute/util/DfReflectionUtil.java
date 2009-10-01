@@ -196,6 +196,17 @@ public class DfReflectionUtil {
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
+    public static Method getMethod(Class<?> clazz, String name, Class<?>[] parameterTypes) {
+        try {
+            return clazz.getMethod(name, parameterTypes);
+        } catch (NoSuchMethodException e) {
+            String msg = "Not found the method in the class: ";
+            msg = msg + " method=" + name + (parameterTypes != null ? Arrays.asList(parameterTypes) : "");
+            msg = msg + " class=" + clazz;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
     public static Object invoke(Method method, Object target, Object[] args) {
         try {
             return method.invoke(target, args);
@@ -208,11 +219,13 @@ public class DfReflectionUtil {
                 throw (Error) t;
             }
             String msg = "The InvocationTargetException occurred: ";
-            msg = msg + " method=" + method + " target=" + target + " args=" + Arrays.asList(args);
+            msg = msg + " method=" + method + " target=" + target;
+            msg = msg + " args=" + (args != null ? Arrays.asList(args) : "");
             throw new IllegalStateException(msg, t);
         } catch (IllegalAccessException e) {
             String msg = "Illegal access to the method:";
-            msg = msg + " method =" + method + " args=" + Arrays.asList(args);
+            msg = msg + " method =" + method;
+            msg = msg + " args=" + (args != null ? Arrays.asList(args) : "");
             throw new IllegalStateException(msg, e);
         }
     }
@@ -237,11 +250,11 @@ public class DfReflectionUtil {
     public static boolean isPublic(int modifier) {
         return Modifier.isPublic(modifier);
     }
-    
+
     public static boolean isStatic(int modifier) {
         return Modifier.isStatic(modifier);
     }
-    
+
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============

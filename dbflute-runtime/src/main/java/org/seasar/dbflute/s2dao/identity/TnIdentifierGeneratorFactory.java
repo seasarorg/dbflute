@@ -16,15 +16,17 @@
 package org.seasar.dbflute.s2dao.identity;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
-import org.seasar.dbflute.s2dao.beans.TnBeanDesc;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
-import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.TnBeanDesc;
+import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -67,13 +69,25 @@ public class TnIdentifierGeneratorFactory {
         if (annotation == null) {
             return new TnIdentifierAssignedGenerator(propertyType);
         }
-        String[] array = DfStringUtil.split(annotation, "=, ");
+        String[] array = tokenize(annotation, "=, ");
         Class<?> clazz = getGeneratorClass(array[0]);
         TnIdentifierGenerator generator = createIdentifierGenerator(clazz, propertyType);
         for (int i = 1; i < array.length; i += 2) {
             setProperty(generator, array[i].trim(), array[i + 1].trim());
         }
         return generator;
+    }
+
+    protected static String[] tokenize(final String str, final String delimiter) {
+        if (str == null || str.trim().length() == 0) {
+            return new String[] {};
+        }
+        final List<String> list = new ArrayList<String>();
+        final StringTokenizer st = new StringTokenizer(str, delimiter);
+        while (st.hasMoreElements()) {
+            list.add(st.nextToken());
+        }
+        return (String[]) list.toArray(new String[list.size()]);
     }
 
     protected static Class<?> getGeneratorClass(String name) {

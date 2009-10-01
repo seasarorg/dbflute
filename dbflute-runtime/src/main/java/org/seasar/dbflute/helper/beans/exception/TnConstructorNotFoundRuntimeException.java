@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.beans.exception;
+package org.seasar.dbflute.helper.beans.exception;
 
 /**
  * {Refers to Seasar and Extends its class}

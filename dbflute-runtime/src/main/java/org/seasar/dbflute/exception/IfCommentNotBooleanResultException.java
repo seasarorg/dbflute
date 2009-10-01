@@ -17,7 +17,6 @@ package org.seasar.dbflute.exception;
 
 /**
  * The exception of when the result of IF comment is not boolean about outsideSql.
- * 
  * @author jflute
  */
 public class IfCommentNotBooleanResultException extends IfCommentWrongExpressionException {
@@ -27,7 +26,6 @@ public class IfCommentNotBooleanResultException extends IfCommentWrongExpression
 
     /**
      * Constructor.
-     * 
      * @param msg Exception message. (NotNull)
      */
     public IfCommentNotBooleanResultException(String msg) {
@@ -36,7 +34,6 @@ public class IfCommentNotBooleanResultException extends IfCommentWrongExpression
 
     /**
      * Constructor.
-     * 
      * @param msg Exception message. (NotNull)
      * @param cause Throwable. (NotNull)
      */

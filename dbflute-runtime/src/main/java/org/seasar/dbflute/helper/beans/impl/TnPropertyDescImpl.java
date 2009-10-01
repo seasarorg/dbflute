@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.beans.impl;
+package org.seasar.dbflute.helper.beans.impl;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -21,9 +21,9 @@ import java.lang.reflect.Method;
 import java.sql.Time;
 import java.sql.Timestamp;
 
-import org.seasar.dbflute.s2dao.beans.TnBeanDesc;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
-import org.seasar.dbflute.s2dao.beans.exception.TnIllegalPropertyRuntimeException;
+import org.seasar.dbflute.helper.beans.TnBeanDesc;
+import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.exception.TnIllegalPropertyRuntimeException;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 

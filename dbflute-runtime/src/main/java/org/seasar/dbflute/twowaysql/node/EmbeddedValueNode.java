@@ -31,7 +31,7 @@ public class EmbeddedValueNode extends AbstractNode {
     //                                                                           =========
     protected String _expression;
     protected String _testValue;
-    protected String[] _names;
+    protected List<String> _nameList;
     protected String _specifiedSql;
     protected boolean _blockNullParameter;
 
@@ -41,7 +41,7 @@ public class EmbeddedValueNode extends AbstractNode {
     public EmbeddedValueNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
         this._expression = expression;
         this._testValue = testValue;
-        this._names = DfStringUtil.split(expression, ".");
+        this._nameList = DfStringUtil.splitList(expression, ".");
         this._specifiedSql = specifiedSql;
         this._blockNullParameter = blockNullParameter;
     }
@@ -50,8 +50,8 @@ public class EmbeddedValueNode extends AbstractNode {
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        final Object value = ctx.getArg(_names[0]);
-        final Class<?> clazz = ctx.getArgType(_names[0]);
+        final Object value = ctx.getArg(_nameList.get(0));
+        final Class<?> clazz = ctx.getArgType(_nameList.get(0));
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
@@ -94,14 +94,14 @@ public class EmbeddedValueNode extends AbstractNode {
     }
 
     protected void setupValueAndType(ValueAndType valueAndType) {
-        final ValueAndTypeSetupper valueAndTypeSetuper = new ValueAndTypeSetupper(_expression, _names,
-                _specifiedSql, false);
+        final ValueAndTypeSetupper valueAndTypeSetuper = new ValueAndTypeSetupper(_expression, _nameList, _specifiedSql,
+                false);
         valueAndTypeSetuper.setupValueAndType(valueAndType);
     }
 
     protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
-        NodeExceptionHandler.throwBindOrEmbeddedParameterNullValueException(_expression,
-                valueAndType.getTargetType(), _specifiedSql, false);
+        NodeExceptionHandler.throwBindOrEmbeddedParameterNullValueException(_expression, valueAndType.getTargetType(),
+                _specifiedSql, false);
     }
 
     protected boolean isInScope() {

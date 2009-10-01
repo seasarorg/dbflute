@@ -22,10 +22,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.s2dao.beans.TnBeanDesc;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
-import org.seasar.dbflute.s2dao.beans.exception.TnPropertyNotFoundRuntimeException;
-import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.TnBeanDesc;
+import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.exception.TnPropertyNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;

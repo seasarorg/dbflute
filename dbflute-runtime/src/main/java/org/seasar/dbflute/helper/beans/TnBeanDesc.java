@@ -13,17 +13,17 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.beans;
+package org.seasar.dbflute.helper.beans;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.seasar.dbflute.s2dao.beans.exception.TnConstructorNotFoundRuntimeException;
-import org.seasar.dbflute.s2dao.beans.exception.TnFieldNotFoundRuntimeException;
-import org.seasar.dbflute.s2dao.beans.exception.TnMethodNotFoundRuntimeException;
-import org.seasar.dbflute.s2dao.beans.exception.TnPropertyNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.TnConstructorNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.TnFieldNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.TnMethodNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.TnPropertyNotFoundRuntimeException;
 
 /**
  * {Refers to Seasar and Extends its class}

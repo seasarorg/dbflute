@@ -13,13 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.beans.factory;
+package org.seasar.dbflute.helper.beans.factory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.seasar.dbflute.s2dao.beans.TnBeanDesc;
-import org.seasar.dbflute.s2dao.beans.impl.TnBeanDescImpl;
+import org.seasar.dbflute.helper.beans.TnBeanDesc;
+import org.seasar.dbflute.helper.beans.impl.TnBeanDescImpl;
 
 /**
  * {Refers to Seasar and Extends its class}

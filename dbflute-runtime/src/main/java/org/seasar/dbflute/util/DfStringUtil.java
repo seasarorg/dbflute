@@ -17,7 +17,6 @@ package org.seasar.dbflute.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -67,16 +66,22 @@ public class DfStringUtil {
     // ===================================================================================
     //                                                                               Split
     //                                                                               =====
-    public static String[] split(final String str, final String delimiter) {
-        if (str == null || str.trim().length() == 0) {
-            return EMPTY_STRINGS;
-        }
+    /**
+     * @param str The split target string. (NotNull)
+     * @param delimiter The delimiter for split. (NotNull)
+     * @return The split list. (NotNull)
+     */
+    public static List<String> splitList(final String str, final String delimiter) {
         final List<String> list = new ArrayList<String>();
-        final StringTokenizer st = new StringTokenizer(str, delimiter);
-        while (st.hasMoreElements()) {
-            list.add(st.nextToken());
+        int i = 0;
+        int j = str.indexOf(delimiter);
+        for (int h = 0; j >= 0; h++) {
+            list.add(str.substring(i, j));
+            i = j + 1;
+            j = str.indexOf(delimiter, i);
         }
-        return (String[]) list.toArray(new String[list.size()]);
+        list.add(str.substring(i));
+        return list;
     }
 
     // ===================================================================================
@@ -161,7 +166,7 @@ public class DfStringUtil {
         sb.append(s.substring(pos, s.length()).toUpperCase());
         return sb.toString();
     }
-    
+
     public static String decapitalizePropertyName(String propertyName) {
         if (propertyName == null || propertyName.length() == 0) {
             return propertyName;

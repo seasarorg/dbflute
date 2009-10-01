@@ -675,15 +675,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String subQueryClause;
         if (columnName.contains(",") && relatedColumnName.contains(",")) {
             // Two-or-More Primary Keys
-            String[] columnNameSplit = DfStringUtil.split(columnName, ",");
-            String[] realColumnNames = new String[columnNameSplit.length];
-            for (int i=0; i < columnNameSplit.length; i++) {
-                realColumnNames[i] = getExistsSubQueryRealColumnName(columnNameSplit[i].trim());
+            List<String> columnNameSplit = DfStringUtil.splitList(columnName, ",");
+            String[] realColumnNames = new String[columnNameSplit.size()];
+            for (int i=0; i < columnNameSplit.size(); i++) {
+                realColumnNames[i] = getExistsSubQueryRealColumnName(columnNameSplit.get(i).trim());
             }
-            String[] relatedColumnSplit = DfStringUtil.split(relatedColumnName, ",");
-            String[] relatedColumnNames = new String[columnNameSplit.length];
-            for (int i=0; i < relatedColumnSplit.length; i++) {
-                relatedColumnNames[i] = relatedColumnSplit[i].trim();
+            List<String> relatedColumnSplit = DfStringUtil.splitList(relatedColumnName, ",");
+            String[] relatedColumnNames = new String[columnNameSplit.size()];
+            for (int i=0; i < relatedColumnSplit.size(); i++) {
+                relatedColumnNames[i] = relatedColumnSplit.get(i).trim();
             }
             subQueryClause = getExistsSubQuerySql(subQuery, realColumnNames, relatedColumnNames, propertyName);
         } else {

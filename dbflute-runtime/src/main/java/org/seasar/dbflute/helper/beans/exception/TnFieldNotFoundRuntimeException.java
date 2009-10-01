@@ -13,31 +13,31 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.beans.exception;
+package org.seasar.dbflute.helper.beans.exception;
 
 /**
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnIllegalPropertyRuntimeException extends RuntimeException {
+public class TnFieldNotFoundRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
     private Class<?> targetClass;
 
-    private String propertyName;
+    private String fieldName;
 
-    public TnIllegalPropertyRuntimeException(Class<?> targetClass, String propertyName, Throwable cause) {
-        super("The property was illegal: class=" + targetClass.getName() + " property=" + propertyName, cause);
+    public TnFieldNotFoundRuntimeException(Class<?> targetClass, String fieldName) {
+        super("The field was not found: class=" + targetClass.getName() + " field=" + fieldName);
         this.targetClass = targetClass;
-        this.propertyName = propertyName;
+        this.fieldName = fieldName;
     }
 
     public Class<?> getTargetClass() {
         return targetClass;
     }
 
-    public String getPropertyName() {
-        return propertyName;
+    public String getFieldName() {
+        return fieldName;
     }
 }

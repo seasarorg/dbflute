@@ -13,31 +13,31 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.beans.exception;
+package org.seasar.dbflute.helper.beans.exception;
 
 /**
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnFieldNotFoundRuntimeException extends RuntimeException {
+public class TnConverterRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    private Class<?> targetClass;
+    private String propertyName;
 
-    private String fieldName;
+    private Object value;
 
-    public TnFieldNotFoundRuntimeException(Class<?> targetClass, String fieldName) {
-        super("The field was not found: class=" + targetClass.getName() + " field=" + fieldName);
-        this.targetClass = targetClass;
-        this.fieldName = fieldName;
+    public TnConverterRuntimeException(String propertyName, Object value, Throwable cause) {
+        super("Failed to convert: property=" + propertyName + " value=" + value, cause);
+        this.propertyName = propertyName;
+        this.value = value;
     }
 
-    public Class<?> getTargetClass() {
-        return targetClass;
+    public String getPropertyName() {
+        return propertyName;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public Object getValue() {
+        return value;
     }
 }

@@ -24,10 +24,10 @@ import java.util.Set;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.helper.beans.TnPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
 import org.seasar.dbflute.util.DfSystemUtil;

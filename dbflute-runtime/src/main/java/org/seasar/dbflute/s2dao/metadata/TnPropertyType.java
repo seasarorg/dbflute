@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
+import org.seasar.dbflute.helper.beans.TnPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
 
 /**
  * {Refers to Seasar and Extends its class}

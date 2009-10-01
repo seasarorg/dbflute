@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.TnPropertyDesc;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
