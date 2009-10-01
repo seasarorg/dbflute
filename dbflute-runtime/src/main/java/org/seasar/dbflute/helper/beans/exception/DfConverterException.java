@@ -19,25 +19,25 @@ package org.seasar.dbflute.helper.beans.exception;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class DfIllegalPropertyRuntimeException extends RuntimeException {
+public class DfConverterException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    private Class<?> targetClass;
-
     private String propertyName;
 
-    public DfIllegalPropertyRuntimeException(Class<?> targetClass, String propertyName, Throwable cause) {
-        super("The property was illegal: class=" + targetClass.getName() + " property=" + propertyName, cause);
-        this.targetClass = targetClass;
-        this.propertyName = propertyName;
-    }
+    private Object value;
 
-    public Class<?> getTargetClass() {
-        return targetClass;
+    public DfConverterException(String propertyName, Object value, Throwable cause) {
+        super("Failed to convert: property=" + propertyName + " value=" + value, cause);
+        this.propertyName = propertyName;
+        this.value = value;
     }
 
     public String getPropertyName() {
         return propertyName;
+    }
+
+    public Object getValue() {
+        return value;
     }
 }

@@ -23,7 +23,7 @@ import java.sql.Timestamp;
 
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.exception.DfIllegalPropertyRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.DfIllegalPropertyException;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -197,7 +197,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
                 return DfReflectionUtil.getValue(field, target);
             }
         } catch (Throwable t) {
-            throw new DfIllegalPropertyRuntimeException(beanDesc.getBeanClass(), propertyName, t);
+            throw new DfIllegalPropertyException(beanDesc.getBeanClass(), propertyName, t);
         }
     }
 
@@ -212,7 +212,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
                 DfReflectionUtil.setValue(field, target, value);
             }
         } catch (Throwable t) {
-            throw new DfIllegalPropertyRuntimeException(beanDesc.getBeanClass(), propertyName, t);
+            throw new DfIllegalPropertyException(beanDesc.getBeanClass(), propertyName, t);
         }
     }
 

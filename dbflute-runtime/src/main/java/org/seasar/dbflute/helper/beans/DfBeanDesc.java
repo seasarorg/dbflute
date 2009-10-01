@@ -20,10 +20,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.seasar.dbflute.helper.beans.exception.DfConstructorNotFoundRuntimeException;
-import org.seasar.dbflute.helper.beans.exception.DfFieldNotFoundRuntimeException;
-import org.seasar.dbflute.helper.beans.exception.DfMethodNotFoundRuntimeException;
-import org.seasar.dbflute.helper.beans.exception.DfPropertyNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.DfConstructorNotFoundException;
+import org.seasar.dbflute.helper.beans.exception.DfFieldNotFoundException;
+import org.seasar.dbflute.helper.beans.exception.DfMethodNotFoundException;
+import org.seasar.dbflute.helper.beans.exception.DfPropertyNotFoundException;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -39,7 +39,7 @@ public interface DfBeanDesc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    Constructor<?> getSuitableConstructor(Object[] args) throws DfConstructorNotFoundRuntimeException;
+    Constructor<?> getSuitableConstructor(Object[] args) throws DfConstructorNotFoundException;
 
     Constructor<?> getConstructor(Class<?>[] paramTypes);
     
@@ -48,7 +48,7 @@ public interface DfBeanDesc {
     //                                                                            ========
     boolean hasPropertyDesc(String propertyName);
 
-    DfPropertyDesc getPropertyDesc(String propertyName) throws DfPropertyNotFoundRuntimeException;
+    DfPropertyDesc getPropertyDesc(String propertyName) throws DfPropertyNotFoundException;
 
     int getPropertyDescSize();
     
@@ -59,21 +59,21 @@ public interface DfBeanDesc {
     //                                                                               =====
     boolean hasField(String fieldName);
 
-    Field getField(String fieldName) throws DfFieldNotFoundRuntimeException;
+    Field getField(String fieldName) throws DfFieldNotFoundException;
 
     int getFieldSize();
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
-    Method getMethod(String methodName) throws DfMethodNotFoundRuntimeException;
+    Method getMethod(String methodName) throws DfMethodNotFoundException;
 
-    Method getMethod(String methodName, Class<?>[] paramTypes) throws DfMethodNotFoundRuntimeException;
+    Method getMethod(String methodName, Class<?>[] paramTypes) throws DfMethodNotFoundException;
 
     Method getMethodNoException(String methodName);
 
     Method getMethodNoException(String methodName, Class<?>[] paramTypes);
 
-    Method[] getMethods(String methodName) throws DfMethodNotFoundRuntimeException;
+    Method[] getMethods(String methodName) throws DfMethodNotFoundException;
 
     boolean hasMethod(String methodName);
 
@@ -82,7 +82,7 @@ public interface DfBeanDesc {
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
-    Object newInstance(Object[] args) throws DfConstructorNotFoundRuntimeException;
-    Object invoke(Object target, String methodName, Object[] args) throws DfMethodNotFoundRuntimeException;
-    Object getFieldValue(String fieldName, Object target) throws DfFieldNotFoundRuntimeException;
+    Object newInstance(Object[] args) throws DfConstructorNotFoundException;
+    Object invoke(Object target, String methodName, Object[] args) throws DfMethodNotFoundException;
+    Object getFieldValue(String fieldName, Object target) throws DfFieldNotFoundException;
 }

@@ -19,25 +19,25 @@ package org.seasar.dbflute.helper.beans.exception;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class DfConverterRuntimeException extends RuntimeException {
+public class DfPropertyNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
+    private Class<?> targetClass;
+
     private String propertyName;
 
-    private Object value;
-
-    public DfConverterRuntimeException(String propertyName, Object value, Throwable cause) {
-        super("Failed to convert: property=" + propertyName + " value=" + value, cause);
+    public DfPropertyNotFoundException(Class<?> componentClass, String propertyName) {
+        super("The property was not found: class=" + componentClass.getName() + " property=" + propertyName);
+        this.targetClass = componentClass;
         this.propertyName = propertyName;
-        this.value = value;
+    }
+
+    public Class<?> getTargetClass() {
+        return targetClass;
     }
 
     public String getPropertyName() {
         return propertyName;
-    }
-
-    public Object getValue() {
-        return value;
     }
 }

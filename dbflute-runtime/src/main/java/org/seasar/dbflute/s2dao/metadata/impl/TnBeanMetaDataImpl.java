@@ -24,7 +24,7 @@ import java.util.Set;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.exception.DfPropertyNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.DfPropertyNotFoundException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
@@ -70,11 +70,11 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         return tableName;
     }
 
-    public TnPropertyType getVersionNoPropertyType() throws DfPropertyNotFoundRuntimeException {
+    public TnPropertyType getVersionNoPropertyType() throws DfPropertyNotFoundException {
         return getPropertyType(getVersionNoPropertyName());
     }
 
-    public TnPropertyType getTimestampPropertyType() throws DfPropertyNotFoundRuntimeException {
+    public TnPropertyType getTimestampPropertyType() throws DfPropertyNotFoundException {
         return getPropertyType(getTimestampPropertyName());
     }
 
@@ -199,7 +199,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
     }
 
     public TnRelationPropertyType getRelationPropertyType(String propertyName)
-            throws DfPropertyNotFoundRuntimeException {
+            throws DfPropertyNotFoundException {
 
         for (int i = 0; i < getRelationPropertyTypeSize(); i++) {
             TnRelationPropertyType rpt = (TnRelationPropertyType) relationPropertyTypes.get(i);
@@ -207,7 +207,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
                 return rpt;
             }
         }
-        throw new DfPropertyNotFoundRuntimeException(getBeanClass(), propertyName);
+        throw new DfPropertyNotFoundException(getBeanClass(), propertyName);
     }
 
     protected void setupTableName(DfBeanDesc beanDesc) {

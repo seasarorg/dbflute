@@ -18,7 +18,7 @@ package org.seasar.dbflute.helper.beans;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.seasar.dbflute.helper.beans.exception.DfIllegalPropertyRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.DfIllegalPropertyException;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -54,7 +54,7 @@ public interface DfPropertyDesc {
 
     Object getValue(Object target) throws IllegalStateException;
 
-    void setValue(Object target, Object value) throws DfIllegalPropertyRuntimeException, IllegalStateException;
+    void setValue(Object target, Object value) throws DfIllegalPropertyException, IllegalStateException;
 
     Object convertIfNeed(Object value);
 }
