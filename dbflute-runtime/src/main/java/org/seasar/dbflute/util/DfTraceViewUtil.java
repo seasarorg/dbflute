@@ -18,7 +18,7 @@ package org.seasar.dbflute.util;
 /**
  * @author jflute
  */
-public class TraceViewUtil {
+public class DfTraceViewUtil {
 
     /**
      * Convert to performance view.

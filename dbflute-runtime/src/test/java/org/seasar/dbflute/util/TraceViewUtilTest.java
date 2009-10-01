@@ -10,7 +10,7 @@ public class TraceViewUtilTest extends TestCase {
 
     public void test_convertObjectArrayToStringView() throws Exception {
         // ## Arrange ##
-        String actual = TraceViewUtil.convertObjectArrayToStringView(new String[] { "aaa", "bbb", "ccc" });
+        String actual = DfTraceViewUtil.convertObjectArrayToStringView(new String[] { "aaa", "bbb", "ccc" });
 
         // ## Act & Assert ##
         assertEquals("aaa, bbb, ccc", actual);

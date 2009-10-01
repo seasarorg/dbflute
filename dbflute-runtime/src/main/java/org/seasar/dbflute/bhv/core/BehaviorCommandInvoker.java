@@ -39,7 +39,7 @@ import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.TraceViewUtil;
+import org.seasar.dbflute.util.DfTraceViewUtil;
 
 /**
  * The invoker of behavior command.
@@ -324,7 +324,7 @@ public class BehaviorCommandInvoker {
     //                                                                      ==============
     protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution,
             long beforeCmd, long afterCmd) {
-        log("SqlExecution Initialization Cost: [" + TraceViewUtil.convertToPerformanceView(afterCmd - beforeCmd) + "]");
+        log("SqlExecution Initialization Cost: [" + DfTraceViewUtil.convertToPerformanceView(afterCmd - beforeCmd) + "]");
     }
 
     // ===================================================================================
@@ -667,7 +667,7 @@ public class BehaviorCommandInvoker {
     protected <RESULT> void logReturn(BehaviorCommand<RESULT> behaviorCommand, Class<?> retType, Object ret,
             long before, long after) {
         try {
-            final String prefix = "===========/ [" + TraceViewUtil.convertToPerformanceView(after - before) + " ";
+            final String prefix = "===========/ [" + DfTraceViewUtil.convertToPerformanceView(after - before) + " ";
             if (List.class.isAssignableFrom(retType)) {
                 if (ret == null) {
                     log(prefix + "(null)]");

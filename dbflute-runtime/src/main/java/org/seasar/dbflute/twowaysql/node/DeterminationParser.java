@@ -19,6 +19,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.exception.IfCommentNotBooleanResultException;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -32,10 +36,6 @@ public class DeterminationParser {
     private static final String OR = " || ";
     private static final String EQUAL = " == ";
     private static final String NOT_EQUAL = " != ";
-    private static final String GREATER_THAN = " > ";
-    private static final String LESS_THAN = " < ";
-    private static final String GREATER_EQUAL = " >= ";
-    private static final String LESS_EQUAL = " <= ";
     private static final String BOOLEAN_NOT = "!";
     private static final String METHOD_SUFFIX = "()";
 
@@ -125,20 +125,8 @@ public class DeterminationParser {
 
     protected Object parseCompareValue(String piece) {
         piece = piece.trim();
-        if (piece.startsWith("'") && piece.endsWith("'")) {
-            return piece.substring("'".length(), piece.length() - "'".length());
-        }
         if ("null".equalsIgnoreCase(piece)) {
             return null;
-        }
-        if ("true".equalsIgnoreCase(piece)) {
-            return true;
-        }
-        if ("false".equalsIgnoreCase(piece)) {
-            return false;
-        }
-        if (piece.startsWith(BOOLEAN_NOT)) {
-            // ng
         }
         final List<String> splitList = splitList(piece, ".");
         final List<String> propertyList = new ArrayList<String>();
@@ -154,31 +142,24 @@ public class DeterminationParser {
             if (baseObject == null) {
                 return null;
             }
-            final String methodName;
+            final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(baseObject.getClass());
             if (property.endsWith(METHOD_SUFFIX)) {
-                methodName = property;
+                final String methodName = property.substring(0, property.length() - METHOD_SUFFIX.length());
+                final Method method = beanDesc.getMethod(methodName);
+                baseObject = DfReflectionUtil.invoke(method, baseObject, (Object[]) null);
             } else {
-                methodName = "get" + DfStringUtil.initCap(property);
+                final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
+                baseObject = propertyDesc.getValue(baseObject);
             }
-            final Method method = DfReflectionUtil.getMethod(baseObject.getClass(), methodName, (Class[]) null);
-            baseObject = DfReflectionUtil.invoke(method, baseObject, (Object[]) null);
             ++index;
         }
         return baseObject;
     }
 
     protected boolean parseStandAloneValue(String piece) {
-        if (piece.startsWith("'") && piece.endsWith("'")) {
-            // ng
-        }
+        piece = piece.trim();
         if ("null".equalsIgnoreCase(piece)) {
-            // ng
-        }
-        if ("true".equalsIgnoreCase(piece)) {
-            return true;
-        }
-        if ("false".equalsIgnoreCase(piece)) {
-            return false;
+            throw new IfCommentNotBooleanResultException("TODO");
         }
         boolean not = false;
         if (piece.startsWith(BOOLEAN_NOT)) {
@@ -194,24 +175,22 @@ public class DeterminationParser {
             propertyList.add(splitList.get(i));
         }
         Object baseObject = _pmb;
-        int index = 0;
         for (String property : propertyList) {
             if (baseObject == null) {
                 // ng
             }
-            final String methodName;
+            final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(baseObject.getClass());
             if (property.endsWith(METHOD_SUFFIX)) {
-                methodName = property;
+                final String methodName = property.substring(0, property.length() - METHOD_SUFFIX.length());
+                final Method method = beanDesc.getMethod(methodName);
+                baseObject = DfReflectionUtil.invoke(method, baseObject, (Object[]) null);
             } else {
-                final boolean lastLoop = (index == (propertyList.size() - 1));
-                methodName = (lastLoop ? "is" : "get") + DfStringUtil.initCap(property);
+                final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
+                baseObject = propertyDesc.getValue(baseObject);
             }
-            final Method method = DfReflectionUtil.getMethod(baseObject.getClass(), methodName, (Class[]) null);
-            baseObject = DfReflectionUtil.invoke(method, baseObject, (Object[]) null);
-            ++index;
         }
         if (baseObject == null) {
-            // ng
+            throw new IfCommentNotBooleanResultException("TODO");
         }
         final boolean result = Boolean.valueOf(baseObject.toString());
         return not ? !result : result;

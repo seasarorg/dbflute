@@ -40,7 +40,7 @@ import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
-import org.seasar.dbflute.util.TraceViewUtil;
+import org.seasar.dbflute.util.DfTraceViewUtil;
 
 /**
  * The abstract class of condition-query.
@@ -1566,7 +1566,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected String convertObjectArrayToStringView(Object[] objArray) {
-        return TraceViewUtil.convertObjectArrayToStringView(objArray);
+        return DfTraceViewUtil.convertObjectArrayToStringView(objArray);
     }
 
     // -----------------------------------------------------

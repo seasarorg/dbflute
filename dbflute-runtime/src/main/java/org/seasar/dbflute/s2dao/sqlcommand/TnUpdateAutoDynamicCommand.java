@@ -27,7 +27,7 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnUpdateAutoHandler;
 import org.seasar.dbflute.util.DfSystemUtil;
-import org.seasar.dbflute.util.TraceViewUtil;
+import org.seasar.dbflute.util.DfTraceViewUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -108,7 +108,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         }
         if (types.isEmpty()) {
             String msg = "The property type for update was not found:";
-            msg = msg + " propertyNames=" + TraceViewUtil.convertObjectArrayToStringView(propertyNames);
+            msg = msg + " propertyNames=" + DfTraceViewUtil.convertObjectArrayToStringView(propertyNames);
             throw new IllegalStateException(msg);
         }
         TnPropertyType[] propertyTypes = (TnPropertyType[]) types.toArray(new TnPropertyType[types.size()]);

@@ -2,6 +2,11 @@ package org.seasar.dbflute.twowaysql.node;
 
 import org.seasar.dbflute.unit.PlainTestCase;
 
+/**
+ * 
+ * @author jflute
+ * @since 0.9.5.5 (2009/10/01 Thursday)
+ */
 public class DeterminationParserTest extends PlainTestCase {
 
     // ===================================================================================
@@ -30,6 +35,61 @@ public class DeterminationParserTest extends PlainTestCase {
         // ## Act && Assert ##
         assertFalse(parser.parse());
         pmb.setMemberName(null);
+        assertTrue(parser.parse());
+    }
+
+    // ===================================================================================
+    //                                                                             Boolean
+    //                                                                             =======
+    public void test_parse_boolean_property() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setExistsPurchase(true);
+        String expression = "pmb.existsPurchase";
+        DeterminationParser parser = createParser(pmb, expression);
+
+        // ## Act && Assert ##
+        assertTrue(parser.parse());
+        pmb.setExistsPurchase(false);
+        assertFalse(parser.parse());
+    }
+
+    public void test_parse_boolean_property_not() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setExistsPurchase(true);
+        String expression = "!pmb.existsPurchase";
+        DeterminationParser parser = createParser(pmb, expression);
+
+        // ## Act && Assert ##
+        assertFalse(parser.parse());
+        pmb.setExistsPurchase(false);
+        assertTrue(parser.parse());
+    }
+
+    public void test_parse_boolean_method() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setExistsPurchase(true);
+        String expression = "pmb.isExistsPurchase()";
+        DeterminationParser parser = createParser(pmb, expression);
+
+        // ## Act && Assert ##
+        assertTrue(parser.parse());
+        pmb.setExistsPurchase(false);
+        assertFalse(parser.parse());
+    }
+
+    public void test_parse_boolean_method_not() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setExistsPurchase(true);
+        String expression = "!pmb.isExistsPurchase()";
+        DeterminationParser parser = createParser(pmb, expression);
+
+        // ## Act && Assert ##
+        assertFalse(parser.parse());
+        pmb.setExistsPurchase(false);
         assertTrue(parser.parse());
     }
 
@@ -127,35 +187,6 @@ public class DeterminationParserTest extends PlainTestCase {
         assertFalse(parser.parse());
         pmb.getNextPmb().setExistsLogin(true);
         assertTrue(parser.parse());
-    }
-
-    // ===================================================================================
-    //                                                                             Literal
-    //                                                                             =======
-    public void test_parse_true_false() {
-        // ## Arrange ##
-        BasePmb pmb = new BasePmb();
-        pmb.setExistsPurchase(true);
-
-        // ## Act && Assert ##
-        assertTrue(createParser(pmb, "pmb.existsPurchase == true").parse());
-        assertFalse(createParser(pmb, "pmb.existsPurchase != true").parse());
-        assertFalse(createParser(pmb, "pmb.isExistsPurchase() == false").parse());
-        assertTrue(createParser(pmb, "pmb.isExistsPurchase() != false").parse());
-    }
-
-    public void test_parse_number() {
-        // ## Arrange ##
-        BasePmb pmb = new BasePmb();
-        pmb.setMemberId(3);
-        
-        // ## Act && Assert ##
-        assertTrue(createParser(pmb, "pmb.memberId > 0").parse());
-        assertFalse(createParser(pmb, "pmb.memberId > 3").parse());
-        assertFalse(createParser(pmb, "pmb.getMemberId() > 4").parse());
-        assertFalse(createParser(pmb, "pmb.memberId < 0").parse());
-        assertFalse(createParser(pmb, "pmb.memberId < 3").parse());
-        assertTrue(createParser(pmb, "pmb.getMemberId() < 4").parse());
     }
 
     // ===================================================================================
