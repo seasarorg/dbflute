@@ -27,7 +27,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
@@ -70,7 +70,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
         } else {
             fieldBeanAnnotationReader = null;
             this.dbmeta = ((Entity) DfReflectionUtil.newInstance(beanClass)).getDBMeta();
-            this.beanDesc = TnBeanDescFactory.getBeanDesc(beanClass);
+            this.beanDesc = DfBeanDescFactory.getBeanDesc(beanClass);
         }
     }
 

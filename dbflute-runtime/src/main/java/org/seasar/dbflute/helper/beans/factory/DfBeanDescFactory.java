@@ -25,7 +25,7 @@ import org.seasar.dbflute.helper.beans.impl.DfBeanDescImpl;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnBeanDescFactory {
+public class DfBeanDescFactory {
     
     // ===================================================================================
     //                                                                          Definition
@@ -35,7 +35,7 @@ public class TnBeanDescFactory {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    protected TnBeanDescFactory() {
+    protected DfBeanDescFactory() {
     }
 
     // ===================================================================================

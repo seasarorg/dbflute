@@ -25,7 +25,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.TnPropertyNotFoundRuntimeException;
-import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -57,7 +57,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
     }
 
     public void initialize() {
-        DfBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(getBeanClass());
+        DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(getBeanClass());
         setupTableName(beanDesc);
         setupProperty();
         setupPrimaryKey();

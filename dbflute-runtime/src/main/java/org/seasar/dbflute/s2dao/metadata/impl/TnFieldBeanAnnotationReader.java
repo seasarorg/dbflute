@@ -19,7 +19,7 @@ import java.lang.reflect.Field;
 
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
@@ -59,7 +59,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     //                                                                         Constructor
     //                                                                         ===========
     public TnFieldBeanAnnotationReader(Class<?> beanClass) {
-        this.beanDesc = TnBeanDescFactory.getBeanDesc(beanClass);
+        this.beanDesc = DfBeanDescFactory.getBeanDesc(beanClass);
     }
 
     // ===================================================================================

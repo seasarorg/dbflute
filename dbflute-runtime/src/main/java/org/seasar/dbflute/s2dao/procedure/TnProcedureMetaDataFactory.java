@@ -26,7 +26,7 @@ import java.util.Stack;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
-import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
@@ -56,7 +56,7 @@ public class TnProcedureMetaDataFactory {
                 throw new IllegalStateException("The pmb type was Not DTO type: " + pmbType.getName());
             }
         }
-        final DfBeanDesc pmbDesc = TnBeanDescFactory.getBeanDesc(pmbType);
+        final DfBeanDesc pmbDesc = DfBeanDescFactory.getBeanDesc(pmbType);
 
         // *Point
         final Stack<Class<?>> stack = new Stack<Class<?>>();

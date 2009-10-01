@@ -22,7 +22,7 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
@@ -88,7 +88,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
         final Object firstArg = args[0];
         String staticSql = getSql();
         if (firstArg != null) {
-            final DfBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(firstArg.getClass());
+            final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(firstArg.getClass());
 
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // Resolve embedded comment for parsing bind variable comment in embedded comment.

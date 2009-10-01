@@ -27,7 +27,7 @@ import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -71,7 +71,7 @@ public class ValueAndTypeSetupper {
             }
             final String currentName = _nameList.get(pos);
             if (pos == 1) {// at the First Loop
-                final DfBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(clazz);
+                final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
                 if (hasLikeSearchOption(beanDesc, currentName)) {
                     likeSearchOption = getLikeSearchOption(beanDesc, currentName, value);
                 }
@@ -86,7 +86,7 @@ public class ValueAndTypeSetupper {
                 clazz = (value != null ? value.getClass() : clazz);
                 continue;
             }
-            final DfBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(clazz);
+            final DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(clazz);
             if (beanDesc.hasPropertyDesc(currentName)) {
                 final DfPropertyDesc pd = beanDesc.getPropertyDesc(currentName);
                 value = getPropertyValue(clazz, value, currentName, pd);

@@ -22,7 +22,7 @@ import java.util.StringTokenizer;
 
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
@@ -111,7 +111,7 @@ public class TnRelationPropertyTypeFactoryImpl implements TnRelationPropertyType
     }
 
     protected DfBeanDesc getBeanDesc() {
-        return TnBeanDescFactory.getBeanDesc(beanClass);
+        return DfBeanDescFactory.getBeanDesc(beanClass);
     }
 
 }

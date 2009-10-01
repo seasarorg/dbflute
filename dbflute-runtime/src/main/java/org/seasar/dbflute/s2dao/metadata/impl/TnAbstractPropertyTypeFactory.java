@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -62,7 +62,7 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
      * @return {@link DfBeanDesc}
      */
     protected DfBeanDesc getBeanDesc() {
-        return TnBeanDescFactory.getBeanDesc(beanClass);
+        return DfBeanDescFactory.getBeanDesc(beanClass);
     }
 
     /**

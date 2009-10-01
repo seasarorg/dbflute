@@ -24,7 +24,7 @@ import java.util.StringTokenizer;
 
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
@@ -104,7 +104,7 @@ public class TnIdentifierGeneratorFactory {
     }
 
     protected static void setProperty(TnIdentifierGenerator generator, String propertyName, String value) {
-        DfBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(generator.getClass());
+        DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(generator.getClass());
         DfPropertyDesc pd = beanDesc.getPropertyDesc(propertyName);
         pd.setValue(generator, value);
     }
