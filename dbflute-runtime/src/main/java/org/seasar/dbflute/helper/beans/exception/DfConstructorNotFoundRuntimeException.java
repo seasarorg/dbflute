@@ -19,7 +19,7 @@ package org.seasar.dbflute.helper.beans.exception;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnConstructorNotFoundRuntimeException extends RuntimeException {
+public class DfConstructorNotFoundRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,13 +29,13 @@ public class TnConstructorNotFoundRuntimeException extends RuntimeException {
 
     private Class<?>[] paramTypes;
 
-    public TnConstructorNotFoundRuntimeException(Class<?> targetClass, Object[] methodArgs) {
+    public DfConstructorNotFoundRuntimeException(Class<?> targetClass, Object[] methodArgs) {
         super("The constructor was not found: class=" + targetClass.getName() + " args=" + getSignature(methodArgs));
         this.targetClass = targetClass;
         this.methodArgs = methodArgs;
     }
 
-    public TnConstructorNotFoundRuntimeException(Class<?> targetClass, Class<?>[] paramTypes) {
+    public DfConstructorNotFoundRuntimeException(Class<?> targetClass, Class<?>[] paramTypes) {
         super("The constructor was not found: class=" + targetClass.getName() + " args=" + getSignature(paramTypes));
         this.targetClass = targetClass;
         this.paramTypes = paramTypes;

@@ -19,7 +19,7 @@ package org.seasar.dbflute.helper.beans.exception;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnConverterRuntimeException extends RuntimeException {
+public class DfConverterRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,7 +27,7 @@ public class TnConverterRuntimeException extends RuntimeException {
 
     private Object value;
 
-    public TnConverterRuntimeException(String propertyName, Object value, Throwable cause) {
+    public DfConverterRuntimeException(String propertyName, Object value, Throwable cause) {
         super("Failed to convert: property=" + propertyName + " value=" + value, cause);
         this.propertyName = propertyName;
         this.value = value;

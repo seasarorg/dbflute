@@ -20,10 +20,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.seasar.dbflute.helper.beans.exception.TnConstructorNotFoundRuntimeException;
-import org.seasar.dbflute.helper.beans.exception.TnFieldNotFoundRuntimeException;
-import org.seasar.dbflute.helper.beans.exception.TnMethodNotFoundRuntimeException;
-import org.seasar.dbflute.helper.beans.exception.TnPropertyNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.DfConstructorNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.DfFieldNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.DfMethodNotFoundRuntimeException;
+import org.seasar.dbflute.helper.beans.exception.DfPropertyNotFoundRuntimeException;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -39,7 +39,7 @@ public interface DfBeanDesc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    Constructor<?> getSuitableConstructor(Object[] args) throws TnConstructorNotFoundRuntimeException;
+    Constructor<?> getSuitableConstructor(Object[] args) throws DfConstructorNotFoundRuntimeException;
 
     Constructor<?> getConstructor(Class<?>[] paramTypes);
     
@@ -48,7 +48,7 @@ public interface DfBeanDesc {
     //                                                                            ========
     boolean hasPropertyDesc(String propertyName);
 
-    DfPropertyDesc getPropertyDesc(String propertyName) throws TnPropertyNotFoundRuntimeException;
+    DfPropertyDesc getPropertyDesc(String propertyName) throws DfPropertyNotFoundRuntimeException;
 
     int getPropertyDescSize();
     
@@ -59,21 +59,21 @@ public interface DfBeanDesc {
     //                                                                               =====
     boolean hasField(String fieldName);
 
-    Field getField(String fieldName) throws TnFieldNotFoundRuntimeException;
+    Field getField(String fieldName) throws DfFieldNotFoundRuntimeException;
 
     int getFieldSize();
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
-    Method getMethod(String methodName) throws TnMethodNotFoundRuntimeException;
+    Method getMethod(String methodName) throws DfMethodNotFoundRuntimeException;
 
-    Method getMethod(String methodName, Class<?>[] paramTypes) throws TnMethodNotFoundRuntimeException;
+    Method getMethod(String methodName, Class<?>[] paramTypes) throws DfMethodNotFoundRuntimeException;
 
     Method getMethodNoException(String methodName);
 
     Method getMethodNoException(String methodName, Class<?>[] paramTypes);
 
-    Method[] getMethods(String methodName) throws TnMethodNotFoundRuntimeException;
+    Method[] getMethods(String methodName) throws DfMethodNotFoundRuntimeException;
 
     boolean hasMethod(String methodName);
 
@@ -82,7 +82,7 @@ public interface DfBeanDesc {
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
-    Object newInstance(Object[] args) throws TnConstructorNotFoundRuntimeException;
-    Object invoke(Object target, String methodName, Object[] args) throws TnMethodNotFoundRuntimeException;
-    Object getFieldValue(String fieldName, Object target) throws TnFieldNotFoundRuntimeException;
+    Object newInstance(Object[] args) throws DfConstructorNotFoundRuntimeException;
+    Object invoke(Object target, String methodName, Object[] args) throws DfMethodNotFoundRuntimeException;
+    Object getFieldValue(String fieldName, Object target) throws DfFieldNotFoundRuntimeException;
 }

@@ -19,7 +19,7 @@ package org.seasar.dbflute.helper.beans.exception;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnMethodNotFoundRuntimeException extends RuntimeException {
+public class DfMethodNotFoundRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public class TnMethodNotFoundRuntimeException extends RuntimeException {
 
     private Class<?>[] methodArgClasses;
 
-    public TnMethodNotFoundRuntimeException(Class<?> targetClass, String methodName, Object[] methodArgs) {
+    public DfMethodNotFoundRuntimeException(Class<?> targetClass, String methodName, Object[] methodArgs) {
         super("The method was not found: class=" + targetClass.getName() + " method=" + methodName + " args="
                 + getSignature(methodArgs));
         this.targetClass = targetClass;
@@ -44,7 +44,7 @@ public class TnMethodNotFoundRuntimeException extends RuntimeException {
         }
     }
 
-    public TnMethodNotFoundRuntimeException(Class<?> targetClass, String methodName, Class<?>[] methodArgClasses) {
+    public DfMethodNotFoundRuntimeException(Class<?> targetClass, String methodName, Class<?>[] methodArgClasses) {
         super("The method was not found: class=" + targetClass.getName() + " method=" + methodName + " args="
                 + getSignature(methodArgClasses));
         this.targetClass = targetClass;

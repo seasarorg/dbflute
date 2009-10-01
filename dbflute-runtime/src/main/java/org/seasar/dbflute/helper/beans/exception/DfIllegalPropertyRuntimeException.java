@@ -19,7 +19,7 @@ package org.seasar.dbflute.helper.beans.exception;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnIllegalPropertyRuntimeException extends RuntimeException {
+public class DfIllegalPropertyRuntimeException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,7 +27,7 @@ public class TnIllegalPropertyRuntimeException extends RuntimeException {
 
     private String propertyName;
 
-    public TnIllegalPropertyRuntimeException(Class<?> targetClass, String propertyName, Throwable cause) {
+    public DfIllegalPropertyRuntimeException(Class<?> targetClass, String propertyName, Throwable cause) {
         super("The property was illegal: class=" + targetClass.getName() + " property=" + propertyName, cause);
         this.targetClass = targetClass;
         this.propertyName = propertyName;
