@@ -7,7 +7,7 @@ import org.seasar.dbflute.unit.PlainTestCase;
  * @author jflute
  * @since 0.9.5.5 (2009/10/01 Thursday)
  */
-public class DeterminationParserTest extends PlainTestCase {
+public class IfCommentParserTest extends PlainTestCase {
 
     // ===================================================================================
     //                                                                                Null
@@ -17,7 +17,7 @@ public class DeterminationParserTest extends PlainTestCase {
         BasePmb pmb = new BasePmb();
         pmb.setMemberName("foo");
         String expression = "pmb.memberName != null";
-        DeterminationParser parser = createParser(pmb, expression);
+        IfCommentParser parser = createParser(pmb, expression);
 
         // ## Act && Assert ##
         assertTrue(parser.parse());
@@ -30,7 +30,7 @@ public class DeterminationParserTest extends PlainTestCase {
         BasePmb pmb = new BasePmb();
         pmb.setMemberName("foo");
         String expression = "pmb.memberName == null";
-        DeterminationParser parser = createParser(pmb, expression);
+        IfCommentParser parser = createParser(pmb, expression);
 
         // ## Act && Assert ##
         assertFalse(parser.parse());
@@ -46,7 +46,7 @@ public class DeterminationParserTest extends PlainTestCase {
         BasePmb pmb = new BasePmb();
         pmb.setExistsPurchase(true);
         String expression = "pmb.existsPurchase";
-        DeterminationParser parser = createParser(pmb, expression);
+        IfCommentParser parser = createParser(pmb, expression);
 
         // ## Act && Assert ##
         assertTrue(parser.parse());
@@ -59,7 +59,7 @@ public class DeterminationParserTest extends PlainTestCase {
         BasePmb pmb = new BasePmb();
         pmb.setExistsPurchase(true);
         String expression = "!pmb.existsPurchase";
-        DeterminationParser parser = createParser(pmb, expression);
+        IfCommentParser parser = createParser(pmb, expression);
 
         // ## Act && Assert ##
         assertFalse(parser.parse());
@@ -72,7 +72,7 @@ public class DeterminationParserTest extends PlainTestCase {
         BasePmb pmb = new BasePmb();
         pmb.setExistsPurchase(true);
         String expression = "pmb.isExistsPurchase()";
-        DeterminationParser parser = createParser(pmb, expression);
+        IfCommentParser parser = createParser(pmb, expression);
 
         // ## Act && Assert ##
         assertTrue(parser.parse());
@@ -85,7 +85,7 @@ public class DeterminationParserTest extends PlainTestCase {
         BasePmb pmb = new BasePmb();
         pmb.setExistsPurchase(true);
         String expression = "!pmb.isExistsPurchase()";
-        DeterminationParser parser = createParser(pmb, expression);
+        IfCommentParser parser = createParser(pmb, expression);
 
         // ## Act && Assert ##
         assertFalse(parser.parse());
@@ -102,7 +102,7 @@ public class DeterminationParserTest extends PlainTestCase {
         pmb.setMemberId(3);
         pmb.setMemberName("foo");
         String expression = "pmb.memberId != null && pmb.memberName != null";
-        DeterminationParser parser = createParser(pmb, expression);
+        IfCommentParser parser = createParser(pmb, expression);
 
         // ## Act && Assert ##
         assertTrue(parser.parse());
@@ -125,7 +125,7 @@ public class DeterminationParserTest extends PlainTestCase {
         pmb.setMemberName("foo");
         pmb.setExistsPurchase(true);
         String expression = "pmb.memberId != null && pmb.memberName != null && pmb.existsPurchase";
-        DeterminationParser parser = createParser(pmb, expression);
+        IfCommentParser parser = createParser(pmb, expression);
 
         // ## Act && Assert ##
         assertTrue(parser.parse());
@@ -150,7 +150,7 @@ public class DeterminationParserTest extends PlainTestCase {
         pmb.setMemberId(3);
         pmb.setMemberName("foo");
         String expression = "pmb.memberId != null || pmb.memberName != null";
-        DeterminationParser parser = createParser(pmb, expression);
+        IfCommentParser parser = createParser(pmb, expression);
 
         // ## Act && Assert ##
         assertTrue(parser.parse());
@@ -175,7 +175,7 @@ public class DeterminationParserTest extends PlainTestCase {
         nextPmb.setExistsLogin(true);
         pmb.setNextPmb(nextPmb);
         String expression = "pmb.memberId != null || pmb.memberName != null || pmb.nextPmb.existsLogin";
-        DeterminationParser parser = createParser(pmb, expression);
+        IfCommentParser parser = createParser(pmb, expression);
 
         // ## Act && Assert ##
         assertTrue(parser.parse());
@@ -192,8 +192,8 @@ public class DeterminationParserTest extends PlainTestCase {
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
-    protected DeterminationParser createParser(Object pmb, String expression) {
-        return new DeterminationParser(pmb, expression, "select foo from bar");
+    protected IfCommentParser createParser(Object pmb, String expression) {
+        return new IfCommentParser(pmb, expression, "select foo from bar");
     }
 
     protected static class BasePmb {

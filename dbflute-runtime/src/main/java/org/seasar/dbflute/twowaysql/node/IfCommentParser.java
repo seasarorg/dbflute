@@ -30,7 +30,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
 /**
  * @author jflute
  */
-public class DeterminationParser {
+public class IfCommentParser {
 
     private static final String AND = " && ";
     private static final String OR = " || ";
@@ -49,7 +49,7 @@ public class DeterminationParser {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DeterminationParser(Object pmb, String expression, String specifiedSql) {
+    public IfCommentParser(Object pmb, String expression, String specifiedSql) {
         this._pmb = pmb;
         this._expression = expression;
         this._specifiedSql = specifiedSql;
