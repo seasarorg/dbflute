@@ -24,9 +24,9 @@ import org.seasar.dbflute.helper.beans.exception.TnIllegalPropertyRuntimeExcepti
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public interface TnPropertyDesc {
+public interface DfPropertyDesc {
 
-    TnBeanDesc getBeanDesc();
+    DfBeanDesc getBeanDesc();
     
     String getPropertyName();
 

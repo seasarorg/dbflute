@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
@@ -101,7 +101,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
             final String yourKey = rpt.getYourKey(i);
             final TnPropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
-            final TnPropertyDesc pd = pt.getPropertyDesc();
+            final DfPropertyDesc pd = pt.getPropertyDesc();
             pd.setValue(res.getRow(), value);
             continue;
         }
@@ -154,7 +154,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     protected void registerRelationValidValue(TnRelationRowCreationResource res, TnPropertyType pt, Object value)
             throws SQLException {
         res.incrementValidValueCount();
-        final TnPropertyDesc pd = pt.getPropertyDesc();
+        final DfPropertyDesc pd = pt.getPropertyDesc();
         pd.setValue(res.getRow(), value);
     }
 

@@ -24,7 +24,7 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.SQLExceptionHandler;
@@ -77,7 +77,7 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
             String msg = "The arguement[propertyType] should not be null: value=" + value;
             throw new IllegalArgumentException(msg);
         }
-        TnPropertyDesc pd = propertyType.getPropertyDesc();
+        DfPropertyDesc pd = propertyType.getPropertyDesc();
         pd.setValue(bean, value);
     }
 

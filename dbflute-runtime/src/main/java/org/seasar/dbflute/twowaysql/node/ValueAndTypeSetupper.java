@@ -25,8 +25,8 @@ import org.seasar.dbflute.exception.BindVariableCommentNotFoundPropertyException
 import org.seasar.dbflute.exception.EmbeddedValueCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.IllegalOutsideSqlOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
-import org.seasar.dbflute.helper.beans.TnBeanDesc;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -71,7 +71,7 @@ public class ValueAndTypeSetupper {
             }
             final String currentName = _nameList.get(pos);
             if (pos == 1) {// at the First Loop
-                final TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(clazz);
+                final DfBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(clazz);
                 if (hasLikeSearchOption(beanDesc, currentName)) {
                     likeSearchOption = getLikeSearchOption(beanDesc, currentName, value);
                 }
@@ -86,9 +86,9 @@ public class ValueAndTypeSetupper {
                 clazz = (value != null ? value.getClass() : clazz);
                 continue;
             }
-            final TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(clazz);
+            final DfBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(clazz);
             if (beanDesc.hasPropertyDesc(currentName)) {
-                final TnPropertyDesc pd = beanDesc.getPropertyDesc(currentName);
+                final DfPropertyDesc pd = beanDesc.getPropertyDesc(currentName);
                 value = getPropertyValue(clazz, value, currentName, pd);
                 if (isLastLoop4LikeSearch(pos, likeSearchOption) && isValidStringValue(value)) { // at the Last Loop
                     value = likeSearchOption.generateRealValue((String) value);
@@ -131,13 +131,13 @@ public class ValueAndTypeSetupper {
     }
 
     // for OutsideSql
-    protected boolean hasLikeSearchOption(TnBeanDesc beanDesc, String currentName) {
+    protected boolean hasLikeSearchOption(DfBeanDesc beanDesc, String currentName) {
         return beanDesc.hasPropertyDesc(currentName + "InternalLikeSearchOption");
     }
 
     // for OutsideSql
-    protected LikeSearchOption getLikeSearchOption(TnBeanDesc beanDesc, String currentName, Object resourceBean) {
-        final TnPropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
+    protected LikeSearchOption getLikeSearchOption(DfBeanDesc beanDesc, String currentName, Object resourceBean) {
+        final DfPropertyDesc pb = beanDesc.getPropertyDesc(currentName + "InternalLikeSearchOption");
         final LikeSearchOption option = (LikeSearchOption) pb.getValue(resourceBean);
         if (option == null) {
             throwLikeSearchOptionNotFoundException(resourceBean, currentName);
@@ -194,7 +194,7 @@ public class ValueAndTypeSetupper {
         throw new IllegalOutsideSqlOperationException(msg);
     }
 
-    protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, TnPropertyDesc pd) {
+    protected Object getPropertyValue(Class<?> beanType, Object beanValue, String currentName, DfPropertyDesc pd) {
         try {
             return pd.getValue(beanValue);
         } catch (RuntimeException e) {

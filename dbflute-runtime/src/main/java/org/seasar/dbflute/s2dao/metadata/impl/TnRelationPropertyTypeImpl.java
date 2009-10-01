@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.metadata.impl;
 
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 
@@ -33,11 +33,11 @@ public class TnRelationPropertyTypeImpl extends TnPropertyTypeImpl implements Tn
 
     protected TnBeanMetaData beanMetaData;
 
-    public TnRelationPropertyTypeImpl(TnPropertyDesc propertyDesc) {
+    public TnRelationPropertyTypeImpl(DfPropertyDesc propertyDesc) {
         super(propertyDesc);
     }
 
-    public TnRelationPropertyTypeImpl(TnPropertyDesc propertyDesc, int relationNo, String[] myKeys, String[] yourKeys,
+    public TnRelationPropertyTypeImpl(DfPropertyDesc propertyDesc, int relationNo, String[] myKeys, String[] yourKeys,
             TnBeanMetaData beanMetaData) {
         super(propertyDesc);
         this.relationNo = relationNo;

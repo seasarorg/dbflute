@@ -30,8 +30,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.beans.TnBeanDesc;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.TnConstructorNotFoundRuntimeException;
 import org.seasar.dbflute.helper.beans.exception.TnFieldNotFoundRuntimeException;
 import org.seasar.dbflute.helper.beans.exception.TnMethodNotFoundRuntimeException;
@@ -44,7 +44,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnBeanDescImpl implements TnBeanDesc {
+public class DfBeanDescImpl implements DfBeanDesc {
 
     // ===================================================================================
     //                                                                          Definition
@@ -58,7 +58,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
     private Class<?> beanClass;
     private Constructor<?>[] constructors;
 
-    private StringKeyMap<TnPropertyDesc> propertyDescMap = StringKeyMap.createAsCaseInsensitive();
+    private StringKeyMap<DfPropertyDesc> propertyDescMap = StringKeyMap.createAsCaseInsensitive();
     private Map<String, Method[]> methodsMap = new ConcurrentHashMap<String, Method[]>();
     private Map<String, Field> fieldMap = new ConcurrentHashMap<String, Field>();
 
@@ -67,7 +67,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnBeanDescImpl(Class<?> beanClass) {
+    public DfBeanDescImpl(Class<?> beanClass) {
         if (beanClass == null) {
             String msg = "The argument 'beanClass' should not be null!";
             throw new IllegalArgumentException(msg);
@@ -120,15 +120,15 @@ public class TnBeanDescImpl implements TnBeanDesc {
         return getPropertyDescInternally(propertyName) != null;
     }
 
-    public TnPropertyDesc getPropertyDesc(String propertyName) throws TnPropertyNotFoundRuntimeException {
-        TnPropertyDesc pd = getPropertyDescInternally(propertyName);
+    public DfPropertyDesc getPropertyDesc(String propertyName) throws TnPropertyNotFoundRuntimeException {
+        DfPropertyDesc pd = getPropertyDescInternally(propertyName);
         if (pd == null) {
             throw new TnPropertyNotFoundRuntimeException(beanClass, propertyName);
         }
         return pd;
     }
 
-    private TnPropertyDesc getPropertyDescInternally(String propertyName) {
+    private DfPropertyDesc getPropertyDescInternally(String propertyName) {
         return propertyDescMap.get(propertyName);
     }
 
@@ -481,7 +481,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
         return new String(chars);
     }
 
-    private void addPropertyDesc(TnPropertyDesc propertyDesc) {
+    private void addPropertyDesc(DfPropertyDesc propertyDesc) {
         if (propertyDesc == null) {
             String msg = "The argument 'propertyDesc' should not be null!";
             throw new IllegalArgumentException(msg);
@@ -491,7 +491,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
 
     private void setupReadMethod(Method readMethod, String propertyName) {
         Class<?> propertyType = readMethod.getReturnType();
-        TnPropertyDesc propDesc = getPropertyDescInternally(propertyName);
+        DfPropertyDesc propDesc = getPropertyDescInternally(propertyName);
         if (propDesc != null) {
             if (!propDesc.getPropertyType().equals(propertyType)) {
                 invalidPropertyNames.add(propertyName);
@@ -499,14 +499,14 @@ public class TnBeanDescImpl implements TnBeanDesc {
                 propDesc.setReadMethod(readMethod);
             }
         } else {
-            propDesc = new TnPropertyDescImpl(propertyName, propertyType, readMethod, null, null, this);
+            propDesc = new DfPropertyDescImpl(propertyName, propertyType, readMethod, null, null, this);
             addPropertyDesc(propDesc);
         }
     }
 
     private void setupWriteMethod(Method writeMethod, String propertyName) {
         Class<?> propertyType = writeMethod.getParameterTypes()[0];
-        TnPropertyDesc propDesc = getPropertyDescInternally(propertyName);
+        DfPropertyDesc propDesc = getPropertyDescInternally(propertyName);
         if (propDesc != null) {
             if (!propDesc.getPropertyType().equals(propertyType)) {
                 invalidPropertyNames.add(propertyName);
@@ -514,7 +514,7 @@ public class TnBeanDescImpl implements TnBeanDesc {
                 propDesc.setWriteMethod(writeMethod);
             }
         } else {
-            propDesc = new TnPropertyDescImpl(propertyName, propertyType, null, writeMethod, null, this);
+            propDesc = new DfPropertyDescImpl(propertyName, propertyType, null, writeMethod, null, this);
             addPropertyDesc(propDesc);
         }
     }
@@ -633,10 +633,10 @@ public class TnBeanDescImpl implements TnBeanDesc {
                 fieldMap.put(fname, field);
                 if (DfReflectionUtil.isInstanceField(field)) {
                     if (hasPropertyDesc(fname)) {
-                        TnPropertyDesc pd = getPropertyDesc(field.getName());
+                        DfPropertyDesc pd = getPropertyDesc(field.getName());
                         pd.setField(field);
                     } else if (DfReflectionUtil.isPublicField(field)) {
-                        TnPropertyDesc pd = new TnPropertyDescImpl(field.getName(), field.getType(), null, null, field,
+                        DfPropertyDesc pd = new DfPropertyDescImpl(field.getName(), field.getType(), null, null, field,
                                 this);
                         propertyDescMap.put(fname, pd);
                     }

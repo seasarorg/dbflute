@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -82,7 +82,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
             final String yourKey = rpt.getYourKey(i);
             final TnPropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
-            final TnPropertyDesc pd = pt.getPropertyDesc();
+            final DfPropertyDesc pd = pt.getPropertyDesc();
             pd.setValue(res.getRow(), value);
             continue;
         }
@@ -145,7 +145,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
                 dbmeta.setupEntityProperty(propertyName, res.getRow(), value);
             } else {
-                final TnPropertyDesc pd = pt.getPropertyDesc();
+                final DfPropertyDesc pd = pt.getPropertyDesc();
                 pd.setValue(res.getRow(), value);
             }
         }

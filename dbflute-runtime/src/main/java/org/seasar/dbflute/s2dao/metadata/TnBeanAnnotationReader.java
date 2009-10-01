@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -23,7 +23,7 @@ import org.seasar.dbflute.helper.beans.TnPropertyDesc;
  */
 public interface TnBeanAnnotationReader {
 
-    String getColumnAnnotation(TnPropertyDesc pd);
+    String getColumnAnnotation(DfPropertyDesc pd);
 
     String getTableAnnotation();
 
@@ -31,13 +31,13 @@ public interface TnBeanAnnotationReader {
 
     String getTimestampPropertyName();
 
-    String getId(TnPropertyDesc pd);
+    String getId(DfPropertyDesc pd);
 
-    boolean hasRelationNo(TnPropertyDesc pd);
+    boolean hasRelationNo(DfPropertyDesc pd);
 
-    int getRelationNo(TnPropertyDesc pd);
+    int getRelationNo(DfPropertyDesc pd);
 
-    String getRelationKey(TnPropertyDesc pd);
+    String getRelationKey(DfPropertyDesc pd);
 
-    String getValueType(TnPropertyDesc pd);
+    String getValueType(DfPropertyDesc pd);
 }

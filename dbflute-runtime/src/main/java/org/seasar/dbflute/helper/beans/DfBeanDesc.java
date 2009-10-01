@@ -29,27 +29,26 @@ import org.seasar.dbflute.helper.beans.exception.TnPropertyNotFoundRuntimeExcept
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public interface TnBeanDesc {
-    
+public interface DfBeanDesc {
+
     // ===================================================================================
     //                                                                                Bean
     //                                                                                ====
     Class<?> getBeanClass();
-    
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     Constructor<?> getSuitableConstructor(Object[] args) throws TnConstructorNotFoundRuntimeException;
-    
+
     Constructor<?> getConstructor(Class<?>[] paramTypes);
-    
     
     // ===================================================================================
     //                                                                            Property
     //                                                                            ========
     boolean hasPropertyDesc(String propertyName);
 
-    TnPropertyDesc getPropertyDesc(String propertyName) throws TnPropertyNotFoundRuntimeException;
+    DfPropertyDesc getPropertyDesc(String propertyName) throws TnPropertyNotFoundRuntimeException;
 
     int getPropertyDescSize();
     

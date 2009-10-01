@@ -20,8 +20,8 @@ import java.util.List;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.helper.beans.TnBeanDesc;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
@@ -66,10 +66,10 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
 
     public TnPropertyType[] createBeanPropertyTypes() {
         final List<TnPropertyType> list = new ArrayList<TnPropertyType>();
-        final TnBeanDesc beanDesc = getBeanDesc();
+        final DfBeanDesc beanDesc = getBeanDesc();
         final List<String> proppertyNameList = beanDesc.getProppertyNameList();
         for (String proppertyName : proppertyNameList) {
-            final TnPropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
+            final DfPropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
 
             // Read-only property is unnecessary!
             if (!pd.hasWriteMethod()) {
@@ -90,7 +90,7 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
     }
 
     @Override
-    protected boolean isRelation(TnPropertyDesc propertyDesc) {
+    protected boolean isRelation(DfPropertyDesc propertyDesc) {
         final String propertyName = propertyDesc.getPropertyName();
         if (hasDBMeta() && (_dbmeta.hasForeign(propertyName) || _dbmeta.hasReferrer(propertyName))) {
             return true;
@@ -98,12 +98,12 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
         return hasRelationNoAnnotation(propertyDesc);
     }
 
-    protected boolean hasRelationNoAnnotation(TnPropertyDesc propertyDesc) {
+    protected boolean hasRelationNoAnnotation(DfPropertyDesc propertyDesc) {
         return beanAnnotationReader.hasRelationNo(propertyDesc);
     }
 
     @Override
-    protected boolean isPrimaryKey(TnPropertyDesc propertyDesc) {
+    protected boolean isPrimaryKey(DfPropertyDesc propertyDesc) {
         final String propertyName = propertyDesc.getPropertyName();
         if (hasDBMeta() && _dbmeta.hasPrimaryKey() && _dbmeta.hasColumn(propertyName)) {
             if (_dbmeta.findColumnInfo(propertyName).isPrimary()) {
@@ -113,21 +113,21 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
         return hasIdAnnotation(propertyDesc);
     }
 
-    protected boolean hasIdAnnotation(TnPropertyDesc propertyDesc) {
+    protected boolean hasIdAnnotation(DfPropertyDesc propertyDesc) {
         return beanAnnotationReader.getId(propertyDesc) != null;
     }
 
     @Override
     protected boolean isPersistent(TnPropertyType propertyType) {
         final String propertyName = propertyType.getPropertyName();
-        final TnPropertyDesc propertyDesc = propertyType.getPropertyDesc();
+        final DfPropertyDesc propertyDesc = propertyType.getPropertyDesc();
         if ((hasDBMeta() && _dbmeta.hasColumn(propertyName)) || hasColumnAnnotation(propertyDesc)) {
             return true;
         }
         return false;
     }
 
-    protected boolean hasColumnAnnotation(TnPropertyDesc propertyDesc) {
+    protected boolean hasColumnAnnotation(DfPropertyDesc propertyDesc) {
         return beanAnnotationReader.getColumnAnnotation(propertyDesc) != null;
     }
 }

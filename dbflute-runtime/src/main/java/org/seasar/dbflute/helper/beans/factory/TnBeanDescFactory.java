@@ -18,8 +18,8 @@ package org.seasar.dbflute.helper.beans.factory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.seasar.dbflute.helper.beans.TnBeanDesc;
-import org.seasar.dbflute.helper.beans.impl.TnBeanDescImpl;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.impl.DfBeanDescImpl;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -30,7 +30,7 @@ public class TnBeanDescFactory {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Map<Class<?>, TnBeanDesc> beanDescCache = new ConcurrentHashMap<Class<?>, TnBeanDesc>(1024);
+    private static final Map<Class<?>, DfBeanDesc> beanDescCache = new ConcurrentHashMap<Class<?>, DfBeanDesc>(1024);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -41,10 +41,10 @@ public class TnBeanDescFactory {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public static TnBeanDesc getBeanDesc(Class<?> clazz) {
-        TnBeanDesc beanDesc = beanDescCache.get(clazz);
+    public static DfBeanDesc getBeanDesc(Class<?> clazz) {
+        DfBeanDesc beanDesc = beanDescCache.get(clazz);
         if (beanDesc == null) {
-            beanDesc = new TnBeanDescImpl(clazz);
+            beanDesc = new DfBeanDescImpl(clazz);
             beanDescCache.put(clazz, beanDesc);
         }
         return beanDesc;

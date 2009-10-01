@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -132,7 +132,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
             // of super class are unused. It prepares original atributes here.
             @Override
             protected void setupIdentifierGenerator(TnPropertyType propertyType) {
-                final TnPropertyDesc pd = propertyType.getPropertyDesc();
+                final DfPropertyDesc pd = propertyType.getPropertyDesc();
                 final String propertyName = propertyType.getPropertyName();
                 final String idType = beanAnnotationReader.getId(pd);
                 final TnIdentifierGenerator generator = createInternalIdentifierGenerator(propertyType, idType);

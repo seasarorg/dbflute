@@ -17,8 +17,8 @@ package org.seasar.dbflute.s2dao.metadata.impl;
 
 import java.lang.reflect.Field;
 
-import org.seasar.dbflute.helper.beans.TnBeanDesc;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.util.DfReflectionUtil;
@@ -53,7 +53,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private TnBeanDesc beanDesc;
+    private DfBeanDesc beanDesc;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -65,7 +65,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
     // ===================================================================================
     //                                                                      Implementation
     //                                                                      ==============
-    public String getColumnAnnotation(TnPropertyDesc pd) {
+    public String getColumnAnnotation(DfPropertyDesc pd) {
         String propertyName = pd.getPropertyName();
         String columnNameKey = propertyName + COLUMN_SUFFIX;
         return getField(columnNameKey);
@@ -95,7 +95,7 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
         return null;
     }
 
-    public String getId(TnPropertyDesc pd) {
+    public String getId(DfPropertyDesc pd) {
         String id = getField(pd.getPropertyName() + ID_SUFFIX);
         if (id != null) {
             return id;
@@ -103,24 +103,24 @@ public class TnFieldBeanAnnotationReader implements TnBeanAnnotationReader {
         return getField(pd.getPropertyName() + ID_SUFFIX);
     }
 
-    public String getRelationKey(TnPropertyDesc pd) {
+    public String getRelationKey(DfPropertyDesc pd) {
         String propertyName = pd.getPropertyName();
         String relkeysKey = propertyName + RELKEYS_SUFFIX;
         return getField(relkeysKey);
     }
 
-    public int getRelationNo(TnPropertyDesc pd) {
+    public int getRelationNo(DfPropertyDesc pd) {
         String relnoKey = pd.getPropertyName() + RELNO_SUFFIX;
         Field field = beanDesc.getField(relnoKey);
         return (Integer) DfReflectionUtil.getValue(field, null);
     }
 
-    public boolean hasRelationNo(TnPropertyDesc pd) {
+    public boolean hasRelationNo(DfPropertyDesc pd) {
         String relnoKey = pd.getPropertyName() + RELNO_SUFFIX;
         return beanDesc.hasField(relnoKey);
     }
 
-    public String getValueType(TnPropertyDesc pd) {
+    public String getValueType(DfPropertyDesc pd) {
         String valueTypeKey = pd.getPropertyName() + VALUE_TYPE_SUFFIX;
         return getField(valueTypeKey);
     }

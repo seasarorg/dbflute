@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -156,7 +156,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             Map<String, Integer> selectIndexMap) throws SQLException {
         final ValueType valueType = pt.getValueType();
         final Object value = getValue(rs, columnName, valueType, selectIndexMap);
-        final TnPropertyDesc pd = pt.getPropertyDesc();
+        final DfPropertyDesc pd = pt.getPropertyDesc();
         pd.setValue(row, value);
     }
 

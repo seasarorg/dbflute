@@ -23,8 +23,8 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.beans.TnBeanDesc;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.resource.SQLExceptionHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
@@ -112,12 +112,12 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         bmd.setModifiedPropertySupport(new TnModifiedPropertySupport() {
             @SuppressWarnings("unchecked")
             public Set<String> getModifiedPropertyNames(Object bean) {
-                TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(bean.getClass());
+                DfBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(bean.getClass());
                 String propertyName = "modifiedPropertyNames";
                 if (!beanDesc.hasPropertyDesc(propertyName)) {
                     return Collections.EMPTY_SET;
                 } else {
-                    TnPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
+                    DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
                     Object value = propertyDesc.getValue(bean);
                     Set<String> names = (Set<String>) value;
                     return names;

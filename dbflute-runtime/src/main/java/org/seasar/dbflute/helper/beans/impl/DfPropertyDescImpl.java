@@ -21,8 +21,8 @@ import java.lang.reflect.Method;
 import java.sql.Time;
 import java.sql.Timestamp;
 
-import org.seasar.dbflute.helper.beans.TnBeanDesc;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.TnIllegalPropertyRuntimeException;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -31,7 +31,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnPropertyDescImpl implements TnPropertyDesc {
+public class DfPropertyDescImpl implements DfPropertyDesc {
 
     // ===================================================================================
     //                                                                          Definition
@@ -46,7 +46,7 @@ public class TnPropertyDescImpl implements TnPropertyDesc {
     private Method readMethod;
     private Method writeMethod;
     private Field field;
-    private TnBeanDesc beanDesc;
+    private DfBeanDesc beanDesc;
     private Constructor<?> stringConstructor;
     private Method valueOfMethod;
     private boolean readable = false;
@@ -55,14 +55,14 @@ public class TnPropertyDescImpl implements TnPropertyDesc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnPropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
-            TnBeanDesc beanDesc) {
+    public DfPropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
+            DfBeanDesc beanDesc) {
 
         this(propertyName, propertyType, readMethod, writeMethod, null, beanDesc);
     }
 
-    public TnPropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
-            Field field, TnBeanDesc beanDesc) {
+    public DfPropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
+            Field field, DfBeanDesc beanDesc) {
         if (propertyName == null) {
             String msg = "The argument 'propertyName' should not be null!";
             throw new IllegalArgumentException(msg);
@@ -110,7 +110,7 @@ public class TnPropertyDescImpl implements TnPropertyDesc {
     // ===================================================================================
     //                                                                                Bean
     //                                                                                ====
-    public TnBeanDesc getBeanDesc() {
+    public DfBeanDesc getBeanDesc() {
         return beanDesc;
     }
 

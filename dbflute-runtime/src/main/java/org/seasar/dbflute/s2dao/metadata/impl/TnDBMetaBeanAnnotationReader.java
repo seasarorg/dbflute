@@ -25,8 +25,8 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
-import org.seasar.dbflute.helper.beans.TnBeanDesc;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.util.DfReflectionUtil;
@@ -49,7 +49,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
     protected final boolean simpleType;
     protected final TnFieldBeanAnnotationReader fieldBeanAnnotationReader;
     protected final DBMeta dbmeta;
-    protected final TnBeanDesc beanDesc;
+    protected final DfBeanDesc beanDesc;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -86,7 +86,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
     /**
      * {@inheritDoc}}
      */
-    public String getColumnAnnotation(TnPropertyDesc pd) {
+    public String getColumnAnnotation(DfPropertyDesc pd) {
         if (simpleType) {
             return null;
         }
@@ -138,7 +138,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
         return dbmeta.getUpdateDateColumnInfo().getPropertyName();
     }
 
-    public String getId(TnPropertyDesc pd) {
+    public String getId(DfPropertyDesc pd) {
         if (simpleType) {
             return null;
         }
@@ -157,7 +157,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
         return null;
     }
 
-    public String getRelationKey(TnPropertyDesc pd) {
+    public String getRelationKey(DfPropertyDesc pd) {
         if (simpleType) {
             return null;
         }
@@ -182,7 +182,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
         return sb.toString();
     }
 
-    public int getRelationNo(TnPropertyDesc pd) {
+    public int getRelationNo(DfPropertyDesc pd) {
         if (simpleType) {
             return 0;
         }
@@ -193,7 +193,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
         return foreignInfo.getRelationNo();
     }
 
-    public boolean hasRelationNo(TnPropertyDesc pd) {
+    public boolean hasRelationNo(DfPropertyDesc pd) {
         if (simpleType) {
             return false;
         }
@@ -203,7 +203,7 @@ public class TnDBMetaBeanAnnotationReader implements TnBeanAnnotationReader {
         return dbmeta.hasForeign(pd.getPropertyName());
     }
 
-    public String getValueType(TnPropertyDesc pd) {
+    public String getValueType(DfPropertyDesc pd) {
         if (simpleType) {
             return null;
         }

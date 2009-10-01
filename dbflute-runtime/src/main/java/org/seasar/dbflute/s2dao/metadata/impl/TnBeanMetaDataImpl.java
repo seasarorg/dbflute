@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.beans.TnBeanDesc;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.TnPropertyNotFoundRuntimeException;
 import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
@@ -57,7 +57,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
     }
 
     public void initialize() {
-        TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(getBeanClass());
+        DfBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(getBeanClass());
         setupTableName(beanDesc);
         setupProperty();
         setupPrimaryKey();
@@ -210,7 +210,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
         throw new TnPropertyNotFoundRuntimeException(getBeanClass(), propertyName);
     }
 
-    protected void setupTableName(TnBeanDesc beanDesc) {
+    protected void setupTableName(DfBeanDesc beanDesc) {
         String ta = beanAnnotationReader.getTableAnnotation();
         if (ta != null) {
             tableName = ta;
@@ -248,7 +248,7 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
     }
 
     protected void setupIdentifierGenerator(TnPropertyType propertyType) {
-        TnPropertyDesc pd = propertyType.getPropertyDesc();
+        DfPropertyDesc pd = propertyType.getPropertyDesc();
         String propertyName = propertyType.getPropertyName();
         String idType = beanAnnotationReader.getId(pd);
         TnIdentifierGenerator generator = TnIdentifierGeneratorFactory.createIdentifierGenerator(propertyType, idType);

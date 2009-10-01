@@ -20,8 +20,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.beans.TnBeanDesc;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.TnBeanDescFactory;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
@@ -88,14 +88,14 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
         final Object firstArg = args[0];
         String staticSql = getSql();
         if (firstArg != null) {
-            final TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(firstArg.getClass());
+            final DfBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(firstArg.getClass());
 
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // Resolve embedded comment for parsing bind variable comment in embedded comment.
             // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             final List<String> proppertyNameList = beanDesc.getProppertyNameList();
             for (String proppertyName : proppertyNameList) {
-                final TnPropertyDesc propertyDesc = beanDesc.getPropertyDesc(proppertyName);
+                final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(proppertyName);
                 final Class<?> propertyType = propertyDesc.getPropertyType();
                 if (!propertyType.equals(String.class)) {
                     continue;

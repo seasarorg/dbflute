@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -147,7 +147,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
                     }
                 }
                 if (relationRow != null) {
-                    final TnPropertyDesc pd = rpt.getPropertyDesc();
+                    final DfPropertyDesc pd = rpt.getPropertyDesc();
                     pd.setValue(row, relationRow);
                 }
             }

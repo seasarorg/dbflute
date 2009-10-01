@@ -24,7 +24,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.exception.EntityAlreadyUpdatedException;
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -180,19 +180,19 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
         TnBeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getPrimaryKeySize(); ++i) {
             TnPropertyType pt = bmd.getPropertyTypeByColumnName(bmd.getPrimaryKey(i));
-            TnPropertyDesc pd = pt.getPropertyDesc();
+            DfPropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
         }
         if (optimisticLockHandling && bmd.hasVersionNoPropertyType()) {
             TnPropertyType pt = bmd.getVersionNoPropertyType();
-            TnPropertyDesc pd = pt.getPropertyDesc();
+            DfPropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
         }
         if (optimisticLockHandling && bmd.hasTimestampPropertyType()) {
             TnPropertyType pt = bmd.getTimestampPropertyType();
-            TnPropertyDesc pd = pt.getPropertyDesc();
+            DfPropertyDesc pd = pt.getPropertyDesc();
             varList.add(pd.getValue(bean));
             varValueTypeList.add(pt.getValueType());
         }
@@ -200,14 +200,14 @@ public abstract class TnAbstractAutoHandler extends TnBasicHandler {
 
     protected void updateTimestampIfNeed(Object bean) {
         if (getTimestamp() != null) {
-            TnPropertyDesc pd = getBeanMetaData().getTimestampPropertyType().getPropertyDesc();
+            DfPropertyDesc pd = getBeanMetaData().getTimestampPropertyType().getPropertyDesc();
             pd.setValue(bean, getTimestamp());
         }
     }
 
     protected void updateVersionNoIfNeed(Object bean) {
         if (getVersionNo() != null) {
-            TnPropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
+            DfPropertyDesc pd = getBeanMetaData().getVersionNoPropertyType().getPropertyDesc();
             pd.setValue(bean, getVersionNo());
         }
     }

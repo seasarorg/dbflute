@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.metadata.impl;
 
-import org.seasar.dbflute.helper.beans.TnPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
@@ -26,7 +26,7 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
  */
 public class TnPropertyTypeImpl implements TnPropertyType {
 
-    private TnPropertyDesc propertyDesc;
+    private DfPropertyDesc propertyDesc;
 
     private String propertyName;
 
@@ -38,15 +38,15 @@ public class TnPropertyTypeImpl implements TnPropertyType {
 
     private boolean persistent = true;
 
-    public TnPropertyTypeImpl(TnPropertyDesc propertyDesc) {
+    public TnPropertyTypeImpl(DfPropertyDesc propertyDesc) {
         this(propertyDesc, TnValueTypes.OBJECT, propertyDesc.getPropertyName());
     }
 
-    public TnPropertyTypeImpl(TnPropertyDesc propertyDesc, ValueType valueType) {
+    public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType) {
         this(propertyDesc, valueType, propertyDesc.getPropertyName());
     }
 
-    public TnPropertyTypeImpl(TnPropertyDesc propertyDesc, ValueType valueType, String columnName) {
+    public TnPropertyTypeImpl(DfPropertyDesc propertyDesc, ValueType valueType, String columnName) {
         this.propertyDesc = propertyDesc;
         this.propertyName = propertyDesc.getPropertyName();
         this.valueType = valueType;
@@ -63,7 +63,7 @@ public class TnPropertyTypeImpl implements TnPropertyType {
         this.columnName = columnName;
     }
 
-    public TnPropertyDesc getPropertyDesc() {
+    public DfPropertyDesc getPropertyDesc() {
         return propertyDesc;
     }
 
