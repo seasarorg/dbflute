@@ -17,7 +17,6 @@ package org.seasar.dbflute.util;
 
 import java.util.Map;
 
-import ognl.ClassResolver;
 import ognl.Ognl;
 import ognl.OgnlException;
 
@@ -46,9 +45,8 @@ public class DfOgnlUtil {
     @SuppressWarnings("unchecked")
     public static Object getValue(Object exp, Map ctx, Object root, String path, int lineNumber) {
         try {
-            Map newCtx = addClassResolverIfNecessary(ctx, root);
-            if (newCtx != null) {
-                return Ognl.getValue(exp, newCtx, root);
+            if (ctx != null) {
+                return Ognl.getValue(exp, ctx, root);
             } else {
                 return Ognl.getValue(exp, root);
             }
@@ -145,46 +143,6 @@ public class DfOgnlUtil {
 
         public OgnlParseExpressionException(String msg, Throwable e) {
             super(msg, e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    static Map addClassResolverIfNecessary(Map ctx, Object root) {
-        // Is it necessary???
-        //        if (root instanceof S2Container) {
-        //            S2Container container = (S2Container) root;
-        //            ClassLoader classLoader = container.getClassLoader();
-        //            if (classLoader != null) {
-        //                ClassResolverImpl classResolver = new ClassResolverImpl(classLoader);
-        //                if (ctx == null) {
-        //                    ctx = Ognl.createDefaultContext(root, classResolver);
-        //                } else {
-        //                    ctx = Ognl.addDefaultContext(root, classResolver, ctx);
-        //                }
-        //            }
-        //        }
-        return ctx;
-    }
-
-    public static class ClassResolverImpl implements ClassResolver {
-        final private ClassLoader classLoader;
-
-        public ClassResolverImpl(ClassLoader classLoader) {
-            this.classLoader = classLoader;
-        }
-
-        @SuppressWarnings("unchecked")
-        public Class<?> classForName(String className, Map ctx) throws ClassNotFoundException {
-            try {
-                return classLoader.loadClass(className);
-            } catch (ClassNotFoundException ex) {
-                int dot = className.indexOf('.');
-                if (dot < 0) {
-                    return classLoader.loadClass("java.lang." + className);
-                } else {
-                    throw ex;
-                }
-            }
         }
     }
 
