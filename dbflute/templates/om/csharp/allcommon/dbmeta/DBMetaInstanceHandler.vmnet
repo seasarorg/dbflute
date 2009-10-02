@@ -71,8 +71,8 @@ namespace ${glPackageBaseCommonDBMeta} {
             InitializeDBMetaMap();
             lock (_tableDbNameInstanceMap) {
                 Map<String, ${glDBMeta}> copiedMap = new HashMap<String, ${glDBMeta}>();
-                foreach (String tableDbName in _tableDbNameInstanceMap) {
-                    copiedMap.put(tableDbName, _tableDbNameInstanceMap[tableDbName]);
+                foreach (String tableDbName in _tableDbNameInstanceMap.keySet()) {
+                    copiedMap.put(tableDbName, _tableDbNameInstanceMap.get(tableDbName));
                 }
                 return copiedMap;
             }
