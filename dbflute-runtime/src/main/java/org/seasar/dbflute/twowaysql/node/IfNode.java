@@ -89,10 +89,12 @@ public class IfNode extends ContainerNode {
         msg = msg + "Please confirm the existence of your property on your arguments." + ln();
         msg = msg + "And confirm the IF comment of your specified SQL." + ln();
         msg = msg + "  For example, correct IF comment is as below:" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    /*IF pmb.xxxId != null*/XXX_ID = .../*END*/" + ln();
         msg = msg + "    /*IF pmb.isPaging()*/.../*END*/" + ln();
         msg = msg + "    /*IF pmb.xxxId == null && pmb.xxxName != null*/.../*END*/" + ln();
         msg = msg + "    /*IF pmb.xxxId == null || pmb.xxxName != null*/.../*END*/" + ln();
+        msg = msg + "    - - - - - - - - - -/" + ln();
         msg = msg + ln();
         msg = msg + "[IF Comment Expression]" + ln() + expression + ln();
         msg = msg + ln();
