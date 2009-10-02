@@ -150,14 +150,14 @@ public class SqlAnalyzer {
     protected void throwIfCommentConditionNotFoundException() {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The condition of IF comment was Not Found!" + ln();
+        msg = msg + "The condition of IF comment was not found!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm the IF comment expression." + ln();
         msg = msg + "It may exist the IF comment that DOESN'T have a condition." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    before (x) -- /*IF*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
-        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + "    (x) -- /*IF*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + "    (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
         msg = msg + ln();
         msg = msg + "[IF Comment Expression]" + ln() + _tokenizer.getToken() + ln();
         msg = msg + ln();
@@ -187,14 +187,14 @@ public class SqlAnalyzer {
     protected void throwEndCommentNotFoundException() {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The end comment was Not Found!" + ln();
+        msg = msg + "The end comment was not found!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm the parameter comment logic." + ln();
         msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
-        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + "    (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
+        msg = msg + "    (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
