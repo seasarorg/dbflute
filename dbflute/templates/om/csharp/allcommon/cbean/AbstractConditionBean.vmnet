@@ -206,7 +206,7 @@ namespace ${glPackageBaseCommonCBean} {
         // ===============================================================================
         //                                                                         OrQuery
         //                                                                         =======
-        protected void xorQ<CB>(CB cb, ${glOrQuery}<CB> orQuery) where CB : ConditionBean {
+        protected void xorQ<CB>(CB cb, ${glOrQuery}<CB> orQuery) where CB : ${glConditionBean} {
             this.SqlClause.makeOrQueryEffective();
             try {
                 orQuery.Invoke(cb);

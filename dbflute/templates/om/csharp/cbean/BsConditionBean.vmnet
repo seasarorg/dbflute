@@ -157,7 +157,7 @@ namespace ${glPackageBaseCB} {
         // ===============================================================================
         //                                                                         OrQuery
         //                                                                         =======
-        public void OrQuery(OrQuery<${myConditionBeanClassName}> orQuery) {
+        public void OrQuery(${glOrQuery}<${myConditionBeanClassName}> orQuery) {
             xorQ((${myConditionBeanClassName})this, orQuery);
         }
     }
