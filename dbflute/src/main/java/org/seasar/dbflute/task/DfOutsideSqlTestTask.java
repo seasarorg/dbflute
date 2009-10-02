@@ -84,12 +84,19 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
         return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
             @Override
             protected String filterSql(String sql) {
+                // /- - - - - - - - - - - - - - - - - - - - - - - - - - - 
+                // Check parameter comments in the SQL before filtering.
+                // - - - - - - - - - -/
+                checkParameterComment(sql);
+
+                // Filter comments if it needs.
                 if (!jdbcDeterminer.isBlockCommentValid()) {
                     sql = removeBlockComment(sql);
                 }
                 if (!jdbcDeterminer.isLineCommentValid()) {
                     sql = removeLineComment(sql);
                 }
+
                 return super.filterSql(sql);
             }
 
@@ -104,7 +111,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
             @Override
             protected boolean isTargetSql(String sql) {
                 final String entityName = getEntityName(sql);
-                if (entityName != null && "df:x".equalsIgnoreCase(entityName)) {// Non target SQL!
+                if (entityName != null && "df:x".equalsIgnoreCase(entityName)) { // Non target SQL!
                     ++_nonTargetSqlCount;
                     return false;
                 }
@@ -157,6 +164,12 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
                 return DfStringUtil.extractAllScope(targetStr, beginMark, endMark);
             }
         };
+    }
+
+    protected void checkParameterComment(String sql) {
+        // It becomes valid after removing OGNL
+        //SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        //analyzer.parse(); // should throw an exception
     }
 
     @Override

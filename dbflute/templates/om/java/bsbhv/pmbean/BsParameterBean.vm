@@ -96,8 +96,14 @@ public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbCl
      */
     @Override
     public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName()).append(":");
+        sb.append(xbuildColumnString());
+        return sb.toString();
+    }
+    private String xbuildColumnString() {
         final String delimiter = ",";
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
         sb.append(delimiter).append(_${propertyName});
 #end

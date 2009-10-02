@@ -14,7 +14,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
 #if ($database.isTargetContainerSeasar())
 import org.seasar.extension.jdbc.types.ValueTypes;
-import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 #end
 import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.seasar.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
@@ -231,7 +231,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
             // Register for BeanDescFactory
             DisposableUtil.add(new Disposable() {
                 public void dispose() {
-                    TnBeanDescFactory.clear();
+                    DfBeanDescFactory.clear();
                 }
             });
             // Register for ValueTypes
