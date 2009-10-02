@@ -21,6 +21,10 @@ import org.seasar.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl;
+import org.seasar.dbflute.twowaysql.SqlAnalyzer;
+import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.seasar.dbflute.twowaysql.node.IfNode;
 #if ($database.isTargetContainerSeasar())
 
 import org.seasar.framework.util.Disposable;
@@ -180,6 +184,37 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
 
     protected TnValueTypeFactory createValueTypeFactory() {
         return new TnValueTypeFactoryImpl();
+    }
+
+    // -----------------------------------------------------
+    //                                  SQL Analyzer Factory
+    //                                  --------------------
+    /**
+     * Assist the factory of SQL analyzer. <br />
+     * This factory is also used on ConditionBean.toDisplaySql().
+     * So this method should not depend on the state of this class. 
+     * @return The factory of SQL analyzer. (NotNull)
+     */
+    public SqlAnalyzerFactory assistSqlAnalyzerFactory() {
+        return new SqlAnalyzerFactory() {
+            public SqlAnalyzer create(String sql, boolean blockNullParameter) {
+                if (${glDBFluteConfig}.getInstance().xisUseOgnl()) {
+                    return new SqlAnalyzer(sql, blockNullParameter);
+                } else {
+                    return new SqlAnalyzer(sql, blockNullParameter) {
+                        @Override
+                        protected IfNode createIfNode(String expr) {
+                            return new IfNode(expr, _specifiedSql) {
+                                @Override
+                                public void accept(CommandContext ctx) {
+                                    doAcceptByEvaluator(ctx);
+                                }
+                            };
+                        }
+                    };
+                }
+            }
+        };
     }
 
     // -----------------------------------------------------
