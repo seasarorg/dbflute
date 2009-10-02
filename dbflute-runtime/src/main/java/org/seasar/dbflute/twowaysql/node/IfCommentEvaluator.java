@@ -105,13 +105,16 @@ public class IfCommentEvaluator {
         if (_expression.contains(AND) && _expression.contains(OR)) {
             throwIfCommentUnsupportedExpressionException();
         }
+        if (_expression.contains("'") || _expression.contains("\"")) {
+            throwIfCommentUnsupportedExpressionException();
+        }
         if (_expression.contains(" < ") || _expression.contains(" > ")) {
             throwIfCommentUnsupportedExpressionException();
         }
         if (_expression.contains(" <= ") || _expression.contains(" >= ")) {
             throwIfCommentUnsupportedExpressionException();
         }
-        if (_expression.contains("'") || _expression.contains("\"")) {
+        if (_expression.contains(" = ") || _expression.contains(" <> ")) {
             throwIfCommentUnsupportedExpressionException();
         }
     }
@@ -275,6 +278,8 @@ public class IfCommentEvaluator {
         msg = msg + "    (x:lessThan) - /*IF pmb.fooId < 3*/" + ln();
         msg = msg + "    (x:greaterEqual) - /*IF pmb.fooId >= 3*/" + ln();
         msg = msg + "    (x:lessEqual) - /*IF pmb.fooId <= 3*/" + ln();
+        msg = msg + "    (x:singleEqual) - /*IF pmb.fooId = null*/ --> /*IF pmb.fooId == null*/" + ln();
+        msg = msg + "    (x:anotherNot) - /*IF pmb.fooId <> null*/ --> /*IF pmb.fooId != null*/" + ln();
         msg = msg + "    " + ln();
         msg = msg + "If you want to write a complex condition, write an ExParameterBean property." + ln();
         msg = msg + "And use the property in IF comment." + ln();
