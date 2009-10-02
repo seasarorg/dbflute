@@ -80,13 +80,13 @@ namespace ${glPackageExtendedParameterBean} {
         //                                                                  Basic Override
         //                                                                  ==============
         public override String ToString() {
-            String delimiter = ",";
             StringBuilder sb = new StringBuilder();
             sb.Append("${myClassName}:");
             sb.Append(xbuildColumnString());
             return sb.ToString();
         }
         private String xbuildColumnString() {
+            String delimiter = ",";
             StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
             sb.Append(delimiter).Append(_${propertyName});
