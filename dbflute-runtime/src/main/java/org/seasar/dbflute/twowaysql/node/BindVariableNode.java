@@ -78,9 +78,8 @@ public class BindVariableNode extends AbstractNode {
     }
 
     protected void setupValueAndType(ValueAndType valueAndType) {
-        final ValueAndTypeSetupper valueAndTypeSetuper = new ValueAndTypeSetupper(_expression, _nameList,
-                _specifiedSql, true);
-        valueAndTypeSetuper.setupValueAndType(valueAndType);
+        final ValueAndTypeSetupper setuper = new ValueAndTypeSetupper(_expression, _nameList, _specifiedSql, true);
+        setuper.setupValueAndType(valueAndType);
     }
 
     protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {

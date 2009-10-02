@@ -30,10 +30,10 @@ public class IfNode extends ContainerNode {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String _expression;
-    private Object _parsedExpression;
-    private ElseNode _elseNode;
-    private String _specifiedSql;
+    protected String _expression;
+    protected Object _parsedExpression;
+    protected ElseNode _elseNode;
+    protected String _specifiedSql;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -48,6 +48,38 @@ public class IfNode extends ContainerNode {
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
+        doAcceptByOgnl(ctx);
+    }
+
+    protected void doAcceptByEvaluator(CommandContext ctx) {
+        final Object pmb = ctx.getArg("pmb");
+        final IfCommentEvaluator evaluator = createIfCommentEvaluator(pmb, _expression);
+        boolean result = false;
+        try {
+            result = evaluator.evaluate();
+        } catch (IfCommentWrongExpressionException e) {
+            final String replaced = replace(_expression, "pmb.", "pmb.parameterMap.");
+            final IfCommentEvaluator another = createIfCommentEvaluator(pmb, replaced);
+            try {
+                result = another.evaluate();
+            } catch (IfCommentWrongExpressionException ignored) {
+                throw e;
+            }
+        }
+        if (result) {
+            super.accept(ctx);
+            ctx.setEnabled(true);
+        } else if (_elseNode != null) {
+            _elseNode.accept(ctx);
+            ctx.setEnabled(true);
+        }
+    }
+
+    protected IfCommentEvaluator createIfCommentEvaluator(Object pmb, String expression) {
+        return new IfCommentEvaluator(pmb, expression, _specifiedSql);
+    }
+
+    protected void doAcceptByOgnl(CommandContext ctx) {
         Object result = null;
         try {
             result = DfOgnlUtil.getValue(_parsedExpression, ctx);

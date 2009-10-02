@@ -38,8 +38,8 @@ import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.util.DfSystemUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.DfTraceViewUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The invoker of behavior command.
@@ -210,6 +210,7 @@ public class BehaviorCommandInvoker {
         resourceContext.setCurrentDBDef(_invokerAssistant.assistCurrentDBDef());
         resourceContext.setDBMetaProvider(_invokerAssistant.assistDBMetaProvider());
         resourceContext.setSqlClauseCreator(_invokerAssistant.assistSqlClauseCreator());
+        resourceContext.setSqlAnalyzerFactory(_invokerAssistant.assistSqlAnalyzerFactory());
         resourceContext.setResourceParameter(_invokerAssistant.assistResourceParameter());
         ResourceContext.setResourceContextOnThread(resourceContext);
     }
@@ -324,7 +325,8 @@ public class BehaviorCommandInvoker {
     //                                                                      ==============
     protected <RESULT> void logSqlExecution(BehaviorCommand<RESULT> behaviorCommand, SqlExecution execution,
             long beforeCmd, long afterCmd) {
-        log("SqlExecution Initialization Cost: [" + DfTraceViewUtil.convertToPerformanceView(afterCmd - beforeCmd) + "]");
+        log("SqlExecution Initialization Cost: [" + DfTraceViewUtil.convertToPerformanceView(afterCmd - beforeCmd)
+                + "]");
     }
 
     // ===================================================================================

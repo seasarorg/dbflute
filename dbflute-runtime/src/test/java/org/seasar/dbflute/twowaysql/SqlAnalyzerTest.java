@@ -20,7 +20,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -37,7 +37,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -63,7 +63,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -85,7 +85,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -105,7 +105,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -127,7 +127,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -156,7 +156,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -184,7 +184,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -212,7 +212,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -243,7 +243,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -266,7 +266,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -304,7 +304,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -331,7 +331,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -354,7 +354,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -375,7 +375,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -405,7 +405,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();
@@ -435,7 +435,7 @@ public class SqlAnalyzerTest extends PlainTestCase {
         SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
 
         // ## Act ##
-        Node rootNode = analyzer.parse();
+        Node rootNode = analyzer.analyze();
 
         // ## Assert ##
         SimpleMemberPmb pmb = new SimpleMemberPmb();

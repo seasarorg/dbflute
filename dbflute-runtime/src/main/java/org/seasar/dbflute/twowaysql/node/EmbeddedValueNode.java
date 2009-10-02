@@ -94,9 +94,8 @@ public class EmbeddedValueNode extends AbstractNode {
     }
 
     protected void setupValueAndType(ValueAndType valueAndType) {
-        final ValueAndTypeSetupper valueAndTypeSetuper = new ValueAndTypeSetupper(_expression, _nameList, _specifiedSql,
-                false);
-        valueAndTypeSetuper.setupValueAndType(valueAndType);
+        final ValueAndTypeSetupper setupper = new ValueAndTypeSetupper(_expression, _nameList, _specifiedSql, false);
+        setupper.setupValueAndType(valueAndType);
     }
 
     protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {

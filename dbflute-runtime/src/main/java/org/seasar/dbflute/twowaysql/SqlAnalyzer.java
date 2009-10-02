@@ -21,7 +21,7 @@ import org.seasar.dbflute.exception.EndCommentNotFoundException;
 import org.seasar.dbflute.exception.IfCommentConditionNotFoundException;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
-import org.seasar.dbflute.twowaysql.node.AbstractNode;
+import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.twowaysql.node.BeginNode;
 import org.seasar.dbflute.twowaysql.node.BindVariableNode;
 import org.seasar.dbflute.twowaysql.node.ContainerNode;
@@ -63,7 +63,7 @@ public class SqlAnalyzer {
     // ===================================================================================
     //                                                                               Parse
     //                                                                               =====
-    public Node parse() {
+    public Node analyze() {
         push(new ContainerNode());
         while (SqlTokenizer.EOF != _tokenizer.next()) {
             parseToken();
@@ -141,7 +141,7 @@ public class SqlAnalyzer {
         if (DfStringUtil.isEmpty(condition)) {
             throwIfCommentConditionNotFoundException();
         }
-        final ContainerNode ifNode = createIfNode(condition);
+        final IfNode ifNode = createIfNode(condition);
         peek().addChild(ifNode);
         push(ifNode);
         parseEnd();
@@ -167,7 +167,7 @@ public class SqlAnalyzer {
     }
 
     protected void parseBegin() {
-        BeginNode beginNode = new BeginNode();
+        BeginNode beginNode = createBeginNode();
         peek().addChild(beginNode);
         push(beginNode);
         parseEnd();
@@ -265,15 +265,19 @@ public class SqlAnalyzer {
         return content != null && "END".equals(content);
     }
 
-    protected AbstractNode createBindVariableNode(String expr, String testValue) {// Extension!
+    protected BeginNode createBeginNode() {
+        return new BeginNode();
+    }
+
+    protected BindVariableNode createBindVariableNode(String expr, String testValue) {
         return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
     }
 
-    protected AbstractNode createEmbeddedValueNode(String expr, String testValue) {// Extension!
+    protected EmbeddedValueNode createEmbeddedValueNode(String expr, String testValue) {
         return new EmbeddedValueNode(expr, testValue, _specifiedSql, _blockNullParameter);
     }
 
-    protected ContainerNode createIfNode(String expr) { // Extension!
+    protected IfNode createIfNode(String expr) {
         return new IfNode(expr, _specifiedSql);
     }
 
@@ -301,22 +305,23 @@ public class SqlAnalyzer {
     }
 
     // ===================================================================================
-    //                                                                             Convert
-    //                                                                             =======
-    public static String convertTwoWaySql2DisplaySql(String twoWaySql, Object arg, String logDateFormat,
-            String logTimestampFormat) {
+    //                                                                          DisplaySql
+    //                                                                          ==========
+    public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, Object arg,
+            String logDateFormat, String logTimestampFormat) {
         final String[] argNames = new String[] { "dto" };
         final Class<?>[] argTypes = new Class<?>[] { arg.getClass() };
         final Object[] args = new Object[] { arg };
-        return convertTwoWaySql2DisplaySql(twoWaySql, argNames, argTypes, args, logDateFormat, logTimestampFormat);
+        return convertTwoWaySql2DisplaySql(factory, twoWaySql, argNames, argTypes, args, logDateFormat,
+                logTimestampFormat);
     }
 
-    public static String convertTwoWaySql2DisplaySql(String twoWaySql, String[] argNames, Class<?>[] argTypes,
-            Object[] args, String logDateFormat, String logTimestampFormat) {
+    public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, String[] argNames,
+            Class<?>[] argTypes, Object[] args, String logDateFormat, String logTimestampFormat) {
         final CommandContext context;
         {
-            final SqlAnalyzer parser = new SqlAnalyzer(twoWaySql, false);
-            final Node node = parser.parse();
+            final SqlAnalyzer parser = factory.create(twoWaySql, false);
+            final Node node = parser.analyze();
             final CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
             context = creator.createCommandContext(args);
             node.accept(context);

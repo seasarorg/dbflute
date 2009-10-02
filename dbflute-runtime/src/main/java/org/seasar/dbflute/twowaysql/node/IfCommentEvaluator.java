@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.seasar.dbflute.exception.IfCommentDifferentTypeComparisonException;
 import org.seasar.dbflute.exception.IfCommentEmptyExpressionException;
@@ -302,11 +303,16 @@ public class IfCommentEvaluator {
                     throwIfCommentNotFoundMethodException(methodName);
                 }
             } else {
-                try {
-                    final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
-                    baseObject = propertyDesc.getValue(baseObject);
-                } catch (DfBeanPropertyNotFoundException e) {
-                    throwIfCommentNotFoundPropertyException(property);
+                if (Map.class.isInstance(baseObject)) {
+                    final Map<?, ?> map = (Map<?, ?>) baseObject;
+                    baseObject = map.get(property);
+                } else {
+                    try {
+                        final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
+                        baseObject = propertyDesc.getValue(baseObject);
+                    } catch (DfBeanPropertyNotFoundException e) {
+                        throwIfCommentNotFoundPropertyException(property);
+                    }
                 }
             }
             preProperty = property;
@@ -353,11 +359,16 @@ public class IfCommentEvaluator {
                     throwIfCommentNotFoundMethodException(methodName);
                 }
             } else {
-                try {
-                    final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
-                    baseObject = propertyDesc.getValue(baseObject);
-                } catch (DfBeanPropertyNotFoundException e) {
-                    throwIfCommentNotFoundPropertyException(property);
+                if (Map.class.isInstance(baseObject)) {
+                    final Map<?, ?> map = (Map<?, ?>) baseObject;
+                    baseObject = map.get(property);
+                } else {
+                    try {
+                        final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
+                        baseObject = propertyDesc.getValue(baseObject);
+                    } catch (DfBeanPropertyNotFoundException e) {
+                        throwIfCommentNotFoundPropertyException(property);
+                    }
                 }
             }
             preProperty = property;

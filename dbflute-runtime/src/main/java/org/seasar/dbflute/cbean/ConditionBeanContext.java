@@ -36,6 +36,7 @@ import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidAliasNameExcept
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidColumnSpecificationException;
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeException;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
+import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -806,12 +807,12 @@ public class ConditionBeanContext {
     }
 
     // ===================================================================================
-    //                                                                         Display SQL
-    //                                                                         ===========
-    public static String convertConditionBean2DisplaySql(ConditionBean cb, String logDateFormat,
-            String logTimestampFormat) {
+    //                                                                          DisplaySql
+    //                                                                          ==========
+    public static String convertConditionBean2DisplaySql(SqlAnalyzerFactory factory, ConditionBean cb,
+            String logDateFormat, String logTimestampFormat) {
         final String twoWaySql = cb.getSqlClause().getClause();
-        return SqlAnalyzer.convertTwoWaySql2DisplaySql(twoWaySql, cb, logDateFormat, logTimestampFormat);
+        return SqlAnalyzer.convertTwoWaySql2DisplaySql(factory, twoWaySql, cb, logDateFormat, logTimestampFormat);
     }
 
     // ===================================================================================

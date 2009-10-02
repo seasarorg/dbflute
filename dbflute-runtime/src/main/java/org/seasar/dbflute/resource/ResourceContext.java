@@ -32,6 +32,8 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.twowaysql.SqlAnalyzer;
+import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 
 /**
  * The context of resource.
@@ -145,6 +147,19 @@ public class ResourceContext {
         return provider.provideDBMetaChecked(tableFlexibleName);
     }
 
+    public static SqlAnalyzer createSqlAnalyzer(String sql, boolean blockNullParameter) {
+        if (!isExistResourceContextOnThread()) {
+            String msg = "The resource context should exist!";
+            throw new IllegalStateException(msg);
+        }
+        SqlAnalyzerFactory factory = getResourceContextOnThread().getSqlAnalyzerFactory();
+        if (factory == null) {
+            String msg = "The provider of SQL analyzer should exist!";
+            throw new IllegalStateException(msg);
+        }
+        return factory.create(sql, blockNullParameter);
+    }
+
     /**
      * Is the SQLException from unique constraint? {Use both SQLState and ErrorCode}
      * @param sqlState SQLState of the SQLException. (Nullable)
@@ -203,7 +218,7 @@ public class ResourceContext {
     public static Date getAccessDate() {
         return AccessContext.getAccessDateOnThread();
     }
-    
+
     public static Timestamp getAccessTimestamp() {
         return AccessContext.getAccessTimestampOnThread();
     }
@@ -280,6 +295,7 @@ public class ResourceContext {
     protected DBMetaProvider _dbmetaProvider;
     protected SqlClauseCreator _sqlClauseCreator;
     protected ResourceParameter _resourceParameter;
+    protected SqlAnalyzerFactory _sqlAnalyzerFactory;
 
     // ===================================================================================
     //                                                                            Accessor
@@ -314,5 +330,13 @@ public class ResourceContext {
 
     public void setResourceParameter(ResourceParameter resourceParameter) {
         _resourceParameter = resourceParameter;
+    }
+
+    public SqlAnalyzerFactory getSqlAnalyzerFactory() {
+        return _sqlAnalyzerFactory;
+    }
+
+    public void setSqlAnalyzerFactory(SqlAnalyzerFactory sqlAnalyzerFactory) {
+        _sqlAnalyzerFactory = sqlAnalyzerFactory;
     }
 }

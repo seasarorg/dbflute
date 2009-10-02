@@ -1,6 +1,8 @@
 package org.seasar.dbflute.twowaysql.node;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.seasar.dbflute.exception.IfCommentDifferentTypeComparisonException;
 import org.seasar.dbflute.exception.IfCommentEmptyExpressionException;
@@ -674,6 +676,16 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         assertFalse(evaluator.evaluate());
     }
 
+    public void test_evaluate_map() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.putMapPmb("fooKey", 3);
+
+        // ## Act && Assert ##
+        assertTrue(createEvaluator(pmb, "pmb.mapPmb.fooKey > 2").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.mapPmb.fooKey > 3").evaluate());
+    }
+
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
@@ -687,6 +699,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         private boolean _existsPurchase;
         private Date _birthdate;
         private NextPmb _nextPmb;
+        private Map<String, Integer> _mapPmb = new HashMap<String, Integer>();
 
         @Override
         public String toString() {
@@ -748,6 +761,14 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
 
         public void setNextPmb(NextPmb nextPmb) {
             this._nextPmb = nextPmb;
+        }
+
+        public Map<String, Integer> getMapPmb() {
+            return _mapPmb;
+        }
+
+        public void putMapPmb(String key, Integer value) {
+            this._mapPmb.put(key, value);
         }
     }
 

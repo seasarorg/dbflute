@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.sqlhandler.TnCommandContextHandler;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
@@ -88,12 +89,16 @@ public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
             Object[] args) {
         CommandContext context;
         {
-            SqlAnalyzer parser = new SqlAnalyzer(twoWaySql, true);
-            Node node = parser.parse();
+            SqlAnalyzer analyzer = createSqlAnalyzer(twoWaySql);
+            Node node = analyzer.analyze();
             CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
             context = creator.createCommandContext(args);
             node.accept(context);
         }
         return context;
+    }
+
+    protected SqlAnalyzer createSqlAnalyzer(String sql) {
+        return ResourceContext.createSqlAnalyzer(sql, true);
     }
 }

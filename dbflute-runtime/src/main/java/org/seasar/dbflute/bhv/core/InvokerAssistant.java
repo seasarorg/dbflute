@@ -25,6 +25,7 @@ import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.resource.ResourceParameter;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
+import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 
 /**
  * @author jflute
@@ -65,6 +66,11 @@ public interface InvokerAssistant {
      * @return The factory of value type. (NotNull)
      */
     TnValueTypeFactory assistValueTypeFactory();
+
+    /**
+     * @return The factory of SQL analyzer. (NotNull)
+     */
+    SqlAnalyzerFactory assistSqlAnalyzerFactory();
 
     /**
      * @return The parameter of resource. (NotNull)

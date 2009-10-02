@@ -30,6 +30,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.StatementConfig;
+import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -645,8 +646,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * @return SQL for display. (NotNull and NotEmpty)
      */
     public String toDisplaySql() {
-        return ConditionBeanContext.convertConditionBean2DisplaySql(this, getLogDateFormat(), getLogTimestampFormat());
+        final SqlAnalyzerFactory factory = getSqlAnalyzerFactory();
+        final String dateFormat = getLogDateFormat();
+        final String timestampFormat = getLogTimestampFormat();
+        return ConditionBeanContext.convertConditionBean2DisplaySql(factory, this, dateFormat, timestampFormat);
     }
+
+    protected abstract SqlAnalyzerFactory getSqlAnalyzerFactory();
 
     protected abstract String getLogDateFormat();
 

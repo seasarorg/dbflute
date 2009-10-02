@@ -204,13 +204,17 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
             Object[] args) {
         CommandContext context;
         {
-            SqlAnalyzer parser = new SqlAnalyzer(twoWaySql, true);
-            Node node = parser.parse();
+            SqlAnalyzer analyzer = createSqlAnalyzer(twoWaySql);
+            Node node = analyzer.analyze();
             CommandContextCreator creator = new CommandContextCreator(argNames, argTypes);
             context = creator.createCommandContext(args);
             node.accept(context);
         }
         return context;
+    }
+
+    protected SqlAnalyzer createSqlAnalyzer(String sql) {
+        return ResourceContext.createSqlAnalyzer(sql, true);
     }
 
     // ===================================================================================
