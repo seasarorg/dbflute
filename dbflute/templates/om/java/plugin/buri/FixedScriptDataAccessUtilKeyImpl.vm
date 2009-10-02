@@ -3,9 +3,9 @@ ${database.allClassCopyright}package ${glPackagePluginBuri};
 import org.apache.commons.beanutils.converters.LongConverter;
 import org.escafe.buri.dataaccess.impl.ScriptDataAccessUtilLongKeyImpl;
 import org.escafe.buri.oouo.internal.structure.BuriDataFieldType;
-import org.seasar.dbflute.s2dao.beans.TnBeanDesc;
-import org.seasar.dbflute.s2dao.beans.TnPropertyDesc;
-import org.seasar.dbflute.s2dao.beans.factory.TnBeanDescFactory;
+import org.seasar.dbflute.helper.beans.DfBeanDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 
 /**
  * @author ${database.classAuthor}
@@ -35,8 +35,8 @@ public class ${glFixedScriptDataAccessUtilKeyImpl} extends ScriptDataAccessUtilL
      */
     @Override
     protected Long getLongPkey(Object target, String prop) {
-        TnBeanDesc beanDesc = TnBeanDescFactory.getBeanDesc(target.getClass());
-        TnPropertyDesc pkeyPropertyDesc = beanDesc.getPropertyDesc(prop);
+        DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(target.getClass());
+        DfPropertyDesc pkeyPropertyDesc = beanDesc.getPropertyDesc(prop);
         Object result = pkeyPropertyDesc.getValue(target);
         return (Long) _converter.convert(Long.class, result);
     }
