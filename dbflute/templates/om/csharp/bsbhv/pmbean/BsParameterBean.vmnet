@@ -82,6 +82,12 @@ namespace ${glPackageExtendedParameterBean} {
         public override String ToString() {
             String delimiter = ",";
             StringBuilder sb = new StringBuilder();
+            sb.Append("${myClassName}:");
+            sb.Append(xbuildColumnString());
+            return sb.ToString();
+        }
+        private String xbuildColumnString() {
+            StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
             sb.Append(delimiter).Append(_${propertyName});
 #end
