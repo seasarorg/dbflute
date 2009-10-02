@@ -16,15 +16,19 @@
 package org.seasar.dbflute.twowaysql.node;
 
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.seasar.dbflute.exception.IfCommentDifferentTypeComparisonException;
 import org.seasar.dbflute.exception.IfCommentEmptyExpressionException;
 import org.seasar.dbflute.exception.IfCommentNotBooleanResultException;
 import org.seasar.dbflute.exception.IfCommentNotFoundMethodException;
 import org.seasar.dbflute.exception.IfCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.IfCommentNullPointerException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedExpressionException;
+import org.seasar.dbflute.exception.IfCommentUnsupportedTypeComparisonException;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
@@ -33,6 +37,8 @@ import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfTypeUtil.ToTimestampFlexiblyParseException;
 
 /**
  * @author jflute
@@ -46,6 +52,10 @@ public class IfCommentEvaluator {
     private static final String OR = " || ";
     private static final String EQUAL = " == ";
     private static final String NOT_EQUAL = " != ";
+    private static final String GREATER_THAN = " > ";
+    private static final String LESS_THAN = " < ";
+    private static final String GREATER_EQUAL = " >= ";
+    private static final String LESS_EQUAL = " <= ";
     private static final String BOOLEAN_NOT = "!";
     private static final String METHOD_SUFFIX = "()";
 
@@ -105,36 +115,130 @@ public class IfCommentEvaluator {
         if (_expression.contains(AND) && _expression.contains(OR)) {
             throwIfCommentUnsupportedExpressionException();
         }
-        if (_expression.contains("'") || _expression.contains("\"")) {
-            throwIfCommentUnsupportedExpressionException();
-        }
-        if (_expression.contains(" < ") || _expression.contains(" > ")) {
-            throwIfCommentUnsupportedExpressionException();
-        }
-        if (_expression.contains(" <= ") || _expression.contains(" >= ")) {
-            throwIfCommentUnsupportedExpressionException();
-        }
         if (_expression.contains(" = ") || _expression.contains(" <> ")) {
+            throwIfCommentUnsupportedExpressionException();
+        }
+        if (_expression.contains("\"")) {
             throwIfCommentUnsupportedExpressionException();
         }
     }
 
-    protected boolean evaluateBooleanClause(String booleanClause) {
+    protected boolean evaluateBooleanClause(final String booleanClause) {
         if (booleanClause.contains(EQUAL)) {
             return evaluateCompareClause(booleanClause, EQUAL, new OperandEvaluator() {
                 public boolean evaluate(Object leftResult, Object rightResult) {
+                    if (leftResult instanceof Number && rightResult instanceof Number) {
+                        leftResult = new BigDecimal(leftResult.toString());
+                        rightResult = new BigDecimal(rightResult.toString());
+                    }
                     return leftResult != null ? leftResult.equals(rightResult) : rightResult == null;
                 }
             });
         } else if (booleanClause.contains(NOT_EQUAL)) {
             return evaluateCompareClause(booleanClause, NOT_EQUAL, new OperandEvaluator() {
                 public boolean evaluate(Object leftResult, Object rightResult) {
+                    if (leftResult instanceof Number && rightResult instanceof Number) {
+                        leftResult = new BigDecimal(leftResult.toString());
+                        rightResult = new BigDecimal(rightResult.toString());
+                    }
                     return leftResult != null ? !leftResult.equals(rightResult) : rightResult != null;
+                }
+            });
+        } else if (booleanClause.contains(GREATER_THAN)) {
+            return evaluateCompareClause(booleanClause, GREATER_THAN, new OperandEvaluator() {
+                public boolean evaluate(Object leftResult, Object rightResult) {
+                    if (leftResult == null) {
+                        return false;
+                    }
+                    if (rightResult == null) {
+                        return true;
+                    }
+                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminater() {
+                        public boolean compare(int compareResult) {
+                            return compareResult > 0;
+                        }
+                    }, booleanClause);
+                }
+            });
+        } else if (booleanClause.contains(LESS_THAN)) {
+            return evaluateCompareClause(booleanClause, LESS_THAN, new OperandEvaluator() {
+                public boolean evaluate(Object leftResult, Object rightResult) {
+                    if (leftResult == null) {
+                        return true;
+                    }
+                    if (rightResult == null) {
+                        return false;
+                    }
+                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminater() {
+                        public boolean compare(int compareResult) {
+                            return compareResult < 0;
+                        }
+                    }, booleanClause);
+                }
+            });
+        } else if (booleanClause.contains(GREATER_EQUAL)) {
+            return evaluateCompareClause(booleanClause, GREATER_EQUAL, new OperandEvaluator() {
+                public boolean evaluate(Object leftResult, Object rightResult) {
+                    if (leftResult == null) {
+                        return rightResult == null;
+                    }
+                    if (rightResult == null) {
+                        return true;
+                    }
+                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminater() {
+                        public boolean compare(int compareResult) {
+                            return compareResult >= 0;
+                        }
+                    }, booleanClause);
+                }
+            });
+        } else if (booleanClause.contains(LESS_EQUAL)) {
+            return evaluateCompareClause(booleanClause, LESS_EQUAL, new OperandEvaluator() {
+                public boolean evaluate(Object leftResult, Object rightResult) {
+                    if (leftResult == null) {
+                        return true;
+                    }
+                    if (rightResult == null) {
+                        return false;
+                    }
+                    return compareLeftRight(leftResult, rightResult, new ComparaDeterminater() {
+                        public boolean compare(int compareResult) {
+                            return compareResult <= 0;
+                        }
+                    }, booleanClause);
                 }
             });
         } else {
             return evaluateStandAloneValue(booleanClause);
         }
+    }
+
+    protected boolean compareLeftRight(Object leftResult, Object rightResult, ComparaDeterminater determinater,
+            String booleanClause) {
+        if (leftResult instanceof Date) {
+            final Date leftDate = (Date) leftResult;
+            if (!(rightResult instanceof Date)) {
+                throwIfCommentDifferentTypeComparisonException(leftResult, rightResult, booleanClause);
+            }
+            final Date rightDate = (Date) rightResult;
+            return determinater.compare(leftDate.compareTo(rightDate));
+        } else if (leftResult instanceof Number) {
+            final Number leftNumber = (Number) leftResult;
+            final BigDecimal leftDecimal = new BigDecimal(leftNumber.toString());
+            if (!(rightResult instanceof Number)) {
+                throwIfCommentDifferentTypeComparisonException(leftResult, rightResult, booleanClause);
+            }
+            final Number rightNumber = (Number) rightResult;
+            final BigDecimal rightDecimal = new BigDecimal(rightNumber.toString());
+            return determinater.compare(leftDecimal.compareTo(rightDecimal));
+        } else {
+            throwIfCommentUnsupportedTypeComparisonException(leftResult, rightResult, booleanClause);
+            return false; // Unreachable!
+        }
+    }
+
+    protected static interface ComparaDeterminater {
+        boolean compare(int compareResult);
     }
 
     protected boolean evaluateCompareClause(String booleanClause, String operand, OperandEvaluator evaluator) {
@@ -151,8 +255,28 @@ public class IfCommentEvaluator {
 
     protected Object evaluateComparePiece(String piece) {
         piece = piece.trim();
-        if ("null".equalsIgnoreCase(piece)) {
-            return null;
+        if (!piece.startsWith("pmb")) {
+            if ("null".equalsIgnoreCase(piece)) {
+                return null;
+            }
+            if ("true".equalsIgnoreCase(piece)) {
+                return true;
+            }
+            if ("false".equalsIgnoreCase(piece)) {
+                return false;
+            }
+            if (piece.startsWith("'") && piece.endsWith("'")) {
+                final String literal = piece.substring("'".length(), piece.length() - "'".length());
+                try {
+                    return DfTypeUtil.toTimestampFlexibly(literal);
+                } catch (ToTimestampFlexiblyParseException ignored) {
+                }
+                return literal;
+            }
+            try {
+                return DfTypeUtil.toBigDecimal(piece);
+            } catch (NumberFormatException ignored) {
+            }
         }
         final List<String> splitList = splitList(piece, ".");
         final List<String> propertyList = new ArrayList<String>();
@@ -196,6 +320,14 @@ public class IfCommentEvaluator {
         if (piece.startsWith(BOOLEAN_NOT)) {
             not = true;
             piece = piece.substring(BOOLEAN_NOT.length());
+        }
+        if (!piece.startsWith("pmb")) {
+            if ("true".equalsIgnoreCase(piece)) {
+                return not ? false : true;
+            }
+            if ("false".equalsIgnoreCase(piece)) {
+                return not ? true : false;
+            }
         }
         final List<String> splitList = splitList(piece, ".");
         final List<String> propertyList = new ArrayList<String>();
@@ -272,14 +404,10 @@ public class IfCommentEvaluator {
         msg = msg + "  For example, unsupported examples:" + ln();
         msg = msg + "    (x:andOr) - /*IF (pmb.fooId != null || pmb.barId != null) && pmb.fooName != null*/" + ln();
         msg = msg + "    (x:argsMethod) - /*IF pmb.buildFooId(123)*/" + ln();
-        msg = msg + "    (x:numberLiteral) - /*IF pmb.fooId == 3*/" + ln();
         msg = msg + "    (x:stringLiteral) - /*IF pmb.fooName == 'Pixy' || pmb.fooName == \"Pixy\"*/" + ln();
-        msg = msg + "    (x:greaterThan) - /*IF pmb.fooId > 3*/" + ln();
-        msg = msg + "    (x:lessThan) - /*IF pmb.fooId < 3*/" + ln();
-        msg = msg + "    (x:greaterEqual) - /*IF pmb.fooId >= 3*/" + ln();
-        msg = msg + "    (x:lessEqual) - /*IF pmb.fooId <= 3*/" + ln();
         msg = msg + "    (x:singleEqual) - /*IF pmb.fooId = null*/ --> /*IF pmb.fooId == null*/" + ln();
         msg = msg + "    (x:anotherNot) - /*IF pmb.fooId <> null*/ --> /*IF pmb.fooId != null*/" + ln();
+        msg = msg + "    (x:doubleQuotation) - /*IF pmb.fooName == \"Pixy\"*/ --> /*IF pmb.fooName == 'Pixy'*/" + ln();
         msg = msg + "    " + ln();
         msg = msg + "If you want to write a complex condition, write an ExParameterBean property." + ln();
         msg = msg + "And use the property in IF comment." + ln();
@@ -370,6 +498,55 @@ public class IfCommentEvaluator {
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IfCommentNullPointerException(msg);
+    }
+
+    protected void throwIfCommentDifferentTypeComparisonException(Object left, Object right, String booleanClause) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The IF comment had the different type comparison!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your IF comment property types." + ln();
+        msg = msg + "If the left type is Number, the right type should be Number." + ln();
+        msg = msg + "If the left type is Date, the right type should be Date." + ln();
+        msg = msg + ln();
+        msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
+        msg = msg + ln();
+        msg = msg + "[Target Boolean Clause]" + ln() + booleanClause + ln();
+        msg = msg + ln();
+        msg = msg + "[Left]" + ln() + (left != null ? left.getClass() : "null") + ln();
+        msg = msg + " --> " + left + ln();
+        msg = msg + ln();
+        msg = msg + "[Right]" + ln() + (right != null ? right.getClass() : "null") + ln();
+        msg = msg + " --> " + right + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new IfCommentDifferentTypeComparisonException(msg);
+    }
+
+    protected void throwIfCommentUnsupportedTypeComparisonException(Object left, Object right, String booleanClause) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The IF comment had the different type comparison!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your IF comment property types." + ln();
+        msg = msg + "For example, String type is unsupported at comparison(>, <, >=, <=)." + ln();
+        msg = msg + "Number and Date are only supported." + ln();
+        msg = msg + ln();
+        msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
+        msg = msg + ln();
+        msg = msg + "[Target Boolean Clause]" + ln() + booleanClause + ln();
+        msg = msg + ln();
+        msg = msg + "[Left]" + ln() + (left != null ? left.getClass() : "null") + ln();
+        msg = msg + " --> " + left + ln();
+        msg = msg + ln();
+        msg = msg + "[Right]" + ln() + (right != null ? right.getClass() : "null") + ln();
+        msg = msg + " --> " + right + ln();
+        msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new IfCommentUnsupportedTypeComparisonException(msg);
     }
 
     protected void throwIfCommentNotBooleanResultException() {

@@ -1,12 +1,17 @@
 package org.seasar.dbflute.twowaysql.node;
 
+import java.util.Date;
+
+import org.seasar.dbflute.exception.IfCommentDifferentTypeComparisonException;
 import org.seasar.dbflute.exception.IfCommentEmptyExpressionException;
 import org.seasar.dbflute.exception.IfCommentNotBooleanResultException;
 import org.seasar.dbflute.exception.IfCommentNotFoundMethodException;
 import org.seasar.dbflute.exception.IfCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.IfCommentNullPointerException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedExpressionException;
+import org.seasar.dbflute.exception.IfCommentUnsupportedTypeComparisonException;
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * 
@@ -16,8 +21,8 @@ import org.seasar.dbflute.unit.PlainTestCase;
 public class IfCommentEvaluatorTest extends PlainTestCase {
 
     // ===================================================================================
-    //                                                                                Null
-    //                                                                                ====
+    //                                                                             Literal
+    //                                                                             =======
     public void test_evaluate_isNotNull() {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
@@ -42,6 +47,58 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         assertFalse(evaluator.evaluate());
         pmb.setMemberName(null);
         assertTrue(evaluator.evaluate());
+    }
+
+    public void test_evaluate_string() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberName("foo");
+        String expression = "pmb.memberName == 'foo'";
+        IfCommentEvaluator evaluator = createEvaluator(pmb, expression);
+
+        // ## Act && Assert ##
+        assertTrue(evaluator.evaluate());
+        pmb.setMemberName("bar");
+        assertFalse(evaluator.evaluate());
+    }
+
+    public void test_evaluate_number() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberId(3);
+        String expression = "pmb.memberId == 3";
+        IfCommentEvaluator evaluator = createEvaluator(pmb, expression);
+
+        // ## Act && Assert ##
+        assertTrue(evaluator.evaluate());
+        pmb.setMemberId(2);
+        assertFalse(evaluator.evaluate());
+    }
+
+    public void test_evaluate_date() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setBirthdate(DfTypeUtil.toDateFlexibly("2009/11/22"));
+        String expression = "pmb.birthdate == '2009/11/22'";
+        IfCommentEvaluator evaluator = createEvaluator(pmb, expression);
+
+        // ## Act && Assert ##
+        assertTrue(evaluator.evaluate());
+        pmb.setBirthdate(DfTypeUtil.toDateFlexibly("2009/10/12"));
+        assertFalse(evaluator.evaluate());
+    }
+
+    public void test_evaluate_boolean() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setExistsPurchase(true);
+        String expression = "pmb.existsPurchase == true";
+        IfCommentEvaluator evaluator = createEvaluator(pmb, expression);
+
+        // ## Act && Assert ##
+        assertTrue(evaluator.evaluate());
+        pmb.setExistsPurchase(false);
+        assertFalse(evaluator.evaluate());
     }
 
     // ===================================================================================
@@ -97,6 +154,24 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         assertFalse(evaluator.evaluate());
         pmb.setExistsPurchase(false);
         assertTrue(evaluator.evaluate());
+    }
+
+    public void test_evaluate_boolean_literal() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+
+        // ## Act && Assert ##
+        assertTrue(createEvaluator(pmb, "true").evaluate());
+        assertFalse(createEvaluator(pmb, "false").evaluate());
+    }
+
+    public void test_evaluate_boolean_literal_not() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+
+        // ## Act && Assert ##
+        assertFalse(createEvaluator(pmb, "!true").evaluate());
+        assertTrue(createEvaluator(pmb, "!false").evaluate());
     }
 
     // ===================================================================================
@@ -196,6 +271,173 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                             Compare
+    //                                                                             =======
+    public void test_greaterThan_number() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberId(3);
+
+        // ## Act && Assert ##
+        assertTrue(createEvaluator(pmb, "pmb.memberId > 0").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.memberId > 3").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.memberId > 4").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.memberId > -6").evaluate());
+        NextPmb nextPmb = new NextPmb();
+        nextPmb.setDisplayOrder(4);
+        pmb.setNextPmb(nextPmb);
+        assertFalse(createEvaluator(pmb, "pmb.memberId > pmb.nextPmb.displayOrder").evaluate());
+        nextPmb.setDisplayOrder(2);
+        assertTrue(createEvaluator(pmb, "pmb.memberId > pmb.nextPmb.displayOrder").evaluate());
+        pmb.setMemberId(null);
+        assertFalse(createEvaluator(pmb, "pmb.memberId > -6").evaluate());
+        pmb.setMemberId(3);
+        nextPmb.setDisplayOrder(null);
+        assertTrue(createEvaluator(pmb, "pmb.memberId > pmb.nextPmb.displayOrder").evaluate());
+    }
+
+    public void test_greaterThan_date() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setBirthdate(DfTypeUtil.toDate("2009/12/24 12:34:56"));
+
+        // ## Act && Assert ##
+        assertTrue(createEvaluator(pmb, "pmb.birthdate > '2009/12/23 12:34:56'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate > '2009/12/24 12:34:57'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate > pmb.birthdate").evaluate());
+        pmb.setBirthdate(DfTypeUtil.toDate("2009/09/12"));
+        assertTrue(createEvaluator(pmb, "pmb.birthdate > '2009/09/11'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate > '2009/09/12'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate > '2009/09/12 12:34:57'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate > '2009/09/13'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate > pmb.birthdate").evaluate());
+    }
+
+    public void test_lessThan_number() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberId(3);
+
+        // ## Act && Assert ##
+        assertFalse(createEvaluator(pmb, "pmb.memberId < 0").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.memberId < 3").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.memberId < 4").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.memberId < -6").evaluate());
+        NextPmb nextPmb = new NextPmb();
+        nextPmb.setDisplayOrder(4);
+        pmb.setNextPmb(nextPmb);
+        assertTrue(createEvaluator(pmb, "pmb.memberId < pmb.nextPmb.displayOrder").evaluate());
+        nextPmb.setDisplayOrder(2);
+        assertFalse(createEvaluator(pmb, "pmb.memberId < pmb.nextPmb.displayOrder").evaluate());
+        pmb.setMemberId(null);
+        assertTrue(createEvaluator(pmb, "pmb.memberId < -6").evaluate());
+        pmb.setMemberId(3);
+        nextPmb.setDisplayOrder(null);
+        assertFalse(createEvaluator(pmb, "pmb.memberId < pmb.nextPmb.displayOrder").evaluate());
+    }
+
+    public void test_lessThan_date() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        Date birthdate = DfTypeUtil.toTimestampFlexibly("2009/12/24 12:34:56");
+        pmb.setBirthdate(birthdate);
+
+        // ## Act && Assert ##
+        assertFalse(createEvaluator(pmb, "pmb.birthdate < '2009/12/23 12:34:56'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate < '2009/12/24 12:34:57'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate < pmb.birthdate").evaluate());
+        pmb.setBirthdate(DfTypeUtil.toDate("2009/09/12"));
+        assertFalse(createEvaluator(pmb, "pmb.birthdate < '2009/09/11'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate < '2009/09/12'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate < '2009/09/12 12:34:57'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate < '2009/09/13'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate < pmb.birthdate").evaluate());
+
+    }
+
+    public void test_greaterEqual_number() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberId(3);
+
+        // ## Act && Assert ##
+        assertTrue(createEvaluator(pmb, "pmb.memberId >= 0").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.memberId >= 3").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.memberId >= 4").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.memberId >= -6").evaluate());
+        NextPmb nextPmb = new NextPmb();
+        nextPmb.setDisplayOrder(4);
+        pmb.setNextPmb(nextPmb);
+        assertFalse(createEvaluator(pmb, "pmb.memberId >= pmb.nextPmb.displayOrder").evaluate());
+        nextPmb.setDisplayOrder(2);
+        assertTrue(createEvaluator(pmb, "pmb.memberId >= pmb.nextPmb.displayOrder").evaluate());
+        pmb.setMemberId(null);
+        assertFalse(createEvaluator(pmb, "pmb.memberId >= -6").evaluate());
+        pmb.setMemberId(3);
+        nextPmb.setDisplayOrder(null);
+        assertTrue(createEvaluator(pmb, "pmb.memberId >= pmb.nextPmb.displayOrder").evaluate());
+    }
+
+    public void test_greaterEqual_date() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        Date birthdate = DfTypeUtil.toDate("2009/12/24 12:34:56");
+        pmb.setBirthdate(birthdate);
+
+        // ## Act && Assert ##
+        assertTrue(createEvaluator(pmb, "pmb.birthdate >= '2009/12/23 12:34:56'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate >= '2009/12/24 12:34:57'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate >= pmb.birthdate").evaluate());
+        pmb.setBirthdate(DfTypeUtil.toDate("2009/09/12"));
+        assertTrue(createEvaluator(pmb, "pmb.birthdate >= '2009/09/11'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate >= '2009/09/12'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate >= '2009/09/12 12:34:57'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate >= '2009/09/13'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate >= pmb.birthdate").evaluate());
+    }
+
+    public void test_lessEqual_number() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberId(3);
+
+        // ## Act && Assert ##
+        assertFalse(createEvaluator(pmb, "pmb.memberId <= 0").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.memberId <= 3").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.memberId <= 4").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.memberId <= -6").evaluate());
+        NextPmb nextPmb = new NextPmb();
+        nextPmb.setDisplayOrder(4);
+        pmb.setNextPmb(nextPmb);
+        assertTrue(createEvaluator(pmb, "pmb.memberId <= pmb.nextPmb.displayOrder").evaluate());
+        nextPmb.setDisplayOrder(2);
+        assertFalse(createEvaluator(pmb, "pmb.memberId <= pmb.nextPmb.displayOrder").evaluate());
+        pmb.setMemberId(null);
+        assertTrue(createEvaluator(pmb, "pmb.memberId <= -6").evaluate());
+        pmb.setMemberId(3);
+        nextPmb.setDisplayOrder(null);
+        assertFalse(createEvaluator(pmb, "pmb.memberId <= pmb.nextPmb.displayOrder").evaluate());
+    }
+
+    public void test_lessEqual_date() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        Date birthdate = DfTypeUtil.toTimestampFlexibly("2009/12/24 12:34:56");
+        pmb.setBirthdate(birthdate);
+
+        // ## Act && Assert ##
+        assertFalse(createEvaluator(pmb, "pmb.birthdate <= '2009/12/23 12:34:56'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= '2009/12/24 12:34:57'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= pmb.birthdate").evaluate());
+        pmb.setBirthdate(DfTypeUtil.toDate("2009/09/12"));
+        assertFalse(createEvaluator(pmb, "pmb.birthdate <= '2009/09/11'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= '2009/09/12'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= '2009/09/12 12:34:57'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= '2009/09/13'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= pmb.birthdate").evaluate());
+    }
+
+    // ===================================================================================
     //                                                                           Exception
     //                                                                           =========
     public void test_evaluate_notFoundMethodProperty() {
@@ -288,46 +530,6 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
             log(e.getMessage());
         }
         try {
-            createEvaluator(pmb, "pmb.fooId < 3").evaluate();
-
-            // ## Assert ##
-            fail();
-        } catch (IfCommentUnsupportedExpressionException e) {
-            log(e.getMessage());
-        }
-        try {
-            createEvaluator(pmb, "pmb.fooId > 3").evaluate();
-
-            // ## Assert ##
-            fail();
-        } catch (IfCommentUnsupportedExpressionException e) {
-            log(e.getMessage());
-        }
-        try {
-            createEvaluator(pmb, "pmb.fooId >= 3").evaluate();
-
-            // ## Assert ##
-            fail();
-        } catch (IfCommentUnsupportedExpressionException e) {
-            log(e.getMessage());
-        }
-        try {
-            createEvaluator(pmb, "pmb.fooId <= 3").evaluate();
-
-            // ## Assert ##
-            fail();
-        } catch (IfCommentUnsupportedExpressionException e) {
-            log(e.getMessage());
-        }
-        try {
-            createEvaluator(pmb, "pmb.fooName == 'Pixy'").evaluate();
-
-            // ## Assert ##
-            fail();
-        } catch (IfCommentUnsupportedExpressionException e) {
-            log(e.getMessage());
-        }
-        try {
             createEvaluator(pmb, "pmb.fooName == \"Pixy\"").evaluate();
 
             // ## Assert ##
@@ -370,6 +572,62 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         }
     }
 
+    public void test_evaluate_IfCommentDifferentTypeComparisonException() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberId(3);
+        pmb.setMemberName("foo");
+        pmb.setBirthdate(new Date());
+
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pmb.memberId <= 'Pixy'").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentDifferentTypeComparisonException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            createEvaluator(pmb, "pmb.memberId <= 'bar'").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentDifferentTypeComparisonException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            createEvaluator(pmb, "pmb.birthdate <= 9").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentDifferentTypeComparisonException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    public void test_evaluate_IfCommentUnsupportedTypeComparisonException() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberId(3);
+        pmb.setMemberName("foo");
+        pmb.setBirthdate(new Date());
+
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pmb.memberName <= 9").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentUnsupportedTypeComparisonException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
     public void test_evaluate_IfCommentNotBooleanResultException() {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
@@ -388,6 +646,35 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                             Various
+    //                                                                             =======
+    public void test_evaluate_trim() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberName("foo");
+        String expression = "  pmb.memberName  !=  null ";
+        IfCommentEvaluator evaluator = createEvaluator(pmb, expression);
+
+        // ## Act && Assert ##
+        assertTrue(evaluator.evaluate());
+        pmb.setMemberName(null);
+        assertFalse(evaluator.evaluate());
+    }
+
+    public void test_evaluate_reverse() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberId(2);
+        String expression = "3 > pmb.memberId";
+        IfCommentEvaluator evaluator = createEvaluator(pmb, expression);
+
+        // ## Act && Assert ##
+        assertTrue(evaluator.evaluate());
+        pmb.setMemberId(3);
+        assertFalse(evaluator.evaluate());
+    }
+
+    // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
     protected IfCommentEvaluator createEvaluator(Object pmb, String expression) {
@@ -398,6 +685,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         private Integer _memberId;
         private String _memberName;
         private boolean _existsPurchase;
+        private Date _birthdate;
         private NextPmb _nextPmb;
 
         @Override
@@ -413,6 +701,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
             final StringBuilder sb = new StringBuilder();
             sb.append(delimiter).append(_memberId);
             sb.append(delimiter).append(_memberName);
+            sb.append(delimiter).append(_birthdate);
             sb.append(delimiter).append(_existsPurchase);
             if (sb.length() > 0) {
                 sb.delete(0, delimiter.length());
@@ -437,6 +726,14 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
             _memberName = memberName;
         }
 
+        public Date getBirthdate() {
+            return _birthdate;
+        }
+
+        public void setBirthdate(Date birthdate) {
+            this._birthdate = birthdate;
+        }
+
         public boolean isExistsPurchase() {
             return _existsPurchase;
         }
@@ -456,6 +753,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
 
     protected static class NextPmb {
         private String _memberStatusCode;
+        private Integer _displayOrder;
         private boolean _existsLogin;
 
         public String getMemberStatusCode() {
@@ -464,6 +762,14 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
 
         public void setMemberStatusCode(String memberStatusCode) {
             this._memberStatusCode = memberStatusCode;
+        }
+
+        public Integer getDisplayOrder() {
+            return _displayOrder;
+        }
+
+        public void setDisplayOrder(Integer displayOrder) {
+            this._displayOrder = displayOrder;
         }
 
         public boolean isExistsLogin() {
