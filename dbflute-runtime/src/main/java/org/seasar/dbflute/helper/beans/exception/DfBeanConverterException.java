@@ -19,25 +19,25 @@ package org.seasar.dbflute.helper.beans.exception;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class DfFieldNotFoundException extends RuntimeException {
+public class DfBeanConverterException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
-    private Class<?> targetClass;
+    private String propertyName;
 
-    private String fieldName;
+    private Object value;
 
-    public DfFieldNotFoundException(Class<?> targetClass, String fieldName) {
-        super("The field was not found: class=" + targetClass.getName() + " field=" + fieldName);
-        this.targetClass = targetClass;
-        this.fieldName = fieldName;
+    public DfBeanConverterException(String propertyName, Object value, Throwable cause) {
+        super("Failed to convert: property=" + propertyName + " value=" + value, cause);
+        this.propertyName = propertyName;
+        this.value = value;
     }
 
-    public Class<?> getTargetClass() {
-        return targetClass;
+    public String getPropertyName() {
+        return propertyName;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public Object getValue() {
+        return value;
     }
 }

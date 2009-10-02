@@ -32,10 +32,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.exception.DfConstructorNotFoundException;
-import org.seasar.dbflute.helper.beans.exception.DfFieldNotFoundException;
-import org.seasar.dbflute.helper.beans.exception.DfMethodNotFoundException;
-import org.seasar.dbflute.helper.beans.exception.DfPropertyNotFoundException;
+import org.seasar.dbflute.helper.beans.exception.DfBeanConstructorNotFoundException;
+import org.seasar.dbflute.helper.beans.exception.DfBeanFieldNotFoundException;
+import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
+import org.seasar.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -89,7 +89,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public Constructor<?> getSuitableConstructor(Object[] args) throws DfConstructorNotFoundException {
+    public Constructor<?> getSuitableConstructor(Object[] args) throws DfBeanConstructorNotFoundException {
         if (args == null) {
             args = EMPTY_ARGS;
         }
@@ -101,7 +101,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
         if (constructor != null) {
             return constructor;
         }
-        throw new DfConstructorNotFoundException(beanClass, args);
+        throw new DfBeanConstructorNotFoundException(beanClass, args);
     }
 
     public Constructor<?> getConstructor(final Class<?>[] paramTypes) {
@@ -110,7 +110,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
                 return constructors[i];
             }
         }
-        throw new DfConstructorNotFoundException(beanClass, paramTypes);
+        throw new DfBeanConstructorNotFoundException(beanClass, paramTypes);
     }
 
     // ===================================================================================
@@ -120,10 +120,10 @@ public class DfBeanDescImpl implements DfBeanDesc {
         return getPropertyDescInternally(propertyName) != null;
     }
 
-    public DfPropertyDesc getPropertyDesc(String propertyName) throws DfPropertyNotFoundException {
+    public DfPropertyDesc getPropertyDesc(String propertyName) throws DfBeanPropertyNotFoundException {
         DfPropertyDesc pd = getPropertyDescInternally(propertyName);
         if (pd == null) {
-            throw new DfPropertyNotFoundException(beanClass, propertyName);
+            throw new DfBeanPropertyNotFoundException(beanClass, propertyName);
         }
         return pd;
     }
@@ -150,7 +150,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
     public Field getField(String fieldName) {
         Field field = (Field) fieldMap.get(fieldName);
         if (field == null) {
-            throw new DfFieldNotFoundException(beanClass, fieldName);
+            throw new DfBeanFieldNotFoundException(beanClass, fieldName);
         }
         return field;
     }
@@ -175,7 +175,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
         if (method != null) {
             return method;
         }
-        throw new DfMethodNotFoundException(beanClass, methodName, paramTypes);
+        throw new DfBeanMethodNotFoundException(beanClass, methodName, paramTypes);
     }
 
     public Method getMethodNoException(final String methodName, final Class<?>[] paramTypes) {
@@ -191,11 +191,11 @@ public class DfBeanDescImpl implements DfBeanDesc {
         return null;
     }
 
-    public Method[] getMethods(String methodName) throws DfMethodNotFoundException {
+    public Method[] getMethods(String methodName) throws DfBeanMethodNotFoundException {
 
         Method[] methods = (Method[]) methodsMap.get(methodName);
         if (methods == null) {
-            throw new DfMethodNotFoundException(beanClass, methodName, null);
+            throw new DfBeanMethodNotFoundException(beanClass, methodName, null);
         }
         return methods;
     }
@@ -339,12 +339,12 @@ public class DfBeanDescImpl implements DfBeanDesc {
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
-    public Object newInstance(Object[] args) throws DfConstructorNotFoundException {
+    public Object newInstance(Object[] args) throws DfBeanConstructorNotFoundException {
         Constructor<?> constructor = getSuitableConstructor(args);
         return DfReflectionUtil.newInstance(constructor, args);
     }
 
-    public Object getFieldValue(String fieldName, Object target) throws DfFieldNotFoundException {
+    public Object getFieldValue(String fieldName, Object target) throws DfBeanFieldNotFoundException {
         Field field = getField(fieldName);
         return DfReflectionUtil.getValue(field, target);
     }
@@ -519,7 +519,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
         }
     }
 
-    private Method getSuitableMethod(String methodName, Object[] args) throws DfMethodNotFoundException {
+    private Method getSuitableMethod(String methodName, Object[] args) throws DfBeanMethodNotFoundException {
         if (args == null) {
             args = EMPTY_ARGS;
         }
@@ -532,7 +532,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
         if (method != null) {
             return method;
         }
-        throw new DfMethodNotFoundException(beanClass, methodName, args);
+        throw new DfBeanMethodNotFoundException(beanClass, methodName, args);
     }
 
     private Method findSuitableMethod(Method[] methods, Object[] args) {

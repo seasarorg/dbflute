@@ -19,37 +19,26 @@ package org.seasar.dbflute.helper.beans.exception;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class DfMethodNotFoundException extends RuntimeException {
+public class DfBeanConstructorNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
     private Class<?> targetClass;
 
-    private String methodName;
+    private Object[] methodArgs;
 
-    private Class<?>[] methodArgClasses;
+    private Class<?>[] paramTypes;
 
-    public DfMethodNotFoundException(Class<?> targetClass, String methodName, Object[] methodArgs) {
-        super("The method was not found: class=" + targetClass.getName() + " method=" + methodName + " args="
-                + getSignature(methodArgs));
+    public DfBeanConstructorNotFoundException(Class<?> targetClass, Object[] methodArgs) {
+        super("The constructor was not found: class=" + targetClass.getName() + " args=" + getSignature(methodArgs));
         this.targetClass = targetClass;
-        this.methodName = methodName;
-        if (methodArgs != null) {
-            methodArgClasses = new Class[methodArgs.length];
-            for (int i = 0; i < methodArgs.length; ++i) {
-                if (methodArgs[i] != null) {
-                    methodArgClasses[i] = methodArgs[i].getClass();
-                }
-            }
-        }
+        this.methodArgs = methodArgs;
     }
 
-    public DfMethodNotFoundException(Class<?> targetClass, String methodName, Class<?>[] methodArgClasses) {
-        super("The method was not found: class=" + targetClass.getName() + " method=" + methodName + " args="
-                + getSignature(methodArgClasses));
+    public DfBeanConstructorNotFoundException(Class<?> targetClass, Class<?>[] paramTypes) {
+        super("The constructor was not found: class=" + targetClass.getName() + " args=" + getSignature(paramTypes));
         this.targetClass = targetClass;
-        this.methodName = methodName;
-        this.methodArgClasses = methodArgClasses;
+        this.paramTypes = paramTypes;
     }
 
     private static String getSignature(Object[] methodArgs) {
@@ -90,11 +79,11 @@ public class DfMethodNotFoundException extends RuntimeException {
         return targetClass;
     }
 
-    public String getMethodName() {
-        return methodName;
+    public Object[] getMethodArgs() {
+        return methodArgs;
     }
 
-    public Class<?>[] getMethodArgClasses() {
-        return methodArgClasses;
+    public Class<?>[] getParamTypes() {
+        return paramTypes;
     }
 }

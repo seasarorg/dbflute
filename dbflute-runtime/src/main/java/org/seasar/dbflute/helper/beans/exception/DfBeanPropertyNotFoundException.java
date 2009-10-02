@@ -19,7 +19,7 @@ package org.seasar.dbflute.helper.beans.exception;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class DfPropertyNotFoundException extends RuntimeException {
+public class DfBeanPropertyNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
@@ -27,7 +27,7 @@ public class DfPropertyNotFoundException extends RuntimeException {
 
     private String propertyName;
 
-    public DfPropertyNotFoundException(Class<?> componentClass, String propertyName) {
+    public DfBeanPropertyNotFoundException(Class<?> componentClass, String propertyName) {
         super("The property was not found: class=" + componentClass.getName() + " property=" + propertyName);
         this.targetClass = componentClass;
         this.propertyName = propertyName;

@@ -27,8 +27,8 @@ import org.seasar.dbflute.exception.IfCommentNullPointerException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.helper.beans.exception.DfMethodNotFoundException;
-import org.seasar.dbflute.helper.beans.exception.DfPropertyNotFoundException;
+import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
+import org.seasar.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -171,14 +171,14 @@ public class IfCommentEvaluator {
                 try {
                     final Method method = beanDesc.getMethod(methodName);
                     baseObject = DfReflectionUtil.invoke(method, baseObject, (Object[]) null);
-                } catch (DfMethodNotFoundException e) {
+                } catch (DfBeanMethodNotFoundException e) {
                     throwIfCommentNotFoundMethodException(methodName);
                 }
             } else {
                 try {
                     final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
                     baseObject = propertyDesc.getValue(baseObject);
-                } catch (DfPropertyNotFoundException e) {
+                } catch (DfBeanPropertyNotFoundException e) {
                     throwIfCommentNotFoundPropertyException(property);
                 }
             }
@@ -214,14 +214,14 @@ public class IfCommentEvaluator {
                 try {
                     final Method method = beanDesc.getMethod(methodName);
                     baseObject = DfReflectionUtil.invoke(method, baseObject, (Object[]) null);
-                } catch (DfMethodNotFoundException e) {
+                } catch (DfBeanMethodNotFoundException e) {
                     throwIfCommentNotFoundMethodException(methodName);
                 }
             } else {
                 try {
                     final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(property);
                     baseObject = propertyDesc.getValue(baseObject);
-                } catch (DfPropertyNotFoundException e) {
+                } catch (DfBeanPropertyNotFoundException e) {
                     throwIfCommentNotFoundPropertyException(property);
                 }
             }
