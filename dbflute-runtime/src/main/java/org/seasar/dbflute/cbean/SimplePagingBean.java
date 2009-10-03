@@ -21,6 +21,7 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseDefault;
+import org.seasar.dbflute.twowaysql.pmb.MapParameterBean;
 
 /**
  * The simple paging-bean.

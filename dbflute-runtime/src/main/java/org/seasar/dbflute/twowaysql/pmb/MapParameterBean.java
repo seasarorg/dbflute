@@ -13,11 +13,19 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.outsidesql;
+package org.seasar.dbflute.twowaysql.pmb;
+
+import java.util.Map;
 
 /**
- * The parameter-bean as marker interface.
+ * The bean of map parameter.
  * @author jflute
  */
-public interface ParameterBean {
+public interface MapParameterBean {
+
+    /**
+     * Get the map of parameter.
+     * @return The map of parameter. (Nullable)
+     */
+    Map<String, Object> getParameterMap();
 }

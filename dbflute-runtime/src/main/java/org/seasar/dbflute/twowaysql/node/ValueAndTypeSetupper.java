@@ -19,7 +19,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.cbean.MapParameterBean;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.exception.BindVariableCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.EmbeddedValueCommentNotFoundPropertyException;
@@ -28,6 +27,7 @@ import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.seasar.dbflute.twowaysql.pmb.MapParameterBean;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
