@@ -36,6 +36,7 @@ public class ColumnInfo {
     protected final boolean autoIncrement;
     protected final Integer columnSize;
     protected final Integer columnDecimalDigits;
+    protected final boolean commonColumn;
     protected final OptimisticLockType optimisticLockType;
 
     // ===================================================================================
@@ -43,19 +44,11 @@ public class ColumnInfo {
     //                                                                         ===========
     public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, String propertyName,
             Class<?> propertyType, boolean primary, boolean autoIncrement, Integer columnSize,
-            Integer columnDecimalDigits) {
-        this(dbmeta, columnDbName, columnAlias, propertyName, propertyType, primary, autoIncrement, columnSize,
-                columnDecimalDigits, OptimisticLockType.NONE);
-    }
-
-    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, String propertyName,
-            Class<?> propertyType, boolean primary, boolean autoIncrement, Integer columnSize,
-            Integer columnDecimalDigits, OptimisticLockType optimisticLockType) {
+            Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
         assertObjectNotNull("propertyName", propertyName);
         assertObjectNotNull("propertyType", propertyType);
-        assertObjectNotNull("optimisticLockType", optimisticLockType);
         this.dbmeta = dbmeta;
         this.columnDbName = columnDbName;
         this.columnAlias = columnAlias;
@@ -65,7 +58,8 @@ public class ColumnInfo {
         this.autoIncrement = autoIncrement;
         this.columnSize = columnSize;
         this.columnDecimalDigits = columnDecimalDigits;
-        this.optimisticLockType = optimisticLockType;
+        this.commonColumn = commonColumn;
+        this.optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
     }
 
     // ===================================================================================
@@ -82,21 +76,6 @@ public class ColumnInfo {
 
     protected String buildInitCapPropertyName() {
         return initCap(this.propertyName);
-    }
-
-    // ===================================================================================
-    //                                                                Optimistic Lock Type
-    //                                                                ====================
-    public boolean isOptimisticLock() {
-        return isVersionNo() || isUpdateDate();
-    }
-
-    public boolean isVersionNo() {
-        return OptimisticLockType.VERSION_NO == optimisticLockType;
-    }
-
-    public boolean isUpdateDate() {
-        return OptimisticLockType.UPDATE_DATE == optimisticLockType;
     }
 
     // ===================================================================================
@@ -197,15 +176,15 @@ public class ColumnInfo {
     }
 
     /**
-     * Is the column is a part of primary keys?
+     * Is the column a part of primary keys?
      * @return Determination.
      */
     public boolean isPrimary() {
         return this.primary;
     }
-    
+
     /**
-     * Is the column is auto increment?
+     * Is the column auto increment?
      * @return Determination.
      */
     public boolean isAutoIncrement() {
@@ -226,5 +205,37 @@ public class ColumnInfo {
      */
     public Integer getColumnDecimalDigits() {
         return this.columnDecimalDigits;
+    }
+
+    /**
+     * Is the column a part of common columns?
+     * @return Determination.
+     */
+    public boolean isCommonColumn() {
+        return this.commonColumn;
+    }
+
+    /**
+     * Is the column for optimistic lock?
+     * @return Determination.
+     */
+    public boolean isOptimisticLock() {
+        return isVersionNo() || isUpdateDate();
+    }
+
+    /**
+     * Is the column version-no for optimistic lock?
+     * @return Determination.
+     */
+    public boolean isVersionNo() {
+        return OptimisticLockType.VERSION_NO == optimisticLockType;
+    }
+
+    /**
+     * Is the column update-date for optimistic lock?
+     * @return Determination.
+     */
+    public boolean isUpdateDate() {
+        return OptimisticLockType.UPDATE_DATE == optimisticLockType;
     }
 }
