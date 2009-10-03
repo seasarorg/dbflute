@@ -811,6 +811,7 @@ public class DfTypeUtil {
             } catch (ToTimestampParseException e) {
                 String msg = "Failed to parse the string to time-stamp flexibly: ";
                 msg = msg + " obj=" + obj;
+                throw new ToTimestampFlexiblyParseException(msg, e);
             }
         }
         String string = (String) obj;

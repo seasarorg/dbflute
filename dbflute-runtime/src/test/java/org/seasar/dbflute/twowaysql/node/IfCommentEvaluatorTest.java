@@ -6,12 +6,14 @@ import java.util.Map;
 
 import org.seasar.dbflute.exception.IfCommentDifferentTypeComparisonException;
 import org.seasar.dbflute.exception.IfCommentEmptyExpressionException;
+import org.seasar.dbflute.exception.IfCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.exception.IfCommentNotBooleanResultException;
 import org.seasar.dbflute.exception.IfCommentNotFoundMethodException;
 import org.seasar.dbflute.exception.IfCommentNotFoundPropertyException;
 import org.seasar.dbflute.exception.IfCommentNullPointerException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedTypeComparisonException;
+import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -81,7 +83,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
         pmb.setBirthdate(DfTypeUtil.toDateFlexibly("2009/11/22"));
-        String expression = "pmb.birthdate == '2009/11/22'";
+        String expression = "pmb.birthdate == date '2009/11/22'";
         IfCommentEvaluator evaluator = createEvaluator(pmb, expression);
 
         // ## Act && Assert ##
@@ -304,14 +306,14 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         pmb.setBirthdate(DfTypeUtil.toDate("2009/12/24 12:34:56"));
 
         // ## Act && Assert ##
-        assertTrue(createEvaluator(pmb, "pmb.birthdate > '2009/12/23 12:34:56'").evaluate());
-        assertFalse(createEvaluator(pmb, "pmb.birthdate > '2009/12/24 12:34:57'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate > date '2009/12/23 12:34:56'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate > date '2009/12/24 12:34:57'").evaluate());
         assertFalse(createEvaluator(pmb, "pmb.birthdate > pmb.birthdate").evaluate());
         pmb.setBirthdate(DfTypeUtil.toDate("2009/09/12"));
-        assertTrue(createEvaluator(pmb, "pmb.birthdate > '2009/09/11'").evaluate());
-        assertFalse(createEvaluator(pmb, "pmb.birthdate > '2009/09/12'").evaluate());
-        assertFalse(createEvaluator(pmb, "pmb.birthdate > '2009/09/12 12:34:57'").evaluate());
-        assertFalse(createEvaluator(pmb, "pmb.birthdate > '2009/09/13'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate > date '2009/09/11'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate > date '2009/09/12'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate > date '2009/09/12 12:34:57'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate > date '2009/09/13'").evaluate());
         assertFalse(createEvaluator(pmb, "pmb.birthdate > pmb.birthdate").evaluate());
     }
 
@@ -345,14 +347,14 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         pmb.setBirthdate(birthdate);
 
         // ## Act && Assert ##
-        assertFalse(createEvaluator(pmb, "pmb.birthdate < '2009/12/23 12:34:56'").evaluate());
-        assertTrue(createEvaluator(pmb, "pmb.birthdate < '2009/12/24 12:34:57'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate < date '2009/12/23 12:34:56'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate < date '2009/12/24 12:34:57'").evaluate());
         assertFalse(createEvaluator(pmb, "pmb.birthdate < pmb.birthdate").evaluate());
         pmb.setBirthdate(DfTypeUtil.toDate("2009/09/12"));
-        assertFalse(createEvaluator(pmb, "pmb.birthdate < '2009/09/11'").evaluate());
-        assertFalse(createEvaluator(pmb, "pmb.birthdate < '2009/09/12'").evaluate());
-        assertTrue(createEvaluator(pmb, "pmb.birthdate < '2009/09/12 12:34:57'").evaluate());
-        assertTrue(createEvaluator(pmb, "pmb.birthdate < '2009/09/13'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate < date '2009/09/11'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate < date '2009/09/12'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate < date '2009/09/12 12:34:57'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate < date '2009/09/13'").evaluate());
         assertFalse(createEvaluator(pmb, "pmb.birthdate < pmb.birthdate").evaluate());
 
     }
@@ -387,14 +389,14 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         pmb.setBirthdate(birthdate);
 
         // ## Act && Assert ##
-        assertTrue(createEvaluator(pmb, "pmb.birthdate >= '2009/12/23 12:34:56'").evaluate());
-        assertFalse(createEvaluator(pmb, "pmb.birthdate >= '2009/12/24 12:34:57'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate >= date '2009/12/23 12:34:56'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate >= date '2009/12/24 12:34:57'").evaluate());
         assertTrue(createEvaluator(pmb, "pmb.birthdate >= pmb.birthdate").evaluate());
         pmb.setBirthdate(DfTypeUtil.toDate("2009/09/12"));
-        assertTrue(createEvaluator(pmb, "pmb.birthdate >= '2009/09/11'").evaluate());
-        assertTrue(createEvaluator(pmb, "pmb.birthdate >= '2009/09/12'").evaluate());
-        assertFalse(createEvaluator(pmb, "pmb.birthdate >= '2009/09/12 12:34:57'").evaluate());
-        assertFalse(createEvaluator(pmb, "pmb.birthdate >= '2009/09/13'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate >= date '2009/09/11'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate >= date '2009/09/12'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate >= date '2009/09/12 12:34:57.123'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate >= date '2009/09/13'").evaluate());
         assertTrue(createEvaluator(pmb, "pmb.birthdate >= pmb.birthdate").evaluate());
     }
 
@@ -424,49 +426,26 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
     public void test_lessEqual_date() {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
-        Date birthdate = DfTypeUtil.toTimestampFlexibly("2009/12/24 12:34:56");
+        Date birthdate = DfTypeUtil.toTimestampFlexibly("2009/12/24 12:34:56.123");
         pmb.setBirthdate(birthdate);
 
         // ## Act && Assert ##
-        assertFalse(createEvaluator(pmb, "pmb.birthdate <= '2009/12/23 12:34:56'").evaluate());
-        assertTrue(createEvaluator(pmb, "pmb.birthdate <= '2009/12/24 12:34:57'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate <= date '2009/12/23 12:34:56'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= date '2009/12/24 12:34:56.123'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= date '2009/12/24 12:34:56.124'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= date '2009/12/24 12:34:57'").evaluate());
         assertTrue(createEvaluator(pmb, "pmb.birthdate <= pmb.birthdate").evaluate());
         pmb.setBirthdate(DfTypeUtil.toDate("2009/09/12"));
-        assertFalse(createEvaluator(pmb, "pmb.birthdate <= '2009/09/11'").evaluate());
-        assertTrue(createEvaluator(pmb, "pmb.birthdate <= '2009/09/12'").evaluate());
-        assertTrue(createEvaluator(pmb, "pmb.birthdate <= '2009/09/12 12:34:57'").evaluate());
-        assertTrue(createEvaluator(pmb, "pmb.birthdate <= '2009/09/13'").evaluate());
+        assertFalse(createEvaluator(pmb, "pmb.birthdate <= date '2009/09/11'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= date '2009/09/12'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= date '2009/09/12 12:34:57.123'").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.birthdate <= date '2009/09/13'").evaluate());
         assertTrue(createEvaluator(pmb, "pmb.birthdate <= pmb.birthdate").evaluate());
     }
 
     // ===================================================================================
     //                                                                           Exception
     //                                                                           =========
-    public void test_evaluate_notFoundMethodProperty() {
-        // ## Arrange ##
-        BasePmb pmb = new BasePmb();
-        pmb.setMemberName("foo");
-
-        // ## Act ##
-        try {
-            createEvaluator(pmb, "pmb.getMemberNameNon() != null").evaluate();
-
-            // ## Assert ##
-            fail();
-        } catch (IfCommentNotFoundMethodException e) {
-            log(e.getMessage());
-        }
-        // ## Act ##
-        try {
-            createEvaluator(pmb, "pmb.memberNameNon != null").evaluate();
-
-            // ## Assert ##
-            fail();
-        } catch (IfCommentNotFoundPropertyException e) {
-            log(e.getMessage());
-        }
-    }
-
     public void test_evaluate_IfCommentEmptyExpressionException() {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
@@ -537,6 +516,76 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
             // ## Assert ##
             fail();
         } catch (IfCommentUnsupportedExpressionException e) {
+            log(e.getMessage());
+        }
+    }
+
+    public void test_evaluate_IfCommentIllegalParameterBeanSpecificationException() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberName("foo");
+
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pm b.getMemberNameNon() != null").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentIllegalParameterBeanSpecificationException e) {
+            log(e.getMessage());
+        }
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pmb,memberNameNon != null").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentIllegalParameterBeanSpecificationException e) {
+            log(e.getMessage());
+        }
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pmb:memberNameNon != null").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentIllegalParameterBeanSpecificationException e) {
+            log(e.getMessage());
+        }
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pnb.memberNameNon != null").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentIllegalParameterBeanSpecificationException e) {
+            log(e.getMessage());
+        }
+        // ## Act && Assert ##
+        createEvaluator("foo", "orignalName != null").evaluate(); // no exception
+    }
+
+    public void test_evaluate_notFoundMethodProperty() {
+        // ## Arrange ##
+        BasePmb pmb = new BasePmb();
+        pmb.setMemberName("foo");
+
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pmb.getMemberNameNon() != null").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentNotFoundMethodException e) {
+            log(e.getMessage());
+        }
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pmb.memberNameNon != null").evaluate();
+
+            // ## Assert ##
+            fail();
+        } catch (IfCommentNotFoundPropertyException e) {
             log(e.getMessage());
         }
     }
@@ -667,13 +716,14 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
         pmb.setMemberId(2);
-        String expression = "3 > pmb.memberId";
-        IfCommentEvaluator evaluator = createEvaluator(pmb, expression);
+        pmb.setBirthdate(DfTypeUtil.toDateFlexibly("2008/11/22"));
 
         // ## Act && Assert ##
-        assertTrue(evaluator.evaluate());
-        pmb.setMemberId(3);
-        assertFalse(evaluator.evaluate());
+        assertTrue(createEvaluator(pmb, "3 > pmb.memberId").evaluate());
+        assertTrue(createEvaluator(pmb, "3 > pmb.memberId && pmb.birthdate < date '2009/11/22'").evaluate());
+        assertTrue(createEvaluator(pmb, "3 > pmb.memberId && date '2009/11/22' > pmb.birthdate").evaluate());
+        assertTrue(createEvaluator(pmb, "pmb.memberId < 3 && date '2009/11/22' > pmb.birthdate").evaluate());
+        assertTrue(createEvaluator(pmb, "3 == pmb.memberId || date '2009/11/22' > pmb.birthdate").evaluate());
     }
 
     public void test_evaluate_map() {
@@ -684,6 +734,44 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         // ## Act && Assert ##
         assertTrue(createEvaluator(pmb, "pmb.mapPmb.fooKey > 2").evaluate());
         assertFalse(createEvaluator(pmb, "pmb.mapPmb.fooKey > 3").evaluate());
+    }
+
+    public void test_evaluate_scalarPmb() {
+        // ## Arrange & Act && Assert ##
+        assertTrue(createEvaluator(3, "pmb > 2").evaluate());
+        assertTrue(createEvaluator("Pixy", "pmb == 'Pixy'").evaluate());
+    }
+
+    public void test_evaluate_nullPmb() {
+        // ## Arrange & Act && Assert ##
+        assertTrue(createEvaluator(null, "pmb == null").evaluate());
+        assertTrue(createEvaluator(null, "pmb != 'Pixy'").evaluate());
+    }
+
+    public void test_evaluate_cdef() {
+        // ## Arrange & Act && Assert ##
+        Classification cdef = new MyCDef();
+
+        // ## Act && Assert ##
+        assertTrue(createEvaluator(cdef, "pmb.code() == 'Pixy'").evaluate());
+    }
+
+    protected static class MyCDef implements Classification {
+        public String name() {
+            return null;
+        }
+
+        public DataType dataType() {
+            return null;
+        }
+
+        public String code() {
+            return "Pixy";
+        }
+
+        public String alias() {
+            return null;
+        }
     }
 
     // ===================================================================================

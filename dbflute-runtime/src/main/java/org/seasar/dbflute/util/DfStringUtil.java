@@ -77,7 +77,7 @@ public class DfStringUtil {
         int j = str.indexOf(delimiter);
         for (int h = 0; j >= 0; h++) {
             list.add(str.substring(i, j));
-            i = j + 1;
+            i = j + delimiter.length();
             j = str.indexOf(delimiter, i);
         }
         list.add(str.substring(i));
