@@ -20,6 +20,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected int? columnSize;
         protected int? columnDecimalDigits;
         protected String columnAlias;
+        protected bool commonColumn;
         protected OptimisticLockType optimisticLockType;
 
         // ===============================================================================
@@ -34,7 +35,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
 
         public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
                        , Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits
-                       , OptimisticLockType optimisticLockType) {
+                       , bool commonColumn, OptimisticLockType optimisticLockType) {
             AssertObjectNotNull("dbmeta", dbmeta);
             AssertObjectNotNull("columnDbName", columnDbName);
             AssertObjectNotNull("propertyName", propertyName);
@@ -48,6 +49,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             this.primary = primary;
             this.columnSize = columnSize;
             this.columnDecimalDigits = columnDecimalDigits;
+            this.commonColumn = commonColumn;
             this.optimisticLockType = optimisticLockType;
         }
 
@@ -64,21 +66,6 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected virtual PropertyInfo FindProperty(Type clazz, String name) {
             return clazz.GetProperty(name);
         }
-
-        // ===============================================================================
-        //                                                            Optimistic Lock Type
-        //                                                            ====================
-        public bool IsOptimisticLock { get {
-            return IsVersionNo || IsUpdateDate;
-        }}
-
-        public bool IsVersionNo { get {
-            return OptimisticLockType.VERSION_NO == optimisticLockType;
-        }}
-
-        public bool IsUpdateDate { get {
-            return OptimisticLockType.UPDATE_DATE == optimisticLockType;
-        }}
 
         // ===============================================================================
         //                                                                  General Helper
@@ -153,5 +140,20 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public int? ColumnDecimalDigits {
             get { return columnDecimalDigits; }
         }
+
+        public bool IsCommonColumn {
+            get { return commonColumn; }
+        }
+        public bool IsOptimisticLock {
+            get { return IsVersionNo || IsUpdateDate; }
+        }}
+
+        public bool IsVersionNo {
+            get { return OptimisticLockType.VERSION_NO == optimisticLockType; }
+        }}
+
+        public bool IsUpdateDate {
+            get { return OptimisticLockType.UPDATE_DATE == optimisticLockType; }
+        }}
     }
 }

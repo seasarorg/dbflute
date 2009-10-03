@@ -1708,7 +1708,7 @@ public class Column {
     //                                                                       =============
     protected Boolean _commonColumn;
 
-    protected boolean isCommonColumn() {
+    public boolean isCommonColumn() {
         if (_commonColumn == null) {
             _commonColumn = false;
             final List<Column> commonColumnList = getTable().getCommonColumnList();
@@ -1725,19 +1725,26 @@ public class Column {
     }
 
     // ===================================================================================
-    //                                                                          Version No
-    //                                                                          ==========
+    //                                                                     Optimistic Lock
+    //                                                                     ===============
     public boolean isVersionNo() {
         final String versionNoPropertyName = getTable().getVersionNoPropertyName();
         return getTable().isUseVersionNo() && getJavaName().equalsIgnoreCase(versionNoPropertyName);
     }
 
-    // ===================================================================================
-    //                                                                         Update Date
-    //                                                                         ===========
     public boolean isUpdateDate() {
         final String updateDatePropertyName = getTable().getUpdateDatePropertyName();
         return getTable().isUseUpdateDate() && getJavaName().equalsIgnoreCase(updateDatePropertyName);
+    }
+
+    public String getOptimistickLockExpression() {
+        if (isVersionNo()) {
+            return "OptimisticLockType.VERSION_NO";
+        } else if (isUpdateDate()) {
+            return "OptimisticLockType.UPDATE_DATE";
+        } else {
+            return "null";
+        }
     }
 
     // ===================================================================================

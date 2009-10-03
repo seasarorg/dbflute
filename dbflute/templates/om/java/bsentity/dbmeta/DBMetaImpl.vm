@@ -34,13 +34,7 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                         Column Info
     //                                                                         ===========
 #foreach ($col in $table.columns)
-#if ($col.isVersionNo())
-    protected ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.VERSION_NO);
-#elseif ($col.isUpdateDate())
-    protected ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, OptimisticLockType.UPDATE_DATE);
-#else
-    protected ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression});
-#end
+    protected ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression});
 #end
 
 #foreach ($col in $table.columns)
