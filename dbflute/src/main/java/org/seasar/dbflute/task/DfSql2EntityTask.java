@@ -43,6 +43,8 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
+import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
+import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
 import org.seasar.dbflute.friends.torque.DfSchemaXmlReader;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
@@ -232,7 +234,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         // /- - - - - - - - - - - - - - - - - - - - - - - - - - -  
         // Implementing SqlFileRunnerBase as inner class.
         // - - - - - - - - - -/
-        final Log innerLog = _log;
         return new DfSqlFileRunnerBase(runInfo, getDataSource()) {
 
             /**
@@ -323,6 +324,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         String entityName = getEntityName(sql);
                         if (entityName != null) {
                             entityName = resolveEntityNameIfNeeds(entityName, _sqlFile);
+                            assertDuplicateEntity(entityName, _sqlFile);
                             _entityInfoMap.put(entityName, columnJdbcTypeMap);
                             if (isCursor(sql)) {
                                 _cursorInfoMap.put(entityName, new Object());
@@ -339,20 +341,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         // for Parameter Bean
                         final DfParameterBeanMetaData parameterBeanMetaData = extractParameterBeanMetaData(sql);
                         if (parameterBeanMetaData != null) {
-                            final String parameterBeanMetaDataKey = parameterBeanMetaData.getClassName();
-                            if (_pmbMetaDataMap.containsKey(parameterBeanMetaDataKey)) {
-                                final String ln = ln();
-                                String msg = "Waning!" + ln;
-                                msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;
-                                msg = msg + "The meta data of parameter-bean already bean registered." + ln;
-                                msg = msg + "It overrides the old one by NEW parameter-bean: name="
-                                        + parameterBeanMetaDataKey + ln;
-                                msg = msg + "- - - - - - - - - - -" + ln;
-                                msg = msg + " sql=" + sql + ln;
-                                msg = msg + "* * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln;
-                                innerLog.warn(msg);
-                            }
-                            _pmbMetaDataMap.put(parameterBeanMetaDataKey, parameterBeanMetaData);
+                            final String pmbName = parameterBeanMetaData.getClassName();
+                            assertDuplicateParameterBean(pmbName, _sqlFile);
+                            _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
                         }
                     }
                 } catch (SQLException e) {
@@ -499,6 +490,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         propertyNameTypeMap.put(propertyName, typeName);
                     }
                 }
+                pmbMetaData.setSqlFile(_sqlFile);
                 return pmbMetaData;
             }
 
@@ -566,10 +558,42 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         };
     }
 
+    protected void assertDuplicateEntity(String entityName, File currentSqlFile) {
+        final File sqlFile = _entitySqlFileMap.get(entityName);
+        if (sqlFile == null) {
+            return;
+        }
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The customize entity was duplicated!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Customize Entity]" + ln() + entityName + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL Files]" + ln() + sqlFile + ln() + currentSqlFile + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new DfCustomizeEntityDuplicateException(msg);
+    }
+
+    protected void assertDuplicateParameterBean(String pmbName, File currentSqlFile) {
+        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(pmbName);
+        if (metaData == null) {
+            return;
+        }
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The parameter-bean was duplicated!" + ln();
+        msg = msg + ln();
+        msg = msg + "[ParameterBean]" + ln() + pmbName + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL Files]" + ln() + metaData.getSqlFile() + ln() + currentSqlFile + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new DfParameterBeanDuplicateException(msg);
+    }
+
     protected void handleNotFoundResult(List<File> sqlFileList) {
         if (_entityInfoMap.isEmpty() && _pmbMetaDataMap.isEmpty()) {
             _log.warn("/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-            _log.warn("SQL for sql2entity was Not Found!");
+            _log.warn("SQL for sql2entity was not found!");
             _log.warn("");
             _log.warn("SQL Files: " + sqlFileList.size());
             int index = 0;

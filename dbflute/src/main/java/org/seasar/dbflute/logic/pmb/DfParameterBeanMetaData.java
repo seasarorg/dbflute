@@ -1,5 +1,6 @@
 package org.seasar.dbflute.logic.pmb;
 
+import java.io.File;
 import java.util.Map;
 
 /**
@@ -14,8 +15,9 @@ public class DfParameterBeanMetaData {
     protected String superClassName;
     protected Map<String, String> propertyNameTypeMap;
     protected Map<String, String> propertyNameOptionMap;
-    protected Map<String, String> propertyNameColumnNameMap; // Only when this is for procedure
-    protected String procedureName; // Only when this is for procedure
+    protected Map<String, String> propertyNameColumnNameMap; // only when this is for procedure
+    protected String procedureName; // only when this is for procedure
+    protected File sqlFile; // when procedure, always null
 
     // ===================================================================================
     //                                                                      Basic Override
@@ -80,5 +82,13 @@ public class DfParameterBeanMetaData {
 
     public void setProcedureName(String procedureName) {
         this.procedureName = procedureName;
+    }
+
+    public File getSqlFile() {
+        return sqlFile;
+    }
+
+    public void setSqlFile(File sqlFile) {
+        this.sqlFile = sqlFile;
     }
 }
