@@ -79,7 +79,7 @@ public class IfNode extends ContainerNode {
     }
 
     protected IfCommentEvaluator createIfCommentEvaluator(final CommandContext ctx, String expression) {
-        return new IfCommentEvaluator(new IfCommentArgumentFinder() {
+        return new IfCommentEvaluator(new ParameterFinder() {
             public Object find(String name) {
                 return ctx.getArg(name);
             }

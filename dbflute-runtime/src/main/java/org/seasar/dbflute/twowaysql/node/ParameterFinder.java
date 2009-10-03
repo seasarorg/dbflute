@@ -18,7 +18,7 @@ package org.seasar.dbflute.twowaysql.node;
 /**
  * @author jflute
  */
-public interface IfCommentArgumentFinder {
+public interface ParameterFinder {
 
     Object find(String name);
 }

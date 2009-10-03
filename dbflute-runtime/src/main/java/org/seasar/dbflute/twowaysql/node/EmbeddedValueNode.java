@@ -19,6 +19,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import org.seasar.dbflute.twowaysql.context.CommandContext;
+import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfStringUtil;
 
@@ -96,14 +97,16 @@ public class EmbeddedValueNode extends AbstractNode {
         }
     }
 
-    protected void assertFirstName(CommandContext ctx, String firstName) {
-        final Object arg = ctx.getArg("df:noway");
-        if (arg == null) {
-            return; // Because the argument has several elements.
-        }
-        if ((arg instanceof ParameterBean) && !firstName.equals("pmb")) {
-            throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException();
-        }
+    protected void assertFirstName(final CommandContext ctx, String firstName) {
+        NodeUtil.assertParameterBeanName(firstName, new ParameterFinder() {
+            public Object find(String name) {
+                return ctx.getArg(name);
+            }
+        }, new IllegalParameterBeanHandler() {
+            public void handle(ParameterBean pmb) {
+                throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(pmb);
+            }
+        });
     }
 
     protected void setupValueAndType(ValueAndType valueAndType) {
@@ -112,8 +115,8 @@ public class EmbeddedValueNode extends AbstractNode {
     }
 
     protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
-        NodeExceptionHandler.throwBindOrEmbeddedCommentParameterNullValueException(_expression, valueAndType
-                .getTargetType(), _specifiedSql, false);
+        NodeUtil.throwBindOrEmbeddedCommentParameterNullValueException(_expression, valueAndType.getTargetType(),
+                _specifiedSql, false);
     }
 
     protected boolean isInScope() {
@@ -155,17 +158,16 @@ public class EmbeddedValueNode extends AbstractNode {
         ctx.addSql(")");
     }
 
-    protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException() {
-        NodeExceptionHandler.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression,
-                _specifiedSql, false);
+    protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(ParameterBean pmb) {
+        NodeUtil.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression, _specifiedSql,
+                false, pmb);
     }
 
     protected void throwBindOrEmbeddedCommentParameterEmptyListException() {
-        NodeExceptionHandler.throwBindOrEmbeddedCommentParameterEmptyListException(_expression, _specifiedSql, false);
+        NodeUtil.throwBindOrEmbeddedCommentParameterEmptyListException(_expression, _specifiedSql, false);
     }
 
     protected void throwBindOrEmbeddedCommentParameterNullOnlyListException() {
-        NodeExceptionHandler
-                .throwBindOrEmbeddedCommentParameterNullOnlyListException(_expression, _specifiedSql, false);
+        NodeUtil.throwBindOrEmbeddedCommentParameterNullOnlyListException(_expression, _specifiedSql, false);
     }
 }

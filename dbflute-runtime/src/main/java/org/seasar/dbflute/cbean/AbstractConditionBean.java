@@ -244,8 +244,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                        --------------
     /**
      * {@inheritDoc}
-     * @param pageSize The page size per one page. (NotMinus & NotZero)
-     * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
      */
     public void paging(int pageSize, int pageNumber) {
         fetchFirst(pageSize);
@@ -254,23 +252,21 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @param paging Determination.
      */
-    public void xsetPaging(boolean paging) {// Very Internal!
-        String msg = "This method is unsupported on ConditionBean!";
-        throw new UnsupportedOperationException(msg);
+    public void xsetPaging(boolean paging) {
+        // Do nothing because this is unsupported on ConditionBean.
+        // And it is possible that this method is called by PagingInvoker.
     }
 
     /**
-     * ${database.ImplementComment}
+     * {@inheritDoc}
      */
     public void disablePagingReSelect() {
         _canPagingReSelect = false;
     }
 
     /**
-     * ${database.ImplementComment}
-     * @return Can the paging re-select execute?
+     * {@inheritDoc}
      */
     public boolean canPagingReSelect() {
         return _canPagingReSelect;

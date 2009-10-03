@@ -783,7 +783,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
     //                                                                         Test Helper
     //                                                                         ===========
     protected IfCommentEvaluator createEvaluator(final Object pmb, String expression) {
-        return new IfCommentEvaluator(new IfCommentArgumentFinder() {
+        return new IfCommentEvaluator(new ParameterFinder() {
             public Object find(String name) {
                 return pmb;
             }

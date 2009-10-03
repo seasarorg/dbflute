@@ -36,6 +36,7 @@ import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -65,14 +66,14 @@ public class IfCommentEvaluator {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private IfCommentArgumentFinder _finder;
+    private ParameterFinder _finder;
     private String _expression;
     private String _specifiedSql;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public IfCommentEvaluator(IfCommentArgumentFinder finder, String expression, String specifiedSql) {
+    public IfCommentEvaluator(ParameterFinder finder, String expression, String specifiedSql) {
         this._finder = finder;
         this._expression = expression;
         this._specifiedSql = specifiedSql;
@@ -355,13 +356,11 @@ public class IfCommentEvaluator {
     }
 
     protected void assertFirstName(String firstName) {
-        final Object arg = _finder.find("df:noway");
-        if (arg == null) {
-            return; // Because the argument has several elements.
-        }
-        if ((arg instanceof ParameterBean) && !firstName.equals("pmb")) {
-            throwIfCommentIllegalParameterBeanSpecificationException();
-        }
+        NodeUtil.assertParameterBeanName(firstName, _finder, new IllegalParameterBeanHandler() {
+            public void handle(ParameterBean pmb) {
+                throwIfCommentIllegalParameterBeanSpecificationException();
+            }
+        });
     }
 
     protected Object processOneProperty(Object baseObject, String preProperty, String property) {

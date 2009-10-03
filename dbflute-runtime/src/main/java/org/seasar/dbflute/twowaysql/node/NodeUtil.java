@@ -18,12 +18,28 @@ package org.seasar.dbflute.twowaysql.node;
 import org.seasar.dbflute.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
 import org.seasar.dbflute.exception.BindVariableCommentParameterNullValueException;
 import org.seasar.dbflute.exception.EmbeddedValueCommentParameterNullValueException;
+import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
  */
-public class NodeExceptionHandler {
+public class NodeUtil {
+
+    public static void assertParameterBeanName(String firstName, ParameterFinder finder,
+            IllegalParameterBeanHandler handler) {
+        final Object arg = finder.find("df:noway");
+        if (arg == null) {
+            return; // Because the argument has several elements.
+        }
+        if ((arg instanceof ParameterBean) && !firstName.equals("pmb")) {
+            handler.handle((ParameterBean) arg);
+        }
+    }
+
+    public static interface IllegalParameterBeanHandler {
+        void handle(ParameterBean pmb);
+    }
 
     public static void throwBindOrEmbeddedCommentParameterNullValueException(String expression, Class<?> targetType,
             String specifiedSql, boolean bind) {
@@ -53,7 +69,7 @@ public class NodeExceptionHandler {
     }
 
     public static void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(String expression,
-            String specifiedSql, boolean bind) {
+            String specifiedSql, boolean bind, ParameterBean pmb) {
         String name = (bind ? "bind variable" : "embedded value");
         String emmark = (bind ? "" : "$");
         String msg = "Look! Read the message below." + ln();
@@ -70,6 +86,8 @@ public class NodeExceptionHandler {
         msg = msg + "    (o) - /*" + emmark + "pmb.memberId*/" + ln();
         msg = msg + ln();
         msg = msg + "[Comment Expression]" + ln() + expression + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified ParameterBean]" + ln() + pmb + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
