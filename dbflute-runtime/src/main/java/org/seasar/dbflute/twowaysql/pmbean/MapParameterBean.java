@@ -18,10 +18,10 @@ package org.seasar.dbflute.twowaysql.pmbean;
 import java.util.Map;
 
 /**
- * The bean of map parameter.
+ * The map parameter-bean.
  * @author jflute
  */
-public interface MapParameterBean {
+public interface MapParameterBean extends ParameterBean {
 
     /**
      * Get the map of parameter.

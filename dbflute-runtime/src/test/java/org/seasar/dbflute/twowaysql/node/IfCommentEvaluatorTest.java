@@ -14,7 +14,7 @@ import org.seasar.dbflute.exception.IfCommentNullPointerException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedTypeComparisonException;
 import org.seasar.dbflute.jdbc.Classification;
-import org.seasar.dbflute.twowaysql.pmb.ParameterBean;
+import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
 

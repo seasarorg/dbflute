@@ -23,13 +23,13 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
  */
 public interface WhereClauseSimpleFilter {
 
-    public static final String BIND_COMMENT_BEGIN_PART = "/*dto";
+    public static final String BIND_COMMENT_BEGIN_PART = "/*pmb";
     public static final String BIND_COMMENT_END_PART = "*/null";
 
-    public static final String EMBEDDED_COMMENT_BEGIN_PART = "/*$dto";
+    public static final String EMBEDDED_COMMENT_BEGIN_PART = "/*$pmb";
     public static final String EMBEDDED_COMMENT_END_PART = "*/null";
 
-    public static final String EMBEDDED_COMMENT_QUOTED_BEGIN_PART = "'/*$dto";
+    public static final String EMBEDDED_COMMENT_QUOTED_BEGIN_PART = "'/*$pmb";
     public static final String EMBEDDED_COMMENT_QUOTED_END_PART = "*/'dummy''";
 
     /**
@@ -67,8 +67,8 @@ public interface WhereClauseSimpleFilter {
             if (_filterTargetColumnInfoSet == null || _filterTargetColumnInfoSet.isEmpty()) {
                 return toEmbedded(clauseElement);
             }
-            for (final java.util.Iterator<ColumnInfo> ite = _filterTargetColumnInfoSet.iterator(); ite.hasNext(); ) {
-                final ColumnInfo columnInfo = (ColumnInfo)ite.next();
+            for (final java.util.Iterator<ColumnInfo> ite = _filterTargetColumnInfoSet.iterator(); ite.hasNext();) {
+                final ColumnInfo columnInfo = (ColumnInfo) ite.next();
                 if (isTargetClause(clauseElement, columnInfo.getColumnDbName())) {
                     return toEmbedded(clauseElement);
                 }
