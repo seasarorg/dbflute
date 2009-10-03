@@ -27,7 +27,7 @@ import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
-import org.seasar.dbflute.twowaysql.pmb.MapParameterBean;
+import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 

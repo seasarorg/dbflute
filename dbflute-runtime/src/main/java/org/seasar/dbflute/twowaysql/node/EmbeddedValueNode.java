@@ -19,7 +19,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.twowaysql.pmb.ParameterBean;
+import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
