@@ -20,7 +20,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                                                          Definition
     //                                                                          ==========
     protected static readonly SelectClauseType DEFAULT_SELECT_CLAUSE_TYPE = SelectClauseType.COLUMNS;
-    protected static readonly String SELECT_HINT = "/*$dto.SelectHint*/ ";
+    protected static readonly String SELECT_HINT = "/*$pmb.SelectHint*/ ";
 
     // ===================================================================================
     //                                                                           Attribute

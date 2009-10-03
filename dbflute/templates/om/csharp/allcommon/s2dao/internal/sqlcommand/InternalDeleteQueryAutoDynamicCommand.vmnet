@@ -32,7 +32,7 @@ public class ${glInternalDeleteQueryAutoDynamicCommand} : ISqlCommand {
     //                                                                             =======
     public Object Execute(Object[] args) {
         ${glConditionBean} cb = extractConditionBeanWithCheck(args);
-        String[] argNames = new String[]{"dto"};
+        String[] argNames = new String[]{"pmb"};
         Type[] argTypes = new Type[]{cb.GetType()};
         String twoWaySql = buildQueryDeleteTwoWaySql(cb);
         ICommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);

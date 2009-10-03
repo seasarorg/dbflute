@@ -445,7 +445,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         int j = value.indexOf(delimiter);
         for (int h = 0; j >= 0; h++) {
             list.add(value.substring(i, j));
-            i = j + 1;
+            i = j + delimiter.length();
             j = value.indexOf(delimiter, i);
         }
         list.add(value.substring(i));

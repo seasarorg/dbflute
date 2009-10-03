@@ -206,6 +206,11 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
                         protected IfNode createIfNode(String expr) {
                             return new IfNode(expr, _specifiedSql) {
                                 @Override
+                                protected Object parseForOgnl(String expression) {
+                                    // do nothing
+                                    return null;
+                                }
+                                @Override
                                 public void accept(CommandContext ctx) {
                                     doAcceptByEvaluator(ctx);
                                 }

@@ -19,7 +19,7 @@ namespace ${glPackageExtendedParameterBean} {
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
     public partial class ${myClassName} : ${glProcedurePmb} {
 #else
-    public partial class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)}{
+    public partial class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} {
 #end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 

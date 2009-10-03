@@ -819,7 +819,7 @@ public class Table {
         int size = ls.size();
         for (int i = 0; i < size; i++) {
             final Column col = (Column) ls.get(i);
-            sb.append(", /*dto.").append(col.getUncapitalisedJavaName()).append("*/null ");
+            sb.append(", /*pmb.").append(col.getUncapitalisedJavaName()).append("*/null ");
         }
         sb.delete(0, ", ".length());
         return sb.toString();

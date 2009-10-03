@@ -4,15 +4,16 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 #end
+import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 
 /**
  * The parameter-bean of ${pmbClassName}.
  * @author ${database.classAuthor}
  */
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-public class ${myClassName} implements ProcedurePmb {
+public class ${myClassName} implements ProcedurePmb, ParameterBean {
 #else
-public class ${myClassName} ${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} {
+public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} implements ParameterBean {
 #end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 

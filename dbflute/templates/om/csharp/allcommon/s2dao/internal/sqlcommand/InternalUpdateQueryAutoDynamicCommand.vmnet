@@ -37,7 +37,7 @@ public class ${glInternalUpdateQueryAutoDynamicCommand} : ISqlCommand {
     public Object Execute(Object[] args) {
         ${glConditionBean} cb = extractConditionBeanWithCheck(args);
         ${glEntity} entity = extractEntityWithCheck(args);
-        String[] argNames = new String[]{"dto", "entity"};
+        String[] argNames = new String[]{"pmb", "entity"};
         Type[] argTypes = new Type[]{cb.GetType(), entity.GetType()};
         String twoWaySql = buildQueryUpdateTwoWaySql(cb, entity);
         if (twoWaySql == null) {

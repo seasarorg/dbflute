@@ -340,7 +340,7 @@ public class Database {
             }
         }
         final DfLanguageDependencyInfo languageDependencyInfo = getBasicProperties().getLanguageDependencyInfo();
-        return languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName + " ";
+        return " " + languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName;
     }
 
     public Map<String, String> getPmbMetaDataPropertyNameTypeMap(String className) {

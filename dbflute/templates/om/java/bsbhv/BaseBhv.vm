@@ -367,7 +367,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #end
                     sb.append(aliasName).append(".${localColumn.name} = ");
                     identity = "${referrer.referrerJavaBeansRulePropertyName}${col.javaName}" + index;
-                    sb.append("/*dto.freeParameterMap.").append(identity).append("*/null");
+                    sb.append("/*pmb.freeParameterMap.").append(identity).append("*/null");
                     cb.xregisterFreeParameter(identity, primaryKeyMap.get("${col.javaName}"));
 #set ($foreignColumnIndex = $foreignColumnIndex + 1)
 #end

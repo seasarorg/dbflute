@@ -173,7 +173,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             Type[] argTypes = MethodUtil.GetParameterTypes(methodInfo);
             SelectDynamicCommand cmd = CreateSelectDynamicCommand(handler);
             if (argTypes.Length == 1 && ValueTypes.GetValueType(argTypes[0]) == ValueTypes.OBJECT) {
-                argNames = new String[] { "dto" };
+                argNames = new String[] { "pmb" };
                 AssertAutoQueryByDtoUnsupported(methodInfo, argTypes);
                 ${glSelectDynamicCommand} dynamicCommand = CreateCustomizeSelectDynamicCommand(handler);
                 cmd = dynamicCommand;

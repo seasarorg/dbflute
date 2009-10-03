@@ -124,15 +124,15 @@ public abstract class ${myClassName} {
     abstract protected void doSetupConditionValue(${glConditionValue} conditionValue, Object value, String location, ${glConditionOption} option);
 
     protected String buildBindClause(String columnName, String location) {
-        return columnName + " " + getOperand() + " " + "/*dto." + location + "*/null";
+        return columnName + " " + getOperand() + " " + "/*pmb." + location + "*/null";
     }
 
     protected String buildBindClauseWithRearOption(String columnName, String location, String rearOption) {
-        return columnName + " " + getOperand() + " " + "/*dto." + location + "*/null" + rearOption;
+        return columnName + " " + getOperand() + " " + "/*pmb." + location + "*/null" + rearOption;
     }
 
     protected String buildBindClause(String columnName, String location, String dummyValue) {
-        return columnName + " " + getOperand() + " " + "/*dto." + location + "*/" + dummyValue;
+        return columnName + " " + getOperand() + " " + "/*pmb." + location + "*/" + dummyValue;
     }
 
     protected String buildClauseWithoutValue(String columnName) {

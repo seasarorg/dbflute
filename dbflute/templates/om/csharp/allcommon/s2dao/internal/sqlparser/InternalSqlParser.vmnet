@@ -266,7 +266,7 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlParser} {
         //                                                                         Convert
         //                                                                         =======
     	public static String ConvertTwoWaySql2DisplaySql(String twoWaySql, Object arg) {
-    	    String[] argNames = new String[]{"dto"};
+    	    String[] argNames = new String[]{"pmb"};
     	    Type[] argTypes = new Type[]{arg.GetType()};
     	    Object[] args = new Object[]{arg};
     		return ConvertTwoWaySql2DisplaySql(twoWaySql, argNames, argTypes, args);
