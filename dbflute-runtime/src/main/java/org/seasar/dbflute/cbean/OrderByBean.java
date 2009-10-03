@@ -18,10 +18,10 @@ package org.seasar.dbflute.cbean;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 
 /**
- * The order-by-bean as interface.
+ * The order-by-bean.
  * @author jflute
  */
-public interface OrderByBean extends SelectResource {
+public interface OrderByBean extends SelectBean {
 
     /**
      * Get sql component of order-by clause.

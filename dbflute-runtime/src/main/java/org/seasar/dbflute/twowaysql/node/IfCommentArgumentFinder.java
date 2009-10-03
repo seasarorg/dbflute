@@ -13,20 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.cbean.mapping;
+package org.seasar.dbflute.twowaysql.node;
 
 /**
- * The mapper of entity to DTO.
- * @param <ENTITY> The type of entity.
- * @param <DTO> The type of DTO.
  * @author jflute
  */
-public interface EntityDtoMapper<ENTITY, DTO> {
+public interface IfCommentArgumentFinder {
 
-    /**
-     * Map entity to data transfer object.
-     * @param entity Entity. (NotNull)
-     * @return Data transfer object. (NotNull)
-     */
-    public DTO map(ENTITY entity);
+    Object find(String name);
 }

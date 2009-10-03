@@ -14,6 +14,7 @@ import org.seasar.dbflute.exception.IfCommentNullPointerException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedTypeComparisonException;
 import org.seasar.dbflute.jdbc.Classification;
+import org.seasar.dbflute.outsidesql.ParameterBean;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -520,7 +521,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         }
     }
 
-    public void test_evaluate_IfCommentIllegalParameterBeanSpecificationException() {
+    public void test_evaluate_VariousSituation() {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
         pmb.setMemberName("foo");
@@ -537,7 +538,6 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         // ## Act ##
         try {
             createEvaluator(pmb, "pmb,memberNameNon != null").evaluate();
-
             // ## Assert ##
             fail();
         } catch (IfCommentIllegalParameterBeanSpecificationException e) {
@@ -546,7 +546,6 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         // ## Act ##
         try {
             createEvaluator(pmb, "pmb:memberNameNon != null").evaluate();
-
             // ## Assert ##
             fail();
         } catch (IfCommentIllegalParameterBeanSpecificationException e) {
@@ -555,14 +554,20 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         // ## Act ##
         try {
             createEvaluator(pmb, "pnb.memberNameNon != null").evaluate();
-
             // ## Assert ##
             fail();
         } catch (IfCommentIllegalParameterBeanSpecificationException e) {
             log(e.getMessage());
         }
-        // ## Act && Assert ##
-        createEvaluator("foo", "orignalName != null").evaluate(); // no exception
+        // ## Act ##
+        try {
+            createEvaluator(pmb, "pmbb != null").evaluate();
+            // ## Assert ##
+            fail();
+        } catch (IfCommentIllegalParameterBeanSpecificationException e) {
+            log(e.getMessage());
+        }
+        createEvaluator("foo", "pmbb != null").evaluate(); // no exception
     }
 
     public void test_evaluate_notFoundMethodProperty() {
@@ -777,11 +782,15 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
     // ===================================================================================
     //                                                                         Test Helper
     //                                                                         ===========
-    protected IfCommentEvaluator createEvaluator(Object pmb, String expression) {
-        return new IfCommentEvaluator(pmb, expression, "select foo from bar");
+    protected IfCommentEvaluator createEvaluator(final Object pmb, String expression) {
+        return new IfCommentEvaluator(new IfCommentArgumentFinder() {
+            public Object find(String name) {
+                return pmb;
+            }
+        }, expression, "select foo from bar");
     }
 
-    protected static class BasePmb {
+    protected static class BasePmb implements ParameterBean {
         private Integer _memberId;
         private String _memberName;
         private boolean _existsPurchase;
@@ -860,7 +869,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         }
     }
 
-    protected static class NextPmb {
+    protected static class NextPmb implements ParameterBean {
         private String _memberStatusCode;
         private Integer _displayOrder;
         private boolean _existsLogin;

@@ -64,9 +64,9 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     // -----------------------------------------------------
     //                                  Paging Determination
     //                                  --------------------
-    // * * * * * * * *
-    // For SQL Comment
-    // * * * * * * * *
+    // * * * * * * * * * * *
+    // For Parameter Comment
+    // * * * * * * * * * * *
     /**
      * {@inheritDoc}
      */
@@ -120,7 +120,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     public boolean canPagingReSelect() {
         return _canPagingReSelect;
     }
-    
+
     // -----------------------------------------------------
     //                                         Fetch Setting
     //                                         -------------

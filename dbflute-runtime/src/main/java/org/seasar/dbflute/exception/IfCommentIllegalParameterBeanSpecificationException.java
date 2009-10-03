@@ -16,7 +16,7 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the IF comment has an illegal parameter-bean specification.
+ * The exception of when the IF comment has the illegal parameter-bean specification.
  * @author jflute
  */
 public class IfCommentIllegalParameterBeanSpecificationException extends IfCommentWrongExpressionException {
@@ -30,14 +30,5 @@ public class IfCommentIllegalParameterBeanSpecificationException extends IfComme
      */
     public IfCommentIllegalParameterBeanSpecificationException(String msg) {
         super(msg);
-    }
-
-    /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
-     * @param cause Throwable. (NotNull)
-     */
-    public IfCommentIllegalParameterBeanSpecificationException(String msg, Throwable cause) {
-        super(msg, cause);
     }
 }

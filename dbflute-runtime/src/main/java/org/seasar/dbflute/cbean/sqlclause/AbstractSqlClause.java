@@ -49,7 +49,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                                                          Definition
     //                                                                          ==========
     protected static final SelectClauseType DEFAULT_SELECT_CLAUSE_TYPE = SelectClauseType.COLUMNS;
-    protected static final String SELECT_HINT = "/*$dto.selectHint*/";
+    protected static final String SELECT_HINT = "/*$pmb.selectHint*/";
 
     // ===================================================================================
     //                                                                           Attribute

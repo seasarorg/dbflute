@@ -24,9 +24,9 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     // ===================================================================================
     //                                                                Paging Determination
     //                                                                ====================
-    // * * * * * * * *
-    // For SQL Comment
-    // * * * * * * * *
+    // * * * * * * * * * * *
+    // For Parameter Comment
+    // * * * * * * * * * * *
     /**
      * Is the execution for paging(NOT count)?
      * @return Determination.
@@ -47,8 +47,8 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     //                                                                      ==============
     /**
      * Set up paging resources.
-	 * @param pageSize The page size per one page. (NotMinus & NotZero)
-	 * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
+     * @param pageSize The page size per one page. (NotMinus & NotZero)
+     * @param pageNumber The number of page. It's ONE origin. (NotMinus & NotZero: If it's minus or zero, it treats as one.)
      */
     public void paging(int pageSize, int pageNumber);
 

@@ -40,8 +40,12 @@ public class IfNode extends ContainerNode {
     //                                                                         ===========
     public IfNode(String expression, String specifiedSql) {
         this._expression = expression;
-        this._parsedExpression = DfOgnlUtil.parseExpression(expression);
+        this._parsedExpression = parseForOgnl(expression);
         this._specifiedSql = specifiedSql;
+    }
+
+    protected Object parseForOgnl(String expression) {
+        return DfOgnlUtil.parseExpression(expression);
     }
 
     // ===================================================================================
@@ -52,14 +56,13 @@ public class IfNode extends ContainerNode {
     }
 
     protected void doAcceptByEvaluator(CommandContext ctx) {
-        final Object pmb = ctx.getArg("pmb");
-        final IfCommentEvaluator evaluator = createIfCommentEvaluator(pmb, _expression);
+        final IfCommentEvaluator evaluator = createIfCommentEvaluator(ctx, _expression);
         boolean result = false;
         try {
             result = evaluator.evaluate();
         } catch (IfCommentWrongExpressionException e) {
             final String replaced = replace(_expression, "pmb.", "pmb.parameterMap.");
-            final IfCommentEvaluator another = createIfCommentEvaluator(pmb, replaced);
+            final IfCommentEvaluator another = createIfCommentEvaluator(ctx, replaced);
             try {
                 result = another.evaluate();
             } catch (IfCommentWrongExpressionException ignored) {
@@ -75,8 +78,12 @@ public class IfNode extends ContainerNode {
         }
     }
 
-    protected IfCommentEvaluator createIfCommentEvaluator(Object pmb, String expression) {
-        return new IfCommentEvaluator(pmb, expression, _specifiedSql);
+    protected IfCommentEvaluator createIfCommentEvaluator(final CommandContext ctx, String expression) {
+        return new IfCommentEvaluator(new IfCommentArgumentFinder() {
+            public Object find(String name) {
+                return ctx.getArg(name);
+            }
+        }, expression, _specifiedSql);
     }
 
     protected void doAcceptByOgnl(CommandContext ctx) {
@@ -97,7 +104,7 @@ public class IfNode extends ContainerNode {
             if (result == null) {
                 throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
             }
-            _parsedExpression = secondParsedExpression;
+            _parsedExpression = secondParsedExpression; // switch
         }
         if (result != null && result instanceof Boolean) {
             if (((Boolean) result).booleanValue()) {

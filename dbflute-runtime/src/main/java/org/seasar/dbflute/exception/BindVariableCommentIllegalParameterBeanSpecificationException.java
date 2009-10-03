@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the value of embedded value is null about outsideSql.
+ * The exception of when the bind variable comment has illegal parameter-bean specification.
  * @author jflute
  */
-public class EmbeddedValueParameterNullValueException extends RuntimeException {
+public class BindVariableCommentIllegalParameterBeanSpecificationException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,16 @@ public class EmbeddedValueParameterNullValueException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public EmbeddedValueParameterNullValueException(String msg) {
+    public BindVariableCommentIllegalParameterBeanSpecificationException(String msg) {
         super(msg);
+    }
+
+    /**
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
+     */
+    public BindVariableCommentIllegalParameterBeanSpecificationException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 }

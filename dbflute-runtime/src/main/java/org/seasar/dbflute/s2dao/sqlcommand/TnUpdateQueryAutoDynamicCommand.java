@@ -40,6 +40,7 @@ import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.node.Node;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -69,7 +70,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     public Object execute(Object[] args) {
         ConditionBean cb = extractConditionBeanWithCheck(args);
         Entity entity = extractEntityWithCheck(args);
-        String[] argNames = new String[] { "dto", "entity" };
+        String[] argNames = new String[] { "pmb", "entity" };
         Class<?>[] argTypes = new Class<?>[] { cb.getClass(), entity.getClass() };
         List<TnPropertyType> propertyTypeList = new ArrayList<TnPropertyType>();
         String twoWaySql = buildQueryUpdateTwoWaySql(entity, cb, propertyTypeList);
@@ -220,6 +221,10 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
+    protected String replace(String text, String fromText, String toText) {
+        return DfStringUtil.replace(text, fromText, toText);
+    }
+
     protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }

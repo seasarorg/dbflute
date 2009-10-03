@@ -18,6 +18,7 @@ package org.seasar.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import org.seasar.dbflute.outsidesql.ParameterBean;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.DfStringUtil;
 
@@ -50,8 +51,10 @@ public class EmbeddedValueNode extends AbstractNode {
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        final Object value = ctx.getArg(_nameList.get(0));
-        final Class<?> clazz = ctx.getArgType(_nameList.get(0));
+        final String firstName = _nameList.get(0);
+        assertFirstName(ctx, firstName);
+        final Object value = ctx.getArg(firstName);
+        final Class<?> clazz = ctx.getArgType(firstName);
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
@@ -93,14 +96,24 @@ public class EmbeddedValueNode extends AbstractNode {
         }
     }
 
+    protected void assertFirstName(CommandContext ctx, String firstName) {
+        final Object arg = ctx.getArg("df:noway");
+        if (arg == null) {
+            return; // Because the argument has several elements.
+        }
+        if ((arg instanceof ParameterBean) && !firstName.equals("pmb")) {
+            throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException();
+        }
+    }
+
     protected void setupValueAndType(ValueAndType valueAndType) {
         final ValueAndTypeSetupper setupper = new ValueAndTypeSetupper(_expression, _nameList, _specifiedSql, false);
         setupper.setupValueAndType(valueAndType);
     }
 
     protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
-        NodeExceptionHandler.throwBindOrEmbeddedParameterNullValueException(_expression, valueAndType.getTargetType(),
-                _specifiedSql, false);
+        NodeExceptionHandler.throwBindOrEmbeddedCommentParameterNullValueException(_expression, valueAndType
+                .getTargetType(), _specifiedSql, false);
     }
 
     protected boolean isInScope() {
@@ -113,7 +126,7 @@ public class EmbeddedValueNode extends AbstractNode {
         }
         final int length = Array.getLength(array);
         if (length == 0) {
-            throwBindOrEmbeddedParameterEmptyListException();
+            throwBindOrEmbeddedCommentParameterEmptyListException();
         }
         String quote = null;
         for (int i = 0; i < length; ++i) {
@@ -124,7 +137,7 @@ public class EmbeddedValueNode extends AbstractNode {
             }
         }
         if (quote == null) {
-            throwBindOrEmbeddedParameterNullOnlyListException();
+            throwBindOrEmbeddedCommentParameterNullOnlyListException();
         }
         boolean existsValidElements = false;
         ctx.addSql("(");
@@ -142,11 +155,17 @@ public class EmbeddedValueNode extends AbstractNode {
         ctx.addSql(")");
     }
 
-    protected void throwBindOrEmbeddedParameterEmptyListException() {
-        NodeExceptionHandler.throwBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
+    protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException() {
+        NodeExceptionHandler.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression,
+                _specifiedSql, false);
     }
 
-    protected void throwBindOrEmbeddedParameterNullOnlyListException() {
-        NodeExceptionHandler.throwBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, false);
+    protected void throwBindOrEmbeddedCommentParameterEmptyListException() {
+        NodeExceptionHandler.throwBindOrEmbeddedCommentParameterEmptyListException(_expression, _specifiedSql, false);
+    }
+
+    protected void throwBindOrEmbeddedCommentParameterNullOnlyListException() {
+        NodeExceptionHandler
+                .throwBindOrEmbeddedCommentParameterNullOnlyListException(_expression, _specifiedSql, false);
     }
 }

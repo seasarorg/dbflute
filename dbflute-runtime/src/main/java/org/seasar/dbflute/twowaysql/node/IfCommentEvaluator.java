@@ -36,6 +36,7 @@ import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
+import org.seasar.dbflute.outsidesql.ParameterBean;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -64,15 +65,15 @@ public class IfCommentEvaluator {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private Object _pmb;
+    private IfCommentArgumentFinder _finder;
     private String _expression;
     private String _specifiedSql;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public IfCommentEvaluator(Object pmb, String expression, String specifiedSql) {
-        this._pmb = pmb;
+    public IfCommentEvaluator(IfCommentArgumentFinder finder, String expression, String specifiedSql) {
+        this._finder = finder;
         this._expression = expression;
         this._specifiedSql = specifiedSql;
     }
@@ -299,7 +300,7 @@ public class IfCommentEvaluator {
         }
         final List<String> propertyList = new ArrayList<String>();
         String preProperty = setupPropertyList(piece, propertyList);
-        Object baseObject = _pmb;
+        Object baseObject = _finder.find(preProperty);
         for (String property : propertyList) {
             baseObject = processOneProperty(baseObject, preProperty, property);
             preProperty = property;
@@ -324,7 +325,7 @@ public class IfCommentEvaluator {
         }
         final List<String> propertyList = new ArrayList<String>();
         String preProperty = setupPropertyList(piece, propertyList);
-        Object baseObject = _pmb;
+        Object baseObject = _finder.find(preProperty);
         for (String property : propertyList) {
             baseObject = processOneProperty(baseObject, preProperty, property);
             preProperty = property;
@@ -342,24 +343,24 @@ public class IfCommentEvaluator {
 
     protected String setupPropertyList(String piece, List<String> emptyPropertyList) {
         final List<String> splitList = splitList(piece, ".");
-        String first = null;
+        String firstName = null;
         for (int i = 0; i < splitList.size(); i++) {
             if (i == 0) {
-                first = splitList.get(i);
-                assertFirstElement(piece, first, splitList.size());
+                assertFirstName(splitList.get(i));
                 continue;
             }
             emptyPropertyList.add(splitList.get(i));
         }
-        return first;
+        return firstName;
     }
 
-    protected void assertFirstElement(String piece, String first, int splitSize) {
-        if (first.contains(" ") || first.contains(",") || first.contains(":")) { // easy check
-            throwIfCommentIllegalParameterBeanSpecificationException(piece);
+    protected void assertFirstName(String firstName) {
+        final Object arg = _finder.find("df:noway");
+        if (arg == null) {
+            return; // Because the argument has several elements.
         }
-        if (!first.equals("pmb") && splitSize > 1) {
-            throwIfCommentIllegalParameterBeanSpecificationException(piece);
+        if ((arg instanceof ParameterBean) && !firstName.equals("pmb")) {
+            throwIfCommentIllegalParameterBeanSpecificationException();
         }
     }
 
@@ -411,7 +412,7 @@ public class IfCommentEvaluator {
         msg = msg + ln();
         msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
         msg = msg + ln();
-        msg = msg + "[Specified ParameterBean]" + ln() + _pmb + ln();
+        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
@@ -451,36 +452,30 @@ public class IfCommentEvaluator {
         msg = msg + ln();
         msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
         msg = msg + ln();
-        msg = msg + "[Specified ParameterBean]" + ln() + _pmb + ln();
+        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IfCommentUnsupportedExpressionException(msg);
     }
 
-    protected void throwIfCommentIllegalParameterBeanSpecificationException(String piece) {
+    public void throwIfCommentIllegalParameterBeanSpecificationException() {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The IF comment had the illegal parameter-bean specification!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your IF comment." + ln();
-        msg = msg + "The piece clause should start with 'pmb' if you want to use a parameter as bean." + ln();
-        msg = msg + "  For example, wrong and correct IF comments is as below:" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    (x) - /*IF pm b.memberId != null*/" + ln();
+        msg = msg + "  For example, wrong and correct IF comment is as below:" + ln();
         msg = msg + "    (x) - /*IF pmb,memberId != null*/" + ln();
+        msg = msg + "    (x) - /*IF p mb.memberId != null*/" + ln();
+        msg = msg + "    (x) - /*IF pmb:memberId != null*/" + ln();
         msg = msg + "    (x) - /*IF pnb.memberId != null*/" + ln();
-        msg = msg + "    (x) - /*IF other.memberId != null*/" + ln();
         msg = msg + "    (o) - /*IF pmb.memberId != null*/" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "(However it doesn't need if you want to use a parameter as scalar)" + ln();
         msg = msg + ln();
         msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
         msg = msg + ln();
-        msg = msg + "[Target Piece]" + ln() + piece + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified ParameterBean]" + ln() + _pmb + ln();
+        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
@@ -506,7 +501,7 @@ public class IfCommentEvaluator {
         msg = msg + (baseObject != null ? baseObject.getClass().getSimpleName() + "." : "");
         msg = msg + notFoundMethod + "()" + ln();
         msg = msg + ln();
-        msg = msg + "[Specified ParameterBean]" + ln() + _pmb + ln();
+        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
@@ -532,7 +527,7 @@ public class IfCommentEvaluator {
         msg = msg + (baseObject != null ? baseObject.getClass().getSimpleName() + "." : "");
         msg = msg + notFoundProperty + ln();
         msg = msg + ln();
-        msg = msg + "[Specified ParameterBean]" + ln() + _pmb + ln();
+        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
@@ -551,7 +546,7 @@ public class IfCommentEvaluator {
         msg = msg + ln();
         msg = msg + "[Null Property]" + ln() + nullProperty + ln();
         msg = msg + ln();
-        msg = msg + "[Specified ParameterBean]" + ln() + _pmb + ln();
+        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
@@ -578,6 +573,8 @@ public class IfCommentEvaluator {
         msg = msg + "[Right]" + ln() + (right != null ? right.getClass() : "null") + ln();
         msg = msg + " --> " + right + ln();
         msg = msg + ln();
+        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
+        msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IfCommentDifferentTypeComparisonException(msg);
@@ -603,6 +600,8 @@ public class IfCommentEvaluator {
         msg = msg + "[Right]" + ln() + (right != null ? right.getClass() : "null") + ln();
         msg = msg + " --> " + right + ln();
         msg = msg + ln();
+        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
+        msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IfCommentUnsupportedTypeComparisonException(msg);
@@ -618,11 +617,15 @@ public class IfCommentEvaluator {
         msg = msg + ln();
         msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
         msg = msg + ln();
-        msg = msg + "[Specified ParameterBean]" + ln() + _pmb + ln();
+        msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IfCommentNotBooleanResultException(msg);
+    }
+
+    protected Object getDisplayParameterBean() {
+        return _finder.find("pmb");
     }
 
     // ===================================================================================

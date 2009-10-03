@@ -856,7 +856,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
         String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
-        String parameter = "/*dto." + getLocationBase(parameterPropertyName) + "*/null";
+        String parameter = "/*pmb." + getLocationBase(parameterPropertyName) + "*/null";
         String clause = "(" + beginMark
                       + subQueryClause + ln() + endIndent
                       + ") " + operand + " " + parameter + " " + endMark;
@@ -1311,7 +1311,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         fixedCondition = replaceString(fixedCondition, "$$alias$$", foreignAliasName);
         fixedCondition = replaceString(fixedCondition, "$$foreignAlias$$", foreignAliasName);
         fixedCondition = replaceString(fixedCondition, "$$localAlias$$", localAliasName);
-        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "dto." + getLocationBase());
+        fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
         return fixedCondition;
     }
     

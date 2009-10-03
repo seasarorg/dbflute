@@ -13,20 +13,22 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.cbean.mapping;
+package org.seasar.dbflute.exception;
 
 /**
- * The mapper of entity to DTO.
- * @param <ENTITY> The type of entity.
- * @param <DTO> The type of DTO.
+ * The exception of when the value of embedded value is null about outsideSql.
  * @author jflute
  */
-public interface EntityDtoMapper<ENTITY, DTO> {
+public class EmbeddedValueCommentParameterNullValueException extends RuntimeException {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Map entity to data transfer object.
-     * @param entity Entity. (NotNull)
-     * @return Data transfer object. (NotNull)
+     * Constructor.
+     * @param msg Exception message. (NotNull)
      */
-    public DTO map(ENTITY entity);
+    public EmbeddedValueCommentParameterNullValueException(String msg) {
+        super(msg);
+    }
 }

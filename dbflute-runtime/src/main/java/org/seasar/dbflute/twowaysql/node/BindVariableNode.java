@@ -18,6 +18,7 @@ package org.seasar.dbflute.twowaysql.node;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import org.seasar.dbflute.outsidesql.ParameterBean;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.util.DfStringUtil;
 
@@ -50,8 +51,10 @@ public class BindVariableNode extends AbstractNode {
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        final Object value = ctx.getArg(_nameList.get(0));
-        final Class<?> clazz = ctx.getArgType(_nameList.get(0));
+        final String firstName = _nameList.get(0);
+        assertFirstName(ctx, firstName);
+        final Object value = ctx.getArg(firstName);
+        final Class<?> clazz = ctx.getArgType(firstName);
         final ValueAndType valueAndType = new ValueAndType();
         valueAndType.setTargetValue(value);
         valueAndType.setTargetType(clazz);
@@ -77,14 +80,24 @@ public class BindVariableNode extends AbstractNode {
         }
     }
 
+    protected void assertFirstName(CommandContext ctx, String firstName) {
+        final Object arg = ctx.getArg("df:noway");
+        if (arg == null) {
+            return; // Because the argument has several elements.
+        }
+        if ((arg instanceof ParameterBean) && !firstName.equals("pmb")) {
+            throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException();
+        }
+    }
+
     protected void setupValueAndType(ValueAndType valueAndType) {
         final ValueAndTypeSetupper setuper = new ValueAndTypeSetupper(_expression, _nameList, _specifiedSql, true);
         setuper.setupValueAndType(valueAndType);
     }
 
     protected void throwBindOrEmbeddedParameterNullValueException(ValueAndType valueAndType) {
-        NodeExceptionHandler.throwBindOrEmbeddedParameterNullValueException(_expression, valueAndType.getTargetType(),
-                _specifiedSql, true);
+        NodeExceptionHandler.throwBindOrEmbeddedCommentParameterNullValueException(_expression, valueAndType
+                .getTargetType(), _specifiedSql, true);
     }
 
     protected boolean isInScope() {
@@ -126,11 +139,16 @@ public class BindVariableNode extends AbstractNode {
         ctx.addSql(")");
     }
 
+    protected void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException() {
+        NodeExceptionHandler.throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(_expression,
+                _specifiedSql, true);
+    }
+
     protected void throwBindOrEmbeddedParameterEmptyListException() {
-        NodeExceptionHandler.throwBindOrEmbeddedParameterEmptyListException(_expression, _specifiedSql, false);
+        NodeExceptionHandler.throwBindOrEmbeddedCommentParameterEmptyListException(_expression, _specifiedSql, true);
     }
 
     protected void throwBindOrEmbeddedParameterNullOnlyListException() {
-        NodeExceptionHandler.throwBindOrEmbeddedParameterNullOnlyListException(_expression, _specifiedSql, true);
+        NodeExceptionHandler.throwBindOrEmbeddedCommentParameterNullOnlyListException(_expression, _specifiedSql, true);
     }
 }

@@ -27,5 +27,5 @@ public interface MapParameterBean {
      * Get the map of parameter.
      * @return The map of parameter. (Nullable)
      */
-    public Map<String, Object> getParameterMap();
+    Map<String, Object> getParameterMap();
 }

@@ -13,22 +13,17 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.exception;
+package org.seasar.dbflute.cbean;
 
 /**
- * The exception of when the value of bind variable is null about outsideSql.
+ * The select-bean.
  * @author jflute
  */
-public class BindVariableParameterNullValueException extends RuntimeException {
-
-    /** Serial version UID. (Default) */
-    private static final long serialVersionUID = 1L;
+public interface SelectBean {
 
     /**
-     * Constructor.
-     * @param msg Exception message. (NotNull)
+     * Check safety result.
+     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
      */
-    public BindVariableParameterNullValueException(String msg) {
-        super(msg);
-    }
+    void checkSafetyResult(int safetyMaxResultSize);
 }

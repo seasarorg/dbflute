@@ -309,7 +309,7 @@ public class SqlAnalyzer {
     //                                                                          ==========
     public static String convertTwoWaySql2DisplaySql(SqlAnalyzerFactory factory, String twoWaySql, Object arg,
             String logDateFormat, String logTimestampFormat) {
-        final String[] argNames = new String[] { "dto" };
+        final String[] argNames = new String[] { "pmb" };
         final Class<?>[] argTypes = new Class<?>[] { arg.getClass() };
         final Object[] args = new Object[] { arg };
         return convertTwoWaySql2DisplaySql(factory, twoWaySql, argNames, argTypes, args, logDateFormat,

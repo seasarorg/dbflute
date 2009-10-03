@@ -85,10 +85,10 @@ public class InsertEntityCommand extends AbstractEntityCommand {
         columnDefSb.delete(0, ", ".length()).insert(0, "(").append(")");
         final StringBuilder columnValuesSb = new StringBuilder();
         for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : columnInfoList) {
-            columnValuesSb.append(", /*dto.").append(columnInfo.getPropertyName()).append("*/null");
+            columnValuesSb.append(", /*pmb.").append(columnInfo.getPropertyName()).append("*/null");
         }
         columnValuesSb.delete(0, ", ".length()).insert(0, "(").append(")");
         final String sql = "insert into " + dbmeta.getTableSqlName() + columnDefSb + " values" + columnValuesSb;
-        return createUpdateDynamicCommand(new String[] { "dto" }, new Class<?>[] { _entityType }, sql);
+        return createUpdateDynamicCommand(new String[] { "pmb" }, new Class<?>[] { _entityType }, sql);
     }
 }

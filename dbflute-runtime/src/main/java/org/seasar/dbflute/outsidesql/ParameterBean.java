@@ -13,17 +13,11 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.cbean;
+package org.seasar.dbflute.outsidesql;
 
 /**
- * The select-resource as marker-interface.
+ * The parameter-bean as marker interface.
  * @author jflute
  */
-public interface SelectResource {
-
-    /**
-     * Check safety result.
-     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
-     */
-    public void checkSafetyResult(int safetyMaxResultSize);
+public interface ParameterBean {
 }

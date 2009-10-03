@@ -52,7 +52,7 @@ public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     //                                                                             =======
     public Object execute(Object[] args) {
         ConditionBean cb = extractConditionBeanWithCheck(args);
-        String[] argNames = new String[] { "dto" };
+        String[] argNames = new String[] { "pmb" };
         Class<?>[] argTypes = new Class<?>[] { cb.getClass() };
         String twoWaySql = buildQueryDeleteTwoWaySql(cb);
         CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);

@@ -248,7 +248,7 @@ public abstract class ConditionKey {
     }
 
     protected String buildBindExpression(String location, String dummyValue) {
-        return "/*dto." + location + "*/" + dummyValue;
+        return "/*pmb." + location + "*/" + dummyValue;
     }
 
     /**

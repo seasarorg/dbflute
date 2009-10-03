@@ -98,7 +98,7 @@ public class ValueAndTypeSetupper {
                 continue;
             }
             final String methodName = "get" + initCap(currentName);
-            if (beanDesc.hasMethod(methodName)) {// Is this unused???
+            if (beanDesc.hasMethod(methodName)) { // basically unused because of using propertyDesc before
                 final Method method = beanDesc.getMethod(methodName);
                 value = invokeGetter(method, value);
                 clazz = method.getReturnType();

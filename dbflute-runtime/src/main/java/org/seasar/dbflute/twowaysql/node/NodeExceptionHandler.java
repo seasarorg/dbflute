@@ -15,8 +15,9 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
-import org.seasar.dbflute.exception.BindVariableParameterNullValueException;
-import org.seasar.dbflute.exception.EmbeddedValueParameterNullValueException;
+import org.seasar.dbflute.exception.BindVariableCommentIllegalParameterBeanSpecificationException;
+import org.seasar.dbflute.exception.BindVariableCommentParameterNullValueException;
+import org.seasar.dbflute.exception.EmbeddedValueCommentParameterNullValueException;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -24,7 +25,7 @@ import org.seasar.dbflute.util.DfSystemUtil;
  */
 public class NodeExceptionHandler {
 
-    public static void throwBindOrEmbeddedParameterNullValueException(String expression, Class<?> targetType,
+    public static void throwBindOrEmbeddedCommentParameterNullValueException(String expression, Class<?> targetType,
             String specifiedSql, boolean bind) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -34,25 +35,52 @@ public class NodeExceptionHandler {
         msg = msg + "Is it within the scope of your assumption?" + ln();
         msg = msg + "If the answer is YES, please confirm your application logic about the parameter." + ln();
         msg = msg + "If the answer is NO, please confirm the logic of parameter comment(especially IF comment)." + ln();
-        msg = msg + "  --> For example:" + ln();
-        msg = msg + "        before (x) -- XXX_ID = /*pmb.xxxId*/3" + ln();
-        msg = msg + "        after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    (x) - XXX_ID = /*pmb.xxxId*/3" + ln();
+        msg = msg + "    (o) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
         msg = msg + ln();
-        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + ln() + expression
-                + ln();
+        msg = msg + "[Comment Expression]" + ln() + expression + ln();
         msg = msg + ln();
         msg = msg + "[Parameter Property Type]" + ln() + targetType + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         if (bind) {
-            throw new BindVariableParameterNullValueException(msg);
+            throw new BindVariableCommentParameterNullValueException(msg);
         } else {
-            throw new EmbeddedValueParameterNullValueException(msg);
+            throw new EmbeddedValueCommentParameterNullValueException(msg);
         }
     }
 
-    public static void throwBindOrEmbeddedParameterEmptyListException(String expression, String specifiedSql,
+    public static void throwBindOrEmbeddedCommentIllegalParameterBeanSpecificationException(String expression,
+            String specifiedSql, boolean bind) {
+        String name = (bind ? "bind variable" : "embedded value");
+        String emmark = (bind ? "" : "$");
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The " + name + " comment had the illegal parameter-bean specification!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm your comment." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    (x) - /*" + emmark + "pmb,memberId*/" + ln();
+        msg = msg + "    (x) - /*" + emmark + "p mb.memberId*/" + ln();
+        msg = msg + "    (x) - /*" + emmark + "pmb:memberId*/" + ln();
+        msg = msg + "    (x) - /*" + emmark + "pnb.memberId*/" + ln();
+        msg = msg + "    (o) - /*" + emmark + "pmb.memberId*/" + ln();
+        msg = msg + ln();
+        msg = msg + "[Comment Expression]" + ln() + expression + ln();
+        msg = msg + ln();
+        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
+        msg = msg + "* * * * * * * * * */";
+        if (bind) {
+            throw new BindVariableCommentIllegalParameterBeanSpecificationException(msg);
+        } else {
+            throw new EmbeddedValueCommentParameterNullValueException(msg);
+        }
+    }
+
+    public static void throwBindOrEmbeddedCommentParameterEmptyListException(String expression, String specifiedSql,
             boolean bind) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -61,24 +89,23 @@ public class NodeExceptionHandler {
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your application logic." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    before (x):" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
         msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
-        msg = msg + "    after  (o):" + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
         msg = msg + "      xxxIdList.add(3);" + ln();
         msg = msg + "      xxxIdList.add(7);" + ln();
         msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
         msg = msg + ln();
-        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + ln() + expression
-                + ln();
+        msg = msg + "[Comment Expression]" + ln() + expression + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IllegalArgumentException(msg);
     }
 
-    public static void throwBindOrEmbeddedParameterNullOnlyListException(String expression, String specifiedSql,
+    public static void throwBindOrEmbeddedCommentParameterNullOnlyListException(String expression, String specifiedSql,
             boolean bind) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -87,19 +114,18 @@ public class NodeExceptionHandler {
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your application logic." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    before (x):" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
         msg = msg + "      xxxIdList.add(null);" + ln();
         msg = msg + "      xxxIdList.add(null);" + ln();
         msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
-        msg = msg + "    after  (o):" + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "      List<Integer> xxxIdList = new ArrayList<Integer>();" + ln();
         msg = msg + "      xxxIdList.add(3);" + ln();
         msg = msg + "      xxxIdList.add(7);" + ln();
         msg = msg + "      cb.query().setXxxId_InScope(xxxIdList);// Or pmb.setXxxIdList(xxxIdList);" + ln();
         msg = msg + ln();
-        msg = msg + "[" + (bind ? "Bind Variable" : "Embedded Value") + " Comment Expression]" + ln() + expression
-                + ln();
+        msg = msg + "[Comment Expression]" + ln() + expression + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";
