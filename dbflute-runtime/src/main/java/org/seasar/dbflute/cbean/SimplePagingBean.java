@@ -65,23 +65,17 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     // -----------------------------------------------------
     //                                  Paging Determination
     //                                  --------------------
-    // * * * * * * * * * * *
-    // For Parameter Comment
-    // * * * * * * * * * * *
     /**
      * {@inheritDoc}
      */
-    public boolean isPaging() {
+    public boolean isPaging() { // for parameter comment
         return _paging;
     }
 
-    // * * * * * * * *
-    // For Framework
-    // * * * * * * * *
     /**
      * {@inheritDoc}
      */
-    public boolean isCountLater() {
+    public boolean isCountLater() { // for framework
         return _countLater;
     }
 

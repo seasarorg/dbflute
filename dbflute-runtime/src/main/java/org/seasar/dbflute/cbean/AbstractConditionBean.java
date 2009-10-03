@@ -224,24 +224,18 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // -----------------------------------------------------
     //                                  Paging Determination
     //                                  --------------------
-    // * * * * * * * *
-    // For SQL Comment
-    // * * * * * * * *
     /**
      * {@inheritDoc}
      */
-    public boolean isPaging() {
+    public boolean isPaging() { // for parameter comment
         String msg = "This method is unsupported on ConditionBean!";
         throw new UnsupportedOperationException(msg);
     }
 
-    // * * * * * * * *
-    // For Framework
-    // * * * * * * * *
     /**
      * {@inheritDoc}
      */
-    public boolean isCountLater() {
+    public boolean isCountLater() { // for framework
         return false; // as default
     }
 

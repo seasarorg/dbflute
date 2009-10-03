@@ -68,9 +68,7 @@ public class PagingInvoker<ENTITY> {
         } else {
             allRecordCount = handler.count();
             if (allRecordCount == 0) {
-                // The list to skip unnecessary select is list-result-bean as empty
-                // because both condition-bean and outside-SQL do so.
-                // (This program was implemented after implementing condition-bean and outside-SQL)
+                pagingBean.xsetPaging(true); // restore its paging state
                 selectedList = builder.buildEmptyListResultBean(pagingBean);
             } else {
                 selectedList = handler.paging();

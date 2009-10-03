@@ -24,20 +24,14 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     // ===================================================================================
     //                                                                Paging Determination
     //                                                                ====================
-    // * * * * * * * * * * *
-    // For Parameter Comment
-    // * * * * * * * * * * *
     /**
-     * Is the execution for paging(NOT count)?
+     * Is the execution for paging(NOT count)? {for parameter comment}
      * @return Determination.
      */
     public boolean isPaging();
 
-    // * * * * * * * *
-    // For Framework
-    // * * * * * * * *
     /**
-     * Is the count executed later?
+     * Is the count executed later? {for framework}
      * @return Determination.
      */
     public boolean isCountLater();
