@@ -176,7 +176,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
         assertOldStyleAdditionalSchema();
         _additionalSchemaMap = new LinkedHashMap<String, DfAdditionalSchemaInfo>();
-        final Map<String, Object> additionalSchemaMap = getVairousMap("additionalSchemaMap");
+        final Map<String, Object> additionalSchemaMap = getVairousStringKeyMap("additionalSchemaMap");
         if (additionalSchemaMap == null) {
             return _additionalSchemaMap;
         }
@@ -191,7 +191,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
                 throw new DfRequiredPropertyNotFoundException(msg);
             }
             if (!(obj instanceof Map<?, ?>)) {
-                String msg = "The type of schema value in the property 'additionalDropMapList' should be Map:";
+                String msg = "The type of schema value in the property 'additionalSchemaMap' should be Map:";
                 msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
                 throw new DfIllegalPropertyTypeException(msg);
             }
@@ -274,31 +274,38 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return (List<String>) value;
     }
 
-    @SuppressWarnings("unchecked")
-    protected Map<String, Object> getVairousMap(String key) {
-        return getVairousMap(key, Collections.EMPTY_MAP);
+    protected void assertVariousPropertyList(String name, Object value) {
+        if (!(value instanceof List<?>)) {
+            String msg = "The property '" + name + "' should be List: " + value;
+            throw new IllegalStateException(msg);
+        }
     }
 
     @SuppressWarnings("unchecked")
-    protected Map<String, Object> getVairousMap(String key, Map<String, Object> defaultMap) {
+    protected Map<String, Object> getVairousStringKeyMap(String key) {
+        return getVairousStringKeyMap(key, Collections.EMPTY_MAP);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> getVairousStringKeyMap(String key, Map<String, Object> defaultMap) {
         final Object value = getVariousObject(key);
         if (value == null) {
             return defaultMap != null ? defaultMap : Collections.EMPTY_MAP;
         }
-        assertVariousPropertyList(key, value);
+        assertVariousPropertyMap(key, value);
         return (Map<String, Object>) value;
+    }
+
+    protected void assertVariousPropertyMap(String name, Object value) {
+        if (!(value instanceof Map<?, ?>)) {
+            String msg = "The property '" + name + "' should be Map: " + value;
+            throw new IllegalStateException(msg);
+        }
     }
 
     protected Object getVariousObject(String key) {
         final Map<String, Object> variousMap = _databaseInfo.getDatabaseVariousMap();
         return variousMap.get(key);
-    }
-
-    protected void assertVariousPropertyList(String name, Object value) {
-        if (!(value instanceof List<?>)) {
-            String msg = "The property '" + name + "' should be list: " + value;
-            throw new IllegalStateException(msg);
-        }
     }
 
     // -----------------------------------------------------
