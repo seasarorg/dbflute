@@ -97,6 +97,7 @@ import org.seasar.dbflute.logic.metahandler.DfIndexHandler;
 import org.seasar.dbflute.logic.metahandler.DfTableHandler;
 import org.seasar.dbflute.logic.metahandler.DfUniqueKeyHandler;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
+import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.w3c.dom.Element;
 
@@ -454,8 +455,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected String getAdditionalSchemaLogString() {
-        final List<String> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
-        return "$ Additional Schemas: " + additionalSchemaList;
+        final Map<String, DfAdditionalSchemaInfo> schemaMap = getDatabaseProperties().getAdditionalSchemaMap();
+        return "$ Additional Schemas: " + schemaMap.keySet();
     }
 
     protected void throwTableNotFoundException() {
@@ -532,8 +533,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMetaInfo> tableList)
             throws SQLException {
-        final List<String> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
-        for (String additionalSchema : additionalSchemaList) {
+        final Map<String, DfAdditionalSchemaInfo> schemaMap = getDatabaseProperties().getAdditionalSchemaMap();
+        final Set<String> schemaSet = schemaMap.keySet();
+        for (String additionalSchema : schemaSet) {
             final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, additionalSchema);
             for (DfTableMetaInfo metaInfo : additionalTableList) {
                 final String tmp = metaInfo.getTableSchema();
@@ -777,8 +779,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         if (schema == null || schema.trim().length() == 0) {
             return false;
         }
-        final List<String> additionalSchemaList = getDatabaseProperties().getAdditionalSchemaList();
-        return additionalSchemaList.contains(schema);
+        return getDatabaseProperties().isAdditionalSchema(schema);
     }
 
     // -----------------------------------------------------

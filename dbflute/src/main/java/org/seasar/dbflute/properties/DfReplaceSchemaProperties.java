@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -186,11 +187,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     public String getAdditionalDropSchema(Map<String, Object> additionalDropMap) {
         final Object obj = additionalDropMap.get("schema");
         if (obj == null) {
-            return null;
+            String msg = "The schema in the property 'additionalDropMapList' should not be null: " + obj;
+            throw new DfRequiredPropertyNotFoundException(msg);
         }
         if (!(obj instanceof String)) {
             String msg = "The schema should be String: schema=" + obj + " type=" + obj.getClass();
-            throw new IllegalStateException(msg);
+            throw new DfIllegalPropertyTypeException(msg);
         }
         return (String) obj;
     }
@@ -279,82 +281,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
      */
     public String getBeforeTakeFinally() { // It's closet!
         return (String) getReplaceSchemaDefinitionMap().get("beforeTakeFinally");
-    }
-
-    // ===================================================================================
-    //                                                                      Once More Drop
-    //                                                                      ==============
-    // It's closet and old style! 
-    @SuppressWarnings("unchecked")
-    protected Map<String, Object> getOnceMoreDropDefinitionMap() {
-        final Map<String, Object> map = (Map<String, Object>) getReplaceSchemaDefinitionMap().get(
-                "onceMoreDropDefinitionMap");
-        if (map != null) {
-            return map;
-        } else {
-            return new HashMap<String, Object>();
-        }
-    }
-
-    public String getOnceMoreDropDefinitionSchema() {
-        final Map<String, Object> map = getOnceMoreDropDefinitionMap();
-        final Object obj = map.get("schema");
-        if (obj == null) {
-            return null;
-        }
-        if (!(obj instanceof String)) {
-            String msg = "The schema should be String: schema=" + obj + " type=" + obj.getClass();
-            throw new IllegalStateException(msg);
-        }
-        return (String) obj;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<String> getOnceMoreDropObjectTypeList() {
-        final Map<String, Object> map = getOnceMoreDropDefinitionMap();
-        Object obj = map.get("objectTypeList");
-        if (obj == null) {
-            obj = map.get("targetDatabaseTypeList");
-            if (obj == null) {
-                ArrayList<String> defaultList = new ArrayList<String>();
-                defaultList.add("TABLE");
-                defaultList.add("VIEW");
-                return defaultList;
-            }
-        }
-        if (!(obj instanceof List)) {
-            String msg = "The schema should be List<String>: objectTypeList=" + obj + " type=" + obj.getClass();
-            throw new IllegalStateException(msg);
-        }
-        return (List<String>) obj;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<String> getOnceMoreDropTableTargetList() {
-        final Map<String, Object> map = getOnceMoreDropDefinitionMap();
-        Object obj = map.get("tableTargetList");
-        if (obj == null) {
-            return new ArrayList<String>();
-        }
-        if (!(obj instanceof List)) {
-            String msg = "The schema should be List<String>: tableTargetList=" + obj + " type=" + obj.getClass();
-            throw new IllegalStateException(msg);
-        }
-        return (List<String>) obj;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<String> getOnceMoreDropTableExceptList() {
-        final Map<String, Object> map = getOnceMoreDropDefinitionMap();
-        Object obj = map.get("tableExceptList");
-        if (obj == null) {
-            return new ArrayList<String>();
-        }
-        if (!(obj instanceof List)) {
-            String msg = "The schema should be List<String>: tableExceptList=" + obj + " type=" + obj.getClass();
-            throw new IllegalStateException(msg);
-        }
-        return (List<String>) obj;
     }
 
     // ===================================================================================

@@ -79,18 +79,18 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         try {
             foreignKeys = dbMeta.getImportedKeys(null, schemaName, tableName);
             while (foreignKeys.next()) {
-                final String refTableName = foreignKeys.getString(3);
+                final String foreignTableName = foreignKeys.getString(3);
                 String fkName = foreignKeys.getString(12);
                 if (fkName == null) { // if FK has no name - make it up (use table name instead)
-                    fkName = refTableName;
+                    fkName = foreignTableName;
                 }
 
-                if (isTableExcept(refTableName)) {
-                    exceptedFKKeyMap.put(fkName, refTableName);
+                if (isTableExcept(schemaName, foreignTableName)) {
+                    exceptedFKKeyMap.put(fkName, foreignTableName);
                     continue;
                 }
-                if (_refTableCheckSet != null && !_refTableCheckSet.contains(refTableName)) {
-                    exceptedFKKeyMap.put(fkName, refTableName);
+                if (_refTableCheckSet != null && !_refTableCheckSet.contains(foreignTableName)) {
+                    exceptedFKKeyMap.put(fkName, foreignTableName);
                     continue;
                 }
 
@@ -105,7 +105,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                     metaInfo = new DfForeignKeyMetaInfo();
                     metaInfo.setForeignKeyName(fkName);
                     metaInfo.setLocalTableName(tableName);
-                    metaInfo.setForeignTableName(refTableName);
+                    metaInfo.setForeignTableName(foreignTableName);
                     fkMap.put(fkName, metaInfo);
                 }
                 metaInfo.putColumnNameMap(localColumnName, foreignColumnName);

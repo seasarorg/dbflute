@@ -1,6 +1,5 @@
 package org.seasar.dbflute.util;
 
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -19,11 +18,16 @@ public class DfNameHintUtil {
     //                                                                              Target
     //                                                                              ======
     public static boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {
-        if (!targetList.isEmpty()) {
+        if (targetList == null) {
+            throw new IllegalArgumentException("The argument 'targetList' should not be null!");
+        }
+        if (exceptList == null) {
+            throw new IllegalArgumentException("The argument 'exceptList' should not be null!");
+        }
+        if (targetList != null && !targetList.isEmpty()) {
             return isHitByTargetList(name, targetList);
         }
-        for (final Iterator<String> ite = exceptList.iterator(); ite.hasNext();) {
-            final String tableHint = (String) ite.next();
+        for (String tableHint : exceptList) {
             if (isHitByTheHint(name, tableHint)) {
                 return false;
             }
@@ -32,9 +36,8 @@ public class DfNameHintUtil {
     }
 
     protected static boolean isHitByTargetList(final String name, final List<String> targetList) {
-        for (final Iterator<String> ite = targetList.iterator(); ite.hasNext();) {
-            final String targetTableHint = (String) ite.next();
-            if (isHitByTheHint(name, targetTableHint)) {
+        for (String tableHint : targetList) {
+            if (isHitByTheHint(name, tableHint)) {
                 return true;
             }
         }

@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Map.Entry;
+
+import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
+import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 
 /**
  * @author jflute
@@ -77,7 +82,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     //                               Object Type Target List
     //                               -----------------------
     public List<String> getObjectTypeTargetList() {
-        return getVairousList("objectTypeTargetList", getDatabaseTypeList());
+        return getVairousStringList("objectTypeTargetList", getDatabaseTypeList());
     }
 
     public boolean hasObjectTypeSynonym() {
@@ -103,17 +108,10 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     // -----------------------------------------------------
-    //                                Additional Schema List
-    //                                ----------------------
-    public List<String> getAdditionalSchemaList() {
-        return getVairousList("additionalSchemaList");
-    }
-
-    // -----------------------------------------------------
     //                                     Table Except List
     //                                     -----------------
-    public List<String> getTableExceptList() {
-        final List<String> vairousList = getVairousList("tableExceptList");
+    public List<String> getTableExceptList() { // for main schema
+        final List<String> vairousList = getVairousStringList("tableExceptList");
         if (!vairousList.isEmpty()) {
             return vairousList;
         }
@@ -128,8 +126,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                     Table Target List
     //                                     -----------------
-    public List<String> getTableTargetList() {
-        final List<String> vairousList = getVairousList("tableTargetList");
+    public List<String> getTableTargetList() { // for main schema
+        final List<String> vairousList = getVairousStringList("tableTargetList");
         if (!vairousList.isEmpty()) {
             return vairousList;
         }
@@ -144,8 +142,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                    Column Except List
     //                                    ------------------
-    public List<String> getSimpleColumnExceptList() {
-        final List<String> vairousList = getVairousList("columnExceptList");
+    public List<String> getSimpleColumnExceptList() { // for main schema
+        final List<String> vairousList = getVairousStringList("columnExceptList");
         if (!vairousList.isEmpty()) {
             return vairousList;
         }
@@ -158,21 +156,111 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     // -----------------------------------------------------
+    //                                 Additional Schema Map
+    //                                 ---------------------
+    protected Map<String, DfAdditionalSchemaInfo> _additionalSchemaMap;
+
+    public Map<String, DfAdditionalSchemaInfo> getAdditionalSchemaMap() {
+        if (_additionalSchemaMap != null) {
+            return _additionalSchemaMap;
+        }
+        _additionalSchemaMap = new LinkedHashMap<String, DfAdditionalSchemaInfo>();
+        final Map<String, Object> additionalSchemaMap = getVairousMap("additionalSchemaMap");
+        if (additionalSchemaMap == null) {
+            return _additionalSchemaMap;
+        }
+        final Set<Entry<String, Object>> entrySet = additionalSchemaMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            final String schemaName = entry.getKey();
+            Object obj = entry.getValue();
+            if (obj == null) {
+                String msg = "The value of schema in the property 'additionalSchemaMap' should be required:";
+                msg = msg + " schema=" + schemaName;
+                msg = msg + " additionalSchemaMap=" + additionalSchemaMap;
+                throw new DfRequiredPropertyNotFoundException(msg);
+            }
+            if (!(obj instanceof Map<?, ?>)) {
+                String msg = "The type of schema value in the property 'additionalDropMapList' should be Map:";
+                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+                throw new DfIllegalPropertyTypeException(msg);
+            }
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> elementMap = (Map<String, Object>) obj;
+
+            final DfAdditionalSchemaInfo info = new DfAdditionalSchemaInfo();
+            info.setSchemaName(schemaName);
+
+            obj = elementMap.get("tableExceptList");
+            if (obj == null) {
+                @SuppressWarnings("unchecked")
+                final List<String> tableExceptList = Collections.EMPTY_LIST;
+                info.setTableExceptList(tableExceptList);
+            } else if (!(obj instanceof List<?>)) {
+                String msg = "The type of tableExceptList in the property 'additionalDropMapList' should be List:";
+                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+                throw new DfIllegalPropertyTypeException(msg);
+            } else {
+                @SuppressWarnings("unchecked")
+                final List<String> tableExceptList = (List<String>) obj;
+                info.setTableExceptList(tableExceptList);
+            }
+
+            obj = elementMap.get("tableTargetList");
+            if (obj == null) {
+                @SuppressWarnings("unchecked")
+                final List<String> tableTargetList = Collections.EMPTY_LIST;
+                info.setTableTargetList(tableTargetList);
+            } else if (!(obj instanceof List<?>)) {
+                String msg = "The type of tableTargetList in the property 'additionalDropMapList' should be List:";
+                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+                throw new DfIllegalPropertyTypeException(msg);
+            } else {
+                @SuppressWarnings("unchecked")
+                final List<String> tableTargetList = (List<String>) obj;
+                info.setTableTargetList(tableTargetList);
+            }
+            info.setSuppressCommonColumn(isProperty("isSuppressCommonColumn", false, elementMap));
+
+            _additionalSchemaMap.put(schemaName, info);
+        }
+        return _additionalSchemaMap;
+    }
+
+    public boolean isAdditionalSchema(String schema) {
+        return getAdditionalSchemaMap().containsKey(schema);
+    }
+
+    // -----------------------------------------------------
     //                                     VariousMap Helper
     //                                     -----------------
     @SuppressWarnings("unchecked")
-    protected List<String> getVairousList(String key) {
-        return getVairousList(key, Collections.EMPTY_LIST);
+    protected List<String> getVairousStringList(String key) {
+        return getVairousStringList(key, Collections.EMPTY_LIST);
     }
 
     @SuppressWarnings("unchecked")
-    protected List<String> getVairousList(String key, List<String> defaultList) {
+    protected List<String> getVairousStringList(String key, List<String> defaultList) {
         final Object value = getVariousObject(key);
         if (value == null) {
-            return defaultList != null ? defaultList : new ArrayList<String>();
+            return defaultList != null ? defaultList : Collections.EMPTY_LIST;
         }
         assertVariousPropertyList(key, value);
         return (List<String>) value;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> getVairousMap(String key) {
+        return getVairousMap(key, Collections.EMPTY_MAP);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Object> getVairousMap(String key, Map<String, Object> defaultMap) {
+        final Object value = getVariousObject(key);
+        if (value == null) {
+            return defaultMap != null ? defaultMap : Collections.EMPTY_MAP;
+        }
+        assertVariousPropertyList(key, value);
+        return (Map<String, Object>) value;
     }
 
     protected Object getVariousObject(String key) {

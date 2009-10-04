@@ -31,7 +31,7 @@ public class DfSchemaInitializerFactory {
     protected Map<String, Object> additionalDropMap;
 
     public enum InitializeType {
-        FIRST, ONCE_MOCE, ADDTIONAL
+        FIRST, ADDTIONAL
     }
 
     // ===================================================================================
@@ -105,31 +105,18 @@ public class DfSchemaInitializerFactory {
             return;
         }
 
-        if (_initializeType.equals(InitializeType.ONCE_MOCE)) {
-            // Here 'Once-More'!
-            final String schema = getOnceMoreSchema();
-            if (schema == null || schema.trim().length() == 0) {
-                String msg = "Once More Drop Schema should not be null or empty: schema=" + schema;
-                throw new IllegalStateException(msg);
-            }
-            initializer.setSchema(schema);
-            initializer.setTableNameWithSchema(true); // because it may be other schema!
-            initializer.setDropObjectTypeList(getOnceMoreObjectTypeList());
-            initializer.setDropTableTargetList(getOnceMoreDropTableTargetList());
-            initializer.setDropTableExceptList(getOnceMoreDropTableExceptList());
-            initializer.setDropGenerateTableOnly(false);
-        } else if (_initializeType.equals(InitializeType.ADDTIONAL)) {
+        if (_initializeType.equals(InitializeType.ADDTIONAL)) {
             // Here 'Additional'!
             if (additionalDropMap == null) {
                 String msg = "The additional drop map should exist if the initialize type is additional!";
                 throw new IllegalStateException(msg);
             }
-            final String schema = getAdditionalDropSchema(additionalDropMap);
-            if (schema == null || schema.trim().length() == 0) {
-                String msg = "Additional Drop Schema should not be null or empty: schema=" + schema;
+            final String schemaName = getAdditionalDropSchema(additionalDropMap);
+            if (schemaName == null || schemaName.trim().length() == 0) {
+                String msg = "Additional Drop Schema should not be null or empty: schema=" + schemaName;
                 throw new IllegalStateException(msg);
             }
-            initializer.setSchema(schema);
+            initializer.setSchema(schemaName);
             initializer.setTableNameWithSchema(true); // because it may be other schema!
             initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(additionalDropMap));
             initializer.setDropTableTargetList(getAdditionalDropTableTargetList(additionalDropMap));
@@ -150,22 +137,6 @@ public class DfSchemaInitializerFactory {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    protected String getOnceMoreSchema() {
-        return _replaceSchemaProperties.getOnceMoreDropDefinitionSchema();
-    }
-
-    protected List<String> getOnceMoreObjectTypeList() {
-        return _replaceSchemaProperties.getOnceMoreDropObjectTypeList();
-    }
-
-    protected List<String> getOnceMoreDropTableTargetList() {
-        return _replaceSchemaProperties.getOnceMoreDropTableTargetList();
-    }
-
-    protected List<String> getOnceMoreDropTableExceptList() {
-        return _replaceSchemaProperties.getOnceMoreDropTableExceptList();
-    }
-
     protected String getAdditionalDropSchema(Map<String, Object> map) {
         return _replaceSchemaProperties.getAdditionalDropSchema(map);
     }

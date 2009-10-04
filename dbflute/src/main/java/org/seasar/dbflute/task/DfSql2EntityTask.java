@@ -71,6 +71,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -811,8 +812,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final DatabaseMetaData metaData = conn.getMetaData();
             final DfProcedureHandler handler = new DfProcedureHandler();
             final List<DfProcedureMetaInfo> procedures = handler.getProcedures(metaData, _schema);
-            final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
-            for (String additionalSchema : additionalSchemaList) {
+            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getDatabaseInfoProperties()
+                    .getAdditionalSchemaMap();
+            final Set<String> additionalSchemaSet = additionalSchemaMap.keySet();
+            for (String additionalSchema : additionalSchemaSet) {
                 final List<DfProcedureMetaInfo> additionalProcedureList = handler.getProcedures(metaData,
                         additionalSchema);
                 for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
@@ -901,8 +904,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final StringBuilder sb = new StringBuilder();
         final String procedureSchema = metaInfo.getProcedureSchema();
         if (procedureSchema != null && procedureSchema.trim().length() > 0) {
-            final List<String> additionalSchemaList = getDatabaseInfoProperties().getAdditionalSchemaList();
-            if (additionalSchemaList.contains(procedureSchema)) {
+            if (getDatabaseInfoProperties().isAdditionalSchema(procedureSchema)) {
                 sb.append(procedureSchema).append(".");
             }
         }

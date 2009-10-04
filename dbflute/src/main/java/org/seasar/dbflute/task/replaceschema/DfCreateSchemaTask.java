@@ -80,11 +80,10 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             initializer.initializeSchema();
         }
         _log.info("");
-        initializeSchemaOnceMore();
-        initializeSchemaAdditional();
+        initializeSchemaAdditionalDrop();
     }
 
-    protected void initializeSchemaAdditional() {
+    protected void initializeSchemaAdditionalDrop() {
         List<Map<String, Object>> additionalDropMapList = getMyProperties().getAdditionalDropMapList();
         if (additionalDropMapList.isEmpty()) {
             return;
@@ -96,11 +95,11 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             String msg = "AdditionalDropDefinitionSchema is unsupported at MySQL and SQLServer!";
             throw new UnsupportedOperationException(msg);
         }
-        _log.info("* * * * * * * * * * * * * * * * * *");
-        _log.info("*                                 *");
-        _log.info("* Initialize Schema (Additional)  *");
-        _log.info("*                                 *");
-        _log.info("* * * * * * * * * * * * * * * * * *");
+        _log.info("* * * * * * * * * * * * * * * * * * * *");
+        _log.info("*                                     *");
+        _log.info("* Initialize Schema (Additional Drop) *");
+        _log.info("*                                     *");
+        _log.info("* * * * * * * * * * * * * * * * * * * *");
         for (Map<String, Object> additionalDropMap : additionalDropMapList) {
             final String additionalDropSchema = getMyProperties().getAdditionalDropSchema(additionalDropMap);
             _log.info("{" + additionalDropSchema + "}");
@@ -110,30 +109,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             }
             _log.info("");
         }
-    }
-
-    protected void initializeSchemaOnceMore() {
-        final String schema = getMyProperties().getOnceMoreDropDefinitionSchema();
-        if (schema == null || schema.trim().length() == 0) {
-            return;
-        }
-        // /= = = = = = = = = = = = = = = = = 
-        // Unsupported at MySQL and SQLServer
-        // = = = = = = = = = =/
-        if (getBasicProperties().isDatabaseMySQL() || getBasicProperties().isDatabaseSqlServer()) {
-            String msg = "OnceMoreDropDefinitionSchema is unsupported at MySQL and SQLServer!";
-            throw new UnsupportedOperationException(msg);
-        }
-        _log.info("* * * * * * * * * * * * * * * * *");
-        _log.info("*                               *");
-        _log.info("* Initialize Schema (Once More) *");
-        _log.info("*                               *");
-        _log.info("* * * * * * * * * * * * * * * * *");
-        final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.ONCE_MOCE);
-        if (initializer != null) {
-            initializer.initializeSchema();
-        }
-        _log.info("");
     }
 
     protected DfSchemaInitializer createSchemaInitializer(InitializeType initializeType) {

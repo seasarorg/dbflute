@@ -70,7 +70,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
     protected DfForeignKeyHandler _foreignKeyHandler = new DfForeignKeyHandler() {
         @Override
-        public boolean isTableExcept(String tableName) {
+        public boolean isTableExcept(String schemaName, String tableName) {
             // All foreign tables are target if the foreign table is except.
             // Because the filtering is executed when translating foreign keys.
             return false;
@@ -102,7 +102,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 final String tableName = rs.getString("TABLE_NAME");
                 final String dbLinkName = rs.getString("DB_LINK");
 
-                if (_tableHandler.isTableExcept(synonymName)) {
+                if (_tableHandler.isTableExcept(tableOwner, synonymName)) {
                     continue;
                 }
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) {
@@ -282,7 +282,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
 
                 final List<String> foreignSynonymList = tableForeignSynonymListMap.get(foreignTableName);
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
-                    if (_tableHandler.isTableExcept(foreignTableName)) {
+                    if (_tableHandler.isTableExcept(synonym.getTableOwner(), foreignTableName)) {
                         removedFKKeyMap.put(fkName, foreignTableName);
                     } else if (_refTableCheckSet != null && !_refTableCheckSet.contains(foreignTableName)) {
                         removedFKKeyMap.put(fkName, foreignTableName);

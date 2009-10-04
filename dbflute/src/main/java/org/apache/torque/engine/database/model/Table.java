@@ -78,6 +78,7 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
+import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.xml.sax.Attributes;
@@ -360,14 +361,8 @@ public class Table {
     }
 
     public boolean isAdditionalSchema() {
-        if (_schema == null || _schema.trim().length() == 0) {
-            return false;
-        }
-        final List<String> schemaList = getProperties().getDatabaseProperties().getAdditionalSchemaList();
-        for (String additionalSchema : schemaList) {
-            if (additionalSchema.equalsIgnoreCase(_schema)) {
-                return true;
-            }
+        if (_schema != null && _schema.trim().length() > 0) {
+            return getDatabaseProperties().isAdditionalSchema(_schema);
         }
         return false;
     }
@@ -453,19 +448,10 @@ public class Table {
                 return _schema + "." + _name;
             }
         }
-        if (isOnAdditionalSchema()) { // For resolving additional schema.
+        if (isAdditionalSchema()) { // for resolving additional schema
             return _schema + "." + _name;
         }
         return _name;
-    }
-
-    protected boolean isOnAdditionalSchema() {
-        if (_schema != null && _schema.trim().length() > 0) {
-            DfDatabaseProperties databaseInfoProperties = getProperties().getDatabaseProperties();
-            final List<String> additionalSchemaList = databaseInfoProperties.getAdditionalSchemaList();
-            return additionalSchemaList.contains(_schema);
-        }
-        return false;
     }
 
     // -----------------------------------------------------
@@ -1672,7 +1658,7 @@ public class Table {
      * @return The value of primaryKeyArgsJavaDocString. (NotNull)
      */
     public String getPrimaryKeyArgsJavaDocString() {
-        final String ln = getProperties().getBasicProperties().getSourceCodeLineSeparator();
+        final String ln = getBasicProperties().getSourceCodeLineSeparator();
         return DfTorqueColumnListToStringUtil.getColumnArgsJavaDocString(getPrimaryKey(), ln);
     }
 
@@ -1957,6 +1943,14 @@ public class Table {
         return DfBuildProperties.getInstance();
     }
 
+    protected DfBasicProperties getBasicProperties() {
+        return getProperties().getBasicProperties();
+    }
+
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return getProperties().getDatabaseProperties();
+    }
+
     // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============
@@ -2053,7 +2047,7 @@ public class Table {
      * @return Sequence name of postgreSQL serial type column. (Nullable: If null, not found)
      */
     protected String extractPostgreSQLSerialSequenceName() {
-        final DfBasicProperties basicProperties = getProperties().getBasicProperties();
+        final DfBasicProperties basicProperties = getBasicProperties();
         if (!basicProperties.isDatabasePostgreSQL() || !hasAutoIncrementColumn()) {
             return null;
         }
@@ -2091,9 +2085,9 @@ public class Table {
     }
 
     protected String getPropertyNameResolvedLanguage(Column col) {
-        if (getProperties().getBasicProperties().isTargetLanguageJava()) {
+        if (getBasicProperties().isTargetLanguageJava()) {
             return col.getJavaBeansRulePropertyName();
-        } else if (getProperties().getBasicProperties().isTargetLanguageCSharp()) {
+        } else if (getBasicProperties().isTargetLanguageCSharp()) {
             return col.getJavaName();
         } else {
             return col.getUncapitalisedJavaName();
@@ -2108,7 +2102,7 @@ public class Table {
      * @return Determination.
      */
     public boolean isUseIdentity() {
-        final DfBasicProperties basicProperties = getProperties().getBasicProperties();
+        final DfBasicProperties basicProperties = getBasicProperties();
 
         // S2DaoはPostgreSQLのIdentity利用をサポートしていないので問答無用でfalse。
         // かつ、Serial型はSequence利用が一般的なので問答無用でfalse。
@@ -2297,7 +2291,7 @@ public class Table {
 
     protected String buildVersionNoJavaName(String versionNoFieldName) {
         if (versionNoFieldName != null && versionNoFieldName.trim().length() != 0) {
-            final DfBasicProperties basicProperties = getProperties().getBasicProperties();
+            final DfBasicProperties basicProperties = getBasicProperties();
             if (basicProperties.isJavaNameOfColumnSameAsDbName()) {
                 return versionNoFieldName;
             } else {
@@ -2334,6 +2328,13 @@ public class Table {
     public boolean hasAllCommonColumn() {
         if (!isWritable()) {
             return false;
+        }
+        if (isAdditionalSchema()) {
+            final Map<String, DfAdditionalSchemaInfo> schemaMap = getDatabaseProperties().getAdditionalSchemaMap();
+            final DfAdditionalSchemaInfo schemaInfo = schemaMap.get(_schema);
+            if (schemaInfo.isSuppressCommonColumn()) {
+                return false;
+            }
         }
         final List<String> commonColumnNameList = getDatabase().getCommonColumnNameList();
         if (commonColumnNameList.isEmpty()) {

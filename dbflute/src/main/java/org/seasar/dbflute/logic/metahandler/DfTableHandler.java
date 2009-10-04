@@ -43,7 +43,8 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
     //                                                                        ============
     /**
      * Get all the table names in the current database that are not system tables.
-     * @param dbMeta JDBC database meta data.
+     * @param dbMeta JDBC database meta data. (NotNull)
+     * @param schemaName The name of schema. (Nullable)
      * @return The list of all the table meta info in a database.
      * @throws SQLException
      */
@@ -60,7 +61,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final String tableSchema = resultSet.getString("TABLE_SCHEM");
                 final String tableComment = resultSet.getString("REMARKS");
 
-                if (isTableExcept(tableName)) {
+                if (isTableExcept(schemaName, tableName)) {
                     _log.info("$ " + tableName + " is excepted!");
                     continue;
                 }
