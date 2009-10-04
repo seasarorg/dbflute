@@ -891,77 +891,8 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                             Flat/Omit
-    //                                             ---------
-    // CSharp Only
-    public boolean isFlatDirectoryPackageValid() {
-        return getProperties().getBasicProperties().isFlatDirectoryPackageValid();
-    }
-
-    public String getFlatDirectoryPackage() {
-        return getProperties().getBasicProperties().getFlatDirectoryPackage();
-    }
-
-    public boolean isOmitDirectoryPackageValid() {
-        return getProperties().getBasicProperties().isOmitDirectoryPackageValid();
-    }
-
-    public String getOmitDirectoryPackage() {
-        return getProperties().getBasicProperties().getOmitDirectoryPackage();
-    }
-
-    // -----------------------------------------------------
-    //                                                Filter
-    //                                                ------
-    public String filterGenericsString(String genericsString) {// It is very important!
-        return getBasicProperties().filterGenericsString(genericsString);
-    }
-
-    public String filterGenericsDowncast(String genericsDowncast) {// It is very important!
-        return getBasicProperties().filterGenericsDowncast(genericsDowncast);
-    }
-
-    public String filterGenericsParamOutput(String variableName, String description) {
-        return getBasicProperties().filterGenericsParamOutput(variableName, description);
-    }
-
-    public String filterGenericsGeneralOutput(String genericsGeneralOutput) {// It is very important!
-        return getBasicProperties().filterGenericsGeneralOutput(genericsGeneralOutput);
-    }
-
-    public String outputOverrideAnnotation() {
-        return getBasicProperties().outputOverrideAnnotation();
-    }
-
-    public String outputOverrideAnnotationAfterNewLineOutput() {
-        return getBasicProperties().outputOverrideAnnotationAfterNewLineOutput();
-    }
-
-    public String outputSuppressWarningsAfterLineSeparator() {
-        return getBasicProperties().outputSuppressWarningsAfterLineSeparator();
-    }
-
-    // -----------------------------------------------------
-    //                                   Behavior Query Path
-    //                                   -------------------
-    public String getBehaviorQueryPathBeginMark() {
-        return getBasicProperties().getBehaviorQueryPathBeginMark();
-    }
-
-    public String getBehaviorQueryPathEndMark() {
-        return getBasicProperties().getBehaviorQueryPathEndMark();
-    }
-
-    // -----------------------------------------------------
-    //                                            Hot Deploy
-    //                                            ----------
-    public boolean isAvailableHotDeploy() {
-        return getBasicProperties().isAvailableHotDeploy();
-    }
-
-    // ===================================================================================
-    //                                                                    Generate Package
-    //                                                                    ================
+    //                                      Generate Package
+    //                                      ----------------
     public String getPackageBase() {
         return getProperties().getBasicProperties().getPackageBase();
     }
@@ -1004,6 +935,56 @@ public class Database {
 
     public String getExtendedEntityPackage() {
         return getProperties().getBasicProperties().getExtendedEntityPackage();
+    }
+
+    // -----------------------------------------------------
+    //                                             Flat/Omit
+    //                                             ---------
+    // CSharp Only
+    public boolean isFlatDirectoryPackageValid() {
+        return getProperties().getBasicProperties().isFlatDirectoryPackageValid();
+    }
+
+    public String getFlatDirectoryPackage() {
+        return getProperties().getBasicProperties().getFlatDirectoryPackage();
+    }
+
+    public boolean isOmitDirectoryPackageValid() {
+        return getProperties().getBasicProperties().isOmitDirectoryPackageValid();
+    }
+
+    public String getOmitDirectoryPackage() {
+        return getProperties().getBasicProperties().getOmitDirectoryPackage();
+    }
+
+    // -----------------------------------------------------
+    //                                            Hot Deploy
+    //                                            ----------
+    public boolean isAvailableHotDeploy() {
+        return getBasicProperties().isAvailableHotDeploy();
+    }
+
+    // -----------------------------------------------------
+    //                                   Behavior Query Path
+    //                                   -------------------
+    public String getBehaviorQueryPathBeginMark() {
+        return getBasicProperties().getBehaviorQueryPathBeginMark();
+    }
+
+    public String getBehaviorQueryPathEndMark() {
+        return getBasicProperties().getBehaviorQueryPathEndMark();
+    }
+
+    // ===================================================================================
+    //                                                                 Database Properties
+    //                                                                 ===================
+    public String getDatabaseSchema() {
+        return getProperties().getDatabaseProperties().getDatabaseSchema();
+    }
+    
+    public boolean hasDatabaseSchema() {
+        String databaseSchema = getDatabaseSchema();
+        return databaseSchema != null && databaseSchema.trim().length() > 0;
     }
 
     // ===================================================================================

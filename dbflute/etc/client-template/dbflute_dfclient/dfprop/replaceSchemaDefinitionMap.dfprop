@@ -101,19 +101,21 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o filterVariablesMap (NotRequired - Default 'map:{}')
-    # You can specify the filter variables for DDL.
+    #  You can specify the filter variables for DDL.
     # 
     #; filterVariablesMap = map:{abc=AAA}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o additionalDropMapList (NotRequired - Default 'list:{}')
-    # You can drop additional other schemas.
-    #   - schema: (Required)
-    #   - objectTypeTargetList: (NotRequired - Default 'list{TABLE;VIEW}')
-    #   - tableExceptList: (NotRequired - Default 'list{}')
-    #   - tableTargetList: (NotRequired - Default 'list{}')
-    #   - isDropAllTable: (NotRequired - Default 'false')
+    #  You can drop additional other schemas.
+    #  Elements of this map are as below:
+    #   o schema: (Required)
+    #   o objectTypeTargetList: (NotRequired - Default 'list{TABLE;VIEW}')
+    #   o tableExceptList: (NotRequired - Default 'list{}')
+    #   o tableTargetList: (NotRequired - Default 'list{}')
+    #   o isDropAllTable: (NotRequired - Default 'false')
+    #
     #; additionalDropMapList = list:{
     #    ; map:{
     #        ; schema = NEXTEXAMPLEDB
@@ -127,21 +129,21 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressTruncateTable (NotRequired - Default 'false')
-    # You can suppress truncating tables at initializing schema.
+    #  You can suppress truncating tables at initializing schema.
     # 
     #; isSuppressTruncateTable = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropForeignKey (NotRequired - Default 'false')
-    # You can suppress dropping foreign keys at initializing schema.
+    #  You can suppress dropping foreign keys at initializing schema.
     # 
     #; isSuppressDropForeignKey = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isSuppressDropTable (NotRequired - Default 'false')
-    # You can suppress dropping tables at initializing schema.
+    #  You can suppress dropping tables at initializing schema.
     # 
     #; isSuppressDropTable = false
     # - - - - - - - - - -/

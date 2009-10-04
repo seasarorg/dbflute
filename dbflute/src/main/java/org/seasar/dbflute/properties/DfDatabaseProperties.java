@@ -160,10 +160,21 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     //                                 ---------------------
     protected Map<String, DfAdditionalSchemaInfo> _additionalSchemaMap;
 
+    protected void assertOldStyleAdditionalSchema() {
+        // Check old style existence
+        final Object oldStyle = getVariousObject("additionalSchemaList");
+        if (oldStyle != null) {
+            String msg = "The property 'additionalSchemaList' have been unsupported!";
+            msg = msg + " Please use the property 'additionalSchemaMap'.";
+            throw new IllegalStateException(msg);
+        }
+    }
+
     public Map<String, DfAdditionalSchemaInfo> getAdditionalSchemaMap() {
         if (_additionalSchemaMap != null) {
             return _additionalSchemaMap;
         }
+        assertOldStyleAdditionalSchema();
         _additionalSchemaMap = new LinkedHashMap<String, DfAdditionalSchemaInfo>();
         final Map<String, Object> additionalSchemaMap = getVairousMap("additionalSchemaMap");
         if (additionalSchemaMap == null) {

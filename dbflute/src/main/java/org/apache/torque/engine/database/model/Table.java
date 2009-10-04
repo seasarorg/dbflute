@@ -345,16 +345,17 @@ public class Table {
     // -----------------------------------------------------
     //                                          Table Schema
     //                                          ------------
-    // Basically unused because the schema may be for test environment.
-    ///**
-    // * Get the schema of the Table
-    // */
-    //public String getSchema() {
-    //    return _schema;
-    //}
+    /**
+     * Get the schema of the Table
+     * @return The schema. (Nullable)
+     */
+    public String getSchema() {
+        return _schema;
+    }
 
     /**
      * Set the schema of the Table
+     * @param schema The name of schema. (Nullable)
      */
     public void setSchema(String schema) {
         this._schema = schema;
