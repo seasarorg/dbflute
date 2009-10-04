@@ -82,21 +82,21 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 final DatabaseMetaData dbMetaData = conn.getMetaData();
                 final DfTableHandler tableNameHandler = new DfTableHandler() {
                     @Override
-                    protected String[] getObjectTypeStringArray() {
+                    protected String[] getRealObjectTypeTargetArray(String schemaName) {
                         if (_dropObjectTypeList != null) {
                             return _dropObjectTypeList.toArray(new String[] {});
                         } else {
-                            return super.getObjectTypeStringArray();
+                            return super.getRealObjectTypeTargetArray(schemaName);
                         }
                     }
 
                     @Override
-                    protected List<String> getTableTargetList() {
-                        if (_dropTableTargetList != null) {
-                            return _dropTableTargetList;
+                    protected List<String> getRealTableExceptList(String schemaName) {
+                        if (_dropTableExceptList != null) {
+                            return _dropTableExceptList;
                         } else {
                             if (_dropGenerateTableOnly) {
-                                return super.getTableTargetList();
+                                return super.getRealTableExceptList(schemaName);
                             } else {
                                 return new ArrayList<String>();
                             }
@@ -104,12 +104,12 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     }
 
                     @Override
-                    protected List<String> getTableExceptList() {
-                        if (_dropTableExceptList != null) {
-                            return _dropTableExceptList;
+                    protected List<String> getRealTableTargetList(String schemaName) {
+                        if (_dropTableTargetList != null) {
+                            return _dropTableTargetList;
                         } else {
                             if (_dropGenerateTableOnly) {
-                                return super.getTableExceptList();
+                                return super.getRealTableTargetList(schemaName);
                             } else {
                                 return new ArrayList<String>();
                             }
@@ -217,13 +217,14 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     continue;
                 }
                 final DfForeignKeyHandler handler = new DfForeignKeyHandler() {
+
                     @Override
-                    protected List<String> getTableTargetList() {
-                        if (_dropTableTargetList != null) {
-                            return _dropTableTargetList;
+                    protected List<String> getRealTableExceptList(String schemaName) {
+                        if (_dropTableExceptList != null) {
+                            return _dropTableExceptList;
                         } else {
                             if (_dropGenerateTableOnly) {
-                                return super.getTableTargetList();
+                                return super.getRealTableExceptList(schemaName);
                             } else {
                                 return new ArrayList<String>();
                             }
@@ -231,12 +232,12 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     }
 
                     @Override
-                    protected List<String> getTableExceptList() {
-                        if (_dropTableExceptList != null) {
-                            return _dropTableExceptList;
+                    protected List<String> getRealTableTargetList(String schemaName) {
+                        if (_dropTableTargetList != null) {
+                            return _dropTableTargetList;
                         } else {
                             if (_dropGenerateTableOnly) {
-                                return super.getTableExceptList();
+                                return super.getRealTableTargetList(schemaName);
                             } else {
                                 return new ArrayList<String>();
                             }

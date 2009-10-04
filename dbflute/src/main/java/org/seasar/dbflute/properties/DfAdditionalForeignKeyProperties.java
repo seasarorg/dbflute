@@ -13,7 +13,7 @@ import org.seasar.dbflute.util.DfStringUtil;
  * @author jflute
  */
 public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProperties {
-    
+
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
@@ -56,7 +56,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
                 final Map<?, ?> foreignDefinitionMap = (Map<?, ?>) firstValue;
                 final Set<?> secondKeySet = foreignDefinitionMap.keySet();
                 final Map<String, String> genericForeignDefinitiontMap = newLinkedHashMap();
-                for (Object componentName : secondKeySet) {// FK Component Loop!
+                for (Object componentName : secondKeySet) { // FK component loop!
                     final Object secondValue = foreignDefinitionMap.get(componentName);
                     if (secondValue == null) {
                         continue;
@@ -119,7 +119,7 @@ public final class DfAdditionalForeignKeyProperties extends DfAbstractHelperProp
         final Map<String, String> componentMap = getAdditionalForeignKeyMap().get(foreignName);
         return componentMap.get(KEY_FIXED_SUFFIX);
     }
-    
+
     public List<String> findLocalColumnNameList(String foreignName) {
         final String property = findLocalColumnName(foreignName);
         if (property == null || property.trim().length() == 0) {

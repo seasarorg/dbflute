@@ -21,11 +21,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 
 /**
  * This class generates an XML schema of an existing database from JDBC meta data.
@@ -50,7 +52,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
      */
     public List<DfTableMetaInfo> getTableList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
         schemaName = filterSchemaName(schemaName);
-        final String[] objectTypes = getObjectTypeStringArray();
+        final String[] objectTypes = getRealObjectTypeTargetArray(schemaName);
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
@@ -87,6 +89,19 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         return tableList;
     }
 
+    protected String[] getRealObjectTypeTargetArray(String schemaName) {
+        if (schemaName != null) {
+            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getAdditionalSchemaMap();
+            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(schemaName);
+            if (schemaInfo != null) {
+                final List<String> objectTypeTargetList = schemaInfo.getObjectTypeTargetList();
+                return objectTypeTargetList.toArray(new String[objectTypeTargetList.size()]);
+            }
+        }
+        final List<String> objectTypeTargetList = getProperties().getDatabaseProperties().getObjectTypeTargetList();
+        return objectTypeTargetList.toArray(new String[objectTypeTargetList.size()]);
+    }
+
     /**
      * Resolve same name table.
      * If the same table names exist, it marks about it.
@@ -112,22 +127,5 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 tableMetaInfo.setExistSameNameTable(true);
             }
         }
-    }
-
-    /**
-     * Get object type string-array.
-     * @return Object type string-array. (NotNull)
-     */
-    protected String[] getObjectTypeStringArray() {
-        final List<String> targetList = getProperties().getDatabaseProperties().getObjectTypeTargetList();
-        return targetList.toArray(new String[targetList.size()]);
-    }
-
-    /**
-     * Is the database Oracle?
-     * @return Determination.
-     */
-    protected boolean isOracle() {
-        return getBasicProperties().isDatabaseOracle();
     }
 }

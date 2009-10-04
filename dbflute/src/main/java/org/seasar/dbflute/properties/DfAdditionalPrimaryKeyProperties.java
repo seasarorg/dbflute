@@ -35,7 +35,7 @@ public final class DfAdditionalPrimaryKeyProperties extends DfAbstractHelperProp
             _additionalPrimaryKeyMap = new LinkedHashMap<String, Map<String, String>>();
             final Map<String, Object> generatedMap = mapProp("torque." + KEY_additionalPrimaryKeyMap, DEFAULT_EMPTY_MAP);
             final Set<String> fisrtKeySet = generatedMap.keySet();
-            for (Object primaryName : fisrtKeySet) { // PK Loop!
+            for (Object primaryName : fisrtKeySet) { // PK loop!
                 final Object firstValue = generatedMap.get(primaryName);
                 if (!(firstValue instanceof Map<?, ?>)) {
                     String msg = "The value type should be Map: tableName=" + primaryName + " property=CustomizeDao";
@@ -45,7 +45,7 @@ public final class DfAdditionalPrimaryKeyProperties extends DfAbstractHelperProp
                 final Map<?, ?> foreignDefinitionMap = (Map<?, ?>) firstValue;
                 final Set<?> secondKeySet = foreignDefinitionMap.keySet();
                 final Map<String, String> genericForeignDefinitiontMap = new LinkedHashMap<String, String>();
-                for (Object componentName : secondKeySet) { // PK Component Loop!
+                for (Object componentName : secondKeySet) { // PK component loop!
                     final Object secondValue = foreignDefinitionMap.get(componentName);
                     if (secondValue == null) {
                         continue;

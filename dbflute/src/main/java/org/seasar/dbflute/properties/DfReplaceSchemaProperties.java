@@ -199,9 +199,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     @SuppressWarnings("unchecked")
     public List<String> getAdditionalDropObjectTypeList(Map<String, Object> additionalDropMap) {
-        Object obj = additionalDropMap.get("objectTypeList");
+        Object obj = additionalDropMap.get("objectTypeTargetList");
         if (obj == null) {
-            obj = additionalDropMap.get("targetDatabaseTypeList");
+            obj = additionalDropMap.get("objectTypeList"); // old style
             if (obj == null) {
                 ArrayList<String> defaultList = new ArrayList<String>();
                 defaultList.add("TABLE");
@@ -210,7 +210,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             }
         }
         if (!(obj instanceof List)) {
-            String msg = "The schema should be List<String>: objectTypeList=" + obj + " type=" + obj.getClass();
+            String msg = "The schema should be List<String>: objectTypeTargetList=" + obj + " type=" + obj.getClass();
             throw new IllegalStateException(msg);
         }
         return (List<String>) obj;

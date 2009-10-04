@@ -46,28 +46,28 @@ public class DfAbstractMetaDataHandler {
     /** The map of additional schema. (Lazy) */
     private Map<String, DfAdditionalSchemaInfo> _additionalSchemaMap;
 
-    protected List<String> getTableExceptList() { // for main schema
+    protected final List<String> getTableExceptList() { // for main schema
         if (_tableExceptList == null) {
             _tableExceptList = getProperties().getDatabaseProperties().getTableExceptList();
         }
         return _tableExceptList;
     }
 
-    protected List<String> getTableTargetList() { // for main schema
+    protected final List<String> getTableTargetList() { // for main schema
         if (_tableTargetList == null) {
             _tableTargetList = getProperties().getDatabaseProperties().getTableTargetList();
         }
         return _tableTargetList;
     }
 
-    protected List<String> getSimpleColumnExceptList() { // for main schema
+    protected final List<String> getSimpleColumnExceptList() { // for main schema
         if (_simpleColumnExceptList == null) {
             _simpleColumnExceptList = getProperties().getDatabaseProperties().getSimpleColumnExceptList();
         }
         return _simpleColumnExceptList;
     }
 
-    protected Map<String, DfAdditionalSchemaInfo> getAdditionalSchemaMap() { // for additional schema
+    protected final Map<String, DfAdditionalSchemaInfo> getAdditionalSchemaMap() { // for additional schema
         if (_additionalSchemaMap == null) {
             _additionalSchemaMap = getProperties().getDatabaseProperties().getAdditionalSchemaMap();
         }
@@ -79,43 +79,60 @@ public class DfAbstractMetaDataHandler {
     //                                                                ====================
     /**
      * Is the table name out of sight?
-     * @param schemaName The name of schema. (NotNull)
+     * @param schemaName The name of schema. (Nullable)
      * @param tableName The name of table. (NotNull)
      * @return Determination.
      */
     public boolean isTableExcept(String schemaName, final String tableName) {
         if (tableName == null) {
-            throw new IllegalArgumentException("The argument 'tableName' is required.");
+            throw new IllegalArgumentException("The argument 'tableName' should not be null.");
         }
+        final List<String> tableTargetList = getRealTableTargetList(schemaName);
+        final List<String> tableExceptList = getRealTableExceptList(schemaName);
+        return !isTargetByHint(tableName, tableTargetList, tableExceptList);
+    }
+
+    protected List<String> getRealTableExceptList(String schemaName) { // extension point
         if (schemaName != null) {
             final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getAdditionalSchemaMap();
             final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(schemaName);
             if (schemaInfo != null) {
-                final List<String> exceptList = schemaInfo.getTableExceptList();
-                final List<String> targetList = schemaInfo.getTableTargetList();
-                return !isTargetByHint(tableName, targetList, exceptList);
+                return schemaInfo.getTableExceptList();
             }
         }
-        {
-            // for main schema
-            final List<String> targetList = getTableTargetList();
-            final List<String> exceptList = getTableExceptList();
-            return !isTargetByHint(tableName, targetList, exceptList);
+        return getTableExceptList();
+    }
+
+    protected List<String> getRealTableTargetList(String schemaName) { // extension point
+        if (schemaName != null) {
+            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getAdditionalSchemaMap();
+            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(schemaName);
+            if (schemaInfo != null) {
+                return schemaInfo.getTableTargetList();
+            }
         }
+        return getTableTargetList();
     }
 
     /**
      * Is the column name out of sight?
-     * @param columnName Column name. (NotNull)
+     * @param schemaName The name of schema. (Nullable)
+     * @param columnName The name of column. (NotNull)
      * @return Determination.
      */
-    public boolean isColumnExcept(final String columnName) {
+    public boolean isColumnExcept(String schemaName, String columnName) {
         if (columnName == null) {
-            throw new NullPointerException("Argument[columnName] is required.");
+            throw new IllegalArgumentException("The argument 'columnName' should not be null.");
         }
-
-        final List<String> columnExceptSimpleList = getSimpleColumnExceptList();
+        final List<String> columnExceptSimpleList = getRealSimpleColumnExceptList(schemaName);
         return !isTargetByHint(columnName, new ArrayList<String>(), columnExceptSimpleList);
+    }
+
+    protected List<String> getRealSimpleColumnExceptList(String schemaName) { // extension point
+        if (schemaName != null) {
+            return new ArrayList<String>(); // unsupported at additional schema
+        }
+        return getSimpleColumnExceptList();
     }
 
     protected boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {

@@ -9,6 +9,7 @@ import java.util.List;
 public class DfAdditionalSchemaInfo {
 
     protected String _schemaName;
+    protected List<String> _objectTypeTargetList;
     protected List<String> _tableExceptList;
     protected List<String> _tableTargetList;
     protected boolean _suppressCommonColumn;
@@ -19,6 +20,14 @@ public class DfAdditionalSchemaInfo {
 
     public void setSchemaName(String schemaName) {
         this._schemaName = schemaName;
+    }
+
+    public List<String> getObjectTypeTargetList() {
+        return _objectTypeTargetList;
+    }
+
+    public void setObjectTypeTargetList(List<String> objectTypeTargetList) {
+        this._objectTypeTargetList = objectTypeTargetList;
     }
 
     public List<String> getTableExceptList() {

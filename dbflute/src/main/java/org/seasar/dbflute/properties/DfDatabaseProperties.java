@@ -190,6 +190,21 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             final DfAdditionalSchemaInfo info = new DfAdditionalSchemaInfo();
             info.setSchemaName(schemaName);
 
+            obj = elementMap.get("objectTypeTargetList");
+            if (obj == null) {
+                @SuppressWarnings("unchecked")
+                final List<String> objectTypeTargetList = Collections.EMPTY_LIST;
+                info.setObjectTypeTargetList(objectTypeTargetList);
+            } else if (!(obj instanceof List<?>)) {
+                String msg = "The type of objectTypeTargetList in the property 'additionalDropMapList' should be List:";
+                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+                throw new DfIllegalPropertyTypeException(msg);
+            } else {
+                @SuppressWarnings("unchecked")
+                final List<String> objectTypeTargetList = (List<String>) obj;
+                info.setObjectTypeTargetList(objectTypeTargetList);
+            }
+
             obj = elementMap.get("tableExceptList");
             if (obj == null) {
                 @SuppressWarnings("unchecked")

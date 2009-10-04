@@ -96,14 +96,14 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         try {
             final String realSchemaName = schemaName;
             columnResultSet = metaData.getColumns(null, realSchemaName, tableName, null);
-            setupColumnMetaInfo(columns, columnResultSet, tableName);
+            setupColumnMetaInfo(columns, columnResultSet, schemaName, tableName);
             if (columns.isEmpty()) {
                 lowerSpare = metaData.getColumns(null, realSchemaName, tableName.toLowerCase(), null);
-                setupColumnMetaInfo(columns, lowerSpare, tableName);
+                setupColumnMetaInfo(columns, lowerSpare, schemaName, tableName);
             }
             if (columns.isEmpty()) {
                 upperSpare = metaData.getColumns(null, realSchemaName, tableName.toUpperCase(), null);
-                setupColumnMetaInfo(columns, upperSpare, tableName);
+                setupColumnMetaInfo(columns, upperSpare, schemaName, tableName);
             }
         } catch (SQLException e) {
             String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + tableName;
@@ -131,8 +131,8 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         return columns;
     }
 
-    protected void setupColumnMetaInfo(List<DfColumnMetaInfo> columns, ResultSet columnResultSet, String tableName)
-            throws SQLException {
+    protected void setupColumnMetaInfo(List<DfColumnMetaInfo> columns, ResultSet columnResultSet, String schemaName,
+            String tableName) throws SQLException {
         // Column names for duplicate check
         final StringSet columnNameSet = StringSet.createAsCaseInsensitive();
 
@@ -142,7 +142,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
         while (columnResultSet.next()) {
             final String columnName = columnResultSet.getString(4);
-            if (isColumnExcept(columnName)) {
+            if (isColumnExcept(schemaName, columnName)) {
                 continue;
             }
 

@@ -69,12 +69,12 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     protected void handleSerialTypeSequence() throws SQLException {
         final DfTableHandler tableHandler = new DfTableHandler() {
             @Override
-            protected List<String> getTableExceptList() {
+            protected List<String> getRealTableExceptList(String schemaName) {
                 return new ArrayList<String>(); // All table target!
             }
 
             @Override
-            protected List<String> getTableTargetList() {
+            protected List<String> getRealTableTargetList(String schemaName) {
                 return new ArrayList<String>(); // All table target!
             }
         };
@@ -84,7 +84,7 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
         final DfUniqueKeyHandler uniqueKeyHandler = new DfUniqueKeyHandler();
         final DfColumnHandler columnHandler = new DfColumnHandler() {
             @Override
-            protected List<String> getSimpleColumnExceptList() {
+            protected List<String> getRealSimpleColumnExceptList(String schemaName) {
                 return new ArrayList<String>(); // All column target!
             }
         };

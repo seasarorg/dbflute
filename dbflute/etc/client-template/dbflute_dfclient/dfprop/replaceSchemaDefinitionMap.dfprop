@@ -29,9 +29,10 @@
 #     ; additionalDropMapList = list:{
 #         ; map:{
 #             ; schema = NEXTEXAMPLEDB
-#             ; objectTypeList = list:{TABLE;VIEW}
-#             ; tableExceptList=list:{AAA}
-#             ; tableTargetList=list:{BBB}
+#             ; objectTypeTargetList = list:{TABLE;VIEW}
+#             ; tableExceptList = list:{AAA}
+#             ; tableTargetList = list:{BBB}
+#             ; isDropAllTable = false
 #         }
 #     }
 #     ; isSuppressTruncateTable = true
@@ -108,13 +109,18 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o additionalDropMapList (NotRequired - Default 'list:{}')
     # You can drop additional other schemas.
-    # 
+    #   - schema: (Required)
+    #   - objectTypeTargetList: (NotRequired - Default 'list{TABLE;VIEW}')
+    #   - tableExceptList: (NotRequired - Default 'list{}')
+    #   - tableTargetList: (NotRequired - Default 'list{}')
+    #   - isDropAllTable: (NotRequired - Default 'false')
     #; additionalDropMapList = list:{
     #    ; map:{
     #        ; schema = NEXTEXAMPLEDB
-    #        ; objectTypeList = list:{TABLE;VIEW}
-    #        ; tableExceptList=list:{FULL_NAME ; prefix:PREFIX_ ; ...}
-    #        ; tableTargetList=list:{FULL_NAME ; prefix:PREFIX_ ; ...}
+    #        ; objectTypeTargetList = list:{TABLE;VIEW}
+    #        ; tableExceptList = list:{FULL_NAME ; prefix:PREFIX_ ; ...}
+    #        ; tableTargetList = list:{FULL_NAME ; prefix:PREFIX_ ; ...}
+    #        ; isDropAllTable = false
     #    }
     #}
     # - - - - - - - - - -/
