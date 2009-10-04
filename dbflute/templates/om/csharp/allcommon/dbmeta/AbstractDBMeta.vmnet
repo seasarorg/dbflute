@@ -50,6 +50,11 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         // createColumnInfo()
+        protected ${glColumnInfo} cci(String columnDbName, String columnAlias, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, bool commonColumn) {
+            return new ${glColumnInfo}(this, columnDbName, columnAlias, propertyName, propertyType, primary, columnSize, columnDecimalDigits, commonColumn);
+        }
+
+        // createColumnInfo()
         protected ${glColumnInfo} cci(String columnDbName, String columnAlias, String propertyName, Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType) {
             return new ${glColumnInfo}(this, columnDbName, columnAlias, propertyName, propertyType, primary, columnSize, columnDecimalDigits, commonColumn, optimisticLockType);
         }

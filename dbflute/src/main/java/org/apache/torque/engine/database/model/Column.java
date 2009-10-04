@@ -1727,6 +1727,10 @@ public class Column {
     // ===================================================================================
     //                                                                     Optimistic Lock
     //                                                                     ===============
+    public boolean isOptimisticLock() {
+        return isVersionNo() || isUpdateDate();
+    }
+
     public boolean isVersionNo() {
         final String versionNoPropertyName = getTable().getVersionNoPropertyName();
         return getTable().isUseVersionNo() && getJavaName().equalsIgnoreCase(versionNoPropertyName);
