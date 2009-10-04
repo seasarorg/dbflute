@@ -146,14 +146,14 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         }
         public bool IsOptimisticLock {
             get { return IsVersionNo || IsUpdateDate; }
-        }}
+        }
 
         public bool IsVersionNo {
             get { return OptimisticLockType.VERSION_NO == optimisticLockType; }
-        }}
+        }
 
         public bool IsUpdateDate {
             get { return OptimisticLockType.UPDATE_DATE == optimisticLockType; }
-        }}
+        }
     }
 }
