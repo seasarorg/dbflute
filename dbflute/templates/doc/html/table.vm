@@ -1,4 +1,7 @@
-<h2 id="${table.name}" title="${table.toolTipTitle}">${table.aliasExpression}${table.name}#if ($database.hasAdditionalSchema() && $table.hasSchema())<span class="tableschema">(${table.schema})</span></h2>
+<h2 id="${table.name}" title="${table.toolTipTitle}">
+${table.aliasExpression}${table.name}
+#if ($database.hasAdditionalSchema() && $table.hasSchema())<span class="tableschema"> on ${table.schema}</span>#end
+</h2>
 <table summary="Columns in ${table.name}">
   <thead>
     <tr>
