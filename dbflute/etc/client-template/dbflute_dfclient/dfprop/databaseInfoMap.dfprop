@@ -81,7 +81,7 @@ map:{
         #    o isSuppressCommonColumn: (NotRequired - Default 'false')
         #
         #; additionalSchemaMap = map:{
-        #    ; NEXTSCHEMA = map:{
+        #    ; NEXTEXAMPLEDB = map:{
         #        ; objectTypeTargetList=list:{TABLE ; VIEW}
         #        ; tableExceptList=list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
         #        ; tableTargetList=list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}

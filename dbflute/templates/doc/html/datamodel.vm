@@ -31,7 +31,7 @@
 		text-align: right;
 	}
 	.mainschema {
-		font-size: 60%;
+		font-size: 40%;
 	}
 	
 	/* table */
@@ -128,11 +128,11 @@
       </tr>
     </thead>
     <tbody>
+#foreach ($table in $database.tableDisplaySortedList)
+      <tr>
 #if ($database.hasDatabaseSchema())
         <td class="schemacell">${table.schema}</td>
 #end
-#foreach ($table in $database.tableDisplaySortedList)
-      <tr>
 #if ($database.isAliasDelimiterInDbCommentValid())
         <td class="aliascell">${table.alias}</td>
 #end
