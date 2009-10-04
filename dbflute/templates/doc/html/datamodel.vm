@@ -31,7 +31,7 @@
 		text-align: right;
 	}
 	.mainschema {
-		font-size: 0.5em;
+		text-align: right;
 	}
 	.tableschema {
 		font-size: 0.6em;
@@ -111,10 +111,10 @@
 </head>
 
 <body>
-  <h1>${database.projectName} schema on ${database.databaseName}</h1>
+  <h1>Project Schema for ${database.projectName} (${database.databaseName})</h1>
   <p class="updatedate">${database.timestampExpression}</p>
 #if ($database.hasDatabaseSchema())
-  <p class="mainschema">from ${database.databaseSchema}</p>
+  <p class="mainschema">generated from ${database.databaseSchema}</p>
 #end
   <h2>Table List</h2>
   <table summary="Tables in the Schema">
