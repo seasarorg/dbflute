@@ -112,10 +112,10 @@
 
 <body>
   <h1>Project Schema for ${database.projectName} (${database.databaseName})</h1>
-  <p class="updatedate">${database.timestampExpression}</p>
 #if ($database.hasDatabaseSchema())
-  <p class="mainschema">generated from ${database.databaseSchema}</p>
+  <p class="mainschema">generated from <strong>${database.databaseSchema}</strong></p>
 #end
+  <p class="updatedate">${database.timestampExpression}</p>
   <h2>Table List</h2>
   <table summary="Tables in the Schema">
     <thead>
