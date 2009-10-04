@@ -27,10 +27,9 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                     Constructor
         //                                                                     ===========
         public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
-                       , Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits)
+                       , Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, bool commonColumn)
             : this (dbmeta, columnDbName, columnAlias, propertyName, propertyType, primary
-                  , columnSize, columnDecimalDigits
-                  , OptimisticLockType.NONE) {
+                  , columnSize, columnDecimalDigits, commonColumn, OptimisticLockType.NONE) {
         }
 
         public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
