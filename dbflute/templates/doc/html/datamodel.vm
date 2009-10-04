@@ -50,6 +50,9 @@
 		border-left: 1px solid #555;
 		padding:2px;
 	}
+	.schemacell {
+		white-space: nowrap;
+	}
 	.aliascell {
 		white-space: nowrap;
 	}
@@ -110,6 +113,9 @@
   <table summary="Tables in the Schema">
     <thead>
       <tr>
+#if ($database.hasDatabaseSchema())
+        <th>Schema</th>
+#end
 #if ($database.isAliasDelimiterInDbCommentValid())
         <th>Alias</th>
 #end
@@ -122,6 +128,9 @@
       </tr>
     </thead>
     <tbody>
+#if ($database.hasDatabaseSchema())
+        <td class="schemacell">${table.schema}</td>
+#end
 #foreach ($table in $database.tableDisplaySortedList)
       <tr>
 #if ($database.isAliasDelimiterInDbCommentValid())

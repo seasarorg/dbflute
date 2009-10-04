@@ -18,6 +18,7 @@ package org.seasar.dbflute.helper.jdbc.metadata.info;
 import java.util.Map;
 
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
@@ -117,10 +118,20 @@ public class DfTableMetaInfo {
 
     @Override
     public String toString() {
+        String comment = "";
+        if (_tableComment != null) {
+            final String ln = DfSystemUtil.getLineSeparator();
+            final int indexOf = _tableComment.indexOf(ln);
+            if (indexOf > 0) { // not contain 0 because ignore first line separator
+                comment = _tableComment.substring(0, indexOf);
+            } else {
+                comment = _tableComment;
+            }
+        }
         if (_tableSchema != null && _tableSchema.trim().length() != 0) {
-            return _tableSchema + "." + _tableName + "(" + _tableType + "): " + _tableComment;
+            return _tableSchema + "." + _tableName + "(" + _tableType + "): " + comment;
         } else {
-            return _tableName + "(" + _tableType + "): " + _tableComment;
+            return _tableName + "(" + _tableType + "): " + comment;
         }
     }
 

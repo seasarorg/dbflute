@@ -265,6 +265,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         // * * * * * *
         // Table Loop
         // * * * * * *
+        _log.info("$ /= = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMetaInfo tableMataInfo = tableList.get(i);
             if (tableMataInfo.isOutOfGenerateTarget()) {
@@ -431,7 +432,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
             _databaseNode.appendChild(tableElement);
         } // End of Table Loop
-
+        _log.info("$ = = = = = = = = = =/");
+        
         final boolean exists = setupAddtionalTableIfNeeds(); // since 0.8.0
         if (tableList.isEmpty() && !exists) {
             throwTableNotFoundException();
@@ -538,8 +540,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         for (String additionalSchema : schemaSet) {
             final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, additionalSchema);
             for (DfTableMetaInfo metaInfo : additionalTableList) {
-                final String tmp = metaInfo.getTableSchema();
-                if (tmp == null || tmp.trim().length() == 0) {
+                final String metaDataSchema = metaInfo.getTableSchema();
+                if (metaDataSchema == null || metaDataSchema.trim().length() == 0) {
                     metaInfo.setTableSchema(additionalSchema);
                 }
             }

@@ -56,9 +56,13 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
+            System.out.println("[" + schemaName + "]");
             resultSet = dbMeta.getTables(null, schemaName, "%", objectTypes);
             while (resultSet.next()) {
                 final String tableName = resultSet.getString(3);
+                
+                System.out.println("************: " + schemaName + "." + tableName);
+                
                 final String tableType = resultSet.getString(4);
                 final String tableSchema = resultSet.getString("TABLE_SCHEM");
                 final String tableComment = resultSet.getString("REMARKS");
