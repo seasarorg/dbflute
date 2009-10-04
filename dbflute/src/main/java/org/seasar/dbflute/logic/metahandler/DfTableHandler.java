@@ -19,6 +19,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,13 +57,10 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
-            System.out.println("[" + schemaName + "]");
+            _log.info("$ ...Getting tables: schema=" + schemaName + " objectTypes=" + Arrays.asList(objectTypes));
             resultSet = dbMeta.getTables(null, schemaName, "%", objectTypes);
             while (resultSet.next()) {
                 final String tableName = resultSet.getString(3);
-                
-                System.out.println("************: " + schemaName + "." + tableName);
-                
                 final String tableType = resultSet.getString(4);
                 final String tableSchema = resultSet.getString("TABLE_SCHEM");
                 final String tableComment = resultSet.getString("REMARKS");
@@ -99,11 +97,21 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
             final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(schemaName);
             if (schemaInfo != null) {
                 final List<String> objectTypeTargetList = schemaInfo.getObjectTypeTargetList();
+                assertObjectTypeTargetListNotEmpty(schemaName, objectTypeTargetList);
                 return objectTypeTargetList.toArray(new String[objectTypeTargetList.size()]);
             }
         }
         final List<String> objectTypeTargetList = getProperties().getDatabaseProperties().getObjectTypeTargetList();
+        assertObjectTypeTargetListNotEmpty(schemaName, objectTypeTargetList);
         return objectTypeTargetList.toArray(new String[objectTypeTargetList.size()]);
+    }
+
+    protected void assertObjectTypeTargetListNotEmpty(String schemaName, List<String> objectTypeTargetList) {
+        if (objectTypeTargetList == null || objectTypeTargetList.isEmpty()) {
+            String msg = "The property 'objectTypeTargetList' should be required:";
+            msg = msg + " schemaName=" + schemaName;
+            throw new IllegalStateException(msg);
+        }
     }
 
     /**

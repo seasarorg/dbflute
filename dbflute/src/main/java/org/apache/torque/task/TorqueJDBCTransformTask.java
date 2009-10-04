@@ -233,10 +233,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _log.info("$ dbMetaData.toString(): " + dbMetaData.toString());
         _log.info("$ dbMetaData.getMaxRowSize(): " + dbMetaData.getMaxRowSize());
         _log.info("$ ");
-        _log.info(getObjectTypeLogString());
-        _log.info(getAdditionalSchemaLogString());
-        _log.info("$ ");
-        _log.info("$ ...Getting tables");
         final List<DfTableMetaInfo> tableList = getTableNames(dbMetaData);
         _log.info("$ Table Count: " + tableList.size());
         _log.info("$ *************************************/");
@@ -433,32 +429,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             _databaseNode.appendChild(tableElement);
         } // End of Table Loop
         _log.info("$ = = = = = = = = = =/");
-        
+
         final boolean exists = setupAddtionalTableIfNeeds(); // since 0.8.0
         if (tableList.isEmpty() && !exists) {
             throwTableNotFoundException();
         }
         _doc.appendChild(_databaseNode);
-    }
-
-    protected String getObjectTypeLogString() {
-        final List<String> objectTypeTargetList = getDatabaseProperties().getObjectTypeTargetList();
-        String typeString = "";
-        int i = 0;
-        for (String objectType : objectTypeTargetList) {
-            if (i == 0) {
-                typeString = objectType;
-            } else {
-                typeString = typeString + ", " + objectType;
-            }
-            ++i;
-        }
-        return "$ Object Types: {" + typeString + "}";
-    }
-
-    protected String getAdditionalSchemaLogString() {
-        final Map<String, DfAdditionalSchemaInfo> schemaMap = getDatabaseProperties().getAdditionalSchemaMap();
-        return "$ Additional Schemas: " + schemaMap.keySet();
     }
 
     protected void throwTableNotFoundException() {
