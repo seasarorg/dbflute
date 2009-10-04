@@ -981,10 +981,14 @@ public class Database {
     public String getDatabaseSchema() {
         return getProperties().getDatabaseProperties().getDatabaseSchema();
     }
-    
+
     public boolean hasDatabaseSchema() {
         String databaseSchema = getDatabaseSchema();
         return databaseSchema != null && databaseSchema.trim().length() > 0;
+    }
+
+    public boolean hasAdditionalSchema() {
+        return !getProperties().getDatabaseProperties().getAdditionalSchemaMap().isEmpty();
     }
 
     // ===================================================================================

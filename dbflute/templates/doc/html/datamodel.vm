@@ -31,7 +31,7 @@
 		text-align: right;
 	}
 	.mainschema {
-		font-size: 40%;
+		font-size: 0.5em;
 	}
 	
 	/* table */
@@ -51,6 +51,7 @@
 		padding:2px;
 	}
 	.schemacell {
+		font-size: 0.8em;
 		white-space: nowrap;
 	}
 	.aliascell {
@@ -113,7 +114,7 @@
   <table summary="Tables in the Schema">
     <thead>
       <tr>
-#if ($database.hasDatabaseSchema())
+#if ($database.hasAdditionalSchema())
         <th>Schema</th>
 #end
 #if ($database.isAliasDelimiterInDbCommentValid())
@@ -130,8 +131,8 @@
     <tbody>
 #foreach ($table in $database.tableDisplaySortedList)
       <tr>
-#if ($database.hasDatabaseSchema())
-        <td class="schemacell">${table.schema}</td>
+#if ($database.hasAdditionalSchema())
+        <td class="schemacell">#if ($table.hasSchema()) ${table.schema}#else &nbsp;#end</td>
 #end
 #if ($database.isAliasDelimiterInDbCommentValid())
         <td class="aliascell">${table.alias}</td>

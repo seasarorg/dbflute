@@ -361,6 +361,10 @@ public class Table {
         this._schema = schema;
     }
 
+    public boolean hasSchema() {
+        return _schema != null && _schema.trim().length() > 0;
+    }
+
     public boolean isAdditionalSchema() {
         if (_schema != null && _schema.trim().length() > 0) {
             return getDatabaseProperties().isAdditionalSchema(_schema);
