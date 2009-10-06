@@ -365,6 +365,10 @@ public class Table {
         return _schema != null && _schema.trim().length() > 0;
     }
 
+    public boolean isMainSchema() {
+        return !isAdditionalSchema();
+    }
+
     public boolean isAdditionalSchema() {
         if (_schema != null && _schema.trim().length() > 0) {
             return getDatabaseProperties().isAdditionalSchema(_schema);

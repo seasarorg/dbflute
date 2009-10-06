@@ -1,8 +1,11 @@
 package org.seasar.dbflute.properties;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.torque.engine.database.model.Table;
 
 /**
  * @author jflute
@@ -175,9 +178,66 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         final File xlsFile = new File("./output/doc/data-xls-template.xls");
         return xlsFile;
     }
-    
+
     public File getDataCsvTemplateDir() {
         final File xlsFile = new File("./output/doc/csvdata");
         return xlsFile;
+    }
+
+    // ===================================================================================
+    //                                                              Table Display Order By
+    //                                                              ======================
+    public Comparator<Table> getTableDisplayOrderBy() {
+        return new Comparator<Table>() {
+            public int compare(Table table1, Table table2) {
+                // = = = =
+                // Schema
+                // = = = =
+                // The main schema has priority
+                {
+                    final boolean mainSchema1 = table1.isMainSchema();
+                    final boolean mainSchema2 = table1.isMainSchema();
+                    if (mainSchema1 != mainSchema2) {
+                        if (mainSchema1) {
+                            return -1;
+                        }
+                        if (mainSchema2) {
+                            return 1;
+                        }
+                        // Unreachable!
+                    }
+                    final String schema1 = table1.getSchema();
+                    final String schema2 = table2.getSchema();
+                    if (schema1 != null && schema2 != null && !schema1.equals(schema2)) {
+                        return schema1.compareTo(schema2);
+                    }
+                }
+
+                // = = =
+                // Type
+                // = = =
+                {
+                    final String type1 = table1.getType();
+                    final String type2 = table2.getType();
+                    if (!type1.equals(type2)) {
+                        // The table type has priority
+                        if (table1.isTypeTable()) {
+                            return -1;
+                        }
+                        if (table2.isTypeTable()) {
+                            return 1;
+                        }
+                        return type1.compareTo(type2);
+                    }
+                }
+
+                // = = =
+                // Table
+                // = = =
+                final String name1 = table1.getName();
+                final String name2 = table2.getName();
+                return name1.compareTo(name2);
+            }
+        };
     }
 }

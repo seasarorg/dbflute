@@ -190,24 +190,8 @@ public class Database {
     }
 
     public List<Table> getTableDisplaySortedList() {
-        final TreeSet<Table> tableSet = new TreeSet<Table>(new Comparator<Table>() {
-            public int compare(Table table1, Table table2) {
-                final String type1 = table1.getType();
-                final String type2 = table2.getType();
-                if (!type1.equals(type2)) {
-                    if (table1.isTypeTable()) {
-                        return -1;
-                    }
-                    if (table2.isTypeTable()) {
-                        return 1;
-                    }
-                    return type1.compareTo(type2);
-                }
-                final String name1 = table1.getName();
-                final String name2 = table2.getName();
-                return name1.compareTo(name2);
-            }
-        });
+        final Comparator<Table> tableDisplayOrderBy = getProperties().getDocumentProperties().getTableDisplayOrderBy();
+        final TreeSet<Table> tableSet = new TreeSet<Table>(tableDisplayOrderBy);
         tableSet.addAll(getTableList());
         return new ArrayList<Table>(tableSet);
     }
