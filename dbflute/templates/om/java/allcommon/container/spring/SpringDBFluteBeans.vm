@@ -8,7 +8,7 @@
     <bean class="${glPackageBaseCommon}.${glDBFluteInitializer}">
         <constructor-arg index="0"><ref bean="${database.DBFluteBeansDataSourceName}"/></constructor-arg>
     </bean>
-#if ($database.hasExtendedImplementedInvokerAssistantClassValid())
+#if ($database.hasExtendedImplementedInvokerAssistantClass())
     <bean id="${database.invokerAssistantComponentName}" class="${database.extendedImplementedInvokerAssistantClass}" autowire="byType">
 #else
     <bean id="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}" autowire="byType">

@@ -60,7 +60,7 @@ public class ${glDBFluteModule} {
     }
 
     protected ${glImplementedInvokerAssistant} createImplementedInvokerAssistant(BehaviorCommandInvoker behaviorCommandInvoker) {
-#if ($database.hasExtendedImplementedInvokerAssistantClassValid())
+#if ($database.hasExtendedImplementedInvokerAssistantClass())
         ${glImplementedInvokerAssistant} invokerAssistant = new ${database.extendedImplementedInvokerAssistantClass}();
 #else
         ${glImplementedInvokerAssistant} invokerAssistant = new ${glImplementedInvokerAssistant}();
