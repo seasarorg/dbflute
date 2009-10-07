@@ -9,6 +9,9 @@ import org.seasar.dbflute.helper.collection.DfFlexibleMap;
  * @author jflute
  */
 public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProperties {
+    // /- - - - - - - - - - - - - - - - - - - 
+    // It's closet until it becomes to need!
+    // - - - - - - - - - -/
 
     // ===================================================================================
     //                                                                         Constructor
@@ -20,6 +23,13 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
     // ===================================================================================
     //                                                                 MultipleFK Property
     //                                                                 ===================
+    // map:{
+    //     ; [tableName] = map:{
+    //         ; [columnName]/[columnName] = map:{
+    //             ; columnAliasName = [aliasName]
+    //         }
+    //     }
+    // }
     public static final String KEY_multipleFKPropertyMap = "multipleFKPropertyMap";
     protected Map<String, Map<String, Map<String, String>>> _multipleFKPropertyMap;
 
@@ -32,17 +42,17 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
         return _multipleFKPropertyMap;
     }
 
-    public DfFlexibleMap<String, Map<String, Map<String, String>>> getMultipleFKPropertyMapAsFlexible() {
+    public DfFlexibleMap<String, Map<String, Map<String, String>>> asFlexible() {
         return new DfFlexibleMap<String, Map<String, Map<String, String>>>(getMultipleFKPropertyMap());
     }
 
     public String getMultipleFKPropertyColumnAliasName(String tableName, java.util.List<String> columnNameList) {
-        final Map<String, Map<String, String>> foreignKeyMap = getMultipleFKPropertyMapAsFlexible().get(tableName);
+        final Map<String, Map<String, String>> foreignKeyMap = asFlexible().get(tableName);
         if (foreignKeyMap == null) {
             return "";
         }
         final String columnKey = createMultipleFKPropertyColumnKey(columnNameList);
-        final DfFlexibleMap<String, Map<String, String>> foreignKeyFxMap = getMultipleFKPropertyForeignKeyMapAsFlexible(foreignKeyMap);
+        final DfFlexibleMap<String, Map<String, String>> foreignKeyFxMap = asFlexible(foreignKeyMap);
         final Map<String, String> foreignPropertyElement = foreignKeyFxMap.get(columnKey);
         if (foreignPropertyElement == null) {
             return "";
@@ -60,10 +70,7 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
         return sb.toString();
     }
 
-    protected DfFlexibleMap<String, Map<String, String>> getMultipleFKPropertyForeignKeyMapAsFlexible(
-            final Map<String, Map<String, String>> foreignKeyMap) {
-        final DfFlexibleMap<String, Map<String, String>> foreignKeyFxMap = new DfFlexibleMap<String, Map<String, String>>(
-                foreignKeyMap);
-        return foreignKeyFxMap;
+    protected DfFlexibleMap<String, Map<String, String>> asFlexible(final Map<String, Map<String, String>> foreignKeyMap) {
+        return new DfFlexibleMap<String, Map<String, String>>(foreignKeyMap);
     }
 }

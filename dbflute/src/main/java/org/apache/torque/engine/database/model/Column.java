@@ -73,7 +73,6 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.xml.sax.Attributes;
 
@@ -1332,8 +1331,7 @@ public class Column {
     //                                                                       Include Query
     //                                                                       =============
     protected boolean hasQueryRestrictionByClassification() {
-        final DfLittleAdjustmentProperties prop = getTable().getProperties().getLittleAdjustmentProperties();
-        return !prop.isMakeConditionQueryClassificationRestriction() && hasClassification();
+        return hasClassification();
     }
 
     protected boolean hasQueryRestrictionByFlgClassification() {
@@ -1400,6 +1398,7 @@ public class Column {
     }
 
     public boolean isAvailableStringInScope() {
+        // It's available if it's flag because this is so basic comparison.
         return getIncludeQueryProperties().isAvailableStringInScope(getTableName(), getName());
     }
 
@@ -1449,6 +1448,7 @@ public class Column {
     }
 
     public boolean isAvailableNumberInScope() {
+        // It's available if it's flag because this is so basic comparison.
         return getIncludeQueryProperties().isAvailableNumberInScope(getTableName(), getName());
     }
 
@@ -1492,7 +1492,7 @@ public class Column {
 
     // ---------------------------------------
     //                     String Old AsInline
-    //                                  ------
+    //                     -------------------
     public boolean isAvailableStringEqualOldAsInline() {
         return getIncludeQueryProperties().isAvailableStringEqualOldAsInline(getTableName(), getName());
     }

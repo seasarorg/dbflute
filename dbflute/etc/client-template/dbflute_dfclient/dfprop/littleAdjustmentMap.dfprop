@@ -70,16 +70,5 @@ map:{
     #
     #; isMakeRecentlyDeprecated = true
     # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isDeleteOldTableClass (NotRequired - Default 'true')
-    #   [true]
-    #     Delete old table class when generate and sql2entity.
-    #
-    #   [false]
-    #     Non.
-    #
-    #; isDeleteOldTableClass = true
-    # - - - - - - - - - -/
 }
 # ----------------/

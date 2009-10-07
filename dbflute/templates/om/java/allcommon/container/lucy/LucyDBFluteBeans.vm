@@ -3,14 +3,18 @@
 <lucy-config>
     <!-- The components of DBFlute Runtime. -->
     <component class="${glPackageBaseCommon}.${glDBFluteInitializer}"/>
-#if ($database.hasExtendedImplementedInvokerAssistantClassValid())
+#if ($database.hasExtendedImplementedInvokerAssistantClass())
     <component name="${database.invokerAssistantComponentName}" class="${database.extendedImplementedInvokerAssistantClass}">
 #else
     <component name="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}">
 #end
         <inject method="setDataSource">${database.DBFluteBeansDataSourceName}</inject>
     </component>
+#if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
+    <component name="${database.commonColumnAutoSetupperComponentName}" class="${database.extendedImplementedCommonColumnAutoSetupperClass}"/>
+#else
     <component name="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}"/>
+#end
     <component name="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}">
         <inject method="setContainer">lucy</inject>
     </component>

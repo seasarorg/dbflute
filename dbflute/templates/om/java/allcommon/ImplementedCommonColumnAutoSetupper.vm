@@ -17,8 +17,8 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
     //                                                                            ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(${glImplementedCommonColumnAutoSetupper}.class);
-
 #if ($database.isExistCommonColumnSetupElement())
+
     // =====================================================================================
     //                                                                             Attribute
     //                                                                             =========
@@ -41,21 +41,15 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
     }
 
 #end
-#end
     // =====================================================================================
     //                                                                                Set up
     //                                                                                ======
     /**
-     * Handle common columns of insert if it needs.
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * {@inheritDoc}
      */
     public void handleCommonColumnOfInsertIfNeeds(Entity targetEntity) {
-#if ($database.isExistCommonColumnSetupElement())
-        if (!(targetEntity instanceof ${glEntityDefinedCommonColumn})) {
-            return;
-        }
-        final ${glEntityDefinedCommonColumn} entity = (${glEntityDefinedCommonColumn})targetEntity;
-        if (!entity.canCommonColumnAutoSetup()) {
+        final ${glEntityDefinedCommonColumn} entity = askIfEntitySetup(targetEntity);
+        if (entity == null) {
             return;
         }
         log(entity, "INSERT");
@@ -79,20 +73,14 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
 #end
 #end
 #end
-#end
     }
 
     /**
-     * Handle common columns of update if it needs.
-     * @param targetEntity Target entity that the type is entity interface. (NotNull)
+     * {@inheritDoc}
      */
     public void handleCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
-#if ($database.isExistCommonColumnSetupElement())
-        if (!(targetEntity instanceof ${glEntityDefinedCommonColumn})) {
-            return;
-        }
-        final ${glEntityDefinedCommonColumn} entity = (${glEntityDefinedCommonColumn})targetEntity;
-        if (!entity.canCommonColumnAutoSetup()) {
+        final ${glEntityDefinedCommonColumn} entity = askIfEntitySetup(targetEntity);
+        if (entity == null) {
             return;
         }
         log(entity, "UPDATE");
@@ -116,9 +104,52 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
 #end
 #end
 #end
-#end
     }
 
+    // =====================================================================================
+    //                                                                         Assist Helper
+    //                                                                         =============
+    protected ${glEntityDefinedCommonColumn} askIfEntitySetup(Entity targetEntity) {
+        if (!hasCommonColumn(targetEntity)) {
+            return null;
+        }
+        final ${glEntityDefinedCommonColumn} entity = downcastEntity(targetEntity);
+        if (!canCommonColumnAutoSetup(entity)) {
+            return null;
+        }
+        return entity;
+    }
+
+    protected boolean hasCommonColumn(Entity targetEntity) {
+        return targetEntity instanceof ${glEntityDefinedCommonColumn};
+    }
+
+    protected boolean canCommonColumnAutoSetup(${glEntityDefinedCommonColumn} entity) {
+        return entity.canCommonColumnAutoSetup();
+    }
+
+    protected ${glEntityDefinedCommonColumn} downcastEntity(Entity targetEntity) {
+        return (${glEntityDefinedCommonColumn})targetEntity;
+    }
+#else
+
+    // =====================================================================================
+    //                                                                                Set up
+    //                                                                                ======
+    /**
+     * {@inheritDoc}
+     */
+    public void handleCommonColumnOfInsertIfNeeds(Entity targetEntity) {
+
+    /**
+     * {@inheritDoc}
+     */
+    public void handleCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
+#end
+
+    // =====================================================================================
+    //                                                                               Logging
+    //                                                                               =======
     protected void log(${glEntityDefinedCommonColumn} entity, String keyword) {
         if (_log.isDebugEnabled()) {
             _log.debug("...Setting up column columns of " + entity.getTableDbName() + " before " + keyword + "!");

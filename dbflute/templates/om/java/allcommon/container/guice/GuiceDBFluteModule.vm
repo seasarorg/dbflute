@@ -33,7 +33,7 @@ public class ${glDBFluteModule} extends AbstractModule {
         BehaviorCommandInvoker behaviorCommandInvoker = new BehaviorCommandInvoker();
         ${glImplementedInvokerAssistant} invokerAssistant = createImplementedInvokerAssistant(behaviorCommandInvoker);
         behaviorCommandInvoker.setInvokerAssistant(invokerAssistant);
-        ${glImplementedCommonColumnAutoSetupper} commonColumnAutoSetupper = new ${glImplementedCommonColumnAutoSetupper}();
+        ${glImplementedCommonColumnAutoSetupper} commonColumnAutoSetupper = createImplementedCommonColumnAutoSetupper();
         
         bind(BehaviorSelector.class).toInstance(behaviorSelector);
         bind(BehaviorCommandInvoker.class).toInstance(behaviorCommandInvoker);
@@ -66,5 +66,13 @@ public class ${glDBFluteModule} extends AbstractModule {
         invokerAssistant.setBehaviorCommandInvoker(behaviorCommandInvoker);
         invokerAssistant.setDataSource(dataSource);
         return invokerAssistant;
+    }
+
+    protected ${glImplementedCommonColumnAutoSetupper} createImplementedCommonColumnAutoSetupper() {
+#if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
+        return new ${database.extendedImplementedCommonColumnAutoSetupperClass}();
+#else
+        return new ${glImplementedCommonColumnAutoSetupper}();
+#end
     }
 }

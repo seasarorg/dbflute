@@ -181,7 +181,7 @@ namespace ${myExtendedEntityPackageName} {
         #region Classification Name/Alias
 #foreach ($col in $table.Columns)
 #if ($col.hasClassification())
-#if (!$col.isTableClassification() || $database.isMakeEntityTableClassificationNameAlias())
+#if (!$col.isTableClassification())
 #if ($col.hasClassificationName())
         public String ${col.javaName}Name {
             get {

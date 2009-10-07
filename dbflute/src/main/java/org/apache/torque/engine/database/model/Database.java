@@ -1292,32 +1292,32 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isMakeEntityTraceRelation();
     }
 
-    public boolean isMakeEntityS2DaoAnnotation() {
-        return getProperties().getLittleAdjustmentProperties().isMakeEntityS2DaoAnnotation();
+    public boolean hasExtendedImplementedInvokerAssistantClass() {
+        return getProperties().getLittleAdjustmentProperties().hasExtendedImplementedInvokerAssistantClass();
     }
 
-    public boolean isMakeEntityTableClassificationNameAlias() {
-        return getProperties().getLittleAdjustmentProperties().isMakeEntityTableClassificationNameAlias();
+    public String getExtendedImplementedInvokerAssistantClass() {
+        return getProperties().getLittleAdjustmentProperties().getExtendedImplementedInvokerAssistantClass();
     }
 
-    public boolean isMakeFlatExpansion() {
-        return getProperties().getLittleAdjustmentProperties().isMakeFlatExpansion();
+    public boolean hasExtendedImplementedCommonColumnAutoSetupperClass() {
+        return getProperties().getLittleAdjustmentProperties().hasExtendedImplementedCommonColumnAutoSetupperClass();
     }
 
-    public boolean isMakeDaoInterface() {
-        return getProperties().getLittleAdjustmentProperties().isMakeDaoInterface();
+    public String getExtendedImplementedCommonColumnAutoSetupperClass() {
+        return getProperties().getLittleAdjustmentProperties().getExtendedImplementedCommonColumnAutoSetupperClass();
+    }
+
+    public boolean hasExtendedS2DaoSettingClassValid() {
+        return getProperties().getLittleAdjustmentProperties().hasExtendedS2DaoSettingClassValid();
+    }
+
+    public String getExtendedS2DaoSettingClass() {
+        return getProperties().getLittleAdjustmentProperties().getExtendedS2DaoSettingClass();
     }
 
     public boolean isStopGenerateExtendedBhv() {
         return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedBhv();
-    }
-
-    public String getStatementResultSetType() {
-        return getProperties().getLittleAdjustmentProperties().getStatementResultSetType();
-    }
-
-    public String getStatementResultSetConcurrency() {
-        return getProperties().getLittleAdjustmentProperties().getStatementResultSetConcurrency();
     }
 
     public boolean isStopGenerateExtendedDao() {
@@ -1328,36 +1328,12 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedEntity();
     }
 
-    public String getExtractAcceptStartBrace() {
-        return getProperties().getLittleAdjustmentProperties().getExtractAcceptStartBrace();
+    public boolean isMakeFlatExpansion() {
+        return getProperties().getLittleAdjustmentProperties().isMakeFlatExpansion();
     }
 
-    public String getExtractAcceptEndBrace() {
-        return getProperties().getLittleAdjustmentProperties().getExtractAcceptEndBrace();
-    }
-
-    public String getExtractAcceptDelimiter() {
-        return getProperties().getLittleAdjustmentProperties().getExtractAcceptDelimiter();
-    }
-
-    public String getExtractAcceptEqual() {
-        return getProperties().getLittleAdjustmentProperties().getExtractAcceptEqual();
-    }
-
-    public boolean hasExtendedImplementedInvokerAssistantClassValid() {
-        return getProperties().getLittleAdjustmentProperties().hasExtendedImplementedInvokerAssistantClassValid();
-    }
-
-    public String getExtendedImplementedInvokerAssistantClass() {
-        return getProperties().getLittleAdjustmentProperties().getExtendedImplementedInvokerAssistantClass();
-    }
-
-    public boolean hasExtendedS2DaoSettingClassValid() {
-        return getProperties().getLittleAdjustmentProperties().hasExtendedS2DaoSettingClassValid();
-    }
-
-    public String getExtendedS2DaoSettingClass() {
-        return getProperties().getLittleAdjustmentProperties().getExtendedS2DaoSettingClass();
+    public boolean isMakeDaoInterface() {
+        return getProperties().getLittleAdjustmentProperties().isMakeDaoInterface();
     }
 
     // ===================================================================================

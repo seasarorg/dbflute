@@ -16,7 +16,11 @@
         <property name="dataSource"><ref bean="${database.DBFluteBeansDataSourceName}"/></property>
         <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
     </bean>
+#if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
+    <bean id="${database.commonColumnAutoSetupperComponentName}" class="${database.extendedImplementedCommonColumnAutoSetupperClass}" autowire="byType"/>
+#else
     <bean id="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}" autowire="byType"/>
+#end
     <bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}" autowire="byType"/>
     <bean id="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker" autowire="byType">
         <property name="invokerAssistant"><ref bean="${database.invokerAssistantComponentName}"/></property>

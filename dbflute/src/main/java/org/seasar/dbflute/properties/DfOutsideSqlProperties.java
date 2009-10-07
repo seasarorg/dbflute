@@ -121,10 +121,6 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         if (value != null && value.trim().length() > 0 && !value.trim().equalsIgnoreCase("null")) {
             return value;
         }
-        DfLittleAdjustmentProperties prop = getLittleAdjustmentProperties();
-        if (prop.hasDaoSqlFileEncoding()) { // for compatible!
-            return prop.getDaoSqlFileEncoding();
-        }
         return "UTF-8";
     }
 

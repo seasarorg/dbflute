@@ -3,8 +3,6 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.util.DfStringUtil;
-
 /**
  * @author jflute
  */
@@ -60,13 +58,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                              ToLower in Generator Underscore Method
-    //                                              ======================================
-    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() { // It's closet!
-        return isProperty("isAvailableToLowerInGeneratorUnderscoreMethod", true);
-    }
-
-    // ===================================================================================
     //                                                                     Make Deprecated
     //                                                                     ===============
     public boolean isMakeDeprecated() {
@@ -84,108 +75,46 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }
 
-    public boolean isMakeConditionQueryClassificationRestriction() { // It's closet!
-        return isProperty("isMakeConditionQueryClassificationRestriction", false);
-    }
-
     // ===================================================================================
-    //                                                                              Entity
-    //                                                                              ======
+    //                                                                         Make Entity
+    //                                                                         ===========
     public boolean isMakeEntityTraceRelation() { // It's closet!
         return isProperty("isMakeEntityTraceRelation", false);
     }
 
-    public boolean isMakeEntityS2DaoAnnotation() { // It's closet!
-        return isProperty("isMakeEntityS2DaoAnnotation", false);
-    }
-
-    public boolean isMakeEntityTableClassificationNameAlias() { // It's closet!
-        return isProperty("isMakeEntityTableClassificationNameAlias", false);
-    }
-
     // ===================================================================================
-    //                                                                            Behavior
-    //                                                                            ========
-    public boolean isMakeFlatExpansion() { // It's closet!
-        return isProperty("isMakeFlatExpansion", false);
+    //                                                                  Extended Component
+    //                                                                  ==================
+    public boolean hasExtendedImplementedInvokerAssistantClass() {
+        String str = getExtendedImplementedInvokerAssistantClass();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    // ===================================================================================
-    //                                                                                 Dao
-    //                                                                                 ===
-    public boolean isMakeDaoInterface() { // It's closet!
-        if (isTargetLanguageCSharp()) {
-            return true; // It is not implemented at CSharp yet
-        }
-        final boolean makeDaoInterface = booleanProp("torque.isMakeDaoInterface", false);
-        if (makeDaoInterface) {
-            String msg = "Dao interfaces are unsupported since DBFlute-0.8.7!";
-            throw new UnsupportedOperationException(msg);
-        }
-        return false;
+    public String getExtendedImplementedInvokerAssistantClass() { // It's closet! Java Only
+        return getProperty("extendedImplementedInvokerAssistantClass", null);
     }
 
-    protected boolean isTargetLanguageCSharp() {
-        return getBasicProperties().isTargetLanguageCSharp();
+    public boolean hasExtendedImplementedCommonColumnAutoSetupperClass() {
+        String str = getExtendedImplementedInvokerAssistantClass();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    // ===================================================================================
-    //                                                                          Result Set
-    //                                                                          ==========
-    public String getStatementResultSetType() {
-        String value = getProperty("statementResultSetType", "ResultSet.TYPE_FORWARD_ONLY");
-        if (value.startsWith("ResultSet.")) {
-            return "java.sql." + value;
-        }
-        return value;
+    public String getExtendedImplementedCommonColumnAutoSetupperClass() { // It's closet! Java Only (future C#)
+        return getProperty("extendedImplementedCommonColumnAutoSetupperClass", null);
     }
 
-    public String getStatementResultSetConcurrency() {
-        String value = getProperty("statementResultSetConcurrency", "ResultSet.CONCUR_READ_ONLY");
-        if (value.startsWith("ResultSet.")) {
-            return "java.sql." + value;
-        }
-        return value;
+    public boolean hasExtendedS2DaoSettingClassValid() {
+        String str = getExtendedS2DaoSettingClass();
+        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    // ===================================================================================
-    //                                                                       Stop Generate
-    //                                                                       =============
-    public boolean isStopGenerateExtendedBhv() { // It's closet!
-        return isProperty("isStopGenerateExtendedBhv", false);
-    }
-
-    public boolean isStopGenerateExtendedDao() { // It's closet!
-        return isProperty("isStopGenerateExtendedDao", false);
-    }
-
-    public boolean isStopGenerateExtendedEntity() { // It's closet!
-        return isProperty("isStopGenerateExtendedEntity", false);
-    }
-
-    // ===================================================================================
-    //                                                                      Extract Accept
-    //                                                                      ==============
-    public String getExtractAcceptStartBrace() { // It's closet!
-        return getProperty("extractAcceptStartBrace", "@{");
-    }
-
-    public String getExtractAcceptEndBrace() { // It's closet!
-        return getProperty("extractAcceptEndBrace", "@}");
-    }
-
-    public String getExtractAcceptDelimiter() { // It's closet!
-        return getProperty("extractAcceptDelimiter", "@;");
-    }
-
-    public String getExtractAcceptEqual() { // It's closet!
-        return getProperty("extractAcceptEqual", "@=");
+    public String getExtendedS2DaoSettingClass() { // It's closet! CSharp Only
+        return getProperty("extendedS2DaoSettingClass", null);
     }
 
     // ===================================================================================
     //                                                                   Alternate Control
     //                                                                   =================
-    // Very Internal
     public boolean isAlternateGenerateControlValid() {
         final String str = getAlternateGenerateControl();
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
@@ -205,51 +134,24 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                                       S2Dao Version
+    //                                                                       Stop Generate
     //                                                                       =============
-    // [Unused on 0.8.8.1]
-    // public boolean isVersionAfter1047() {
-    //     return hasS2DaoVersion() ? isS2DaoVersionGreaterEqual("1.0.47") : true;
-    // }
-    protected boolean hasS2DaoVersion() {
-        final String value = stringProp("torque.s2daoVersion", null);
-        if (value != null && value.trim().length() != 9) {
-            return true;
-        }
-        return false;
+    public boolean isStopGenerateExtendedBhv() { // It's closet! Basically CSharp Only
+        return isProperty("isStopGenerateExtendedBhv", false);
     }
 
-    protected String getS2DaoVersion() {
-        String s2daoVersion = getProperty("s2daoVersion", null);
-
-        // If null, return the latest version!
-        return s2daoVersion != null ? DfStringUtil.replace(s2daoVersion, ".", "") : "9.9.99";
+    public boolean isStopGenerateExtendedDao() { // It's closet! Basically CSharp Only
+        return isProperty("isStopGenerateExtendedDao", false);
     }
 
-    protected boolean isS2DaoVersionGreaterEqual(String targetVersion) {
-        final String s2daoVersion = getS2DaoVersion();
-        final String filteredTargetVersion = DfStringUtil.replace(targetVersion, ".", "");
-        return s2daoVersion.compareToIgnoreCase(filteredTargetVersion) >= 0;
-    }
-
-    public boolean hasDaoSqlFileEncoding() { // for compatible!
-        final String daoSqlFileEncoding = getDaoSqlFileEncoding();
-        if (daoSqlFileEncoding != null && daoSqlFileEncoding.trim().length() != 0) {
-            return true;
-        }
-        return false;
-    }
-
-    public String getDaoSqlFileEncoding() { // for compatible!
-        final String defaultEncoding = "UTF-8";
-        final String property = stringProp("torque.daoSqlFileEncoding", defaultEncoding);
-        return !property.equals("null") ? property : defaultEncoding;
+    public boolean isStopGenerateExtendedEntity() { // It's closet! Basically CSharp Only
+        return isProperty("isStopGenerateExtendedEntity", false);
     }
 
     // ===================================================================================
     //                                                              Delete Old Table Class
     //                                                              ======================
-    public boolean isDeleteOldTableClass() {
+    public boolean isDeleteOldTableClass() { // It's closet and internal!
         // The default value is true since 0.8.8.1.
         return isProperty("isDeleteOldTableClass", true);
     }
@@ -257,32 +159,41 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                          Skip Generate If Same File
     //                                                          ==========================
-    public boolean isSkipGenerateIfSameFile() { // It's closet!
+    public boolean isSkipGenerateIfSameFile() { // It's closet and internal!
         // The default value is true since 0.7.8.
         return isProperty("isSkipGenerateIfSameFile", true);
     }
 
     // ===================================================================================
-    //                                        Extended Implemented Invoker Assistant Class
-    //                                        ============================================
-    public boolean hasExtendedImplementedInvokerAssistantClassValid() {
-        String str = getExtendedImplementedInvokerAssistantClass();
-        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
-    }
-
-    public String getExtendedImplementedInvokerAssistantClass() { // It's closet! Java Only
-        return getProperty("extendedImplementedInvokerAssistantClass", null);
+    //                                              ToLower in Generator Underscore Method
+    //                                              ======================================
+    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() { // It's closet and internal!
+        return isProperty("isAvailableToLowerInGeneratorUnderscoreMethod", true);
     }
 
     // ===================================================================================
-    //                                                        Extended S2Dao Setting Class
-    //                                                        ============================
-    public boolean hasExtendedS2DaoSettingClassValid() {
-        String str = getExtendedS2DaoSettingClass();
-        return str != null && str.trim().length() > 0 && !str.trim().equals("null");
+    //                                                                      Flat Expansion
+    //                                                                      ==============
+    public boolean isMakeFlatExpansion() { // It's closet until review!
+        return isProperty("isMakeFlatExpansion", false);
     }
 
-    public String getExtendedS2DaoSettingClass() { // It's closet! CSharp Only
-        return getProperty("extendedS2DaoSettingClass", null);
+    // ===================================================================================
+    //                                                                               S2Dao
+    //                                                                               =====
+    public boolean isMakeDaoInterface() { // It's closet! CSharp Only
+        if (isTargetLanguageCSharp()) {
+            return true; // It is not implemented at CSharp yet
+        }
+        final boolean makeDaoInterface = booleanProp("torque.isMakeDaoInterface", false);
+        if (makeDaoInterface) {
+            String msg = "Dao interfaces are unsupported since DBFlute-0.8.7!";
+            throw new UnsupportedOperationException(msg);
+        }
+        return false;
+    }
+
+    protected boolean isTargetLanguageCSharp() {
+        return getBasicProperties().isTargetLanguageCSharp();
     }
 }
