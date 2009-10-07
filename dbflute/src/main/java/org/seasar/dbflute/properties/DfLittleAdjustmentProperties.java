@@ -95,7 +95,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     public boolean hasExtendedImplementedCommonColumnAutoSetupperClass() {
-        String str = getExtendedImplementedInvokerAssistantClass();
+        String str = getExtendedImplementedCommonColumnAutoSetupperClass();
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
