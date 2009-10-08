@@ -125,7 +125,9 @@
 			</zipfileset>
 	      	<zipfileset prefix="etc/license" dir="etc/license">
 	          	<include name="*.txt"/>
+		        <include name="*.html"/>
 				<exclude name="Derby_License.txt"/>
+				<exclude name="H2_License.html"/>
 	      	</zipfileset>
 	      	<zipfileset prefix="etc/logprop" dir="etc/logprop">
 	            <include name="log4j.properties"/>
