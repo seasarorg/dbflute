@@ -6,9 +6,13 @@
 # o isAvailableAddingSchemaToTableSqlName (NotRequired - Default 'false')
 # o isAvailableDatabaseDependency (NotRequired - Default 'false')
 # o isAvailableNonPrimaryKeyWritable (NotRequired - Default 'false')
+# o isMakeEntityChaseRelation (NotRequired - Default 'false')
+# o isMakeConditionQueryEqualEmptyString (NotRequired - Default 'false')
 # o isMakeDeprecated (NotRequired - Default 'false')
 # o isMakeRecentlyDeprecated (NotRequired - Default 'true')
-# o isDeleteOldTableClass (NotRequired - Default 'true')
+# o extendedImplementedInvokerAssistantClass (NotRequired - Default '')
+# o extendedImplementedCommonColumnAutoSetupperClass (NotRequired - Default '')
+# o extendedS2DaoSettingClass (NotRequired - Default '')
 # 
 # *The line that starts with '#' means comment-out.
 #
@@ -23,19 +27,19 @@ map:{
     #
     #; isAvailableAddingSchemaToTableSqlName = false
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isAvailableDatabaseDependency (NotRequired - Default 'false')
     #   [true]
     #     Generate the method that depends on the database.
-    #     For example, cb.lockWithRR() at DB2.
+    #     For example: cb.lockWithRR() at DB2.
     #
     #   [false]
     #     Non.
     #
     #; isAvailableDatabaseDependency = false
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isAvailableNonPrimaryKeyWritable (NotRequired - Default 'false')
     #   [true]
@@ -46,7 +50,32 @@ map:{
     #
     #; isAvailableNonPrimaryKeyWritable = false
     # - - - - - - - - - -/
-    
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isMakeEntityChaseRelation (NotRequired - Default 'false')
+    #   [true]
+    #     Make chase-relation methods of entity.
+    #     For example: member.chaseMemberStatus().getMemberStatusName()
+    #     This statement doesn't have a null pointer if the MemberStatus doesn't exist.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isMakeEntityChaseRelation = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isMakeConditionQueryEqualEmptyString (NotRequired - Default 'false')
+    #   [true]
+    #     Make equal-empty-string methods of condition-query.
+    #     For example: cb.query().setMemberName_Equal_EmptyString()
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isMakeConditionQueryEqualEmptyString = false
+    # - - - - - - - - - -/
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isMakeDeprecated (NotRequired - Default 'false')
     #   [true]
@@ -58,7 +87,7 @@ map:{
     #
     #; isMakeDeprecated = false
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isMakeRecentlyDeprecated (NotRequired - Default 'true')
     #   [true]
@@ -69,6 +98,39 @@ map:{
     #     Non.
     #
     #; isMakeRecentlyDeprecated = true
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o extendedImplementedInvokerAssistantClass (NotRequired - Default '')
+    #  If you want to extend the embedded invoker assistant,
+    #  specify the class name of your original invoker assistant
+    #  that extends the embedded one.
+    #  *Basically you SHOULD NOT specify this property!
+    #
+    # @JavaOnly
+    #; extendedImplementedInvokerAssistantClass = com.example.ExtendedImplementedInvokerAssistant
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o extendedImplementedCommonColumnAutoSetupperClass (NotRequired - Default '')
+    #  If you want to extend the embedded common column auto setupper,
+    #  specify the class name of your original common column auto setupper
+    #  that extends the embedded one.
+    #  *Basically you SHOULD NOT specify this property!
+    #
+    # @JavaOnly
+    #; extendedImplementedCommonColumnAutoSetupperClass = com.example.ExtendedImplementedCommonColumnAutoSetupper
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o extendedS2DaoSettingClass (NotRequired - Default '')
+    #  If you want to extend the embedded S2Dao setting,
+    #  specify the class name of your original S2Dao setting
+    #  that extends the embedded one.
+    #  *Basically you SHOULD NOT specify this property!
+    #
+    # @CSharpOnly
+    #; extendedS2DaoSettingClass = Com.Example.ExtendedS2DaoSetting
     # - - - - - - - - - -/
 }
 # ----------------/

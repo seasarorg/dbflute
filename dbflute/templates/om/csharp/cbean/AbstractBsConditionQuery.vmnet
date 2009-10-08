@@ -25,9 +25,9 @@ namespace ${glPackageBaseCQ} {
 #set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
 #if (${col.isJavaNativeStringObject()})
 
-        public void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, fRES(v)); }
+        public void Set${tmpJavaName}_Equal(${col.javaNative} v) { DoSet${tmpJavaName}_Equal(fRES(v)); }
 #if ($database.isMakeConditionQueryEqualEmptyString())
-        public void Set${tmpJavaName}_Equal_EmptyString() { reg${tmpJavaName}(CK_EQ, ""); }
+        public void Set${tmpJavaName}_Equal_EmptyString() { DoSet${tmpJavaName}_Equal(""); }
 #end
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.ClassificationMapList)
@@ -36,12 +36,16 @@ namespace ${glPackageBaseCQ} {
         /// $database.buildClassificationApplicationComment($classificationMap)
         /// </summary>
         public void Set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-            reg${tmpJavaName}(CK_EQ, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code);
+            DoSet${tmpJavaName}_Equal(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code);
         }
 #end
 #end
+        protected void DoSet${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, v); }
 #if (${col.isAvailableStringNotEqual()})
-        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, fRES(v)); }
+        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { DoSet${tmpJavaName}_NotEqual(fRES(v)); }
+#if ($database.isMakeConditionQueryEqualEmptyString())
+        public void Set${tmpJavaName}_NotEqual_EmptyString() { DoSet${tmpJavaName}_NotEqual(""); }
+#end
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.ClassificationMapList)
         /// <summary>
@@ -49,10 +53,11 @@ namespace ${glPackageBaseCQ} {
         /// $database.buildClassificationApplicationComment($classificationMap)
         /// </summary>
         public void Set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
-            reg${tmpJavaName}(CK_NE, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code);
+            DoSet${tmpJavaName}_NotEqual(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.Code);
         }
 #end
 #end
+        protected void DoSet${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, v); }
 #end
 #if (${col.isAvailableStringGreaterThan()})
         public void Set${tmpJavaName}_GreaterThan(${col.javaNative} v) { reg${tmpJavaName}(CK_GT, fRES(v)); }

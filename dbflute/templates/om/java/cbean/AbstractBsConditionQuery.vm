@@ -64,15 +64,15 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
      */
     public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_EQ, fRES(${tmpUncapitalisedJavaName}));
+        doSet${tmpJavaName}_Equal(fRES(${tmpUncapitalisedJavaName}));
     }
 #if ($database.isMakeConditionQueryEqualEmptyString())
 
     /**
-     * Equal(=). As the empty-string. And NullOrEmptyIgnored, OnlyOnceRegistered.
+     * Equal(=). As the empty-string. And OnlyOnceRegistered.
      */
     public void set${tmpJavaName}_Equal_EmptyString() {
-        reg${tmpJavaName}(CK_EQ, "");
+        doSet${tmpJavaName}_Equal("");
     }
 #end
 #if (${col.hasClassification()})
@@ -83,10 +83,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_EQ, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code());
+        doSet${tmpJavaName}_Equal(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code());
     }
 #end
 #end
+
+    protected void doSet${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
+    }
 #if (${col.isAvailableStringNotEqual()})
 
     /**
@@ -94,8 +98,17 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
      */
     public void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_NE, fRES(${tmpUncapitalisedJavaName}));
+        doSet${tmpJavaName}_NotEqual(fRES(${tmpUncapitalisedJavaName}));
     }
+#if ($database.isMakeConditionQueryEqualEmptyString())
+
+    /**
+     * Equal(!=). As the empty-string. And OnlyOnceRegistered.
+     */
+    public void set${tmpJavaName}_NotEqual_EmptyString() {
+        doSet${tmpJavaName}_NotEqual("");
+    }
+#end
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.ClassificationMapList)
 
@@ -104,10 +117,14 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_NotEqual_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_NE, ${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code());
+        doSet${tmpJavaName}_NotEqual(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code());
     }
 #end
 #end
+
+    protected void doSet${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+        reg${tmpJavaName}(CK_NE, ${tmpUncapitalisedJavaName});
+    }
 #end
 #if (${col.isAvailableStringGreaterThan()})
 

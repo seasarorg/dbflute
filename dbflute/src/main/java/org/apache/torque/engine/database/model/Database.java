@@ -1288,8 +1288,8 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isMakeConditionQueryEqualEmptyString();
     }
 
-    public boolean isMakeEntityTraceRelation() {
-        return getProperties().getLittleAdjustmentProperties().isMakeEntityTraceRelation();
+    public boolean isMakeEntityChaseRelation() {
+        return getProperties().getLittleAdjustmentProperties().isMakeEntityChaseRelation();
     }
 
     public boolean hasExtendedImplementedInvokerAssistantClass() {

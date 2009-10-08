@@ -58,6 +58,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                         Make Entity
+    //                                                                         ===========
+    public boolean isMakeEntityChaseRelation() {
+        return isProperty("isMakeEntityChaseRelation", false);
+    }
+
+    // ===================================================================================
     //                                                                     Make Deprecated
     //                                                                     ===============
     public boolean isMakeDeprecated() {
@@ -71,15 +78,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                 Make ConditionQuery
     //                                                                 ===================
-    public boolean isMakeConditionQueryEqualEmptyString() { // It's closet!
+    public boolean isMakeConditionQueryEqualEmptyString() {
         return isProperty("isMakeConditionQueryEqualEmptyString", false);
-    }
-
-    // ===================================================================================
-    //                                                                         Make Entity
-    //                                                                         ===========
-    public boolean isMakeEntityTraceRelation() { // It's closet!
-        return isProperty("isMakeEntityTraceRelation", false);
     }
 
     // ===================================================================================
@@ -90,7 +90,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    public String getExtendedImplementedInvokerAssistantClass() { // It's closet! Java Only
+    public String getExtendedImplementedInvokerAssistantClass() { // Java Only
         return getProperty("extendedImplementedInvokerAssistantClass", null);
     }
 
@@ -99,7 +99,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    public String getExtendedImplementedCommonColumnAutoSetupperClass() { // It's closet! Java Only (future C#)
+    public String getExtendedImplementedCommonColumnAutoSetupperClass() { // Java Only
         return getProperty("extendedImplementedCommonColumnAutoSetupperClass", null);
     }
 
@@ -108,7 +108,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
     }
 
-    public String getExtendedS2DaoSettingClass() { // It's closet! CSharp Only
+    public String getExtendedS2DaoSettingClass() { // CSharp Only
         return getProperty("extendedS2DaoSettingClass", null);
     }
 
@@ -136,15 +136,15 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                       Stop Generate
     //                                                                       =============
-    public boolean isStopGenerateExtendedBhv() { // It's closet! Basically CSharp Only
+    public boolean isStopGenerateExtendedBhv() { // It's closet and secret!
         return isProperty("isStopGenerateExtendedBhv", false);
     }
 
-    public boolean isStopGenerateExtendedDao() { // It's closet! Basically CSharp Only
+    public boolean isStopGenerateExtendedDao() { // It's closet and secret!
         return isProperty("isStopGenerateExtendedDao", false);
     }
 
-    public boolean isStopGenerateExtendedEntity() { // It's closet! Basically CSharp Only
+    public boolean isStopGenerateExtendedEntity() { // It's closet and secret!
         return isProperty("isStopGenerateExtendedEntity", false);
     }
 
