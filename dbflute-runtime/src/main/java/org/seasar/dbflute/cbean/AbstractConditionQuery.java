@@ -1220,6 +1220,30 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // -----------------------------------------------------
+    //                                            Inner Join
+    //                                            ----------
+    /**
+     * Change the join type for this relation to inner join. <br />
+     * This method is for PERFORMANCE TUNING basically.
+     */
+    public void innerJoin() {
+        if (isBaseQuery(this)) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "The method 'innerJoin()' should be called for a relation query!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "Please confirm your program. " + ln();
+            msg = msg + "  For example:" + ln();
+            msg = msg + "    (x) - cb.query().innerJoin();" + ln();
+            msg = msg + "    (o) - cb.query().queryMemberStatusCode().innerJoin();" + ln();
+            msg = msg + "* * * * * * * * * */";
+            throw new IllegalStateException(msg);
+        }
+        getSqlClause().changeToInnerJoin(getRealAliasName());
+    }
+    
+    // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
     /**

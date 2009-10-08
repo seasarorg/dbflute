@@ -165,6 +165,12 @@ public interface SqlClause {
      */
     public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap);
 
+    /**
+     * Change the join type for the relation to inner join.
+     * @param aliasName The registered alias name of join table. (NotNull and Unique per invoking method)
+     */
+    public void changeToInnerJoin(String aliasName);
+
     public SqlClause makeInnerJoinEffective();
 
     public SqlClause backToOuterJoin();

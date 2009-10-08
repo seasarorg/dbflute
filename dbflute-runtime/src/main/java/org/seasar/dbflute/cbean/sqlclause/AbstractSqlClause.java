@@ -504,7 +504,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
             sb.append(getLineSeparator()).append("   ");
-            if (joinInfo.isInnerJoin()) { // basically false
+            if (joinInfo.isInnerJoin()) {
                 sb.append(" inner join ");
             } else {
                 sb.append(" left outer join "); // is main!
@@ -695,6 +695,9 @@ public abstract class AbstractSqlClause implements SqlClause {
     // ===================================================================================
     //                                                                           OuterJoin
     //                                                                           =========
+    /**
+     * {@inheritDoc}
+     */
     public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap) {
         assertAlreadyOuterJoin(aliasName);
         assertJoinOnMapNotEmpty(joinOnMap, aliasName);
@@ -706,6 +709,19 @@ public abstract class AbstractSqlClause implements SqlClause {
             joinInfo.setInnerJoin(true);
         }
         _outerJoinMap.put(aliasName, joinInfo);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void changeToInnerJoin(String aliasName) {
+        final LeftOuterJoinInfo joinInfo = _outerJoinMap.get(aliasName);
+        if (joinInfo == null) {
+            String msg = "The aliasName should be registered:";
+            msg = msg + " aliasName=" + aliasName + " outerJoinMap=" + _outerJoinMap.keySet();
+            throw new IllegalStateException(msg);
+        }
+        joinInfo.setInnerJoin(true);
     }
 
     public SqlClause makeInnerJoinEffective() {
@@ -1198,7 +1214,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             msg = msg + "[Actual Parameter Value]" + getLineSeparator();
             msg = msg + "fetchSize=" + _fetchSize + getLineSeparator();
             msg = msg + "fetchPageNumber=" + fetchPageNumber + getLineSeparator();
-            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
         _fetchPageNumber = fetchPageNumber;
