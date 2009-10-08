@@ -409,7 +409,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
             sb.append(getLineSeparator()).append("   ");
-            sb.append(" left outer join ");
+            if (joinInfo.isInnerJoin()) {
+                sb.append(" inner join ");
+            } else {
+                sb.append(" left outer join "); // is main!
+            }
             if (inlineWhereClauseList.isEmpty()) {
                 sb.append(joinTableName);
             } else {
@@ -584,11 +588,21 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap) {
         assertAlreadyOuterJoin(aliasName);
         assertJoinOnMapNotEmpty(joinOnMap, aliasName);
-         LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
+        LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
         joinInfo.setAliasName(aliasName);
         joinInfo.setJoinTableName(joinTableName);
         joinInfo.setJoinOnMap(joinOnMap);
         _outerJoinMap.put(aliasName, joinInfo);
+    }
+
+    public void changeToInnerJoin(String aliasName) {
+        LeftOuterJoinInfo joinInfo = _outerJoinMap.get(aliasName);
+        if (joinInfo == null) {
+            String msg = "The aliasName should be registered:";
+            msg = msg + " aliasName=" + aliasName + " outerJoinMap=" + _outerJoinMap.keySet();
+            throw new IllegalStateException(msg);
+        }
+        joinInfo.setInnerJoin(true);
     }
 
     public String getFixedConditionKey() {
@@ -601,7 +615,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         protected List<String> _inlineWhereClauseList = new ArrayList<String>();
         protected List<String> _additionalOnClauseList = new ArrayList<String>();
         protected Map<String, String> _joinOnMap;
-        protected bool _onClauseInline;
+        protected bool _innerJoin;
         public String getAliasName() {
             return _aliasName;
         }
@@ -632,11 +646,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
         public void setJoinOnMap(Map<String, String> value) {
             _joinOnMap = value;
         }
-        public bool isOnClauseInline() {
-            return _onClauseInline;
+        public bool isInnerJoin() {
+            return _innerJoin;
         }
-        public void setOnClauseInline(bool value) {
-            _onClauseInline = value;
+        public void setInnerJoin(bool value) {
+            _innerJoin = value;
         }
     }
 

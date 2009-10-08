@@ -1263,6 +1263,26 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     // -----------------------------------------------------
+    //                                            Inner Join
+    //                                            ----------
+    public void InnerJoin() {
+        if (isBaseQuery(this)) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "The method 'InnerJoin()' should be called for a relation query!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "Please confirm your program. " + ln();
+            msg = msg + "  For example:" + ln();
+            msg = msg + "    (x) - cb.Query().InnerJoin();" + ln();
+            msg = msg + "    (o) - cb.Query().QueryMemberStatusCode().InnerJoin();" + ln();
+            msg = msg + "* * * * * * * * * */";
+            throw new IllegalStateException(msg);
+        }
+        getSqlClause().changeToInnerJoin(getRealAliasName());
+    }
+
+    // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
 	public void WithNullsFirst() {// is User Public!
