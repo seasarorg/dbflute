@@ -1,5 +1,7 @@
 #!/bin/sh
 
 NATIVE_PROPERTIES_PATH=$1
-
-cp $NATIVE_PROPERTIES_PATH $DBFLUTE_HOME/build.properties
+if ! [ -e build.properties ]; then
+  mv $NATIVE_PROPERTIES_PATH build.properties
+fi
+cp build.properties $DBFLUTE_HOME/build.properties

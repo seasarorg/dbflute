@@ -1,4 +1,6 @@
 
 set NATIVE_PROPERTIES_PATH=%1
-
-copy %NATIVE_PROPERTIES_PATH% %DBFLUTE_HOME%\build.properties
+if not exist build.properties (
+  ren %NATIVE_PROPERTIES_PATH% build.properties
+)
+copy build.properties %DBFLUTE_HOME%\build.properties
