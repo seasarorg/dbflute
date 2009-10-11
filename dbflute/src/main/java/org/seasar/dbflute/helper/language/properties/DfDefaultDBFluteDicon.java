@@ -11,11 +11,6 @@ public interface DfDefaultDBFluteDicon {
     public String getDBFluteDiconNamespace();
 
     /**
-     * @return The package name of dbflute dicon. (NotNull)
-     */
-    public String getDBFluteDiconPackageName();
-
-    /**
      * @return The file name of dbflute dicon. (NotNull)
      */
     public String getDBFluteDiconFileName();

@@ -34,7 +34,7 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
 
     public static final String PATH_MAVEN_SRC_MAIN_JAVA = "src/main/java";
     public static final String PATH_MAVEN_SRC_MAIN_RESOURCES = "src/main/resources";
-    
+
     public DfGrammarInfo getGrammarInfo() {
         return new DfGrammarInfoJava();
     }
@@ -55,30 +55,34 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
         return new LanguageMetaDataJava();
     }
 
-    public String getDefaultSourceDirectory() {
+    public String getDefaultGenerateOutputDirectory() {
         return "../" + PATH_MAVEN_SRC_MAIN_JAVA;
     }
-    
+
+    public String getDefaultResourceOutputDirectory() {
+        return "../resources";
+    }
+
     public String getIntegerConvertExpression(String value) {
         return "Integer.valueOf(\"" + value + "\")";
     }
-    
+
     public String getConditionBeanPackageName() {
         return "cbean";
     }
-    
+
     public boolean isCompileTargetFile(File file) {
         return true;
     }
-    
+
     public boolean isFlatOrOmitDirectorySupported() {
         return false;
     }
-    
+
     public static boolean containsSrcMainJava(String path) {
         return path.contains(PATH_MAVEN_SRC_MAIN_JAVA);
     }
-    
+
     /**
      * @param path The path of target. (NotNull)
      * @return Replaced maven path for 'src/main/resources' if it has 'src/main/java'. (NotNull)

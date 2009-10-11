@@ -13,10 +13,6 @@ public class DfDefaultDBFluteDiconJava implements DfDefaultDBFluteDicon {
         return "dbflute";
     }
 
-    public String getDBFluteDiconPackageName() {
-        return "../resources";
-    }
-
     public String getJ2eeDiconResourceName() {
         return "j2ee.dicon";
     }

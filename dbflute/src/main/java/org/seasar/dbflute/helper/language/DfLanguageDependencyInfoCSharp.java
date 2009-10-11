@@ -43,7 +43,7 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
     public DfDefaultDBFluteDicon getDefaultDBFluteDicon() {
         return new DfDefaultDBFluteDiconCSharp();
     }
-    
+
     public DfGeneratedClassPackageDefault getGeneratedClassPackageInfo() {
         return new DfGeneratedClassPackageDefaultCSharp();
     }
@@ -52,18 +52,22 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
         return new LanguageMetaDataCSharp();
     }
 
-    public String getDefaultSourceDirectory() {
+    public String getDefaultGenerateOutputDirectory() {
         return "../source";
     }
-    
+
+    public String getDefaultResourceOutputDirectory() {
+        return "../source/${topNamespace}/Resources";
+    }
+
     public String getIntegerConvertExpression(String value) {
         return "new int?(" + value + ")";
     }
-    
+
     public String getConditionBeanPackageName() {
         return "CBean";
     }
-    
+
     public boolean isCompileTargetFile(File file) {
         String absolutePath = file.getAbsolutePath();
         absolutePath = DfStringUtil.replace(absolutePath, "\\", "/");
@@ -72,7 +76,7 @@ public class DfLanguageDependencyInfoCSharp implements DfLanguageDependencyInfo 
         }
         return true;
     }
-    
+
     public boolean isFlatOrOmitDirectorySupported() {
         return true;
     }

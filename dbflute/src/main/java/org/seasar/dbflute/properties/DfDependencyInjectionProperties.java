@@ -97,8 +97,10 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
     }
 
     public List<String> getDBFluteDiconPackageNameList() { // Java Only
-        final String defaultPackageName = getDefaultDBFluteDicon().getDBFluteDiconPackageName();
-        final String prop = getProperty("dbfluteDiconPackageName", defaultPackageName);
+        final String prop = getProperty("dbfluteDiconPackageName", null);
+        if (prop == null) {
+            return new ArrayList<String>();
+        }
         final String[] array = prop.split(";");
         final List<String> ls = new ArrayList<String>();
         for (String string : array) {
@@ -167,8 +169,10 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
     //                                                           DBFluteBeans(Spring/Lucy)
     //                                                           =========================
     public List<String> getDBFluteBeansPackageNameList() { // Java Only
-        final String defaultPackageName = getDefaultDBFluteDicon().getDBFluteDiconPackageName();
-        final String prop = getProperty("dbfluteBeansPackageName", defaultPackageName);
+        final String prop = getProperty("dbfluteBeansPackageName", null);
+        if (prop == null) {
+            return new ArrayList<String>();
+        }
         final String[] array = prop.split(";");
         final List<String> ls = new ArrayList<String>();
         for (String string : array) {
@@ -180,11 +184,11 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
     public String getDBFluteBeansFileName() { // Java Only
         return getProperty("dbfluteBeansFileName", "dbfluteBeans.xml");
     }
-    
+
     public String getDBFluteBeansDataSourceName() { // Java Only
         return getProperty("dbfluteBeansDataSourceName", "dataSource");
     }
-    
+
     // ===================================================================================
     //                                                             Quill DataSource(Quill)
     //                                                             =======================

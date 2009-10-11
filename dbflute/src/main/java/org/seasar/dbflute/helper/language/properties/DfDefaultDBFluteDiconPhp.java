@@ -13,10 +13,6 @@ public class DfDefaultDBFluteDiconPhp implements DfDefaultDBFluteDicon {
         return "dbflute";
     }
 
-    public String getDBFluteDiconPackageName() {
-        return "";
-    }
-
     public String getJ2eeDiconResourceName() {
         return "%PDO_DICON%";
     }

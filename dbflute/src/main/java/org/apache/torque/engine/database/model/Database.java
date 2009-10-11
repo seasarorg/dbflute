@@ -975,7 +975,23 @@ public class Database {
     }
 
     public List<String> getDBFluteDiconPackageNameList() {
-        return getProperties().getDependencyInjectionProperties().getDBFluteDiconPackageNameList();
+        final String resourceOutputDirectory = getBasicProperties().getResourceOutputDirectory();
+        if (resourceOutputDirectory != null) {
+            final List<String> resulList = new ArrayList<String>();
+            resulList.add(resourceOutputDirectory);
+            return resulList;
+        }
+
+        // for compatible and default value
+        final List<String> diconPackageNameList = getProperties().getDependencyInjectionProperties()
+                .getDBFluteDiconPackageNameList();
+        if (diconPackageNameList != null && !diconPackageNameList.isEmpty()) {
+            return diconPackageNameList;
+        } else {
+            final List<String> resulList = new ArrayList<String>();
+            resulList.add(getBasicProperties().getDefaultResourceOutputDirectory());
+            return resulList;
+        }
     }
 
     public String getDBFluteCreatorDiconFileName() {
@@ -1006,7 +1022,23 @@ public class Database {
     //                                         Spring & Lucy
     //                                         -------------
     public List<String> getDBFluteBeansPackageNameList() {
-        return getProperties().getDependencyInjectionProperties().getDBFluteBeansPackageNameList();
+        final String resourceOutputDirectory = getBasicProperties().getResourceOutputDirectory();
+        if (resourceOutputDirectory != null) {
+            final List<String> resulList = new ArrayList<String>();
+            resulList.add(resourceOutputDirectory);
+            return resulList;
+        }
+
+        // for compatible and default value
+        final List<String> diconPackageNameList = getProperties().getDependencyInjectionProperties()
+                .getDBFluteBeansPackageNameList();
+        if (diconPackageNameList != null && !diconPackageNameList.isEmpty()) {
+            return diconPackageNameList;
+        } else {
+            final List<String> resulList = new ArrayList<String>();
+            resulList.add(getBasicProperties().getDefaultResourceOutputDirectory());
+            return resulList;
+        }
     }
 
     public String getDBFluteBeansFileName() {

@@ -301,8 +301,16 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         if (property != null) {
             return property;
         }
-        final String defaultSourceDirectory = getLanguageDependencyInfo().getDefaultSourceDirectory();
-        return getProperty("java.dir", defaultSourceDirectory); // old style or default
+        final String defaultDirectory = getLanguageDependencyInfo().getDefaultGenerateOutputDirectory();
+        return getProperty("java.dir", defaultDirectory); // old style or default
+    }
+
+    public String getResourceOutputDirectory() {
+        return getProperty("resourceOutputDirectory", null);
+    }
+
+    public String getDefaultResourceOutputDirectory() {
+        return getLanguageDependencyInfo().getDefaultResourceOutputDirectory();
     }
 
     // ===================================================================================

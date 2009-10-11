@@ -53,8 +53,12 @@ public class DfLanguageDependencyInfoPhp implements DfLanguageDependencyInfo {
         return new LanguageMetaDataPhp();
     }
 
-    public String getDefaultSourceDirectory() {
+    public String getDefaultGenerateOutputDirectory() {
         return "../" + PATH_MAVEN_SRC_MAIN_PHP;
+    }
+
+    public String getDefaultResourceOutputDirectory() {
+        return "";
     }
 
     public String getIntegerConvertExpression(String value) {
@@ -68,11 +72,11 @@ public class DfLanguageDependencyInfoPhp implements DfLanguageDependencyInfo {
     public boolean isCompileTargetFile(File file) {
         return true;
     }
-    
+
     public boolean isFlatOrOmitDirectorySupported() {
         return false;
     }
-    
+
     public String getDefaultSequenceType() {
         return "";
     }
