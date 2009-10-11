@@ -2301,7 +2301,7 @@ public class Table {
     protected String buildVersionNoJavaName(String versionNoFieldName) {
         if (versionNoFieldName != null && versionNoFieldName.trim().length() != 0) {
             final DfBasicProperties basicProperties = getBasicProperties();
-            if (basicProperties.isJavaNameOfColumnSameAsDbName()) {
+            if (basicProperties.isColumnNameCamelCase()) {
                 return versionNoFieldName;
             } else {
                 return makeJavaName(versionNoFieldName);

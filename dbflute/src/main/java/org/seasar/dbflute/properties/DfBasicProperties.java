@@ -297,19 +297,33 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                    Output Directory
     //                                                                    ================
     public String getOutputDirectory() {
+        final String property = getProperty("generateOutputDirectory", null);
+        if (property != null) {
+            return property;
+        }
         final String defaultSourceDirectory = getLanguageDependencyInfo().getDefaultSourceDirectory();
-        return getProperty("java.dir", defaultSourceDirectory);
+        return getProperty("java.dir", defaultSourceDirectory); // old style or default
     }
 
     // ===================================================================================
     //                                                                              Naming
     //                                                                              ======
-    public boolean isJavaNameOfTableSameAsDbName() {
-        return isProperty("isJavaNameOfTableSameAsDbName", false);
+    public boolean isTableNameCamelCase() {
+        final boolean defaultProperty = false;
+        final boolean property = isProperty("isTableNameCamelCase", defaultProperty);
+        if (property) {
+            return true;
+        }
+        return isProperty("isJavaNameOfTableSameAsDbName", defaultProperty); // old style or default
     }
 
-    public boolean isJavaNameOfColumnSameAsDbName() {
-        return isProperty("isJavaNameOfColumnSameAsDbName", false);
+    public boolean isColumnNameCamelCase() {
+        final boolean defaultProperty = false;
+        final boolean property = isProperty("isColumnNameCamelCase", defaultProperty);
+        if (property) {
+            return true;
+        }
+        return isProperty("isJavaNameOfColumnSameAsDbName", defaultProperty); // old style or default
     }
 
     // ===================================================================================

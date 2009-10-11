@@ -849,17 +849,6 @@ public class Database {
     }
 
     // -----------------------------------------------------
-    //                                                Naming
-    //                                                ------
-    public boolean isJavaNameOfTableSameAsDbName() {
-        return getBasicProperties().isJavaNameOfTableSameAsDbName();
-    }
-
-    public boolean isJavaNameOfColumnSameAsDbName() {
-        return getBasicProperties().isJavaNameOfColumnSameAsDbName();
-    }
-
-    // -----------------------------------------------------
     //                                         Prefix/Suffix
     //                                         -------------
     public String getProjectPrefix() {
@@ -1671,7 +1660,7 @@ public class Database {
     }
 
     public String convertJavaNameByJdbcNameAsTable(String jdbcName) {
-        if (isJavaNameOfTableSameAsDbName()) {
+        if (getBasicProperties().isTableNameCamelCase()) {
             return jdbcName;
         }
         final List<String> inputs = new ArrayList<String>(2);
@@ -1685,7 +1674,7 @@ public class Database {
     }
 
     public String convertJavaNameByJdbcNameAsColumn(String jdbcName) {
-        if (isJavaNameOfColumnSameAsDbName()) {
+        if (getBasicProperties().isColumnNameCamelCase()) {
             return jdbcName;
         }
         final List<String> inputs = new ArrayList<String>(2);
