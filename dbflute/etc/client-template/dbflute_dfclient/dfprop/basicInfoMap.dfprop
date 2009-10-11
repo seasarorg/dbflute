@@ -11,9 +11,10 @@
 # o packageBase: (Required)
 # 
 # Adjustment Properties:
-# o java.dir: (NotRequired - Default Java:'../src/main/java' CSharp:'../source')
-# o isJavaNameOfTableSameAsDbName: (NotRequired - Default 'false')
-# o isJavaNameOfColumnSameAsDbName: (NotRequired - Default 'false')
+# o generateOutputDirectory: (NotRequired - Default Java:'../src/main/java' CSharp:'../source')
+# o resourceOutputDirectory: (NotRequired - Default '../resources')
+# o isTableNameCamelCase: (NotRequired - Default false)
+# o isColumnNameCamelCase: (NotRequired - Default false)
 # o projectPrefix: (NotRequired - Default '')
 # o classAuthor: (NotRequired - Default 'DBFlute(AutoGenerator)')
 # o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
@@ -87,18 +88,18 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o java.dir: (NotRequired - Default Java:'../src/main/java' CSharp:'../source')
+    # o generateOutputDirectory: (NotRequired - Default Java:'../src/main/java' CSharp:'../source')
     #  The base output directory for generating.
     #  Basically you don't need to specify this if the project style is as follows:
     #
     #   *Java Project Style
-    #     If this value is '../src/main/java' and your project type is under maven,
+    #     If this value is '../src/main/java' and your project is under the Maven,
     #     you don't need to set up this property!
     #
     #     {app-project}
     #         |
     #         |-dbflute_[project]
-    #         |       |-build-[project].properties
+    #         |       |-dfprop
     #         |       |-...
     #         |
     #         |-src/main/java         // *Here!
@@ -106,46 +107,53 @@ map:{
     #         |-...
     #
     #   *CSharp Project Style
-    #     [app-solution]/dbflute_[project]/build-[project].properties
-    #     [app-solution]/mydbflute/dbflute-0.6.0
+    #     [app-solution]/dbflute_[project]/dfprop
+    #     [app-solution]/mydbflute/dbflute-0.9.6
     #     [app-solution]/source/[app-solution].sln
     #     [app-solution]/source/[app-project(top-namespace)]/[part-namespace]/AllCommon
     #     [app-solution]/source/[app-project(top-namespace)]/[part-namespace]/BsBhv
     #     [app-solution]/source/[app-project(top-namespace)]/[part-namespace]/...
-    #     [app-solution]/source/[app-project(top-namespace)]/Resources/DBFlute.dicon
-    #     [app-solution]/source/[app-project(top-namespace)]/Resources/Ado.dicon
+    #     [app-solution]/source/[app-project(top-namespace)]/Resources/...
     #
-    #; java.dir = ../src/main/java
+    #; generateOutputDirectory = ../src/main/java
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isJavaNameOfTableSameAsDbName: (NotRequired - Default 'false')
-    #  Is the class name same as table name(on DB)?
-    #  Basically you don't need this if the style of table name is like 'ABC_DEF'.
+    # o resourceOutputDirectory: (NotRequired - Default '../resources')
+    #  The base output directory for resource files that contain DI configurations.
+    #  Basically you don't need to specify this if your project is under the Maven.
+    #
+    #; resourceOutputDirectory = ../resources
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isTableNameCamelCase: (NotRequired - Default false)
+    #  Is the table name camel case?
+    #  Basically you don't need this if the style of table name is like 'FOO_STATUS'.
     #    [true]
-    #      The class name is same as table DB name.
+    #      The table name is camel case.
     #      ex) If the table name is 'OrderDetail', the class name is 'OrderDetail'.
     # 
     #    [false]
     #      ex) If the table name is 'ORDER_DETAIL', the class name is 'OrderDetail'.
     #      ex) If the table name is 'OrderDetail', the class name is 'Orderdetail'.
     #
-    #; isJavaNameOfTableSameAsDbName = false
+    #; isTableNameCamelCase = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isJavaNameOfColumnSameAsDbName: (NotRequired - Default 'false')
-    #  Is the class name same as column name(on DB)?
-    #  Basically you don't need this if the style of column name is like 'ABC_DEF'.
+    # o isColumnNameCamelCase: (NotRequired - Default false)
+    #  Is the column name camel case?
+    #  Basically you don't need this if the style of column name is like 'FOO_NAME'.
     #    [true]
-    #      The class name is same as table DB name.
+    #      The column name is camel case.
     #      ex) If the column name is 'OrderDetailId', the class name is 'OrderDetailId'.
     # 
     #    [false]
     #      ex) If the column name is 'ORDER_DETAIL_ID', the class name is 'OrderDetailId'.
     #      ex) If the column name is 'OrderDetailId',  the class name is 'Orderdetailid'.
     #
-    #; isJavaNameOfColumnSameAsDbName = false
+    #; isColumnNameCamelCase = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -4,26 +4,24 @@
 # The various settings about dependency injection(DI Container). 
 # 
 # {Java} Seasar Only:
-# o dbfluteDiconNamespace (NotRequired - Default 'dbflute')
-# o dbfluteDiconPackageName (NotRequired - Default '../resources')
-# o dbfluteDiconFileName (NotRequired - Default 'dbflute.dicon')
-# o j2eeDiconResourceName (NotRequired - Default 'j2ee.dicon')
-# o dbfluteDiconBeforeJ2eeIncludeDefinitionMap (NotRequired - Default 'map:{}')
-# o dbfluteDiconOtherIncludeDefinitionMap (NotRequired - Default 'map:{}')
+# o dbfluteDiconNamespace: (NotRequired - Default 'dbflute')
+# o dbfluteDiconFileName: (NotRequired - Default 'dbflute.dicon')
+# o j2eeDiconResourceName: (NotRequired - Default 'j2ee.dicon')
+# o dbfluteDiconBeforeJ2eeIncludeDefinitionMap: (NotRequired - Default 'map:{}')
+# o dbfluteDiconOtherIncludeDefinitionMap: (NotRequired - Default 'map:{}')
 # 
 # {Java} Spring and Lucy Only:
-# o dbfluteBeansPackageName (NotRequired - Default '../resources')
-# o dbfluteBeansFileName (NotRequired - Default 'dbfluteBeans.xml')
-# o dbfluteBeansDataSourceName (NotRequired - Default 'dataSource')
+# o dbfluteBeansFileName: (NotRequired - Default 'dbfluteBeans.xml')
+# o dbfluteBeansDataSourceName: (NotRequired - Default 'dataSource')
 # 
 # {CSharp} Quill(CSharp Seasar) Only:
-# o quillDataSourceName (NotRequired - Default '')
+# o quillDataSourceName: (NotRequired - Default '')
 # 
 # *The line that starts with '#' means comment-out.
 #
 map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteDiconNamespace (NotRequired - Default 'dbflute')
+    # o dbfluteDiconNamespace: (NotRequired - Default 'dbflute')
     #  The namespace of DBFlute DI configuration.
     #
     # @JavaSeasarOnly
@@ -31,15 +29,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteDiconPackageName (NotRequired - Default '../resources')
-    #  The package name(output directory) of DBFlute DI configuration for Seasar.
-    #
-    # @JavaSeasarOnly
-    #; dbfluteDiconPackageName = ../resources
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteDiconFileName (NotRequired - Default 'dbflute.dicon')
+    # o dbfluteDiconFileName: (NotRequired - Default 'dbflute.dicon')
     #  The file name of DBFlute DI configuration for Seasar.
     #
     # @JavaSeasarOnly
@@ -47,7 +37,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o j2eeDiconResourceName (NotRequired - Default 'j2ee.dicon')
+    # o j2eeDiconResourceName: (NotRequired - Default 'j2ee.dicon')
     #  The file name of J2EE DI configuration.
     #
     # @JavaSeasarOnly
@@ -55,7 +45,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteDiconBeforeJ2eeIncludeDefinitionMap (NotRequired - Default 'map:{}')
+    # o dbfluteDiconBeforeJ2eeIncludeDefinitionMap: (NotRequired - Default 'map:{}')
     #  The include definition of DBFlute DI configuration before j2ee including.
     #  ex) map:{ jdbc-xxx.dicon = dummy }
     # 
@@ -64,7 +54,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteDiconOtherIncludeDefinitionMap (NotRequired - Default 'map:{}')
+    # o dbfluteDiconOtherIncludeDefinitionMap: (NotRequired - Default 'map:{}')
     #  The other include definition of DBFlute DI configuration.
     #  ex) map:{ common.dicon = dummy }
     # 
@@ -73,15 +63,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteBeansPackageName (NotRequired - Default '../resources')
-    #  The package name(output directory) of DBFlute DI configuration for Spring and Lucy.
-    #
-    # @JavaSpringLucyOnly
-    #; dbfluteBeansPackageName = ../resources
-    # - - - - - - - - - -/
-
-    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteBeansFileName (NotRequired - Default 'dbfluteBeans.xml')
+    # o dbfluteBeansFileName: (NotRequired - Default 'dbfluteBeans.xml')
     #  The file name of DBFlute DI configuration for Spring and Lucy.
     # 
     # @JavaSpringLucyOnly
@@ -89,7 +71,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dbfluteBeansDataSourceName (NotRequired - Default 'dataSource')
+    # o dbfluteBeansDataSourceName: (NotRequired - Default 'dataSource')
     #  The data source name that DBFlute(Behaviors) uses.
     #
     # @JavaSpringLucyOnly
@@ -97,7 +79,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o quillDataSourceName (NotRequired - Default '')
+    # o quillDataSourceName: (NotRequired - Default '')
     #  The data source name of Quill(CSharp Seasar).
     # 
     # @CSharpQuillOnly
