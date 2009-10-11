@@ -597,7 +597,7 @@ public class Database {
     //                                                                    Output Directory
     //                                                                    ================
     public void enableGenerateOutputDirectory() {
-        getGeneratorInstance().setOutputPath(getProperties().getBasicProperties().getOutputDirectory());
+        getGeneratorInstance().setOutputPath(getProperties().getBasicProperties().getGenerateOutputDirectory());
     }
 
     public void enableSql2EntityOutputDirectory() {
@@ -831,7 +831,7 @@ public class Database {
     //                                               JavaDir
     //                                               -------
     public String getJavaDir() {
-        return getBasicProperties().getOutputDirectory();
+        return getBasicProperties().getGenerateOutputDirectory();
     }
 
     // -----------------------------------------------------

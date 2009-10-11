@@ -140,7 +140,7 @@ public class DfBehaviorQueryPathSetupper {
         if (behaviorQueryPathMap.isEmpty()) {
             return;
         }
-        String outputDir = getBasicProperties().getOutputDirectory();
+        String outputDir = getBasicProperties().getGenerateOutputDirectory();
         if (outputDir.endsWith("/")) {
             outputDir = outputDir.substring(0, outputDir.length() - "/".length());
         }

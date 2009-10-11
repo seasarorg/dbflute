@@ -296,7 +296,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                    Output Directory
     //                                                                    ================
-    public String getOutputDirectory() {
+    public String getGenerateOutputDirectory() {
         final String property = getProperty("generateOutputDirectory", null);
         if (property != null) {
             return property;

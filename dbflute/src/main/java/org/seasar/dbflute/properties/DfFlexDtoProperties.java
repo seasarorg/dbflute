@@ -71,9 +71,9 @@ public final class DfFlexDtoProperties extends DfAbstractHelperProperties {
     public String getOutputDirectory() {
         final String value = (String) getFlexDtoDefinitionMap().get("outputDirectory");
         if (value == null) {
-            return getBasicProperties().getOutputDirectory();
+            return getBasicProperties().getGenerateOutputDirectory();
         }
-        return getBasicProperties().getOutputDirectory() + "/" + value;
+        return getBasicProperties().getGenerateOutputDirectory() + "/" + value;
     }
 
     public Map<String, String> getJavaToFlexNativeMap() {
