@@ -140,11 +140,13 @@ public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAut
      * {@inheritDoc}
      */
     public void handleCommonColumnOfInsertIfNeeds(Entity targetEntity) {
+    }
 
     /**
      * {@inheritDoc}
      */
     public void handleCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
+    }
 #end
 
     // =====================================================================================
