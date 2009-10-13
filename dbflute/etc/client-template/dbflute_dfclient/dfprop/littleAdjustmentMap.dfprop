@@ -3,22 +3,22 @@
 #
 # The various settings about a little adjustment.
 # 
-# o isAvailableAddingSchemaToTableSqlName (NotRequired - Default 'false')
-# o isAvailableDatabaseDependency (NotRequired - Default 'false')
-# o isAvailableNonPrimaryKeyWritable (NotRequired - Default 'false')
-# o isMakeEntityChaseRelation (NotRequired - Default 'false')
-# o isMakeConditionQueryEqualEmptyString (NotRequired - Default 'false')
-# o isMakeDeprecated (NotRequired - Default 'false')
-# o isMakeRecentlyDeprecated (NotRequired - Default 'true')
-# o extendedImplementedInvokerAssistantClass (NotRequired - Default '')
-# o extendedImplementedCommonColumnAutoSetupperClass (NotRequired - Default '')
-# o extendedS2DaoSettingClass (NotRequired - Default '')
+# o isAvailableAddingSchemaToTableSqlName: (NotRequired - Default 'false')
+# o isAvailableDatabaseDependency: (NotRequired - Default 'false')
+# o isAvailableNonPrimaryKeyWritable: (NotRequired - Default 'false')
+# o isMakeEntityChaseRelation: (NotRequired - Default 'false')
+# o isMakeConditionQueryEqualEmptyString: (NotRequired - Default 'false')
+# o isMakeDeprecated: (NotRequired - Default 'false')
+# o isMakeRecentlyDeprecated: (NotRequired - Default 'true')
+# o extendedImplementedInvokerAssistantClass: (NotRequired - Default '')
+# o extendedImplementedCommonColumnAutoSetupperClass: (NotRequired - Default '')
+# o extendedS2DaoSettingClass: (NotRequired - Default '')
 # 
 # *The line that starts with '#' means comment-out.
 #
 map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isAvailableAddingSchemaToTableSqlName (NotRequired - Default 'false')
+    # o isAvailableAddingSchemaToTableSqlName: (NotRequired - Default 'false')
     #   [true]
     #     Add schema to table SQL name. (The table name on query is SCHEMA.TABLE)
     #
@@ -29,7 +29,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isAvailableDatabaseDependency (NotRequired - Default 'false')
+    # o isAvailableDatabaseDependency: (NotRequired - Default 'false')
     #   [true]
     #     Generate the method that depends on the database.
     #     For example: cb.lockWithRR() at DB2.
@@ -41,7 +41,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isAvailableNonPrimaryKeyWritable (NotRequired - Default 'false')
+    # o isAvailableNonPrimaryKeyWritable: (NotRequired - Default 'false')
     #   [true]
     #     Generate writable methods at non-primary-key table.
     #
@@ -52,7 +52,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isMakeEntityChaseRelation (NotRequired - Default 'false')
+    # o isMakeEntityChaseRelation: (NotRequired - Default 'false')
     #   [true]
     #     Make chase-relation methods of entity.
     #     For example: member.chaseMemberStatus().getMemberStatusName()
@@ -65,7 +65,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isMakeConditionQueryEqualEmptyString (NotRequired - Default 'false')
+    # o isMakeConditionQueryEqualEmptyString: (NotRequired - Default 'false')
     #   [true]
     #     Make equal-empty-string methods of condition-query.
     #     For example: cb.query().setMemberName_Equal_EmptyString()
@@ -77,7 +77,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isMakeDeprecated (NotRequired - Default 'false')
+    # o isMakeDeprecated: (NotRequired - Default 'false')
     #   [true]
     #     Make deprecated method and class and so on...
     #     *You should specify this property 'false'!
@@ -89,7 +89,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isMakeRecentlyDeprecated (NotRequired - Default 'true')
+    # o isMakeRecentlyDeprecated: (NotRequired - Default 'true')
     #   [true]
     #     Make RECENTLY deprecated method and class and so on...
     #     *You should specify this property 'false'!
@@ -101,7 +101,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o extendedImplementedInvokerAssistantClass (NotRequired - Default '')
+    # o extendedImplementedInvokerAssistantClass: (NotRequired - Default '')
     #  If you want to extend the embedded invoker assistant,
     #  specify the class name of your original invoker assistant
     #  that extends the embedded one.
@@ -112,7 +112,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o extendedImplementedCommonColumnAutoSetupperClass (NotRequired - Default '')
+    # o extendedImplementedCommonColumnAutoSetupperClass: (NotRequired - Default '')
     #  If you want to extend the embedded common column auto setupper,
     #  specify the class name of your original common column auto setupper
     #  that extends the embedded one.
@@ -123,7 +123,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o extendedS2DaoSettingClass (NotRequired - Default '')
+    # o extendedS2DaoSettingClass: (NotRequired - Default '')
     #  If you want to extend the embedded S2Dao setting,
     #  specify the class name of your original S2Dao setting
     #  that extends the embedded one.

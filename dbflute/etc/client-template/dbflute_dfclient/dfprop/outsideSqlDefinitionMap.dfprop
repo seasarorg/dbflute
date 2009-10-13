@@ -3,21 +3,21 @@
 #
 # The various settings about outside SQL. 
 # 
-# o isGenerateProcedureParameterBean (NotRequired - Default 'false')
-# o targetProcedureCatalogList (NotRequired - Default 'list:{}')
-# o targetProcedureSchemaList (NotRequired - Default 'list:{}')
-# o targetProcedureNameList (NotRequired - Default 'list:{}')
-# o sqlFileEncoding (NotRequired - Default 'UTF-8')
-# o sqlDirectory (NotRequired - Default java.dir & '../src/main/resources')
-# o sqlPackage (NotRequired - Default '')
+# o isGenerateProcedureParameterBean: (NotRequired - Default 'false')
+# o targetProcedureCatalogList: (NotRequired - Default 'list:{}')
+# o targetProcedureSchemaList: (NotRequired - Default 'list:{}')
+# o targetProcedureNameList: (NotRequired - Default 'list:{}')
+# o sqlFileEncoding: (NotRequired - Default 'UTF-8')
+# o sqlDirectory: (NotRequired - Default java.dir & '../src/main/resources')
+# o sqlPackage: (NotRequired - Default '')
 # 
 # *The line that starts with '#' means comment-out.
 #
 map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isGenerateProcedureParameterBean (NotRequired - Default 'false')
+    # o isGenerateProcedureParameterBean: (NotRequired - Default 'false')
     #   [true]
-    #     Generate the parameter bean for procedure.
+    #     Does it generate the parameter bean for procedure?
     #     If you call the procedure from DBFlute, you should specify 'true'!
     #
     #   [false]
@@ -27,7 +27,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o targetProcedureCatalogList (NotRequired - Default 'list:{}')
+    # o targetProcedureCatalogList: (NotRequired - Default 'list:{}')
     #  You can specify target catalog of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
     #
@@ -35,7 +35,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o targetProcedureSchemaList (NotRequired - Default 'list:{}')
+    # o targetProcedureSchemaList: (NotRequired - Default 'list:{}')
     #  You can specify target schema of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
     #  ex) list:{PROCEDUREDB}
@@ -43,7 +43,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o targetProcedureNameList (NotRequired - Default 'list:{}')
+    # o targetProcedureNameList: (NotRequired - Default 'list:{}')
     #  You can specify target name of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
     #  ex) list:{prefix:SP_}
@@ -51,7 +51,7 @@ map:{
     # - - - - - - - - - -/
     
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o sqlFileEncoding (NotRequired - Default 'UTF-8')
+    # o sqlFileEncoding: (NotRequired - Default 'UTF-8')
     #  The encoding of SQL file for outside SQL.
     #  Basically you don't need this.
     #
@@ -59,7 +59,7 @@ map:{
     # - - - - - - - - - -/
     
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o sqlDirectory (NotRequired - Default java.dir & '../src/main/resources')
+    # o sqlDirectory: (NotRequired - Default java.dir & '../src/main/resources')
     #  The directory of SQL file for outside SQL.
     #  Basically you don't need this.
     #
@@ -67,7 +67,7 @@ map:{
     # - - - - - - - - - -/
     
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o sqlPackage (NotRequired - Default 'UTF-8')
+    # o sqlPackage: (NotRequired - Default 'UTF-8')
     #  The package of SQL file for outside SQL.
     #  Basically you don't need this.
     #  You can use variable '$$PACKAGE_BASE$$' that means 'packageBase'.
