@@ -18,11 +18,8 @@ package org.seasar.dbflute.twowaysql.context.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import ognl.OgnlRuntime;
-
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.twowaysql.context.CommandContextPropertyAccessor;
 
 /**
  * @author jflute
@@ -52,10 +49,6 @@ public class CommandContextImpl implements CommandContext {
     private boolean alreadySkippedPrefix;
 
     private CommandContext parent;
-
-    static {
-        OgnlRuntime.setPropertyAccessor(CommandContext.class, new CommandContextPropertyAccessor());
-    }
 
     // ===================================================================================
     //                                                                         Constructor

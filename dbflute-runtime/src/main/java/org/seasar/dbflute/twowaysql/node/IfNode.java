@@ -15,12 +15,9 @@
  */
 package org.seasar.dbflute.twowaysql.node;
 
-import org.seasar.dbflute.exception.IfCommentNotBooleanResultException;
 import org.seasar.dbflute.exception.IfCommentWrongExpressionException;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.util.DfOgnlUtil;
 import org.seasar.dbflute.util.DfStringUtil;
-import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
@@ -31,7 +28,6 @@ public class IfNode extends ContainerNode {
     //                                                                           Attribute
     //                                                                           =========
     protected String _expression;
-    protected Object _parsedExpression;
     protected ElseNode _elseNode;
     protected String _specifiedSql;
 
@@ -40,19 +36,19 @@ public class IfNode extends ContainerNode {
     //                                                                         ===========
     public IfNode(String expression, String specifiedSql) {
         this._expression = expression;
-        this._parsedExpression = parseForOgnl(expression);
         this._specifiedSql = specifiedSql;
     }
 
-    protected Object parseForOgnl(String expression) {
-        return DfOgnlUtil.parseExpression(expression);
+    protected Object parseForOgnl(String expression) { // deleted at the future
+        // do nothing
+        return null;
     }
 
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
     public void accept(CommandContext ctx) {
-        doAcceptByOgnl(ctx);
+        doAcceptByEvaluator(ctx);
     }
 
     protected void doAcceptByEvaluator(CommandContext ctx) {
@@ -86,95 +82,8 @@ public class IfNode extends ContainerNode {
         }, expression, _specifiedSql);
     }
 
-    protected void doAcceptByOgnl(CommandContext ctx) {
-        Object result = null;
-        try {
-            result = DfOgnlUtil.getValue(_parsedExpression, ctx);
-        } catch (RuntimeException e) {
-            if (!_expression.contains("pmb.")) {
-                throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
-            }
-            final String replaced = replace(_expression, "pmb.", "pmb.parameterMap.");
-            final Object secondParsedExpression = DfOgnlUtil.parseExpression(replaced);
-            try {
-                result = DfOgnlUtil.getValue(secondParsedExpression, ctx);
-            } catch (RuntimeException ignored) {
-                throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
-            }
-            if (result == null) {
-                throwIfCommentWrongExpressionException(_expression, e, _specifiedSql);
-            }
-            _parsedExpression = secondParsedExpression; // switch
-        }
-        if (result != null && result instanceof Boolean) {
-            if (((Boolean) result).booleanValue()) {
-                super.accept(ctx);
-                ctx.setEnabled(true);
-            } else if (_elseNode != null) {
-                _elseNode.accept(ctx);
-                ctx.setEnabled(true);
-            }
-        } else {
-            throwIfCommentNotBooleanResultException(_expression, result, _specifiedSql);
-        }
-    }
-
-    protected void throwIfCommentWrongExpressionException(String expression, RuntimeException cause, String specifiedSql) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The IF comment of your specified SQL was Wrong!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the existence of your property on your arguments." + ln();
-        msg = msg + "And confirm the IF comment of your specified SQL." + ln();
-        msg = msg + "  For example, correct IF comment is as below:" + ln();
-        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
-        msg = msg + "    /*IF pmb.xxxId != null*/XXX_ID = .../*END*/" + ln();
-        msg = msg + "    /*IF pmb.isPaging()*/.../*END*/" + ln();
-        msg = msg + "    /*IF pmb.xxxId == null && pmb.xxxName != null*/.../*END*/" + ln();
-        msg = msg + "    /*IF pmb.xxxId == null || pmb.xxxName != null*/.../*END*/" + ln();
-        msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + ln();
-        msg = msg + "[IF Comment Expression]" + ln() + expression + ln();
-        msg = msg + ln();
-        msg = msg + "[Cause Message]" + ln();
-        msg = msg + cause.getClass() + ":" + ln();
-        msg = msg + "  --> " + cause.getMessage() + ln();
-        final Throwable nestedCause = cause.getCause();
-        if (nestedCause != null) {
-            msg = msg + nestedCause.getClass() + ":" + ln();
-            msg = msg + "  --> " + nestedCause.getMessage() + ln();
-        }
-        msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new IfCommentWrongExpressionException(msg, cause);
-    }
-
-    protected void throwIfCommentNotBooleanResultException(String expression, Object result, String specifiedSql) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The boolean expression on IF comment of your specified SQL was Wrong!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the grammar of your IF comment. Does it really express boolean?" + ln();
-        msg = msg + "And confirm the existence of your property on your arguments if you use parameterMap." + ln();
-        msg = msg + ln();
-        msg = msg + "[IF Comment Expression]" + ln() + expression + ln();
-        msg = msg + ln();
-        msg = msg + "[IF Comment Result Value]" + ln() + result + ln();
-        msg = msg + ln();
-        msg = msg + "[Specified SQL]" + ln() + specifiedSql + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new IfCommentNotBooleanResultException(msg);
-    }
-
     protected String replace(String text, String fromText, String toText) {
         return DfStringUtil.replace(text, fromText, toText);
-    }
-
-    protected String ln() {
-        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================
