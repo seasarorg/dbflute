@@ -2,9 +2,9 @@
 
 	<property name="version" value="0.9.6"/>
 	<property name="build.version" value="0.9.6-BETA1"/>
+	<property name="pre.version" value="0.9.5.5"/>
 
 	<target name="dist">
-		<delete file="../dbflute/dist/dbflute-runtime-*.jar"/>
 		<copy file="target/dbflute-runtime-${build.version}.jar"
 			  tofile="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  overwrite="true"/>
@@ -14,7 +14,6 @@
 	</target>
 
 	<target name="reflect-mac-library" depends="dist">
-		<delete file="../dbflute/lib/forCompile/dbflute-runtime-*.jar"/>
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute/lib/forCompile/dbflute-runtime.jar"
 			  overwrite="true"/>
@@ -25,7 +24,6 @@
 			  tofile="../dbflute/lib/forExecute/dbflute-runtime.jar"
 			  overwrite="true"/>
 		
-		<delete file="../javatest/lib/dbflute-runtime-*.jar"/>
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../javatest/lib/dbflute-runtime.jar"
 			  overwrite="true"/>
@@ -43,7 +41,8 @@
 	<!-- = = = = = = = = = = -->
 
 	<target name="reflect-mac-basic" depends="reflect-mac-library">
-		<delete file="../dbflute-basic-example/lib/dbflute-runtime-*.jar"/>
+		<delete file="../dbflute-basic-example/lib/dbflute-runtime-${pre.version}.jar"/>
+		<delete file="../dbflute-basic-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute-basic-example/lib/dbflute-runtime-${version}.jar"
 			  overwrite="true"/>
@@ -53,7 +52,8 @@
 	</target>
 
 	<target name="reflect-mac-spring" depends="dist">
-		<delete file="../dbflute-spring-example/lib/dbflute-runtime-*.jar"/>
+		<delete file="../dbflute-spring-example/lib/dbflute-runtime-${pre.version}.jar"/>
+		<delete file="../dbflute-spring-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
 			  overwrite="true"/>
@@ -63,7 +63,8 @@
 	</target>
 
 	<target name="reflect-mac-guice" depends="dist">
-		<delete file="../dbflute-guice-example/lib/dbflute-runtime-*.jar"/>
+		<delete file="../dbflute-guice-example/lib/dbflute-runtime-${pre.version}.jar"/>
+		<delete file="../dbflute-guice-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute-guice-example/lib/dbflute-runtime-${version}.jar"
 			  overwrite="true"/>
@@ -73,7 +74,8 @@
 	</target>
 
 	<target name="reflect-mac-lucy" depends="dist">
-		<delete file="../dbflute-lucy-example/lib/dbflute-runtime-*.jar"/>
+		<delete file="../dbflute-lucy-example/lib/dbflute-runtime-${pre.version}.jar"/>
+		<delete file="../dbflute-lucy-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute-lucy-example/lib/dbflute-runtime-${version}.jar"
 			  overwrite="true"/>
@@ -83,7 +85,8 @@
 	</target>
 
 	<target name="reflect-mac-ymir" depends="dist">
-		<delete file="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-*.jar"/>
+		<delete file="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${pre.version}.jar"/>
+		<delete file="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${version}.jar"
 			  overwrite="true"/>
@@ -93,7 +96,8 @@
 	</target>
 
 	<target name="reflect-mac-sastruts" depends="dist">
-		<delete file="../dbflute-sastruts-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-*.jar"/>
+		<delete file="../dbflute-sastruts-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${pre.version}.jar"/>
+		<delete file="../dbflute-sastruts-example/src/main/webapp/WEB-INF/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute-sastruts-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${version}.jar"
 			  overwrite="true"/>
@@ -103,7 +107,8 @@
 	</target>
 
 	<target name="reflect-mac-clientsql" depends="dist">
-		<delete file="../dbflute-clientsql-example/lib/dbflute-runtime-*.jar"/>
+		<delete file="../dbflute-clientsql-example/lib/dbflute-runtime-${pre.version}.jar"/>
+		<delete file="../dbflute-clientsql-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute-clientsql-example/lib/dbflute-runtime-${version}.jar"
 			  overwrite="true"/>
@@ -113,7 +118,8 @@
 	</target>
 
 	<target name="reflect-mac-tricky" depends="dist">
-		<delete file="../dbflute-tricky-example/lib/dbflute-runtime-*.jar"/>
+		<delete file="../dbflute-tricky-example/lib/dbflute-runtime-${pre.version}.jar"/>
+		<delete file="../dbflute-tricky-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute-tricky-example/lib/dbflute-runtime-${version}.jar"
 			  overwrite="true"/>
