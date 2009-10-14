@@ -7,6 +7,7 @@ import org.seasar.dbflute.Entity;
  * @author ${database.classAuthor}
  */
 public interface ${glEntityDefinedCommonColumn} extends Entity {
+#if ($database.isExistCommonColumnSetupElement())
 #foreach ($columnName in ${database.commonColumnNameList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($commonColumnMap = ${database.CommonColumnMap})
@@ -47,6 +48,7 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
      * @return Determination.
      */
     public boolean is${javaName}${classificationMap.get('name')}();
+#end
 #end
 #end
 #end

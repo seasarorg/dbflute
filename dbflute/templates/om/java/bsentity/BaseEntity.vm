@@ -623,7 +623,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #set ($propertyLoopIndex = $propertyLoopIndex + 1)
 #end
 #if ($table.hasAllCommonColumn())
-#foreach ($columnName in ${database.commonColumnNameConvertionList})
+#foreach ($columnName in ${database.commonColumnNameConversionList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($commonColumnMap = ${database.commonColumnMap})
 #set ($columnType = ${commonColumnMap.get(${columnName})})

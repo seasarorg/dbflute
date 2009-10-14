@@ -2335,6 +2335,15 @@ public class Table {
      * @return Determination.
      */
     public boolean hasAllCommonColumn() {
+        try {
+            return doHasAllCommonColumn();
+        } catch (RuntimeException e) {
+            _log.debug("Failed to execute 'Table.hasAllCommonColumn()'!", e);
+            throw e;
+        }
+    }
+
+    protected boolean doHasAllCommonColumn() {
         if (!isWritable()) {
             return false;
         }
@@ -2349,9 +2358,8 @@ public class Table {
         if (commonColumnNameList.isEmpty()) {
             return false;
         }
-        final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
         for (String commonColumnName : commonColumnNameList) {
-            if (commonColumnProperties.isCommonColumnConvertion(commonColumnName)) {
+            if (getProperties().getCommonColumnProperties().isCommonColumnConversion(commonColumnName)) {
                 try {
                     findTargetColumnJavaNameByCommonColumnName(commonColumnName);
                 } catch (IllegalStateException e) {
@@ -2376,16 +2384,16 @@ public class Table {
         }
         final List<String> commonColumnNameList = getDatabase().getCommonColumnNameList();
         for (String commonColumnName : commonColumnNameList) {
-            ls.add(getColumn(commonColumnName));
+            ls.add(getColumn(findTargetColumnNameByCommonColumnName(commonColumnName)));
         }
         return ls;
     }
 
     public String findTargetColumnJavaNameByCommonColumnName(String commonColumnName) {
-        final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
-        if (commonColumnProperties.isCommonColumnConvertion(commonColumnName)) {
-            String filteredCommonColumn = convertCommonColumnName(commonColumnName, commonColumnProperties);
-            final Column column = getCommonColumnConvertion(commonColumnName, filteredCommonColumn);
+        final DfCommonColumnProperties prop = getProperties().getCommonColumnProperties();
+        if (prop.isCommonColumnConversion(commonColumnName)) {
+            final String filteredCommonColumn = convertCommonColumnName(commonColumnName, prop);
+            final Column column = getCommonColumnConversion(commonColumnName, filteredCommonColumn);
             return column.getJavaName();
         } else {
             final Column column = getCommonColumnNormal(commonColumnName);
@@ -2394,10 +2402,10 @@ public class Table {
     }
 
     public String findTargetColumnNameByCommonColumnName(String commonColumnName) {
-        final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
-        if (commonColumnProperties.isCommonColumnConvertion(commonColumnName)) {
-            String filteredCommonColumn = convertCommonColumnName(commonColumnName, commonColumnProperties);
-            final Column column = getCommonColumnConvertion(commonColumnName, filteredCommonColumn);
+        final DfCommonColumnProperties prop = getProperties().getCommonColumnProperties();
+        if (prop.isCommonColumnConversion(commonColumnName)) {
+            final String filteredCommonColumn = convertCommonColumnName(commonColumnName, prop);
+            final Column column = getCommonColumnConversion(commonColumnName, filteredCommonColumn);
             return column.getName();
         } else {
             final Column column = getCommonColumnNormal(commonColumnName);
@@ -2414,19 +2422,18 @@ public class Table {
         return column;
     }
 
-    protected Column getCommonColumnConvertion(String commonColumnName, String filteredCommonColumn) {
+    protected Column getCommonColumnConversion(String commonColumnName, String filteredCommonColumn) {
         final Column column = getColumn(filteredCommonColumn);
         if (column == null) {
-            String msg = "Not found column by '" + filteredCommonColumn + "'. Original name is '" + commonColumnName
-                    + "'.";
+            String msg = "Not found column by '" + filteredCommonColumn + "': ";
+            msg = msg + "original=" + commonColumnName;
             throw new IllegalStateException(msg);
         }
         return column;
     }
 
-    protected String convertCommonColumnName(String commonColumnName,
-            final DfCommonColumnProperties commonColumnProperties) {
-        String filteredCommonColumn = commonColumnProperties.filterCommonColumn(commonColumnName);
+    protected String convertCommonColumnName(String commonColumnName, DfCommonColumnProperties prop) {
+        String filteredCommonColumn = prop.filterCommonColumn(commonColumnName);
         filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "TABLE_NAME", getName());
         filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "table_name", getName());
         filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "TableName", getJavaName());
@@ -2492,7 +2499,12 @@ public class Table {
     //                                                                     Behavior Filter
     //                                                                     ===============
     public boolean hasBehaviorFilterBeforeColumn() {
-        return hasBehaviorFilterBeforeInsertColumn() || hasBehaviorFilterBeforeUpdateColumn();
+        try {
+            return hasBehaviorFilterBeforeInsertColumn() || hasBehaviorFilterBeforeUpdateColumn();
+        } catch (RuntimeException e) {
+            _log.debug("Failed to execute 'Table.hasBehaviorFilterBeforeColumn()'!", e);
+            throw e;
+        }
     }
 
     protected List<Column> _behaviorFilterBeforeInsertColumnList;
@@ -2505,13 +2517,13 @@ public class Table {
         if (_behaviorFilterBeforeInsertColumnList != null) {
             return _behaviorFilterBeforeInsertColumnList;
         }
-        DfBehaviorFilterProperties prop = getProperties().getBehaviorFilterProperties();
-        Map<String, Object> map = prop.getBeforeInsertMap();
-        Set<String> columnNameSet = map.keySet();
+        final DfBehaviorFilterProperties prop = getProperties().getBehaviorFilterProperties();
+        final Map<String, Object> map = prop.getBeforeInsertMap();
+        final Set<String> columnNameSet = map.keySet();
         _behaviorFilterBeforeInsertColumnList = new ArrayList<Column>();
-        Set<String> commonColumnNameSet = new HashSet<String>();
+        final Set<String> commonColumnNameSet = new HashSet<String>();
         if (hasAllCommonColumn()) {
-            List<Column> commonColumnList = getCommonColumnList();
+            final List<Column> commonColumnList = getCommonColumnList();
             for (Column commonColumn : commonColumnList) {
                 commonColumnNameSet.add(commonColumn.getName());
             }

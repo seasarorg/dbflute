@@ -581,7 +581,7 @@ public abstract class ${myClassName} implements ${myEntityInterfaceName} {
 #end
 #end
 #if ($table.hasAllCommonColumn())
-#foreach ($columnName in ${database.commonColumnNameConvertionList})
+#foreach ($columnName in ${database.commonColumnNameConversionList})
 #set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
 #set ($commonColumnMap = ${database.commonColumnMap})
 #set ($columnType = ${commonColumnMap.get(${columnName})})

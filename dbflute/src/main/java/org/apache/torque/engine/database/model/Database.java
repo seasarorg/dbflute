@@ -88,9 +88,9 @@ import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionFinder;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
-import org.seasar.dbflute.properties.DfCommonColumnProperties.CommonColumnSetupResource;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.properties.assistant.TableFinder;
+import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.xml.sax.Attributes;
 
 /**
@@ -1086,12 +1086,8 @@ public class Database {
         return getProperties().getCommonColumnProperties().getCommonColumnNameList();
     }
 
-    public List<String> getCommonColumnNameConvertionList() {
-        return getProperties().getCommonColumnProperties().getCommonColumnNameConvertionList();
-    }
-
-    public boolean isCommonColumnConvertion(String commonColumnName) {
-        return getProperties().getCommonColumnProperties().isCommonColumnConvertion(commonColumnName);
+    public List<String> getCommonColumnNameConversionList() {
+        return getProperties().getCommonColumnProperties().getCommonColumnNameConversionList();
     }
 
     public String filterCommonColumn(String commonColumnName) {
@@ -1107,7 +1103,7 @@ public class Database {
     }
 
     public boolean hasCommonColumnConvertion(String commonColumnName) {
-        return getProperties().getCommonColumnProperties().isCommonColumnConvertion(commonColumnName);
+        return getProperties().getCommonColumnProperties().isCommonColumnConversion(commonColumnName);
     }
 
     // --------------------------------------
@@ -1142,23 +1138,6 @@ public class Database {
     public String getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(String columnName) {
         return getProperties().getCommonColumnProperties()
                 .getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(columnName);
-    }
-
-    // --------------------------------------
-    //                                 delete
-    //                                 ------
-    public Map<String, Object> getCommonColumnSetupBeforeDeleteInterceptorLogicMap() {
-        return getProperties().getCommonColumnProperties().getBeforeDeleteMap();
-    }
-
-    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(String columnName) {
-        return getProperties().getCommonColumnProperties()
-                .containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(columnName);
-    }
-
-    public String getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(String columnName) {
-        return getProperties().getCommonColumnProperties()
-                .getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(columnName);
     }
 
     // --------------------------------------

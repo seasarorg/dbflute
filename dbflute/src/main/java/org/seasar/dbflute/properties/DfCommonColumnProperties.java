@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
@@ -77,31 +78,43 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         return _commonColumnNameList;
     }
 
-    public static final String COMMON_COLUMN_CONVERTION_PREFIX_MARK = "$-";
+    // -----------------------------------------------------
+    //                                     Column Conversion
+    //                                     -----------------
+    // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+    // ex) If common columns start with table name
+    // map:{
+    //     ; commonColumnMap = map:{
+    //         ; $-TABLE_NAME_REGISTER_DATETIME=TIMESTAMP ; ...
+    //         ; $-TABLE_NAME_UPDATE_DATETIME=TIMESTAMP   ; ...
+    //     }
+    //     ; ...
+    // - - - - - - - - - -/
+    public static final String COMMON_COLUMN_CONVERSION_PREFIX_MARK = "$-";
 
-    protected List<String> _commonColumnNameConvertionList;
+    protected List<String> _commonColumnNameConversionList;
 
-    public List<String> getCommonColumnNameConvertionList() {
-        if (_commonColumnNameConvertionList == null) {
-            _commonColumnNameConvertionList = new ArrayList<String>();
+    public List<String> getCommonColumnNameConversionList() {
+        if (_commonColumnNameConversionList == null) {
+            _commonColumnNameConversionList = new ArrayList<String>();
             final Map<String, Object> commonColumnMap = getCommonColumnMap();
             final Set<String> keySet = commonColumnMap.keySet();
             for (String columnName : keySet) {
-                if (columnName.startsWith(COMMON_COLUMN_CONVERTION_PREFIX_MARK)) {
-                    _commonColumnNameConvertionList.add(columnName);
+                if (columnName.startsWith(COMMON_COLUMN_CONVERSION_PREFIX_MARK)) {
+                    _commonColumnNameConversionList.add(columnName);
                 }
             }
         }
-        return _commonColumnNameConvertionList;
+        return _commonColumnNameConversionList;
     }
 
-    public boolean isCommonColumnConvertion(String commonColumnName) {
-        return commonColumnName.startsWith(COMMON_COLUMN_CONVERTION_PREFIX_MARK);
+    public boolean isCommonColumnConversion(String commonColumnName) {
+        return commonColumnName.startsWith(COMMON_COLUMN_CONVERSION_PREFIX_MARK);
     }
 
     public String filterCommonColumn(String commonColumnName) {
-        if (commonColumnName.startsWith(COMMON_COLUMN_CONVERTION_PREFIX_MARK)) {
-            return commonColumnName.substring(COMMON_COLUMN_CONVERTION_PREFIX_MARK.length());
+        if (commonColumnName.startsWith(COMMON_COLUMN_CONVERSION_PREFIX_MARK)) {
+            return commonColumnName.substring(COMMON_COLUMN_CONVERSION_PREFIX_MARK.length());
         } else {
             return commonColumnName;
         }
@@ -113,8 +126,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     public boolean isExistCommonColumnSetupElement() {
         final Map<String, Object> insertElementMap = getBeforeInsertMap();
         final Map<String, Object> updateElementMap = getBeforeUpdateMap();
-        final Map<String, Object> deleteElementMap = getBeforeDeleteMap();
-        if (insertElementMap.isEmpty() && updateElementMap.isEmpty() && deleteElementMap.isEmpty()) {
+        if (insertElementMap.isEmpty() && updateElementMap.isEmpty()) {
             return false;
         }
         return true;
@@ -129,7 +141,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     @SuppressWarnings("unchecked")
     public Map<String, Object> getBeforeInsertMap() {
         if (_beforeInsertMap == null) {
-            getCommonColumnMap();// For initialization of commonColumnMap.
+            getCommonColumnMap(); // For initialization of commonColumnMap.
             if (_commonColumnTopMap != null && _commonColumnTopMap.containsKey("beforeInsertMap")) {
                 // For the way by dfprop-setting.
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -177,7 +189,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     @SuppressWarnings("unchecked")
     public Map<String, Object> getBeforeUpdateMap() {
         if (_beforeUpdateMap == null) {
-            getCommonColumnMap();// For initialization of commonColumnMap.
+            getCommonColumnMap(); // For initialization of commonColumnMap.
             if (_commonColumnTopMap != null && _commonColumnTopMap.containsKey("beforeUpdateMap")) {
                 // For the way by dfprop-setting.
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -214,59 +226,15 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                    Intercept Delete
-    //                                                                    ================
-    public static final String KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap = "commonColumnSetupBeforeDeleteInterceptorLogicMap";
-    protected Map<String, Object> _beforeDeleteMap;
-
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> getBeforeDeleteMap() {
-        if (_beforeDeleteMap == null) {
-            getCommonColumnMap();// For initialization of commonColumnMap.
-            if (_commonColumnTopMap != null && _commonColumnTopMap.containsKey("beforeDeleteMap")) {
-                // For the way by dfprop-setting.
-                // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                // ; beforeDeleteMap = map:{
-                //     ; REGISTER_DATETIME = $$AccessContext$$.getAccessTimestampOnThread()
-                //     ; REGISTER_USER     = $$AccessContext$$.getAccessUserOnThread()
-                //     ; REGISTER_PROCESS  = $$AccessContext$$.getAccessProcessOnThread()
-                //     ; UPDATE_DATETIME   = entity.getRegisterDatetime()
-                //     ; UPDATE_USER       = entity.getRegisterUser()
-                //     ; UPDATE_PROCESS    = entity.getRegisterProcess()
-                // }
-                // - - - - - - - - - -/ 
-                _beforeDeleteMap = (Map<String, Object>) _commonColumnTopMap.get("beforeDeleteMap");
-            } else {
-                // For old style.
-                final String key = "torque." + KEY_commonColumnSetupBeforeDeleteInterceptorLogicMap;
-                _beforeDeleteMap = mapProp(key, DEFAULT_EMPTY_MAP);
-            }
-            filterCommonColumnSetupValue(_beforeDeleteMap);
-        }
-        return _beforeDeleteMap;
-    }
-
-    public boolean containsValidColumnNameKeyCommonColumnSetupBeforeDeleteInterceptorLogicMap(String columnName) {
-        final Map<String, Object> map = getBeforeDeleteMap();
-        final String logic = (String) map.get(columnName);
-        if (logic != null && logic.trim().length() != 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public String getCommonColumnSetupBeforeDeleteInterceptorLogicByColumnName(String columnName) {
-        final Map<String, Object> map = getBeforeDeleteMap();
-        return (String) map.get(columnName);
-    }
-
-    // ===================================================================================
     //                                                                    Intercept Common
     //                                                                    ================
     // -----------------------------------------------------
     //                                        Logic Handling
     //                                        --------------
+    // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+    // ex) Get a value from a method of classification.
+    // DELETE_FLG = $entity.classifyDeleteFlgTrue()
+    // - - - - - - - - - -/
     public boolean isCommonColumnSetupInvokingLogic(String logic) {
         return logic.startsWith("$");
     }
@@ -324,13 +292,13 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                              resource
     //                                              --------
+    // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+    // ex) Get date from dateProvider
+    // R_TIMESTAMP = @org.seasar.dbflute.DateProvider@dateProvider.getDate()
+    // - - - - - - - - - -/
     protected static final String COMMON_COLUMN_SETUP_RESOURCE_PREFIX_MARK = "@";
     protected static final String COMMON_COLUMN_SETUP_RESOURCE_SECOND_MARK = "@";
     protected static final String COMMON_COLUMN_SETUP_RESOURCE_VARIABLE_PREFIX = "_";
-
-    // 
-    // @org.seasar.dbflute.DateProvider@dateProvider.getDate()
-    // 
 
     protected Map<String, CommonColumnSetupResource> _commonColumnSetupResourceMap = new LinkedHashMap<String, CommonColumnSetupResource>();
 
@@ -356,14 +324,21 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
         String remainderString = value.substring(prefixMark.length());
         if (!remainderString.contains(secondMark)) {
             String msg = "The common column setup may be wrong format.";
-            msg = msg + " Not found second mark[" + secondMark + "]" + ": " + value;
+            msg = msg + " Not found second mark[" + secondMark + "]" + ": value=" + value;
+            msg = msg + " right answer=@org....DataProvider@dataProvider.getDate()";
             throw new IllegalStateException(msg);
         }
         final int secondMarkIndex = remainderString.indexOf(prefixMark);
         final String className = remainderString.substring(0, secondMarkIndex);
         remainderString = remainderString.substring(secondMarkIndex + 1);
+        final int methodCallDotIndex = remainderString.indexOf(".");
+        if (methodCallDotIndex < 0) {
+            String msg = "The common column setup may be wrong format.";
+            msg = msg + " Not found method call: value=" + value;
+            msg = msg + " right answer=...DataProvider@dataProvider.getDate()";
+            throw new IllegalStateException(msg);
+        }
         final String propertyName = remainderString.substring(0, remainderString.indexOf("."));
-
         final CommonColumnSetupResource resource = createCommonColumnSetupResource(className, propertyName);
         _commonColumnSetupResourceMap.put(propertyName, resource);
         return true;
@@ -378,39 +353,5 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
 
     protected CommonColumnSetupResource newCommonColumnSetupResource() {
         return new CommonColumnSetupResource(COMMON_COLUMN_SETUP_RESOURCE_VARIABLE_PREFIX);
-    }
-
-    public static class CommonColumnSetupResource {
-        protected String className;
-        protected String propertyName;
-        protected String variablePrefix;
-
-        public CommonColumnSetupResource(String variablePrefix) {
-            this.variablePrefix = variablePrefix;
-        }
-
-        public String getClassName() {
-            return className;
-        }
-
-        public void setClassName(String className) {
-            this.className = className;
-        }
-
-        public String getPropertyName() {
-            return propertyName;
-        }
-
-        public String getPropertyNameInitCap() {
-            return DfStringUtil.initCapAfterTrimming(propertyName);
-        }
-
-        public String getPropertyVariableName() {
-            return variablePrefix + propertyName;
-        }
-
-        public void setPropertyName(String propertyName) {
-            this.propertyName = propertyName;
-        }
     }
 }
