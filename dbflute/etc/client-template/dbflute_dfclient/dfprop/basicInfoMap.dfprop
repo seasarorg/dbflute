@@ -29,7 +29,7 @@ map:{
     #  the SQL for your DBFlute project.
     #  Your possible choices are:
     #
-    #    h2, derby, mysql, postgresql, oracle, db2, mssql,
+    #    mysql, postgresql, oracle, db2, mssql, h2, derby
     # 
     ; database = h2
     # - - - - - - - - - -/
