@@ -21,6 +21,7 @@ import java.sql.Statement;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
+import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.jdbc.ResultSetWrapper;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.resource.SQLExceptionHandler;
@@ -51,15 +52,15 @@ public class TnPagingResultSet extends ResultSetWrapper {
 
     /** Does it limit by cursor forcedly? */
     protected boolean _limitByCursorForcedly;
-	
-	/** Does it skip to cursor end? */
-	protected boolean _skipToCursorEnd;
 
-	/** Is the database DB2? */
-	protected final boolean _db2;
-	{
-	    _db2 = ResourceContext.isCurrentDBDef(DBDef.DB2);
-	}
+    /** Does it skip to cursor end? */
+    protected boolean _skipToCursorEnd;
+
+    /** Is the database DB2? */
+    protected final boolean _db2;
+    {
+        _db2 = ResourceContext.isCurrentDBDef(DBDef.DB2);
+    }
 
     // ===================================================================================
     //                                                                         Constructor
@@ -71,8 +72,8 @@ public class TnPagingResultSet extends ResultSetWrapper {
      * @param offsetByCursorForcedly Offset by cursor forcedly.
      * @param limitByCursorForcedly Limit by cursor forcedly.
      */
-    public TnPagingResultSet(ResultSet resultSet, FetchNarrowingBean fetchNarrowingBean
-                                         , boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
+    public TnPagingResultSet(ResultSet resultSet, FetchNarrowingBean fetchNarrowingBean,
+            boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
         super(resultSet);
 
         _resultSet = resultSet;
@@ -108,13 +109,13 @@ public class TnPagingResultSet extends ResultSetWrapper {
         } else {
             try {
                 while (true) {
-					if (_fetchCounter >= skipStartIndex) {
-					    break;
-					}
-					if (!_resultSet.next()) {
-					    _skipToCursorEnd = true;// [DBFLUTE-243]
-					    break;
-					}
+                    if (_fetchCounter >= skipStartIndex) {
+                        break;
+                    }
+                    if (!_resultSet.next()) {
+                        _skipToCursorEnd = true;// [DBFLUTE-243]
+                        break;
+                    }
                     ++_fetchCounter;
                 }
             } catch (SQLException e) {
@@ -145,9 +146,9 @@ public class TnPagingResultSet extends ResultSetWrapper {
      * @throws SQLException
      */
     public boolean next() throws SQLException {
-	    if (_db2 && _skipToCursorEnd) { // [DBFLUTE-243]
-		    return false;
-		}
+        if (_db2 && _skipToCursorEnd) { // [DBFLUTE-243]
+            return false;
+        }
         final boolean hasNext = super.next();
         ++_requestCounter;
         if (!isAvailableLimitLoopCount()) {
@@ -155,7 +156,9 @@ public class TnPagingResultSet extends ResultSetWrapper {
             return hasNext;
         }
 
-        if (hasNext && _fetchCounter < getFetchNarrowingSkipStartIndex() + getFetchNarrowingLoopCount()) {
+        final int skipStartIndex = getFetchNarrowingSkipStartIndex();
+        final int loopCount = getFetchNarrowingLoopCount();
+        if (hasNext && _fetchCounter < skipStartIndex + loopCount) {
             ++_fetchCounter;
             checkSafetyResult(true);
             return true;
@@ -178,10 +181,11 @@ public class TnPagingResultSet extends ResultSetWrapper {
     }
 
     protected void checkSafetyResult(boolean hasNext) {
-        if (hasNext && getSafetyMaxResultSize() > 0 && _requestCounter > (getSafetyMaxResultSize() + 1)) {
-            String msg = "You have already been in Danger Zone!";
-            msg = msg + " Please confirm your query or data of table: safetyMaxResultSize=" + getSafetyMaxResultSize();
-            throw new org.seasar.dbflute.exception.DangerousResultSizeException(msg, getSafetyMaxResultSize());
+        final int safetyMaxResultSize = getSafetyMaxResultSize();
+        if (hasNext && safetyMaxResultSize > 0 && _requestCounter > safetyMaxResultSize) {
+            String msg = "You've been in Danger Zone:";
+            msg = msg + " safetyMaxResultSize=" + safetyMaxResultSize;
+            throw new DangerousResultSizeException(msg, safetyMaxResultSize);
         }
     }
 
@@ -227,7 +231,7 @@ public class TnPagingResultSet extends ResultSetWrapper {
     protected void handleSQLException(SQLException e, Statement statement) {
         new SQLExceptionHandler().handleSQLException(e, statement);
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
@@ -238,8 +242,8 @@ public class TnPagingResultSet extends ResultSetWrapper {
     public boolean isLimitByCursorForcedly() {
         return _limitByCursorForcedly;
     }
-	
-	public boolean isSkipToCursorEnd() {
-	    return _skipToCursorEnd;
-	}
+
+    public boolean isSkipToCursorEnd() {
+        return _skipToCursorEnd;
+    }
 }

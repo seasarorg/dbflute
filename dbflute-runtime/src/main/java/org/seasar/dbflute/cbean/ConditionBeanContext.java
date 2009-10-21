@@ -202,7 +202,7 @@ public class ConditionBeanContext {
     public static void throwEntityAlreadyDeletedException(Object searchKey4Log) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The entity was Not Found! it has already been deleted!" + ln();
+        msg = msg + "The entity was NOT found! it has already been deleted!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm the existence of your target record on your database." + ln();
@@ -223,12 +223,12 @@ public class ConditionBeanContext {
     public static void throwEntityDuplicatedException(String resultCountString, Object searchKey4Log, Throwable cause) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The entity was Too Many! it has been duplicated. It should be the only one! But the resultCount="
-                + resultCountString + ln();
+        msg = msg + "The entity was too many! it has been duplicated." + ln();
+        msg = msg + "It should be the only one! But the resultCount: " + resultCountString + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your search condition. Does it really select the only one?" + ln();
-        msg = msg + "Please confirm your database. Does it really exist the only one?" + ln();
+        msg = msg + "Confirm your search condition. Does it really select the only one?" + ln();
+        msg = msg + "And confirm your database. Does it really exist the only one?" + ln();
         msg = msg + ln();
         if (searchKey4Log != null && searchKey4Log instanceof ConditionBean) {
             final ConditionBean cb = (ConditionBean) searchKey4Log;

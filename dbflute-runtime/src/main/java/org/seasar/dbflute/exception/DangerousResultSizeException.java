@@ -24,13 +24,16 @@ public class DangerousResultSizeException extends RuntimeException {
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
 
-    /** Safety max result size. */
+    /** The max size of safety result. */
     protected int _safetyMaxResultSize;
+
+    /** The actual size of result. */
+    protected int _actualResultSize;
 
     /**
      * Constructor.
      * @param msg Exception message. (NotNull)
-     * @param safetyMaxResultSize Safety max result size.
+     * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
      */
     public DangerousResultSizeException(String msg, int safetyMaxResultSize) {
         super(msg);
@@ -38,10 +41,30 @@ public class DangerousResultSizeException extends RuntimeException {
     }
 
     /**
-     * Get safety max result size.
-     * @return Safety max result size.
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param safetyMaxResultSize The max size of safety result. (NotZero, ZotMinus)
+     * @param actualResultSize The actual size of result. (NotZero, ZotMinus, GraeterThanMaxSize)
+     */
+    public DangerousResultSizeException(String msg, int safetyMaxResultSize, int actualResultSize) {
+        super(msg);
+        this._safetyMaxResultSize = safetyMaxResultSize;
+        this._actualResultSize = actualResultSize;
+    }
+
+    /**
+     * Get the max size of safety result.
+     * @return The max size of safety result. (Basically returns a plus value)
      */
     public int getSafetyMaxResultSize() {
         return _safetyMaxResultSize;
+    }
+
+    /**
+     * Get the actual size of result.
+     * @return The actual size of result. (If the value is minus, it means it's unknown)
+     */
+    public int getActualResultSize() {
+        return _actualResultSize;
     }
 }

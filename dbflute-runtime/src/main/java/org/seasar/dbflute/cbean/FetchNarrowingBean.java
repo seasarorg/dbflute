@@ -23,35 +23,30 @@ public interface FetchNarrowingBean {
 
     /**
      * Get fetch start index.
-     * 
      * @return Fetch start index.
      */
     public int getFetchNarrowingSkipStartIndex();
 
     /**
      * Get fetch size.
-     * 
      * @return Fetch size.
      */
     public int getFetchNarrowingLoopCount();
 
     /**
      * Is fetch start index supported?
-     * 
      * @return Determination.
      */
     public boolean isFetchNarrowingSkipStartIndexEffective();
 
     /**
      * Is fetch size supported?
-     * 
      * @return Determination.
      */
     public boolean isFetchNarrowingLoopCountEffective();
 
     /**
      * Is fetch-narrowing effective?
-     * 
      * @return Determination.
      */
     public boolean isFetchNarrowingEffective();
@@ -67,9 +62,8 @@ public interface FetchNarrowingBean {
     public void restoreIgnoredFetchNarrowing();
 
     /**
-     * Get safety max result size.
-     * 
-     * @return Safety max result size.
+     * Get the max size of safety result.
+     * @return The max size of safety result.
      */
     public int getSafetyMaxResultSize();
 }

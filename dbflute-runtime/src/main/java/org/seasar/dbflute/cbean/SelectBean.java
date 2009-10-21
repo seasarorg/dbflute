@@ -22,8 +22,9 @@ package org.seasar.dbflute.cbean;
 public interface SelectBean {
 
     /**
-     * Check safety result.
-     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     * Check whether the result size is safety or not. <br />
+     * If the result size is in Danger Zone, the select method throws DangerousResultSizeException.
+     * @param safetyMaxResultSize The max size of safety result. (If zero or minus, checking is invalid)
      */
     void checkSafetyResult(int safetyMaxResultSize);
 }

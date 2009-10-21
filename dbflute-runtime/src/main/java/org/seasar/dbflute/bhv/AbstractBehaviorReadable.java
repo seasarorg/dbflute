@@ -51,6 +51,7 @@ import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingSimpleFacade;
@@ -132,8 +133,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         List<ENTITY> ls = null;
         try {
             ls = callback.callbackSelectList(cb);
-        } catch (org.seasar.dbflute.exception.DangerousResultSizeException e) {
-            throwEntityDuplicatedException("{Over safetyMaxResultSize '1'}", cb, e);
+        } catch (DangerousResultSizeException e) {
+            throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
         }
         if (ls.isEmpty()) {
             return null;
@@ -153,8 +154,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         List<ENTITY> ls = null;
         try {
             ls = callback.callbackSelectList(cb);
-        } catch (org.seasar.dbflute.exception.DangerousResultSizeException e) {
-            throwEntityDuplicatedException("{Over safetyMaxResultSize '1'}", cb, e);
+        } catch (DangerousResultSizeException e) {
+            throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
         }
         assertEntityNotDeleted(ls, cb);
         assertEntitySelectedAsOne(ls, cb);
@@ -234,7 +235,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             throwEntityAlreadyDeletedException(searchKey4Log);
         }
         if (ls.size() > 1) {
-            throwEntityDuplicatedException(ls.size() + "", searchKey4Log, null);
+            throwEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
         }
     }
 

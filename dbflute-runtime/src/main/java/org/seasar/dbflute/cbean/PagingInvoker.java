@@ -17,6 +17,8 @@ package org.seasar.dbflute.cbean;
 
 import java.util.List;
 
+import org.seasar.dbflute.exception.DangerousResultSizeException;
+
 /**
  * The invoker of paging.
  * @param <ENTITY> The type of entity.
@@ -47,6 +49,7 @@ public class PagingInvoker<ENTITY> {
     public PagingResultBean<ENTITY> invokePaging(PagingHandler<ENTITY> handler) {
         assertObjectNotNull("handler", handler);
         final PagingBean pagingBean = handler.getPagingBean();
+        final int safetyMaxResultSize = pagingBean.getSafetyMaxResultSize();
         assertObjectNotNull("handler.getPagingBean()", pagingBean);
         if (!pagingBean.isFetchScopeEffective()) {
             String msg = "The paging bean is not effective about fetch-scope!";
@@ -74,6 +77,7 @@ public class PagingInvoker<ENTITY> {
                 selectedList = handler.paging();
             }
         }
+        checkSafetyResult(safetyMaxResultSize, allRecordCount);
         final PagingResultBean<ENTITY> rb = builder.buildPagingResultBean(pagingBean, allRecordCount, selectedList);
         if (pagingBean.canPagingReSelect() && isNecessaryToReadPageAgain(rb)) {
             pagingBean.fetchPage(rb.getAllPageCount());
@@ -132,6 +136,20 @@ public class PagingInvoker<ENTITY> {
      */
     protected boolean isNecessaryToReadPageAgain(PagingResultBean<ENTITY> rb) {
         return rb.getAllRecordCount() > 0 && rb.getSelectedList().isEmpty();
+    }
+
+    /**
+     * Check whether the count of all records is safety or not.
+     * @param safetyMaxResultSize The max size of safety result.
+     * @param allRecordCount The count of all records.
+     * @throws DangerousResultSizeException When the count of all records is dangerous.
+     */
+    protected void checkSafetyResult(int safetyMaxResultSize, int allRecordCount) {
+        if (safetyMaxResultSize > 0 && allRecordCount > safetyMaxResultSize) {
+            String msg = "You've been in Danger Zone:";
+            msg = msg + " safetyMaxResultSize=" + safetyMaxResultSize;
+            throw new DangerousResultSizeException(msg, safetyMaxResultSize, allRecordCount);
+        }
     }
 
     // ===================================================================================
