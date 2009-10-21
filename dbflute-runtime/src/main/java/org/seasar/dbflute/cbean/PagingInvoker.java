@@ -148,6 +148,7 @@ public class PagingInvoker<ENTITY> {
         if (safetyMaxResultSize > 0 && allRecordCount > safetyMaxResultSize) {
             String msg = "You've been in Danger Zone:";
             msg = msg + " safetyMaxResultSize=" + safetyMaxResultSize;
+            msg = msg + " allRecordCount=" + allRecordCount;
             throw new DangerousResultSizeException(msg, safetyMaxResultSize, allRecordCount);
         }
     }
