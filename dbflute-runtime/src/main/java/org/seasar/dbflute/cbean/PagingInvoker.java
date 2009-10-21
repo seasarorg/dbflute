@@ -61,31 +61,35 @@ public class PagingInvoker<ENTITY> {
         final ResultBeanBuilder<ENTITY> builder = createResultBeanBuilder();
         final int allRecordCount;
         final List<ENTITY> selectedList;
-        if (pagingBean.isCountLater()) {
-            selectedList = handler.paging();
-            if (isCurrentLastPage(selectedList, pagingBean)) {
-                allRecordCount = deriveAllRecordCountFromLastPageValues(selectedList, pagingBean);
+        try {
+            if (pagingBean.isCountLater()) {
+                selectedList = handler.paging();
+                if (isCurrentLastPage(selectedList, pagingBean)) {
+                    allRecordCount = deriveAllRecordCountFromLastPageValues(selectedList, pagingBean);
+                } else {
+                    allRecordCount = handler.count();
+                }
+                checkSafetyResult(safetyMaxResultSize, allRecordCount);
             } else {
                 allRecordCount = handler.count();
+                checkSafetyResult(safetyMaxResultSize, allRecordCount);
+                if (allRecordCount == 0) {
+                    selectedList = builder.buildEmptyListResultBean(pagingBean);
+                } else {
+                    selectedList = handler.paging();
+                }
             }
-        } else {
-            allRecordCount = handler.count();
-            if (allRecordCount == 0) {
-                pagingBean.xsetPaging(true); // restore its paging state
-                selectedList = builder.buildEmptyListResultBean(pagingBean);
+            final PagingResultBean<ENTITY> rb = builder.buildPagingResultBean(pagingBean, allRecordCount, selectedList);
+            if (pagingBean.canPagingReSelect() && isNecessaryToReadPageAgain(rb)) {
+                pagingBean.fetchPage(rb.getAllPageCount());
+                final int reAllRecordCount = handler.count();
+                final List<ENTITY> reSelectedList = handler.paging();
+                return builder.buildPagingResultBean(pagingBean, reAllRecordCount, reSelectedList);
             } else {
-                selectedList = handler.paging();
+                return rb;
             }
-        }
-        checkSafetyResult(safetyMaxResultSize, allRecordCount);
-        final PagingResultBean<ENTITY> rb = builder.buildPagingResultBean(pagingBean, allRecordCount, selectedList);
-        if (pagingBean.canPagingReSelect() && isNecessaryToReadPageAgain(rb)) {
-            pagingBean.fetchPage(rb.getAllPageCount());
-            final int reAllRecordCount = handler.count();
-            final List<ENTITY> reSelectedList = handler.paging();
-            return builder.buildPagingResultBean(pagingBean, reAllRecordCount, reSelectedList);
-        } else {
-            return rb;
+        } finally {
+            pagingBean.xsetPaging(true); // restore its paging state finally
         }
     }
 
