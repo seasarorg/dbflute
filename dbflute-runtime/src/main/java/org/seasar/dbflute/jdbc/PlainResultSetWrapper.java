@@ -37,11 +37,11 @@ import java.util.Map;
 /**
  * @author jflute
  */
-public class ResultSetWrapper implements ResultSet {
+public class PlainResultSetWrapper implements ResultSet {
 
     private ResultSet original;
 
-    public ResultSetWrapper(ResultSet original) {
+    public PlainResultSetWrapper(ResultSet original) {
         this.original = original;
     }
 
@@ -266,7 +266,6 @@ public class ResultSetWrapper implements ResultSet {
     }
 
     public void updateBinaryStream(int columnIndex, InputStream x, int length) throws SQLException {
-
         original.updateBinaryStream(columnIndex, x, length);
     }
 
@@ -275,7 +274,6 @@ public class ResultSetWrapper implements ResultSet {
     }
 
     public void updateCharacterStream(int columnIndex, Reader x, int length) throws SQLException {
-
         original.updateCharacterStream(columnIndex, x, length);
     }
 
@@ -288,7 +286,6 @@ public class ResultSetWrapper implements ResultSet {
     }
 
     public void updateObject(int columnIndex, Object x, int scale) throws SQLException {
-
         original.updateObject(columnIndex, x, scale);
     }
 
@@ -465,7 +462,6 @@ public class ResultSetWrapper implements ResultSet {
     }
 
     public void updateTimestamp(int columnIndex, Timestamp x) throws SQLException {
-
         original.updateTimestamp(columnIndex, x);
     }
 
@@ -488,12 +484,10 @@ public class ResultSetWrapper implements ResultSet {
     }
 
     public void updateAsciiStream(String columnName, InputStream x, int length) throws SQLException {
-
         original.updateAsciiStream(columnName, x, length);
     }
 
     public void updateBinaryStream(String columnName, InputStream x, int length) throws SQLException {
-
         original.updateBinaryStream(columnName, x, length);
     }
 
@@ -502,7 +496,6 @@ public class ResultSetWrapper implements ResultSet {
     }
 
     public void updateCharacterStream(String columnName, Reader reader, int length) throws SQLException {
-
         original.updateCharacterStream(columnName, reader, length);
     }
 
@@ -617,12 +610,10 @@ public class ResultSetWrapper implements ResultSet {
     }
 
     public void updateTimestamp(String columnName, Timestamp x) throws SQLException {
-
         original.updateTimestamp(columnName, x);
     }
 
     public Timestamp getTimestamp(int columnIndex, Calendar cal) throws SQLException {
-
         return original.getTimestamp(columnIndex, cal);
     }
 
@@ -640,7 +631,6 @@ public class ResultSetWrapper implements ResultSet {
     }
 
     public Timestamp getTimestamp(String columnName, Calendar cal) throws SQLException {
-
         return original.getTimestamp(columnName, cal);
     }
 }

@@ -15,9 +15,11 @@
  */
 package org.seasar.dbflute.twowaysql.pmbean;
 
+import org.seasar.dbflute.cbean.SelectBean;
+
 /**
- * The parameter-bean as marker interface.
+ * The parameter-bean.
  * @author jflute
  */
-public interface ParameterBean {
+public interface ParameterBean extends SelectBean {
 }

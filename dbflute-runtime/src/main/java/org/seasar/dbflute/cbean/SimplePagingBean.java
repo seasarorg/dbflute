@@ -43,7 +43,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     /** The map of parameter. (Nullable) */
     protected Map<String, Object> _parameterMap;
 
-    /** Safety max result size. */
+    /** The max size of safety result. */
     protected int _safetyMaxResultSize;
 
     /** Is the execution for paging(NOT count)? */
@@ -216,6 +216,16 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     }
 
     // ===================================================================================
+    //                                                        Implementation of SelectBean
+    //                                                        ============================
+    /**
+     * {@inheritDoc}
+     */
+    public int getSafetyMaxResultSize() {
+        return _safetyMaxResultSize;
+    }
+
+    // ===================================================================================
     //                                                Implementation of FetchNarrowingBean
     //                                                ====================================
     /**
@@ -265,13 +275,6 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
      */
     public void restoreIgnoredFetchNarrowing() {
         _fetchNarrowing = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getSafetyMaxResultSize() {
-        return _safetyMaxResultSize;
     }
 
     // ===================================================================================

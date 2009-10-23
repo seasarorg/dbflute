@@ -17,9 +17,9 @@ package org.seasar.dbflute.bhv.core.command;
 
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
+import org.seasar.dbflute.cbean.SelectBeanContext;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
-import org.seasar.dbflute.cbean.FetchNarrowingBeanContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateQueryAutoDynamicCommand;
 
@@ -59,7 +59,7 @@ public class QueryUpdateEntityCBCommand extends AbstractEntityCommand {
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
         final ConditionBean cb = _conditionBean;
-        FetchNarrowingBeanContext.setFetchNarrowingBeanOnThread(cb);
+        SelectBeanContext.setSelectBeanOnThread(cb);
         ConditionBeanContext.setConditionBeanOnThread(cb);
     }
 

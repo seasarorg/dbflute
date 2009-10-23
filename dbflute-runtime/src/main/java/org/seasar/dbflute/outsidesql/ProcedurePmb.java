@@ -15,15 +15,17 @@
  */
 package org.seasar.dbflute.outsidesql;
 
+import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
+
 /**
  * The parameter-bean for procedure.
  * @author jflute
  */
-public interface ProcedurePmb {
+public interface ProcedurePmb extends ParameterBean {
 
     /**
      * Get the value of procedure name.
      * @return The value of procedure name. (NotNull)
      */
-    public String getProcedureName();
+    String getProcedureName();
 }

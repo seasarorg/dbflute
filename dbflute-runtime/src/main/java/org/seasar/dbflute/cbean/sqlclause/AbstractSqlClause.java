@@ -1294,7 +1294,6 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                                                     ===============
     /**
      * {@inheritDoc}
-     * @return Fetch-narrowing start-index.
      */
     public int getFetchNarrowingSkipStartIndex() {
         return getPageStartIndex();
@@ -1302,7 +1301,6 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     /**
      * {@inheritDoc}
-     * @return Fetch-narrowing size.
      */
     public int getFetchNarrowingLoopCount() {
         return getFetchSize();
@@ -1310,7 +1308,6 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     /**
      * {@inheritDoc}
-     * @return Determination.
      */
     public boolean isFetchNarrowingEffective() {
         return _fetchScopeEffective;
@@ -1324,11 +1321,12 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     public String resolveNestLevelExpression(String name, int cqNestNo) {
-        // if (cqNestNo > 1) {
-        //     return name + "_n" + cqNestNo;
-        // } else {
-        //     return name;
-        // }
+        // *comment out old style 
+        //if (cqNestNo > 1) {
+        //    return name + "_n" + cqNestNo;
+        //} else {
+        //    return name;
+        //}
         return name;
     }
 

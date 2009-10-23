@@ -22,11 +22,12 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.cbean.SelectBeanContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
-import org.seasar.dbflute.cbean.FetchNarrowingBeanContext;
+import org.seasar.dbflute.cbean.SelectBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
-import org.seasar.dbflute.s2dao.jdbc.TnPagingResultSet;
+import org.seasar.dbflute.s2dao.jdbc.TnFunctionalResultSet;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 /**
@@ -99,30 +100,38 @@ public class TnBasicSelectHandler extends TnBasicHandler {
         // All select statements on DBFlute use this result set. 
         // - - - - - - - - - -/
         final ResultSet resultSet = ps.executeQuery();
-        if (!FetchNarrowingBeanContext.isExistFetchNarrowingBeanOnThread()) {
+        if (!isUseFunctionalResultSet()) {
             return resultSet;
         }
-        final FetchNarrowingBean cb = FetchNarrowingBeanContext.getFetchNarrowingBeanOnThread();
-        if (!isUseFetchNarrowingResultSetWrapper(cb)) {
-            return resultSet;
-        }
-        final TnPagingResultSet wrapper;
+        final SelectBean selbean = SelectBeanContext.getSelectBeanOnThread();
+        final TnFunctionalResultSet wrapper;
         if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
             final OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
             final boolean offsetByCursorForcedly = context.isOffsetByCursorForcedly();
             final boolean limitByCursorForcedly = context.isLimitByCursorForcedly();
-            wrapper = createPagingResultSet(resultSet, cb, offsetByCursorForcedly, limitByCursorForcedly);
+            wrapper = createFunctionalResultSet(resultSet, selbean, offsetByCursorForcedly, limitByCursorForcedly);
         } else {
-            wrapper = createPagingResultSet(resultSet, cb, false, false);
+            wrapper = createFunctionalResultSet(resultSet, selbean, false, false);
         }
         return wrapper;
     }
 
-    protected boolean isUseFetchNarrowingResultSetWrapper(FetchNarrowingBean cb) {
-        if (cb.getSafetyMaxResultSize() > 0) {
+    protected boolean isUseFunctionalResultSet() {
+        // about select-bean (priority one)
+        if (!SelectBeanContext.isExistSelectBeanOnThread()) {
+            return false;
+        }
+        final SelectBean selbean = SelectBeanContext.getSelectBeanOnThread();
+        if (selbean.getSafetyMaxResultSize() > 0) {
             return true;
         }
-        if (!cb.isFetchNarrowingEffective()) {
+        
+        // about fetch-narrowing-bean (priority two)
+        if (!SelectBeanContext.isExistFetchNarrowingBeanOnThread()) {
+            return false;
+        }
+        final FetchNarrowingBean fnbean = SelectBeanContext.getFetchNarrowingBeanOnThread();
+        if (!fnbean.isFetchNarrowingEffective()) {
             return false; // It is not necessary to control.
         }
         if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
@@ -131,15 +140,15 @@ public class TnBasicSelectHandler extends TnBasicHandler {
                 return true;
             }
         }
-        if (cb.isFetchNarrowingSkipStartIndexEffective() || cb.isFetchNarrowingLoopCountEffective()) {
+        if (fnbean.isFetchNarrowingSkipStartIndexEffective() || fnbean.isFetchNarrowingLoopCountEffective()) {
             return true;
         }
         return false;
     }
 
-    protected TnPagingResultSet createPagingResultSet(ResultSet resultSet, FetchNarrowingBean cb,
+    protected TnFunctionalResultSet createFunctionalResultSet(ResultSet resultSet, SelectBean selbean,
             boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
-        return new TnPagingResultSet(resultSet, cb, offsetByCursorForcedly, limitByCursorForcedly);
+        return new TnFunctionalResultSet(resultSet, selbean, offsetByCursorForcedly, limitByCursorForcedly);
     }
 
     // ===================================================================================

@@ -22,10 +22,11 @@ import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
+import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfSystemUtil;
-
 
 /**
  * The cursor executor of outside-SQL.
@@ -46,16 +47,14 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
 
-	/** The current database definition. (NotNull) */
+    /** The current database definition. (NotNull) */
     protected DBDef _currentDBDef;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlEntityExecutor(BehaviorCommandInvoker behaviorCommandInvoker
-                                  , OutsideSqlOption outsideSqlOption
-                                  , String tableDbName
-                                  , DBDef currentDBDef) {
+    public OutsideSqlEntityExecutor(BehaviorCommandInvoker behaviorCommandInvoker, OutsideSqlOption outsideSqlOption,
+            String tableDbName, DBDef currentDBDef) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
@@ -76,12 +75,23 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntity(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        final List<ENTITY> ls = invoke(createSelectListCommand(path, pmb, entityType));
-        if (ls.isEmpty()) {
+        if (pmb instanceof ParameterBean) {
+            ((ParameterBean) pmb).checkSafetyResult(1);
+        }
+        final List<ENTITY> ls;
+        try {
+            ls = invoke(createSelectListCommand(path, pmb, entityType));
+        } catch (DangerousResultSizeException e) {
+            String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
+            throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
+            return null; // unreachable
+        }
+        if (ls == null || ls.isEmpty()) {
             return null;
         }
         if (ls.size() > 1) {
-            throwEntityDuplicatedException(ls.size() + "", buildSearch4LogString(path, pmb, entityType), null);
+            String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
+            throwEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
         }
         return ls.get(0);
     }
@@ -98,21 +108,33 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntityWithDeletedCheck(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        final List<ENTITY> ls = invoke(createSelectListCommand(path, pmb, entityType));
+        if (pmb instanceof ParameterBean) {
+            ((ParameterBean) pmb).checkSafetyResult(1);
+        }
+        final List<ENTITY> ls;
+        try {
+            ls = invoke(createSelectListCommand(path, pmb, entityType));
+        } catch (DangerousResultSizeException e) {
+            String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
+            throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
+            return null; // unreachable
+        }
         if (ls == null || ls.isEmpty()) {
-            throwEntityAlreadyDeletedException(buildSearch4LogString(path, pmb, entityType));
+            String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
+            throwEntityAlreadyDeletedException(searchKey4Log);
         }
         if (ls.size() > 1) {
-            throwEntityDuplicatedException(ls.size() + "", buildSearch4LogString(path, pmb, entityType), null);
+            String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
+            throwEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
         }
         return ls.get(0);
     }
 
-    protected <ENTITY> String buildSearch4LogString(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        String tmp = "Table  = " + _outsideSqlOption.getTableDbName() + getLineSeparator();
-        tmp = tmp + "Path   = " + path + getLineSeparator();
-        tmp = tmp + "Pmb    = " + (pmb != null ? pmb.getClass().getSimpleName() : "null") + ":" + pmb + getLineSeparator();
-        tmp = tmp + "Entity = " + (entityType != null ? entityType.getSimpleName() : "null")  + getLineSeparator();
+    protected <ENTITY> String buildSearchKey4Log(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+        String tmp = "Table  = " + _outsideSqlOption.getTableDbName() + ln();
+        tmp = tmp + "Path   = " + path + ln();
+        tmp = tmp + "Pmb    = " + (pmb != null ? pmb.getClass().getSimpleName() : "null") + ":" + pmb + ln();
+        tmp = tmp + "Entity = " + (entityType != null ? entityType.getSimpleName() : "null") + ln();
         tmp = tmp + "Option = " + _outsideSqlOption;
         return tmp;
     }
@@ -131,11 +153,13 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+    protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, PARAMETER_BEAN pmb,
+            Class<ENTITY> entityType) {
         return xsetupCommand(new OutsideSqlSelectListCommand<ENTITY>(), path, pmb, entityType);
     }
 
-    private <ENTITY> OutsideSqlSelectListCommand<ENTITY> xsetupCommand(OutsideSqlSelectListCommand<ENTITY> command, String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
+    private <ENTITY> OutsideSqlSelectListCommand<ENTITY> xsetupCommand(OutsideSqlSelectListCommand<ENTITY> command,
+            String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
         command.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setOutsideSqlPath(path);
@@ -160,10 +184,10 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     //                                                                              Option
     //                                                                              ======
     public OutsideSqlEntityExecutor<PARAMETER_BEAN> configure(StatementConfig statementConfig) {
-		_outsideSqlOption.setStatementConfig(statementConfig);
+        _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }
-	
+
     public OutsideSqlEntityExecutor<PARAMETER_BEAN> dynamicBinding() {
         _outsideSqlOption.dynamicBinding();
         return this;
@@ -176,7 +200,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * Get the value of line separator.
      * @return The value of line separator. (NotNull)
      */
-    protected static String getLineSeparator() {
+    protected static String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 }

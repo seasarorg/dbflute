@@ -798,6 +798,14 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         private NextPmb _nextPmb;
         private Map<String, Integer> _mapPmb = new HashMap<String, Integer>();
 
+        public void checkSafetyResult(int safetyMaxResultSize) {
+
+        }
+
+        public int getSafetyMaxResultSize() {
+            return 0;
+        }
+
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
@@ -873,6 +881,13 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         private String _memberStatusCode;
         private Integer _displayOrder;
         private boolean _existsLogin;
+
+        public void checkSafetyResult(int safetyMaxResultSize) {
+        }
+
+        public int getSafetyMaxResultSize() {
+            return 0;
+        }
 
         public String getMemberStatusCode() {
             return _memberStatusCode;

@@ -25,8 +25,9 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
+import org.seasar.dbflute.cbean.SelectBeanContext;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
-import org.seasar.dbflute.cbean.FetchNarrowingBeanContext;
+import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameResult;
@@ -771,13 +772,16 @@ public class BehaviorCommandInvoker {
         if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
             OutsideSqlContext.clearOutsideSqlContextOnThread();
         }
-        if (FetchNarrowingBeanContext.isExistFetchNarrowingBeanOnThread()) {
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            // Because there is possible that fetch narrowing has been ignored for manualPaging of outsideSql.
-            // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-            FetchNarrowingBeanContext.getFetchNarrowingBeanOnThread().restoreIgnoredFetchNarrowing();
-
-            FetchNarrowingBeanContext.clearFetchNarrowingBeanOnThread();
+        if (SelectBeanContext.isExistSelectBeanOnThread()) {
+            if (SelectBeanContext.isExistFetchNarrowingBeanOnThread()) {
+                // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                // Because there is possible that fetch narrowing has been
+                // ignored for manualPaging of outsideSql.
+                // - - - - - - - - - -/
+                final FetchNarrowingBean fnbean = SelectBeanContext.getFetchNarrowingBeanOnThread();
+                fnbean.restoreIgnoredFetchNarrowing();
+            }
+            SelectBeanContext.clearSelectBeanOnThread();
         }
         if (ConditionBeanContext.isExistConditionBeanOnThread()) {
             ConditionBeanContext.clearConditionBeanOnThread();

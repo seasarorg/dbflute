@@ -19,51 +19,45 @@ package org.seasar.dbflute.cbean;
  * The bean of fetch narrowing.
  * @author jflute
  */
-public interface FetchNarrowingBean {
+public interface FetchNarrowingBean extends SelectBean {
 
     /**
      * Get fetch start index.
      * @return Fetch start index.
      */
-    public int getFetchNarrowingSkipStartIndex();
+    int getFetchNarrowingSkipStartIndex();
 
     /**
      * Get fetch size.
      * @return Fetch size.
      */
-    public int getFetchNarrowingLoopCount();
+    int getFetchNarrowingLoopCount();
 
     /**
      * Is fetch start index supported?
      * @return Determination.
      */
-    public boolean isFetchNarrowingSkipStartIndexEffective();
+    boolean isFetchNarrowingSkipStartIndexEffective();
 
     /**
      * Is fetch size supported?
      * @return Determination.
      */
-    public boolean isFetchNarrowingLoopCountEffective();
+    boolean isFetchNarrowingLoopCountEffective();
 
     /**
      * Is fetch-narrowing effective?
      * @return Determination.
      */
-    public boolean isFetchNarrowingEffective();
+    boolean isFetchNarrowingEffective();
 
     /**
      * Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
      */
-    public void ignoreFetchNarrowing();
+    void ignoreFetchNarrowing();
 
     /**
      * Restore ignored fetch narrowing. {INTERNAL METHOD}
      */
-    public void restoreIgnoredFetchNarrowing();
-
-    /**
-     * Get the max size of safety result.
-     * @return The max size of safety result.
-     */
-    public int getSafetyMaxResultSize();
+    void restoreIgnoredFetchNarrowing();
 }

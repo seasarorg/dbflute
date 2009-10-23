@@ -21,8 +21,9 @@ import java.sql.Statement;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
+import org.seasar.dbflute.cbean.SelectBean;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
-import org.seasar.dbflute.jdbc.ResultSetWrapper;
+import org.seasar.dbflute.jdbc.PlainResultSetWrapper;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.resource.SQLExceptionHandler;
 
@@ -30,28 +31,31 @@ import org.seasar.dbflute.resource.SQLExceptionHandler;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnPagingResultSet extends ResultSetWrapper {
+public class TnFunctionalResultSet extends PlainResultSetWrapper {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     /** The real result set. (NotNull) */
-    protected ResultSet _resultSet;
+    protected final ResultSet _resultSet;
 
-    /** The bean of fetch narrowing. (NotNull) */
-    protected FetchNarrowingBean _fetchNarrowingBean;
+    /** The bean of select. (NotNull) */
+    protected final SelectBean _selectBean;
+
+    /** The bean of fetch narrowing. (Nullable) */
+    protected final FetchNarrowingBean _fetchNarrowingBean;
+
+    /** Does it offset by cursor forcedly? */
+    protected final boolean _offsetByCursorForcedly;
+
+    /** Does it limit by cursor forcedly? */
+    protected final boolean _limitByCursorForcedly;
 
     /** The counter of fetch. */
     protected long _fetchCounter;
 
     /** the counter of request. */
     protected long _requestCounter;
-
-    /** Does it offset by cursor forcedly? */
-    protected boolean _offsetByCursorForcedly;
-
-    /** Does it limit by cursor forcedly? */
-    protected boolean _limitByCursorForcedly;
 
     /** Does it skip to cursor end? */
     protected boolean _skipToCursorEnd;
@@ -68,16 +72,17 @@ public class TnPagingResultSet extends ResultSetWrapper {
     /**
      * Constructor.
      * @param resultSet Original result set. (NotNull)
-     * @param fetchNarrowingBean Fetch-narrowing-bean. (NotNull)
+     * @param selectBean The select-bean. (NotNull)
      * @param offsetByCursorForcedly Offset by cursor forcedly.
      * @param limitByCursorForcedly Limit by cursor forcedly.
      */
-    public TnPagingResultSet(ResultSet resultSet, FetchNarrowingBean fetchNarrowingBean,
-            boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
+    public TnFunctionalResultSet(ResultSet resultSet, SelectBean selectBean, boolean offsetByCursorForcedly,
+            boolean limitByCursorForcedly) {
         super(resultSet);
 
         _resultSet = resultSet;
-        _fetchNarrowingBean = fetchNarrowingBean;
+        _selectBean = selectBean;
+        _fetchNarrowingBean = selectBean instanceof FetchNarrowingBean ? (FetchNarrowingBean) selectBean : null;
         _offsetByCursorForcedly = offsetByCursorForcedly;
         _limitByCursorForcedly = limitByCursorForcedly;
 
@@ -113,7 +118,7 @@ public class TnPagingResultSet extends ResultSetWrapper {
                         break;
                     }
                     if (!_resultSet.next()) {
-                        _skipToCursorEnd = true;// [DBFLUTE-243]
+                        _skipToCursorEnd = true; // [DBFLUTE-243]
                         break;
                     }
                     ++_fetchCounter;
@@ -145,6 +150,7 @@ public class TnPagingResultSet extends ResultSetWrapper {
      * @return Does the result set have next record?
      * @throws SQLException
      */
+    @Override
     public boolean next() throws SQLException {
         if (_db2 && _skipToCursorEnd) { // [DBFLUTE-243]
             return false;
@@ -190,32 +196,88 @@ public class TnPagingResultSet extends ResultSetWrapper {
     }
 
     // ===================================================================================
-    //                                                                        Fetch Option
-    //                                                                        ============
+    //                                                                         Select Bean
+    //                                                                         ===========
+    /**
+     * @return The max size of safety result.
+     */
+    public int getSafetyMaxResultSize() {
+        return _selectBean.getSafetyMaxResultSize();
+    }
+
+    // ===================================================================================
+    //                                                                Fetch Narrowing Bean
+    //                                                                ====================
+    /**
+     * Is the fetch narrowing effective?
+     * @return Determination.
+     */
     protected boolean isFetchNarrowingEffective() {
+        if (_fetchNarrowingBean == null) {
+            return false;
+        }
         return _fetchNarrowingBean.isFetchNarrowingEffective();
     }
 
+    /**
+     * Is the skip start index of fetch narrowing effective?
+     * If isFetchNarrowingEffective() is false, this is not called by anyone.
+     * @return Determination.
+     */
     protected boolean isFetchNarrowingSkipStartIndexEffective() {
+        if (_fetchNarrowingBean == null) {
+            String msg = "This method should not be called";
+            msg = msg + " when isFetchNarrowingEffective() is false!";
+            throw new IllegalStateException(msg);
+        }
         return _fetchNarrowingBean.isFetchNarrowingSkipStartIndexEffective();
     }
 
+    /**
+     * Is the loop count of fetch narrowing effective?
+     * If isFetchNarrowingEffective() is false, this is not called by anyone.
+     * @return Determination.
+     */
     protected boolean isFetchNarrowingLoopCountEffective() {
+        if (_fetchNarrowingBean == null) {
+            String msg = "This method should not be called";
+            msg = msg + " when isFetchNarrowingEffective() is false!";
+            throw new IllegalStateException(msg);
+        }
         return _fetchNarrowingBean.isFetchNarrowingLoopCountEffective();
     }
 
+    /**
+     * Get the skip start index of fetch narrowing.
+     * If isFetchNarrowingEffective() is false, this is not called by anyone.
+     * @return The skip start index of fetch narrowing.
+     */
     protected int getFetchNarrowingSkipStartIndex() {
+        if (_fetchNarrowingBean == null) {
+            String msg = "This method should not be called";
+            msg = msg + " when isFetchNarrowingEffective() is false!";
+            throw new IllegalStateException(msg);
+        }
         return _fetchNarrowingBean.getFetchNarrowingSkipStartIndex();
     }
 
+    /**
+     * Get the loop count of fetch narrowing.
+     * If isFetchNarrowingEffective() is false, this is not called by anyone.
+     * @return The loop count of fetch narrowing.
+     */
     protected int getFetchNarrowingLoopCount() {
+        if (_fetchNarrowingBean == null) {
+            String msg = "This method should not be called";
+            msg = msg + " when isFetchNarrowingEffective() is false!";
+            throw new IllegalStateException(msg);
+        }
         return _fetchNarrowingBean.getFetchNarrowingLoopCount();
     }
 
-    public int getSafetyMaxResultSize() {
-        return _fetchNarrowingBean.getSafetyMaxResultSize();
-    }
-
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected boolean isScrollableCursor() {
         try {
             return !(_resultSet.getType() == ResultSet.TYPE_FORWARD_ONLY);
@@ -225,9 +287,6 @@ public class TnPagingResultSet extends ResultSetWrapper {
         }
     }
 
-    // ===================================================================================
-    //                                                                   Exception Handler
-    //                                                                   =================
     protected void handleSQLException(SQLException e, Statement statement) {
         new SQLExceptionHandler().handleSQLException(e, statement);
     }

@@ -27,29 +27,29 @@ public interface OrderByBean extends SelectBean {
      * Get sql component of order-by clause.
      * @return Sql component of order-by clause. (NotNull)
      */
-    public OrderByClause getSqlComponentOfOrderByClause();
+    OrderByClause getSqlComponentOfOrderByClause();
 
     /**
      * Get order-by clause.
      * @return Order-by clause. (NotNull)
      */
-    public String getOrderByClause();
+    String getOrderByClause();
 
     /**
      * Clear order-by.
      * @return this. (NotNull)
      */
-    public OrderByBean clearOrderBy();
+    OrderByBean clearOrderBy();
 
     /**
      * Ignore order-by.
      * @return this. (NotNull)
      */
-    public OrderByBean ignoreOrderBy();
+    OrderByBean ignoreOrderBy();
 
     /**
      * Make order-by effective.
      * @return this. (NotNull)
      */
-    public OrderByBean makeOrderByEffective();
+    OrderByBean makeOrderByEffective();
 }

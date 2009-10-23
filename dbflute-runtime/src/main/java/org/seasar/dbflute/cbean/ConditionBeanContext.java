@@ -287,18 +287,16 @@ public class ConditionBeanContext {
         msg = msg + "You specified the column that had Not been Set up!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
-        msg = msg
-                + "You should call setupSelect_[ForeignTable]() before calling specify[ForeignTable]().column[TargetColumn]()."
-                + ln();
+        msg = msg + "You should call setupSelect_[ForeignTable]()"
+                + " before calling specify[ForeignTable]().column[TargetColumn]()." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().specifyMemberStatus().columnMemberStatusName(); // *No!" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Good!]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.setupSelect_MemberStatus(); // *Point!" + ln();
@@ -323,8 +321,7 @@ public class ConditionBeanContext {
         msg = msg + "[Advice]" + ln();
         msg = msg + "You should specified a local table column at condition-bean for scalar select." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    memberBhv.scalarSelect(Integer.class).max(new ScalarSelect<MemberCB>() {" + ln();
         msg = msg + "        public void query(MemberCB cb) {" + ln();
@@ -332,8 +329,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    });" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Good!]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    memberBhv.scalarSelect(Date.class).max(new ScalarSelect() {" + ln();
         msg = msg + "        public void query(MemberCB cb) {" + ln();
@@ -358,8 +355,7 @@ public class ConditionBeanContext {
         msg = msg + "[Advice]" + ln();
         msg = msg + "You should set valid alias name. {NotNull, NotEmpty}" + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -368,8 +364,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    }, null); // *No! {null, \"\", \"   \"} are NG!" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Good!]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -393,8 +389,7 @@ public class ConditionBeanContext {
         msg = msg + "You should implement a property(setter and getter) in the entity." + ln();
         msg = msg + "Or you should confirm whether the alias name has typo or not." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [ConditionBean Invoking]" + ln();
+        msg = msg + "    ConditionBean Invoking:" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -403,8 +398,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Extended Entity]" + ln();
+        msg = msg + ln();
+        msg = msg + "    Extended Entity:" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    // At the entity of Purchase..." + ln();
         msg = msg + "    protected Date _latestPurchaseDatetime;" + ln();
@@ -432,8 +427,7 @@ public class ConditionBeanContext {
         msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
         msg = msg + " (If your function is count(), the target column should be primary key.)" + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -442,8 +436,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -453,8 +447,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Good!]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -499,8 +493,7 @@ public class ConditionBeanContext {
         msg = msg + "[Advice]" + ln();
         msg = msg + "You should specified a local table column at condition-bean for derived-referrer." + ln();
         msg = msg + "  For example(for SpecifyDerivedReferrer):" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -509,8 +502,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Good!]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivedPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -536,8 +529,7 @@ public class ConditionBeanContext {
         msg = msg + "[Advice]" + ln();
         msg = msg + "You should specified an alias name that is the same as one in specify-derived-referrer." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -547,8 +539,8 @@ public class ConditionBeanContext {
         msg = msg + "    }, \"LATEST_PURCHASE_DATETIME\");" + ln();
         msg = msg + "    cb.query().addSpecifiedDerivedOrderBy_Desc(\"WRONG_NAME_DATETIME\");" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Good!]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.specify().derivePurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -576,8 +568,7 @@ public class ConditionBeanContext {
         msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
         msg = msg + " (If your function is count(), the target column should be primary key.)" + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -586,8 +577,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    }).greaterEqual(123);" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -597,8 +588,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    }).greaterEqual(123);" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Good!]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -647,8 +638,7 @@ public class ConditionBeanContext {
         msg = msg + "[Advice]" + ln();
         msg = msg + "You should specified a local table column at condition-bean for derived-query." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
@@ -657,8 +647,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    });" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Good!]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
@@ -682,8 +672,7 @@ public class ConditionBeanContext {
         msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
         msg = msg + " (If your function is count(), the target column should be primary key.)" + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
@@ -692,8 +681,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    });" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
@@ -703,8 +692,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    });" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Good!]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
@@ -750,8 +739,7 @@ public class ConditionBeanContext {
         msg = msg + "[Advice]" + ln();
         msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
@@ -760,8 +748,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    }).lessThan...;" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Wrong]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (x):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();
@@ -771,8 +759,8 @@ public class ConditionBeanContext {
         msg = msg + "        }" + ln();
         msg = msg + "    }).lessThan...;" + ln();
         msg = msg + "    - - - - - - - - - -/" + ln();
-        msg = msg + "    " + ln();
-        msg = msg + "    [Good!]" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
         msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         msg = msg + "    MemberCB cb = new MemberCB();" + ln();
         msg = msg + "    cb.columnQuery(new SpecifyQuery<MemberCB>() {" + ln();

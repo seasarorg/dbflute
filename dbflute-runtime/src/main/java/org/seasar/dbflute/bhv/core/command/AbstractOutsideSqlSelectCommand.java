@@ -18,8 +18,9 @@ package org.seasar.dbflute.bhv.core.command;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.bhv.core.execution.OutsideSqlSelectExecution;
+import org.seasar.dbflute.cbean.SelectBeanContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
-import org.seasar.dbflute.cbean.FetchNarrowingBeanContext;
+import org.seasar.dbflute.cbean.SelectBean;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
@@ -54,7 +55,7 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         // Set up fetchNarrowingBean.
         final Object pmb = _parameterBean;
         final OutsideSqlOption option = _outsideSqlOption;
-        setupOutsideSqlFetchNarrowingBean(pmb, option);
+        setupAssistBean(pmb, option);
     }
 
     protected void setupOutsideSqlContext(OutsideSqlContext outsideSqlContext) {
@@ -76,15 +77,16 @@ public abstract class AbstractOutsideSqlSelectCommand<RESULT> extends AbstractOu
         outsideSqlContext.setupBehaviorQueryPathIfNeeds();
     }
 
-    protected void setupOutsideSqlFetchNarrowingBean(Object pmb, OutsideSqlOption option) {
-        if (pmb == null || !FetchNarrowingBeanContext.isTheTypeFetchNarrowingBean(pmb.getClass())) {
+    protected void setupAssistBean(Object pmb, OutsideSqlOption option) {
+        if (pmb == null) {
             return;
         }
-        final FetchNarrowingBean fetchNarrowingBean = (FetchNarrowingBean) pmb;
-        if (option.isManualPaging()) {
-            fetchNarrowingBean.ignoreFetchNarrowing();
+        if (pmb instanceof SelectBean) {
+            SelectBeanContext.setSelectBeanOnThread((SelectBean) pmb);
+            if (pmb instanceof FetchNarrowingBean && option.isManualPaging()) {
+                ((FetchNarrowingBean) pmb).ignoreFetchNarrowing();
+            }
         }
-        FetchNarrowingBeanContext.setFetchNarrowingBeanOnThread(fetchNarrowingBean);
     }
 
     public void afterExecuting() {

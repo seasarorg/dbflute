@@ -27,4 +27,10 @@ public interface SelectBean {
      * @param safetyMaxResultSize The max size of safety result. (If zero or minus, checking is invalid)
      */
     void checkSafetyResult(int safetyMaxResultSize);
+
+    /**
+     * Get the max size of safety result.
+     * @return The max size of safety result.
+     */
+    int getSafetyMaxResultSize();
 }
