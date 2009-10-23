@@ -22,10 +22,10 @@ import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.command.OutsideSqlSelectListCommand;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
+import org.seasar.dbflute.cbean.FetchBean;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
-import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -140,17 +140,17 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     }
 
     protected int checkSafetyResultAsOneIfNeed(PARAMETER_BEAN pmb) {
-        if (pmb instanceof ParameterBean) {
-            final int safetyMaxResultSize = ((ParameterBean) pmb).getSafetyMaxResultSize();
-            ((ParameterBean) pmb).checkSafetyResult(1);
+        if (pmb instanceof FetchBean) {
+            final int safetyMaxResultSize = ((FetchBean) pmb).getSafetyMaxResultSize();
+            ((FetchBean) pmb).checkSafetyResult(1);
             return safetyMaxResultSize;
         }
         return 0;
     }
 
     protected void restoreSafetyResultIfNeed(PARAMETER_BEAN pmb, int preSafetyMaxResultSize) {
-        if (pmb instanceof ParameterBean) {
-            ((ParameterBean) pmb).checkSafetyResult(preSafetyMaxResultSize);
+        if (pmb instanceof FetchBean) {
+            ((FetchBean) pmb).checkSafetyResult(preSafetyMaxResultSize);
         }
     }
 
