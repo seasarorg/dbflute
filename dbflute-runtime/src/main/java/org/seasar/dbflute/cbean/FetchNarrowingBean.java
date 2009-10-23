@@ -19,7 +19,7 @@ package org.seasar.dbflute.cbean;
  * The bean of fetch narrowing.
  * @author jflute
  */
-public interface FetchNarrowingBean extends SelectBean {
+public interface FetchNarrowingBean extends FetchBean {
 
     /**
      * Get fetch start index.

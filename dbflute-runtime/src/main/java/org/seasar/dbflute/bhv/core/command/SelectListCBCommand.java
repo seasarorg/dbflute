@@ -20,9 +20,9 @@ import java.util.List;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
-import org.seasar.dbflute.cbean.SelectBeanContext;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
+import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 
@@ -62,7 +62,7 @@ public class SelectListCBCommand<ENTITY extends Entity> extends AbstractSelectCB
     public void beforeGettingSqlExecution() {
         assertStatus("beforeGettingSqlExecution");
         final ConditionBean cb = _conditionBean;
-        SelectBeanContext.setSelectBeanOnThread(cb);
+        FetchAssistContext.setFetchBeanOnThread(cb);
         ConditionBeanContext.setConditionBeanOnThread(cb);
     }
 

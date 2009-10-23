@@ -25,8 +25,8 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
-import org.seasar.dbflute.cbean.SelectBeanContext;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
+import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.helper.stacktrace.InvokeNameExtractingResource;
@@ -772,16 +772,16 @@ public class BehaviorCommandInvoker {
         if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
             OutsideSqlContext.clearOutsideSqlContextOnThread();
         }
-        if (SelectBeanContext.isExistSelectBeanOnThread()) {
-            if (SelectBeanContext.isExistFetchNarrowingBeanOnThread()) {
+        if (FetchAssistContext.isExistFetchBeanOnThread()) {
+            if (FetchAssistContext.isExistFetchNarrowingBeanOnThread()) {
                 // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // Because there is possible that fetch narrowing has been
                 // ignored for manualPaging of outsideSql.
                 // - - - - - - - - - -/
-                final FetchNarrowingBean fnbean = SelectBeanContext.getFetchNarrowingBeanOnThread();
+                final FetchNarrowingBean fnbean = FetchAssistContext.getFetchNarrowingBeanOnThread();
                 fnbean.restoreIgnoredFetchNarrowing();
             }
-            SelectBeanContext.clearSelectBeanOnThread();
+            FetchAssistContext.clearFetchBeanOnThread();
         }
         if (ConditionBeanContext.isExistConditionBeanOnThread()) {
             ConditionBeanContext.clearConditionBeanOnThread();

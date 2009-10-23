@@ -16,10 +16,10 @@
 package org.seasar.dbflute.cbean;
 
 /**
- * The select-bean.
+ * The fetch-bean.
  * @author jflute
  */
-public interface SelectBean {
+public interface FetchBean {
 
     /**
      * Check whether the result size is safety or not. <br />

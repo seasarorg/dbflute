@@ -59,10 +59,10 @@ public class OutsideSqlPagingExecutor {
     //                                                                         Constructor
     //                                                                         ===========
     public OutsideSqlPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker
-                                   , OutsideSqlOption outsideSqlOption
-                                   , String tableDbName
-                                   , DBDef currentDBDef
-                                   , StatementConfig defaultStatementConfig) {
+                                  , OutsideSqlOption outsideSqlOption
+                                  , String tableDbName
+                                  , DBDef currentDBDef
+                                  , StatementConfig defaultStatementConfig) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
@@ -166,8 +166,8 @@ public class OutsideSqlPagingExecutor {
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
     public <ENTITY> PagingResultBean<ENTITY> selectPage(final String path
-                                                       , final PagingBean pmb
-                                                       , final Class<ENTITY> entityType) {
+                                                      , final PagingBean pmb
+                                                      , final Class<ENTITY> entityType) {
         final OutsideSqlEntityExecutor<PagingBean> countExecutor = createCountExecutor();
         final PagingHandler<ENTITY> handler = new PagingHandler<ENTITY>() {
             public PagingBean getPagingBean() {

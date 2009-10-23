@@ -22,12 +22,12 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.cbean.SelectBeanContext;
+import org.seasar.dbflute.cbean.FetchAssistContext;
+import org.seasar.dbflute.cbean.FetchBean;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
-import org.seasar.dbflute.cbean.SelectBean;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
-import org.seasar.dbflute.s2dao.jdbc.TnFunctionalResultSet;
+import org.seasar.dbflute.s2dao.jdbc.TnFetchAssistResultSet;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
 /**
@@ -103,8 +103,8 @@ public class TnBasicSelectHandler extends TnBasicHandler {
         if (!isUseFunctionalResultSet()) {
             return resultSet;
         }
-        final SelectBean selbean = SelectBeanContext.getSelectBeanOnThread();
-        final TnFunctionalResultSet wrapper;
+        final FetchBean selbean = FetchAssistContext.getFetchBeanOnThread();
+        final TnFetchAssistResultSet wrapper;
         if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
             final OutsideSqlContext context = OutsideSqlContext.getOutsideSqlContextOnThread();
             final boolean offsetByCursorForcedly = context.isOffsetByCursorForcedly();
@@ -117,38 +117,34 @@ public class TnBasicSelectHandler extends TnBasicHandler {
     }
 
     protected boolean isUseFunctionalResultSet() {
-        // about select-bean (priority one)
-        if (!SelectBeanContext.isExistSelectBeanOnThread()) {
-            return false;
+        // for safety result
+        final FetchBean fcbean = FetchAssistContext.getFetchBeanOnThread();
+        if (fcbean != null && fcbean.getSafetyMaxResultSize() > 0) {
+            return true; // priority one
         }
-        final SelectBean selbean = SelectBeanContext.getSelectBeanOnThread();
-        if (selbean.getSafetyMaxResultSize() > 0) {
-            return true;
-        }
-        
-        // about fetch-narrowing-bean (priority two)
-        if (!SelectBeanContext.isExistFetchNarrowingBeanOnThread()) {
-            return false;
-        }
-        final FetchNarrowingBean fnbean = SelectBeanContext.getFetchNarrowingBeanOnThread();
-        if (!fnbean.isFetchNarrowingEffective()) {
-            return false; // It is not necessary to control.
-        }
-        if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
-            final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
-            if (outsideSqlContext.isOffsetByCursorForcedly() || outsideSqlContext.isLimitByCursorForcedly()) {
-                return true;
+
+        final FetchNarrowingBean fnbean = FetchAssistContext.getFetchNarrowingBeanOnThread();
+        if (fnbean != null && fnbean.isFetchNarrowingEffective()) {
+            // for unsupported paging (Database)
+            if (fnbean.isFetchNarrowingSkipStartIndexEffective() || fnbean.isFetchNarrowingLoopCountEffective()) {
+                return true; // priority two
+            }
+
+            // for auto paging (OutsideSql)
+            if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
+                final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
+                if (outsideSqlContext.isOffsetByCursorForcedly() || outsideSqlContext.isLimitByCursorForcedly()) {
+                    return true; // priority three
+                }
             }
         }
-        if (fnbean.isFetchNarrowingSkipStartIndexEffective() || fnbean.isFetchNarrowingLoopCountEffective()) {
-            return true;
-        }
+
         return false;
     }
 
-    protected TnFunctionalResultSet createFunctionalResultSet(ResultSet resultSet, SelectBean selbean,
+    protected TnFetchAssistResultSet createFunctionalResultSet(ResultSet resultSet, FetchBean fcbean,
             boolean offsetByCursorForcedly, boolean limitByCursorForcedly) {
-        return new TnFunctionalResultSet(resultSet, selbean, offsetByCursorForcedly, limitByCursorForcedly);
+        return new TnFetchAssistResultSet(resultSet, fcbean, offsetByCursorForcedly, limitByCursorForcedly);
     }
 
     // ===================================================================================

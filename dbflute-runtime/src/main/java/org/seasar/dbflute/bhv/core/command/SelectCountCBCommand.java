@@ -21,7 +21,6 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
-
 /**
  * @author jflute
  */

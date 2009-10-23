@@ -16,51 +16,51 @@
 package org.seasar.dbflute.cbean;
 
 /**
- * The context for select-bean.
+ * The context for fetch-assist.
  * @author jflute
  */
-public class SelectBeanContext {
+public class FetchAssistContext {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static ThreadLocal<SelectBean> _threadLocal = new ThreadLocal<SelectBean>();
+    private static ThreadLocal<FetchBean> _threadLocal = new ThreadLocal<FetchBean>();
 
     // ===================================================================================
-    //                                                                         Select Bean
-    //                                                                         ===========
+    //                                                                          Fetch Bean
+    //                                                                          ==========
     /**
-     * Get select-bean on thread.
-     * @return The instance of select-bean. (Nullable)
+     * Get fetch-bean on thread.
+     * @return The instance of fetch-bean. (Nullable)
      */
-    public static SelectBean getSelectBeanOnThread() {
+    public static FetchBean getFetchBeanOnThread() {
         return _threadLocal.get();
     }
 
     /**
-     * Set select-bean on thread.
-     * @param selectBean The instance of select-bean. (NotNull)
+     * Set fetch-bean on thread.
+     * @param fetchBean The instance of fetch-bean. (NotNull)
      */
-    public static void setSelectBeanOnThread(SelectBean selectBean) {
-        if (selectBean == null) {
-            String msg = "The argument[selectBean] must not be null.";
+    public static void setFetchBeanOnThread(FetchBean fetchBean) {
+        if (fetchBean == null) {
+            String msg = "The argument[fetchBean] must not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _threadLocal.set(selectBean);
+        _threadLocal.set(fetchBean);
     }
 
     /**
-     * Is existing select-bean on thread?
+     * Is existing fetch-bean on thread?
      * @return Determination.
      */
-    public static boolean isExistSelectBeanOnThread() {
+    public static boolean isExistFetchBeanOnThread() {
         return (_threadLocal.get() != null);
     }
 
     /**
-     * Clear select-bean on thread.
+     * Clear fetch-bean on thread.
      */
-    public static void clearSelectBeanOnThread() {
+    public static void clearFetchBeanOnThread() {
         _threadLocal.set(null);
     }
 
@@ -72,8 +72,8 @@ public class SelectBeanContext {
      * @return The instance of fetch-narrowing-bean. (Nullable)
      */
     public static FetchNarrowingBean getFetchNarrowingBeanOnThread() {
-        if (isExistSelectBeanOnThread()) {
-            final SelectBean bean = getSelectBeanOnThread();
+        if (isExistFetchBeanOnThread()) {
+            final FetchBean bean = getFetchBeanOnThread();
             if (bean instanceof FetchNarrowingBean) {
                 return (FetchNarrowingBean) bean;
             }

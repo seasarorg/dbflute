@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
 
 import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.cbean.SelectBeanContext;
+import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.EntityRowHandler;
@@ -508,7 +508,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         // ## Arrange ##
         BehaviorCommandInvoker invoker = new BehaviorCommandInvoker();
         OutsideSqlContext.setOutsideSqlContextOnThread(new MockOutsideSqlContext());
-        SelectBeanContext.setSelectBeanOnThread(new MockConditionBean());
+        FetchAssistContext.setFetchBeanOnThread(new MockConditionBean());
         ConditionBeanContext.setConditionBeanOnThread(new MockConditionBean());
         ConditionBeanContext.setEntityRowHandlerOnThread(new EntityRowHandler<Entity>() {
             public void handle(Entity entity) {
@@ -518,7 +518,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         ResourceContext.setResourceContextOnThread(new ResourceContext());
 
         assertTrue(OutsideSqlContext.isExistOutsideSqlContextOnThread());
-        assertTrue(SelectBeanContext.isExistFetchNarrowingBeanOnThread());
+        assertTrue(FetchAssistContext.isExistFetchNarrowingBeanOnThread());
         assertTrue(ConditionBeanContext.isExistConditionBeanOnThread());
         assertTrue(ConditionBeanContext.isExistEntityRowHandlerOnThread());
         assertTrue(InternalMapContext.isExistInternalMapContextOnThread());
@@ -529,7 +529,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
 
         // ## Assert ##
         assertFalse(OutsideSqlContext.isExistOutsideSqlContextOnThread());
-        assertFalse(SelectBeanContext.isExistFetchNarrowingBeanOnThread());
+        assertFalse(FetchAssistContext.isExistFetchNarrowingBeanOnThread());
         assertFalse(ConditionBeanContext.isExistConditionBeanOnThread());
         assertFalse(ConditionBeanContext.isExistEntityRowHandlerOnThread());
         assertFalse(InternalMapContext.isExistInternalMapContextOnThread());

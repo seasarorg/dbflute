@@ -75,7 +75,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntity(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        final int preSize = checkSafetyResultAsOneIfNeed(pmb);
+        final int preSafetyMaxResultSize = checkSafetyResultAsOneIfNeed(pmb);
         final List<ENTITY> ls;
         try {
             ls = invoke(createSelectListCommand(path, pmb, entityType));
@@ -84,7 +84,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
             throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
             return null; // unreachable
         } finally {
-            restoreSafetyResultIfNeed(pmb, preSize);
+            restoreSafetyResultIfNeed(pmb, preSafetyMaxResultSize);
         }
         if (ls == null || ls.isEmpty()) {
             return null;
@@ -108,7 +108,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntityWithDeletedCheck(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        final int preSize = checkSafetyResultAsOneIfNeed(pmb);
+        final int preSafetyMaxResultSize = checkSafetyResultAsOneIfNeed(pmb);
         final List<ENTITY> ls;
         try {
             ls = invoke(createSelectListCommand(path, pmb, entityType));
@@ -117,7 +117,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
             throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
             return null; // unreachable
         } finally {
-            restoreSafetyResultIfNeed(pmb, preSize);
+            restoreSafetyResultIfNeed(pmb, preSafetyMaxResultSize);
         }
         if (ls == null || ls.isEmpty()) {
             String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
@@ -148,9 +148,9 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         return 0;
     }
 
-    protected void restoreSafetyResultIfNeed(PARAMETER_BEAN pmb, int preSize) {
+    protected void restoreSafetyResultIfNeed(PARAMETER_BEAN pmb, int preSafetyMaxResultSize) {
         if (pmb instanceof ParameterBean) {
-            ((ParameterBean) pmb).checkSafetyResult(preSize);
+            ((ParameterBean) pmb).checkSafetyResult(preSafetyMaxResultSize);
         }
     }
 

@@ -22,7 +22,6 @@ import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
-
 /**
  * @author jflute
  * @param <RESULT> The type of result.

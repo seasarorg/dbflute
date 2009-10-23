@@ -20,8 +20,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.cbean.FetchBean;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
-import org.seasar.dbflute.cbean.SelectBean;
 import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.jdbc.PlainResultSetWrapper;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -31,7 +31,7 @@ import org.seasar.dbflute.resource.SQLExceptionHandler;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnFunctionalResultSet extends PlainResultSetWrapper {
+public class TnFetchAssistResultSet extends PlainResultSetWrapper {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -39,8 +39,8 @@ public class TnFunctionalResultSet extends PlainResultSetWrapper {
     /** The real result set. (NotNull) */
     protected final ResultSet _resultSet;
 
-    /** The bean of select. (NotNull) */
-    protected final SelectBean _selectBean;
+    /** The bean of fetch. (NotNull) */
+    protected final FetchBean _fetchBean;
 
     /** The bean of fetch narrowing. (Nullable) */
     protected final FetchNarrowingBean _fetchNarrowingBean;
@@ -72,17 +72,17 @@ public class TnFunctionalResultSet extends PlainResultSetWrapper {
     /**
      * Constructor.
      * @param resultSet Original result set. (NotNull)
-     * @param selectBean The select-bean. (NotNull)
+     * @param fetchBean The fetch-bean. (NotNull)
      * @param offsetByCursorForcedly Offset by cursor forcedly.
      * @param limitByCursorForcedly Limit by cursor forcedly.
      */
-    public TnFunctionalResultSet(ResultSet resultSet, SelectBean selectBean, boolean offsetByCursorForcedly,
+    public TnFetchAssistResultSet(ResultSet resultSet, FetchBean fetchBean, boolean offsetByCursorForcedly,
             boolean limitByCursorForcedly) {
         super(resultSet);
 
         _resultSet = resultSet;
-        _selectBean = selectBean;
-        _fetchNarrowingBean = selectBean instanceof FetchNarrowingBean ? (FetchNarrowingBean) selectBean : null;
+        _fetchBean = fetchBean;
+        _fetchNarrowingBean = fetchBean instanceof FetchNarrowingBean ? (FetchNarrowingBean) fetchBean : null;
         _offsetByCursorForcedly = offsetByCursorForcedly;
         _limitByCursorForcedly = limitByCursorForcedly;
 
@@ -196,13 +196,13 @@ public class TnFunctionalResultSet extends PlainResultSetWrapper {
     }
 
     // ===================================================================================
-    //                                                                         Select Bean
-    //                                                                         ===========
+    //                                                                          Fetch Bean
+    //                                                                          ==========
     /**
      * @return The max size of safety result.
      */
     public int getSafetyMaxResultSize() {
-        return _selectBean.getSafetyMaxResultSize();
+        return _fetchBean.getSafetyMaxResultSize();
     }
 
     // ===================================================================================

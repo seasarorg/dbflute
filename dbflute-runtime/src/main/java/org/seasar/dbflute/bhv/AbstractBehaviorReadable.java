@@ -129,7 +129,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
             InternalSelectEntityCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
-        final int preSize = checkSafetyResultAsOne(cb);
+        final int preSafetyMaxResultSize = checkSafetyResultAsOne(cb);
         final List<ENTITY> ls;
         try {
             ls = callback.callbackSelectList(cb);
@@ -137,7 +137,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
             return null; // unreachable
         } finally {
-            restoreSafetyResult(cb, preSize);
+            restoreSafetyResult(cb, preSafetyMaxResultSize);
         }
         if (ls.isEmpty()) {
             return null;
@@ -153,7 +153,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityWithDeletedCheckInternally(
             CB cb, InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
-        final int preSize = checkSafetyResultAsOne(cb);
+        final int preSafetyMaxResultSize = checkSafetyResultAsOne(cb);
         final List<ENTITY> ls;
         try {
             ls = callback.callbackSelectList(cb);
@@ -161,7 +161,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
             return null; // unreachable
         } finally {
-            restoreSafetyResult(cb, preSize);
+            restoreSafetyResult(cb, preSafetyMaxResultSize);
         }
         assertEntityNotDeleted(ls, cb);
         assertEntitySelectedAsOne(ls, cb);
@@ -178,8 +178,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return safetyMaxResultSize;
     }
 
-    protected void restoreSafetyResult(ConditionBean cb, int preSize) {
-        cb.checkSafetyResult(preSize);
+    protected void restoreSafetyResult(ConditionBean cb, int preSafetyMaxResultSize) {
+        cb.checkSafetyResult(preSafetyMaxResultSize);
     }
 
     // ===================================================================================
