@@ -3,8 +3,10 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
-#end
+#else
+import org.seasar.dbflute.cbean.FetchBean;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
+#end
 
 /**
  * The parameter-bean of ${pmbClassName}.
@@ -13,7 +15,7 @@ import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 public class ${myClassName} implements ProcedurePmb {
 #else
-public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} implements ParameterBean {
+public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} implements ParameterBean, FetchBean {
 #end
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 
@@ -55,7 +57,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
 #end
 #end
-#if (!$database.hasPmbMetaDataSuperClassDefinition($pmbClassName))
+#if ($database.hasPmbMetaDataSafetyResultDefitinion($pmbClassName))
     /** The max size of safety result. */
     protected int _safetyMaxResultSize;
 
@@ -78,7 +80,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     }
 
 #end
-#if (!$database.hasPmbMetaDataSuperClassDefinition($pmbClassName))
+#if ($database.hasPmbMetaDataSafetyResultDefitinion($pmbClassName))
     // ===================================================================================
     //                                                                       Safety Result
     //                                                                       =============

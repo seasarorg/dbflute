@@ -327,9 +327,12 @@ public class Database {
         return " " + languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName;
     }
 
-    public boolean hasPmbMetaDataSuperClassDefinition(String className) {
+    public boolean hasPmbMetaDataSafetyResultDefitinion(String className) {
+        if (isPmbMetaDataForProcedure(className)) {
+            return false;
+        }
         final String classDefinition = getPmbMetaDataSuperClassDefinition(className);
-        return classDefinition != null && classDefinition.trim().length() > 0;
+        return classDefinition == null || classDefinition.trim().length() == 0;
     }
 
     public Map<String, String> getPmbMetaDataPropertyNameTypeMap(String className) {
