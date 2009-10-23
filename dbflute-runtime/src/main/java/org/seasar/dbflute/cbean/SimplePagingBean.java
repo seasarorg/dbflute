@@ -21,7 +21,9 @@ import java.util.Map;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseDefault;
+import org.seasar.dbflute.exception.PagingPageSizeNotPlusException;
 import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The simple paging-bean.
@@ -86,8 +88,33 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
      * {@inheritDoc}
      */
     public void paging(int pageSize, int pageNumber) {
+        if (pageSize <= 0) {
+            throwPagingPageSizeNotPlusException(pageSize, pageNumber);
+        }
         fetchFirst(pageSize);
         fetchPage(pageNumber);
+    }
+
+    protected void throwPagingPageSizeNotPlusException(int pageSize, int pageNumber) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Page size for paging should not be minus or zero!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Confirm the value of your parameter 'pageSize'." + ln();
+        msg = msg + "The first parameter of paging() should be a plus value!" + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    (x) - pmb.paging(0, 1);" + ln();
+        msg = msg + "    (x) - pmb.paging(-3, 2);" + ln();
+        msg = msg + "    (o) - pmb.paging(4, 3);" + ln();
+        msg = msg + ln();
+        msg = msg + "[Page Size]" + ln();
+        msg = msg + pageSize + ln();
+        msg = msg + ln();
+        msg = msg + "[Page Number]" + ln();
+        msg = msg + pageNumber + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new PagingPageSizeNotPlusException(msg);
     }
 
     /**
@@ -318,6 +345,13 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
             _parameterMap = new LinkedHashMap<String, Object>();
         }
         _parameterMap.put(key, value);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

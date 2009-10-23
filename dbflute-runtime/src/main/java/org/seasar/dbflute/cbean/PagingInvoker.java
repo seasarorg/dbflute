@@ -18,6 +18,8 @@ package org.seasar.dbflute.cbean;
 import java.util.List;
 
 import org.seasar.dbflute.exception.DangerousResultSizeException;
+import org.seasar.dbflute.exception.PagingStatusInvalidException;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * The invoker of paging.
@@ -49,15 +51,11 @@ public class PagingInvoker<ENTITY> {
     public PagingResultBean<ENTITY> invokePaging(PagingHandler<ENTITY> handler) {
         assertObjectNotNull("handler", handler);
         final PagingBean pagingBean = handler.getPagingBean();
-        final int safetyMaxResultSize = pagingBean.getSafetyMaxResultSize();
         assertObjectNotNull("handler.getPagingBean()", pagingBean);
         if (!pagingBean.isFetchScopeEffective()) {
-            String msg = "The paging bean is not effective about fetch-scope!";
-            msg = msg + " When you select page, you should set up fetch-scope of";
-            msg = msg + " paging bean(Should invoke fetchFirst() and fetchPage()!).";
-            msg = msg + " The paging bean is: " + pagingBean;
-            throw new IllegalStateException(msg);
+            throwPagingStatusInvalidException(pagingBean);
         }
+        final int safetyMaxResultSize = pagingBean.getSafetyMaxResultSize();
         final ResultBeanBuilder<ENTITY> builder = createResultBeanBuilder();
         final int allRecordCount;
         final List<ENTITY> selectedList;
@@ -69,10 +67,10 @@ public class PagingInvoker<ENTITY> {
                 } else {
                     allRecordCount = handler.count();
                 }
-                checkSafetyResult(safetyMaxResultSize, allRecordCount);
-            } else {
+                checkSafetyResultIfNeed(safetyMaxResultSize, allRecordCount);
+            } else { // basically main here
                 allRecordCount = handler.count();
-                checkSafetyResult(safetyMaxResultSize, allRecordCount);
+                checkSafetyResultIfNeed(safetyMaxResultSize, allRecordCount);
                 if (allRecordCount == 0) {
                     selectedList = builder.buildEmptyListResultBean(pagingBean);
                 } else {
@@ -91,6 +89,52 @@ public class PagingInvoker<ENTITY> {
         } finally {
             pagingBean.xsetPaging(true); // restore its paging state finally
         }
+    }
+
+    protected void throwPagingStatusInvalidException(PagingBean pagingBean) {
+        boolean cbean = pagingBean instanceof ConditionBean;
+        String name = cbean ? "condition-bean" : "parameter-bean";
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The status of paging was INVALID!" + ln();
+        msg = msg + "(Paging parameters was not found)" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Confirm your logic for paging of " + name + "." + ln();
+        msg = msg + "Paging execution needs paging parameters 'pageSize' and 'pageNumber'." + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    (x):" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
+        if (cbean) {
+            msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+            msg = msg + "    cb.query().set...;" + ln();
+            msg = msg + "    ... = memberBhv.selectPage(cb);" + ln();
+        } else {
+            msg = msg + "    SimpleMemberPmb pmb = new SimpleMemberPmb();" + ln();
+            msg = msg + "    pmb.set...;" + ln();
+            msg = msg + "    ... = memberBhv.outsideSql().manualPaging().selectPage(...);" + ln();
+        }
+        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + ln();
+        msg = msg + "    (o):" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
+        if (cbean) {
+            msg = msg + "    MemberCB cb = new MemberCB();" + ln();
+            msg = msg + "    cb.query().set...;" + ln();
+            msg = msg + "    cb.paging(20, 2); // *Point!" + ln();
+            msg = msg + "    ... = memberBhv.selectPage(cb);" + ln();
+        } else {
+            msg = msg + "    SimpleMemberPmb cb = new SimpleMemberPmb();" + ln();
+            msg = msg + "    pmb.set...;" + ln();
+            msg = msg + "    pmb.paging(20, 2); // *Point!" + ln();
+            msg = msg + "    ... = memberBhv.outsideSql().manualPaging().selectPage(...);" + ln();
+        }
+        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + ln();
+        msg = msg + "[Paging Bean]" + ln();
+        msg = msg + pagingBean + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new PagingStatusInvalidException(msg);
     }
 
     /**
@@ -143,12 +187,12 @@ public class PagingInvoker<ENTITY> {
     }
 
     /**
-     * Check whether the count of all records is safety or not.
+     * Check whether the count of all records is safety or not if it needs.
      * @param safetyMaxResultSize The max size of safety result.
      * @param allRecordCount The count of all records.
      * @throws DangerousResultSizeException When the count of all records is dangerous.
      */
-    protected void checkSafetyResult(int safetyMaxResultSize, int allRecordCount) {
+    protected void checkSafetyResultIfNeed(int safetyMaxResultSize, int allRecordCount) {
         if (safetyMaxResultSize > 0 && allRecordCount > safetyMaxResultSize) {
             String msg = "You've been in Danger Zone:";
             msg = msg + " safetyMaxResultSize=" + safetyMaxResultSize;
@@ -158,8 +202,15 @@ public class PagingInvoker<ENTITY> {
     }
 
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
     /**
      * Assert that the object is not null.
      * @param variableName Variable name. (NotNull)

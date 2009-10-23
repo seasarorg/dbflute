@@ -79,7 +79,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
         if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
             return;
         }
-        String ln = getLineSeparator();
+        String ln = ln();
         _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (" + ln + "select";
         _fetchScopeSqlSuffix = "";
         if (isFetchStartIndexSupported()) {

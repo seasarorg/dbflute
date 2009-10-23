@@ -238,9 +238,9 @@ public abstract class AbstractSqlClause implements SqlClause {
                 UnionQueryInfo unionQueryInfo = (UnionQueryInfo) ite.next();
                 String unionQueryClause = unionQueryInfo.getUnionQueryClause();
                 boolean unionAll = unionQueryInfo.isUnionAll();
-                sb.append(getLineSeparator());
+                sb.append(ln());
                 sb.append(unionAll ? " union all " : " union ");
-                sb.append(getLineSeparator());
+                sb.append(ln());
                 sb.append(selectClause).append(" ").append(unionQueryClause);
             }
         }
@@ -252,7 +252,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             return sql;
         }
         String selectClause = buildSelectClauseCountOrScalar("dfmain");
-        String ln = getLineSeparator();
+        String ln = ln();
         String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
         String endMark = resolveSubQueryEndMark("dfmain");
         return selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
@@ -347,7 +347,7 @@ public abstract class AbstractSqlClause implements SqlClause {
                     onQueryName = columnAliasName;
                 }
                 if (!finishedForeignIndent) {
-                    sb.append(getLineSeparator()).append("     ");
+                    sb.append(ln()).append("     ");
                     finishedForeignIndent = true;
                 }
                 sb.append(", ").append(realColumnName).append(" as ").append(onQueryName);
@@ -359,7 +359,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
             Collection<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.values();
             for (String deriveSubQuery : deriveSubQuerySet) {
-                sb.append(getLineSeparator()).append("     ");
+                sb.append(ln()).append("     ");
                 sb.append(", ").append(deriveSubQuery);
 
                 // [DBFlute-0.8.3]
@@ -479,7 +479,7 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     public String getFromClause() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getLineSeparator()).append("  ");
+        sb.append(ln()).append("  ");
         sb.append("from ");
         if (_baseTableInlineWhereList.isEmpty()) {
             sb.append(_tableName).append(" dflocal");
@@ -503,7 +503,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
-            sb.append(getLineSeparator()).append("   ");
+            sb.append(ln()).append("   ");
             if (joinInfo.isInnerJoin()) {
                 sb.append(" inner join ");
             } else {
@@ -573,10 +573,10 @@ public abstract class AbstractSqlClause implements SqlClause {
             String clauseElement = (String) ite.next();
             clauseElement = filterWhereClauseSimply(clauseElement);
             if (count == 0) {
-                sb.append(getLineSeparator()).append(" ");
+                sb.append(ln()).append(" ");
                 sb.append("where ").append(template ? getWhereFirstConditionMark() : "").append(clauseElement);
             } else {
-                sb.append(getLineSeparator()).append("  ");
+                sb.append(ln()).append("  ");
                 sb.append(" and ").append(clauseElement);
             }
         }
@@ -599,7 +599,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             orderByClause = _orderByClause.getOrderByClause();
         }
         if (orderByClause != null && orderByClause.trim().length() > 0) {
-            return getLineSeparator() + " " + orderByClause;
+            return ln() + " " + orderByClause;
         } else {
             return orderByClause;
         }
@@ -608,7 +608,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     public String getSqlSuffix() {
         String sqlSuffix = createSqlSuffix();
         if (sqlSuffix != null && sqlSuffix.trim().length() > 0) {
-            return getLineSeparator() + sqlSuffix;
+            return ln() + sqlSuffix;
         } else {
             return sqlSuffix;
         }
@@ -934,7 +934,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         if (whereList.size() < 2) {
             return;
         }
-        final String or = getLineSeparator() + "    or ";
+        final String or = ln() + "    or ";
         final String newClause = (String) whereList.remove(whereList.size() - 1);
         final String preClause = (String) whereList.remove(whereList.size() - 1);
         if (preClause.startsWith("(") && preClause.contains(or) && preClause.endsWith(")")) {
@@ -1191,31 +1191,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             fetchPageNumber = 1;
         }
         if (_fetchSize <= 0) {
-            String msg = "Look! Read the message below." + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "Fetch size should not be minus or zero!" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg
-                    + "When you invoke this method, it is necessary to invoke 'fetchFirst()' or 'fetchScope()' ahead of that. "
-                    + getLineSeparator();
-            msg = msg
-                    + "Please confirm your program. Does it really invoke 'fetchPage()' with 'fetchFirst()' or 'fetchScope()'?"
-                    + getLineSeparator();
-            msg = msg + "  For example:" + getLineSeparator();
-            msg = msg + "    before (x):" + getLineSeparator();
-            msg = msg + "      XxxCB cb = new XxxCB();" + getLineSeparator();
-            msg = msg + "      cb.fetchPage(3);" + getLineSeparator();
-            msg = msg + "    after  (o):" + getLineSeparator();
-            msg = msg + "      XxxCB cb = new XxxCB();" + getLineSeparator();
-            msg = msg + "      cb.fetchFirst(20); // The size of page" + getLineSeparator();
-            msg = msg + "      cb.fetchPage(3);   // The number of target page" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Actual Parameter Value]" + getLineSeparator();
-            msg = msg + "fetchSize=" + _fetchSize + getLineSeparator();
-            msg = msg + "fetchPageNumber=" + fetchPageNumber + getLineSeparator();
-            msg = msg + "* * * * * * * * * */";
-            throw new IllegalStateException(msg);
+            throwFetchSizeNotPlusException(fetchPageNumber);
         }
         _fetchPageNumber = fetchPageNumber;
         if (_fetchPageNumber == 1 && _fetchStartIndex == 0) {
@@ -1224,6 +1200,20 @@ public abstract class AbstractSqlClause implements SqlClause {
         doClearFetchPageClause();
         doFetchPage();
         return this;
+    }
+
+    protected void throwFetchSizeNotPlusException(int fetchPageNumber) { // as system exception
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Fetch size should not be minus or zero!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Fetch Size]" + ln();
+        msg = msg + "fetchSize=" + _fetchSize + ln();
+        msg = msg + ln();
+        msg = msg + "[Fetch Page Number]" + ln();
+        msg = msg + "fetchPageNumber=" + fetchPageNumber + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new IllegalStateException(msg);
     }
 
     abstract protected void doFetchFirst();
@@ -1460,7 +1450,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     protected String filterSubQueryIndent(String sql, String preIndent, String originalSql) {
-        final String lineSeparator = getLineSeparator();
+        final String lineSeparator = ln();
         if (!sql.contains(getSubQueryBeginMarkPrefix())) {
             return sql;
         }
@@ -1491,7 +1481,7 @@ public abstract class AbstractSqlClause implements SqlClause {
                     subSb.append(clause);
                     indent = buildSpaceBar(markIndex - preIndent.length());
                 } else {
-                    mainSb.append(line).append(getLineSeparator());
+                    mainSb.append(line).append(ln());
                 }
             } else {
                 // - - - - - - - -
@@ -1505,17 +1495,17 @@ public abstract class AbstractSqlClause implements SqlClause {
                         throw new SubQueryIndentFailureException(msg);
                     }
                     final String clause = line.substring(0, markIndex) + line.substring(terminalIndex + terminalLength);
-                    subSb.append(clause).append(getLineSeparator());
+                    subSb.append(clause).append(ln());
                     final String currentSql = filterSubQueryIndent(subSb.toString(), preIndent + indent, originalSql);
                     mainSb.append(currentSql);
                     throughBegin = false;
                     throughBeginFirst = false;
                 } else {
                     if (!throughBeginFirst) {
-                        subSb.append(line.trim()).append(getLineSeparator());
+                        subSb.append(line.trim()).append(ln());
                         throughBeginFirst = true;
                     } else {
-                        subSb.append(indent).append(line).append(getLineSeparator());
+                        subSb.append(indent).append(line).append(ln());
                     }
                 }
             }
@@ -1524,20 +1514,20 @@ public abstract class AbstractSqlClause implements SqlClause {
 
         if (throughBegin) {
             String msg = "End Mark Not Found!";
-            msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
-            msg = msg + subQueryIdentity + getLineSeparator();
-            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator() + sql;
-            msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
-            msg = msg + getLineSeparator() + "[Original SQL]" + getLineSeparator() + originalSql;
+            msg = msg + ln() + "[Current SubQueryIdentity]" + ln();
+            msg = msg + subQueryIdentity + ln();
+            msg = msg + ln() + "[Before Filter]" + ln() + sql;
+            msg = msg + ln() + "[After Filter]" + ln() + filteredSql;
+            msg = msg + ln() + "[Original SQL]" + ln() + originalSql;
             throw new SubQueryIndentFailureException(msg);
         }
         if (filteredSql.contains(beginMarkPrefix)) {
             String msg = "Any begin marks are not filtered!";
-            msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
-            msg = msg + subQueryIdentity + getLineSeparator();
-            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator() + sql;
-            msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
-            msg = msg + getLineSeparator() + "[Original SQL]" + getLineSeparator() + originalSql;
+            msg = msg + ln() + "[Current SubQueryIdentity]" + ln();
+            msg = msg + subQueryIdentity + ln();
+            msg = msg + ln() + "[Before Filter]" + ln() + sql;
+            msg = msg + ln() + "[After Filter]" + ln() + filteredSql;
+            msg = msg + ln() + "[Original SQL]" + ln() + originalSql;
             throw new SubQueryIndentFailureException(msg);
         }
         return filteredSql;
@@ -1660,7 +1650,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
         final StringBuilder sb = new StringBuilder();
-        String ln = getLineSeparator();
+        String ln = ln();
         sb.append("update ").append(_tableName).append(ln);
         int index = 0;
         // It is guaranteed that the map has one or more elements.
@@ -1721,7 +1711,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         if (isUpdateSubQueryUseLocalTableSupported() && !dbmeta.hasTwoOrMorePrimaryKeys()) {
             final String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             final StringBuilder sb = new StringBuilder();
-            String ln = getLineSeparator();
+            String ln = ln();
             sb.append("delete from ").append(_tableName).append(ln);
             sb.append(" where ").append(primaryKeyName);
             sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
@@ -1799,7 +1789,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         return DfStringUtil.replace(text, fromText, toText);
     }
 
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 

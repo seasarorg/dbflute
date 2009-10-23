@@ -27,6 +27,7 @@ import org.seasar.dbflute.cbean.sqlclause.WhereClauseSimpleFilter;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.exception.PagingPageSizeNotPlusException;
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -246,8 +247,33 @@ public abstract class AbstractConditionBean implements ConditionBean {
      * {@inheritDoc}
      */
     public void paging(int pageSize, int pageNumber) {
+        if (pageSize <= 0) {
+            throwPagingPageSizeNotPlusException(pageSize, pageNumber);
+        }
         fetchFirst(pageSize);
         fetchPage(pageNumber);
+    }
+
+    protected void throwPagingPageSizeNotPlusException(int pageSize, int pageNumber) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Page size for paging should not be minus or zero!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Confirm the value of your parameter 'pageSize'." + ln();
+        msg = msg + "The first parameter of paging() should be a plus value!" + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    (x) - cb.paging(0, 1);" + ln();
+        msg = msg + "    (x) - cb.paging(-3, 2);" + ln();
+        msg = msg + "    (o) - cb.paging(4, 3);" + ln();
+        msg = msg + ln();
+        msg = msg + "[Page Size]" + ln();
+        msg = msg + pageSize + ln();
+        msg = msg + ln();
+        msg = msg + "[Page Number]" + ln();
+        msg = msg + pageNumber + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new PagingPageSizeNotPlusException(msg);
     }
 
     /**
@@ -277,8 +303,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                         -------------
     /**
      * {@inheritDoc}
-     * @param fetchSize Fetch-size. (NotMinus & NotZero)
-     * @return this. (NotNUll)
      */
     public PagingBean fetchFirst(int fetchSize) {
         getSqlClause().fetchFirst(fetchSize);
@@ -287,9 +311,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @param fetchStartIndex Fetch-start-index. 0 origin. (NotMinus)
-     * @param fetchSize Fetch-size. (NotMinus & NotZero)
-     * @return this. (NotNUll)
      */
     public PagingBean fetchScope(int fetchStartIndex, int fetchSize) {
         getSqlClause().fetchScope(fetchStartIndex, fetchSize);
@@ -298,8 +319,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
-     * @return this. (NotNull)
      */
     public PagingBean fetchPage(int fetchPageNumber) {
         getSqlClause().fetchPage(fetchPageNumber);
@@ -311,7 +330,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                        --------------
     /**
      * {@inheritDoc}
-     * @return Fetch-start-index.
      */
     public int getFetchStartIndex() {
         return getSqlClause().getFetchStartIndex();
@@ -319,7 +337,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return Fetch-size.
      */
     public int getFetchSize() {
         return getSqlClause().getFetchSize();
@@ -327,7 +344,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return Fetch-page-number.
      */
     public int getFetchPageNumber() {
         return getSqlClause().getFetchPageNumber();
@@ -335,7 +351,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return Page start index. 0 origin. (NotMinus)
      */
     public int getPageStartIndex() {
         return getSqlClause().getPageStartIndex();
@@ -343,15 +358,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return Page end index. 0 origin. (NotMinus)
      */
     public int getPageEndIndex() {
         return getSqlClause().getPageEndIndex();
     }
 
     /**
-     * Is fetch scope effective?
-     * @return Determiantion.
+     * {@inheritDoc}
      */
     public boolean isFetchScopeEffective() {
         return getSqlClause().isFetchScopeEffective();
@@ -397,7 +410,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                ====================================
     /**
      * {@inheritDoc}
-     * @return Fetch start index.
      */
     public int getFetchNarrowingSkipStartIndex() {
         return getSqlClause().getFetchNarrowingSkipStartIndex();
@@ -405,7 +417,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return Fetch size.
      */
     public int getFetchNarrowingLoopCount() {
         return getSqlClause().getFetchNarrowingLoopCount();
@@ -413,7 +424,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return Determination.
      */
     public boolean isFetchNarrowingSkipStartIndexEffective() {
         return !getSqlClause().isFetchStartIndexSupported();
@@ -421,7 +431,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return Determination.
      */
     public boolean isFetchNarrowingLoopCountEffective() {
         return !getSqlClause().isFetchSizeSupported();
@@ -429,14 +438,13 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return Determiantion.
      */
     public boolean isFetchNarrowingEffective() {
         return getSqlClause().isFetchNarrowingEffective();
     }
 
     /**
-     * Ignore fetch narrowing. Only checking safety result size is valid. {INTERNAL METHOD}
+     * {@inheritDoc}
      */
     public void ignoreFetchNarrowing() {
         String msg = "This method is unsupported on ConditionBean!";
@@ -444,23 +452,21 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     /**
-     * Restore ignored fetch narrowing. {INTERNAL METHOD}
+     * {@inheritDoc}
      */
     public void restoreIgnoredFetchNarrowing() {
         // Do nothing!
     }
 
     /**
-     * Get safety max result size.
-     * @return Safety max result size.
+     * {@inheritDoc}
      */
     public int getSafetyMaxResultSize() {
         return _safetyMaxResultSize;
     }
 
     /**
-     * Check safety result.
-     * @param safetyMaxResultSize Safety max result size. (If zero or minus, ignore checking)
+     * {@inheritDoc}
      */
     public void checkSafetyResult(int safetyMaxResultSize) {
         this._safetyMaxResultSize = safetyMaxResultSize;
@@ -471,7 +477,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                       =============================
     /**
      * {@inheritDoc}
-     * @return Sql component of order-by clause. (NotNull)
      */
     public OrderByClause getSqlComponentOfOrderByClause() {
         return getSqlClause().getSqlComponentOfOrderByClause();
@@ -479,7 +484,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return Order-by clause. (NotNull)
      */
     public String getOrderByClause() {
         return _sqlClause.getOrderByClause();
@@ -487,7 +491,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public OrderByBean clearOrderBy() {
         getSqlClause().clearOrderBy();
@@ -496,7 +499,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public OrderByBean ignoreOrderBy() {
         getSqlClause().ignoreOrderBy();
@@ -505,7 +507,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public OrderByBean makeOrderByEffective() {
         getSqlClause().makeOrderByEffective();
@@ -517,7 +518,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                        ============
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public ConditionBean lockForUpdate() {
         getSqlClause().lockForUpdate();
@@ -528,9 +528,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                        Select Count
     //                                                                        ============
     /**
-     * Set up various things for select-count-ignore-fetch-scope. {Internal}
-     * This method is for INTERNAL. Don't invoke this!
-     * @return this. (NotNull)
+     * {@inheritDoc}
      */
     public ConditionBean xsetupSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = true;
@@ -542,9 +540,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     /**
-     * Do after-care for select-count-ignore-fetch-scope. {Internal}
-     * This method is for INTERNAL. Don't invoke this!
-     * @return this. (NotNull)
+     * {@inheritDoc}
      */
     public ConditionBean xafterCareSelectCountIgnoreFetchScope() {
         _isSelectCountIgnoreFetchScope = false;
@@ -559,9 +555,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected boolean _isSelectCountIgnoreFetchScope;
 
     /**
-     * Is set up various things for select-count-ignore-fetch-scope?
-     * This method is for INTERNAL. Don't invoke this!
-     * @return Determination.
+     * {@inheritDoc}
      */
     public boolean isSelectCountIgnoreFetchScope() {
         return _isSelectCountIgnoreFetchScope;
@@ -797,22 +791,22 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return DfStringUtil.initCap(str);
     }
 
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
-    /**
-     * The override.
-     * @return SQL for display. (NotNull)
-     */
+    @Override
     public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(getClass().getSimpleName()).append(":").append(ln());
         try {
-            return toDisplaySql();
+            sb.append(toDisplaySql());
         } catch (RuntimeException e) {
-            return getSqlClause().getClause();
+            sb.append(getSqlClause().getClause());
         }
+        return sb.toString();
     }
 }

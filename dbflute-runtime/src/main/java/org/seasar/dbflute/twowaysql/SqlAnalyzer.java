@@ -156,8 +156,8 @@ public class SqlAnalyzer {
         msg = msg + "Please confirm the IF comment expression." + ln();
         msg = msg + "It may exist the IF comment that DOESN'T have a condition." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    (x) -- /*IF*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
-        msg = msg + "    (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + "    (x) - /*IF*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + "    (o) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
         msg = msg + ln();
         msg = msg + "[IF Comment Expression]" + ln() + _tokenizer.getToken() + ln();
         msg = msg + ln();
@@ -193,8 +193,8 @@ public class SqlAnalyzer {
         msg = msg + "Please confirm the parameter comment logic." + ln();
         msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
-        msg = msg + "    (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + "    (x) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
+        msg = msg + "    (o) - /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + _specifiedSql + ln();
         msg = msg + "* * * * * * * * * */";

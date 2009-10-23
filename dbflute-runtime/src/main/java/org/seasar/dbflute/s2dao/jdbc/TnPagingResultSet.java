@@ -152,7 +152,7 @@ public class TnPagingResultSet extends ResultSetWrapper {
         final boolean hasNext = super.next();
         ++_requestCounter;
         if (!isAvailableLimitLoopCount()) {
-            checkSafetyResult(hasNext);
+            checkSafetyResultIfNeed(hasNext);
             return hasNext;
         }
 
@@ -160,7 +160,7 @@ public class TnPagingResultSet extends ResultSetWrapper {
         final int loopCount = getFetchNarrowingLoopCount();
         if (hasNext && _fetchCounter < skipStartIndex + loopCount) {
             ++_fetchCounter;
-            checkSafetyResult(true);
+            checkSafetyResultIfNeed(true);
             return true;
         } else {
             return false;
@@ -180,7 +180,7 @@ public class TnPagingResultSet extends ResultSetWrapper {
         return false;
     }
 
-    protected void checkSafetyResult(boolean hasNext) {
+    protected void checkSafetyResultIfNeed(boolean hasNext) {
         final int safetyMaxResultSize = getSafetyMaxResultSize();
         if (hasNext && safetyMaxResultSize > 0 && _requestCounter > safetyMaxResultSize) {
             String msg = "You've been in Danger Zone:";
