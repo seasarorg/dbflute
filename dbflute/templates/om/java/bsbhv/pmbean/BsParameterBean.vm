@@ -55,9 +55,11 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
 #end
 #end
+#if (!$database.hasPmbMetaDataSuperClassDefinition($pmbClassName))
     /** The max size of safety result. */
     protected int _safetyMaxResultSize;
 
+#end
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -76,7 +78,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     }
 
 #end
-
+#if (!$database.hasPmbMetaDataSuperClassDefinition($pmbClassName))
     // ===================================================================================
     //                                                                       Safety Result
     //                                                                       =============
@@ -94,6 +96,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return _safetyMaxResultSize;
     }
 
+#end
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============

@@ -327,6 +327,11 @@ public class Database {
         return " " + languageDependencyInfo.getGrammarInfo().getExtendsStringMark() + " " + superClassName;
     }
 
+    public boolean hasPmbMetaDataSuperClassDefinition(String className) {
+        final String classDefinition = getPmbMetaDataSuperClassDefinition(className);
+        return classDefinition != null && classDefinition.trim().length() > 0;
+    }
+
     public Map<String, String> getPmbMetaDataPropertyNameTypeMap(String className) {
         assertArgumentPmbMetaDataClassName(className);
         final DfParameterBeanMetaData metaData = findPmbMetaData(className);
