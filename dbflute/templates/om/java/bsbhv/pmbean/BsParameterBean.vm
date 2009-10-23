@@ -11,7 +11,7 @@ import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
  * @author ${database.classAuthor}
  */
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
-public class ${myClassName} implements ProcedurePmb, ParameterBean {
+public class ${myClassName} implements ProcedurePmb {
 #else
 public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbClassName)} implements ParameterBean {
 #end
@@ -55,6 +55,9 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
 #end
 #end
+    /** The max size of safety result. */
+    protected int _safetyMaxResultSize;
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -65,14 +68,35 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     // ===================================================================================
     //                                                                           Procedure
     //                                                                           =========
+    /**
+     * {@inheritDoc}
+     */
     public String getProcedureName() {
         return "${database.getPmbMetaDataProcedureName($pmbClassName)}";
     }
 
 #end
+
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
+    //                                                                       Safety Result
+    //                                                                       =============
+    /**
+     * {@inheritDoc}
+     */
+    public void checkSafetyResult(int safetyMaxResultSize) {
+        _safetyMaxResultSize = safetyMaxResultSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getSafetyMaxResultSize() {
+        return _safetyMaxResultSize;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     /**
      * @param value Query value. (Nullable)
      * @return Converted value. (Nullable)
@@ -93,7 +117,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                                                      Basic Override
     //                                                                      ==============
     /**
-     * ${database.overrideComment}
+     * @return The display string of all parameters. (NotNull)
      */
     @Override
     public String toString() {
