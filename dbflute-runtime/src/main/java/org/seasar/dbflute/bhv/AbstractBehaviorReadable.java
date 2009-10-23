@@ -129,12 +129,15 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
             InternalSelectEntityCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
-        cb.checkSafetyResult(1);
-        List<ENTITY> ls = null;
+        final int preSize = checkSafetyResultAsOne(cb);
+        final List<ENTITY> ls;
         try {
             ls = callback.callbackSelectList(cb);
         } catch (DangerousResultSizeException e) {
             throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
+            return null; // unreachable
+        } finally {
+            restoreSafetyResult(cb, preSize);
         }
         if (ls.isEmpty()) {
             return null;
@@ -150,12 +153,15 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityWithDeletedCheckInternally(
             CB cb, InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
-        cb.checkSafetyResult(1);
-        List<ENTITY> ls = null;
+        final int preSize = checkSafetyResultAsOne(cb);
+        final List<ENTITY> ls;
         try {
             ls = callback.callbackSelectList(cb);
         } catch (DangerousResultSizeException e) {
             throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
+            return null; // unreachable
+        } finally {
+            restoreSafetyResult(cb, preSize);
         }
         assertEntityNotDeleted(ls, cb);
         assertEntitySelectedAsOne(ls, cb);
@@ -164,6 +170,16 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     protected static interface InternalSelectEntityWithDeletedCheckCallback<ENTITY extends Entity, CB extends ConditionBean> {
         public List<ENTITY> callbackSelectList(CB cb);
+    }
+
+    protected int checkSafetyResultAsOne(ConditionBean cb) {
+        final int safetyMaxResultSize = cb.getSafetyMaxResultSize();
+        cb.checkSafetyResult(1);
+        return safetyMaxResultSize;
+    }
+
+    protected void restoreSafetyResult(ConditionBean cb, int preSize) {
+        cb.checkSafetyResult(preSize);
     }
 
     // ===================================================================================
