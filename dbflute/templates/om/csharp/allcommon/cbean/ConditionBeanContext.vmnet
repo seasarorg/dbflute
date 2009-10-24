@@ -55,10 +55,6 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                  Exception Handling
         //                                                                  ==================
         public static void ThrowEntityAlreadyDeletedException(Object searchKey4Log) {
-            ThrowEntityAlreadyDeletedException(searchKey4Log, null);
-        }
-
-        public static void ThrowEntityAlreadyDeletedException(Object searchKey4Log) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
             msg = msg + "The entity was Not Found! it has already been deleted!" + ln();
@@ -78,10 +74,6 @@ namespace ${glPackageBaseCommonCBean} {
             }
             msg = msg + "* * * * * * * * * */" + ln();
             throw new ${glPackageBaseCommonException}.${glEntityAlreadyDeletedException}(msg);
-        }
-
-        public static void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause) {
-            ThrowEntityDuplicatedException(resultCountString, searchKey4Log, cause, null);
         }
 
         public static void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause) {

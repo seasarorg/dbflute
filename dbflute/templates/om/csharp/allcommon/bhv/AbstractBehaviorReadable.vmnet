@@ -81,43 +81,14 @@ namespace ${glPackageBaseCommonBhv} {
         // -----------------------------------------------------
         //                                       Internal Helper
         //                                       ---------------
-        protected int XCheckSafetyResultAsOne(${glConditionBean} cb) {
+        protected int xcheckSafetyResultAsOne(${glConditionBean} cb) {
             int safetyMaxResultSize = cb.SafetyMaxResultSize;
             cb.CheckSafetyResult(1);
             return safetyMaxResultSize;
         }
 
-        protected void XRestoreSafetyResult(${glConditionBean} cb, int preSafetyMaxResultSize) {
+        protected void xrestoreSafetyResult(${glConditionBean} cb, int preSafetyMaxResultSize) {
             cb.CheckSafetyResult(preSafetyMaxResultSize);
-        }
-
-        // ===============================================================================
-        //                                                                       List Read
-        //                                                                       =========
-        public virtual ${glListResultBean}<${glEntity}> ReadList(${glConditionBean} cb) {
-            AssertConditionBeanNotNull(cb);
-            return new ${glResultBeanBuilder}<${glEntity}>(TableDbName).BuildListResultBean(cb, this.CallReadList(cb));
-        }
-
-        // ===============================================================================
-        //                                                                       Page Read
-        //                                                                       =========
-        public virtual ${glPagingResultBean}<${glEntity}> ReadPage(${glConditionBean} cb) {
-            AssertConditionBeanNotNull(cb);
-            ${glPagingInvoker}<${glEntity}> invoker = new ${glPagingInvoker}<${glEntity}>(TableDbName);
-            return invoker.InvokePaging(new InternalReadPagingHandler(this, cb));
-        }
-
-        private class InternalReadPagingHandler : ${glPagingHandler}<${glEntity}> {
-            protected ${glBehaviorReadable} _bhv;
-            protected ${glConditionBean} _cb;
-            public InternalReadPagingHandler(${glBehaviorReadable} bhv, ${glConditionBean} cb) {
-                _bhv = bhv;
-                _cb = cb;
-            }
-            public ${glPagingBean} PagingBean { get { return _cb; } }
-            public int Count() { return _bhv.ReadCount(_cb); }
-            public IList<${glEntity}> Paging() { return _bhv.ReadList(_cb); }
         }
 
         // ===============================================================================
@@ -145,11 +116,11 @@ namespace ${glPackageBaseCommonBhv} {
         }
 
         protected void ThrowEntityAlreadyDeletedException(Object searchKey4Log) {
-            ${glConditionBeanContext}.throwEntityAlreadyDeletedException(searchKey4Log);
+            ${glConditionBeanContext}.ThrowEntityAlreadyDeletedException(searchKey4Log);
         }
 
         protected void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause) {
-            ${glConditionBeanContext}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
+            ${glConditionBeanContext}.ThrowEntityDuplicatedException(resultCountString, searchKey4Log, cause);
         }
 
         // ===============================================================================
@@ -400,8 +371,8 @@ namespace ${glPackageBaseCommonBhv} {
         protected abstract bool HasUpdateDateValue(${glEntity} entity);
 
         // ===============================================================================
-        //                                                                   Filter Method
-        //                                                                   =============
+        //                                                                  Process Method
+        //                                                                  ==============
         protected virtual void FilterEntityOfInsert(${glEntity} targetEntity) { // for isAvailableNonPrimaryKeyWritable
         }
 

@@ -92,7 +92,7 @@ namespace ${glPackageExtendedBhv} {
         #region Entity Select
         public virtual ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            int preSafetyMaxResultSize = XCheckSafetyResultAsOne(cb);
+            int preSafetyMaxResultSize = xcheckSafetyResultAsOne(cb);
             IList<${myExtendedObjectClassName}> ls = null;
             try {
                 ls = this.DelegateSelectList(cb);
@@ -100,7 +100,7 @@ namespace ${glPackageExtendedBhv} {
                 ThrowEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
                 return null; // unreachable
             } finally {
-                XRestoreSafetyResult(cb, preSafetyMaxResultSize);
+                xrestoreSafetyResult(cb, preSafetyMaxResultSize);
             }
             if (ls.Count == 0) { return null; }
             AssertEntitySelectedAsOne(ls, cb);

@@ -27,6 +27,7 @@ namespace ${glPackageBaseCommonCBean} {
         /// </summary>
         void RestoreIgnoredFetchNarrowing();
 
+        void CheckSafetyResult(int safetyMaxResultSize);
         int SafetyMaxResultSize { get; }
     }
 }

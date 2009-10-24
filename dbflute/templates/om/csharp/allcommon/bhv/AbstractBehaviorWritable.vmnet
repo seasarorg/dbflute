@@ -191,11 +191,6 @@ namespace ${glPackageBaseCommonBhv} {
             return true;
         }
 
-        protected virtual int CallCreate(${glEntity} entity) {
-            if (!ProcessBeforeInsert(entity)) { return 1; }
-            return DoCallCreate(entity);
-        }
-
         protected virtual void FrameworkFilterEntityOfInsert(${glEntity} targetEntity) {
             InjectSequenceToPrimaryKeyIfNeeds(targetEntity);
             SetupCommonColumnOfInsertIfNeeds(targetEntity);
@@ -252,8 +247,6 @@ namespace ${glPackageBaseCommonBhv} {
         protected virtual void AssertEntityOfInsert(${glEntity} entity) {
         }
 
-        protected abstract int DoCallCreate(${glEntity} entity);
-
         // -------------------------------------------------
         //                                            Modify
         //                                            ------
@@ -263,11 +256,6 @@ namespace ${glPackageBaseCommonBhv} {
             FilterEntityOfUpdate(entity);
             AssertEntityOfUpdate(entity);
             return true;
-        }
-
-        protected virtual int CallModify(${glEntity} entity) {
-            if (!ProcessBeforeUpdate(entity)) { return 1; }
-            return DoCallModify(entity);
         }
 
         protected virtual void FrameworkFilterEntityOfUpdate(${glEntity} targetEntity) {
@@ -314,8 +302,6 @@ namespace ${glPackageBaseCommonBhv} {
         protected virtual void AssertEntityOfUpdate(${glPackageBaseCommon}.${glEntity} entity) {
         }
 
-        protected abstract int DoCallModify(${glEntity} entity);
-
         // -------------------------------------------------
         //                                            Remove
         //                                            ------
@@ -327,11 +313,6 @@ namespace ${glPackageBaseCommonBhv} {
             return true;
         }
 
-        protected virtual int CallRemove(${glEntity} entity) {
-            if (!ProcessBeforeDelete(entity)) { return 1; }
-            return DoCallRemove(entity);
-        }
-
         protected virtual void FrameworkFilterEntityOfDelete(${glEntity} targetEntity) {
         }
 
@@ -340,8 +321,6 @@ namespace ${glPackageBaseCommonBhv} {
 
         protected virtual void AssertEntityOfDelete(${glEntity} entity) {
         }
-
-        protected abstract int DoCallRemove(${glEntity} entity);
 
         // -------------------------------------------------
         //                                            Helper
@@ -355,7 +334,7 @@ namespace ${glPackageBaseCommonBhv} {
             } else {
                 return false;
             }
-        }
+        }1
 
         protected void AssertEntityHasVersionNoValue(${glEntity} entity) {
             if (!DBMeta.HasVersionNo) {
