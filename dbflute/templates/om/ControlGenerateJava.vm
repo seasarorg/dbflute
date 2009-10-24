@@ -402,18 +402,18 @@ $database.info("/* * * * * * * * * * * * * * {Table Class}")
 
     #if (!$database.isStopGenerateExtendedBhv())
       #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.OutputPath},$path).exists())
+      #if (!$files.file(${generator.outputPath},$path).exists())
         $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
       #end
-      $database.reflectGenerateExCopyright($path)
+      $database.reflectAllExCopyright($path)
     #end
 
     #if (!$database.isStopGenerateExtendedEntity())
       #set ( $path = "${database.getPackageAsPath(${glPackageExtendedEntity})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.OutputPath},$path).exists())
+      #if (!$files.file(${generator.outputPath},$path).exists())
         $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
       #end
-      $database.reflectGenerateExCopyright($path)
+      $database.reflectAllExCopyright($path)
     #end
 
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseCB})}${myBaseConditionBeanClassName}.${glClassFileExtension}" )
@@ -432,16 +432,16 @@ $database.info("/* * * * * * * * * * * * * * {Table Class}")
     $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
 
     #set ( $path = "${database.getPackageAsPath(${glPackageCB})}${myConditionBeanClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.OutputPath},$path).exists())
+    #if (!$files.file(${generator.outputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
     #end
-    $database.reflectGenerateExCopyright($path)
+    $database.reflectAllExCopyright($path)
 
     #set ( $path = "${database.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.OutputPath},$path).exists())
+    #if (!$files.file(${generator.outputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/cbean/ExConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
     #end
-    $database.reflectGenerateExCopyright($path)
+    $database.reflectAllExCopyright($path)
   #end
 #end
 $database.info("* * * * * * * * * */")
@@ -480,9 +480,10 @@ $database.info(" ")
 
     #if (!$database.isStopGenerateExtendedEntity())
       #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.OutputPath},$path).exists())
+      #if (!$files.file(${generator.outputPath},$path).exists())
         $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
       #end
+      $database.reflectAllExCopyright($path)
     #end
 
     #if ($database.isSimpleDtoUseDtoMapper())
@@ -520,9 +521,10 @@ $database.info(" ")
 
     #if (!$database.isStopGenerateExtendedEntity())
       #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
-      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.OutputPath},$path).exists())
+      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.outputPath},$path).exists())
         $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
       #end
+      $database.reflectAllExCopyright($path)
     #end
   #end
   $database.info("}")

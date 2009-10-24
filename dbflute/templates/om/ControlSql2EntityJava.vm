@@ -158,17 +158,17 @@ $database.debug("    for (String tableName : tableNameList) {")
 
     $database.debug("        parse('ExtendedTypeSafeCursor')")
     #set ( $path = "${database.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.OutputPath},$path).exists())
+    #if (!$files.file(${generator.outputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
     #end
-    $database.reflectSql2EntityExCopyright($path)
+    $database.reflectAllExCopyright($path)
 
     $database.debug("        parse('ExtendedTypeSafeCursorHandler')")
     #set ( $path = "${database.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.OutputPath},$path).exists())
+    #if (!$files.file(${generator.outputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
     #end
-    $database.reflectSql2EntityExCopyright($path)
+    $database.reflectAllExCopyright($path)
   #else
     $database.debug("        parseBaseCustomizeEntity(tableName);     // ${myBaseObjectClassName}")
     #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
@@ -179,11 +179,11 @@ $database.debug("    for (String tableName : tableNameList) {")
     $generator.parse("om/${glResourceDirectory}/bsentity/dbmeta/DBMetaImpl.${glTemplateFileExtension}",$path,"", "")
 
     #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.OutputPath},$path).exists())
+    #if (!$files.file(${generator.outputPath},$path).exists())
       $database.debug("        parseExtendedCustomizeEntity(tableName); // ${myExtendedObjectClassName}")
       $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
     #end
-    $database.reflectSql2EntityExCopyright($path)
+    $database.reflectAllExCopyright($path)
   #end
 #end
 $database.debug("    }")
@@ -215,11 +215,11 @@ $database.debug("    for (DfParameterBeanMetaData parameterBean : parameterBeanL
     $generator.parse("om/${glResourceDirectory}/bsbhv/pmbean/BsParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
 
     #set ( $path = "${database.getPackageAsPath(${glPackageExtendedParameterBean})}${myExtendedParameterBeanClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.OutputPath},$path).exists())
+    #if (!$files.file(${generator.outputPath},$path).exists())
       $database.debug("        parseExtendedParameterBean(parameterBean); // ${myExtendedParameterBeanClassName}")
       $generator.parse("om/${glResourceDirectory}/exbhv/pmbean/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
     #end
-    $database.reflectSql2EntityExCopyright($path)
+    $database.reflectAllExCopyright($path)
   #end
 $database.debug("    }")
 $database.debug("}")
@@ -259,9 +259,10 @@ $database.debug("}")
 
     #if (!$database.isStopGenerateExtendedEntity())
       #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.OutputPath},$path).exists())
+      #if (!$files.file(${generator.outputPath},$path).exists())
         $generator.parse("om/${glResourceDirectory}/plugin/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
       #end
+      $database.reflectAllExCopyright($path)
     #end
 
     #if ($database.isSimpleDtoUseDtoMapper())
@@ -301,9 +302,10 @@ $database.debug("}")
 
     #if (!$database.isStopGenerateExtendedEntity())
       #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
-      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.OutputPath},$path).exists())
+      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.outputPath},$path).exists())
         $generator.parse("om/${glResourceDirectory}/plugin/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
       #end
+      $database.reflectAllExCopyright($path)
     #end
     #end
   #end

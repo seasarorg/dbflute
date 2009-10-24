@@ -2171,12 +2171,12 @@ $database.info("/* * * * * * * * * * * * * * {Table Class}")
         #set ($myExtendedBhvClassName = "${glProjectPrefix}${table.JavaName}BhvImpl")
 
         #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvInterfaceName}.${glClassFileExtension}" )
-        #if (!$files.file(${generator.OutputPath},$path).exists())
+        #if (!$files.file(${generator.outputPath},$path).exists())
           $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
         #end
       #else
         #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvClassName}.${glClassFileExtension}" )
-        #if (!$files.file(${generator.OutputPath},$path).exists())
+        #if (!$files.file(${generator.outputPath},$path).exists())
           $generator.parse("om/${glResourceDirectory}/exbhv/ExtendedBhv.${glTemplateFileExtension}", $path, "table", $table)
         #end
       #end
@@ -2185,7 +2185,7 @@ $database.info("/* * * * * * * * * * * * * * {Table Class}")
     #if ($database.isMakeDaoInterface())
       #if (!$database.isStopGenerateExtendedDao())
         #set ( $path = "${database.getPackageAsPath(${glPackageExtendedDao})}${myExtendedDaoClassName}.${glClassFileExtension}" )
-        #if (!$files.file(${generator.OutputPath},$path).exists())
+        #if (!$files.file(${generator.outputPath},$path).exists())
           $generator.parse("om/${glResourceDirectory}/exdao/ExtendedDao.${glTemplateFileExtension}", $path, "table", $table)
         #end
       #end
@@ -2193,7 +2193,7 @@ $database.info("/* * * * * * * * * * * * * * {Table Class}")
 
     #if (!$database.isStopGenerateExtendedEntity())
       #set ( $path = "${database.getPackageAsPath(${glPackageExtendedEntity})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.OutputPath},$path).exists())
+      #if (!$files.file(${generator.outputPath},$path).exists())
         $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
       #end
     #end
@@ -2214,12 +2214,12 @@ $database.info("/* * * * * * * * * * * * * * {Table Class}")
     $generator.parse("om/${glResourceDirectory}/cbean/NestSelectSetupper.${glTemplateFileExtension}", $path, "table", $table)
 
     #set ( $path = "${database.getPackageAsPath(${glPackageCB})}${myConditionBeanClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.OutputPath},$path).exists())
+    #if (!$files.file(${generator.outputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/cbean/ExConditionBean.${glTemplateFileExtension}", $path, "table", $table)
     #end
 
     #set ( $path = "${database.getPackageAsPath(${glPackageCQ})}${myConditionQueryClassName}.${glClassFileExtension}" )
-    #if (!$files.file(${generator.OutputPath},$path).exists())
+    #if (!$files.file(${generator.outputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/cbean/ExConditionQuery.${glTemplateFileExtension}", $path, "table", $table)
     #end
   #end
@@ -2260,7 +2260,7 @@ $database.info(" ")
 
     #if (!$database.isStopGenerateExtendedEntity())
       #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.${glClassFileExtension}" )
-      #if (!$files.file(${generator.OutputPath},$path).exists())
+      #if (!$files.file(${generator.outputPath},$path).exists())
         $generator.parse("om/${glResourceDirectory}/other/simpledto/SimpleDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
       #end
     #end
@@ -2300,7 +2300,7 @@ $database.info(" ")
 
     #if (!$database.isStopGenerateExtendedEntity())
       #set ( $path = "${database.getPackageAsPath(${myExtendedEntityPackageName})}${myExtendedObjectClassName}.as" )
-      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.OutputPath},$path).exists())
+      #if ($database.isFlexDtoOverrideExtended() || !$files.file(${generator.outputPath},$path).exists())
         $generator.parse("om/${glResourceDirectory}/other/flexdto/FlexDtoExtendedEntity.${glTemplateFileExtension}", $path, "table", $table)
       #end
     #end
