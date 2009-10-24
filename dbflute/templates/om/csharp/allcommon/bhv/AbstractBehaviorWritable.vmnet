@@ -22,15 +22,14 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                   =============
         public virtual void Create(${glEntity} entity) {
             AssertEntityNotNull(entity);
-            CallCreate(entity);
+            DoCreate(entity);
         }
 
         protected abstract void DoCreate(${glEntity} entity);
 
         public virtual void Modify(${glEntity} entity) {
             AssertEntityNotNull(entity);
-            int modifiedCount = CallModify(entity);
-            AssertUpdatedEntity(entity, modifiedCount);
+            DoModify(entity);
         }
 
         protected abstract void DoModify(${glEntity} entity);
@@ -49,8 +48,7 @@ namespace ${glPackageBaseCommonBhv} {
 
         public virtual void Remove(${glEntity} entity) {
             AssertEntityNotNull(entity);
-            int removedCount = CallRemove(entity);
-            AssertDeletedEntity(entity, removedCount);
+            DoRemove(entity);
         }
 
         protected abstract void DoRemove(${glEntity} entity);
@@ -334,7 +332,7 @@ namespace ${glPackageBaseCommonBhv} {
             } else {
                 return false;
             }
-        }1
+        }
 
         protected void AssertEntityHasVersionNoValue(${glEntity} entity) {
             if (!DBMeta.HasVersionNo) {
