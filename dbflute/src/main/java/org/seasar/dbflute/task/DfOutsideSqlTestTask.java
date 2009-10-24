@@ -26,6 +26,7 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
+import org.seasar.dbflute.logic.sqlfile.OutsideSqlChecker;
 import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -87,7 +88,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
                 // /- - - - - - - - - - - - - - - - - - - - - - - - - - - 
                 // Check parameter comments in the SQL before filtering.
                 // - - - - - - - - - -/
-                checkParameterComment(sql);
+                checkParameterComment(_sqlFile, sql);
 
                 // Filter comments if it needs.
                 if (!jdbcDeterminer.isBlockCommentValid()) {
@@ -166,10 +167,9 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
         };
     }
 
-    protected void checkParameterComment(String sql) {
-        // It becomes valid after removing OGNL
-        //SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
-        //analyzer.parse(); // should throw an exception
+    protected void checkParameterComment(File sqlFile, String sql) {
+        final OutsideSqlChecker checker = new OutsideSqlChecker();
+        checker.check(sqlFile.getName(), sql);
     }
 
     @Override

@@ -68,7 +68,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     public void prepare(File sqlFile) {
-        this._sqlFile = sqlFile;
+        _sqlFile = sqlFile;
         _result = new DfSqlFileRunnerResult();
         _result.setSrcFile(sqlFile);
     }

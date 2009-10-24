@@ -3,6 +3,7 @@ package org.seasar.dbflute.logic.sqlfile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.seasar.dbflute.exception.DfIllegalAutoNamingClassNameException;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -109,7 +110,7 @@ public class SqlFileNameResolver {
         msg = msg + "Your className contained colon or semicolon but it was not auto-naming mark." + ln();
         msg = msg + "The auto-naming marks are '" + mark + "'." + ln();
         msg = msg + "  For example(@SQL):" + ln();
-        msg = msg + "    - - - - - - - - - - - -" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
         if (entity) {
             msg = msg + "    -- #" + mark + "#" + ln();
         } else {
@@ -120,25 +121,17 @@ public class SqlFileNameResolver {
         }
         msg = msg + "    " + ln();
         msg = msg + "    select * from ..." + ln();
-        msg = msg + "    - - - - - - - - - - - -" + ln();
+        msg = msg + "    - - - - - - - - - -/" + ln();
         msg = msg + "Confirm your auto-naming class definition if you want to use auto-naming." + ln();
         msg = msg + ln();
         msg = msg + "[Wrong Class Name]" + ln() + className + ln();
         msg = msg + ln();
         msg = msg + "[SQL File]" + ln() + fileName + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new IllegalAutoNamingClassNameException(msg);
+        throw new DfIllegalAutoNamingClassNameException(msg);
     }
 
     protected String ln() {
         return "\n";
-    }
-
-    public static class IllegalAutoNamingClassNameException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public IllegalAutoNamingClassNameException(String msg) {
-            super(msg);
-        }
     }
 }
