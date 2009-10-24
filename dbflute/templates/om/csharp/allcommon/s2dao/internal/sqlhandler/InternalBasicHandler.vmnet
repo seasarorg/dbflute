@@ -336,6 +336,9 @@ namespace ${glPackageBaseCommonS2DaoInternalSqlHandler} {
             // if (uniqueConstraintValid && IsUniqueConstraintException(e)) {
             //     ThrowEntityAlreadyExistsException(e, cmd, resource);
             // }
+            if (e is ${glDangerousResultSizeException}) {
+                throw e; // because SQLException on C# is runtime exception 
+            }
             ThrowSQLFailureException(e, cmd, displaySql);
         }
 
