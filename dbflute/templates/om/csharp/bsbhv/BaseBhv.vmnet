@@ -12,6 +12,7 @@ using ${glPackageBaseCommonBhvLoad};
 using ${glPackageBaseCommonBhvSetup};
 using ${glPackageBaseCommonCBean};
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonException};
 using ${myDBMetaPackageName};
 using ${glPackageExtendedDao};
 using ${glPackageExtendedEntity};
