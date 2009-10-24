@@ -16,11 +16,28 @@ import org.seasar.dbflute.util.DfStringUtil;
 public class OutsideSqlChecker {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _suppressIfCommentExpressionCheck;
+
+    // ===================================================================================
     //                                                                             Checker
     //                                                                             =======
     public void check(String fileName, String sql) {
         // check NG mark
         final List<String> splitList = splitList(sql, "\n");
+        checkSql2EntityMark(splitList, fileName, sql);
+
+        // check parameter comment easily
+        final SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
+        final List<String> ifCommentList = analyzer.researchIfComment();
+        analyzer.analyze(); // should throw an exception
+
+        // check IF comment expression
+        checkIfCommentExpression(ifCommentList, sql);
+    }
+
+    protected void checkSql2EntityMark(List<String> splitList, String fileName, String sql) {
         for (String line : splitList) {
             line = line.trim();
             if (!line.contains("--")) {
@@ -32,13 +49,12 @@ public class OutsideSqlChecker {
                 throwParameterBeanMarkInvalidException(line, fileName, sql);
             }
         }
+    }
 
-        // check parameter comment easily
-        final SqlAnalyzer analyzer = new SqlAnalyzer(sql, false);
-        final List<String> ifCommentList = analyzer.researchIfComment();
-        analyzer.analyze(); // should throw an exception
-
-        // check IF comment expression
+    protected void checkIfCommentExpression(List<String> ifCommentList, String sql) {
+        if (_suppressIfCommentExpressionCheck) {
+            return;
+        }
         for (String expr : ifCommentList) {
             final IfCommentEvaluator evaluator = new IfCommentEvaluator(new ParameterFinder() {
                 public Object find(String name) {
@@ -102,5 +118,12 @@ public class OutsideSqlChecker {
 
     protected String ln() {
         return "\n";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void suppressIfCommentExpressionCheck() {
+        _suppressIfCommentExpressionCheck = true;
     }
 }

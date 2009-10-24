@@ -169,6 +169,12 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
 
     protected void checkParameterComment(File sqlFile, String sql) {
         final OutsideSqlChecker checker = new OutsideSqlChecker();
+
+        // the IfCommentExpression check is for Java only
+        if (!getBasicProperties().isTargetLanguageJava()) {
+            checker.suppressIfCommentExpressionCheck();
+        }
+
         checker.check(sqlFile.getName(), sql);
     }
 
