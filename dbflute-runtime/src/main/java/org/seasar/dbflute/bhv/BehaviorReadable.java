@@ -34,7 +34,7 @@ public interface BehaviorReadable {
      * Get table DB name.
      * @return Table DB name. (NotNull)
      */
-    public String getTableDbName();
+    String getTableDbName();
 
     // ===================================================================================
     //                                                                              DBMeta
@@ -43,7 +43,7 @@ public interface BehaviorReadable {
      * Get the instance of DBMeta.
      * @return The instance of DBMeta. (NotNull)
      */
-    public DBMeta getDBMeta();
+    DBMeta getDBMeta();
 
     // ===================================================================================
     //                                                                        New Instance
@@ -52,13 +52,13 @@ public interface BehaviorReadable {
      * New entity.
      * @return Entity. (NotNull)
      */
-    public Entity newEntity();
+    Entity newEntity();
 
     /**
      * New condition-bean.
      * @return Condition-bean. (NotNull)
      */
-    public ConditionBean newConditionBean();
+    ConditionBean newConditionBean();
 
     // ===================================================================================
     //                                                                       Basic Get All
@@ -68,7 +68,7 @@ public interface BehaviorReadable {
      * @return Count all.
      * @deprecated Sorry! Please use selectCount(emptyCB)
      */
-    public int getCountAll();
+    int getCountAll();
 
     // ===================================================================================
     //                                                                    Basic Read Count
@@ -82,7 +82,7 @@ public interface BehaviorReadable {
      * @param cb Condition-bean. This condition-bean should not be set up about fetch-scope. (NotNull)
      * @return Read count. (NotNull)
      */
-    public int readCount(ConditionBean cb);
+    int readCount(ConditionBean cb);
 
     // ===================================================================================
     //                                                                   Basic Read Entity
@@ -93,7 +93,7 @@ public interface BehaviorReadable {
      * @return Read entity. (Nullalble)
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
-    public Entity readEntity(ConditionBean cb);
+    Entity readEntity(ConditionBean cb);
 
     /**
      * Read simple entity by condition-bean with deleted check.
@@ -102,7 +102,7 @@ public interface BehaviorReadable {
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
-    public Entity readEntityWithDeletedCheck(ConditionBean cb);
+    Entity readEntityWithDeletedCheck(ConditionBean cb);
 
     // ===================================================================================
     //                                                                     Basic Read List
@@ -110,16 +110,16 @@ public interface BehaviorReadable {
     /**
      * Read list as result-bean.
      * @param cb Condition-bean. (NotNull)
-     * @return List-result-bean. If the select result is zero, it returns empty list. (NotNull)
+     * @return The list of entity as result-bean. If the select result is zero, it returns empty list. (NotNull)
      */
-    public ListResultBean<Entity> readList(ConditionBean cb);
+    ListResultBean<? extends Entity> readList(ConditionBean cb);
 
     /**
      * Read page as result-bean.
      * @param cb Condition-bean. (NotNull)
-     * @return Read page. (NotNull)
+     * @return The page of entity as result-bean. (NotNull)
      */
-    public PagingResultBean<Entity> readPage(final ConditionBean cb);
+    PagingResultBean<? extends Entity> readPage(final ConditionBean cb);
 
     // ===================================================================================
     //                                                                            Sequence
@@ -128,7 +128,7 @@ public interface BehaviorReadable {
      * Read next value of sequence.
      * @return The next value of sequence. (NotNull)
      */
-    public java.math.BigDecimal readNextVal();
+    java.math.BigDecimal readNextVal();
 
     // ===================================================================================
     //                                                                             Warm Up
@@ -136,5 +136,5 @@ public interface BehaviorReadable {
     /**
      * Warm up the command of behavior.
      */
-    public void warmUpCommand();
+    void warmUpCommand();
 }

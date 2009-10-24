@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.seasar.dbflute.Entity;
 
-
 /**
  * The interface of behavior-writable.
  * @author jflute
@@ -34,7 +33,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @param entity Entity. (NotNull)
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
-    public void create(org.seasar.dbflute.Entity entity);
+    void create(org.seasar.dbflute.Entity entity);
 
     /**
      * Modify.
@@ -44,7 +43,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
-    public void modify(org.seasar.dbflute.Entity entity);
+    void modify(org.seasar.dbflute.Entity entity);
 
     /**
      * Modify non-strict.
@@ -53,7 +52,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
-    public void modifyNonstrict(Entity entity);
+    void modifyNonstrict(Entity entity);
 
     /**
      * Create or modify. <br />
@@ -65,7 +64,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
-    public void createOrModify(org.seasar.dbflute.Entity entity);
+    void createOrModify(org.seasar.dbflute.Entity entity);
 
     /**
      * Create or modify non-strict. <br />
@@ -76,7 +75,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
      */
-    public void createOrModifyNonstrict(org.seasar.dbflute.Entity entity);
+    void createOrModifyNonstrict(org.seasar.dbflute.Entity entity);
 
     /**
      * Remove.
@@ -85,7 +84,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
-    public void remove(org.seasar.dbflute.Entity entity);
+    void remove(org.seasar.dbflute.Entity entity);
 
     // =====================================================================================
     //                                                                    Basic Batch Update
@@ -95,7 +94,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @param entityList The list of entity. (NotNull and NotEmpty)
      * @return The array of created count.
      */
-    public int[] lumpCreate(List<Entity> entityList);
+    int[] lumpCreate(List<Entity> entityList);
 
     /**
      * Lump modify the list.
@@ -104,7 +103,7 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated. And Only when s2dao's version is over 1.0.47 (contains 1.0.47).
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
-    public int[] lumpModify(List<Entity> entityList);
+    int[] lumpModify(List<Entity> entityList);
 
     /**
      * Lump remove the list.
@@ -113,5 +112,5 @@ public interface BehaviorWritable extends BehaviorReadable {
      * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated. And Only when s2dao's version is over 1.0.47 (contains 1.0.47).
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
      */
-    public int[] lumpRemove(List<Entity> entityList);
+    int[] lumpRemove(List<Entity> entityList);
 }

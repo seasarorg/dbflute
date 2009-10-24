@@ -406,6 +406,23 @@ public abstract class AbstractConditionBean implements ConditionBean {
     }
 
     // ===================================================================================
+    //                                                         Implementation of FetchBean
+    //                                                         ===========================
+    /**
+     * {@inheritDoc}
+     */
+    public void checkSafetyResult(int safetyMaxResultSize) {
+        this._safetyMaxResultSize = safetyMaxResultSize;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getSafetyMaxResultSize() {
+        return _safetyMaxResultSize;
+    }
+
+    // ===================================================================================
     //                                                Implementation of FetchNarrowingBean
     //                                                ====================================
     /**
@@ -456,20 +473,6 @@ public abstract class AbstractConditionBean implements ConditionBean {
      */
     public void restoreIgnoredFetchNarrowing() {
         // Do nothing!
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getSafetyMaxResultSize() {
-        return _safetyMaxResultSize;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void checkSafetyResult(int safetyMaxResultSize) {
-        this._safetyMaxResultSize = safetyMaxResultSize;
     }
 
     // ===================================================================================

@@ -125,7 +125,7 @@ public class TnBasicSelectHandler extends TnBasicHandler {
 
         final FetchNarrowingBean fnbean = FetchAssistContext.getFetchNarrowingBeanOnThread();
         if (fnbean != null && fnbean.isFetchNarrowingEffective()) {
-            // for unsupported paging (Database)
+            // for unsupported paging (ConditionBean)
             if (fnbean.isFetchNarrowingSkipStartIndexEffective() || fnbean.isFetchNarrowingLoopCountEffective()) {
                 return true; // priority two
             }

@@ -21,7 +21,7 @@ import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
  * The order-by-bean.
  * @author jflute
  */
-public interface OrderByBean extends FetchBean {
+public interface OrderByBean {
 
     /**
      * Get sql component of order-by clause.

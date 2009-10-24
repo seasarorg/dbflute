@@ -75,7 +75,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntity(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        final int preSafetyMaxResultSize = checkSafetyResultAsOneIfNeed(pmb);
+        final int preSafetyMaxResultSize = xcheckSafetyResultAsOneIfNeed(pmb);
         final List<ENTITY> ls;
         try {
             ls = invoke(createSelectListCommand(path, pmb, entityType));
@@ -84,7 +84,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
             throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
             return null; // unreachable
         } finally {
-            restoreSafetyResultIfNeed(pmb, preSafetyMaxResultSize);
+            xrestoreSafetyResultIfNeed(pmb, preSafetyMaxResultSize);
         }
         if (ls == null || ls.isEmpty()) {
             return null;
@@ -108,26 +108,12 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
      * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity is duplicated.
      */
     public <ENTITY> ENTITY selectEntityWithDeletedCheck(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
-        final int preSafetyMaxResultSize = checkSafetyResultAsOneIfNeed(pmb);
-        final List<ENTITY> ls;
-        try {
-            ls = invoke(createSelectListCommand(path, pmb, entityType));
-        } catch (DangerousResultSizeException e) {
-            String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
-            throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", searchKey4Log, e);
-            return null; // unreachable
-        } finally {
-            restoreSafetyResultIfNeed(pmb, preSafetyMaxResultSize);
-        }
-        if (ls == null || ls.isEmpty()) {
+        final ENTITY entity = selectEntity(path, pmb, entityType);
+        if (entity == null) {
             String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
             throwEntityAlreadyDeletedException(searchKey4Log);
         }
-        if (ls.size() > 1) {
-            String searchKey4Log = buildSearchKey4Log(path, pmb, entityType);
-            throwEntityDuplicatedException(String.valueOf(ls.size()), searchKey4Log, null);
-        }
-        return ls.get(0);
+        return entity;
     }
 
     protected <ENTITY> String buildSearchKey4Log(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
@@ -139,7 +125,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         return tmp;
     }
 
-    protected int checkSafetyResultAsOneIfNeed(PARAMETER_BEAN pmb) {
+    protected int xcheckSafetyResultAsOneIfNeed(PARAMETER_BEAN pmb) {
         if (pmb instanceof FetchBean) {
             final int safetyMaxResultSize = ((FetchBean) pmb).getSafetyMaxResultSize();
             ((FetchBean) pmb).checkSafetyResult(1);
@@ -148,7 +134,7 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
         return 0;
     }
 
-    protected void restoreSafetyResultIfNeed(PARAMETER_BEAN pmb, int preSafetyMaxResultSize) {
+    protected void xrestoreSafetyResultIfNeed(PARAMETER_BEAN pmb, int preSafetyMaxResultSize) {
         if (pmb instanceof FetchBean) {
             ((FetchBean) pmb).checkSafetyResult(preSafetyMaxResultSize);
         }

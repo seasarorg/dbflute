@@ -27,16 +27,16 @@ public class TokenFileOutputResult {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected List<Entity> _selectedList;
+    protected List<? extends Entity> _selectedList;
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public List<Entity> getSelectedList() {
+    public List<? extends Entity> getSelectedList() {
         return _selectedList;
     }
 
-    public void setSelectedList(List<Entity> selectedList) {
+    public void setSelectedList(List<? extends Entity> selectedList) {
         _selectedList = selectedList;
     }
 }

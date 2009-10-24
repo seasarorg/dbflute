@@ -42,11 +42,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.ListResultBean;
-import org.seasar.dbflute.cbean.PagingBean;
-import org.seasar.dbflute.cbean.PagingHandler;
-import org.seasar.dbflute.cbean.PagingInvoker;
 import org.seasar.dbflute.cbean.PagingResultBean;
-import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.cbean.ScalarQuery;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
@@ -82,7 +78,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      * @deprecated Sorry! Please use selectCount(emptyCB)
      */
     public int getCountAll() {
-        return callGetCountAll();
+        return readCount(newConditionBean());
     }
 
     // ===================================================================================
@@ -93,8 +89,10 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     public int readCount(ConditionBean cb) {
         assertCBNotNull(cb);
-        return callReadCount(cb);
+        return doReadCount(cb);
     }
+
+    protected abstract int doReadCount(ConditionBean cb);
 
     // ===================================================================================
     //                                                                         Entity Read 
@@ -104,32 +102,28 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
      */
     public Entity readEntity(ConditionBean cb) {
         assertCBNotNull(cb);
-        final List<Entity> ls = readList(cb);
-        if (ls.isEmpty()) {
-            return null;
-        }
-        assertEntitySelectedAsOne(ls, cb);
-        return (Entity) ls.get(0);
+        return doReadEntity(cb);
     }
+
+    protected abstract Entity doReadEntity(ConditionBean cb);
 
     /**
      * {@inheritDoc}
      */
     public Entity readEntityWithDeletedCheck(ConditionBean cb) {
         assertCBNotNull(cb);
-        final List<Entity> ls = readList(cb);
-        assertEntityNotDeleted(ls, cb);
-        assertEntitySelectedAsOne(ls, cb);
-        return (Entity) ls.get(0);
+        return doReadEntityWithDeletedCheck(cb);
     }
 
-    // ===================================================================================
-    //                                                         Entity Read Internal Helper
-    //                                                         ===========================
+    protected abstract Entity doReadEntityWithDeletedCheck(ConditionBean cb);
+
+    // -----------------------------------------------------
+    //                                       Internal Helper
+    //                                       ---------------
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityInternally(CB cb,
             InternalSelectEntityCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
-        final int preSafetyMaxResultSize = checkSafetyResultAsOne(cb);
+        final int preSafetyMaxResultSize = xcheckSafetyResultAsOne(cb);
         final List<ENTITY> ls;
         try {
             ls = callback.callbackSelectList(cb);
@@ -137,7 +131,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
             return null; // unreachable
         } finally {
-            restoreSafetyResult(cb, preSafetyMaxResultSize);
+            xrestoreSafetyResult(cb, preSafetyMaxResultSize);
         }
         if (ls.isEmpty()) {
             return null;
@@ -151,34 +145,28 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected <ENTITY extends Entity, CB extends ConditionBean> ENTITY helpSelectEntityWithDeletedCheckInternally(
-            CB cb, InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
+            CB cb, final InternalSelectEntityWithDeletedCheckCallback<ENTITY, CB> callback) {
         assertCBNotNull(cb);
-        final int preSafetyMaxResultSize = checkSafetyResultAsOne(cb);
-        final List<ENTITY> ls;
-        try {
-            ls = callback.callbackSelectList(cb);
-        } catch (DangerousResultSizeException e) {
-            throwEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
-            return null; // unreachable
-        } finally {
-            restoreSafetyResult(cb, preSafetyMaxResultSize);
-        }
-        assertEntityNotDeleted(ls, cb);
-        assertEntitySelectedAsOne(ls, cb);
-        return (ENTITY) ls.get(0);
+        final ENTITY entity = helpSelectEntityInternally(cb, new InternalSelectEntityCallback<ENTITY, CB>() {
+            public List<ENTITY> callbackSelectList(CB cb) {
+                return callback.callbackSelectList(cb);
+            }
+        });
+        assertEntityNotDeleted(entity, cb);
+        return entity;
     }
 
     protected static interface InternalSelectEntityWithDeletedCheckCallback<ENTITY extends Entity, CB extends ConditionBean> {
         public List<ENTITY> callbackSelectList(CB cb);
     }
 
-    protected int checkSafetyResultAsOne(ConditionBean cb) {
+    protected int xcheckSafetyResultAsOne(ConditionBean cb) {
         final int safetyMaxResultSize = cb.getSafetyMaxResultSize();
         cb.checkSafetyResult(1);
         return safetyMaxResultSize;
     }
 
-    protected void restoreSafetyResult(ConditionBean cb, int preSafetyMaxResultSize) {
+    protected void xrestoreSafetyResult(ConditionBean cb, int preSafetyMaxResultSize) {
         cb.checkSafetyResult(preSafetyMaxResultSize);
     }
 
@@ -188,33 +176,29 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     /**
      * {@inheritDoc}
      */
-    public ListResultBean<Entity> readList(ConditionBean cb) {
+    public ListResultBean<? extends Entity> readList(ConditionBean cb) {
         assertCBNotNull(cb);
-        return new ResultBeanBuilder<Entity>(getTableDbName()).buildListResultBean(cb, callReadList(cb));
+        return doReadList(cb);
     }
 
+    protected abstract ListResultBean<? extends Entity> doReadList(ConditionBean cb);
+
+    // ===================================================================================
+    //                                                                           Page Read
+    //                                                                           =========
     /**
      * {@inheritDoc}
      */
-    public PagingResultBean<Entity> readPage(final ConditionBean cb) {
+    public PagingResultBean<? extends Entity> readPage(final ConditionBean cb) {
         assertCBNotNull(cb);
-        final PagingInvoker<Entity> invoker = new PagingInvoker<Entity>(getTableDbName());
-        final PagingHandler<Entity> handler = new PagingHandler<Entity>() {
-            public PagingBean getPagingBean() {
-                return cb;
-            }
-
-            public int count() {
-                return readCount(cb);
-            }
-
-            public List<Entity> paging() {
-                return readList(cb);
-            }
-        };
-        return invoker.invokePaging(handler);
+        return doReadPage(cb);
     }
 
+    protected abstract PagingResultBean<? extends Entity> doReadPage(ConditionBean cb);
+
+    // ===================================================================================
+    //                                                              Entity Result Handling
+    //                                                              ======================
     /**
      * Assert that the entity is not deleted.
      * @param entity Selected entity. (Nullable)
@@ -501,8 +485,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     // ===================================================================================
-    //                                                       Load Referrer Internal Helper
-    //                                                       =============================
+    //                                                                       Load Referrer
+    //                                                                       =============
     /**
      * Help load referrer internally.
      * About internal policy, the value of primary key(and others too) is treated as CaseInsensitive.
@@ -716,8 +700,8 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     // ===================================================================================
-    //                                                            Pull out Internal Helper
-    //                                                            ========================
+    //                                                                    Pull out Foreign
+    //                                                                    ================
     protected <LOCAL_ENTITY extends Entity, FOREIGN_ENTITY extends Entity> List<FOREIGN_ENTITY> helpPulloutInternally(
             List<LOCAL_ENTITY> localEntityList, InternalPulloutCallback<LOCAL_ENTITY, FOREIGN_ENTITY> callback) {
         assertObjectNotNull("localEntityList", localEntityList);
@@ -788,10 +772,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             assertStringNotNullAndNotTrimmedEmpty("filename", filename);
             assertObjectNotNull("tokenFileOutputOption", tokenFileOutputOption);
 
-            final List<Entity> ls = readList(cb);
-            List<List<String>> rowList = new ArrayList<List<String>>();
-            for (java.util.Iterator<Entity> ite = ls.iterator(); ite.hasNext();) {
-                final Entity entity = ite.next();
+            final List<? extends Entity> entityList = readList(cb);
+            final List<List<String>> rowList = new ArrayList<List<String>>();
+            for (Entity entity : entityList) {
                 final List<String> valueList = getDBMeta().convertToColumnStringValueList(entity);
                 rowList.add(valueList);
             }
@@ -807,50 +790,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             fileMakingOption.setFileMakingHeaderInfo(fileMakingHeaderInfo);
             fileMakingSimpleFacade.makeFromRowList(filename, rowList, fileMakingOption);
             final TokenFileOutputResult tokeFileOutputResult = new TokenFileOutputResult();
-            tokeFileOutputResult.setSelectedList(ls);
+            tokeFileOutputResult.setSelectedList(entityList);
             return tokeFileOutputResult;
         }
     }
 
     // ===================================================================================
-    //                                                                     Delegate Method
-    //                                                                     ===============
-    /**
-     * @return All count.
-     */
-    protected int callGetCountAll() {
-        return callReadCount(newConditionBean());
-    }
-
-    /**
-     * @return All list. (NotNull)
-     */
-    protected List<Entity> callGetListAll() {
-        return callReadList(newConditionBean());
-    }
-
-    /**
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read count. (NotNull)
-     */
-    protected int callReadCount(ConditionBean cb) {
-        assertCBNotNull(cb);
-        return doCallReadCount(cb);
-    }
-
-    protected abstract int doCallReadCount(ConditionBean cb);
-
-    /**
-     * @param cb Condition-bean that the type is condition-bean-interface. (NotNull)
-     * @return Read list. If the select result is zero, it returns empty list. (NotNull)
-     */
-    protected List<Entity> callReadList(ConditionBean cb) {
-        assertCBNotNull(cb);
-        return doCallReadList(cb);
-    }
-
-    protected abstract List<Entity> doCallReadList(ConditionBean cb);
-
+    //                                                                      Process Method
+    //                                                                      ==============
     /**
      * Filter the entity of insert.
      * @param targetEntity Target entity that the type is entity interface. (NotNull)
@@ -960,8 +907,18 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     // ===================================================================================
     //                                                                Optimistic Lock Info
     //                                                                ====================
+    /**
+     * Does the entity have a value of version-no? 
+     * @param entity The instance of entity. (NotNull)
+     * @return Determination.
+     */
     protected abstract boolean hasVersionNoValue(Entity entity);
 
+    /**
+     * Does the entity have a value of update-date? 
+     * @param entity The instance of entity. (NotNull)
+     * @return Determination.
+     */
     protected abstract boolean hasUpdateDateValue(Entity entity);
 
     // ===================================================================================
@@ -987,18 +944,38 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return DfSystemUtil.getLineSeparator();
     }
 
+    // ===================================================================================
+    //                                                                     Downcast Helper
+    //                                                                     ===============
     @SuppressWarnings("unchecked")
-    protected <ENTITY extends Entity> ENTITY helpDowncastInternally(Entity entity, Class<ENTITY> clazz) {
+    protected <ENTITY extends Entity> ENTITY helpEntityDowncastInternally(Entity entity, Class<ENTITY> clazz) {
         assertObjectNotNull("entity", entity);
         assertObjectNotNull("clazz", clazz);
         try {
             return (ENTITY) entity;
         } catch (ClassCastException e) {
-            String msg = "The entity should be " + clazz.getSimpleName() + " but it was: " + entity.getClass();
+            String msg = "The entity should be " + clazz.getSimpleName();
+            msg = msg + " but it was: " + entity.getClass();
             throw new RuntimeException(msg, e);
         }
     }
 
+    @SuppressWarnings("unchecked")
+    protected <CB extends ConditionBean> CB helpConditionBeanDowncastInternally(ConditionBean cb, Class<CB> clazz) {
+        assertObjectNotNull("cb", cb);
+        assertObjectNotNull("clazz", clazz);
+        try {
+            return (CB) cb;
+        } catch (ClassCastException e) {
+            String msg = "The condition-bean should be " + clazz.getSimpleName();
+            msg = msg + " but it was: " + cb.getClass();
+            throw new RuntimeException(msg, e);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
     // -----------------------------------------------------
     //                                         Assert Object
     //                                         -------------

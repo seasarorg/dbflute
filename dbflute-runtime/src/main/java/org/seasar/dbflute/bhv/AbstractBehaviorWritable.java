@@ -160,7 +160,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      */
     public void remove(org.seasar.dbflute.Entity entity) {
         assertEntityNotNull(entity);
-        callRemove(entity);
+        doRemove(entity);
     }
 
     protected abstract void doRemove(Entity entity);
@@ -559,24 +559,11 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     // =====================================================================================
-    //                                                                       Delegate Method
-    //                                                                       ===============
+    //                                                                        Process Method
+    //                                                                        ==============
     // -----------------------------------------------------
     //                                                Insert
     //                                                ------
-    /**
-     * @param entity Entity that the type is entity interface. (NotNull)
-     * @return Inserted count.
-     */
-    protected int callCreate(Entity entity) {
-        if (!processBeforeInsert(entity)) {
-            return 1;/*as Normal End*/
-        }
-        return doCallCreate(entity);
-    }
-
-    protected abstract int doCallCreate(Entity entity);
-
     /**
      * Process before insert.
      * @param entity Entity that the type is entity interface. (NotNull)
@@ -593,74 +580,6 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return true;
     }
 
-    // -----------------------------------------------------
-    //                                                Update
-    //                                                ------
-    /**
-     * {modified only}
-     * @param entity Entity that the type is entity interface. (NotNull)
-     * @return Updated count.
-     */
-    protected int callModify(Entity entity) {
-        if (!processBeforeUpdate(entity)) {
-            return 1;/*as Normal End*/
-        }
-        return doCallModify(entity);
-    }
-
-    protected abstract int doCallModify(Entity entity);
-
-    /**
-     * Process before update.
-     * @param entity Entity that the type is entity interface. (NotNull)
-     * @return Execution Determination. (true: execute / false: non)
-     */
-    protected boolean processBeforeUpdate(Entity entity) {
-        if (!determineExecuteUpdate(entity)) {
-            return false;
-        }
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        frameworkFilterEntityOfUpdate(entity);
-        filterEntityOfUpdate(entity);
-        assertEntityOfUpdate(entity);
-        return true;
-    }
-
-    // -----------------------------------------------------
-    //                                                Delete
-    //                                                ------
-    /**
-     * @param entity Entity that the type is entity interface. (NotNull)
-     * @return Deleted count.
-     */
-    protected int callRemove(Entity entity) {
-        if (!processBeforeDelete(entity)) {
-            return 1;/*as Normal End*/
-        }
-        return doCallRemove(entity);
-    }
-
-    protected abstract int doCallRemove(Entity entity);
-
-    /**
-     * Process before delete.
-     * @param entity Entity that the type is entity interface. (NotNull)
-     * @return Execution Determination. (true: execute / false: non)
-     */
-    protected boolean processBeforeDelete(Entity entity) {
-        if (!determineExecuteDelete(entity)) {
-            return false;
-        }
-        assertEntityNotNullAndHasPrimaryKeyValue(entity);
-        frameworkFilterEntityOfDelete(entity);
-        filterEntityOfDelete(entity);
-        assertEntityOfDelete(entity);
-        return true;
-    }
-
-    // -----------------------------------------------------
-    //                                    Pre-Process Insert
-    //                                    ------------------
     /**
      * Determine execution of insert.
      * @param entity Entity. (NotNull)
@@ -721,10 +640,26 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      */
     protected void assertEntityOfInsert(Entity entity) {
     }
-
+    
     // -----------------------------------------------------
-    //                                    Pre-Process Update
-    //                                    ------------------
+    //                                                Update
+    //                                                ------
+    /**
+     * Process before update.
+     * @param entity Entity that the type is entity interface. (NotNull)
+     * @return Execution Determination. (true: execute / false: non)
+     */
+    protected boolean processBeforeUpdate(Entity entity) {
+        if (!determineExecuteUpdate(entity)) {
+            return false;
+        }
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        frameworkFilterEntityOfUpdate(entity);
+        filterEntityOfUpdate(entity);
+        assertEntityOfUpdate(entity);
+        return true;
+    }
+
     /**
      * Determine execution of update.
      * @param entity Entity. (NotNull)
@@ -767,8 +702,24 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
     }
 
     // -----------------------------------------------------
-    //                                    Pre-Process Delete
-    //                                    ------------------
+    //                                                Delete
+    //                                                ------
+    /**
+     * Process before delete.
+     * @param entity Entity that the type is entity interface. (NotNull)
+     * @return Execution Determination. (true: execute / false: non)
+     */
+    protected boolean processBeforeDelete(Entity entity) {
+        if (!determineExecuteDelete(entity)) {
+            return false;
+        }
+        assertEntityNotNullAndHasPrimaryKeyValue(entity);
+        frameworkFilterEntityOfDelete(entity);
+        filterEntityOfDelete(entity);
+        assertEntityOfDelete(entity);
+        return true;
+    }
+
     /**
      * Determine execution of delete.
      * @param entity Entity. (NotNull)
