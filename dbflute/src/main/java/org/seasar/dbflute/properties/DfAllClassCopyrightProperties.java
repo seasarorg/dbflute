@@ -74,7 +74,6 @@ public final class DfAllClassCopyrightProperties extends DfAbstractHelperPropert
                         return;
                     }
                     sb.append(copyright);
-                    sb.append(sourceCodeLn);
                 }
                 sb.append(lineString);
                 sb.append(sourceCodeLn);
