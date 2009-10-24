@@ -180,7 +180,6 @@ public abstract class DfAbstractHelperProperties {
     //                                                ------
     /**
      * Get property as string. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @return Property as string. (NotNull)
      */
@@ -199,7 +198,6 @@ public abstract class DfAbstractHelperProperties {
 
     /**
      * Get property as string. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @param defaultValue Default value. (Nullable)
      * @return Property as string. (Nullable: If the default-value is null)
@@ -221,7 +219,6 @@ public abstract class DfAbstractHelperProperties {
 
     /**
      * Get property as string. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @param defaultValue Default value. (Nullable)
      * @return Property as string. (Nullable: If the default-value is null)
@@ -250,7 +247,6 @@ public abstract class DfAbstractHelperProperties {
     //                                               -------
     /**
      * Get property as boolean. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @return Property as boolean.
      */
@@ -265,7 +261,6 @@ public abstract class DfAbstractHelperProperties {
 
     /**
      * Get property as boolean. {Delegate method}
-     * 
      * @param key Property-key. (NotNull)
      * @param defaultValue Default value.
      * @return Property as boolean.

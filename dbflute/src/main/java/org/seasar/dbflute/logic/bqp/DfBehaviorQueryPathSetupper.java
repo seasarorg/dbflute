@@ -80,6 +80,14 @@ public class DfBehaviorQueryPathSetupper {
             _log.info("*Behavior Query Path is suppressed!");
             return;
         }
+        reflectBehaviorQueryPath(createBehaviorQueryPathMap(sqlFileList));
+    }
+
+    /**
+     * @param sqlFileList The list of SQL file. (NotNull)
+     * @return The map of behavior query path. (NotNull)
+     */
+    protected Map<String, Map<String, String>> createBehaviorQueryPathMap(List<File> sqlFileList) {
         final String exbhvName;
         {
             String exbhvPackage = getBasicProperties().getExtendedBehaviorPackage();
@@ -88,10 +96,9 @@ public class DfBehaviorQueryPathSetupper {
             }
             exbhvName = exbhvPackage;
         }
-
         Map<String, Map<String, String>> behaviorQueryPathMap = new LinkedHashMap<String, Map<String, String>>();
         gatherBehaviorQueryPathInfo(behaviorQueryPathMap, sqlFileList, exbhvName);
-        reflectBehaviorQueryPath(behaviorQueryPathMap);
+        return behaviorQueryPathMap;
     }
 
     /**
@@ -137,8 +144,17 @@ public class DfBehaviorQueryPathSetupper {
      * @param behaviorQueryPathMap The map of behavior query path. (NotNull)
      */
     protected void reflectBehaviorQueryPath(Map<String, Map<String, String>> behaviorQueryPathMap) {
-        if (behaviorQueryPathMap.isEmpty()) {
+        Map<File, Map<String, Map<String, String>>> reflectResourceMap = createReflectResourceMap(behaviorQueryPathMap);
+        if (reflectResourceMap.isEmpty()) {
             return;
+        }
+        handleReflectResource(reflectResourceMap);
+    }
+
+    protected Map<File, Map<String, Map<String, String>>> createReflectResourceMap(
+            Map<String, Map<String, String>> behaviorQueryPathMap) {
+        if (behaviorQueryPathMap.isEmpty()) {
+            return new HashMap<File, Map<String, Map<String, String>>>();
         }
         String outputDir = getBasicProperties().getGenerateOutputDirectory();
         if (outputDir.endsWith("/")) {
@@ -163,7 +179,7 @@ public class DfBehaviorQueryPathSetupper {
         };
         if (!bsbhvDir.exists()) {
             _log.warn("The base behavior directory was not found: bsbhvDir=" + bsbhvDir);
-            return;
+            return new HashMap<File, Map<String, Map<String, String>>>();
         }
 
         final List<File> bsbhvFileList = Arrays.asList(bsbhvDir.listFiles(filefilter));
@@ -200,7 +216,7 @@ public class DfBehaviorQueryPathSetupper {
                 resourceElementMap.put(behaviorQueryPath, behaviorQueryElementMap);
             }
         }
-        handleReflectResource(reflectResourceMap);
+        return reflectResourceMap;
     }
 
     protected void throwBehaviorNotFoundException(Map<String, File> bsbhvFileMap,
@@ -256,7 +272,7 @@ public class DfBehaviorQueryPathSetupper {
         final String encoding = getBasicProperties().getTemplateFileEncoding();
         final BufferedReader bufferedReader;
         try {
-            bufferedReader = new java.io.BufferedReader(new InputStreamReader(new FileInputStream(bsbhvFile), encoding));
+            bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(bsbhvFile), encoding));
         } catch (UnsupportedEncodingException e) {
             String msg = "The encoding is unsupported: encoding=" + encoding;
             throw new IllegalStateException(msg, e);
@@ -283,7 +299,7 @@ public class DfBehaviorQueryPathSetupper {
                 lineString = bufferedReader.readLine();
                 if (lineString == null) {
                     if (targetArea) {
-                        String msg = "The end mark of behavior query path was Not Found: bsbhvFile=" + bsbhvFile;
+                        String msg = "The end mark of behavior query path was NOT found: bsbhvFile=" + bsbhvFile;
                         throw new IllegalStateException(msg);
                     }
                     break;
@@ -412,7 +428,7 @@ public class DfBehaviorQueryPathSetupper {
     protected DfBasicProperties getBasicProperties() {
         return _buildProperties.getBasicProperties();
     }
-    
+
     protected DfOutsideSqlProperties getOutsideSqlProperties() {
         return _buildProperties.getOutsideSqlProperties();
     }

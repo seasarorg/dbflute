@@ -856,6 +856,18 @@ public class Database {
         return getProperties().getAllClassCopyrightProperties().getAllClassCopyright();
     }
 
+    public void reflectGenerateExCopyright(String path) {
+        final String outputDirectory = getBasicProperties().getGenerateOutputDirectory();
+        final String absolutePath = outputDirectory + "/" + path;
+        getProperties().getAllClassCopyrightProperties().reflectAllExCopyright(absolutePath);
+    }
+
+    public void reflectSql2EntityExCopyright(String path) {
+        final String outputDirectory = getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory();
+        final String absolutePath = outputDirectory + "/" + path;
+        getProperties().getAllClassCopyrightProperties().reflectAllExCopyright(absolutePath);
+    }
+
     // -----------------------------------------------------
     //                                         Prefix/Suffix
     //                                         -------------

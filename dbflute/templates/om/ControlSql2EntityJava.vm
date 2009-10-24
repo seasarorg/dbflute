@@ -161,12 +161,14 @@ $database.debug("    for (String tableName : tableNameList) {")
     #if (!$files.file(${generator.OutputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursor.${glTemplateFileExtension}",$path ,"" ,"")
     #end
+    $database.reflectSql2EntityExCopyright($path)
 
     $database.debug("        parse('ExtendedTypeSafeCursorHandler')")
     #set ( $path = "${database.getPackageAsPath(${myExtendedDaoCursorPackageName})}${myExtendedTypeSafeCursorHandlerClassName}.${glClassFileExtension}" )
     #if (!$files.file(${generator.OutputPath},$path).exists())
       $generator.parse("om/${glResourceDirectory}/exbhv/cursor/ExTypeSafeCursorHandler.${glTemplateFileExtension}",$path ,"" ,"")
     #end
+    $database.reflectSql2EntityExCopyright($path)
   #else
     $database.debug("        parseBaseCustomizeEntity(tableName);     // ${myBaseObjectClassName}")
     #set ( $path = "${database.getPackageAsPath(${myBaseEntityPackageName})}${myBaseObjectClassName}.${glClassFileExtension}" )
@@ -181,6 +183,7 @@ $database.debug("    for (String tableName : tableNameList) {")
       $database.debug("        parseExtendedCustomizeEntity(tableName); // ${myExtendedObjectClassName}")
       $generator.parse("om/${glResourceDirectory}/exentity/ExtendedEntity.${glTemplateFileExtension}",$path ,"" ,"")
     #end
+    $database.reflectSql2EntityExCopyright($path)
   #end
 #end
 $database.debug("    }")
@@ -216,6 +219,7 @@ $database.debug("    for (DfParameterBeanMetaData parameterBean : parameterBeanL
       $database.debug("        parseExtendedParameterBean(parameterBean); // ${myExtendedParameterBeanClassName}")
       $generator.parse("om/${glResourceDirectory}/exbhv/pmbean/ExParameterBean.${glTemplateFileExtension}",$path ,"" ,"")
     #end
+    $database.reflectSql2EntityExCopyright($path)
   #end
 $database.debug("    }")
 $database.debug("}")
