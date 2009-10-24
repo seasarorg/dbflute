@@ -58,7 +58,7 @@ namespace ${glPackageBaseCommonCBean} {
             ThrowEntityAlreadyDeletedException(searchKey4Log, null);
         }
 
-        public static void ThrowEntityAlreadyDeletedException(Object searchKey4Log, String tableDbName) {
+        public static void ThrowEntityAlreadyDeletedException(Object searchKey4Log) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
             msg = msg + "The entity was Not Found! it has already been deleted!" + ln();
@@ -84,7 +84,7 @@ namespace ${glPackageBaseCommonCBean} {
             ThrowEntityDuplicatedException(resultCountString, searchKey4Log, cause, null);
         }
 
-        public static void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause, String tableDbName) {
+        public static void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
             msg = msg + "The entity was Too Many! it has been duplicated. It should be the only one! But the resultCount=" + resultCountString + ln();
@@ -134,8 +134,7 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
             msg = msg + " (If your function is count(), the target column should be primary key.)" + ln();
             msg = msg + "  For example:" + ln();
-            msg = msg + "    " + ln();
-            msg = msg + "    [Wrong]" + ln();
+            msg = msg + "    (x):" + ln();
             msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
             msg = msg + "    MemberCB cb = new MemberCB();" + ln();
             msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -144,8 +143,8 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "        }" + ln();
             msg = msg + "    }).greaterEqual(123);" + ln();
             msg = msg + "    - - - - - - - - - -/" + ln();
-            msg = msg + "    " + ln();
-            msg = msg + "    [Wrong]" + ln();
+            msg = msg + ln();
+            msg = msg + "    (x):" + ln();
             msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
             msg = msg + "    MemberCB cb = new MemberCB();" + ln();
             msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -155,8 +154,8 @@ namespace ${glPackageBaseCommonCBean} {
             msg = msg + "        }" + ln();
             msg = msg + "    }).greaterEqual(123);" + ln();
             msg = msg + "    - - - - - - - - - -/" + ln();
-            msg = msg + "    " + ln();
-            msg = msg + "    [Good!]" + ln();
+            msg = msg + ln();
+            msg = msg + "    (o):" + ln();
             msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
             msg = msg + "    MemberCB cb = new MemberCB();" + ln();
             msg = msg + "    cb.query().scalarPurchaseList().max(new SubQuery<PurchaseCB>() {" + ln();
@@ -205,8 +204,7 @@ namespace ${glPackageBaseCommonCBean} {
 	        msg = msg + "[Advice]" + ln();
 	        msg = msg + "You should specified a local table column at condition-bean for derived-query." + ln();
 	        msg = msg + "  For example:" + ln();
-	        msg = msg + "    " + ln();
-	        msg = msg + "    [Wrong]" + ln();
+	        msg = msg + "    (x):" + ln();
 	        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
 	        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
 	        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
@@ -215,8 +213,8 @@ namespace ${glPackageBaseCommonCBean} {
 	        msg = msg + "        }" + ln();
 	        msg = msg + "    });" + ln();
 	        msg = msg + "    - - - - - - - - - -/" + ln();
-	        msg = msg + "    " + ln();
-	        msg = msg + "    [Good!]" + ln();
+	        msg = msg + ln();
+	        msg = msg + "    (o):" + ln();
 	        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
 	        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
 	        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
@@ -240,8 +238,7 @@ namespace ${glPackageBaseCommonCBean} {
 	        msg = msg + " You should call specify().column[TargetColumn]() only once." + ln();
 	        msg = msg + " (If your function is count(), the target column should be primary key.)" + ln();
 	        msg = msg + "  For example:" + ln();
-	        msg = msg + "    " + ln();
-	        msg = msg + "    [Wrong]" + ln();
+	        msg = msg + "    (x):" + ln();
 	        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
 	        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
 	        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
@@ -250,8 +247,8 @@ namespace ${glPackageBaseCommonCBean} {
 	        msg = msg + "        }" + ln();
 	        msg = msg + "    });" + ln();
 	        msg = msg + "    - - - - - - - - - -/" + ln();
-	        msg = msg + "    " + ln();
-	        msg = msg + "    [Wrong]" + ln();
+	        msg = msg + ln();
+	        msg = msg + "    (x):" + ln();
 	        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
 	        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
 	        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();
@@ -261,8 +258,8 @@ namespace ${glPackageBaseCommonCBean} {
 	        msg = msg + "        }" + ln();
 	        msg = msg + "    });" + ln();
 	        msg = msg + "    - - - - - - - - - -/" + ln();
-	        msg = msg + "    " + ln();
-	        msg = msg + "    [Good!]" + ln();
+	        msg = msg + ln();
+	        msg = msg + "    (o):" + ln();
 	        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
 	        msg = msg + "    MemberCB cb = new MemberCB();" + ln();
 	        msg = msg + "    cb.query().scalar_Equal().max(new SubQuery<MemberCB>() {" + ln();

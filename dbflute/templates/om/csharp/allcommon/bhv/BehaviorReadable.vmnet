@@ -34,6 +34,7 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                   Basic Get All
         //                                                                   =============
+        [Obsolete("Use ReadCount(NewConditionBean())")]
         int GetCountAll();
 
         // ===============================================================================
@@ -63,18 +64,10 @@ namespace ${glPackageBaseCommonBhv} {
         /// <exception cref="${glPackageBaseCommonException}.${glEntityDuplicatedException}">When the entity has been duplicated.</exception>
         ${glEntity} ReadEntityWithDeletedCheck(${glConditionBean} cb);
 
-        /// <summary>
-        /// Read list.
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Read list. (NotNull)</returns>
-        ${glListResultBean}<${glEntity}> ReadList(${glConditionBean} cb);
+        // unsupported for generic problem
+        //${glListResultBean}<${glEntity}> ReadList(${glConditionBean} cb);
 
-        /// <summary>
-        /// Read page.
-        /// </summary>
-        /// <param name="cb">Condition-bean. (NotNull)</param>
-        /// <returns>Read page. (NotNull)</returns>
-        ${glPagingResultBean}<${glEntity}> ReadPage(${glConditionBean} cb);
+        // unsupported for generic problem
+        //${glPagingResultBean}<${glEntity}> ReadPage(${glConditionBean} cb);
     }
 }

@@ -5,6 +5,7 @@ using System.Reflection;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonException};
 
 namespace ${glPackageBaseCommonS2Dao} {
 
@@ -23,12 +24,6 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        /**
-         * Constructor.
-         * 
-         * @param dataReader Original data-reader. (NotNull)
-         * @param ${glAttachedCBArgsVariableName} FetchNarrowing-bean. (NotNull)
-         */
         public ${glFetchNarrowingResultSetWrapper}(System.Data.IDataReader dataReader, ${glFetchNarrowingBean} fetchNarrowingBean
                                                  , bool offsetByCursorForcedly, bool limitByCursorForcedly) {
             _dataReader = dataReader;
@@ -48,12 +43,12 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
             int skipStartIndex = GetFetchNarrowingSkipStartIndex();
             if (IsCursorUsed()) {
-//                if (0 == skipStartIndex) {
-//                    _dataReader.beforeFirst();
-//                } else {
-//                    _dataReader.absolute(skipStartIndex);
-//                }
-//                _fetchCounter = _dataReader.getRow();
+                //if (0 == skipStartIndex) {
+                //    _dataReader.beforeFirst();
+                //} else {
+                //    _dataReader.absolute(skipStartIndex);
+                //}
+                //_fetchCounter = _dataReader.getRow();
                 throw new NotSupportedException("Cursor is unsupported!!!");
             } else {
                 while (_fetchCounter < skipStartIndex && _dataReader.Read()) {
@@ -78,12 +73,6 @@ namespace ${glPackageBaseCommonS2Dao} {
         // ===============================================================================
         //                                                                            Read
         //                                                                            ====
-        /**
-         * Read.
-         * 
-         * @return Does the result set have next record?
-         * @throws SQLException
-         */
         public bool Read() {
             bool hasNext = _dataReader.Read();
             ++_requestCounter;
@@ -115,16 +104,17 @@ namespace ${glPackageBaseCommonS2Dao} {
         }
 
         protected void CheckSafetyResult(bool hasNext) {
-            if (hasNext && GetSafetyMaxResultSize() > 0 && _requestCounter > (GetSafetyMaxResultSize() + 1)) {
-                String msg = "You have already been in Danger Zone!";
-                msg = msg + " Please confirm your query or data of table: safetyMaxResultSize=" + GetSafetyMaxResultSize();
-                throw new ${glPackageBaseCommonException}.${glDangerousResultSizeException}(msg, GetSafetyMaxResultSize());
+            int safetyMaxResultSize = GetSafetyMaxResultSize();
+            if (hasNext && safetyMaxResultSize > 0 && _requestCounter > safetyMaxResultSize) {
+                String msg = "You've been in Danger Zone:";
+                msg = msg + " safetyMaxResultSize=" + safetyMaxResultSize;
+                throw new ${glDangerousResultSizeException}(msg, safetyMaxResultSize);
             }
         }
 
         // ===============================================================================
-        //                                                                    Fetch Option
-        //                                                                    ============
+        //                                                            Fetch Narrowing Bean
+        //                                                            ====================
         protected bool IsFetchNarrowingEffective() {
             return _fetchNarrowingBean.IsFetchNarrowingEffective;
         }
@@ -149,12 +139,15 @@ namespace ${glPackageBaseCommonS2Dao} {
             return _fetchNarrowingBean.SafetyMaxResultSize;
         }
 
+        // ===============================================================================
+        //                                                                   Assist Helper
+        //                                                                   =============
         protected bool IsCursorUsed() {
             return IsCursorSupported(_dataReader);
         }
 
         public static bool IsCursorSupported(System.Data.IDataReader dataReader) {
-            return false;// Is Cursor Unsupported at C#?
+            return false; // Is Cursor Unsupported at C#?
         }
 
         // ===============================================================================

@@ -9,7 +9,7 @@ namespace ${glPackageBaseCommonCBean} {
     /// The condition-bean as interface.
     /// Author: ${database.classAuthor}
     /// </summary>
-    public interface ${glOrderByBean} : ${glSelectResource} {
+    public interface ${glOrderByBean} {
 
         /// <summary>
         /// The property of sql component of order-by clause.

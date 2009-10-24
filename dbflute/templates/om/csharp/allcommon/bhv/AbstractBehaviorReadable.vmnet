@@ -46,6 +46,7 @@ namespace ${glPackageBaseCommonBhv} {
         // ===============================================================================
         //                                                                   Basic Get All
         //                                                                   =============
+        [Obsolete("Use ReadCount(NewConditionBean())")]
         public int GetCountAll() {
             return this.ReadCount(NewConditionBean());
         }
@@ -55,28 +56,39 @@ namespace ${glPackageBaseCommonBhv} {
         //                                                                      ==========
         public virtual int ReadCount(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
-            return this.CallReadCount(cb);
+            return DoReadCount(cb);
         }
+
+        protected abstract int DoReadCount(${glConditionBean} cb);
 
         // ===============================================================================
         //                                                                     Entity Read
         //                                                                     ===========
         public virtual ${glEntity} ReadEntity(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
-            IList<${glEntity}> ls = this.CallReadList(cb);
-            if (ls.Count == 0) {
-                return null;
-            }
-            AssertEntitySelectedAsOne(ls, cb);
-            return (${glEntity})ls[0];
+            return DoReadEntity(cb);
         }
+
+        protected abstract ${glEntity} DoReadEntity(${glConditionBean} cb);
 
         public virtual ${glEntity} ReadEntityWithDeletedCheck(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
-            IList<${glEntity}> ls = this.CallReadList(cb);
-            AssertEntityNotDeleted(ls, cb);
-            AssertEntitySelectedAsOne(ls, cb);
-            return (${glEntity})ls[0];
+            return DoReadEntityWithDeletedCheck(cb);
+        }
+
+        protected abstract ${glEntity} DoReadEntityWithDeletedCheck(${glConditionBean} cb);
+
+        // -----------------------------------------------------
+        //                                       Internal Helper
+        //                                       ---------------
+        protected int XCheckSafetyResultAsOne(${glConditionBean} cb) {
+            int safetyMaxResultSize = cb.SafetyMaxResultSize;
+            cb.CheckSafetyResult(1);
+            return safetyMaxResultSize;
+        }
+
+        protected void XRestoreSafetyResult(${glConditionBean} cb, int preSafetyMaxResultSize) {
+            cb.CheckSafetyResult(preSafetyMaxResultSize);
         }
 
         // ===============================================================================
@@ -87,6 +99,9 @@ namespace ${glPackageBaseCommonBhv} {
             return new ${glResultBeanBuilder}<${glEntity}>(TableDbName).BuildListResultBean(cb, this.CallReadList(cb));
         }
 
+        // ===============================================================================
+        //                                                                       Page Read
+        //                                                                       =========
         public virtual ${glPagingResultBean}<${glEntity}> ReadPage(${glConditionBean} cb) {
             AssertConditionBeanNotNull(cb);
             ${glPagingInvoker}<${glEntity}> invoker = new ${glPagingInvoker}<${glEntity}>(TableDbName);
@@ -105,28 +120,36 @@ namespace ${glPackageBaseCommonBhv} {
             public IList<${glEntity}> Paging() { return _bhv.ReadList(_cb); }
         }
 
-        // -------------------------------------------------
-        //                                     Assert Result
-        //                                     -------------
+        // ===============================================================================
+        //                                                          Entity Result Handling
+        //                                                          ======================
         protected void AssertEntityNotDeleted(${glEntity} entity, Object searchKey4Log) {
             if (entity == null) {
-                ${glConditionBeanContext}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
+                ThrowEntityAlreadyDeletedException(searchKey4Log);
             }
         }
 
         protected void AssertEntityNotDeleted<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntity} {
             if (ls == null || ls.Count == 0) {
-                ${glConditionBeanContext}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
+                ThrowEntityAlreadyDeletedException(searchKey4Log);
             }
         }
 
         protected void AssertEntitySelectedAsOne<ENTITY_TYPE>(IList<ENTITY_TYPE> ls, Object searchKey4Log) where ENTITY_TYPE : ${glEntity} {
             if (ls == null || ls.Count == 0) {
-				${glConditionBeanContext}.ThrowEntityAlreadyDeletedException(searchKey4Log, TableDbName);
+				ThrowEntityAlreadyDeletedException(searchKey4Log);
             }
             if (ls.Count != 1) {
-			    ${glConditionBeanContext}.ThrowEntityDuplicatedException("" + ls.Count, searchKey4Log, null, TableDbName);
+			    ThrowEntityDuplicatedException("" + ls.Count, searchKey4Log, null);
             }
+        }
+
+        protected void ThrowEntityAlreadyDeletedException(Object searchKey4Log) {
+            ${glConditionBeanContext}.throwEntityAlreadyDeletedException(searchKey4Log);
+        }
+
+        protected void ThrowEntityDuplicatedException(String resultCountString, Object searchKey4Log, Exception cause) {
+            ${glConditionBeanContext}.throwEntityDuplicatedException(resultCountString, searchKey4Log, cause);
         }
 
         // ===============================================================================
@@ -377,12 +400,8 @@ namespace ${glPackageBaseCommonBhv} {
         protected abstract bool HasUpdateDateValue(${glEntity} entity);
 
         // ===============================================================================
-        //                                                                 Delegate Method
-        //                                                                 ===============
-        protected int CallReadCount(${glConditionBean} cb) { return DoCallReadCount(cb); }
-        protected abstract int DoCallReadCount(${glConditionBean} cb);
-        protected IList<${glEntity}> CallReadList(${glConditionBean} cb) { return DoCallReadList(cb); }
-        protected abstract IList<${glEntity}> DoCallReadList(${glConditionBean} cb);
+        //                                                                   Filter Method
+        //                                                                   =============
         protected virtual void FilterEntityOfInsert(${glEntity} targetEntity) { // for isAvailableNonPrimaryKeyWritable
         }
 

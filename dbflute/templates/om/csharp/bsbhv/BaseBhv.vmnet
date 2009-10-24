@@ -80,6 +80,10 @@ namespace ${glPackageExtendedBhv} {
             AssertConditionBeanNotNull(cb);
             return this.DelegateSelectCount(cb);
         }
+
+        protected override int DoReadCount(${glConditionBean} cb) {
+            return SelectCount(cb);
+        }
         #endregion
 
         // ===============================================================================
@@ -88,18 +92,34 @@ namespace ${glPackageExtendedBhv} {
         #region Entity Select
         public virtual ${myExtendedObjectClassName} SelectEntity(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
+            int preSafetyMaxResultSize = XCheckSafetyResultAsOne(cb);
+            IList<${myExtendedObjectClassName}> ls = null;
+            try {
+                ls = this.DelegateSelectList(cb);
+            } catch (${glDangerousResultSizeException} e) {
+                ThrowEntityDuplicatedException("{over safetyMaxResultSize '1'}", cb, e);
+                return null; // unreachable
+            } finally {
+                XRestoreSafetyResult(cb, preSafetyMaxResultSize);
+            }
             if (ls.Count == 0) { return null; }
             AssertEntitySelectedAsOne(ls, cb);
             return (${myExtendedObjectClassName})ls[0];
         }
 
+        protected override ${glEntity} DoReadEntity(${glConditionBean} cb) {
+            return SelectEntity(cb);
+        }
+
         public virtual ${myExtendedObjectClassName} SelectEntityWithDeletedCheck(${myConditionBeanClassName} cb) {
             AssertConditionBeanNotNull(cb);
-            IList<${myExtendedObjectClassName}> ls = this.DelegateSelectList(cb);
-            AssertEntityNotDeleted(ls, cb);
-            AssertEntitySelectedAsOne(ls, cb);
-            return (${myExtendedObjectClassName})ls[0];
+            ${myExtendedObjectClassName} entity = SelectEntity(cb);
+            AssertEntityNotDeleted(entity, cb);
+            return entity;
+        }
+
+        protected override ${glEntity} DoReadEntityWithDeletedCheck(${glConditionBean} cb) {
+            return SelectEntityWithDeletedCheck(cb);
         }
 #if ($table.hasPrimaryKey())
 
@@ -254,12 +274,20 @@ namespace ${glPackageExtendedBhv} {
             this.DelegateInsert(entity);
         }
 
+        protected override void DoCreate(${glEntity} entity) {
+            Insert((${myExtendedObjectClassName})entity);
+        }
+
         public virtual void Update(${myExtendedObjectClassName} entity) {
             AssertEntityNotNull(entity);
             AssertEntityHasVersionNoValue(entity);
             AssertEntityHasUpdateDateValue(entity);
             int updatedCount = this.DelegateUpdate(entity);
             AssertUpdatedEntity(entity, updatedCount);
+        }
+
+        protected override void DoModify(${glEntity} entity) {
+            Update((${myExtendedObjectClassName})entity);
         }
 #if ($table.hasOptimisticLock())
 
@@ -302,6 +330,11 @@ namespace ${glPackageExtendedBhv} {
         public virtual void Delete(${myExtendedObjectClassName} entity) {
             HelpDeleteInternally<${myExtendedObjectClassName}>(entity, new MyInternalDeleteCallback(this));
         }
+
+        protected override void DoRemove(${glEntity} entity) {
+            Remove((${myExtendedObjectClassName})entity);
+        }
+
         protected class MyInternalDeleteCallback : InternalDeleteCallback<${myExtendedObjectClassName}> {
             protected ${myClassName} _bhv;
             public MyInternalDeleteCallback(${myClassName} bhv) { _bhv = bhv; }
@@ -378,9 +411,7 @@ namespace ${glPackageExtendedBhv} {
         //                                                                 ===============
         #region Delegate Method
         protected int DelegateSelectCount(${myConditionBeanClassName} cb) { AssertConditionBeanNotNull(cb); return this.Dao.SelectCount(cb); }
-        protected override int DoCallReadCount(${glConditionBean} cb) { return this.DelegateSelectCount((${myConditionBeanClassName})cb); }
         protected IList<${myExtendedObjectClassName}> DelegateSelectList(${myConditionBeanClassName} cb) { AssertConditionBeanNotNull(cb); return this.Dao.SelectList(cb); }
-        protected override IList<${glEntity}> DoCallReadList(${glConditionBean} cb) { return (IList<${glEntity}>)this.DelegateSelectList((${myConditionBeanClassName})cb); }
 #if ($table.isUseSequence())
         protected ${table.sequenceReturnType} DelegateSelectNextVal() { return this.Dao.SelectNextVal(); }
 #end
@@ -407,9 +438,6 @@ namespace ${glPackageExtendedBhv} {
         protected int DelegateDeleteNonstrict(${myExtendedObjectClassName} e)
         { if (!ProcessBeforeDelete(e)) { return 1; } return this.Dao.DeleteNonstrict(e); }
 #end
-        protected override int DoCallCreate(${glEntity} e) { return this.DelegateInsert((${myExtendedObjectClassName})e); }
-        protected override int DoCallModify(${glEntity} e) { return this.DelegateUpdate((${myExtendedObjectClassName})e); }
-        protected override int DoCallRemove(${glEntity} e) { return this.DelegateDelete((${myExtendedObjectClassName})e); }
 #end
         #endregion
 #if ($table.hasBehaviorFilterBeforeColumn())

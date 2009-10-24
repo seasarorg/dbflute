@@ -4,10 +4,7 @@ ${database.allClassCopyright}package ${glPackageBaseBhv};
 import java.util.List;
 
 import org.seasar.dbflute.*;
-#if (${table.hasPrimaryKey()} && $table.hasReferrerAsMany())
-import org.seasar.dbflute.bhv.ConditionBeanSetupper;
-import org.seasar.dbflute.bhv.LoadReferrerOption;
-#end
+import org.seasar.dbflute.bhv.*;
 #if ($table.isAvailableNonPrimaryKeyWritable())
 import org.seasar.dbflute.bhv.core.command.InsertEntityCommand;
 #end
@@ -76,7 +73,7 @@ import ${glPackageCB}.*;
  * </pre>
  * @author ${database.classAuthor}
  */
-public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendClassName} {
+public abstract class ${myClassName} extends ${myExtendClassName} {
 
     // ===================================================================================
     //                                                                          Definition
@@ -102,9 +99,16 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     // ===================================================================================
     //                                                                        New Instance
     //                                                                        ============
+    /** {@inheritDoc} */
     public Entity newEntity() { return newMyEntity(); }
+
+    /** {@inheritDoc} */
     public ConditionBean newConditionBean() { return newMyConditionBean(); }
+
+    /** @return The instance of new entity as my table type. (NotNull) */
     public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
+
+    /** @return The instance of new condition-bean as my table type. (NotNull) */
     public ${myConditionBeanClassName} newMyConditionBean() { return new ${myConditionBeanClassName}(); }
 
     // ===================================================================================
@@ -119,7 +123,12 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         assertCBNotNull(cb);
         return delegateSelectCount(cb);
     }
-    
+
+    @Override
+    protected int doReadCount(ConditionBean cb) {
+        return selectCount(downcast(cb));
+    }
+
     // ===================================================================================
     //                                                                       Cursor Select
     //                                                                       =============
@@ -148,6 +157,11 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
             public List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
     }
 
+    @Override
+    protected Entity doReadEntity(ConditionBean cb) {
+        return selectEntity(downcast(cb));
+    }
+
     /**
      * Select the entity by the condition-bean with deleted check.
      * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
@@ -158,6 +172,11 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb) {
         return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
             public List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
+    }
+
+    @Override
+    protected Entity doReadEntityWithDeletedCheck(ConditionBean cb) {
+        return selectEntityWithDeletedCheck(downcast(cb));
     }
 #if ($table.hasPrimaryKey())
 
@@ -203,6 +222,11 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
         return new ResultBeanBuilder<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
     }
 
+    @Override
+    protected ListResultBean<? extends Entity> doReadList(ConditionBean cb) {
+        return selectList(downcast(cb));
+    }
+
     // ===================================================================================
     //                                                                         Page Select
     //                                                                         ===========
@@ -220,6 +244,11 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
             public List<${myExtendedObjectClassName}> paging() { return selectList(cb); }
         };
         return invoker.invokePaging(handler);
+    }
+
+    @Override
+    protected PagingResultBean<? extends Entity> doReadPage(ConditionBean cb) {
+        return selectPage(downcast(cb));
     }
 
     // ===================================================================================
@@ -513,8 +542,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     }
 
     @Override
-    protected void doCreate(Entity ${myEntityVariableName}) {
-        insert((${myExtendedObjectClassName})${myEntityVariableName});
+    protected void doCreate(Entity entity) {
+        insert(downcast(entity));
     }
 
     /**
@@ -535,7 +564,7 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 
     @Override
     protected void doModify(Entity entity) {
-        update((${myExtendedObjectClassName})entity);
+        update(downcast(entity));
     }
 #if ($table.hasOptimisticLock())
     
@@ -555,9 +584,9 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     @Override
     protected void doModifyNonstrict(Entity entity) {
 #if ($table.hasOptimisticLock())
-        updateNonstrict((${myExtendedObjectClassName})entity);
+        updateNonstrict(downcast(entity));
 #else
-        update((${myExtendedObjectClassName})entity);
+        update(downcast(entity));
 #end
     }
 
@@ -582,8 +611,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     }
 
     @Override
-    protected void doCreateOrUpdate(Entity ${myEntityVariableName}) {
-        insertOrUpdate((${myExtendedObjectClassName})${myEntityVariableName});
+    protected void doCreateOrUpdate(Entity entity) {
+        insertOrUpdate(downcast(entity));
     }
 #if ($table.hasOptimisticLock())
 
@@ -605,9 +634,9 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     @Override
     protected void doCreateOrUpdateNonstrict(Entity entity) {
 #if ($table.isUseUpdateDate() || $table.isUseVersionNo())
-        insertOrUpdateNonstrict((${myExtendedObjectClassName})entity);
+        insertOrUpdateNonstrict(downcast(entity));
 #else
-        insertOrUpdate((${myExtendedObjectClassName})entity);
+        insertOrUpdate(downcast(entity));
 #end
     }
 
@@ -627,8 +656,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     }
 
     @Override
-    protected void doRemove(Entity ${myEntityVariableName}) {
-        delete((${myExtendedObjectClassName})${myEntityVariableName});
+    protected void doRemove(Entity entity) {
+        delete(downcast(entity));
     }
 #if ($table.hasOptimisticLock())
 
@@ -885,11 +914,8 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     protected int delegateSelectCount(${myConditionBeanClassName} cb) { return invoke(createSelectCountCBCommand(cb)); }
     protected void delegateSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler)
     { invoke(createSelectCursorCBCommand(cb, entityRowHandler, ${myExtendedObjectClassName}.class)); }
-    protected int doCallReadCount(ConditionBean cb) { return delegateSelectCount((${myConditionBeanClassName})cb); }
     protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb)
     { return invoke(createSelectListCBCommand(cb, ${myExtendedObjectClassName}.class)); }
-    @SuppressWarnings("unchecked")
-    protected List<Entity> doCallReadList(ConditionBean cb) { return (List)delegateSelectList((${myConditionBeanClassName})cb); }
 #if ($table.isUseSequence())
     protected ${table.sequenceReturnType} delegateSelectNextVal() { return invoke(createSelectNextValCommand(${table.sequenceReturnType}.class)); }
 #end
@@ -900,14 +926,12 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     //                                                ------
     protected int delegateInsert(${myExtendedObjectClassName} e)
     { if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e)); }
-    protected int doCallCreate(Entity entity) {return delegateInsert(downcast(entity)); }
     protected int delegateUpdate(${myExtendedObjectClassName} e)
 #if ($table.hasOptimisticLock())
     { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e)); }
 #else
     { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
 #end
-    protected int doCallModify(Entity entity) { return delegateUpdate(downcast(entity)); }
 #if ($table.hasOptimisticLock())
     protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e)
     { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
@@ -918,7 +942,6 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #else
     { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e)); }
 #end
-    protected int doCallRemove(Entity entity) { return delegateDelete(downcast(entity)); }
 #if ($table.hasOptimisticLock())
     protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e)
     { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e)); }
@@ -1028,6 +1051,9 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     // ===================================================================================
     //                                                                Optimistic Lock Info
     //                                                                ====================
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean hasVersionNoValue(Entity entity) {
 #if ($table.isUseVersionNo())
@@ -1037,6 +1063,9 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
 #end
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean hasUpdateDateValue(Entity entity) {
 #if ($table.isUseUpdateDate())
@@ -1047,9 +1076,13 @@ public abstract class ${myClassName} extends org.seasar.dbflute.bhv.${myExtendCl
     }
 
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
+    //                                                                     Downcast Helper
+    //                                                                     ===============
     protected ${myExtendedObjectClassName} downcast(Entity entity) {
-        return helpDowncastInternally(entity, ${myExtendedObjectClassName}.class);
+        return helpEntityDowncastInternally(entity, ${myExtendedObjectClassName}.class);
+    }
+
+    protected ${myConditionBeanClassName} downcast(ConditionBean cb) {
+        return helpConditionBeanDowncastInternally(cb, ${myConditionBeanClassName}.class);
     }
 }

@@ -25,11 +25,15 @@ namespace ${glPackageBaseCommonBhv} {
             CallCreate(entity);
         }
 
+        protected abstract void DoCreate(${glEntity} entity);
+
         public virtual void Modify(${glEntity} entity) {
             AssertEntityNotNull(entity);
             int modifiedCount = CallModify(entity);
             AssertUpdatedEntity(entity, modifiedCount);
         }
+
+        protected abstract void DoModify(${glEntity} entity);
 
         protected static void AssertUpdatedEntity(${glEntity} entity, int updatedCount) {
             if (updatedCount == 0) {
@@ -48,6 +52,8 @@ namespace ${glPackageBaseCommonBhv} {
             int removedCount = CallRemove(entity);
             AssertDeletedEntity(entity, removedCount);
         }
+
+        protected abstract void DoRemove(${glEntity} entity);
 
         protected static void AssertDeletedEntity(${glEntity} entity, int deletedCount) {
             if (deletedCount == 0) {

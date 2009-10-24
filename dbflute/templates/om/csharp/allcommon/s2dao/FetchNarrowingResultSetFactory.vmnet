@@ -22,39 +22,44 @@ namespace ${glPackageBaseCommonS2Dao} {
 
         public IDataReader CreateDataReader(IDataSource dataSource, IDbCommand cmd) {
             IDataReader dataReader = ExecuteReader(dataSource, cmd);
-
-            if (!${glFetchNarrowingBeanContext}.IsExistFetchNarrowingBeanOnThread()) {
-                return dataReader;// If the first argument is not condition-bean...
-            }
-            ${glFetchNarrowingBean} cb = ${glFetchNarrowingBeanContext}.GetFetchNarrowingBeanOnThread();
-            if (!IsUseFetchNarrowingResultSetWrapper(cb)) {
+            if (!IsUseFetchNarrowingResultSetWrapper()) {
                 return dataReader;
             }
+            ${glFetchNarrowingBean} fnbean = ${glFetchNarrowingBeanContext}.GetFetchNarrowingBeanOnThread();
             ${glFetchNarrowingResultSetWrapper} wrapper = null;
             if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
                 ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
-                wrapper = new ${glFetchNarrowingResultSetWrapper}(dataReader, cb, outsideSqlContext.IsOffsetByCursorForcedly, outsideSqlContext.IsLimitByCursorForcedly);
+                wrapper = new ${glFetchNarrowingResultSetWrapper}(dataReader, fnbean
+                              , outsideSqlContext.IsOffsetByCursorForcedly
+                              , outsideSqlContext.IsLimitByCursorForcedly);
             } else {
-                wrapper = new ${glFetchNarrowingResultSetWrapper}(dataReader, cb, false, false);
+                wrapper = new ${glFetchNarrowingResultSetWrapper}(dataReader, fnbean, false, false);
             }
             return wrapper;
         }
 
-        protected bool IsUseFetchNarrowingResultSetWrapper(${glFetchNarrowingBean} cb) {
-            if (cb.SafetyMaxResultSize > 0) {
+        protected bool IsUseFetchNarrowingResultSetWrapper() {
+            ${glFetchNarrowingBean} fnbean = ${glFetchNarrowingBeanContext}.GetFetchNarrowingBeanOnThread();
+
+            // for safety result
+            if (fnbean != null && fnbean.SafetyMaxResultSize > 0) {
                 return true;
             }
-            if (!cb.IsFetchNarrowingEffective) {
-                return false;// It is not necessary to control.
-            }
-            if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
-                ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
-                if (outsideSqlContext.IsOffsetByCursorForcedly || outsideSqlContext.IsLimitByCursorForcedly) {
+
+            // for unsupported paging (ConditionBean)
+            if (fnbean != null && fnbean.IsFetchNarrowingEffective) {
+                // for unsupported paging (Database)
+                if (fnbean.IsFetchNarrowingSkipStartIndexEffective || fnbean.IsFetchNarrowingLoopCountEffective) {
                     return true;
                 }
-            }
-            if (cb.IsFetchNarrowingSkipStartIndexEffective || cb.IsFetchNarrowingLoopCountEffective) {
-                return true;
+
+                // for auto paging (OutsideSql)
+                if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                    ${glOutsideSqlContext} outsideSqlContext = ${glOutsideSqlContext}.GetOutsideSqlContextOnThread();
+                    if (outsideSqlContext.IsOffsetByCursorForcedly || outsideSqlContext.IsLimitByCursorForcedly) {
+                        return true;
+                    }
+                }
             }
             return false;
         }

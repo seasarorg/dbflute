@@ -107,13 +107,13 @@ namespace ${glPackageBaseCommonCBean} {
         // -------------------------------------------------
         //                                    Fetch Property
         //                                    --------------
+        public int SafetyMaxResultSize { get { return _safetyMaxResultSize; } }
         public int FetchStartIndex { get { return this.SqlClause.getFetchStartIndex(); } }
         public int FetchSize { get { return this.SqlClause.getFetchSize(); } }
         public int FetchPageNumber { get { return this.SqlClause.getFetchPageNumber(); } }
         public int PageStartIndex { get { return this.SqlClause.getPageStartIndex(); } }
         public int PageEndIndex { get { return this.SqlClause.getPageEndIndex(); } }
         public bool IsFetchScopeEffective { get { return this.SqlClause.isFetchScopeEffective(); } }
-        public int SafetyMaxResultSize { get { return _safetyMaxResultSize; } }
 
         // -------------------------------------------------
         //                                     Hint Property
@@ -124,6 +124,13 @@ namespace ${glPackageBaseCommonCBean} {
         public String WhereClause { get { return this.SqlClause.getWhereClause(); } }
         public String OrderByClause { get { return this.SqlClause.getOrderByClause(); } }
         public String SqlSuffix { get { return this.SqlClause.getSqlSuffix(); } }
+
+        // ===============================================================================
+        //                                                     Implementation of FetchBean
+        //                                                     ===========================
+        public void CheckSafetyResult(int safetyMaxResultSize) {
+            this._safetyMaxResultSize = safetyMaxResultSize;
+        }
 
         // ===============================================================================
         //                                            Implementation of FetchNarrowingBean
@@ -160,13 +167,6 @@ namespace ${glPackageBaseCommonCBean} {
 
         public abstract ${glConditionBean} AddOrderBy_PK_Asc();
         public abstract ${glConditionBean} AddOrderBy_PK_Desc();
-
-        // ===============================================================================
-        //                                                Implementation of SelectResource
-        //                                                ================================
-        public void CheckSafetyResult(int safetyMaxResultSize) {
-            this._safetyMaxResultSize = safetyMaxResultSize;
-        }
 
         // ===============================================================================
         //                                                                    Lock Setting
