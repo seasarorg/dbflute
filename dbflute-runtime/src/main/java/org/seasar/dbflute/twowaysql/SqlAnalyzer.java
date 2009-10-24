@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.twowaysql;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.seasar.dbflute.exception.EndCommentNotFoundException;
@@ -46,6 +48,9 @@ public class SqlAnalyzer {
     protected boolean _blockNullParameter;
     protected SqlTokenizer _tokenizer;
     protected Stack<Node> _nodeStack = new Stack<Node>();
+    protected List<String> _researchIfCommentList;
+    protected List<String> _researchBindVariableCommentList;
+    protected List<String> _researchEmbeddedValueCommentList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -61,8 +66,8 @@ public class SqlAnalyzer {
     }
 
     // ===================================================================================
-    //                                                                               Parse
-    //                                                                               =====
+    //                                                                             Analyze
+    //                                                                             =======
     public Node analyze() {
         push(new ContainerNode());
         while (SqlTokenizer.EOF != _tokenizer.next()) {
@@ -217,15 +222,15 @@ public class SqlAnalyzer {
         final String expr = _tokenizer.getToken();
         final String s = _tokenizer.skipToken();
         if (expr.startsWith("$")) {
-            peek().addChild(createEmbeddedValueNode(expr.substring(1), s));// Extension!
+            peek().addChild(createEmbeddedValueNode(expr.substring(1), s));
         } else {
-            peek().addChild(createBindVariableNode(expr, s));// Extension!
+            peek().addChild(createBindVariableNode(expr, s));
         }
     }
 
     protected void parseBindVariable() {
         final String expr = _tokenizer.getToken();
-        peek().addChild(createBindVariableNode(expr, null));// Extension!
+        peek().addChild(createBindVariableNode(expr, null));
     }
 
     protected Node pop() {
@@ -269,16 +274,19 @@ public class SqlAnalyzer {
         return new BeginNode();
     }
 
+    protected IfNode createIfNode(String expr) {
+        researchIfNeed(_researchIfCommentList, expr); // for research
+        return new IfNode(expr, _specifiedSql);
+    }
+
     protected BindVariableNode createBindVariableNode(String expr, String testValue) {
+        researchIfNeed(_researchBindVariableCommentList, expr); // for research
         return new BindVariableNode(expr, testValue, _specifiedSql, _blockNullParameter);
     }
 
     protected EmbeddedValueNode createEmbeddedValueNode(String expr, String testValue) {
+        researchIfNeed(_researchEmbeddedValueCommentList, expr); // for research
         return new EmbeddedValueNode(expr, testValue, _specifiedSql, _blockNullParameter);
-    }
-
-    protected IfNode createIfNode(String expr) {
-        return new IfNode(expr, _specifiedSql);
     }
 
     protected SqlNode createSqlNode(String sql) {
@@ -291,6 +299,51 @@ public class SqlAnalyzer {
 
     protected PrefixSqlNode createPrefixSqlNode(String prefix, String sql) {
         return new PrefixSqlNode(prefix, sql);
+    }
+
+    // ===================================================================================
+    //                                                                            Research
+    //                                                                            ========
+    /**
+     * Research IF comments. (basically for research only, NOT for execution)<br />
+     * This method should be called before calling analyze(). <br />
+     * The returned list is filled with IF comment after calling analyze().
+     * @return The list of IF comment. (NotNull)
+     */
+    public List<String> researchIfComment() { // should NOT be called with execution
+        final List<String> resultList = new ArrayList<String>();
+        _researchIfCommentList = resultList;
+        return resultList;
+    }
+
+    /**
+     * Research bind variable comments. (basically for research only, NOT for execution)<br />
+     * This method should be called before calling analyze(). <br />
+     * The returned list is filled with bind variable comment after calling analyze().
+     * @return The list of bind variable comment. (NotNull)
+     */
+    public List<String> researchBindVariableComment() { // should NOT be called with execution
+        final List<String> resultList = new ArrayList<String>();
+        _researchBindVariableCommentList = resultList;
+        return resultList;
+    }
+
+    /**
+     * Research embedded value comments. (basically for research only, NOT for execution)<br />
+     * This method should be called before calling analyze(). <br />
+     * The returned list is filled with embedded value comment after calling analyze().
+     * @return The list of embedded value comment. (NotNull)
+     */
+    public List<String> researchEmbeddedValueComment() { // should NOT be called with execution
+        final List<String> resultList = new ArrayList<String>();
+        _researchEmbeddedValueCommentList = resultList;
+        return resultList;
+    }
+
+    protected void researchIfNeed(List<String> researchList, String expr) {
+        if (researchList != null) {
+            researchList.add(expr);
+        }
     }
 
     // ===================================================================================
