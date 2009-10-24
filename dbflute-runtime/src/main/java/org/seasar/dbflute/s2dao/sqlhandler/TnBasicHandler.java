@@ -257,7 +257,7 @@ public class TnBasicHandler {
             return dataSource.getConnection();
         } catch (SQLException e) {
             handleSQLException(e, null);
-            return null;// Unreachable!
+            return null;// unreachable
         }
     }
 
@@ -273,7 +273,7 @@ public class TnBasicHandler {
             return ps.executeUpdate();
         } catch (SQLException e) {
             handleSQLException(e, ps, true);
-            return 0;// Unreachable!
+            return 0;// unreachable
         }
     }
 

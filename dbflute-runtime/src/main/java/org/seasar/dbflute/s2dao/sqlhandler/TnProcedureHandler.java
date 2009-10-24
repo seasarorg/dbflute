@@ -86,7 +86,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
             return handleOutParameters(cs, dto, returnValue);
         } catch (SQLException e) {
             handleSQLException(e, cs);
-            return null;// Unreachable!
+            return null;// unreachable
         } finally {
             close(cs);
         }
@@ -158,7 +158,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
             return statement.getResultSet();
         } catch (SQLException e) {
             handleSQLException(e, statement);
-            return null;// Unreachable!
+            return null;// unreachable
         }
     }
 

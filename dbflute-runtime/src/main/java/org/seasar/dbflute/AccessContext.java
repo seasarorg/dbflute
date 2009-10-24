@@ -93,7 +93,7 @@ public class AccessContext {
         } else {
             throwAccessContextNotFoundException(methodName);
         }
-        return null; // Unreachable!
+        return null; // unreachable
     }
 
     /**
@@ -115,7 +115,7 @@ public class AccessContext {
         } else {
             throwAccessContextNotFoundException(methodName);
         }
-        return null; // Unreachable!
+        return null; // unreachable
     }
 
     /**
@@ -137,7 +137,7 @@ public class AccessContext {
         } else {
             throwAccessContextNotFoundException(methodName);
         }
-        return null; // Unreachable!
+        return null; // unreachable
     }
 
     /**
@@ -198,7 +198,7 @@ public class AccessContext {
         } else {
             throwAccessContextNotFoundException(methodName);
         }
-        return null; // Unreachable!
+        return null; // unreachable
     }
 
     protected static void throwAccessContextNotFoundException(String methodName) {

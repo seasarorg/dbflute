@@ -71,7 +71,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
             return createBeanMetaData(metaData, beanClass, relationNestLevel);
         } catch (SQLException e) {
             handleSQLException(e);
-            return null; // Unreachable!
+            return null; // unreachable
         } finally {
             if (conn != null) {
                 try {

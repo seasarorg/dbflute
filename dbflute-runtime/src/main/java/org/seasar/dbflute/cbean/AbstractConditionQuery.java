@@ -479,7 +479,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         if (option == null) {
             throwLikeSearchOptionNotFoundException(colName, value);
-            return;// Unreachable!
+            return;// unreachable
         }
         if (xsuppressEscape()) {
             option.notEscape();

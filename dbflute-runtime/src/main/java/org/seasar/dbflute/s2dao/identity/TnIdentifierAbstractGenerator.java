@@ -106,7 +106,7 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
                 return conn.prepareStatement(sql);
             } catch (SQLException e) {
                 handleSQLException(e, null);
-                return null; // Unreachable!
+                return null; // unreachable
             }
         }
         public CallableStatement createCallableStatement(Connection conn, String sql) {
@@ -114,7 +114,7 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
                 return conn.prepareCall(sql);
             } catch (SQLException e) {
                 handleSQLException(e, null);
-                return null; // Unreachable!
+                return null; // unreachable
             }
         }
 

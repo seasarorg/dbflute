@@ -141,7 +141,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
                 updateCount = ps.getUpdateCount();
             } catch (SQLException e) {
                 handleSQLException(e, ps);
-                return; // Unreachable!
+                return; // unreachable
             }
             handleBatchUpdateResultWithOptimisticLockByUpdateCount(list, updateCount);
         } else {
@@ -223,7 +223,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
             return ps.executeBatch();
         } catch (SQLException e) {
             handleSQLException(e, ps, true);
-            return null; // Unreachable!
+            return null; // unreachable
         }
     }
 	

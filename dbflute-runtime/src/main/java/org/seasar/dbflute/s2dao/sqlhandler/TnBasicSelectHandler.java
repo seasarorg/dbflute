@@ -76,7 +76,7 @@ public class TnBasicSelectHandler extends TnBasicHandler {
             return execute(ps);
         } catch (SQLException e) {
             handleSQLException(e, ps);
-            return null; // Unreachable!
+            return null; // unreachable
         } finally {
             close(ps);
         }

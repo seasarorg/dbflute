@@ -200,7 +200,7 @@ public class ValueAndTypeSetupper {
         } catch (RuntimeException e) {
             throwPropertyHandlingFailureException(beanType, beanValue, currentName, _expression, _specifiedSql, _bind,
                     e);
-            return null;// Unreachable!
+            return null;// unreachable
         }
     }
 

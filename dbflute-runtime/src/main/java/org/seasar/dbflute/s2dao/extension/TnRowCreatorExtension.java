@@ -142,7 +142,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                 _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName + " dbmeta");
             }
             throwNonsenseClassCastException(row, dbmeta, e);
-            return null; // Unreachable!
+            return null; // unreachable
         } catch (SQLException e) {
             if (_log.isWarnEnabled()) {
                 String msg = SQLException.class.getSimpleName() + " occurred while ResultSet Handling:";

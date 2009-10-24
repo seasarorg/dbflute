@@ -84,7 +84,7 @@ public class TnStatementFactoryImpl implements StatementFactory {
             return ps;
         } catch (SQLException e) {
             handleSQLException(e, null);
-            return null; // Unreachable!
+            return null; // unreachable
         }
     }
 
@@ -137,7 +137,7 @@ public class TnStatementFactoryImpl implements StatementFactory {
             return conn.prepareCall(sql);
         } catch (SQLException e) {
             handleSQLException(e, null);
-            return null;// Unreachable!
+            return null;// unreachable
         }
     }
 

@@ -283,7 +283,7 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
             return !(_resultSet.getType() == ResultSet.TYPE_FORWARD_ONLY);
         } catch (SQLException e) {
             handleSQLException(e, null);
-            return false;// Unreachable!
+            return false;// unreachable
         }
     }
 
