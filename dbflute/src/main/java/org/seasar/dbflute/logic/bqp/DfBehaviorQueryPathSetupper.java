@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.DfBehaviorNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlMarkAnalyzer;
@@ -251,6 +252,11 @@ public class DfBehaviorQueryPathSetupper {
         handleReflectResource(reflectResourceMap);
     }
 
+    /**
+     * @param behaviorQueryPathMap The map of behavior query path. (NotNull)
+     * @return The map of reflect resource. (NotNull)
+     * @throws DfBehaviorNotFoundException When the behavior is not found.
+     */
     protected Map<File, Map<String, Map<String, String>>> createReflectResourceMap(
             Map<String, Map<String, String>> behaviorQueryPathMap) {
         if (behaviorQueryPathMap.isEmpty()) {
@@ -339,15 +345,7 @@ public class DfBehaviorQueryPathSetupper {
         msg = msg + ln();
         msg = msg + "[Behavior List]" + ln() + bsbhvFileMap.keySet() + ln();
         msg = msg + "* * * * * * * * * */" + ln();
-        throw new BehaviorNotFoundException(msg);
-    }
-
-    protected static class BehaviorNotFoundException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public BehaviorNotFoundException(String msg) {
-            super(msg);
-        }
+        throw new DfBehaviorNotFoundException(msg);
     }
 
     /**
