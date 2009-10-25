@@ -2709,7 +2709,6 @@ public class Table {
             description = DfStringUtil.replace(description, "<", "&lt;");
             description = DfStringUtil.replace(description, ">", "&gt;");
             description = DfStringUtil.replace(description, "\r\n", "\n");
-            description = DfStringUtil.replace(description, "\n", "<br />");
             return description;
         } else {
             return "&nbsp;";
