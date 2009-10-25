@@ -8,7 +8,7 @@ import org.seasar.dbflute.exception.DfParameterBeanMarkInvalidException;
 import org.seasar.dbflute.exception.EndCommentNotFoundException;
 import org.seasar.dbflute.exception.IfCommentConditionNotFoundException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedExpressionException;
-import org.seasar.dbflute.logic.outsidesql.OutsideSqlChecker;
+import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlChecker;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -21,7 +21,7 @@ public class OutsideSqlCheckerTest extends PlainTestCase {
     @Test
     public void test_check_basic() {
         // ## Arrange ##
-        OutsideSqlChecker ker = new OutsideSqlChecker();
+        DfOutsideSqlChecker ker = new DfOutsideSqlChecker();
         String fn = "test.sql";
 
         // ## Act & Assert ##
@@ -34,7 +34,7 @@ public class OutsideSqlCheckerTest extends PlainTestCase {
     @Test
     public void test_check_customizeEntity() {
         // ## Arrange ##
-        OutsideSqlChecker ker = new OutsideSqlChecker();
+        DfOutsideSqlChecker ker = new DfOutsideSqlChecker();
         String fn = "test.sql";
 
         // ## Act ##
@@ -72,7 +72,7 @@ public class OutsideSqlCheckerTest extends PlainTestCase {
     @Test
     public void test_check_parameterBean() {
         // ## Arrange ##
-        OutsideSqlChecker ker = new OutsideSqlChecker();
+        DfOutsideSqlChecker ker = new DfOutsideSqlChecker();
         String fn = "test.sql";
 
         // ## Act ##
@@ -110,7 +110,7 @@ public class OutsideSqlCheckerTest extends PlainTestCase {
     @Test
     public void test_check_parameterComment() {
         // ## Arrange ##
-        OutsideSqlChecker ker = new OutsideSqlChecker();
+        DfOutsideSqlChecker ker = new DfOutsideSqlChecker();
         String fn = "test.sql";
 
         // ## Act ##
@@ -138,7 +138,7 @@ public class OutsideSqlCheckerTest extends PlainTestCase {
     @Test
     public void test_check_ifCommentExpression_basic() {
         // ## Arrange ##
-        OutsideSqlChecker ker = new OutsideSqlChecker();
+        DfOutsideSqlChecker ker = new DfOutsideSqlChecker();
         String fn = "test.sql";
 
         // ## Act & Assert ##
@@ -150,7 +150,7 @@ public class OutsideSqlCheckerTest extends PlainTestCase {
     @Test
     public void test_check_ifCommentExpression_unsupported() {
         // ## Arrange ##
-        OutsideSqlChecker ker = new OutsideSqlChecker();
+        DfOutsideSqlChecker ker = new DfOutsideSqlChecker();
         String fn = "test.sql";
 
         // ## Act & Assert ##

@@ -84,7 +84,7 @@ import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.initializer.IncludeQueryInitializer;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnType;
-import org.seasar.dbflute.logic.outsidesql.SqlFileCollector;
+import org.seasar.dbflute.logic.outsidesql.DfSqlFileCollector;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
@@ -1858,7 +1858,7 @@ public class Database {
 
     protected List<File> collectSqlFileList() {
         final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
-        final SqlFileCollector sqlFileCollector = new SqlFileCollector(sqlDirectory, getBasicProperties());
+        final DfSqlFileCollector sqlFileCollector = new DfSqlFileCollector(sqlDirectory, getBasicProperties());
         sqlFileCollector.suppressDirectoryCheck();
         return sqlFileCollector.collectSqlFileList();
     }

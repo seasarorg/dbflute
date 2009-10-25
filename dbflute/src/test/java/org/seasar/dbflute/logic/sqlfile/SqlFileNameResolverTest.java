@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.seasar.dbflute.logic.outsidesql.SqlFileNameResolver;
+import org.seasar.dbflute.logic.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -19,8 +19,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_basic() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
         String fileName = "MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
@@ -34,8 +34,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_with_DBName() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
         String fileName = "MemberBhv_selectSimpleMember_oracle.sql";
 
         // ## Act ##
@@ -49,8 +49,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_nonPrefix() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
         String fileName = "MemberBhv_SimpleMember.sql";
 
         // ## Act ##
@@ -64,8 +64,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_initCap() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
         String fileName = "MemberBhv_SelectSimpleMember.sql";
 
         // ## Act ##
@@ -79,8 +79,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_noCap() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
         String fileName = "MemberBhv_selectsimplemember.sql";
 
         // ## Act ##
@@ -94,8 +94,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_fullPath_by_slash() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
         String fileName = "foo/bar/MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
@@ -109,8 +109,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_fullPath_by_backSlash() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
         String fileName = "foo\\bar\\MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
@@ -124,8 +124,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_startsWithUnderScore() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
         String fileName = "MemberBhv__selectSimpleMember.sql";
 
         // ## Act ##
@@ -143,8 +143,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
 
         // ## Act ##
         String actual = resolver.resolveEntityNameIfNeeds(className, "selectSimpleMember.sql");
@@ -157,8 +157,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath_DBSuffix() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
 
         // ## Act ##
         String actual = resolver.resolveEntityNameIfNeeds(className, "selectSimpleMember_oracle.sql");
@@ -171,8 +171,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath_Unsupport() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
 
         // ## Act ##
         String actual = resolver.resolveEntityNameIfNeeds(className, "Member_selectSimpleMember.sql");
@@ -185,8 +185,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_no_BehaviorQueryPath_startsWithUnderScore() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
 
         // ## Act ##
         try {
@@ -203,8 +203,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_entity_no_SQLFile() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.ENTITY_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.ENTITY_MARK;
 
         // ## Act ##
         try {
@@ -235,8 +235,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_pmb_basic() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.PMB_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.PMB_MARK;
         String fileName = "MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
@@ -250,8 +250,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_pmb_with_DBName() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.PMB_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.PMB_MARK;
         String fileName = "MemberBhv_selectSimpleMember_oracle.sql";
 
         // ## Act ##
@@ -265,8 +265,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_pmb_nonPrefix() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.PMB_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.PMB_MARK;
         String fileName = "MemberBhv_SimpleMember.sql";
 
         // ## Act ##
@@ -280,8 +280,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_pmb_initCap() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.PMB_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.PMB_MARK;
         String fileName = "MemberBhv_SelectSimpleMember.sql";
 
         // ## Act ##
@@ -295,8 +295,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_pmb_noCap() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.PMB_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.PMB_MARK;
         String fileName = "MemberBhv_selectsimplemember.sql";
 
         // ## Act ##
@@ -310,8 +310,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_pmb_fullPath_by_slash() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.PMB_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.PMB_MARK;
         String fileName = "foo/bar/MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
@@ -325,8 +325,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_pmb_fullPath_by_backSlash() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.PMB_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.PMB_MARK;
         String fileName = "foo\\bar\\MemberBhv_selectSimpleMember.sql";
 
         // ## Act ##
@@ -340,8 +340,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_pmb_no_BehaviorQueryPath() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.PMB_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.PMB_MARK;
 
         // ## Act ##
         String actual = resolver.resolvePmbNameIfNeeds(className, "selectSimpleMember.sql");
@@ -354,8 +354,8 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_pmb_no_SQLFile() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
-        String className = SqlFileNameResolver.PMB_MARK;
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
+        String className = DfSqlFileNameResolver.PMB_MARK;
 
         // ## Act ##
         try {
@@ -386,7 +386,7 @@ public class SqlFileNameResolverTest extends PlainTestCase {
     @Test
     public void test_resolveObjectNameIfNeeds_nonTarget() {
         // ## Arrange ##
-        SqlFileNameResolver resolver = new SqlFileNameResolver();
+        DfSqlFileNameResolver resolver = new DfSqlFileNameResolver();
         String className = "NormalName";
         String fileName = "MemberBhv_selectSimpleMember.sql";
 

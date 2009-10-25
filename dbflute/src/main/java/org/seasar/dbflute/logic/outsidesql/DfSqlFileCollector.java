@@ -16,7 +16,7 @@ import org.seasar.dbflute.task.DfSql2EntityTask;
  * @author jflute
  * @since 0.7.9 (2008/08/29 Friday)
  */
-public class SqlFileCollector {
+public class DfSqlFileCollector {
 
     // ===================================================================================
     //                                                                          Definition
@@ -34,7 +34,7 @@ public class SqlFileCollector {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SqlFileCollector(String sqlDirectory, DfBasicProperties basicProperties) {
+    public DfSqlFileCollector(String sqlDirectory, DfBasicProperties basicProperties) {
         _sqlDirectory = sqlDirectory;
         _basicProperties = basicProperties;
     }

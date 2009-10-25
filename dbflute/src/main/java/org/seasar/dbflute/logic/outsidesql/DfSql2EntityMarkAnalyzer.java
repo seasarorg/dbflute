@@ -10,7 +10,7 @@ import org.seasar.dbflute.util.DfStringUtil;
  * @author jflute
  * @since 0.9.5 (2009/04/10 Friday)
  */
-public class Sql2EntityMarkAnalyzer {
+public class DfSql2EntityMarkAnalyzer {
 
     // ===================================================================================
     //                                                                           Analyzing

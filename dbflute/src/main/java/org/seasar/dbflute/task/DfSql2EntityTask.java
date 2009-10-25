@@ -63,8 +63,8 @@ import org.seasar.dbflute.logic.metahandler.DfProcedureHandler;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureMetaInfo;
-import org.seasar.dbflute.logic.outsidesql.Sql2EntityMarkAnalyzer;
-import org.seasar.dbflute.logic.outsidesql.SqlFileNameResolver;
+import org.seasar.dbflute.logic.outsidesql.DfSql2EntityMarkAnalyzer;
+import org.seasar.dbflute.logic.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
 import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -101,7 +101,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, DfProcedureMetaInfo> _procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
 
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
-    protected Sql2EntityMarkAnalyzer _markAnalyzer = new Sql2EntityMarkAnalyzer();
+    protected DfSql2EntityMarkAnalyzer _markAnalyzer = new DfSql2EntityMarkAnalyzer();
 
     // for getting schema
     protected String _schemaXml;
@@ -665,11 +665,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String resolveEntityNameIfNeeds(String className, File file) {
-        return new SqlFileNameResolver().resolveEntityNameIfNeeds(className, file.getName());
+        return new DfSqlFileNameResolver().resolveEntityNameIfNeeds(className, file.getName());
     }
 
     protected String resolvePmbNameIfNeeds(String className, File file) {
-        return new SqlFileNameResolver().resolvePmbNameIfNeeds(className, file.getName());
+        return new DfSqlFileNameResolver().resolvePmbNameIfNeeds(className, file.getName());
     }
 
     // ===================================================================================

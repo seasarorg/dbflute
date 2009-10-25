@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
-import org.seasar.dbflute.logic.outsidesql.Sql2EntityMarkAnalyzer;
+import org.seasar.dbflute.logic.outsidesql.DfSql2EntityMarkAnalyzer;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -140,7 +140,7 @@ public class DfBehaviorQueryPathSetupper {
                 final Map<String, String> elementMap = elementEntry.getValue();
                 final String path = elementMap.get("path");
                 final File sqlFile = new File(path);
-                final Sql2EntityMarkAnalyzer analyzer = new Sql2EntityMarkAnalyzer();
+                final DfSql2EntityMarkAnalyzer analyzer = new DfSql2EntityMarkAnalyzer();
                 final BufferedReader reader = new BufferedReader(newInputStreamReader(sqlFile));
                 final StringBuilder sb = new StringBuilder();
                 try {

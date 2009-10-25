@@ -26,7 +26,7 @@ import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
-import org.seasar.dbflute.logic.outsidesql.OutsideSqlChecker;
+import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlChecker;
 import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -168,7 +168,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     }
 
     protected void checkParameterComment(File sqlFile, String sql) {
-        final OutsideSqlChecker checker = new OutsideSqlChecker();
+        final DfOutsideSqlChecker checker = new DfOutsideSqlChecker();
 
         // the IfCommentExpression check is for Java only
         if (!getBasicProperties().isTargetLanguageJava()) {

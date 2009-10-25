@@ -29,7 +29,7 @@ import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.friends.torque.DfAntTaskUtil;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
-import org.seasar.dbflute.logic.outsidesql.SqlFileCollector;
+import org.seasar.dbflute.logic.outsidesql.DfSqlFileCollector;
 import org.seasar.dbflute.logic.scmconn.CurrentSchemaConnector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -265,7 +265,7 @@ public abstract class DfAbstractTask extends Task {
      */
     protected List<File> collectSqlFileList() {
         final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
-        final SqlFileCollector sqlFileCollector = new SqlFileCollector(sqlDirectory, getBasicProperties());
+        final DfSqlFileCollector sqlFileCollector = new DfSqlFileCollector(sqlDirectory, getBasicProperties());
         return sqlFileCollector.collectSqlFileList();
     }
 

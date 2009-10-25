@@ -160,7 +160,7 @@
 		<th>Alias</th>
 #end
 		<th>Name</th>
-			<th>Type</th>
+		<th>Type</th>
 		<th>ForeignTable</th>
 		<th>ReferrerTable</th>
 		<th>Comment</th>
