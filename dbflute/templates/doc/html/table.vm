@@ -4,7 +4,7 @@ ${table.aliasExpression}${table.name}
 &nbsp;<span class="tableschema">on ${table.schema}</span>
 #end
 #if ($table.hasBehaviorQueryPath())
-&nbsp;<span class="bqpcount"><a href="${database.sharp}${table.javaName}Sql">{outsideSql=${table.behaviorQueryPathList.size()}}</a></span>
+&nbsp;<span class="bqpcount"><a href="${database.sharp}${table.javaName}Sql">(outsideSql=${table.behaviorQueryPathList.size()})</a></span>
 #end
 </h2>
 <table summary="Columns in ${table.name}">

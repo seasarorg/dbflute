@@ -1,12 +1,14 @@
 # /---------------------------------------------------------------------------
 # outsideSqlDefinitionMap: (NotRequired - Default 'map:{}')
 #
-# The various settings about outside SQL. 
+# The various settings about outsideSql. 
 # 
 # o isGenerateProcedureParameterBean: (NotRequired - Default 'false')
 # o targetProcedureCatalogList: (NotRequired - Default 'list:{}')
 # o targetProcedureSchemaList: (NotRequired - Default 'list:{}')
 # o targetProcedureNameList: (NotRequired - Default 'list:{}')
+# o isRequiredSqlTitle: (NotRequired - Default 'false')
+# o isRequiredSqlDescription: (NotRequired - Default 'false')
 # o sqlFileEncoding: (NotRequired - Default 'UTF-8')
 # o sqlDirectory: (NotRequired - Default java.dir & '../src/main/resources')
 # o sqlPackage: (NotRequired - Default '')
@@ -49,26 +51,50 @@ map:{
     #  ex) list:{prefix:SP_}
     #; targetProcedureNameList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
     # - - - - - - - - - -/
-    
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isRequiredSqlTitle: (NotRequired - Default 'false')
+    #   [true]
+    #     You should always write the title of outsideSql.
+    #     If it doesn't exist, the OutsideSqlTest task fails.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isRequiredSqlTitle = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isRequiredSqlDescription: (NotRequired - Default 'false')
+    #   [true]
+    #     You should always write the description of outsideSql.
+    #     If it doesn't exist, the OutsideSqlTest task fails.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isRequiredSqlDescription = false
+    # - - - - - - - - - -/
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o sqlFileEncoding: (NotRequired - Default 'UTF-8')
-    #  The encoding of SQL file for outside SQL.
+    #  The encoding of SQL file for outsideSql.
     #  Basically you don't need this.
     #
     #; sqlFileEncoding = UTF-8
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o sqlDirectory: (NotRequired - Default java.dir & '../src/main/resources')
-    #  The directory of SQL file for outside SQL.
+    #  The directory of SQL file for outsideSql.
     #  Basically you don't need this.
     #
     #; sqlDirectory = ../src/main/resources
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o sqlPackage: (NotRequired - Default 'UTF-8')
-    #  The package of SQL file for outside SQL.
+    #  The package of SQL file for outsideSql.
     #  Basically you don't need this.
     #  You can use variable '$$PACKAGE_BASE$$' that means 'packageBase'.
     #

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.seasar.dbflute.exception.DfCustomizeEntityMarkInvalidException;
 import org.seasar.dbflute.exception.DfParameterBeanMarkInvalidException;
+import org.seasar.dbflute.exception.DfRequiredOutsideSqlDescriptionNotFoundException;
+import org.seasar.dbflute.exception.DfRequiredOutsideSqlTitleNotFoundException;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.node.IfCommentEvaluator;
 import org.seasar.dbflute.twowaysql.node.ParameterFinder;
@@ -18,13 +20,15 @@ public class DfOutsideSqlChecker {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean _suppressIfCommentExpressionCheck;
+    protected boolean _ifCommentExpressionCheck;
+    protected boolean _requiredTitleCheck;
+    protected boolean _requiredDescriptionCheck;
 
     // ===================================================================================
     //                                                                             Checker
     //                                                                             =======
     public void check(String fileName, String sql) {
-        // check NG mark
+        // check Sql2Entity mark
         final List<String> splitList = splitList(sql, "\n");
         checkSql2EntityMark(splitList, fileName, sql);
 
@@ -33,8 +37,12 @@ public class DfOutsideSqlChecker {
         final List<String> ifCommentList = analyzer.researchIfComment();
         analyzer.analyze(); // should throw an exception
 
-        // check IF comment expression
+        // check IF comment expression (option)
         checkIfCommentExpression(ifCommentList, sql);
+
+        // check title and description (option)
+        checkRequiredTitle(fileName, sql);
+        checkRequiredDescription(fileName, sql);
     }
 
     protected void checkSql2EntityMark(List<String> splitList, String fileName, String sql) {
@@ -52,7 +60,7 @@ public class DfOutsideSqlChecker {
     }
 
     protected void checkIfCommentExpression(List<String> ifCommentList, String sql) {
-        if (_suppressIfCommentExpressionCheck) {
+        if (!_ifCommentExpressionCheck) {
             return;
         }
         for (String expr : ifCommentList) {
@@ -109,6 +117,77 @@ public class DfOutsideSqlChecker {
         throw new DfParameterBeanMarkInvalidException(msg);
     }
 
+    protected void checkRequiredTitle(String fileName, String sql) {
+        if (!_requiredTitleCheck) {
+            return;
+        }
+        final DfOutsideSqlMarkAnalyzer analyzer = new DfOutsideSqlMarkAnalyzer();
+        final String title = analyzer.getTitle(sql);
+        if (DfStringUtil.isNullOrTrimmedEmpty(title)) {
+            throwRequiredOutsideSqlTitleNotFoundException(fileName, sql);
+        }
+    }
+
+    protected void throwRequiredOutsideSqlTitleNotFoundException(String fileName, String sql) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The outsideSql title was NOT found!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "A outsideSql title is required at this project." + ln();
+        msg = msg + "(The property 'isRequiredSqlTitle' of outsideSqlDefinition is true)" + ln();
+        msg = msg + "  For example: @OutsideSql" + ln();
+        msg = msg + "    (o):" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+        msg = msg + "    /*" + ln();
+        msg = msg + "     [df:title]" + ln();
+        msg = msg + "     Simple Member Select" + ln();
+        msg = msg + "    */" + ln();
+        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + ln();
+        msg = msg + "[File]" + ln() + fileName + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL]" + ln() + sql + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new DfRequiredOutsideSqlTitleNotFoundException(msg);
+    }
+
+    protected void checkRequiredDescription(String fileName, String sql) {
+        if (!_requiredDescriptionCheck) {
+            return;
+        }
+        final DfOutsideSqlMarkAnalyzer analyzer = new DfOutsideSqlMarkAnalyzer();
+        final String description = analyzer.getDescription(sql);
+        if (DfStringUtil.isNullOrTrimmedEmpty(description)) {
+            throwRequiredOutsideSqlDescriptionNotFoundException(fileName, sql);
+        }
+    }
+
+    protected void throwRequiredOutsideSqlDescriptionNotFoundException(String fileName, String sql) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The outsideSql description was NOT found!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "A outsideSql description is required at this project." + ln();
+        msg = msg + "(The property 'isRequiredSqlDescription' of outsideSqlDefinition is true)" + ln();
+        msg = msg + "  For example: @OutsideSql" + ln();
+        msg = msg + "    (o):" + ln();
+        msg = msg + "    /- - - - - - - - - - - - - - - - - - - - " + ln();
+        msg = msg + "    /*" + ln();
+        msg = msg + "     [df:description]" + ln();
+        msg = msg + "     This SQL is ..." + ln();
+        msg = msg + "     It uses 'union all' for performance ..." + ln();
+        msg = msg + "    */" + ln();
+        msg = msg + "    - - - - - - - - - -/" + ln();
+        msg = msg + ln();
+        msg = msg + "[File]" + ln() + fileName + ln();
+        msg = msg + ln();
+        msg = msg + "[SQL]" + ln() + sql + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new DfRequiredOutsideSqlDescriptionNotFoundException(msg);
+    }
+
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
@@ -123,7 +202,15 @@ public class DfOutsideSqlChecker {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void suppressIfCommentExpressionCheck() {
-        _suppressIfCommentExpressionCheck = true;
+    public void enableIfCommentExpressionCheck() {
+        _ifCommentExpressionCheck = true;
+    }
+
+    public void enableRequiredTitleCheck() {
+        _requiredTitleCheck = true;
+    }
+
+    public void enableRequiredDescriptionCheck() {
+        _requiredDescriptionCheck = true;
     }
 }

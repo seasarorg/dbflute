@@ -171,8 +171,16 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
         final DfOutsideSqlChecker checker = new DfOutsideSqlChecker();
 
         // the IfCommentExpression check is for Java only
-        if (!getBasicProperties().isTargetLanguageJava()) {
-            checker.suppressIfCommentExpressionCheck();
+        if (getBasicProperties().isTargetLanguageJava()) {
+            checker.enableIfCommentExpressionCheck();
+        }
+
+        if (getProperties().getOutsideSqlProperties().isRequiredSqlTitle()) {
+            checker.enableRequiredTitleCheck();
+        }
+
+        if (getProperties().getOutsideSqlProperties().isRequiredSqlDescription()) {
+            checker.enableRequiredDescriptionCheck();
         }
 
         checker.check(sqlFile.getName(), sql);

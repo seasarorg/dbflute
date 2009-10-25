@@ -109,6 +109,17 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                      OutsideSqlTest
+    //                                                                      ==============
+    public boolean isRequiredSqlTitle() {
+        return isProperty("isRequiredSqlTitle", false);
+    }
+
+    public boolean isRequiredSqlDescription() {
+        return isProperty("isRequiredSqlDescription", false);
+    }
+
+    // ===================================================================================
     //                                                                     SqlFileEncoding
     //                                                                     ===============
     public boolean hasSqlFileEncoding() {
