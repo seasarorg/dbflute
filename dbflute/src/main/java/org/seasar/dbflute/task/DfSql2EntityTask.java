@@ -323,7 +323,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         }
 
                         // for Customize Entity
-                        String entityName = getEntityName(sql);
+                        String entityName = getCustomizeEntityName(sql);
                         if (entityName != null) {
                             entityName = resolveEntityNameIfNeeds(entityName, _sqlFile);
                             assertDuplicateEntity(entityName, _sqlFile);
@@ -408,7 +408,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
 
             protected boolean isTargetEntityMakingSql(String sql) {
-                final String entityName = getEntityName(sql);
+                final String entityName = getCustomizeEntityName(sql);
                 if (entityName == null) {
                     return false;
                 }
@@ -419,8 +419,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
 
             protected boolean isTargetParameterBeanMakingSql(String sql) {
-                final String parameterBeanClassDefinition = getParameterBeanClassDefinition(sql);
-                return parameterBeanClassDefinition != null;
+                final String parameterBeanName = getParameterBeanName(sql);
+                return parameterBeanName != null;
             }
 
             /**
@@ -429,22 +429,22 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
              * @return the meta data of parameter bean. (Nullable: If it returns null, it means 'Not Found'.)
              */
             protected DfParameterBeanMetaData extractParameterBeanMetaData(String sql) {
-                final String classDefinition = getParameterBeanClassDefinition(sql);
-                if (classDefinition == null) {
+                final String parameterBeanName = getParameterBeanName(sql);
+                if (parameterBeanName == null) {
                     return null;
                 }
                 final DfParameterBeanMetaData pmbMetaData = new DfParameterBeanMetaData();
                 {
                     final String delimiter = "extends";
-                    final int idx = classDefinition.indexOf(delimiter);
+                    final int idx = parameterBeanName.indexOf(delimiter);
                     {
-                        String className = (idx >= 0) ? classDefinition.substring(0, idx) : classDefinition;
+                        String className = (idx >= 0) ? parameterBeanName.substring(0, idx) : parameterBeanName;
                         className = className.trim();
                         className = resolvePmbNameIfNeeds(className, _sqlFile);
                         pmbMetaData.setClassName(className);
                     }
                     if (idx >= 0) {
-                        final String superClassName = classDefinition.substring(idx + delimiter.length()).trim();
+                        final String superClassName = parameterBeanName.substring(idx + delimiter.length()).trim();
                         pmbMetaData.setSuperClassName(superClassName);
                         resolveSuperClassSimplePagingBean(pmbMetaData);
                     }
@@ -528,8 +528,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
             @Override
             protected boolean isTargetSql(String sql) {
-                final String entityName = getEntityName(sql);
-                final String parameterBeanClassDefinition = getParameterBeanClassDefinition(sql);
+                final String entityName = getCustomizeEntityName(sql);
+                final String parameterBeanClassDefinition = getParameterBeanName(sql);
 
                 // No Pmb and Non Target Entity --> Non Target
                 if (parameterBeanClassDefinition == null && entityName != null && "df:x".equalsIgnoreCase(entityName)) {
@@ -632,8 +632,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                           Analyzing
     //                                                                           =========
-    protected String getEntityName(final String sql) {
-        return _markAnalyzer.getEntityName(sql);
+    protected String getCustomizeEntityName(final String sql) {
+        return _markAnalyzer.getCustomizeEntityName(sql);
     }
 
     protected boolean isCursor(final String sql) {
@@ -641,11 +641,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected List<String> getEntityPropertyTypeList(final String sql) {
-        return _markAnalyzer.getEntityPropertyTypeList(sql);
+        return _markAnalyzer.getCustomizeEntityPropertyTypeList(sql);
     }
 
-    protected String getParameterBeanClassDefinition(final String sql) {
-        return _markAnalyzer.getParameterBeanClassDefinition(sql);
+    protected String getParameterBeanName(final String sql) {
+        return _markAnalyzer.getParameterBeanName(sql);
     }
 
     protected List<String> getParameterBeanPropertyTypeList(final String sql) {

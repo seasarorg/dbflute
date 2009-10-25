@@ -2600,11 +2600,28 @@ public class Table {
         return new ArrayList<String>(tableBqpMap.keySet());
     }
 
-    public String getBehaviorQueryPathPath(String behaviorQueryPath) {
-        final Map<String, Map<String, String>> behaviorQueryPathMap = getBehaviorQueryPathMap();
-        final Map<String, String> elementMap = behaviorQueryPathMap.get(behaviorQueryPath);
-        final String path = elementMap.get("path");
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(path) ? path : "";
+    public String getBehaviorQueryPathDisplayName(String behaviorQueryPath) {
+        final String subDirectoryPath = getBehaviorQueryPathSubDirectoryPath(behaviorQueryPath);
+        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(subDirectoryPath)) {
+            final String connector = "_";
+            return DfStringUtil.replace(subDirectoryPath, "/", connector) + connector + behaviorQueryPath;
+        } else {
+            return behaviorQueryPath;
+        }
+    }
+
+    public String getBehaviorQueryPathFileName(String behaviorQueryPath) {
+        final String path = getBehaviorQueryPathPath(behaviorQueryPath);
+        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(path)) {
+            final int fileNameIndex = path.lastIndexOf("/");
+            if (fileNameIndex >= 0) {
+                return path.substring(fileNameIndex + "/".length());
+            } else {
+                return path;
+            }
+        } else {
+            return "";
+        }
     }
 
     public String getBehaviorQueryPathSubDirectoryPath(String behaviorQueryPath) {
@@ -2614,14 +2631,33 @@ public class Table {
         return DfStringUtil.isNotNullAndNotTrimmedEmpty(subDirectoryPath) ? subDirectoryPath : "";
     }
 
-    public String getBehaviorQueryPathDisplayPath(String behaviorQueryPath) {
-        final String subDirectoryPath = getBehaviorQueryPathSubDirectoryPath(behaviorQueryPath);
-        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(subDirectoryPath)) {
-            final String connector = "_";
-            return DfStringUtil.replace(subDirectoryPath, "/", connector) + connector + behaviorQueryPath;
-        } else {
-            return behaviorQueryPath;
-        }
+    public String getBehaviorQueryPathPath(String behaviorQueryPath) {
+        final Map<String, Map<String, String>> behaviorQueryPathMap = getBehaviorQueryPathMap();
+        final Map<String, String> elementMap = behaviorQueryPathMap.get(behaviorQueryPath);
+        final String path = elementMap.get("path");
+        return DfStringUtil.isNotNullAndNotTrimmedEmpty(path) ? path : "";
+    }
+
+    public boolean hasBehaviorQueryPathCustomizeEntity(String behaviorQueryPath) {
+        return DfStringUtil.isNotNullAndNotTrimmedEmpty(getBehaviorQueryPathCustomizeEntity(behaviorQueryPath));
+    }
+
+    public String getBehaviorQueryPathCustomizeEntity(String behaviorQueryPath) {
+        final Map<String, Map<String, String>> behaviorQueryPathMap = getBehaviorQueryPathMap();
+        final Map<String, String> elementMap = behaviorQueryPathMap.get(behaviorQueryPath);
+        final String customizeEntity = elementMap.get("customizeEntity");
+        return DfStringUtil.isNotNullAndNotTrimmedEmpty(customizeEntity) ? customizeEntity : "";
+    }
+
+    public boolean hasBehaviorQueryPathParameterBean(String behaviorQueryPath) {
+        return DfStringUtil.isNotNullAndNotTrimmedEmpty(getBehaviorQueryPathParameterBean(behaviorQueryPath));
+    }
+
+    public String getBehaviorQueryPathParameterBean(String behaviorQueryPath) {
+        final Map<String, Map<String, String>> behaviorQueryPathMap = getBehaviorQueryPathMap();
+        final Map<String, String> elementMap = behaviorQueryPathMap.get(behaviorQueryPath);
+        final String parameterBean = elementMap.get("parameterBean");
+        return DfStringUtil.isNotNullAndNotTrimmedEmpty(parameterBean) ? parameterBean : "";
     }
 
     // This method is not necessary because sql2entity cannot use this.

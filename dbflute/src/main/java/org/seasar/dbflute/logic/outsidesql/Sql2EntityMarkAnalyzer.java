@@ -15,7 +15,11 @@ public class Sql2EntityMarkAnalyzer {
     // ===================================================================================
     //                                                                           Analyzing
     //                                                                           =========
-    public String getEntityName(String sql) {
+    /**
+     * @param sql The string of SQL. (NotNull)
+     * @return The name of entity. (Nullable: If it's not found, this returns null)
+     */
+    public String getCustomizeEntityName(String sql) {
         return getTargetString(sql, "#");
     }
 
@@ -24,11 +28,15 @@ public class Sql2EntityMarkAnalyzer {
         return targetString != null && (targetString.contains("cursor") || targetString.contains("cursol"));
     }
 
-    public List<String> getEntityPropertyTypeList(final String sql) {
+    public List<String> getCustomizeEntityPropertyTypeList(final String sql) {
         return getTargetList(sql, "##");
     }
 
-    public String getParameterBeanClassDefinition(final String sql) {
+    /**
+     * @param sql The string of SQL. (NotNull)
+     * @return The name of parameter-bean. (Nullable: If it's not found, this returns null)
+     */
+    public String getParameterBeanName(final String sql) {
         return getTargetString(sql, "!");
     }
 

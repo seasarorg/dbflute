@@ -13,8 +13,8 @@
 		font-size: 90%;
 		margin: 10px 5px 5px 15px;
 	}
-	
-	/* header */
+
+	/* heading */
 	h1 {
 		font-size: 1.5em;
 		border-bottom: 2px solid #af0000;
@@ -27,14 +27,21 @@
 		border-left: 10px solid #af0000;
 		text-indent: 10px;
 	}
-	.updatedate {
-		text-align: right;
+	h3 {
+		padding: 0 0 0 10px;
+		margin: 1em 10% 0 0;
+		border-top: double 3px #af0000;
+		border-bottom: solid 1px #333333;
+		font-size: 1.5em;
+		color: #333333;
 	}
-	.mainschema {
-		text-align: right;
-	}
-	.tableschema {
-		font-size: 0.6em;
+	h4 {
+ 		padding: 0 0 0 10px;
+		margin: 1em 10% 0 1em;
+		border-top: solid 1px #af0000;
+		border-bottom: solid 1px #af0000;
+		font-size: 1.4em;
+		color: #333333;
 	}
 
 	/* table */
@@ -109,70 +116,105 @@
 	}
 
 	/* behavior query path */
-	.bqpdisp {
+	div.bqpcount {
+		
+	}
+	dl.bqplist {
+		padding-left: 2em;
+	}
+	dl.bqplist dt {
+		display: list-item;
+	}
+	dl.bqplist dd {
+		font-size: 90%;
+		padding-left: 2em;
+	}
+
+	/* various info */
+	.updatedate {
+		text-align: right;
+	}
+	.mainschema {
+		text-align: right;
+	}
+	.tableschema {
+		font-size: 0.6em;
 	}
   </style>
 </head>
 
 <body>
-  <h1>Project Schema for ${database.projectName} (${database.databaseName})</h1>
+<h1>Project Schema for ${database.projectName} (${database.databaseName})</h1>
 #if ($database.hasDatabaseSchema())
-  <p class="mainschema">generated from <strong>${database.databaseSchema}</strong></p>
+<p class="mainschema">generated from <strong>${database.databaseSchema}</strong></p>
 #end
-  <p class="updatedate">${database.timestampExpression}</p>
-  <h2>Table List</h2>
-  <table summary="Tables in the Schema">
-    <thead>
-      <tr>
+<p class="updatedate">${database.timestampExpression}</p>
+<h2>Table List</h2>
+<table summary="Tables in the Schema">
+	<thead>
+	<tr>
 #if ($database.hasAdditionalSchema())
-        <th>Schema</th>
+		<th>Schema</th>
 #end
 #if ($database.isAliasDelimiterInDbCommentValid())
-        <th>Alias</th>
+		<th>Alias</th>
 #end
-        <th>Name</th>
-        <th>Type</th>
-        <th>ForeignTable</th>
-        <th>ReferrerTable</th>
-        <th>Comment</th>
-        <th>EntityName</th>
-      </tr>
-    </thead>
-    <tbody>
+		<th>Name</th>
+			<th>Type</th>
+		<th>ForeignTable</th>
+		<th>ReferrerTable</th>
+		<th>Comment</th>
+		<th>EntityName</th>
+	</tr>
+	</thead>
+	<tbody>
 #foreach ($table in $database.tableDisplaySortedList)
-      <tr>
+	<tr>
 #if ($database.hasAdditionalSchema())
-        <td class="schemacell">#if ($table.hasSchema()) ${table.schema}#else &nbsp;#end</td>
+		<td class="schemacell">#if ($table.hasSchema()) ${table.schema}#else &nbsp;#end</td>
 #end
 #if ($database.isAliasDelimiterInDbCommentValid())
-        <td class="aliascell">${table.alias}</td>
+		<td class="aliascell">${table.alias}</td>
 #end
-        <td><a href="#${table.name}" title="${table.toolTipTitle}">${table.name}</a></td>
-        <td class="subcell">${table.type}</td>
-        <td class="subcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
-        <td class="subcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
-        <td class="commentcell">#if ($table.hasComment()) ${table.commentForSchemaHtml}#else &nbsp;#end</td>
-        <td class="subcell">${table.javaName}</td>
-      </tr>
+		<td><a href="#${table.name}" title="${table.toolTipTitle}">${table.name}</a></td>
+		<td class="subcell">${table.type}</td>
+		<td class="subcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
+		<td class="subcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
+		<td class="commentcell">#if ($table.hasComment()) ${table.commentForSchemaHtml}#else &nbsp;#end</td>
+		<td class="subcell">${table.javaName}</td>
+	</tr>
 #end
-    </tbody>
-  </table>
+	</tbody>
+</table>
 
 #foreach ($table in $database.tableDisplaySortedList)
 $generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 
+<h2>OutsideSql List</h2>
+#foreach ($table in $database.tableDisplaySortedList)
+#if ($table.hasBehaviorQueryPath())
+<h3 id="${table.javaName}Sql">${table.name}</h3>
+<dl class="bqplist">
+#foreach ($behaviorQueryPath in $table.behaviorQueryPathList)
+	<dt>$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>
+	<dd>$table.getBehaviorQueryPathFileName($behaviorQueryPath)</dd>
+#end
+</dl>
+#end
+#end
+
 #if ($database.hasClassificationDefinitionMap())
-  <h2>Classification Definition</h2>
-  <table summary="Classifications in the Schema">
-      <thead>
-      <tr>
-        <th>Classification</th>
-        <th>Top Comment</th>
-        <th>Definition</th>
-      </tr>
-      </thead>
-    <tbody>
+<h2>Classification Definition</h2>
+<table summary="Classifications in the Schema">
+	<thead>
+	<tr>
+		<th>Classification</th>
+		<th>Top Comment</th>
+		<th>Definition</th>
+	</tr>
+	</thead>
+	<tbody>
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
 #set ($existTop = false)
@@ -182,31 +224,31 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #else
   #set ($existTop = false)
 #end
-      <tr>
-        <td>${classificationName}</td>
-        <td>#if ($existTop && $classificationTopMap.containsKey('topComment'))$classificationTopMap.get('topComment')#else &nbsp;#end</td>
-        <td>
-          <table class="child">
-            <tr>
-              <th><a name="${classificationName}Cls"/>Code</th>
-              <th>Name</th>
-              <th>Alias</th>
-              <th>Comment</th>
-            </tr>
+	<tr>
+		<td>${classificationName}</td>
+		<td>#if ($existTop && $classificationTopMap.containsKey('topComment'))$classificationTopMap.get('topComment')#else &nbsp;#end</td>
+		<td>
+			<table class="child">
+			<tr>
+				<th><a name="${classificationName}Cls"/>Code</th>
+				<th>Name</th>
+				<th>Alias</th>
+				<th>Comment</th>
+			</tr>
 #foreach ($classificationMap in $classificationMapList)
-            <tr>
-              <td>$classificationMap.get('code')</td>
-              <td>${classificationMap.get('name')}</td>
-              <td>#if ($classificationMap.containsKey('alias'))${classificationMap.get('alias')}#else &nbsp;#end</td>
-              <td>#if ($classificationMap.containsKey('comment'))${classificationMap.get('comment')}#else &nbsp;#end</td>
-            </tr>
+			<tr>
+				<td>$classificationMap.get('code')</td>
+				<td>${classificationMap.get('name')}</td>
+				<td>#if ($classificationMap.containsKey('alias'))${classificationMap.get('alias')}#else &nbsp;#end</td>
+				<td>#if ($classificationMap.containsKey('comment'))${classificationMap.get('comment')}#else &nbsp;#end</td>
+			</tr>
 #end
-          </table>
-        </td>
-      </tr>
+			</table>
+		</td>
+	</tr>
 #end
-    </tbody>
-  </table>
+	</tbody>
+</table>
 #end
 </body>
 </html>

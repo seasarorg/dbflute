@@ -41,6 +41,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
+import org.seasar.dbflute.logic.outsidesql.Sql2EntityMarkAnalyzer;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -131,8 +132,49 @@ public class DfBehaviorQueryPathSetupper {
                 className = className.substring(basePrefix.length(), className.length());
             }
             resultMap.put(className, entry.getValue());
+
+            // additional element
+            final Map<String, Map<String, String>> behaviorQueryPathMap = entry.getValue();
+            final Set<Entry<String, Map<String, String>>> bqpSet = behaviorQueryPathMap.entrySet();
+            for (Entry<String, Map<String, String>> elementEntry : bqpSet) {
+                final Map<String, String> elementMap = elementEntry.getValue();
+                final String path = elementMap.get("path");
+                final File sqlFile = new File(path);
+                final Sql2EntityMarkAnalyzer analyzer = new Sql2EntityMarkAnalyzer();
+                final BufferedReader reader = new BufferedReader(newInputStreamReader(sqlFile));
+                final StringBuilder sb = new StringBuilder();
+                try {
+                    while (true) {
+                        String line;
+                        line = reader.readLine();
+                        if (line == null) {
+                            break;
+                        }
+                        sb.append(line).append(ln());
+                    }
+                } catch (IOException e) {
+                    String msg = "Failed to read the SQL: " + sqlFile;
+                    throw new IllegalStateException(msg, e);
+                }
+                final String sql = sb.toString();
+                final String customizeEntity = analyzer.getCustomizeEntityName(sql);
+                final String parameterBean = analyzer.getParameterBeanName(sql);
+                elementMap.put("customizeEntity", customizeEntity);
+                elementMap.put("parameterBean", parameterBean);
+            }
         }
         return resultMap;
+    }
+
+    protected InputStreamReader newInputStreamReader(File sqlFile) {
+        final String encoding = getProperties().getOutsideSqlProperties().getSqlFileEncoding();
+        try {
+            return new InputStreamReader(new FileInputStream(sqlFile), encoding);
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException("The file does not exist: " + sqlFile, e);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException("The encoding is unsupported: " + encoding, e);
+        }
     }
 
     // ===================================================================================
@@ -278,22 +320,22 @@ public class DfBehaviorQueryPathSetupper {
             Map<String, String> behaviorQueryElementMap, String bsbhvPathBase) {
         final String path = behaviorQueryElementMap.get("path");
         final String behaviorName = behaviorQueryElementMap.get("behaviorName");
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The behavior was Not Found!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the existence of the behavior." + getLineSeparator();
-        msg = msg + "And confirm your SQL file name." + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Your SQL File]" + getLineSeparator() + path + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Not Found Behavior]" + getLineSeparator() + behaviorName + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Behavior Directory]" + getLineSeparator() + bsbhvPathBase + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Behavior List]" + getLineSeparator() + bsbhvFileMap.keySet() + getLineSeparator();
-        msg = msg + "* * * * * * * * * */" + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The behavior was Not Found!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the existence of the behavior." + ln();
+        msg = msg + "And confirm your SQL file name." + ln();
+        msg = msg + ln();
+        msg = msg + "[Your SQL File]" + ln() + path + ln();
+        msg = msg + ln();
+        msg = msg + "[Not Found Behavior]" + ln() + behaviorName + ln();
+        msg = msg + ln();
+        msg = msg + "[Behavior Directory]" + ln() + bsbhvPathBase + ln();
+        msg = msg + ln();
+        msg = msg + "[Behavior List]" + ln() + bsbhvFileMap.keySet() + ln();
+        msg = msg + "* * * * * * * * * */" + ln();
         throw new BehaviorNotFoundException(msg);
     }
 
@@ -469,8 +511,8 @@ public class DfBehaviorQueryPathSetupper {
         return File.separator;
     }
 
-    public String getLineSeparator() {
-        return System.getProperty("line.separator");
+    public String ln() {
+        return "\n";
     }
 
     // ===================================================================================
