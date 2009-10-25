@@ -18,6 +18,23 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("ccc", splitList.get(2));
     }
 
+    public void test_rtrim_default() {
+        assertNull(DfStringUtil.rtrim(null));
+        assertEquals(" foo", DfStringUtil.rtrim(" foo "));
+        assertEquals(" foo", DfStringUtil.rtrim(" foo \n "));
+        assertEquals(" foo", DfStringUtil.rtrim(" foo \n \n"));
+        assertEquals(" foo", DfStringUtil.rtrim(" foo \r\n "));
+        assertEquals(" foo", DfStringUtil.rtrim(" foo \r\n \r\n"));
+    }
+
+    public void test_rtrim_originalTrimTarget() {
+        assertNull(DfStringUtil.rtrim(null, "\n"));
+        assertEquals(" foo ", DfStringUtil.rtrim(" foo \n", "\n"));
+        assertEquals(" foo \n ", DfStringUtil.rtrim(" foo \n ", "\n"));
+        assertEquals(" foo \r", DfStringUtil.rtrim(" foo \r\n", "\n"));
+        assertEquals(" foo ", DfStringUtil.rtrim(" foo \r\n", "\r\n"));
+    }
+
     public void test_extractFirstScope_basic() {
         assertEquals("BAR", DfStringUtil.extractFirstScope("FOObeginBARendDODO", "begin", "end"));
         assertEquals("BAR", DfStringUtil.extractFirstScope("FOObeginBARend", "begin", "end"));

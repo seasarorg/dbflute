@@ -95,17 +95,24 @@ public class DfStringUtil {
     }
 
     // ===================================================================================
-    //                                                                       Basic Convert
-    //                                                                       =============
+    //                                                                                Trim
+    //                                                                                ====
     public static final String rtrim(String text) {
         return rtrim(text, null);
     }
 
     public static final String rtrim(String text, String trimText) {
-        if (text == null)
+        if (text == null) {
             return null;
-        if (trimText == null)
-            trimText = " ";
+        }
+
+        // for trim target same as String.trim()
+        if (trimText == null) {
+            final String notTrimmedString = "a";
+            return (notTrimmedString + text).trim().substring(notTrimmedString.length());
+        }
+
+        // for original trim target
         int pos;
         for (pos = text.length() - 1; pos >= 0 && trimText.indexOf(text.charAt(pos)) >= 0; pos--)
             ;
