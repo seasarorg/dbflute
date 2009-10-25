@@ -44,6 +44,14 @@
 		color: #333333;
 	}
 
+	/* total info */
+	.updatedate {
+		text-align: right;
+	}
+	.mainschema {
+		text-align: right;
+	}
+
 	/* table */
 	table {
 		border-collapse:collapse;
@@ -115,30 +123,33 @@
 		border-right: 1px solid #aaa;
 	}
 
-	/* behavior query path */
-	div.bqpcount {
-		
+	/* table supplementary info */
+	span.tableschema {
+		font-size: 0.6em;
+	}
+	span.bqpcount {
+		font-size: 0.5em;
 	}
 	dl.bqplist {
 		padding-left: 2em;
 	}
 	dl.bqplist dt {
 		display: list-item;
+		font-size: 1.2em;
+		margin-top: 0.3em;
 	}
 	dl.bqplist dd {
-		font-size: 90%;
+		font-size: 0.9em;
 		padding-left: 2em;
 	}
-
-	/* various info */
-	.updatedate {
-		text-align: right;
+	dl.bqplist dd span.file {
+		font-style: italic;
 	}
-	.mainschema {
-		text-align: right;
+	dl.bqplist dd span.ctet {
+		color: green;
 	}
-	.tableschema {
-		font-size: 0.6em;
+	dl.bqplist dd span.pmb {
+		color: green;
 	}
   </style>
 </head>
@@ -194,11 +205,19 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 <h2>OutsideSql List</h2>
 #foreach ($table in $database.tableDisplaySortedList)
 #if ($table.hasBehaviorQueryPath())
-<h3 id="${table.javaName}Sql">${table.name}</h3>
+<h3 id="${table.javaName}Sql"><a href="#${table.name}">${table.name}</a></h3>
 <dl class="bqplist">
 #foreach ($behaviorQueryPath in $table.behaviorQueryPathList)
 	<dt>$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>
-	<dd>$table.getBehaviorQueryPathFileName($behaviorQueryPath)</dd>
+	<dd>
+		<span class="file">$table.getBehaviorQueryPathFileName($behaviorQueryPath)</span>
+#if ($table.hasBehaviorQueryPathCustomizeEntity($behaviorQueryPath))
+        <span class="ctet">(${table.getBehaviorQueryPathCustomizeEntity($behaviorQueryPath)})</span>
+#end
+#if ($table.hasBehaviorQueryPathParameterBean($behaviorQueryPath))
+        <span class="pmb">(${table.getBehaviorQueryPathParameterBean($behaviorQueryPath)})</span>
+#end
+	</dd>
 #end
 </dl>
 #end
