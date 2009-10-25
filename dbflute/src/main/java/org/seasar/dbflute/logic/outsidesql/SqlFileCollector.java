@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.sqlfile;
+package org.seasar.dbflute.logic.outsidesql;
 
 import java.io.File;
 import java.util.ArrayList;
