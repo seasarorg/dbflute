@@ -208,16 +208,22 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 <h3 id="${table.javaName}Sql"><a href="#${table.name}">${table.name}</a></h3>
 <dl class="bqplist">
 #foreach ($behaviorQueryPath in $table.behaviorQueryPathList)
-	<dt>$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>
+	<dt>$table.getBehaviorQueryPathTitleForSchemaHtml($behaviorQueryPath)$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>
+#if ($table.hasBehaviorQueryPathDescription($behaviorQueryPath))
+	<dd>
+		<pre>$table.getBehaviorQueryPathDescriptionForSchemaHtml($behaviorQueryPath)</pre>
+	</dd>
+#end
+	<dd>
 	<dd>
 		<span class="file">$table.getBehaviorQueryPathFileName($behaviorQueryPath)</span>
 #if ($table.hasBehaviorQueryPathCustomizeEntity($behaviorQueryPath))
-        <span class="ctet">(${table.getBehaviorQueryPathCustomizeEntity($behaviorQueryPath)})</span>
+        <span class="ctet">(${table.getBehaviorQueryPathCustomizeEntity($behaviorQueryPath)}${table.getBehaviorQueryPathCursorForSchemaHtml($behaviorQueryPath)})</span>
 #end
 #if ($table.hasBehaviorQueryPathParameterBean($behaviorQueryPath))
         <span class="pmb">(${table.getBehaviorQueryPathParameterBean($behaviorQueryPath)})</span>
-#end
 	</dd>
+#end
 #end
 </dl>
 #end

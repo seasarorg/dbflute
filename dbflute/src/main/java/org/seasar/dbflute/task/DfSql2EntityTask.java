@@ -63,7 +63,7 @@ import org.seasar.dbflute.logic.metahandler.DfProcedureHandler;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureMetaInfo;
-import org.seasar.dbflute.logic.outsidesql.DfSql2EntityMarkAnalyzer;
+import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
 import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
@@ -101,7 +101,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, DfProcedureMetaInfo> _procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
 
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
-    protected DfSql2EntityMarkAnalyzer _markAnalyzer = new DfSql2EntityMarkAnalyzer();
+    protected DfOutsideSqlMarkAnalyzer _markAnalyzer = new DfOutsideSqlMarkAnalyzer();
 
     // for getting schema
     protected String _schemaXml;

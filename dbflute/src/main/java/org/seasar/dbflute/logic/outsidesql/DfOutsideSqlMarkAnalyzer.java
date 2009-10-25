@@ -10,7 +10,13 @@ import org.seasar.dbflute.util.DfStringUtil;
  * @author jflute
  * @since 0.9.5 (2009/04/10 Friday)
  */
-public class DfSql2EntityMarkAnalyzer {
+public class DfOutsideSqlMarkAnalyzer {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final String TITLE_MARK = "[df:title]";
+    protected static final String DESCRIPTION_MARK = "[df:description]";
 
     // ===================================================================================
     //                                                                           Analyzing
@@ -62,6 +68,60 @@ public class DfSql2EntityMarkAnalyzer {
             }
         }
         return retLs;
+    }
+
+    public String getTitle(String sql) {
+        final String titleMark = TITLE_MARK;
+        final String descriptionMark = DESCRIPTION_MARK;
+        final int markIndex = sql.indexOf(titleMark);
+        if (markIndex < 0) {
+            return null;
+        }
+        String peace = sql.substring(markIndex + titleMark.length());
+        final int descriptionIndex = peace.indexOf(descriptionMark);
+        final int commentEndIndex = peace.indexOf("*/");
+        if (descriptionIndex < 0 && commentEndIndex < 0) {
+            String msg = "Title needs '*/' or '" + descriptionMark + "' as closing mark: " + sql;
+            throw new IllegalStateException(msg);
+        }
+        final int titleEndIndex;
+        if (descriptionIndex < 0) {
+            titleEndIndex = commentEndIndex;
+        } else if (commentEndIndex < 0) {
+            titleEndIndex = descriptionIndex;
+        } else {
+            titleEndIndex = commentEndIndex < descriptionIndex ? commentEndIndex : descriptionIndex;
+        }
+        peace = peace.substring(0, titleEndIndex);
+        peace = DfStringUtil.replace(peace, "\r\n", "\n");
+        peace = DfStringUtil.replace(peace, "\n", "");
+        return peace.trim();
+    }
+
+    public String getDescription(String sql) {
+        final String descriptionMark = DESCRIPTION_MARK;
+        final int markIndex = sql.indexOf(descriptionMark);
+        if (markIndex < 0) {
+            return null;
+        }
+        String peace = sql.substring(markIndex + descriptionMark.length());
+        final int commentEndIndex = peace.indexOf("*/");
+        if (commentEndIndex < 0) {
+            String msg = "Description needs '*/' as closing mark: " + sql;
+            throw new IllegalStateException(msg);
+        }
+        peace = peace.substring(0, commentEndIndex);
+        peace = DfStringUtil.replace(peace, "\r\n", "\n");
+        final int firstLnIndex = peace.indexOf("\n");
+        if (firstLnIndex < 0) { // only one line
+            return peace.trim();
+        }
+        final String firstLine = peace.substring(0, firstLnIndex);
+        if (firstLine.trim().length() == 0) { // first line has spaces only
+            // trims spaces before line separator.
+            peace = peace.substring(firstLnIndex + "\n".length());
+        }
+        return DfStringUtil.rtrim(peace);
     }
 
     // ===================================================================================
