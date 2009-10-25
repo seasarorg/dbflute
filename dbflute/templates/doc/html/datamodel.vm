@@ -202,6 +202,7 @@
 $generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 
+#if ($database.hasTableBqpMap())
 <h2>OutsideSql List</h2>
 #foreach ($table in $database.tableDisplaySortedList)
 #if ($table.hasBehaviorQueryPath())
@@ -226,6 +227,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 #end
 </dl>
+#end
 #end
 #end
 

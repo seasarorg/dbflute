@@ -1842,6 +1842,10 @@ public class Database {
     //                                                                 ===================
     protected Map<String, Map<String, Map<String, String>>> _tableBqpMap;
 
+    public boolean hasTableBqpMap() {
+        return !getTableBqpMap().isEmpty();
+    }
+
     protected Map<String, Map<String, Map<String, String>>> getTableBqpMap() {
         if (_tableBqpMap != null) {
             return _tableBqpMap;

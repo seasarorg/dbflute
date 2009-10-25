@@ -84,6 +84,9 @@ public class DfBehaviorQueryPathSetupper {
             _log.info("*Behavior Query Path is suppressed!");
             return;
         }
+        if (sqlFileList.isEmpty()) {
+            return;
+        }
         reflectBehaviorQueryPath(createBehaviorQueryPathMap(sqlFileList));
     }
 
@@ -110,6 +113,9 @@ public class DfBehaviorQueryPathSetupper {
      */
     public Map<String, Map<String, Map<String, String>>> extractTableBqpMap(List<File> sqlFileList) {
         final Map<String, Map<String, Map<String, String>>> resultMap = StringKeyMap.createAsCaseInsensitiveOrder();
+        if (sqlFileList.isEmpty()) {
+            return resultMap;
+        }
         final Map<String, Map<String, String>> bqpMap = createBehaviorQueryPathMap(sqlFileList);
         final Map<File, Map<String, Map<String, String>>> resourceMap = createReflectResourceMap(bqpMap);
         final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = resourceMap.entrySet();
