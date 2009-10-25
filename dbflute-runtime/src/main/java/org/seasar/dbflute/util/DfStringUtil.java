@@ -19,22 +19,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {Refers to Seasar and Extends its class}
  * @author jflute
  */
 public class DfStringUtil {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     protected static final String[] EMPTY_STRINGS = new String[0];
 
     // ===================================================================================
-    //                                                                               Empty
-    //                                                                               =====
-    public static final boolean isEmpty(final String text) {
+    //                                                                        Null & Empty
+    //                                                                        ============
+    public static final boolean isNullOrEmpty(final String text) {
         return text == null || text.length() == 0;
     }
 
-    public static final boolean isNotEmpty(final String text) {
-        return !isEmpty(text);
+    public static final boolean isNullOrTrimmedEmpty(final String text) {
+        return text == null || text.trim().length() == 0;
+    }
+
+    public static final boolean isNotNullAndNotEmpty(final String text) {
+        return !isNullOrEmpty(text);
+    }
+
+    public static final boolean isNotNullAndNotTrimmedEmpty(final String text) {
+        return !isNullOrTrimmedEmpty(text);
     }
 
     // ===================================================================================

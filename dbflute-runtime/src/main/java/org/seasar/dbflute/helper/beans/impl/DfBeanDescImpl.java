@@ -469,7 +469,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
     }
 
     private static String decapitalizePropertyName(String name) {
-        if (DfStringUtil.isEmpty(name)) {
+        if (DfStringUtil.isNullOrEmpty(name)) {
             return name;
         }
         if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) && Character.isUpperCase(name.charAt(0))) {

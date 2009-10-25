@@ -296,7 +296,7 @@ public class DfTypeUtil {
     }
 
     private static double toPrimitiveDouble(String s) {
-        if (DfStringUtil.isEmpty(s)) {
+        if (DfStringUtil.isNullOrEmpty(s)) {
             return 0;
         }
         return Double.parseDouble(normalize(s));
@@ -357,7 +357,7 @@ public class DfTypeUtil {
     }
 
     private static float toPrimitiveFloat(String s) {
-        if (DfStringUtil.isEmpty(s)) {
+        if (DfStringUtil.isNullOrEmpty(s)) {
             return 0;
         }
         return Float.parseFloat(normalize(s));
@@ -422,7 +422,7 @@ public class DfTypeUtil {
     }
 
     private static short toPrimitiveShort(String s) {
-        if (DfStringUtil.isEmpty(s)) {
+        if (DfStringUtil.isNullOrEmpty(s)) {
             return 0;
         }
         return Short.parseShort(normalize(s));
@@ -508,7 +508,7 @@ public class DfTypeUtil {
     }
 
     private static byte toPrimitiveByte(String s) {
-        if (DfStringUtil.isEmpty(s)) {
+        if (DfStringUtil.isNullOrEmpty(s)) {
             return 0;
         }
         return Byte.parseByte(normalize(s));

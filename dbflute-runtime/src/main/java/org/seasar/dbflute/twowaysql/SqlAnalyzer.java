@@ -143,7 +143,7 @@ public class SqlAnalyzer {
 
     protected void parseIf() {
         final String condition = _tokenizer.getToken().substring(2).trim();
-        if (DfStringUtil.isEmpty(condition)) {
+        if (DfStringUtil.isNullOrEmpty(condition)) {
             throwIfCommentConditionNotFoundException();
         }
         final IfNode ifNode = createIfNode(condition);
