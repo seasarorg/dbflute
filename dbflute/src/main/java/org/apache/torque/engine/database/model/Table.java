@@ -1924,7 +1924,6 @@ public class Table {
 
     /**
      * Returns the elements of the list, separated by commas.
-     *
      * @param list a list of Columns
      * @return A CSV list.
      */
@@ -2043,7 +2042,6 @@ public class Table {
 
     /**
      * Has sequence name of postgreSQL serial type column.
-     * 
      * @return Determination.
      */
     protected boolean hasPostgreSQLSerialSequenceName() {
@@ -2113,8 +2111,7 @@ public class Table {
     public boolean isUseIdentity() {
         final DfBasicProperties basicProperties = getBasicProperties();
 
-        // S2DaoはPostgreSQLのIdentity利用をサポートしていないので問答無用でfalse。
-        // かつ、Serial型はSequence利用が一般的なので問答無用でfalse。
+        // because serial type is treated as sequence 
         if (basicProperties.isDatabasePostgreSQL()) {
             return false;
         }
@@ -2586,9 +2583,55 @@ public class Table {
     }
 
     // ===================================================================================
+    //                                                                 Behavior Query Path
+    //                                                                 ===================
+    protected Map<String, Map<String, String>> getBehaviorQueryPathMap() {
+        final Map<String, Map<String, Map<String, String>>> tableBqpMap = getDatabase().getTableBqpMap();
+        final Map<String, Map<String, String>> elementMap = tableBqpMap.get(getJavaName());
+        return elementMap != null ? elementMap : new HashMap<String, Map<String, String>>();
+    }
+
+    public boolean hasBehaviorQueryPath() {
+        return !getBehaviorQueryPathList().isEmpty();
+    }
+
+    public List<String> getBehaviorQueryPathList() {
+        final Map<String, Map<String, String>> tableBqpMap = getBehaviorQueryPathMap();
+        return new ArrayList<String>(tableBqpMap.keySet());
+    }
+
+    public String getBehaviorQueryPathPath(String behaviorQueryPath) {
+        final Map<String, Map<String, String>> behaviorQueryPathMap = getBehaviorQueryPathMap();
+        final Map<String, String> elementMap = behaviorQueryPathMap.get(behaviorQueryPath);
+        final String path = elementMap.get("path");
+        return DfStringUtil.isNotNullAndNotTrimmedEmpty(path) ? path : "";
+    }
+
+    public String getBehaviorQueryPathSubDirectoryPath(String behaviorQueryPath) {
+        final Map<String, Map<String, String>> tableBqpMap = getBehaviorQueryPathMap();
+        final Map<String, String> elementMap = tableBqpMap.get(behaviorQueryPath);
+        final String subDirectoryPath = elementMap.get("subDirectoryPath");
+        return DfStringUtil.isNotNullAndNotTrimmedEmpty(subDirectoryPath) ? subDirectoryPath : "";
+    }
+
+    public String getBehaviorQueryPathDisplayPath(String behaviorQueryPath) {
+        final String subDirectoryPath = getBehaviorQueryPathSubDirectoryPath(behaviorQueryPath);
+        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(subDirectoryPath)) {
+            final String connector = "_";
+            return DfStringUtil.replace(subDirectoryPath, "/", connector) + connector + behaviorQueryPath;
+        } else {
+            return behaviorQueryPath;
+        }
+    }
+
+    // This method is not necessary because sql2entity cannot use this.
+    //public List<String> getBehaviorQueryPathDefinitionList() {
+    //}
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String getLineSeparator() {
+    protected String ln() {
         return "\n";
     }
 

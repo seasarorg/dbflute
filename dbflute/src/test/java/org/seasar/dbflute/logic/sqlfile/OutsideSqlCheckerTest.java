@@ -8,6 +8,7 @@ import org.seasar.dbflute.exception.DfParameterBeanMarkInvalidException;
 import org.seasar.dbflute.exception.EndCommentNotFoundException;
 import org.seasar.dbflute.exception.IfCommentConditionNotFoundException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedExpressionException;
+import org.seasar.dbflute.logic.outsidesql.OutsideSqlChecker;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**

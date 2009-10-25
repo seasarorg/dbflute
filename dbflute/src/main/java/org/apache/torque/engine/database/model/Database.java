@@ -54,11 +54,13 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -78,9 +80,11 @@ import org.seasar.dbflute.friends.torque.DfAdditionalUniqueKeyInitializer;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
+import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.initializer.IncludeQueryInitializer;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnType;
+import org.seasar.dbflute.logic.outsidesql.SqlFileCollector;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
 import org.seasar.dbflute.logic.pmb.PmbMetaDataPropertyOptionClassification;
@@ -1831,6 +1835,32 @@ public class Database {
     public String getPackageAsPath(String pckge) {
         final DfPackagePathHandler handler = new DfPackagePathHandler(getBasicProperties());
         return handler.getPackageAsPath(pckge);
+    }
+
+    // ===================================================================================
+    //                                                                 Behavior Query Path
+    //                                                                 ===================
+    protected Map<String, Map<String, Map<String, String>>> _tableBqpMap;
+
+    protected Map<String, Map<String, Map<String, String>>> getTableBqpMap() {
+        if (_tableBqpMap != null) {
+            return _tableBqpMap;
+        }
+        final DfBehaviorQueryPathSetupper setupper = new DfBehaviorQueryPathSetupper(getProperties());
+        try {
+            _tableBqpMap = setupper.extractTableBqpMap(collectSqlFileList());
+        } catch (RuntimeException e) {
+            _log.warn("Failed to extract the map of table behavior query path!", e);
+            _tableBqpMap = new HashMap<String, Map<String, Map<String, String>>>();
+        }
+        return _tableBqpMap;
+    }
+
+    protected List<File> collectSqlFileList() {
+        final String sqlDirectory = getProperties().getOutsideSqlProperties().getSqlDirectory();
+        final SqlFileCollector sqlFileCollector = new SqlFileCollector(sqlDirectory, getBasicProperties());
+        sqlFileCollector.suppressDirectoryCheck();
+        return sqlFileCollector.collectSqlFileList();
     }
 
     // ===================================================================================

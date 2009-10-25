@@ -29,6 +29,7 @@ public class SqlFileCollector {
     //                                                                           =========
     protected String _sqlDirectory;
     protected DfBasicProperties _basicProperties;
+    protected boolean _suppressDirectoryCheck;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -63,8 +64,12 @@ public class SqlFileCollector {
                     sqlFileList.addAll(collectSqlFile(srcMainResources));
                 }
             } else {
-                String msg = "The sqlDirectory does not exist: " + dir;
-                throw new IllegalStateException(msg);
+                if (_suppressDirectoryCheck) {
+                    return new ArrayList<File>();
+                } else {
+                    String msg = "The sqlDirectory does not exist: " + dir;
+                    throw new IllegalStateException(msg);
+                }
             }
         }
         return sqlFileList;
@@ -95,4 +100,10 @@ public class SqlFileCollector {
         return DfLanguageDependencyInfoJava.replaceSrcMainJavaToSrcMainResources(sqlDirectory);
     }
 
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void suppressDirectoryCheck() {
+        _suppressDirectoryCheck = true;
+    }
 }

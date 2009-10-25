@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -64,9 +63,10 @@ import org.seasar.dbflute.logic.metahandler.DfProcedureHandler;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnType;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureMetaInfo;
+import org.seasar.dbflute.logic.outsidesql.Sql2EntityMarkAnalyzer;
+import org.seasar.dbflute.logic.outsidesql.SqlFileNameResolver;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
 import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
-import org.seasar.dbflute.logic.sqlfile.SqlFileNameResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
@@ -101,6 +101,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, DfProcedureMetaInfo> _procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
 
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
+    protected Sql2EntityMarkAnalyzer _markAnalyzer = new Sql2EntityMarkAnalyzer();
 
     // for getting schema
     protected String _schemaXml;
@@ -632,71 +633,27 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                           Analyzing
     //                                                                           =========
     protected String getEntityName(final String sql) {
-        return getTargetString(sql, "#");
+        return _markAnalyzer.getEntityName(sql);
     }
 
     protected boolean isCursor(final String sql) {
-        final String targetString = getTargetString(sql, "+");
-        return targetString != null && (targetString.contains("cursor") || targetString.contains("cursol"));
+        return _markAnalyzer.isCursor(sql);
     }
 
     protected List<String> getEntityPropertyTypeList(final String sql) {
-        return getTargetList(sql, "##");
+        return _markAnalyzer.getEntityPropertyTypeList(sql);
     }
 
     protected String getParameterBeanClassDefinition(final String sql) {
-        return getTargetString(sql, "!");
+        return _markAnalyzer.getParameterBeanClassDefinition(sql);
     }
 
     protected List<String> getParameterBeanPropertyTypeList(final String sql) {
-        return getTargetList(sql, "!!");
-    }
-
-    protected String getTargetString(final String sql, final String mark) {
-        final List<String> targetList = getTargetList(sql, mark);
-        return !targetList.isEmpty() ? targetList.get(0) : null;
-    }
-
-    protected List<String> getTargetList(final String sql, final String mark) {
-        if (sql == null || sql.trim().length() == 0) {
-            String msg = "The sql is invalid: " + sql;
-            throw new IllegalArgumentException(msg);
-        }
-        final List<String> betweenBeginEndMarkList = getListBetweenBeginEndMark(sql, "--" + mark, mark);
-        if (!betweenBeginEndMarkList.isEmpty()) {
-            return betweenBeginEndMarkList;
-        } else {
-            // for MySQL. 
-            return getListBetweenBeginEndMark(sql, "-- " + mark, mark);
-        }
+        return _markAnalyzer.getParameterBeanPropertyTypeList(sql);
     }
 
     protected List<String> getPrimaryKeyColumnNameList(final String sql) {
-        if (sql == null || sql.trim().length() == 0) {
-            String msg = "The sql is invalid: " + sql;
-            throw new IllegalArgumentException(msg);
-        }
-        final List<String> retLs = new ArrayList<String>();
-        String primaryKeyColumnNameSeparatedString = getStringBetweenBeginEndMark(sql, "--*", "*");
-        if (primaryKeyColumnNameSeparatedString == null || primaryKeyColumnNameSeparatedString.trim().length() == 0) {
-            primaryKeyColumnNameSeparatedString = getStringBetweenBeginEndMark(sql, "-- *", "*");// for MySQL.
-        }
-        if (primaryKeyColumnNameSeparatedString != null && primaryKeyColumnNameSeparatedString.trim().length() != 0) {
-            final StringTokenizer st = new StringTokenizer(primaryKeyColumnNameSeparatedString, ",;/\t");
-            while (st.hasMoreTokens()) {
-                final String nextToken = st.nextToken();
-                retLs.add(nextToken.trim());
-            }
-        }
-        return retLs;
-    }
-
-    protected String getStringBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-        return DfStringUtil.extractFirstScope(targetStr, beginMark, endMark);
-    }
-
-    protected List<String> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-        return DfStringUtil.extractAllScope(targetStr, beginMark, endMark);
+        return _markAnalyzer.getPrimaryKeyColumnNameList(sql);
     }
 
     protected String removeBlockComment(final String sql) {

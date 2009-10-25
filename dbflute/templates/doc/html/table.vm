@@ -48,3 +48,10 @@ ${table.aliasExpression}${table.name}
   </tr>
 #end
 </table>
+<div class="bqpdisp">
+<ul>
+#foreach ($behaviorQueryPath in $table.behaviorQueryPathList)
+  <li>$table.getBehaviorQueryPathDisplayPath($behaviorQueryPath)</li>
+#end
+</ul>
+</div>

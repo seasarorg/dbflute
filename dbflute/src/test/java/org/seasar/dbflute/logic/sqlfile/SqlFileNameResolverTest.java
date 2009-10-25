@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
+import org.seasar.dbflute.logic.outsidesql.SqlFileNameResolver;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**

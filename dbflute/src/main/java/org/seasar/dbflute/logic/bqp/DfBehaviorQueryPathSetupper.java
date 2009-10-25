@@ -32,12 +32,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -70,8 +72,8 @@ public class DfBehaviorQueryPathSetupper {
     }
 
     // ===================================================================================
-    //                                                                 Behavior Query Path
-    //                                                                 ===================
+    //                                                                              Set up 
+    //                                                                              ======
     /**
      * @param sqlFileList The list of SQL file. (NotNull)
      */
@@ -83,6 +85,59 @@ public class DfBehaviorQueryPathSetupper {
         reflectBehaviorQueryPath(createBehaviorQueryPathMap(sqlFileList));
     }
 
+    // ===================================================================================
+    //                                                                             Extract
+    //                                                                             =======
+    /**
+     * Extract the case insensitive map of table behavior query path.
+     * <pre>
+     * map:{
+     *     [tablePropertyName] = map:{
+     *         [behaviorQueryPath] = map:{
+     *             ; path = [value]
+     *             ; behaviorName = [value]
+     *             ; entityName = [value]
+     *             ; subDirectoryPath = [value]
+     *             ; behaviorQueryPath = [value]
+     *         }
+     *     } 
+     * }
+     * </pre>
+     * @param sqlFileList The list of SQL file. (NotNull)
+     * @return The case insensitive map of table behavior query path. (NotNull)
+     */
+    public Map<String, Map<String, Map<String, String>>> extractTableBqpMap(List<File> sqlFileList) {
+        final Map<String, Map<String, Map<String, String>>> resultMap = StringKeyMap.createAsCaseInsensitiveOrder();
+        final Map<String, Map<String, String>> bqpMap = createBehaviorQueryPathMap(sqlFileList);
+        final Map<File, Map<String, Map<String, String>>> resourceMap = createReflectResourceMap(bqpMap);
+        final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = resourceMap.entrySet();
+        for (Entry<File, Map<String, Map<String, String>>> entry : entrySet) {
+            final File bsbhvFile = entry.getKey();
+            String className = bsbhvFile.getName();
+            final int extIndex = className.lastIndexOf(".");
+            if (extIndex >= 0) {
+                className = className.substring(0, extIndex);
+            }
+            if (className.endsWith("Bhv")) {
+                className = className.substring(0, className.length() - "Bhv".length());
+            }
+            final DfBasicProperties basicProperties = _buildProperties.getBasicProperties();
+            final String projectPrefix = basicProperties.getProjectPrefix();
+            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(projectPrefix) && className.startsWith(projectPrefix)) {
+                className = className.substring(projectPrefix.length(), className.length());
+            }
+            final String basePrefix = basicProperties.getBasePrefix();
+            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(basePrefix) && className.startsWith(basePrefix)) {
+                className = className.substring(basePrefix.length(), className.length());
+            }
+            resultMap.put(className, entry.getValue());
+        }
+        return resultMap;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     /**
      * @param sqlFileList The list of SQL file. (NotNull)
      * @return The map of behavior query path. (NotNull)
@@ -322,7 +377,7 @@ public class DfBehaviorQueryPathSetupper {
                                 .append(lineString.substring(0, lineString.indexOf(behaviorQueryPathBeginMark)));
                         definitionLineSb.append(grammarInfo.getPublicStaticDefinition());
                         final String subDirectoryPath = behaviorQueryElementMap.get("subDirectoryPath");
-                        if (subDirectoryPath != null) {
+                        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(subDirectoryPath)) {
                             final String subDirectoryName = DfStringUtil.replace(subDirectoryPath, "/", "_");
                             final String subDirectoryValue = DfStringUtil.replace(subDirectoryPath, "/", ":");
                             definitionLineSb.append(" String PATH_");
