@@ -13,6 +13,7 @@
 		font-family: Verdana, Arial, sans-serif;
 		font-size: 90%;
 		margin: 10px 5px 5px 15px;
+		background-color: #ffffe0;
 	}
 
 	/* heading */
@@ -167,7 +168,7 @@
 		margin-top: 0.3em;
 	}
 	dl.procedurelist dt span.type {
-		font-size: 0.9em;
+		font-size: 0.7em;
 		color: green;
 	}
 	dl.procedurelist dd {
