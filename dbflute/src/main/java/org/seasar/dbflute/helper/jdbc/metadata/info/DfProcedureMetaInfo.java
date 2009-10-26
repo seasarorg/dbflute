@@ -41,7 +41,7 @@ public class DfProcedureMetaInfo {
             }
         }
         sb.append(procedureName);
-        sb.append(" (").append(procedureType).append(")");
+        sb.append(" <span class=\"type\">(").append(procedureType).append(")</span>");
         return sb.toString();
     }
 

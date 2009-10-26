@@ -10,7 +10,7 @@
 		padding: 0;
 	}
 	body {
-		font-family: sans-serif;
+		font-family: Verdana, Arial, sans-serif;
 		font-size: 90%;
 		margin: 10px 5px 5px 15px;
 	}
@@ -166,6 +166,10 @@
 		font-size: 1.2em;
 		margin-top: 0.3em;
 	}
+	dl.procedurelist dt span.type {
+		font-size: 0.9em;
+		color: green;
+	}
 	dl.procedurelist dd {
 		font-size: 0.9em;
 		padding-left: 1em;
@@ -173,6 +177,10 @@
 	dl.procedurelist dd.column {
 		font-style: italic;
 		padding-left: 2em;
+	}
+	dl.procedurelist dd.column span.type {
+		font-size: 0.9em;
+		color: green;
 	}
 	dl.procedurelist dd.column pre {
 		padding-left: 1em;

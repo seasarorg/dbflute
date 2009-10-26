@@ -33,7 +33,7 @@ public class DfProcedureColumnMetaInfo {
             }
             sb.append(")");
         }
-        sb.append(" (").append(procedureColumnType).append(")");
+        sb.append(" <span class=\"type\">(").append(procedureColumnType).append(")</span>");
         return sb.toString();
     }
 
