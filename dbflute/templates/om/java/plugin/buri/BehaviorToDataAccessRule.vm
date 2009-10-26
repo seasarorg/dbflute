@@ -273,7 +273,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * @param resource The resource of DBFlute. (NotNull)
      */
     protected void selectSetup(BuriDataFieldType src, Method method, DfBeanDesc beanDesc, DBFluteResource resource) {
-        if (!DfStringUtil.isEmpty(src.getSelect())) {
+        if (!DfStringUtil.isNullOrEmpty(src.getSelect())) {
             return;
         }
         if (isSelectMethod(src, method)) {
@@ -309,7 +309,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * @param resource The resource of DBFlute. (NotNull)
      */
     protected void selectManySetup(BuriDataFieldType src, Method method, DfBeanDesc beanDesc, DBFluteResource resource) {
-        if (!DfStringUtil.isEmpty(src.getSelectMany())) {
+        if (!DfStringUtil.isNullOrEmpty(src.getSelectMany())) {
             return;
         }
         if (isSelectManyMethod(src, method)) {
@@ -345,7 +345,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
         if (isInsertMethod(src, method)) {
             String daoName = src.getCache().get(BEHAVIOR_KEY).toString();
             String insertOgnl = daoName + "." + method.getName() + "(#data)";
-            if (!DfStringUtil.isEmpty(src.getInsert())) {
+            if (!DfStringUtil.isNullOrEmpty(src.getInsert())) {
                 String insertStr = src.getInsert();
                 StringBuffer strBuff = new StringBuffer();
                 strBuff.append(insertStr);
@@ -383,7 +383,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * @param resource The resource of DBFlute. (NotNull)
      */
     protected void updateSetup(BuriDataFieldType src, Method method, DfBeanDesc beanDesc, DBFluteResource resource) {
-        if (!DfStringUtil.isEmpty(src.getUpdate())) {
+        if (!DfStringUtil.isNullOrEmpty(src.getUpdate())) {
             return;
         }
         if (isUpdateMethod(src, method)) {
@@ -417,7 +417,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * @param resource The resource of DBFlute. (NotNull)
      */
     protected void deleteSetup(BuriDataFieldType src, Method method, DfBeanDesc beanDesc, DBFluteResource resource) {
-        if (!DfStringUtil.isEmpty(src.getDelete())) {
+        if (!DfStringUtil.isNullOrEmpty(src.getDelete())) {
             return;
         }
         if (isDeleteMethod(src, method)) {
@@ -451,7 +451,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * @param resource The resource of DBFlute. (NotNull)
      */
     protected void tableNameSetup(BuriDataFieldType src, Method method, DfBeanDesc beanDesc, DBFluteResource resource) {
-        if (!DfStringUtil.isEmpty(src.getTableName())) {
+        if (!DfStringUtil.isNullOrEmpty(src.getTableName())) {
             return;
         }
         src.setTableName(resource.getDBMeta().getTableDbName());
@@ -471,7 +471,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
             String daoName = src.getCache().get(BEHAVIOR_KEY).toString();
             String pkey = (String) src.getCache().get(BEHAVIOR_KEY + "_KeyName");
             String selectNextVal = "#data." + pkey + " = " + daoName + "." + method.getName() + "()";
-            if (!DfStringUtil.isEmpty(src.getInsert())) {
+            if (!DfStringUtil.isNullOrEmpty(src.getInsert())) {
                 final String insertStr = src.getInsert();
                 final StringBuilder sb = new StringBuilder();
                 sb.append(selectNextVal.toString());
