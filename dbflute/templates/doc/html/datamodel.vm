@@ -186,11 +186,11 @@
 <p class="mainschema">generated from <strong>${database.databaseSchema}</strong></p>
 #end
 <p class="updatedate">${database.timestampExpression}</p>
-#if ($database.hasTableBqpMap() || $database.isGenerateProcedureParameterBean())
-<p class="sublink"><a href="#outsidesql">OutsideSql List</a></p>
-#end
 #if ($database.hasClassificationDefinitionMap())
 <p class="sublink"><a href="#cdef">Classification Definition</a></p>
+#end
+#if ($database.hasTableBqpMap() || $database.isGenerateProcedureParameterBean())
+<p class="sublink"><a href="#outsidesql">OutsideSql List</a></p>
 #end
 
 <h2>Table List</h2>
@@ -233,59 +233,6 @@
 
 #foreach ($table in $database.tableDisplaySortedList)
 $generator.parse("doc/html/table.vm", null, "table", $table)
-#end
-
-#if ($database.hasTableBqpMap() || $database.isGenerateProcedureParameterBean())
-<h2 id="outsidesql">OutsideSql List</h2>
-#if ($database.isGenerateProcedureParameterBean())
-<h3 id="procedure">Procedure</h3>
-<dl class="procedurelist">
-#foreach ($procedure in $database.availableProcedureList)
-	<dt>${procedure.procedureDisplayNameForSchemaHtml}</dt>
-#if ($procedure.hasProcedureComment())
-	<dd>
-		<pre>${procedure.procedureCommentForSchemaHtml}</pre>
-	</dd>
-#end
-#if ($procedure.procedureColumnMetaInfoList.isEmpty())
-	<dd class="column">*no arguments</dd>
-#else
-#foreach ($column in $procedure.procedureColumnMetaInfoList)
-	<dd class="column">
-		${column.columnDisplayNameForSchemaHtml}
-#if ($column.hasColumnComment())
-		<pre>${column.columnCommentForSchemaHtml}</pre>
-#end
-	</dd>
-#end
-#end
-#end
-</dl>
-#end
-#foreach ($table in $database.tableDisplaySortedList)
-#if ($table.hasBehaviorQueryPath())
-<h3 id="${table.javaName}Sql"><a href="#${table.name}">${table.name}</a></h3>
-<dl class="bqplist">
-#foreach ($behaviorQueryPath in $table.behaviorQueryPathList)
-	<dt>$table.getBehaviorQueryPathTitleForSchemaHtml($behaviorQueryPath)$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>
-#if ($table.hasBehaviorQueryPathDescription($behaviorQueryPath))
-	<dd>
-		<pre>$table.getBehaviorQueryPathDescriptionForSchemaHtml($behaviorQueryPath)</pre>
-	</dd>
-#end
-	<dd class="subinfo">
-		<span class="file">$table.getBehaviorQueryPathFileName($behaviorQueryPath)</span>
-#if ($table.hasBehaviorQueryPathCustomizeEntity($behaviorQueryPath))
-		<span class="ctet">(${table.getBehaviorQueryPathCustomizeEntity($behaviorQueryPath)}${table.getBehaviorQueryPathCursorForSchemaHtml($behaviorQueryPath)})</span>
-#end
-#if ($table.hasBehaviorQueryPathParameterBean($behaviorQueryPath))
-		<span class="pmb">(${table.getBehaviorQueryPathParameterBean($behaviorQueryPath)})</span>
-#end
-	</dd>
-#end
-</dl>
-#end
-#end
 #end
 
 #if ($database.hasClassificationDefinitionMap())
@@ -333,6 +280,59 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 	</tbody>
 </table>
+#end
+
+#if ($database.hasTableBqpMap() || $database.isGenerateProcedureParameterBean())
+<h2 id="outsidesql">OutsideSql List</h2>
+#foreach ($table in $database.tableDisplaySortedList)
+#if ($table.hasBehaviorQueryPath())
+<h3 id="${table.javaName}Sql"><a href="#${table.name}">${table.name}</a></h3>
+<dl class="bqplist">
+#foreach ($behaviorQueryPath in $table.behaviorQueryPathList)
+	<dt>$table.getBehaviorQueryPathTitleForSchemaHtml($behaviorQueryPath)$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>
+#if ($table.hasBehaviorQueryPathDescription($behaviorQueryPath))
+	<dd>
+		<pre>$table.getBehaviorQueryPathDescriptionForSchemaHtml($behaviorQueryPath)</pre>
+	</dd>
+#end
+	<dd class="subinfo">
+		<span class="file">$table.getBehaviorQueryPathFileName($behaviorQueryPath)</span>
+#if ($table.hasBehaviorQueryPathCustomizeEntity($behaviorQueryPath))
+		<span class="ctet">(${table.getBehaviorQueryPathCustomizeEntity($behaviorQueryPath)}${table.getBehaviorQueryPathCursorForSchemaHtml($behaviorQueryPath)})</span>
+#end
+#if ($table.hasBehaviorQueryPathParameterBean($behaviorQueryPath))
+		<span class="pmb">(${table.getBehaviorQueryPathParameterBean($behaviorQueryPath)})</span>
+#end
+	</dd>
+#end
+</dl>
+#end
+#end
+#if ($database.isGenerateProcedureParameterBean())
+<h3 id="procedure">Procedure</h3>
+<dl class="procedurelist">
+#foreach ($procedure in $database.availableProcedureList)
+	<dt>${procedure.procedureDisplayNameForSchemaHtml}</dt>
+#if ($procedure.hasProcedureComment())
+	<dd>
+		<pre>${procedure.procedureCommentForSchemaHtml}</pre>
+	</dd>
+#end
+#if ($procedure.procedureColumnMetaInfoList.isEmpty())
+	<dd class="column">*no arguments</dd>
+#else
+#foreach ($column in $procedure.procedureColumnMetaInfoList)
+	<dd class="column">
+		${column.columnDisplayNameForSchemaHtml}
+#if ($column.hasColumnComment())
+		<pre>${column.columnCommentForSchemaHtml}</pre>
+#end
+	</dd>
+#end
+#end
+#end
+</dl>
+#end
 #end
 </body>
 </html>

@@ -195,8 +195,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             }
             final Integer decimalDigits;
             {
-                final String precision = columnRs.getString("PRECISION");
-                decimalDigits = precision != null ? new Integer(precision) : null;
+                final String scale = columnRs.getString("SCALE");
+                decimalDigits = scale != null ? new Integer(scale) : null;
             }
             final String columnComment = columnRs.getString("REMARKS");
 
