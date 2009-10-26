@@ -453,7 +453,7 @@ public class TypeMap {
         }
     }
 
-    protected static String getDefaultDecimalJavaNativeType() {
+    public static String getDefaultDecimalJavaNativeType() {
         final DfBuildProperties prop = DfBuildProperties.getInstance();
         final DfBasicProperties basicProperties = prop.getBasicProperties();
         if (basicProperties.isTargetLanguageJava()) {

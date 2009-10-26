@@ -774,8 +774,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
             final Integer columnSize = procedureColumnMetaInfo.getColumnSize();
             final Integer decimalDigits = procedureColumnMetaInfo.getDecimalDigits();
-            final String torqueType = _columnHandler.getColumnJdbcType(jdbcType, dbTypeName);
-            propertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
+            if (getBasicProperties().isDatabaseOracle() && "number".equalsIgnoreCase(dbTypeName)) {
+                // Because the length setting of procedure parameter is unsupported on Oracle.
+                propertyType = TypeMap.getDefaultDecimalJavaNativeType();
+            } else {
+                final String torqueType = _columnHandler.getColumnJdbcType(jdbcType, dbTypeName);
+                propertyType = TypeMap.findJavaNativeByJdbcType(torqueType, columnSize, decimalDigits);
+            }
         }
         return propertyType;
     }
