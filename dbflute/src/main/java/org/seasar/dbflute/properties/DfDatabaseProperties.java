@@ -252,6 +252,10 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return _additionalSchemaMap;
     }
 
+    public boolean hasAdditionalSchema() {
+        return !getAdditionalSchemaMap().isEmpty();
+    }
+
     public boolean isAdditionalSchema(String schema) {
         return getAdditionalSchemaMap().containsKey(schema);
     }

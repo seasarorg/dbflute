@@ -22,9 +22,7 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
-import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
-import org.seasar.dbflute.twowaysql.node.IfNode;
 #if ($database.isTargetContainerSeasar())
 
 import org.seasar.framework.util.Disposable;
@@ -198,26 +196,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     public SqlAnalyzerFactory assistSqlAnalyzerFactory() {
         return new SqlAnalyzerFactory() {
             public SqlAnalyzer create(String sql, boolean blockNullParameter) {
-                if (${glDBFluteConfig}.getInstance().xisUseOgnl()) {
-                    return new SqlAnalyzer(sql, blockNullParameter);
-                } else {
-                    return new SqlAnalyzer(sql, blockNullParameter) {
-                        @Override
-                        protected IfNode createIfNode(String expr) {
-                            return new IfNode(expr, _specifiedSql) {
-                                @Override
-                                protected Object parseForOgnl(String expression) {
-                                    // do nothing
-                                    return null;
-                                }
-                                @Override
-                                public void accept(CommandContext ctx) {
-                                    doAcceptByEvaluator(ctx);
-                                }
-                            };
-                        }
-                    };
-                }
+                return new SqlAnalyzer(sql, blockNullParameter);
             }
         };
     }

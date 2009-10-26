@@ -987,7 +987,7 @@ public class Database {
     }
 
     public boolean hasAdditionalSchema() {
-        return !getProperties().getDatabaseProperties().getAdditionalSchemaMap().isEmpty();
+        return getProperties().getDatabaseProperties().hasAdditionalSchema();
     }
 
     // ===================================================================================

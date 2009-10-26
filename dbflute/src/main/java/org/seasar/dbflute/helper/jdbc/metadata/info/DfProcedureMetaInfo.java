@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.DfStringUtil;
 
@@ -21,11 +23,22 @@ public class DfProcedureMetaInfo {
 
     public String getProcedureDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
-        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureCatalog)) {
-            sb.append(procedureCatalog).append(".");
-        }
-        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureSchema)) {
-            sb.append(procedureSchema).append(".");
+        final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
+        final DfDatabaseProperties databaseProp = DfBuildProperties.getInstance().getDatabaseProperties();
+        if (basicProp.isDatabaseOracle()) {
+            if (databaseProp.hasAdditionalSchema() && DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureSchema)) {
+                sb.append(procedureSchema).append(".");
+            }
+            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureCatalog)) {
+                sb.append(procedureCatalog).append(".");
+            }
+        } else {
+            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureCatalog)) {
+                sb.append(procedureCatalog).append(".");
+            }
+            if (databaseProp.hasAdditionalSchema() && DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureSchema)) {
+                sb.append(procedureSchema).append(".");
+            }
         }
         sb.append(procedureName);
         sb.append(" (").append(procedureType).append(")");

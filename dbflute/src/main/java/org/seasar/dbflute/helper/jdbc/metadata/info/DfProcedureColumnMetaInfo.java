@@ -19,7 +19,11 @@ public class DfProcedureColumnMetaInfo {
         if (DfStringUtil.isNotNullAndNotTrimmedEmpty(columnName)) {
             sb.append(columnName);
         } else {
-            sb.append("arg");
+            if (DfProcedureColumnType.procedureColumnReturn.equals(procedureColumnType)) {
+                sb.append("(result)");
+            } else {
+                sb.append("(arg)");
+            }
         }
         sb.append(" ").append(dbTypeName);
         if (columnSize != null) {

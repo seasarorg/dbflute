@@ -70,11 +70,6 @@ public class ${glDBFluteConfig} {
     //                                                  Lock
     //                                                  ----
 	protected boolean _locked = true;
-
-    // -----------------------------------------------------
-    //                                                   Tmp
-    //                                                   ---
-	protected boolean _useOgnl = true;
 	
     // ===================================================================================
     //                                                                         Constructor
@@ -358,21 +353,6 @@ public class ${glDBFluteConfig} {
 		}
 		String msg = "The configuration of DBFlute is locked! Don't access at this timing!";
 		throw new IllegalStateException(msg);
-	}
-
-    // ===================================================================================
-    //                                                                      Use OGNL (Tmp)
-    //                                                                      ==============
-	public boolean xisUseOgnl() { // is temporary method
-	    return _useOgnl;
-	}
-	
-	public void xsetUseOgnl(boolean useOgnl) { // is temporary method
-	    assertNotLocked();
-		if (_log.isInfoEnabled()) {
-		    _log.info("...Setting useOgnl: " + useOgnl);
-		}
-	    _useOgnl = useOgnl;
 	}
 
     // ===================================================================================
