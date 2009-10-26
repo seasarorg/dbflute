@@ -119,7 +119,6 @@
 	}
 	table.child th {
 		font-size: 0.7em;
-		background-color: #fff;
 	}
 	table.child, table.child td, table.child th {
 		border-top: none;
