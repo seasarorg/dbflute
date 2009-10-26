@@ -41,7 +41,7 @@ public class DfProcedureMetaInfo {
             }
         }
         sb.append(procedureName);
-        sb.append(" <span class=\"type\">(").append(procedureType).append(")</span>");
+        sb.append(" <span class=\"type\">(").append(procedureType.alias()).append(")</span>");
         return sb.toString();
     }
 
@@ -63,7 +63,16 @@ public class DfProcedureMetaInfo {
     }
 
     public enum DfProcedureType {
-        procedureResultUnknown, procedureNoResult, procedureReturnsResult
+        procedureResultUnknown("ResultUnknown"), procedureNoResult("NoResult"), procedureReturnsResult("ReturnsResult");
+        private String _alias;
+
+        private DfProcedureType(String alias) {
+            _alias = alias;
+        }
+
+        public String alias() {
+            return _alias;
+        }
     }
 
     public String getProcedureCatalog() {

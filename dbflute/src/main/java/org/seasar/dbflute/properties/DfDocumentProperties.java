@@ -101,6 +101,11 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (text == null || text.trim().length() == 0) {
             return null;
         }
+        // escape
+        text = DfStringUtil.replace(text, "<", "&lt;");
+        text = DfStringUtil.replace(text, ">", "&gt;");
+
+        // line separator
         text = removeCR(text);
         final String htmlLineSeparator = "<br />";
         if (text.contains(NORMAL_LINE_SEPARATOR)) {
@@ -109,8 +114,6 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (text.contains(SPECIAL_LINE_SEPARATOR)) {
             text = text.replaceAll(SPECIAL_LINE_SEPARATOR, htmlLineSeparator);
         }
-        text = DfStringUtil.replace(text, "<", "&lt;");
-        text = DfStringUtil.replace(text, ">", "&gt;");
         return text;
     }
 
@@ -118,9 +121,12 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         if (text == null || text.trim().length() == 0) {
             return null;
         }
-        text = removeCR(text);
+        // escape
         text = DfStringUtil.replace(text, "<", "&lt;");
         text = DfStringUtil.replace(text, ">", "&gt;");
+
+        // line separator
+        text = removeCR(text);
         return text;
     }
 

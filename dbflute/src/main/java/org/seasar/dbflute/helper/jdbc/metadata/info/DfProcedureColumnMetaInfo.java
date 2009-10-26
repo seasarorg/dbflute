@@ -33,7 +33,7 @@ public class DfProcedureColumnMetaInfo {
             }
             sb.append(")");
         }
-        sb.append(" <span class=\"type\">(").append(procedureColumnType).append(")</span>");
+        sb.append(" <span class=\"type\">(").append(procedureColumnType.alias()).append(")</span>");
         return sb.toString();
     }
 
@@ -55,7 +55,17 @@ public class DfProcedureColumnMetaInfo {
     }
 
     public enum DfProcedureColumnType {
-        procedureColumnUnknown, procedureColumnIn, procedureColumnInOut, procedureColumnOut, procedureColumnReturn, procedureColumnResult
+        procedureColumnUnknown("Unknown"), procedureColumnIn("In"), procedureColumnInOut("InOut"), procedureColumnOut(
+                "Out"), procedureColumnReturn("Return"), procedureColumnResult("Result");
+        private final String _alias;
+
+        private DfProcedureColumnType(String alias) {
+            _alias = alias;
+        }
+
+        public String alias() {
+            return _alias;
+        }
     }
 
     public String getColumnName() {
