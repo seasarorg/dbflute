@@ -39,11 +39,6 @@ public class IfNode extends ContainerNode {
         this._specifiedSql = specifiedSql;
     }
 
-    protected Object parseForOgnl(String expression) { // deleted at the future
-        // do nothing
-        return null;
-    }
-
     // ===================================================================================
     //                                                                              Accept
     //                                                                              ======
