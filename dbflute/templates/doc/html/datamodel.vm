@@ -1,4 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -140,16 +141,38 @@
 	}
 	dl.bqplist dd {
 		font-size: 0.9em;
+		padding-left: 1em;
+	}
+	dl.bqplist dd.subinfo {
 		padding-left: 2em;
 	}
-	dl.bqplist dd span.file {
+	dl.bqplist dd.subinfo span.file {
 		font-style: italic;
 	}
-	dl.bqplist dd span.ctet {
+	dl.bqplist dd.subinfo span.ctet {
 		color: green;
 	}
-	dl.bqplist dd span.pmb {
+	dl.bqplist dd.subinfo span.pmb {
 		color: green;
+	}
+	dl.procedurelist {
+		padding-left: 2em;
+	}
+	dl.procedurelist dt {
+		display: list-item;
+		font-size: 1.2em;
+		margin-top: 0.3em;
+	}
+	dl.procedurelist dd {
+		font-size: 0.9em;
+		padding-left: 1em;
+	}
+	dl.procedurelist dd.column {
+		font-style: italic;
+		padding-left: 2em;
+	}
+	dl.procedurelist dd.column pre {
+		padding-left: 1em;
 	}
   </style>
 </head>
@@ -202,7 +225,7 @@
 $generator.parse("doc/html/table.vm", null, "table", $table)
 #end
 
-#if ($database.hasTableBqpMap())
+#if ($database.hasTableBqpMap() || $database.isGenerateProcedureParameterBean())
 <h2>OutsideSql List</h2>
 #foreach ($table in $database.tableDisplaySortedList)
 #if ($table.hasBehaviorQueryPath())
@@ -215,24 +238,48 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 		<pre>$table.getBehaviorQueryPathDescriptionForSchemaHtml($behaviorQueryPath)</pre>
 	</dd>
 #end
-	<dd>
-	<dd>
+	<dd class="subinfo">
 		<span class="file">$table.getBehaviorQueryPathFileName($behaviorQueryPath)</span>
 #if ($table.hasBehaviorQueryPathCustomizeEntity($behaviorQueryPath))
-        <span class="ctet">(${table.getBehaviorQueryPathCustomizeEntity($behaviorQueryPath)}${table.getBehaviorQueryPathCursorForSchemaHtml($behaviorQueryPath)})</span>
+		<span class="ctet">(${table.getBehaviorQueryPathCustomizeEntity($behaviorQueryPath)}${table.getBehaviorQueryPathCursorForSchemaHtml($behaviorQueryPath)})</span>
 #end
 #if ($table.hasBehaviorQueryPathParameterBean($behaviorQueryPath))
-        <span class="pmb">(${table.getBehaviorQueryPathParameterBean($behaviorQueryPath)})</span>
+		<span class="pmb">(${table.getBehaviorQueryPathParameterBean($behaviorQueryPath)})</span>
+#end
 	</dd>
+#end
+</dl>
+#end
+#end
+#if ($database.isGenerateProcedureParameterBean())
+<h3 id="procedure">Procedure List</h3>
+<dl class="procedurelist">
+#foreach ($procedure in $database.availableProcedureList)
+	<dt>${procedure.procedureDisplayNameForSchemaHtml}</dt>
+#if ($procedure.hasProcedureComment())
+	<dd>
+		<pre>${procedure.procedureCommentForSchemaHtml}</pre>
+	</dd>
+#end
+#if ($procedure.procedureColumnMetaInfoList.isEmpty())
+	<dd class="column">*no arguments</dd>
+#else
+#foreach ($column in $procedure.procedureColumnMetaInfoList)
+	<dd class="column">
+		${column.columnDisplayNameForSchemaHtml}
+#if ($column.hasColumnComment())
+		<pre>${column.columnCommentForSchemaHtml}</pre>
+#end
+	</dd>
+#end
 #end
 #end
 </dl>
 #end
 #end
-#end
 
 #if ($database.hasClassificationDefinitionMap())
-<h2>Classification Definition</h2>
+<h2 id="cdef">Classification Definition</h2>
 <table summary="Classifications in the Schema">
 	<thead>
 	<tr>

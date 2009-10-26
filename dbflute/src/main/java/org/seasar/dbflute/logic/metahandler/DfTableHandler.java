@@ -45,7 +45,8 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
     //                                                                        Meta Getting
     //                                                                        ============
     /**
-     * Get all the table names in the current database that are not system tables.
+     * Get all the table names in the current database that are not system tables. <br />
+     * This does not contain additional schema. only specified schema is considered.
      * @param dbMeta JDBC database meta data. (NotNull)
      * @param schemaName The name of schema. (Nullable)
      * @return The list of all the table meta info in a database.

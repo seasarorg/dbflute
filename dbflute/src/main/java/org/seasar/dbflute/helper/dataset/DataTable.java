@@ -177,7 +177,7 @@ public class DataTable {
     //                                                                       Assist Helper
     //                                                                       =============
     protected Map<String, DfColumnMetaInfo> extractColumnMetaMap(DatabaseMetaData metaData, String schemaName) {
-        final List<DfColumnMetaInfo> metaList = new DfColumnHandler().getColumns(metaData, schemaName, tableName);
+        final List<DfColumnMetaInfo> metaList = new DfColumnHandler().getColumnList(metaData, schemaName, tableName);
         final Map<String, DfColumnMetaInfo> metaMap = new HashMap<String, DfColumnMetaInfo>();
         for (DfColumnMetaInfo metaInfo : metaList) {
             metaMap.put(metaInfo.getColumnName(), metaInfo);

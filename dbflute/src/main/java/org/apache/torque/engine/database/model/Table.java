@@ -402,7 +402,7 @@ public class Table {
 
     public String getCommentForSchemaHtml() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveLineSeparatorForSchemaHtml(getComment());
+        String comment = prop.resolveTextForSchemaHtml(getComment());
         return comment != null ? comment : "";
     }
 
@@ -413,7 +413,7 @@ public class Table {
 
     public String getCommentForJavaDoc() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveLineSeparatorForJavaDoc(getComment(), "");
+        final String comment = prop.resolveTextForJavaDoc(getComment(), "");
         return comment != null ? comment : "";
     }
 
@@ -2685,8 +2685,8 @@ public class Table {
     public String getBehaviorQueryPathTitleForSchemaHtml(String behaviorQueryPath) {
         String title = getBehaviorQueryPathTitle(behaviorQueryPath);
         if (DfStringUtil.isNotNullAndNotTrimmedEmpty(title)) {
-            title = DfStringUtil.replace(title, "<", "&lt;");
-            title = DfStringUtil.replace(title, ">", "&gt;");
+            final DfDocumentProperties prop = getProperties().getDocumentProperties();
+            title = prop.resolveTextForSchemaHtml(title);
             return "(" + title + ")";
         } else {
             return "&nbsp;";
@@ -2706,9 +2706,8 @@ public class Table {
     public String getBehaviorQueryPathDescriptionForSchemaHtml(String behaviorQueryPath) {
         String description = getBehaviorQueryPathDescription(behaviorQueryPath);
         if (DfStringUtil.isNotNullAndNotTrimmedEmpty(description)) {
-            description = DfStringUtil.replace(description, "<", "&lt;");
-            description = DfStringUtil.replace(description, ">", "&gt;");
-            description = DfStringUtil.replace(description, "\r\n", "\n");
+            final DfDocumentProperties prop = getProperties().getDocumentProperties();
+            description = prop.resolvePreTextForSchemaHtml(description);
             return description;
         } else {
             return "&nbsp;";

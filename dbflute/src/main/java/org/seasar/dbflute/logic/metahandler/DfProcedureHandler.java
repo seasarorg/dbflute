@@ -15,12 +15,23 @@
  */
 package org.seasar.dbflute.logic.metahandler;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureColumnMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 
 /**
  * @author jflute
@@ -31,9 +42,65 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                        Meta Getting
     //                                                                        ============
-    public List<DfProcedureMetaInfo> getProcedures(DatabaseMetaData metaData, String schemaName) {
+    /**
+     * Get the list of target procedure meta information that contains additional schema.
+     * @param metaData The meta data of database. (NotNull)
+     * @param schemaName The name of main schema. (Nullable)
+     * @return The list of target procedure meta information.. (NotNull)
+     */
+    public List<DfProcedureMetaInfo> getAvailableProcedureList(DatabaseMetaData metaData, String schemaName)
+            throws SQLException {
+        final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
+        if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
+            return new ArrayList<DfProcedureMetaInfo>();
+        }
+        final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
+        Connection conn = null;
+        try {
+            // main schema
+            final List<DfProcedureMetaInfo> procedures = getPlainProcedureList(metaData, schemaName);
+
+            // additional schema
+            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = databaseProperties.getAdditionalSchemaMap();
+            final Set<String> additionalSchemaSet = additionalSchemaMap.keySet();
+            for (String additionalSchema : additionalSchemaSet) {
+                final List<DfProcedureMetaInfo> additionalProcedureList = getPlainProcedureList(metaData,
+                        additionalSchema);
+                for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
+                    final String procedureSchema = metaInfo.getProcedureSchema();
+                    if (procedureSchema == null || procedureSchema.trim().length() == 0) {
+                        metaInfo.setProcedureSchema(additionalSchema);
+                    }
+                }
+                procedures.addAll(additionalProcedureList);
+            }
+            final List<DfProcedureMetaInfo> resultList = new ArrayList<DfProcedureMetaInfo>();
+            for (DfProcedureMetaInfo metaInfo : procedures) {
+                final String procedureCatalog = metaInfo.getProcedureCatalog();
+                if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
+                    continue;
+                }
+                final String procedureSchema = metaInfo.getProcedureSchema();
+                if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema)) {
+                    continue;
+                }
+                final String procedureName = metaInfo.getProcedureName();
+                if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
+                    continue;
+                }
+                resultList.add(metaInfo);
+            }
+            return procedures;
+        } finally {
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+    public List<DfProcedureMetaInfo> getPlainProcedureList(DatabaseMetaData metaData, String schemaName) {
         schemaName = filterSchemaName(schemaName);
-        
+
         // /- - - - - - - - - - - - - - - - - - - - - -
         // Set up default schema name of PostgreSQL.
         // Because PostgreSQL returns system procedures.
@@ -157,151 +224,5 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             procedureColumnMetaInfo.setColumnComment(columnComment);
             procedureMetaInfo.addProcedureColumnMetaInfo(procedureColumnMetaInfo);
         }
-    }
-
-    // ===================================================================================
-    //                                                                 Procedure Meta Info
-    //                                                                 ===================
-    public static class DfProcedureMetaInfo {
-        protected String procedureCatalog;
-        protected String procedureSchema;
-        protected String procedureName;
-        protected String procedureComment;
-        protected DfProcedureType procedureType;
-        protected List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = new ArrayList<DfProcedureColumnMetaInfo>();
-
-        @Override
-        public String toString() {
-            return "{" + procedureName + ", " + procedureType + ", " + procedureComment + ", "
-                    + procedureColumnMetaInfoList + "}";
-        }
-
-        public String getProcedureCatalog() {
-            return procedureCatalog;
-        }
-
-        public void setProcedureCatalog(String procedureCatalog) {
-            this.procedureCatalog = procedureCatalog;
-        }
-        
-        public String getProcedureSchema() {
-            return procedureSchema;
-        }
-
-        public void setProcedureSchema(String procedureSchema) {
-            this.procedureSchema = procedureSchema;
-        }
-        public String getProcedureName() {
-            return procedureName;
-        }
-
-        public void setProcedureName(String procedureName) {
-            this.procedureName = procedureName;
-        }
-
-        public DfProcedureType getProcedureType() {
-            return procedureType;
-        }
-
-        public void setProcedureType(DfProcedureType procedureType) {
-            this.procedureType = procedureType;
-        }
-
-        public String getProcedureComment() {
-            return procedureComment;
-        }
-
-        public void setProcedureComment(String procedureComment) {
-            this.procedureComment = procedureComment;
-        }
-
-        public List<DfProcedureColumnMetaInfo> getProcedureColumnMetaInfoList() {
-            return procedureColumnMetaInfoList;
-        }
-
-        public void addProcedureColumnMetaInfo(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
-            procedureColumnMetaInfoList.add(procedureColumnMetaInfo);
-        }
-
-    }
-
-    public static class DfProcedureColumnMetaInfo {
-        protected String columnName;
-        protected int jdbcType;
-        protected String dbTypeName;
-        protected Integer columnSize;
-        protected Integer decimalDigits;
-        protected String columnComment;
-        protected DfProcedureColumnType procedureColumnType;
-
-        public String getColumnName() {
-            return columnName;
-        }
-
-        public void setColumnName(String columnName) {
-            this.columnName = columnName;
-        }
-
-        public DfProcedureColumnType getProcedureColumnType() {
-            return procedureColumnType;
-        }
-
-        public void setProcedureColumnType(DfProcedureColumnType procedureColumnType) {
-            this.procedureColumnType = procedureColumnType;
-        }
-
-        public int getJdbcType() {
-            return jdbcType;
-        }
-
-        public void setJdbcType(int jdbcType) {
-            this.jdbcType = jdbcType;
-        }
-
-        public String getDbTypeName() {
-            return dbTypeName;
-        }
-
-        public void setDbTypeName(String dbTypeName) {
-            this.dbTypeName = dbTypeName;
-        }
-
-        public Integer getColumnSize() {
-            return columnSize;
-        }
-
-        public void setColumnSize(Integer columnSize) {
-            this.columnSize = columnSize;
-        }
-
-        public Integer getDecimalDigits() {
-            return decimalDigits;
-        }
-
-        public void setDecimalDigits(Integer decimalDigits) {
-            this.decimalDigits = decimalDigits;
-        }
-
-        public String getColumnComment() {
-            return columnComment;
-        }
-
-        public void setColumnComment(String columnComment) {
-            this.columnComment = columnComment;
-        }
-
-        @Override
-        public String toString() {
-            return "{" + columnName + ", " + procedureColumnType + ", " + jdbcType + ", " + dbTypeName + "("
-                    + columnSize + ", " + decimalDigits + ")" + columnComment + "}";
-        }
-    }
-
-    public enum DfProcedureType {
-        procedureResultUnknown, procedureNoResult, procedureReturnsResult
-    }
-
-    public enum DfProcedureColumnType {
-        procedureColumnUnknown, procedureColumnIn, procedureColumnInOut, procedureColumnOut, procedureColumnReturn, procedureColumnResult
     }
 }

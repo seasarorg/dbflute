@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.torque.engine.database.model.Table;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -96,37 +97,51 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return value != null && value.trim().equalsIgnoreCase("true");
     }
 
-    public String resolveLineSeparatorForSchemaHtml(String comment) {
-        if (comment == null || comment.trim().length() == 0) {
+    public String resolveTextForSchemaHtml(String text) {
+        if (text == null || text.trim().length() == 0) {
             return null;
         }
-        comment = removeCR(comment);
+        text = removeCR(text);
         final String htmlLineSeparator = "<br />";
-        if (comment.contains(NORMAL_LINE_SEPARATOR)) {
-            comment = comment.replaceAll(NORMAL_LINE_SEPARATOR, htmlLineSeparator);
+        if (text.contains(NORMAL_LINE_SEPARATOR)) {
+            text = text.replaceAll(NORMAL_LINE_SEPARATOR, htmlLineSeparator);
         }
-        if (comment.contains(SPECIAL_LINE_SEPARATOR)) {
-            comment = comment.replaceAll(SPECIAL_LINE_SEPARATOR, htmlLineSeparator);
+        if (text.contains(SPECIAL_LINE_SEPARATOR)) {
+            text = text.replaceAll(SPECIAL_LINE_SEPARATOR, htmlLineSeparator);
         }
-        return comment;
+        text = DfStringUtil.replace(text, "<", "&lt;");
+        text = DfStringUtil.replace(text, ">", "&gt;");
+        return text;
     }
 
-    public String resolveLineSeparatorForJavaDoc(String comment, String indent) {
-        if (getBasicProperties().isTargetLanguageCSharp()) {
-            return resolveLineSeparatorForCSharpDoc(comment, "    " + indent);
-        }
-        if (comment == null || comment.trim().length() == 0) {
+    public String resolvePreTextForSchemaHtml(String text) {
+        if (text == null || text.trim().length() == 0) {
             return null;
         }
-        comment = removeCR(comment);
+        text = removeCR(text);
+        text = DfStringUtil.replace(text, "<", "&lt;");
+        text = DfStringUtil.replace(text, ">", "&gt;");
+        return text;
+    }
+
+    public String resolveTextForJavaDoc(String Text, String indent) {
+        if (getBasicProperties().isTargetLanguageCSharp()) {
+            return resolveLineSeparatorForCSharpDoc(Text, "    " + indent);
+        }
+        if (Text == null || Text.trim().length() == 0) {
+            return null;
+        }
+        Text = removeCR(Text);
         final String javaDocLineSeparator = "<br />" + NORMAL_LINE_SEPARATOR + indent + " * ";
-        if (comment.contains(NORMAL_LINE_SEPARATOR)) {
-            comment = comment.replaceAll(NORMAL_LINE_SEPARATOR, javaDocLineSeparator);
+        if (Text.contains(NORMAL_LINE_SEPARATOR)) {
+            Text = Text.replaceAll(NORMAL_LINE_SEPARATOR, javaDocLineSeparator);
         }
-        if (comment.contains(SPECIAL_LINE_SEPARATOR)) {
-            comment = comment.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
+        if (Text.contains(SPECIAL_LINE_SEPARATOR)) {
+            Text = Text.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
         }
-        return comment;
+        Text = DfStringUtil.replace(Text, "<", "&lt;");
+        Text = DfStringUtil.replace(Text, ">", "&gt;");
+        return Text;
     }
 
     protected String resolveLineSeparatorForCSharpDoc(String comment, String indent) {

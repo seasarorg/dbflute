@@ -222,7 +222,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                         Data Source
     //                                                                         ===========
     protected boolean isUseDataSource() {
-        return isDataXlsTemplateRecordLimitValid();
+        return isDataXlsTemplateRecordLimitValid() || isGenerateProcedureParameterBean();
     }
 
     // ===================================================================================
@@ -261,6 +261,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
             flexibleMap.put(key, "dummy");
         }
         return flexibleMap;
+    }
+
+    public boolean isGenerateProcedureParameterBean() {
+        return getProperties().getOutsideSqlProperties().isGenerateProcedureParameterBean();
     }
 
     // ===================================================================================

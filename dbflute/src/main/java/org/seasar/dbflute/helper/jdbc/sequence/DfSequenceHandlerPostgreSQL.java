@@ -100,7 +100,7 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
             if (!autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyName)) {
                 continue;
             }
-            final Map<String, DfColumnMetaInfo> columnMetaMap = columnHandler.getColumnMetaMap(metaData, _schema,
+            final Map<String, DfColumnMetaInfo> columnMetaMap = columnHandler.getColumnMetaInfo(metaData, _schema,
                     tableName);
             final DfColumnMetaInfo columnMetaInfo = columnMetaMap.get(primaryKeyName);
             final String defaultValue = columnMetaInfo.getDefaultValue();

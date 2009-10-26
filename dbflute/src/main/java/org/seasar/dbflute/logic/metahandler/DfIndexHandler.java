@@ -37,31 +37,8 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
     private static final Log _log = LogFactory.getLog(DfIndexHandler.class);
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
-    // {WEBから抜粋}
-    // 
-    //テーブルのインデックスと統計情報の記述を取得します。 NON_UNIQUE、TYPE、INDEX_NAME、ORDINAL_POSITION の順に並べます。
-    //インデックス列の記述には以下のカラムがあります。
-    //
-    //   1. TABLE_CAT String => テーブル カタログ (null の場合もあります)。
-    //   2. TABLE_SCHEM String => テーブル スキーマ (null の場合もあります)。
-    //   3. TABLE_NAME String => テーブル名。
-    //   4. NON_UNIQUE boolean => 一意でないインデックスを許可するかどうか。TYPE が tableIndexStatistic の場合は false。
-    //   5. INDEX_QUALIFIER String => インデックス カタログ (null の場合もあります)。TYPE が tableIndexStatistic の場合は null。
-    //   6. INDEX_NAME String => インデックス名。TYPE が tableIndexStatistic の場合は null。
-    //   7. TYPE short => インデックス タイプ。
-    //          * tableIndexStatistic - テーブルのインデックス記述と共に返されるテーブルの統計情報を識別。
-    //          * tableIndexClustered - クラスタ化されたインデックス。
-    //          * tableIndexHashed - ハッシュ化されたインデックス。
-    //          * tableIndexOther - ほかの形式のインデックス。 
-    //   8. ORDINAL_POSITION short => インデックス内の列の連番。TYPE が tableIndexStatistic の場合は 0。
-    //   9. COLUMN_NAME String => 列名。TYPE が tableIndexStatistic の場合は null。
-    //  10. ASC_OR_DESC String => 列のソート順。"A" => 昇順。"D" => 降順。ソート順をサポートしていない場合は null。TYPE が tableIndexStatistic の場合は null。
-    //  11. CARDINALITY int => TYPE が tableIndexStatistic の場合は、テーブル内の行数。そのほかの場合は、インデックス内の一意の値の数。
-    //  12. PAGES int => TYPE が tableIndexStatistic の場合は、テーブルのページ数。そのほかの場合は、現在のインデックスのページ数。
-    //  13. FILTER_CONDITION String => フィルタがある場合は、そのフィルタの状態 (null の場合もあります)。 
-    //
+    //                                                                        Meta Getting
+    //                                                                        ============
     public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String schemaName,
             DfTableMetaInfo tableMetaInfo, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
         schemaName = filterSchemaName(schemaName);

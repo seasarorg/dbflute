@@ -55,6 +55,9 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -66,6 +69,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -79,11 +84,14 @@ import org.seasar.dbflute.friends.torque.DfAdditionalPrimaryKeyInitializer;
 import org.seasar.dbflute.friends.torque.DfAdditionalUniqueKeyInitializer;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.deletefile.DfOldClassHandler;
 import org.seasar.dbflute.logic.initializer.IncludeQueryInitializer;
-import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnType;
+import org.seasar.dbflute.logic.metahandler.DfProcedureHandler;
 import org.seasar.dbflute.logic.outsidesql.DfSqlFileCollector;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
@@ -1422,6 +1430,10 @@ public class Database {
     // ===================================================================================
     //                                                               OutsideSql Properties
     //                                                               =====================
+    public boolean isGenerateProcedureParameterBean() {
+        return getProperties().getOutsideSqlProperties().isGenerateProcedureParameterBean();
+    }
+
     public boolean hasSqlFileEncoding() {
         return getProperties().getOutsideSqlProperties().hasSqlFileEncoding();
     }
@@ -1865,6 +1877,31 @@ public class Database {
         final DfSqlFileCollector sqlFileCollector = new DfSqlFileCollector(sqlDirectory, getBasicProperties());
         sqlFileCollector.suppressDirectoryCheck();
         return sqlFileCollector.collectSqlFileList();
+    }
+
+    // ===================================================================================
+    //                                                                  Procedure Document
+    //                                                                  ==================
+    public List<DfProcedureMetaInfo> getAvailableProcedureList() {
+        final DfProcedureHandler handler = new DfProcedureHandler();
+        final String schemaName = getDatabaseSchema();
+        final DataSource dataSource = getDataSource();
+        try {
+            final Connection conn = dataSource.getConnection();
+            final DatabaseMetaData metaData = conn.getMetaData();
+            return handler.getAvailableProcedureList(metaData, getDatabaseSchema());
+        } catch (SQLException e) {
+            String msg = "Failed to get the list of available procedure:";
+            msg = msg + " schemaName=" + schemaName;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                          DataSource
+    //                                                                          ==========
+    protected DataSource getDataSource() {
+        return DfDataSourceContext.getDataSource();
     }
 
     // ===================================================================================

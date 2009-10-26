@@ -50,6 +50,9 @@ import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureColumnMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureMetaInfo;
+import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSQLExecutionFailureException;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
@@ -60,9 +63,6 @@ import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.metahandler.DfColumnHandler;
 import org.seasar.dbflute.logic.metahandler.DfProcedureHandler;
-import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnMetaInfo;
-import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureColumnType;
-import org.seasar.dbflute.logic.metahandler.DfProcedureHandler.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
@@ -71,7 +71,6 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -690,23 +689,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
             return;
         }
-        final List<DfProcedureMetaInfo> procedures = getProcedures();
+        final List<DfProcedureMetaInfo> procedures = getAvailableProcedures();
         _log.info(" ");
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         for (DfProcedureMetaInfo metaInfo : procedures) {
-            final String procedureCatalog = metaInfo.getProcedureCatalog();
-            if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
-                continue;
-            }
-            final String procedureSchema = metaInfo.getProcedureSchema();
-            if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema)) {
-                continue;
-            }
             final String procedureName = metaInfo.getProcedureName();
-            if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
-                continue;
-            }
-
             _procedureMap.put(procedureName, metaInfo);
 
             final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
@@ -762,27 +749,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         _log.info(" ");
     }
 
-    protected List<DfProcedureMetaInfo> getProcedures() throws SQLException {
+    protected List<DfProcedureMetaInfo> getAvailableProcedures() throws SQLException {
         Connection conn = null;
         try {
             conn = getDataSource().getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
             final DfProcedureHandler handler = new DfProcedureHandler();
-            final List<DfProcedureMetaInfo> procedures = handler.getProcedures(metaData, _schema);
-            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getDatabaseInfoProperties()
-                    .getAdditionalSchemaMap();
-            final Set<String> additionalSchemaSet = additionalSchemaMap.keySet();
-            for (String additionalSchema : additionalSchemaSet) {
-                final List<DfProcedureMetaInfo> additionalProcedureList = handler.getProcedures(metaData,
-                        additionalSchema);
-                for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
-                    final String procedureSchema = metaInfo.getProcedureSchema();
-                    if (procedureSchema == null || procedureSchema.trim().length() == 0) {
-                        metaInfo.setProcedureSchema(additionalSchema);
-                    }
-                }
-                procedures.addAll(additionalProcedureList);
-            }
+            final List<DfProcedureMetaInfo> procedures = handler.getAvailableProcedureList(metaData, _schema);
             return procedures;
         } finally {
             if (conn != null) {

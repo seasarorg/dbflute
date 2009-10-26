@@ -57,8 +57,9 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
      * @param tableName The name of table. (NotNull, CaseInsensitive)
      * @return The map of column meta information. The key is column name. (NotNull)
      */
-    public Map<String, DfColumnMetaInfo> getColumnMetaMap(DatabaseMetaData metaData, String schemaName, String tableName) {
-        final List<DfColumnMetaInfo> columns = getColumns(metaData, schemaName, tableName);
+    public Map<String, DfColumnMetaInfo> getColumnMetaInfo(DatabaseMetaData metaData, String schemaName,
+            String tableName) {
+        final List<DfColumnMetaInfo> columns = getColumnList(metaData, schemaName, tableName);
         final Map<String, DfColumnMetaInfo> map = new LinkedHashMap<String, DfColumnMetaInfo>();
         for (DfColumnMetaInfo metaInfo : columns) {
             map.put(metaInfo.getColumnName(), metaInfo);
@@ -73,11 +74,12 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
      * @param tableMetaInfo The meta information of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData metaData, String schemaName, DfTableMetaInfo tableMetaInfo) {
+    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String schemaName,
+            DfTableMetaInfo tableMetaInfo) {
         schemaName = filterSchemaName(schemaName);
         schemaName = tableMetaInfo.selectMetaExtractingSchemaName(schemaName);
         final String tableName = tableMetaInfo.getTableName();
-        return getColumns(metaData, schemaName, tableName);
+        return getColumnList(metaData, schemaName, tableName);
     }
 
     /**
@@ -87,7 +89,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
      * @param tableName The name of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMetaInfo> getColumns(DatabaseMetaData metaData, String schemaName, String tableName) {
+    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String schemaName, String tableName) {
         schemaName = filterSchemaName(schemaName);
         final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;

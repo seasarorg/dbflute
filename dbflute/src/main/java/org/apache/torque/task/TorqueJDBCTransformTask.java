@@ -605,7 +605,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, DfTableMetaInfo table) throws SQLException {
         final String schema = getHandlerUseSchema(table);
-        List<DfColumnMetaInfo> columnList = _columnHandler.getColumns(dbMeta, schema, table);
+        List<DfColumnMetaInfo> columnList = _columnHandler.getColumnList(dbMeta, schema, table);
         if (canHandleSynonym(table) && columnList.isEmpty()) {
             DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
             if (synonym != null && synonym.isDBLink()) {

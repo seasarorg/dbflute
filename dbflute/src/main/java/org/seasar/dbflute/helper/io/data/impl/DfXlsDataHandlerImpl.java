@@ -322,7 +322,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleMap<String, DfColumnMetaInfo>();
         try {
             final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-            final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumns(metaData, _schemaName,
+            final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumnList(metaData, _schemaName,
                     tableName);
             for (DfColumnMetaInfo columnMetaInfo : columnMetaDataList) {
                 columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);

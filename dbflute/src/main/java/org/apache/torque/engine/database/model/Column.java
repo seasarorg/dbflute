@@ -785,7 +785,7 @@ public class Column {
 
     public String getCommentForSchemaHtml() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveLineSeparatorForSchemaHtml(getComment());
+        final String comment = prop.resolveTextForSchemaHtml(getComment());
         return comment != null ? comment : "";
     }
 
@@ -796,7 +796,7 @@ public class Column {
 
     public String getCommentForJavaDoc() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.resolveLineSeparatorForJavaDoc(getComment(), "    ");
+        final String comment = prop.resolveTextForJavaDoc(getComment(), "    ");
         return comment != null ? comment : "";
     }
 
