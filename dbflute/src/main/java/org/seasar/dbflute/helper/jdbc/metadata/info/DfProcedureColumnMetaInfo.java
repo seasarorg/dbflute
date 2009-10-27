@@ -25,7 +25,7 @@ public class DfProcedureColumnMetaInfo {
                 sb.append("(arg)");
             }
         }
-        sb.append(" ").append(dbTypeName);
+        sb.append(" - ").append(dbTypeName);
         if (columnSize != null) {
             sb.append("(").append(columnSize);
             if (decimalDigits != null) {
