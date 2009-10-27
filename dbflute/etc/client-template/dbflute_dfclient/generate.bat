@@ -15,6 +15,7 @@ rem Execute {Generate}.
 rem nnnnnnnnnn/
 call %DBFLUTE_HOME%\etc\cmd\_df-generate.cmd %MY_PROPERTIES_PATH%
 
-pause
-
+if "%finally_pause%"=="y" (
+  pause
+)
 
