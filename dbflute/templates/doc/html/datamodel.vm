@@ -10,7 +10,7 @@
 		padding: 0;
 	}
 	body {
-		font-family: Verdana, Arial, sans-serif;
+		font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
 		font-size: 90%;
 		margin: 10px 5px 5px 15px;
 		background-color: #ffffe0;
