@@ -15,7 +15,7 @@ rem Execute {Sql2Entity}.
 rem nnnnnnnnnn/
 call %DBFLUTE_HOME%\etc\cmd\_df-sql2entity.cmd %MY_PROPERTIES_PATH% %1
 
-if "%finally_pause%"=="y" (
+if "%pause_at_end%"=="y" (
   pause
 )
 

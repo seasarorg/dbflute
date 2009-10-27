@@ -15,7 +15,7 @@ rem Execute {Outsite-Sql-Test}.
 rem nnnnnnnnnn/
 call %DBFLUTE_HOME%\etc\cmd\_df-outside-sql-test.cmd %MY_PROPERTIES_PATH% %1
 
-if "%finally_pause%"=="y" (
+if "%pause_at_end%"=="y" (
   pause
 )
 
