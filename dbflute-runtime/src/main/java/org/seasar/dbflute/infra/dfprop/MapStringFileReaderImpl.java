@@ -13,22 +13,24 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.mapstring.impl;
+package org.seasar.dbflute.infra.dfprop;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
-import org.seasar.dbflute.helper.mapstring.MapStringFileReader;
+import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 
 /**
  * @author jflute
  * @since 0.9.6 (2009/10/28 Wednesday)
  */
-public class MapStringFileReaderImpl implements MapStringFileReader {
+public class MapStringFileReaderImpl {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -105,32 +107,34 @@ public class MapStringFileReaderImpl implements MapStringFileReader {
     public Map<String, String> readMapAsStringValue(String path, String encoding) {
         final Map<String, String> resultMap = new LinkedHashMap<String, String>();
         final Map<String, Object> map = readMap(path, encoding);
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            resultMap.put(key, (String) map.get(key));
+
+        final Set<Entry<String, Object>> entrySet = map.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            resultMap.put(entry.getKey(), (String) entry.getValue());
         }
         return resultMap;
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, java.util.List<String>> readMapAsListStringValue(String path, String encoding) {
-        final Map<String, java.util.List<String>> resultMap = newLinkedHashMap();
+    public Map<String, List<String>> readMapAsListStringValue(String path, String encoding) {
+        final Map<String, List<String>> resultMap = newLinkedHashMap();
         final Map<String, Object> map = readMap(path, encoding);
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            resultMap.put(key, (java.util.List<String>) map.get(key));
+        final Set<Entry<String, Object>> entrySet = map.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            resultMap.put(entry.getKey(), (List<String>) entry.getValue());
         }
         return resultMap;
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, java.util.Map<String, String>> readMapAsMapStringValue(String path, String encoding) {
-        final Map<String, java.util.Map<String, String>> resultMap = newLinkedHashMap();
+    public Map<String, Map<String, String>> readMapAsMapStringValue(String path, String encoding) {
+        final Map<String, Map<String, String>> resultMap = newLinkedHashMap();
         final Map<String, Object> map = readMap(path, encoding);
-        final Set<String> keySet = map.keySet();
-        for (String key : keySet) {
-            resultMap.put(key, (java.util.Map<String, String>) map.get(key));
+        final Set<Entry<String, Object>> entrySet = map.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            resultMap.put(entry.getKey(), (Map<String, String>) entry.getValue());
         }
+
         return resultMap;
     }
 
