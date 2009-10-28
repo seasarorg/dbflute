@@ -31,12 +31,7 @@ import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
  * @author jflute
  * @since 0.9.6 (2009/10/28 Wednesday)
  */
-public class MapStringFileReader {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    protected static final String LINE_COMMENT_MARK = "#";
+public class MapDfpropFileReader implements DfPropFileReader {
 
     // ===================================================================================
     //                                                                                Read
@@ -55,10 +50,10 @@ public class MapStringFileReader {
      * }
      * </pre>
      * @param path The file path. (NotNull)
-     * @param encoding The file encoding. (NotNull)
      * @return The read map. (NotNull)
      */
-    public Map<String, Object> readMap(String path, String encoding) {
+    public Map<String, Object> readMap(String path) {
+        final String encoding = getFileEncoding();
         final String lineCommentMark = getLineCommentMark();
         final File file = new File(path);
         final StringBuilder sb = new StringBuilder();
@@ -112,7 +107,7 @@ public class MapStringFileReader {
     }
 
     protected String removeInitialUnicodeBomIfNeeds(String encoding, String value) {
-        if ("UTF-8".equalsIgnoreCase(encoding) && value.length() > 0 && value.charAt(0) == '\uFEFF') {
+        if (UTF8_ENCODING.equalsIgnoreCase(encoding) && value.length() > 0 && value.charAt(0) == '\uFEFF') {
             value = value.substring(1);
         }
         return value;
@@ -131,13 +126,11 @@ public class MapStringFileReader {
      * }
      * </pre>
      * @param path The file path. (NotNull)
-     * @param encoding The file encoding. (NotNull)
      * @return The read map. (NotNull)
      */
-    public Map<String, String> readMapAsStringValue(String path, String encoding) {
+    public Map<String, String> readMapAsStringValue(String path) {
         final Map<String, String> resultMap = new LinkedHashMap<String, String>();
-        final Map<String, Object> map = readMap(path, encoding);
-
+        final Map<String, Object> map = readMap(path);
         final Set<Entry<String, Object>> entrySet = map.entrySet();
         for (Entry<String, Object> entry : entrySet) {
             resultMap.put(entry.getKey(), (String) entry.getValue());
@@ -158,13 +151,12 @@ public class MapStringFileReader {
      * }
      * </pre>
      * @param path The file path. (NotNull)
-     * @param encoding The file encoding. (NotNull)
      * @return The read map. (NotNull)
      */
     @SuppressWarnings("unchecked")
-    public Map<String, List<String>> readMapAsListStringValue(String path, String encoding) {
+    public Map<String, List<String>> readMapAsListStringValue(String path) {
         final Map<String, List<String>> resultMap = newLinkedHashMap();
-        final Map<String, Object> map = readMap(path, encoding);
+        final Map<String, Object> map = readMap(path);
         final Set<Entry<String, Object>> entrySet = map.entrySet();
         for (Entry<String, Object> entry : entrySet) {
             resultMap.put(entry.getKey(), (List<String>) entry.getValue());
@@ -185,24 +177,26 @@ public class MapStringFileReader {
      * }
      * </pre>
      * @param path The file path. (NotNull)
-     * @param encoding The file encoding. (NotNull)
      * @return The read map. (NotNull)
      */
     @SuppressWarnings("unchecked")
-    public Map<String, Map<String, String>> readMapAsMapStringValue(String path, String encoding) {
+    public Map<String, Map<String, String>> readMapAsMapStringValue(String path) {
         final Map<String, Map<String, String>> resultMap = newLinkedHashMap();
-        final Map<String, Object> map = readMap(path, encoding);
+        final Map<String, Object> map = readMap(path);
         final Set<Entry<String, Object>> entrySet = map.entrySet();
         for (Entry<String, Object> entry : entrySet) {
             resultMap.put(entry.getKey(), (Map<String, String>) entry.getValue());
         }
-
         return resultMap;
     }
 
     // ===================================================================================
     //                                                                     Extension Point
     //                                                                     ===============
+    protected String getFileEncoding() {
+        return FILE_ENCODING;
+    }
+
     protected String getLineCommentMark() {
         return LINE_COMMENT_MARK;
     }
