@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import org.seasar.dbflute.jdbc.ValueType;
@@ -31,6 +32,9 @@ public class DisplaySqlBuilder {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
+    public static final String DEFAULT_TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String NULL = "null";
 
     // ===================================================================================
@@ -141,19 +145,12 @@ public class DisplaySqlBuilder {
             return quote(bindVariable.toString());
         } else if (bindVariable instanceof Number) {
             return bindVariable.toString();
-        } else if (bindVariable instanceof Time) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            return quote(sdf.format((java.util.Date) bindVariable));
         } else if (bindVariable instanceof Timestamp) {
-            final String format = logTimestampFormat != null ? logTimestampFormat : "yyyy-MM-dd HH:mm:ss";
-            final DateFormatResource resource = analyzeDateFormat(format);
-            final SimpleDateFormat sdf = new SimpleDateFormat(resource.getFormat());
-            return quote(sdf.format((java.util.Date) bindVariable), resource);
+            return buildTimestampText(bindVariable, logTimestampFormat);
+        } else if (bindVariable instanceof Time) {
+            return buildTimeText(bindVariable);
         } else if (bindVariable instanceof java.util.Date) {
-            final String format = logDateFormat != null ? logDateFormat : "yyyy-MM-dd";
-            final DateFormatResource resource = analyzeDateFormat(format);
-            final SimpleDateFormat sdf = new SimpleDateFormat(resource.getFormat());
-            return quote(sdf.format((java.util.Date) bindVariable), resource);
+            return buildDateText(bindVariable, logDateFormat);
         } else if (bindVariable instanceof Boolean) {
             return bindVariable.toString();
         } else if (bindVariable == null) {
@@ -161,6 +158,34 @@ public class DisplaySqlBuilder {
         } else {
             return quote(bindVariable.toString());
         }
+    }
+
+    protected static String buildTimestampText(Object bindVariable, String logTimestampFormat) {
+        final String format = logTimestampFormat != null ? logTimestampFormat : DEFAULT_TIMESTAMP_FORMAT;
+        final DateFormatResource resource = analyzeDateFormat(format);
+        final DateFormat sdf = createDateFormat(resource);
+        return quote(sdf.format((java.util.Date) bindVariable), resource);
+    }
+
+    protected static String buildTimeText(Object bindVariable) {
+        final String defaultFormat = DEFAULT_TIME_FORMAT;
+        final DateFormat sdf = createDateFormat(defaultFormat);
+        return quote(sdf.format((java.util.Date) bindVariable));
+    }
+
+    protected static String buildDateText(Object bindVariable, String logDateFormat) {
+        final String format = logDateFormat != null ? logDateFormat : DEFAULT_DATE_FORMAT;
+        final DateFormatResource resource = analyzeDateFormat(format);
+        final DateFormat sdf = createDateFormat(resource);
+        return quote(sdf.format((java.util.Date) bindVariable), resource);
+    }
+
+    protected static DateFormat createDateFormat(String format) {
+        return new SimpleDateFormat(format);
+    }
+
+    protected static DateFormat createDateFormat(DateFormatResource resource) {
+        return new SimpleDateFormat(resource.getFormat());
     }
 
     /**
