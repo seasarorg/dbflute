@@ -15,6 +15,12 @@
  */
 package org.seasar.dbflute.properties.filereader;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.infra.dfprop.DfPropFileReader;
@@ -28,18 +34,74 @@ public class DfMapStringFileReader {
     //                                                                                Read
     //                                                                                ====
     public Map<String, Object> readMap(String path) {
-        return new DfPropFileReader().readMap(path);
+        FileInputStream ins = null;
+        try {
+            ins = new FileInputStream(new File(path));
+            return new DfPropFileReader().readMap(ins);
+        } catch (FileNotFoundException e) {
+            return newLinkedHashMap();
+        } finally {
+            if (ins != null) {
+                try {
+                    ins.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
 
     public Map<String, String> readMapAsStringValue(String path) {
-        return new DfPropFileReader().readMapAsStringValue(path);
+        FileInputStream ins = null;
+        try {
+            ins = new FileInputStream(new File(path));
+            return new DfPropFileReader().readMapAsStringValue(ins);
+        } catch (FileNotFoundException e) {
+            return newLinkedHashMap();
+        } finally {
+            if (ins != null) {
+                try {
+                    ins.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
 
-    public Map<String, java.util.List<String>> readMapAsListStringValue(String path) {
-        return new DfPropFileReader().readMapAsListStringValue(path);
+    public Map<String, List<String>> readMapAsStringListValue(String path) {
+        FileInputStream ins = null;
+        try {
+            ins = new FileInputStream(new File(path));
+            return new DfPropFileReader().readMapAsStringListValue(ins);
+        } catch (FileNotFoundException e) {
+            return newLinkedHashMap();
+        } finally {
+            if (ins != null) {
+                try {
+                    ins.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
 
-    public Map<String, java.util.Map<String, String>> readMapAsMapValue(String path) {
-        return new DfPropFileReader().readMapAsMapStringValue(path);
+    public Map<String, Map<String, String>> readMapAsStringMapValue(String path) {
+        FileInputStream ins = null;
+        try {
+            ins = new FileInputStream(new File(path));
+            return new DfPropFileReader().readMapAsStringMapValue(ins);
+        } catch (FileNotFoundException e) {
+            return newLinkedHashMap();
+        } finally {
+            if (ins != null) {
+                try {
+                    ins.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+    }
+
+    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
+        return new LinkedHashMap<KEY, VALUE>();
     }
 }

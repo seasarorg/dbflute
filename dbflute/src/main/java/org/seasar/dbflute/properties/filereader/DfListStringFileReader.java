@@ -15,6 +15,11 @@
  */
 package org.seasar.dbflute.properties.filereader;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.infra.dfprop.DfPropFileReader;
@@ -29,6 +34,19 @@ public class DfListStringFileReader {
     //                                                                                Read
     //                                                                                ====
     public List<Object> readList(String path) {
-        return new DfPropFileReader().readList(path);
+        FileInputStream ins = null;
+        try {
+            ins = new FileInputStream(new File(path));
+            return new DfPropFileReader().readList(ins);
+        } catch (FileNotFoundException e) {
+            return new ArrayList<Object>();
+        } finally {
+            if (ins != null) {
+                try {
+                    ins.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
 }

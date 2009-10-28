@@ -454,24 +454,24 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     private DfFlexibleMap<String, List<String>> getNotTrimTableColumnMap(String dataDirectoryName) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = dataDirectoryName + "/notTrimColumnMap.dataprop";
-        Map<String, List<String>> resultMap = reader.readMapAsListStringValue(path);
+        Map<String, List<String>> resultMap = reader.readMapAsStringListValue(path);
         if (resultMap != null && !resultMap.isEmpty()) {
             return new DfFlexibleMap<String, List<String>>(resultMap);
         }
         path = dataDirectoryName + "/not-trim-column.txt";
-        resultMap = reader.readMapAsListStringValue(path);
+        resultMap = reader.readMapAsStringListValue(path);
         return new DfFlexibleMap<String, List<String>>(resultMap);
     }
 
     private DfFlexibleMap<String, List<String>> getEmptyStringTableColumnMap(String dataDirectoryName) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = dataDirectoryName + "/emptyStringColumnMap.dataprop";
-        Map<String, List<String>> resultMap = reader.readMapAsListStringValue(path);
+        Map<String, List<String>> resultMap = reader.readMapAsStringListValue(path);
         if (resultMap != null && !resultMap.isEmpty()) {
             return new DfFlexibleMap<String, List<String>>(resultMap);
         }
         path = dataDirectoryName + "/empty-string-column.txt";
-        resultMap = reader.readMapAsListStringValue(path);
+        resultMap = reader.readMapAsStringListValue(path);
         return new DfFlexibleMap<String, List<String>>(resultMap);
     }
 
