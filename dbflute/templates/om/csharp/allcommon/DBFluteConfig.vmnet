@@ -336,17 +336,6 @@ public class ${myClassName} {
 		String msg = "The config of dbflute is locked! Don't access at this timing!";
 		throw new SystemException(msg);
 	}
-	
-    // ===================================================================================
-    //                                                                        Config Clear
-    //                                                                        ============
-	public void Clear() { // the only properties that update OK while executing
-	    _defaultStatementConfig = null;
-	    _queryLogLevelInfo = false;
-	    _executeStatusLogLevelInfo = false;
-	    _useSqlLogRegistry = false;
-		_internalDebug = false;
-	}
 }
 
 }
