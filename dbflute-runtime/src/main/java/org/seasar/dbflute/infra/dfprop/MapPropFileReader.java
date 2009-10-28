@@ -18,6 +18,7 @@ package org.seasar.dbflute.infra.dfprop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +32,18 @@ import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
  * @author jflute
  * @since 0.9.6 (2009/10/28 Wednesday)
  */
-public class MapPropFileReader implements DfPropFileReader {
+public class MapPropFileReader {
 
     // ===================================================================================
-    //                                                                                Read
-    //                                                                                ====
+    //                                                                          Definition
+    //                                                                          ==========
+    public static final String UTF8_ENCODING = "UTF-8";
+    public static final String FILE_ENCODING = UTF8_ENCODING;
+    public static final String LINE_COMMENT_MARK = "#";
+
+    // ===================================================================================
+    //                                                                            Read Map
+    //                                                                            ========
     /**
      * Read the map string file. <br />
      * If the type of values is various type, this method is available. <br />
@@ -188,6 +196,110 @@ public class MapPropFileReader implements DfPropFileReader {
             resultMap.put(entry.getKey(), (Map<String, String>) entry.getValue());
         }
         return resultMap;
+    }
+
+    // ===================================================================================
+    //                                                                           Read List
+    //                                                                           =========
+    public List<Object> readList(String path) {
+        final String encoding = getFileEncoding();
+        final String lineCommentMark = getLineCommentMark();
+        final File file = new File(path);
+        final StringBuilder sb = new StringBuilder();
+        if (file.exists()) {
+            java.io.FileInputStream fis = null;
+            java.io.InputStreamReader ir = null;
+            java.io.BufferedReader br = null;
+            try {
+                fis = new java.io.FileInputStream(file);
+                ir = new java.io.InputStreamReader(fis, encoding);
+                br = new java.io.BufferedReader(ir);
+
+                int count = -1;
+                while (true) {
+                    ++count;
+
+                    String lineString = br.readLine();
+                    if (lineString == null) {
+                        break;
+                    }
+                    if (count == 0) {
+                        lineString = removeInitialUnicodeBomIfNeeds(encoding, lineString);
+                    }
+                    if (lineString.trim().length() == 0) {
+                        continue;
+                    }
+                    // If the line is comment...
+                    if (lineCommentMark != null && lineString.trim().startsWith(lineCommentMark)) {
+                        continue;
+                    }
+                    sb.append(lineString);
+                }
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
+        }
+        if (sb.toString().trim().length() == 0) {
+            return new ArrayList<Object>();
+        }
+        final MapListStringImpl mapListString = new MapListStringImpl();
+        return mapListString.generateList(sb.toString());
+    }
+
+    // ===================================================================================
+    //                                                                         Read String
+    //                                                                         ===========
+    public String readString(String path) {
+        final String encoding = getFileEncoding();
+        final String lineCommentMark = getLineCommentMark();
+        final File file = new File(path);
+        final StringBuilder sb = new StringBuilder();
+        if (file.exists()) {
+            java.io.FileInputStream fis = null;
+            java.io.InputStreamReader ir = null;
+            java.io.BufferedReader br = null;
+            try {
+                fis = new java.io.FileInputStream(file);
+                ir = new java.io.InputStreamReader(fis, encoding);
+                br = new java.io.BufferedReader(ir);
+
+                int count = -1;
+                while (true) {
+                    ++count;
+
+                    final String lineString = br.readLine();
+                    if (lineString == null) {
+                        break;
+                    }
+                    // If the line is comment...
+                    if (lineCommentMark != null && lineString.trim().startsWith(lineCommentMark)) {
+                        continue;
+                    }
+                    sb.append(lineString + "\n");
+                }
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                if (br != null) {
+                    try {
+                        br.close();
+                    } catch (IOException ignored) {
+                    }
+                }
+            }
+        }
+        return removeInitialUnicodeBomIfNeeds(encoding, sb.toString());
     }
 
     // ===================================================================================
