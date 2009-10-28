@@ -18,17 +18,21 @@ package org.seasar.dbflute.infra.dfprop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 
 /**
  * @author jflute
  * @since 0.9.6 (2009/10/28 Wednesday)
  */
-public class StringDfPropFileReader implements DfPropFileReader {
+public class ListPropFileReader implements DfPropFileReader {
 
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public String readString(String path) {
+    public List<Object> readList(String path) {
         final String encoding = getFileEncoding();
         final String lineCommentMark = getLineCommentMark();
         final File file = new File(path);
@@ -46,15 +50,21 @@ public class StringDfPropFileReader implements DfPropFileReader {
                 while (true) {
                     ++count;
 
-                    final String lineString = br.readLine();
+                    String lineString = br.readLine();
                     if (lineString == null) {
                         break;
+                    }
+                    if (count == 0) {
+                        lineString = removeInitialUnicodeBomIfNeeds(encoding, lineString);
+                    }
+                    if (lineString.trim().length() == 0) {
+                        continue;
                     }
                     // If the line is comment...
                     if (lineCommentMark != null && lineString.trim().startsWith(lineCommentMark)) {
                         continue;
                     }
-                    sb.append(lineString + "\n");
+                    sb.append(lineString);
                 }
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
@@ -69,7 +79,11 @@ public class StringDfPropFileReader implements DfPropFileReader {
                 }
             }
         }
-        return removeInitialUnicodeBomIfNeeds(encoding, sb.toString());
+        if (sb.toString().trim().length() == 0) {
+            return new ArrayList<Object>();
+        }
+        final MapListStringImpl mapListString = new MapListStringImpl();
+        return mapListString.generateList(sb.toString());
     }
 
     protected String removeInitialUnicodeBomIfNeeds(String encoding, String value) {

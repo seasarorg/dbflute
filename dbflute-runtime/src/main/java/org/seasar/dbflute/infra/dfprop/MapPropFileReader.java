@@ -31,7 +31,7 @@ import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
  * @author jflute
  * @since 0.9.6 (2009/10/28 Wednesday)
  */
-public class MapDfpropFileReader implements DfPropFileReader {
+public class MapPropFileReader implements DfPropFileReader {
 
     // ===================================================================================
     //                                                                                Read
