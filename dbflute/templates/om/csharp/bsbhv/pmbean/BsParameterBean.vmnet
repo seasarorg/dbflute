@@ -1,4 +1,3 @@
-
 #set ($myClassName = "${myExtendedParameterBeanClassName}")
 
 using System;
@@ -8,6 +7,7 @@ using ${glPackageBaseCommon};
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 using ${glPackageBaseCommonCBeanOutsidesql};
 #end
+import ${glPackageBaseCommonCOption};
 
 namespace ${glPackageExtendedParameterBean} {
 
@@ -107,18 +107,55 @@ namespace ${glPackageExtendedParameterBean} {
 #else
             get { return _${propertyName}; }
 #end
+#if (!$database.hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter($pmbClassName, $propertyName))
             set { _${propertyName} = value; }
+#end
         }
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
         public void Set${database.initCap($propertyName)}(${propertyType} ${propertyName}, ${glPackageBaseCommonCOption}.${glLikeSearchOption} ${propertyName}Option) {
-            this.${database.initCap($propertyName)} = ${propertyName};
+            _${propertyName} = ${propertyName};
             _${propertyName}InternalLikeSearchOption = ${propertyName}Option;
         }
+#end
+#if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${propertyName}) {
+            _${propertyName} = ${propertyName};
+            _${propertyName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikePrefix();
+        }
+#end
+#if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${propertyName}) {
+            _${propertyName} = ${propertyName};
+            _${propertyName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikeContain();
+        }
+#end
+#if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${propertyName}) {
+            _${propertyName} = ${propertyName};
+            _${propertyName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikeSuffix();
+        }
+#end
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
 
         public ${glPackageBaseCommonCOption}.${glLikeSearchOption} ${database.initCap($propertyName)}InternalLikeSearchOption { get {
             return _${propertyName}InternalLikeSearchOption;
         }}
+#end
+#if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_FromDate(${propertyType} ${propertyName}) {
+            _${propertyName} = new ${glFromToOption}().CompareAsDate().filterFromDate(${propertyName});
+        }
+#end
+#if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
+
+        public void Set${database.initCap($propertyName)}_ToDate(${propertyType} ${propertyName}) {
+            _${propertyName} = new ${glFromToOption}().CompareAsDate().filterToDate(${propertyName});
+        }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))
 #set ($classificationName = $database.getPmbMetaDataPropertyOptionClassificationName($pmbClassName, $propertyName))

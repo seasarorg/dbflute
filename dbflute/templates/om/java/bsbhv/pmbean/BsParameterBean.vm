@@ -236,10 +236,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${propertyName}) {
-        _${propertyName} = ${propertyName};
-        if (_${propertyName} != null) {
-            _${propertyName} = new FromToOption().compareAsDate().filterFromDate(_${propertyName});
-        }
+        _${propertyName} = new FromToOption().compareAsDate().filterFromDate(${propertyName});
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
@@ -249,10 +246,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${propertyName}) {
-        _${propertyName} = ${propertyName};
-        if (_${propertyName} != null) {
-            _${propertyName} = new FromToOption().compareAsDate().filterToDate(_${propertyName});
-        }
+        _${propertyName} = new FromToOption().compareAsDate().filterToDate(${propertyName});
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))
