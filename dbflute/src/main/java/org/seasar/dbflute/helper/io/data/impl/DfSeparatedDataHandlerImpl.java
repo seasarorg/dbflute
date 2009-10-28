@@ -128,24 +128,24 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
     private Map<String, Map<String, String>> getConvertValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = info.getBasePath() + "/" + encoding + "/convertValueMap.dataprop";
-        Map<String, Map<String, String>> resultMap = reader.readMapAsMapValue(path, encoding);
+        Map<String, Map<String, String>> resultMap = reader.readMapAsMapValue(path);
         if (resultMap != null && !resultMap.isEmpty()) {
             return resultMap;
         }
         path = info.getBasePath() + "/" + encoding + "/convert-value.txt";
-        resultMap = reader.readMapAsMapValue(path, encoding);
+        resultMap = reader.readMapAsMapValue(path);
         return resultMap;
     }
 
     private Map<String, String> getDefaultValueMap(DfSeparatedDataSeveralHandlingInfo info, String encoding) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = info.getBasePath() + "/" + encoding + "/defaultValueMap.dataprop";
-        Map<String, String> resultMap = reader.readMapAsStringValue(path, encoding);
+        Map<String, String> resultMap = reader.readMapAsStringValue(path);
         if (resultMap != null && !resultMap.isEmpty()) {
             return resultMap;
         }
         path = info.getBasePath() + "/" + encoding + "/default-value.txt";
-        resultMap = reader.readMapAsStringValue(path, encoding);
+        resultMap = reader.readMapAsStringValue(path);
         return resultMap;
     }
 

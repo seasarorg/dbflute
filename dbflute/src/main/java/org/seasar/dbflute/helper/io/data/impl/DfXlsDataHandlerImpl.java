@@ -430,48 +430,48 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     private Map<String, String> getDefaultValueMap(String dataDirectoryName) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = dataDirectoryName + "/defaultValueMap.dataprop";
-        Map<String, String> resultMap = reader.readMapAsStringValue(path, "UTF-8");
+        Map<String, String> resultMap = reader.readMapAsStringValue(path);
         if (resultMap != null && !resultMap.isEmpty()) {
             return resultMap;
         }
         path = dataDirectoryName + "/default-value.txt";
-        resultMap = reader.readMapAsStringValue(path, "UTF-8");
+        resultMap = reader.readMapAsStringValue(path);
         return resultMap;
     }
 
     private DfFlexibleMap<String, String> getTableNameMap(String dataDirectoryName) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = dataDirectoryName + "/tableNameMap.dataprop";
-        Map<String, String> resultMap = reader.readMapAsStringValue(path, "UTF-8");
+        Map<String, String> resultMap = reader.readMapAsStringValue(path);
         if (resultMap != null && !resultMap.isEmpty()) {
             return new DfFlexibleMap<String, String>(resultMap);
         }
         path = dataDirectoryName + "/table-name.txt";
-        resultMap = reader.readMapAsStringValue(path, "UTF-8");
+        resultMap = reader.readMapAsStringValue(path);
         return new DfFlexibleMap<String, String>(resultMap);
     }
 
     private DfFlexibleMap<String, List<String>> getNotTrimTableColumnMap(String dataDirectoryName) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = dataDirectoryName + "/notTrimColumnMap.dataprop";
-        Map<String, List<String>> resultMap = reader.readMapAsListStringValue(path, "UTF-8");
+        Map<String, List<String>> resultMap = reader.readMapAsListStringValue(path);
         if (resultMap != null && !resultMap.isEmpty()) {
             return new DfFlexibleMap<String, List<String>>(resultMap);
         }
         path = dataDirectoryName + "/not-trim-column.txt";
-        resultMap = reader.readMapAsListStringValue(path, "UTF-8");
+        resultMap = reader.readMapAsListStringValue(path);
         return new DfFlexibleMap<String, List<String>>(resultMap);
     }
 
     private DfFlexibleMap<String, List<String>> getEmptyStringTableColumnMap(String dataDirectoryName) {
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         String path = dataDirectoryName + "/emptyStringColumnMap.dataprop";
-        Map<String, List<String>> resultMap = reader.readMapAsListStringValue(path, "UTF-8");
+        Map<String, List<String>> resultMap = reader.readMapAsListStringValue(path);
         if (resultMap != null && !resultMap.isEmpty()) {
             return new DfFlexibleMap<String, List<String>>(resultMap);
         }
         path = dataDirectoryName + "/empty-string-column.txt";
-        resultMap = reader.readMapAsListStringValue(path, "UTF-8");
+        resultMap = reader.readMapAsListStringValue(path);
         return new DfFlexibleMap<String, List<String>>(resultMap);
     }
 

@@ -413,47 +413,44 @@ public abstract class DfAbstractHelperProperties {
     //                                                              ==================
     protected String getOutsidePropString(String key) {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
-        final String encoding = "UTF-8";
         final DfStringFileReader reader = new DfStringFileReader();
         if (!isEnvironmentDefault()) {
             final String environmentType = getEnvironmentType();
             final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
-            final String str = reader.readString(path, encoding);
+            final String str = reader.readString(path);
             if (str.trim().length() > 0) {
                 return str;
             }
         }
-        return reader.readString("./dfprop/" + filteredKey + ".dfprop", encoding);
+        return reader.readString("./dfprop/" + filteredKey + ".dfprop");
     }
 
     protected Map<String, Object> getOutsidePropMap(String key) {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
-        final String encoding = "UTF-8";
         final DfMapStringFileReader reader = new DfMapStringFileReader();
         if (!isEnvironmentDefault()) {
             final String environmentType = getEnvironmentType();
             final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
-            final Map<String, Object> map = reader.readMap(path, encoding);
+            final Map<String, Object> map = reader.readMap(path);
             if (!map.isEmpty()) {
                 return map;
             }
         }
-        return reader.readMap("./dfprop/" + filteredKey + ".dfprop", encoding);
+        return reader.readMap("./dfprop/" + filteredKey + ".dfprop");
     }
 
     protected List<Object> getOutsidePropList(String key) {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
-        final String encoding = "UTF-8";
         final DfListStringFileReader reader = new DfListStringFileReader();
         if (!isEnvironmentDefault()) {
             final String environmentType = getEnvironmentType();
             final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
-            List<Object> list = reader.readList(path, encoding);
+            List<Object> list = reader.readList(path);
             if (!list.isEmpty()) {
                 return list;
             }
         }
-        return reader.readList("./dfprop/" + filteredKey + ".dfprop", encoding);
+        return reader.readList("./dfprop/" + filteredKey + ".dfprop");
     }
 
     // ===============================================================================
