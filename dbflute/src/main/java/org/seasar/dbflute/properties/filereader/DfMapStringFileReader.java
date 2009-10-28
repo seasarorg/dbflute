@@ -17,7 +17,7 @@ package org.seasar.dbflute.properties.filereader;
 
 import java.util.Map;
 
-import org.seasar.dbflute.infra.dfprop.MapPropFileReader;
+import org.seasar.dbflute.infra.dfprop.DfPropFileReader;
 
 /**
  * @author jflute
@@ -28,18 +28,18 @@ public class DfMapStringFileReader {
     //                                                                                Read
     //                                                                                ====
     public Map<String, Object> readMap(String path) {
-        return new MapPropFileReader().readMap(path);
+        return new DfPropFileReader().readMap(path);
     }
 
     public Map<String, String> readMapAsStringValue(String path) {
-        return new MapPropFileReader().readMapAsStringValue(path);
+        return new DfPropFileReader().readMapAsStringValue(path);
     }
 
     public Map<String, java.util.List<String>> readMapAsListStringValue(String path) {
-        return new MapPropFileReader().readMapAsListStringValue(path);
+        return new DfPropFileReader().readMapAsListStringValue(path);
     }
 
     public Map<String, java.util.Map<String, String>> readMapAsMapValue(String path) {
-        return new MapPropFileReader().readMapAsMapStringValue(path);
+        return new DfPropFileReader().readMapAsMapStringValue(path);
     }
 }

@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.properties.filereader;
 
-import org.seasar.dbflute.infra.dfprop.StringPropFileReader;
+import org.seasar.dbflute.infra.dfprop.DfPropFileReader;
 
 /**
  * @author jflute
@@ -27,6 +27,6 @@ public class DfStringFileReader {
     //                                                                                Read
     //                                                                                ====
     public String readString(String path) {
-        return new StringPropFileReader().readString(path);
+        return new DfPropFileReader().readString(path);
     }
 }

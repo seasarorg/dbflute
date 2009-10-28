@@ -17,7 +17,7 @@ package org.seasar.dbflute.properties.filereader;
 
 import java.util.List;
 
-import org.seasar.dbflute.infra.dfprop.ListPropFileReader;
+import org.seasar.dbflute.infra.dfprop.DfPropFileReader;
 
 /**
  * @author jflute
@@ -29,6 +29,6 @@ public class DfListStringFileReader {
     //                                                                                Read
     //                                                                                ====
     public List<Object> readList(String path) {
-        return new ListPropFileReader().readList(path);
+        return new DfPropFileReader().readList(path);
     }
 }
