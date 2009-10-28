@@ -7,6 +7,12 @@ import org.seasar.dbflute.outsidesql.ProcedurePmb;
 import org.seasar.dbflute.cbean.FetchBean;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 #end
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
+import org.seasar.dbflute.cbean.coption.LikeSearchOption;
+#end
+#if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
+import org.seasar.dbflute.cbean.coption.FromToOption;
+#end
 
 /**
  * The parameter-bean of ${pmbClassName}.
@@ -51,9 +57,9 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     /** The value of ${propertyName}. */
     protected ${propertyType} _${propertyName};
 
-#if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
     /** The value of likeSearchOption for ${propertyName}. */
-    protected org.seasar.dbflute.cbean.coption.LikeSearchOption _${propertyName}InternalLikeSearchOption;
+    protected LikeSearchOption _${propertyName}InternalLikeSearchOption;
 
 #end
 #end
@@ -158,6 +164,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return _${propertyName};
 #end
     }
+#if (!$database.hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter($pmbClassName, $propertyName))
 
     /**
      * Set the value of ${propertyName}.
@@ -166,6 +173,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}) {
         _${propertyName} = ${propertyName};
     }
+#end
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
     /**
@@ -173,17 +181,78 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      * @param ${propertyName}Option The option of likeSearch for ${propertyName}. (Nullable)
      */
-    public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}, org.seasar.dbflute.cbean.coption.LikeSearchOption ${propertyName}Option) {
+    public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}, LikeSearchOption ${propertyName}Option) {
         _${propertyName} = ${propertyName};
         _${propertyName}InternalLikeSearchOption = ${propertyName}Option;
     }
+#end
+#if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
+
+    /**
+     * Set the value of ${propertyName} as prefix-search.
+     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     */
+    public void set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${propertyName}) {
+        _${propertyName} = ${propertyName};
+        _${propertyName}InternalLikeSearchOption = new LikeSearchOption().likePrefix();
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
+
+    /**
+     * Set the value of ${propertyName} as contain-search.
+     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     */
+    public void set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${propertyName}) {
+        _${propertyName} = ${propertyName};
+        _${propertyName}InternalLikeSearchOption = new LikeSearchOption().likeContain();
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
+
+    /**
+     * Set the value of ${propertyName} as suffix-search.
+     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     */
+    public void set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${propertyName}) {
+        _${propertyName} = ${propertyName};
+        _${propertyName}InternalLikeSearchOption = new LikeSearchOption().likeSuffix();
+    }
+#end
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
 
     /**
      * Get the internal option of likeSearch for ${propertyName}. {Internal Method: Don't Invoke This!}
      * @return The internal option of likeSearch for ${propertyName}. (Nullable)
      */
-    public org.seasar.dbflute.cbean.coption.LikeSearchOption get${database.initCap($propertyName)}InternalLikeSearchOption() {
+    public LikeSearchOption get${database.initCap($propertyName)}InternalLikeSearchOption() {
         return _${propertyName}InternalLikeSearchOption;
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
+
+    /**
+     * Set the value of ${propertyName} as from-date.
+     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     */
+    public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${propertyName}) {
+        _${propertyName} = ${propertyName};
+        if (_${propertyName} != null) {
+            _${propertyName} = new FromToOption().compareAsDate().filterFromDate(_${propertyName});
+        }
+    }
+#end
+#if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
+
+    /**
+     * Set the value of ${propertyName} as to-date.
+     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     */
+    public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${propertyName}) {
+        _${propertyName} = ${propertyName};
+        if (_${propertyName} != null) {
+            _${propertyName} = new FromToOption().compareAsDate().filterToDate(_${propertyName});
+        }
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))
