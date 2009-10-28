@@ -114,13 +114,6 @@ public class DfPropFileReader {
         return mapListString.generateMap(sb.toString());
     }
 
-    protected String removeInitialUnicodeBomIfNeeds(String encoding, String value) {
-        if (UTF8_ENCODING.equalsIgnoreCase(encoding) && value.length() > 0 && value.charAt(0) == '\uFEFF') {
-            value = value.substring(1);
-        }
-        return value;
-    }
-
     /**
      * Read the map string file as string value. <br />
      * If the type of all values is string type, this method is available. <br />
@@ -311,6 +304,16 @@ public class DfPropFileReader {
 
     protected String getLineCommentMark() {
         return LINE_COMMENT_MARK;
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected String removeInitialUnicodeBomIfNeeds(String encoding, String value) {
+        if (UTF8_ENCODING.equalsIgnoreCase(encoding) && value.length() > 0 && value.charAt(0) == '\uFEFF') {
+            value = value.substring(1);
+        }
+        return value;
     }
 
     // ===================================================================================
