@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataHandler;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataSeveralHandlingInfo;
-import org.seasar.dbflute.helper.io.text.DfMapStringFileReader;
+import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 
 /**
  * @author jflute
