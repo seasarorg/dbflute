@@ -32,12 +32,12 @@ import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
  * @author jflute
  * @since 0.9.6 (2009/10/28 Wednesday)
  */
-public class MapPropFileReader {
+public class DfPropFileReader {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    public static final String UTF8_ENCODING = "UTF-8";
+    private static final String UTF8_ENCODING = "UTF-8";
     public static final String FILE_ENCODING = UTF8_ENCODING;
     public static final String LINE_COMMENT_MARK = "#";
 
