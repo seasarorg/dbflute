@@ -50,8 +50,8 @@ namespace ${glPackageExtendedParameterBean} {
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
         protected ${propertyType} _${propertyName};
-#if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
-        protected ${glPackageBaseCommonCOption}.${glLikeSearchOption} _${propertyName}InternalLikeSearchOption;
+#if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
+        protected ${glLikeSearchOption} _${propertyName}InternalLikeSearchOption;
 
 #end
 #end
