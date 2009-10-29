@@ -30,6 +30,76 @@ public class SqlTokenizerTest extends PlainTestCase {
         assertEquals("and", skippedToken);
     }
 
+    public void test_skipToken_integerTestValue() {
+        // ## Arrange ##
+        String sql = "/*foo*/123/*END*/";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        tokenizer.next();
+        String skippedToken = tokenizer.skipToken();
+
+        // ## Assert ##
+        log("skippedToken : " + skippedToken);
+        assertEquals("123", skippedToken);
+    }
+
+    public void test_skipToken_stringTestValue() {
+        // ## Arrange ##
+        String sql = "/*foo*/'2001-12-15'/*END*/";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        tokenizer.next();
+        String skippedToken = tokenizer.skipToken();
+
+        // ## Assert ##
+        log("skippedToken : " + skippedToken);
+        assertEquals("'2001-12-15'", skippedToken);
+    }
+
+    public void test_skipToken_nonTestValue_dateLiteralPrefix() {
+        // ## Arrange ##
+        String sql = "/*foo*/date '2001-12-15'/*END*/";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        tokenizer.next();
+        String skippedToken = tokenizer.skipToken();
+
+        // ## Assert ##
+        log("skippedToken : " + skippedToken);
+        assertEquals("date", skippedToken);
+    }
+
+    public void test_skipToken_testValue_dateLiteralPrefix() {
+        // ## Arrange ##
+        String sql = "/*foo*/date '2001-12-15'/*END*/";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        tokenizer.next();
+        String skippedToken = tokenizer.skipToken(true);
+
+        // ## Assert ##
+        log("skippedToken : " + skippedToken);
+        assertEquals("date '2001-12-15'", skippedToken);
+    }
+
+    public void test_skipToken_testValue_timestampLiteralPrefix() {
+        // ## Arrange ##
+        String sql = "/*foo*/timestamp '2001-12-15 12:34:56.123'/*END*/";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        tokenizer.next();
+        String skippedToken = tokenizer.skipToken(true);
+
+        // ## Assert ##
+        log("skippedToken : " + skippedToken);
+        assertEquals("timestamp '2001-12-15 12:34:56.123'", skippedToken);
+    }
+
     public void test_skipWhitespace() {
         // ## Arrange ##
         String sql = "/*IF pmb.memberName != null*/ and member.MEMBER_NAME = 'TEST'/*END*/";
@@ -46,6 +116,91 @@ public class SqlTokenizerTest extends PlainTestCase {
         log("before       : " + tokenizer.getBefore());
         log("after        : " + tokenizer.getAfter());
         assertEquals("and", skippedToken);
+    }
+
+    public void test_extractDateLiteralPrefix_date() {
+        // ## Arrange ##
+        String sql = "foo/*bar*/date '2009-10-29";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        String prefix = tokenizer.extractDateLiteralPrefix(true, sql, "foo/*bar*/".length());
+
+        // ## Assert ##
+        assertEquals("date ", prefix);
+    }
+
+    public void test_extractDateLiteralPrefix_dateNonSpace() {
+        // ## Arrange ##
+        String sql = "foo/*bar*/date'2009-10-29";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        String prefix = tokenizer.extractDateLiteralPrefix(true, sql, "foo/*bar*/".length());
+
+        // ## Assert ##
+        assertEquals("date", prefix);
+    }
+
+    public void test_extractDateLiteralPrefix_timestamp() {
+        // ## Arrange ##
+        String sql = "foo/*bar*/timestamp '2009-10-29";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        String prefix = tokenizer.extractDateLiteralPrefix(true, sql, "foo/*bar*/".length());
+
+        // ## Assert ##
+        assertEquals("timestamp ", prefix);
+    }
+
+    public void test_extractDateLiteralPrefix_timestampNonSpace() {
+        // ## Arrange ##
+        String sql = "foo/*bar*/timestamp'2009-10-29";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        String prefix = tokenizer.extractDateLiteralPrefix(true, sql, "foo/*bar*/".length());
+
+        // ## Assert ##
+        assertEquals("timestamp", prefix);
+    }
+
+    public void test_extractDateLiteralPrefix_dateUpperCase() {
+        // ## Arrange ##
+        String sql = "foo/*bar*/DATE '2009-10-29";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        String prefix = tokenizer.extractDateLiteralPrefix(true, sql, "foo/*bar*/".length());
+
+        // ## Assert ##
+        assertEquals("DATE ", prefix);
+    }
+
+    public void test_extractDateLiteralPrefix_timestampUpperCase() {
+        // ## Arrange ##
+        String sql = "foo/*bar*/TIMESTAMP '2009-10-29";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        String prefix = tokenizer.extractDateLiteralPrefix(true, sql, "foo/*bar*/".length());
+
+        // ## Assert ##
+        assertEquals("TIMESTAMP ", prefix);
+    }
+
+    public void test_extractDateLiteralPrefix_nonTarget() {
+        // ## Arrange ##
+        SqlTokenizer tokenizer = new SqlTokenizer(null);
+
+        // ## Act & Assert ##
+        int l = "foo/*bar*/".length();
+        assertEquals("", tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/'2009-10-29", l));
+        assertEquals("", tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/23", l));
+        assertEquals("", tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/abc", l));
+        assertEquals("", tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/date foo", l));
+        assertEquals("", tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/timestamp bar", l));
     }
 
     // ===================================================================================

@@ -35,7 +35,7 @@ public class SqlTokenizer {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String sql;
+    protected final String sql;
     protected int position = 0;
     protected String token;
     protected int tokenType = SQL;
@@ -194,37 +194,102 @@ public class SqlTokenizer {
     }
 
     public String skipToken() {
-        int index = sql.length();
-        char quote = position < sql.length() ? sql.charAt(position) : '\0';
-        final boolean quoting = quote == '\'' || quote == '(';
-        if (quote == '(') {
-            quote = ')';
+        return skipToken(false);
+    }
+
+    public String skipToken(boolean testValue) {
+        int index = sql.length(); // last index as default
+
+        final String dateLiteralPrefix = extractDateLiteralPrefix(testValue, sql, position);
+        position = position + dateLiteralPrefix.length();
+
+        final char quote;
+        {
+            final char firstChar = (position < sql.length() ? sql.charAt(position) : '\0');
+            quote = (firstChar == '(' ? ')' : firstChar);
         }
+        final boolean quoting = quote == '\'' || quote == ')';
+
         for (int i = quoting ? position + 1 : position; i < sql.length(); ++i) {
             final char c = sql.charAt(i);
-            if ((Character.isWhitespace(c) || c == ',' || c == ')' || c == '(') && !quoting) {
-                // the end point when not quoting  
+            if (isNotQuoteEndPoint(quoting, c)) {
                 index = i;
                 break;
-            } else if (c == '/' && i + 1 < sql.length() && sql.charAt(i + 1) == '*') {
+            } else if (isBlockCommentBeginPoint(sql, c, i)) {
                 index = i;
                 break;
-            } else if (c == '-' && i + 1 < sql.length() && sql.charAt(i + 1) == '-') {
+            } else if (isLineCommentBeginPoint(sql, c, i)) {
                 index = i;
                 break;
-            } else if (quoting && quote == '\'' && c == '\'' && (i + 1 >= sql.length() || sql.charAt(i + 1) != '\'')) {
+            } else if (quoting && isSingleQuoteEndPoint(sql, quote, c, i)) {
                 index = i + 1;
                 break;
-            } else if (quoting && c == quote) {
+            } else if (quoting && isQuoteEndPoint(sql, quote, c, i)) {
                 index = i + 1;
                 break;
             }
         }
-        token = sql.substring(position, index);
+        token = dateLiteralPrefix + sql.substring(position, index);
         tokenType = SQL;
         nextTokenType = SQL;
         position = index;
         return token;
+    }
+
+    protected String extractDateLiteralPrefix(boolean testValue, String currentSql, int position) {
+        String literalPrefix = "";
+        if (!testValue) {
+            return literalPrefix;
+        }
+        if (position >= currentSql.length()) {
+            return literalPrefix;
+        }
+        final char firstChar = currentSql.charAt(position);
+        if (firstChar != 'd' && firstChar != 'D' && firstChar != 't' && firstChar != 'T') {
+            return literalPrefix;
+        }
+        String rear = currentSql.substring(position);
+        if (rear.length() > 12) {
+            // get only the quantity needed for performance
+            rear = rear.substring(0, 12); // max length + 1
+        }
+        String lowerRear = rear.toLowerCase();
+        if (lowerRear.startsWith("date '")) {
+            literalPrefix = rear.substring(0, "date ".length());
+        } else if (lowerRear.startsWith("date'")) {
+            literalPrefix = rear.substring(0, "date".length());
+        } else if (lowerRear.startsWith("timestamp '")) { // max length
+            literalPrefix = rear.substring(0, "timestamp ".length());
+        } else if (lowerRear.startsWith("timestamp'")) {
+            literalPrefix = rear.substring(0, "timestamp".length());
+        }
+        return literalPrefix;
+    }
+
+    protected boolean isNotQuoteEndPoint(boolean quoting, char c) {
+        return !quoting && (Character.isWhitespace(c) || c == ',' || c == ')' || c == '(');
+    }
+
+    protected boolean isBlockCommentBeginPoint(String currentSql, char c, int i) {
+        return c == '/' && isNextCharacter(currentSql, i, '*');
+    }
+
+    protected boolean isLineCommentBeginPoint(String currentSql, char c, int i) {
+        return c == '-' && isNextCharacter(currentSql, i, '-');
+    }
+
+    protected boolean isSingleQuoteEndPoint(String currentSql, char quote, char c, int i) {
+        final int sqlLen = currentSql.length();
+        final boolean endSqlOrNotEscapeQuote = (i + 1 >= sqlLen || currentSql.charAt(i + 1) != '\'');
+        return quote == '\'' && c == '\'' && endSqlOrNotEscapeQuote;
+    }
+
+    protected boolean isQuoteEndPoint(String currentSql, char quote, char c, int i) {
+        return c == quote;
+    }
+
+    protected boolean isNextCharacter(String currentSql, int i, char targetChar) {
+        return i + 1 < currentSql.length() && currentSql.charAt(i + 1) == targetChar;
     }
 
     public String skipWhitespace() {

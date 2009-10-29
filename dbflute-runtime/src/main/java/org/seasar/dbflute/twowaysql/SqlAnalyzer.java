@@ -220,11 +220,11 @@ public class SqlAnalyzer {
 
     protected void parseCommentBindVariable() {
         final String expr = _tokenizer.getToken();
-        final String s = _tokenizer.skipToken();
+        final String testValue = _tokenizer.skipToken(true);
         if (expr.startsWith("$")) {
-            peek().addChild(createEmbeddedValueNode(expr.substring(1), s));
+            peek().addChild(createEmbeddedValueNode(expr.substring(1), testValue));
         } else {
-            peek().addChild(createBindVariableNode(expr, s));
+            peek().addChild(createBindVariableNode(expr, testValue));
         }
     }
 
