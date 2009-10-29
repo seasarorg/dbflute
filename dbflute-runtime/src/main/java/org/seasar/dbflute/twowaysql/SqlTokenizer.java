@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.twowaysql;
 
-import org.seasar.dbflute.exception.EndCommentNotFoundException;
+import org.seasar.dbflute.exception.CommentEndNotFoundException;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -31,7 +31,7 @@ public class SqlTokenizer {
     public static final int ELSE = 3;
     public static final int BIND_VARIABLE = 4;
     public static final int EOF = 99;
-	
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -91,8 +91,7 @@ public class SqlTokenizer {
         int elseCommentLength = -1;
         if (lineCommentStartPos >= 0) {
             int skipPos = skipWhitespace(lineCommentStartPos + 2);
-            if (skipPos + 4 < sql.length()
-                    && "ELSE".equals(sql.substring(skipPos, skipPos + 4))) {
+            if (skipPos + 4 < sql.length() && "ELSE".equals(sql.substring(skipPos, skipPos + 4))) {
                 elseCommentStartPos = lineCommentStartPos;
                 elseCommentLength = skipPos + 4 - lineCommentStartPos;
             }
@@ -128,12 +127,10 @@ public class SqlTokenizer {
         if (commentStartPos >= 0) {
             nextStartPos = commentStartPos;
         }
-        if (elseCommentStartPos >= 0
-                && (nextStartPos < 0 || elseCommentStartPos < nextStartPos)) {
+        if (elseCommentStartPos >= 0 && (nextStartPos < 0 || elseCommentStartPos < nextStartPos)) {
             nextStartPos = elseCommentStartPos;
         }
-        if (bindVariableStartPos >= 0
-                && (nextStartPos < 0 || bindVariableStartPos < nextStartPos)) {
+        if (bindVariableStartPos >= 0 && (nextStartPos < 0 || bindVariableStartPos < nextStartPos)) {
             nextStartPos = bindVariableStartPos;
         }
         return nextStartPos;
@@ -150,7 +147,7 @@ public class SqlTokenizer {
             commentEndPos = commentEndPos2;
         }
         if (commentEndPos < 0) {
-			throwEndCommentNotFoundException(sql.substring(position));
+            throwEndCommentNotFoundException(sql.substring(position));
         }
         token = sql.substring(position, commentEndPos);
         nextTokenType = SQL;
@@ -161,20 +158,20 @@ public class SqlTokenizer {
     protected void throwEndCommentNotFoundException(String expression) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The end comment was Not Found!" + ln();
+        msg = msg + "The comment end was NOT found!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the parameter comment logic." + ln();
-        msg = msg + "It may exist the parameter comment that DOESN'T have an end comment." + ln();
+        msg = msg + "Please confirm the SQL comment writing." + ln();
+        msg = msg + "It may exist the comment that DOESN'T have a comment end." + ln();
         msg = msg + "  For example:" + ln();
-        msg = msg + "    before (x) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3" + ln();
-        msg = msg + "    after  (o) -- /*IF pmb.xxxId != null*/XXX_ID = /*pmb.xxxId*/3/*END*/" + ln();
+        msg = msg + "    before (x) -- /*pmb.xxxId3" + ln();
+        msg = msg + "    after  (o) -- /*pmb.xxxId*/3" + ln();
         msg = msg + ln();
-        msg = msg + "[End Comment Expected Place]" + ln() + expression + ln();
+        msg = msg + "[Comment End Expected Place]" + ln() + expression + ln();
         msg = msg + ln();
         msg = msg + "[Specified SQL]" + ln() + sql + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new EndCommentNotFoundException(msg);
+        throw new CommentEndNotFoundException(msg);
     }
 
     protected void parseBindVariable() {
@@ -199,26 +196,23 @@ public class SqlTokenizer {
     public String skipToken() {
         int index = sql.length();
         char quote = position < sql.length() ? sql.charAt(position) : '\0';
-        boolean quoting = quote == '\'' || quote == '(';
+        final boolean quoting = quote == '\'' || quote == '(';
         if (quote == '(') {
             quote = ')';
         }
         for (int i = quoting ? position + 1 : position; i < sql.length(); ++i) {
-            char c = sql.charAt(i);
-            if ((Character.isWhitespace(c) || c == ',' || c == ')' || c == '(')
-                    && !quoting) {
+            final char c = sql.charAt(i);
+            if ((Character.isWhitespace(c) || c == ',' || c == ')' || c == '(') && !quoting) {
+                // the end point when not quoting  
                 index = i;
                 break;
-            } else if (c == '/' && i + 1 < sql.length()
-                    && sql.charAt(i + 1) == '*') {
+            } else if (c == '/' && i + 1 < sql.length() && sql.charAt(i + 1) == '*') {
                 index = i;
                 break;
-            } else if (c == '-' && i + 1 < sql.length()
-                    && sql.charAt(i + 1) == '-') {
+            } else if (c == '-' && i + 1 < sql.length() && sql.charAt(i + 1) == '-') {
                 index = i;
                 break;
-            } else if (quoting && quote == '\'' && c == '\''
-                    && (i + 1 >= sql.length() || sql.charAt(i + 1) != '\'')) {
+            } else if (quoting && quote == '\'' && c == '\'' && (i + 1 >= sql.length() || sql.charAt(i + 1) != '\'')) {
                 index = i + 1;
                 break;
             } else if (quoting && c == quote) {

@@ -16,10 +16,10 @@
 package org.seasar.dbflute.exception;
 
 /**
- * The exception of when the end comment is not found in outsideSql.
+ * The exception of when the comment end is not found in outsideSql.
  * @author jflute
  */
-public class EndCommentNotFoundException extends RuntimeException {
+public class CommentEndNotFoundException extends RuntimeException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
@@ -28,7 +28,7 @@ public class EndCommentNotFoundException extends RuntimeException {
      * Constructor.
      * @param msg Exception message. (NotNull)
      */
-    public EndCommentNotFoundException(String msg) {
+    public CommentEndNotFoundException(String msg) {
         super(msg);
     }
 }
