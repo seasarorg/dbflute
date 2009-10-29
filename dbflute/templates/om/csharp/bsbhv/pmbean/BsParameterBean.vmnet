@@ -113,7 +113,7 @@ namespace ${glPackageExtendedParameterBean} {
         }
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
-        public void Set${database.initCap($propertyName)}(${propertyType} ${propertyName}, ${glPackageBaseCommonCOption}.${glLikeSearchOption} ${propertyName}Option) {
+        public void Set${database.initCap($propertyName)}(${propertyType} ${propertyName}, ${glLikeSearchOption} ${propertyName}Option) {
             _${propertyName} = ${propertyName};
             _${propertyName}InternalLikeSearchOption = ${propertyName}Option;
         }
@@ -141,7 +141,7 @@ namespace ${glPackageExtendedParameterBean} {
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
 
-        public ${glPackageBaseCommonCOption}.${glLikeSearchOption} ${database.initCap($propertyName)}InternalLikeSearchOption { get {
+        public ${glLikeSearchOption} ${database.initCap($propertyName)}InternalLikeSearchOption { get {
             return _${propertyName}InternalLikeSearchOption;
         }}
 #end
