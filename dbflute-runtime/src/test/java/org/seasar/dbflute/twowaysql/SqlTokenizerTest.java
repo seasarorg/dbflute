@@ -1,5 +1,6 @@
 package org.seasar.dbflute.twowaysql;
 
+import org.seasar.dbflute.exception.CommentEndNotFoundException;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -122,5 +123,26 @@ public class SqlTokenizerTest extends PlainTestCase {
         log("13: " + tokenizer.token);
         tokenizer.next();
         log("14: " + tokenizer.token);
+    }
+
+    // ===================================================================================
+    //                                                                           Exception
+    //                                                                           =========
+    public void test_commentEndNotFound() {
+        // ## Arrange ##
+        String sql = "/*IF pmb.memberName != null*/and member.MEMBER_NAME = 'TEST'/*END";
+        SqlTokenizer tokenizer = new SqlTokenizer(sql);
+
+        // ## Act ##
+        try {
+            while (SqlTokenizer.EOF != tokenizer.next()) {
+            }
+
+            // ## Assert ##
+            fail();
+        } catch (CommentEndNotFoundException e) {
+            // OK
+            log(e.getMessage());
+        }
     }
 }
