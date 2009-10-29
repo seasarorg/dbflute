@@ -7,7 +7,7 @@ using ${glPackageBaseCommon};
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 using ${glPackageBaseCommonCBeanOutsidesql};
 #end
-import ${glPackageBaseCommonCOption};
+using ${glPackageBaseCommonCOption};
 
 namespace ${glPackageExtendedParameterBean} {
 
