@@ -201,7 +201,9 @@ public class SqlTokenizer {
         int index = sql.length(); // last index as default
 
         final String dateLiteralPrefix = extractDateLiteralPrefix(testValue, sql, position);
-        position = position + dateLiteralPrefix.length();
+        if (dateLiteralPrefix != null) {
+            position = position + dateLiteralPrefix.length();
+        }
 
         final char quote;
         {
@@ -229,7 +231,10 @@ public class SqlTokenizer {
                 break;
             }
         }
-        token = dateLiteralPrefix + sql.substring(position, index);
+        token = sql.substring(position, index);
+        if (dateLiteralPrefix != null) {
+            token = dateLiteralPrefix + token;
+        }
         tokenType = SQL;
         nextTokenType = SQL;
         position = index;
@@ -237,28 +242,34 @@ public class SqlTokenizer {
     }
 
     protected String extractDateLiteralPrefix(boolean testValue, String currentSql, int position) {
-        String literalPrefix = "";
         if (!testValue) {
-            return literalPrefix;
+            return null;
         }
         if (position >= currentSql.length()) {
-            return literalPrefix;
+            return null;
         }
         final char firstChar = currentSql.charAt(position);
         if (firstChar != 'd' && firstChar != 'D' && firstChar != 't' && firstChar != 'T') {
-            return literalPrefix;
+            return null;
         }
-        String rear = currentSql.substring(position);
-        if (rear.length() > 12) {
-            // get only the quantity needed for performance
-            rear = rear.substring(0, 12); // max length + 1
+        final String rear;
+        {
+            final String tmpRear = currentSql.substring(position);
+            final int maxlength = "timestamp '".length();
+            if (tmpRear.length() > maxlength) {
+                // get only the quantity needed for performance
+                rear = tmpRear.substring(0, maxlength);
+            } else {
+                rear = tmpRear;
+            }
         }
-        String lowerRear = rear.toLowerCase();
+        final String lowerRear = rear.toLowerCase();
+        String literalPrefix = null;
         if (lowerRear.startsWith("date '")) {
             literalPrefix = rear.substring(0, "date ".length());
         } else if (lowerRear.startsWith("date'")) {
             literalPrefix = rear.substring(0, "date".length());
-        } else if (lowerRear.startsWith("timestamp '")) { // max length
+        } else if (lowerRear.startsWith("timestamp '")) { // has max length
             literalPrefix = rear.substring(0, "timestamp ".length());
         } else if (lowerRear.startsWith("timestamp'")) {
             literalPrefix = rear.substring(0, "timestamp".length());

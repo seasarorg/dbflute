@@ -196,11 +196,11 @@ public class SqlTokenizerTest extends PlainTestCase {
 
         // ## Act & Assert ##
         int l = "foo/*bar*/".length();
-        assertEquals("", tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/'2009-10-29", l));
-        assertEquals("", tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/23", l));
-        assertEquals("", tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/abc", l));
-        assertEquals("", tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/date foo", l));
-        assertEquals("", tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/timestamp bar", l));
+        assertEquals(null, tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/'2009-10-29", l));
+        assertEquals(null, tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/23", l));
+        assertEquals(null, tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/abc", l));
+        assertEquals(null, tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/date foo", l));
+        assertEquals(null, tokenizer.extractDateLiteralPrefix(true, "foo/*bar*/timestamp bar", l));
     }
 
     // ===================================================================================
