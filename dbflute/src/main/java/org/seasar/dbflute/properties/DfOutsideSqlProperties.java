@@ -119,6 +119,10 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return isProperty("isRequiredSqlDescription", false);
     }
 
+    public boolean isSuppressParameterCommentCheck() { // It's closet!
+        return isProperty("isSuppressParameterCommentCheck", false);
+    }
+
     // ===================================================================================
     //                                                                     SqlFileEncoding
     //                                                                     ===============

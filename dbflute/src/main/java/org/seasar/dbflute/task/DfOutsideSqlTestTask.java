@@ -27,6 +27,7 @@ import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlChecker;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -58,7 +59,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
 
     @Override
     protected void customizeRunnerInformation(DfRunnerInformation runInfo) {
-        runInfo.setEncoding(getProperties().getOutsideSqlProperties().getSqlFileEncoding());
+        runInfo.setEncoding(getOutsideSqlProperties().getSqlFileEncoding());
     }
 
     @Override
@@ -168,6 +169,9 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     }
 
     protected void checkParameterComment(File sqlFile, String sql) {
+        if (getOutsideSqlProperties().isSuppressParameterCommentCheck()) {
+            return;
+        }
         final DfOutsideSqlChecker checker = new DfOutsideSqlChecker();
 
         // the IfCommentExpression check is for Java only
@@ -175,11 +179,11 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
             checker.enableIfCommentExpressionCheck();
         }
 
-        if (getProperties().getOutsideSqlProperties().isRequiredSqlTitle()) {
+        if (getOutsideSqlProperties().isRequiredSqlTitle()) {
             checker.enableRequiredTitleCheck();
         }
 
-        if (getProperties().getOutsideSqlProperties().isRequiredSqlDescription()) {
+        if (getOutsideSqlProperties().isRequiredSqlDescription()) {
             checker.enableRequiredDescriptionCheck();
         }
 
@@ -188,7 +192,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
 
     @Override
     protected String getSqlDirectory() {
-        return getProperties().getOutsideSqlProperties().getSqlDirectory();
+        return getOutsideSqlProperties().getSqlDirectory();
     }
 
     @Override
@@ -229,6 +233,10 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
     //                                                                       =============
     protected DfJdbcDeterminer createJdbcDeterminer() {
         return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
+    }
+
+    protected DfOutsideSqlProperties getOutsideSqlProperties() {
+        return getProperties().getOutsideSqlProperties();
     }
 
     // ===================================================================================
