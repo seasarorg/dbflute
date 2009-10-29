@@ -43,6 +43,7 @@ $database.initializeClassificationDeployment()
 
 ## [Allcommon-ConditionBean-Option]
 #set ($glLikeSearchOption = "${glProjectPrefix}LikeSearchOption")
+#set ($glFromToOption = "${glProjectPrefix}FromToOption")
 
 ## [DBMeta]
 #set ($glDBMeta = "${glProjectPrefix}DBMeta")
