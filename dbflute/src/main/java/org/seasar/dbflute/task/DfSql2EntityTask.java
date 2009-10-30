@@ -310,7 +310,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             metaInfo.setDbTypeName(columnTypeName);
 
                             int columnSize = md.getPrecision(i);
-                            if (columnSize <= 0) { // Example: sum(COLUMN)
+                            if (!DfColumnHandler.isColumnSizeValid(columnSize)) {
+                                // ex) sum(COLUMN)
                                 columnSize = md.getColumnDisplaySize(i);
                             }
                             metaInfo.setColumnSize(columnSize);
@@ -916,6 +917,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 setupColumnSizeContainsDigit(columnJdbcTypeMap, columnName, column);
                 setupColumnComment(columnJdbcTypeMap, columnName, column);
                 setupSql2EntityRelatedTableName(columnJdbcTypeMap, columnName, column);
+                setupSql2EntityRelatedColumnName(columnJdbcTypeMap, columnName, column);
                 setupSql2EntityForcedJavaNative(columnJdbcTypeMap, columnName, column);
 
                 tbl.addColumn(column);
@@ -1007,23 +1009,14 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
         final int columnSize = metaInfo.getColumnSize();
         final int decimalDigits = metaInfo.getDecimalDigits();
-        column.setColumnSize(columnSize + "," + decimalDigits);
+        column.setupColumnSize(columnSize, decimalDigits);
     }
 
     protected void setupColumnComment(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName,
             final Column column) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
         final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
-        if (_schemaData == null) {
-            return;
-        }
-        final Table relatedTable;
-        try {
-            relatedTable = _schemaData.getDatabase().getTable(sql2EntityRelatedTableName);
-        } catch (EngineException e) {
-            String msg = "Failed to get database information: schemaData=" + _schemaData;
-            throw new IllegalStateException(msg);
-        }
+        final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
         if (relatedTable == null) {
             return;
         }
@@ -1040,7 +1033,41 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             String columnName, final Column column) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
         final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
+        final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
+        if (relatedTable == null) {
+            return;
+        }
         column.setSql2EntityRelatedTableName(sql2EntityRelatedTableName);
+    }
+
+    protected void setupSql2EntityRelatedColumnName(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
+            String columnName, final Column column) {
+        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+        final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
+        final Table relatedTable = getRelatedTable(sql2EntityRelatedTableName);
+        if (relatedTable == null) {
+            return;
+        }
+        final String sql2EntityRelatedColumnName = metaInfo.getSql2EntityRelatedColumnName();
+        final Column relatedColumn = relatedTable.getColumn(sql2EntityRelatedColumnName);
+        if (relatedColumn == null) {
+            return;
+        }
+        column.setSql2EntityRelatedColumnName(sql2EntityRelatedColumnName);
+    }
+
+    protected Table getRelatedTable(String sql2EntityRelatedTableName) {
+        if (_schemaData == null) {
+            return null;
+        }
+        final Table relatedTable;
+        try {
+            relatedTable = _schemaData.getDatabase().getTable(sql2EntityRelatedTableName);
+        } catch (EngineException e) {
+            String msg = "Failed to get database information: schemaData=" + _schemaData;
+            throw new IllegalStateException(msg);
+        }
+        return relatedTable;
     }
 
     protected void setupSql2EntityForcedJavaNative(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,

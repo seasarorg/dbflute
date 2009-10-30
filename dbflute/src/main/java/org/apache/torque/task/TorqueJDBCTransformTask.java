@@ -481,8 +481,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected void setupColumnSize(final DfColumnMetaInfo columnMetaInfo, final Element columnElement) {
         final int columnSize = columnMetaInfo.getColumnSize();
         final int decimalDigits = columnMetaInfo.getDecimalDigits();
-        if (columnSize > 0) {
-            if (decimalDigits > 0) {
+        if (DfColumnHandler.isColumnSizeValid(columnSize)) {
+            if (DfColumnHandler.isDecimalDigitsValid(decimalDigits)) {
                 columnElement.setAttribute("size", columnSize + ", " + decimalDigits);
             } else {
                 columnElement.setAttribute("size", String.valueOf(columnSize));

@@ -1,6 +1,7 @@
 package org.seasar.dbflute.helper.jdbc.metadata.info;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.logic.metahandler.DfColumnHandler;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.DfStringUtil;
 
@@ -26,9 +27,9 @@ public class DfProcedureColumnMetaInfo {
             }
         }
         sb.append(" - ").append(dbTypeName);
-        if (columnSize != null) {
+        if (DfColumnHandler.isColumnSizeValid(columnSize)) {
             sb.append("(").append(columnSize);
-            if (decimalDigits != null) {
+            if (DfColumnHandler.isDecimalDigitsValid(decimalDigits)) {
                 sb.append(", ").append(decimalDigits);
             }
             sb.append(")");

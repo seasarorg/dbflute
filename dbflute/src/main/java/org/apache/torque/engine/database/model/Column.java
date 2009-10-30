@@ -120,8 +120,9 @@ public class Column {
     // -----------------------------------------------------
     //                                Sql2Entity Information
     //                                ----------------------
-    private String _sql2EntityForcedJavaNative;
     private String _sql2EntityRelatedTableName;
+    private String _sql2EntityRelatedColumnName;
+    private String _sql2EntityForcedJavaNative;
 
     // -----------------------------------------------------
     //                                       Other Component
@@ -439,6 +440,9 @@ public class Column {
         if (_sql2EntityRelatedTableName != null) {
             plugDelimiterIfNeeds(sb);
             sb.append("Related to ").append(_sql2EntityRelatedTableName);
+            if (_sql2EntityRelatedColumnName != null) {
+                sb.append(".").append(_sql2EntityRelatedColumnName);
+            }
         }
         return sb.toString();
     }
@@ -717,6 +721,16 @@ public class Column {
 
     public void setColumnSize(String columnSize) {
         _columnSize = columnSize;
+    }
+
+    public void setupColumnSize(int columnSize, int decimalDigits) {
+        if (DfColumnHandler.isColumnSizeValid(columnSize)) {
+            if (DfColumnHandler.isDecimalDigitsValid(decimalDigits)) {
+                setColumnSize(columnSize + ", " + decimalDigits);
+            } else {
+                setColumnSize(String.valueOf(columnSize));
+            }
+        }
     }
 
     public boolean hasColumnSize() {
@@ -1208,6 +1222,15 @@ public class Column {
      */
     public void setSql2EntityRelatedTableName(String sql2EntityRelatedTableName) {
         _sql2EntityRelatedTableName = sql2EntityRelatedTableName;
+    }
+
+    /**
+     * Set the related column name for Sql2Entity. <br />
+     * This is used at supplementary information.
+     * @param sql2EntityRelatedColumnName The related column name for Sql2Entity. (Nullable)
+     */
+    public void setSql2EntityRelatedColumnName(String sql2EntityRelatedColumnName) {
+        _sql2EntityRelatedColumnName = sql2EntityRelatedColumnName;
     }
 
     /**

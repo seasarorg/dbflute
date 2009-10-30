@@ -258,4 +258,15 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     public boolean isUUID(final String dbTypeName) {
         return getJdbcTypeMapper().isUUID(dbTypeName);
     }
+
+    // ===================================================================================
+    //                                                                Column Size Handling
+    //                                                                ====================
+    public static boolean isColumnSizeValid(Integer columnSize) {
+        return columnSize != null && columnSize > 0;
+    }
+
+    public static boolean isDecimalDigitsValid(Integer decimalDigits) {
+        return decimalDigits != null && decimalDigits > 0;
+    }
 }
