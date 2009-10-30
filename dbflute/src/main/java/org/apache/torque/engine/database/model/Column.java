@@ -431,7 +431,7 @@ public class Column {
         }
         if (getDefaultValue() != null && getDefaultValue().trim().length() > 0 && !isAutoIncrement()) {
             plugDelimiterIfNeeds(sb);
-            sb.append("Default=[").append(getDefaultValue() + "]");
+            sb.append("default=[").append(getDefaultValue() + "]");
         }
         if (isForeignKey()) {
             plugDelimiterIfNeeds(sb);
@@ -439,7 +439,7 @@ public class Column {
         }
         if (_sql2EntityRelatedTableName != null) {
             plugDelimiterIfNeeds(sb);
-            sb.append("Related to ").append(_sql2EntityRelatedTableName);
+            sb.append("related to ").append(_sql2EntityRelatedTableName);
             if (_sql2EntityRelatedColumnName != null) {
                 sb.append(".").append(_sql2EntityRelatedColumnName);
             }
