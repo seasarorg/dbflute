@@ -190,8 +190,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final String dbTypeName = columnRs.getString("TYPE_NAME");
             final Integer columnSize;
             {
-                final String length = columnRs.getString("LENGTH");
-                columnSize = length != null ? new Integer(length) : null;
+                final String precision = columnRs.getString("PRECISION");
+                if (precision != null && precision.trim().length() != 0) {
+                    columnSize = new Integer(precision);
+                } else {
+                    final String length = columnRs.getString("LENGTH");
+                    columnSize = length != null ? new Integer(length) : null;
+                }
             }
             final Integer decimalDigits;
             {

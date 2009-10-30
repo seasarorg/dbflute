@@ -419,7 +419,8 @@ public class Table {
     //                                        Display String
     //                                        --------------
     public String getBasicInfoDispString() {
-        return getAliasExpression() + getName() + " that the type is " + getType();
+        final String type = getType();
+        return getAliasExpression() + getName() + (type != null ? " that is " + getType() : "");
     }
 
     public String getToolTipTitle() {
