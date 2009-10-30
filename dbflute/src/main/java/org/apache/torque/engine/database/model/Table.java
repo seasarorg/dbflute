@@ -104,7 +104,7 @@ public class Table {
     private String _name;
     private String _type;
     private String _schema;
-    private String _comment;
+    private String _plainComment;
     private String _description;
     private String _javaName;
     protected String _javaNamingMethod;
@@ -166,7 +166,7 @@ public class Table {
         _name = attrib.getValue("name");
         _type = attrib.getValue("type");
         _schema = attrib.getValue("schema");
-        _comment = attrib.getValue("comment");
+        _plainComment = attrib.getValue("comment");
         _javaName = attrib.getValue("javaName");
 
         // It retrieves the method for converting from specified name to a java name.
@@ -303,7 +303,7 @@ public class Table {
 
     public String getAlias() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = _comment;
+        final String comment = _plainComment;
         if (comment != null) {
             final String alias = prop.extractAliasFromDbComment(comment);
             if (alias != null) {
@@ -379,25 +379,23 @@ public class Table {
     // -----------------------------------------------------
     //                                         Table Comment
     //                                         -------------
+    public String getPlainComment() {
+        return _plainComment;
+    }
+
+    public void setPlainComment(String plainComment) {
+        this._plainComment = plainComment;
+    }
+
     public boolean hasComment() {
         final String comment = getComment();
         return comment != null && comment.trim().length() > 0;
     }
 
-    /**
-     * Get the comment of the Table
-     */
     public String getComment() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.extractCommentFromDbComment(_comment);
+        final String comment = prop.extractCommentFromDbComment(_plainComment);
         return comment != null ? comment : "";
-    }
-
-    /**
-     * Set the comment of the Table
-     */
-    public void setComment(String comment) {
-        this._comment = comment;
     }
 
     public String getCommentForSchemaHtml() {

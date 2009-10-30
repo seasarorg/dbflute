@@ -81,7 +81,7 @@ public class ${glDBFluteConfig} {
      */
     private ${glDBFluteConfig}() {
 	    if (_logDateFormat == null && isCurrentDBDef(DBDef.Oracle)) {
-	        _logDateFormat = "date $df:{" + DisplaySqlBuilder.DEFAULT_DATE_FORMAT + "}";
+	        _logDateFormat = "timestamp $df:{yyyy-MM-dd HH:mm:ss}";
 	    }
 	    if (_logTimestampFormat == null && isCurrentDBDef(DBDef.Oracle)) {
 	        _logTimestampFormat = "timestamp $df:{" + DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT + "}";

@@ -109,7 +109,7 @@ public class Column {
     private String _dbType;
     private String _columnSize;
     private String _defaultValue;
-    private String _comment;
+    private String _plainComment;
     private List<ForeignKey> _referrers;
 
     // -----------------------------------------------------
@@ -120,8 +120,8 @@ public class Column {
     // -----------------------------------------------------
     //                                Sql2Entity Information
     //                                ----------------------
-    private String _sql2EntityTableName;
-    private String _sql2EntityJavaNative;
+    private String _sql2EntityForcedJavaNative;
+    private String _sql2EntityRelatedTableName;
 
     // -----------------------------------------------------
     //                                       Other Component
@@ -185,7 +185,7 @@ public class Column {
         final String autoIncrement = attrib.getValue("autoIncrement");
         _isAutoIncrement = ("true".equals(autoIncrement));
 
-        _comment = attrib.getValue("comment");
+        _plainComment = attrib.getValue("comment");
         _defaultValue = attrib.getValue("default");
         _columnSize = attrib.getValue("size");
 
@@ -234,7 +234,7 @@ public class Column {
 
     public String getAlias() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = _comment;
+        final String comment = _plainComment;
         if (comment != null) {
             final String alias = prop.extractAliasFromDbComment(comment);
             if (alias != null) {
@@ -435,6 +435,10 @@ public class Column {
         if (isForeignKey()) {
             plugDelimiterIfNeeds(sb);
             sb.append("FK to " + getForeignTableName());
+        }
+        if (_sql2EntityRelatedTableName != null) {
+            plugDelimiterIfNeeds(sb);
+            sb.append("Related to ").append(_sql2EntityRelatedTableName);
         }
         return sb.toString();
     }
@@ -768,6 +772,14 @@ public class Column {
     // -----------------------------------------------------
     //                                        Column Comment
     //                                        --------------
+    public String getPlainComment() {
+        return _plainComment;
+    }
+
+    public void setPlainComment(String plainComment) {
+        this._plainComment = plainComment;
+    }
+
     public boolean hasComment() {
         final String comment = getComment();
         return comment != null && comment.trim().length() > 0;
@@ -775,12 +787,12 @@ public class Column {
 
     public String getComment() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        final String comment = prop.extractCommentFromDbComment(_comment);
+        final String comment = prop.extractCommentFromDbComment(_plainComment);
         return comment != null ? comment : "";
     }
 
     public void setComment(String comment) {
-        this._comment = comment;
+        this._plainComment = comment;
     }
 
     public String getCommentForSchemaHtml() {
@@ -1058,8 +1070,8 @@ public class Column {
      * @return Java native type used by torque. (NotNull)
      */
     public String getJavaNative() {
-        if (_sql2EntityJavaNative != null && _sql2EntityJavaNative.trim().length() > 0) {
-            return _sql2EntityJavaNative;
+        if (_sql2EntityForcedJavaNative != null && _sql2EntityForcedJavaNative.trim().length() > 0) {
+            return _sql2EntityForcedJavaNative;
         }
         return TypeMap.findJavaNativeByJdbcType(_jdbcType, getIntegerColumnSize(), getDecimalDigits());
     }
@@ -1189,20 +1201,22 @@ public class Column {
     // ===================================================================================
     //                                                              Sql2Entity Information
     //                                                              ======================
-    public String getSql2EntityTableName() {
-        return _sql2EntityTableName;
+    /**
+     * Set the related table name for Sql2Entity. <br />
+     * This is used at supplementary information.
+     * @param sql2EntityRelatedTableName The related table name for Sql2Entity. (Nullable)
+     */
+    public void setSql2EntityRelatedTableName(String sql2EntityRelatedTableName) {
+        _sql2EntityRelatedTableName = sql2EntityRelatedTableName;
     }
 
-    public void setSql2EntityTableName(String sql2EntityTableName) {
-        _sql2EntityTableName = sql2EntityTableName;
-    }
-
-    public String getSql2EntityJavaNative() {
-        return _sql2EntityJavaNative;
-    }
-
-    public void setSql2EntityJavaNative(String sql2EntityJavaNative) {
-        _sql2EntityJavaNative = sql2EntityJavaNative;
+    /**
+     * Set the forced java native type for Sql2Entity. <br />
+     * This is used at getting java native type as high priority.
+     * @param sql2EntityForcedJavaNative The forced java native type for Sql2Entity. (Nullable)
+     */
+    public void setSql2EntityForcedJavaNative(String sql2EntityForcedJavaNative) {
+        _sql2EntityForcedJavaNative = sql2EntityForcedJavaNative;
     }
 
     // ===================================================================================
@@ -1617,7 +1631,7 @@ public class Column {
 
     public boolean hasClassification() {
         final Database database = getTable().getDatabase();
-        if (_sql2EntityTableName != null && database.hasClassification(_sql2EntityTableName, getName())) {
+        if (hasSql2EntityRelatedTableClassification()) {
             return true;
         }
         return database.hasClassification(getTableName(), getName());
@@ -1633,7 +1647,7 @@ public class Column {
 
     public boolean hasClassificationName() {
         final Database database = getTable().getDatabase();
-        if (_sql2EntityTableName != null && database.hasClassificationName(_sql2EntityTableName, getName())) {
+        if (hasSql2EntityRelatedTableClassificationName()) {
             return true;
         }
         return database.hasClassificationName(getTableName(), getName());
@@ -1641,7 +1655,7 @@ public class Column {
 
     public boolean hasClassificationAlias() {
         final Database database = getTable().getDatabase();
-        if (_sql2EntityTableName != null && database.hasClassificationAlias(_sql2EntityTableName, getName())) {
+        if (hasSql2EntityRelatedTableClassificationAlias()) {
             return true;
         }
         return database.hasClassificationAlias(getTableName(), getName());
@@ -1649,11 +1663,9 @@ public class Column {
 
     public String getClassificationName() {
         final Database database = getTable().getDatabase();
-        if (_sql2EntityTableName != null) {
-            final String classificationName = database.getClassificationName(_sql2EntityTableName, getName());
-            if (classificationName != null) {
-                return classificationName;
-            }
+        final String classificationName = getSql2EntityRelatedTableClassificationName();
+        if (classificationName != null) {
+            return classificationName;
         }
         return database.getClassificationName(getTableName(), getName());
     }
@@ -1674,6 +1686,38 @@ public class Column {
             _log.warn("getClassificationMapList() threw the exception: ", e);
             throw e;
         }
+    }
+
+    protected boolean hasSql2EntityRelatedTableClassification() {
+        if (_sql2EntityRelatedTableName == null) {
+            return false;
+        }
+        final Database database = getTable().getDatabase();
+        return database.hasClassification(_sql2EntityRelatedTableName, getName());
+    }
+
+    protected boolean hasSql2EntityRelatedTableClassificationName() {
+        if (_sql2EntityRelatedTableName == null) {
+            return false;
+        }
+        final Database database = getTable().getDatabase();
+        return database.hasClassificationName(_sql2EntityRelatedTableName, getName());
+    }
+
+    protected boolean hasSql2EntityRelatedTableClassificationAlias() {
+        if (_sql2EntityRelatedTableName == null) {
+            return false;
+        }
+        final Database database = getTable().getDatabase();
+        return database.hasClassificationAlias(_sql2EntityRelatedTableName, getName());
+    }
+
+    protected String getSql2EntityRelatedTableClassificationName() {
+        if (_sql2EntityRelatedTableName == null) {
+            return null;
+        }
+        final Database database = getTable().getDatabase();
+        return database.getClassificationName(_sql2EntityRelatedTableName, getName());
     }
 
     // ===================================================================================

@@ -32,6 +32,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
@@ -276,20 +277,22 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         for (int i = 1; i <= md.getColumnCount(); i++) {
                             final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
 
-                            String sql2EntityTableName = null;
+                            String sql2EntityRelatedTableName = null;
                             try {
-                                sql2EntityTableName = md.getTableName(i);
+                                sql2EntityRelatedTableName = md.getTableName(i);
                             } catch (SQLException ignored) {
                                 // Because this table name is not required. This is for classification.
                                 String msg = "ResultSetMetaData.getTableName(" + i + ") threw the exception:";
                                 msg = msg + " " + ignored.getMessage();
                                 _log.info(msg);
                             }
-                            metaInfo.setSql2EntityTableName(sql2EntityTableName);
+                            metaInfo.setSql2EntityRelatedTableName(sql2EntityRelatedTableName);
 
                             String columnName = md.getColumnLabel(i);
+                            String relatedColumnName = md.getColumnName(i);
+                            metaInfo.setSql2EntityRelatedColumnName(relatedColumnName);
                             if (columnName == null || columnName.trim().length() == 0) {
-                                columnName = md.getColumnName(i);
+                                columnName = relatedColumnName;
                             }
                             if (columnName == null || columnName.trim().length() == 0) {
                                 final String ln = ln();
@@ -315,8 +318,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             final int scale = md.getScale(i);
                             metaInfo.setDecimalDigits(scale);
 
-                            final String sql2entityJavaNative = columnJavaNativeMap.get(columnName);
-                            metaInfo.setSql2EntityJavaNative(sql2entityJavaNative);
+                            final String sql2entityForcedJavaNative = columnJavaNativeMap.get(columnName);
+                            metaInfo.setSql2EntityForcedJavaNative(sql2entityForcedJavaNative);
 
                             columnJdbcTypeMap.put(columnName, metaInfo);
                         }
@@ -911,8 +914,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 setupTorqueType(columnJdbcTypeMap, columnName, column, allCommonColumn);
                 setupDbType(columnJdbcTypeMap, columnName, column);
                 setupColumnSizeContainsDigit(columnJdbcTypeMap, columnName, column);
-                setupSql2EntitySecondTableName(columnJdbcTypeMap, columnName, column);
-                setupSql2EntitySecondJavaNative(columnJdbcTypeMap, columnName, column);
+                setupColumnComment(columnJdbcTypeMap, columnName, column);
+                setupSql2EntityRelatedTableName(columnJdbcTypeMap, columnName, column);
+                setupSql2EntityForcedJavaNative(columnJdbcTypeMap, columnName, column);
 
                 tbl.addColumn(column);
                 _log.info("   " + (column.isPrimaryKey() ? "*" : " ") + columnName + " --> " + column.getName() + " : "
@@ -1006,18 +1010,44 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         column.setColumnSize(columnSize + "," + decimalDigits);
     }
 
-    protected void setupSql2EntitySecondTableName(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
-            String columnName, final Column column) {
+    protected void setupColumnComment(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap, String columnName,
+            final Column column) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
-        final String sql2EntityTableName = metaInfo.getSql2EntityTableName();
-        column.setSql2EntityTableName(sql2EntityTableName);
+        final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
+        if (_schemaData == null) {
+            return;
+        }
+        final Table relatedTable;
+        try {
+            relatedTable = _schemaData.getDatabase().getTable(sql2EntityRelatedTableName);
+        } catch (EngineException e) {
+            String msg = "Failed to get database information: schemaData=" + _schemaData;
+            throw new IllegalStateException(msg);
+        }
+        if (relatedTable == null) {
+            return;
+        }
+        final String relatedColumnName = metaInfo.getSql2EntityRelatedColumnName();
+        final Column relatedColumn = relatedTable.getColumn(relatedColumnName);
+        if (relatedColumn == null) {
+            return;
+        }
+        final String plainComment = relatedColumn.getPlainComment();
+        column.setPlainComment(plainComment);
     }
 
-    protected void setupSql2EntitySecondJavaNative(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
+    protected void setupSql2EntityRelatedTableName(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
             String columnName, final Column column) {
         final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
-        final String sql2EntityJavaNative = metaInfo.getSql2EntityJavaNative();
-        column.setSql2EntityJavaNative(sql2EntityJavaNative);
+        final String sql2EntityRelatedTableName = metaInfo.getSql2EntityRelatedTableName();
+        column.setSql2EntityRelatedTableName(sql2EntityRelatedTableName);
+    }
+
+    protected void setupSql2EntityForcedJavaNative(final Map<String, DfColumnMetaInfo> columnJdbcTypeMap,
+            String columnName, final Column column) {
+        final DfColumnMetaInfo metaInfo = columnJdbcTypeMap.get(columnName);
+        final String sql2EntityForcedJavaNative = metaInfo.getSql2EntityForcedJavaNative();
+        column.setSql2EntityForcedJavaNative(sql2EntityForcedJavaNative);
     }
 
     protected VelocityContext createVelocityContext(final AppData appData) {
