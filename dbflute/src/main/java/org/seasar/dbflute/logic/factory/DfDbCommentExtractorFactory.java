@@ -50,11 +50,16 @@ public class DfDbCommentExtractorFactory {
         if (_basicProperties.isDatabaseMySQL()) {
             final DfDbCommentExtractorMySql extractor = new DfDbCommentExtractorMySql();
             extractor.setDataSource(_dataSource);
-            final String schema = extractSchemaFromMySqlUrl();
-            if (schema == null || schema.trim().length() == 0) {
-                return null;
+            if (_schema != null && _schema.trim().length() > 0) {
+                extractor.setSchema(_schema);
+            } else {
+                // because a schema is not required at MySQL
+                final String schema = extractSchemaFromMySqlUrl();
+                if (schema == null || schema.trim().length() == 0) {
+                    return null;
+                }
+                extractor.setSchema(schema);
             }
-            extractor.setSchema(schema);
             return extractor;
         } else if (_basicProperties.isDatabaseOracle()) {
             final DfDbCommentExtractorOracle extractor = new DfDbCommentExtractorOracle();
