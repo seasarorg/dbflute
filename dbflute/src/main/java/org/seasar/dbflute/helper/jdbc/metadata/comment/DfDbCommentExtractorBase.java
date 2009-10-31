@@ -126,7 +126,7 @@ public abstract class DfDbCommentExtractorBase implements DfDbCommentExtractor {
                 final String comments = rs.getString("COMMENTS");
                 final UserTabComments userTabComments = new UserTabComments();
                 userTabComments.setTableName(tableName);
-                userTabComments.setComments(comments);
+                userTabComments.setComments(filterTableComments(comments));
                 resultList.add(userTabComments);
             }
             return resultList;
@@ -151,6 +151,10 @@ public abstract class DfDbCommentExtractorBase implements DfDbCommentExtractor {
         }
     }
 
+    protected String filterTableComments(String comments) { // extension point
+        return comments; // as default
+    }
+
     protected abstract List<UserColComments> selectUserColComments(Connection conn, Set<String> tableSet);
 
     protected List<UserColComments> doSelectUserColComments(String sql, Connection conn, Set<String> tableSet) {
@@ -171,7 +175,7 @@ public abstract class DfDbCommentExtractorBase implements DfDbCommentExtractor {
                 final UserColComments userColComments = new UserColComments();
                 userColComments.setTableName(tableName);
                 userColComments.setColumnName(columnName);
-                userColComments.setComments(comments);
+                userColComments.setComments(filterColumnComments(comments));
                 resultList.add(userColComments);
             }
             return resultList;
@@ -194,6 +198,10 @@ public abstract class DfDbCommentExtractorBase implements DfDbCommentExtractor {
                 }
             }
         }
+    }
+
+    protected String filterColumnComments(String comments) { // extension point
+        return comments; // as default
     }
 
     // ===================================================================================

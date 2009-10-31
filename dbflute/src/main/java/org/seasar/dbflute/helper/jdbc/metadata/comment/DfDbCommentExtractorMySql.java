@@ -41,6 +41,18 @@ public class DfDbCommentExtractorMySql extends DfDbCommentExtractorBase {
         return doSelectUserTabComments(sql, conn, tableSet);
     }
 
+    @Override
+    protected String filterTableComments(String comments) { // extension point
+        if (comments.startsWith("InnoDB free:")) {
+            return null;
+        }
+        final int semicolunIndex = comments.indexOf("; InnoDB free:");
+        if (semicolunIndex < 0) {
+            return comments;
+        }
+        return comments.substring(0, semicolunIndex);
+    }
+
     protected List<UserColComments> selectUserColComments(Connection conn, Set<String> tableSet) {
         final List<UserColComments> resultList = new ArrayList<UserColComments>();
         for (String tableName : tableSet) {
