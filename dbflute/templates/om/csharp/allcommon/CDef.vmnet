@@ -63,7 +63,11 @@ namespace ${glPackageBaseCommon} {
                 ${classificationName} cls = (${classificationName})obj;
                 return _code.ToLower().Equals(cls.Code.ToLower());
             }
-            public override String ToString() { return _code; }
+#if ($database.isCDefToStringReturnsName())
+            public override String ToString() { return this.Name; }
+#else
+            public override String ToString() { return this.Code; }
+#end
         }
 
 #end

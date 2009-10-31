@@ -113,6 +113,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                                CDef
+    //                                                                                ====
+    public boolean isCDefToStringReturnsName() { // It's closet!
+        return isProperty("isCDefToStringReturnsName", false);
+    }
+
+    // ===================================================================================
     //                                                                   Alternate Control
     //                                                                   =================
     public boolean isAlternateGenerateControlValid() {

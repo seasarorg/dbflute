@@ -1312,6 +1312,10 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().getExtendedS2DaoSettingClass();
     }
 
+    public boolean isCDefToStringReturnsName() {
+        return getProperties().getLittleAdjustmentProperties().isCDefToStringReturnsName();
+    }
+
     public boolean isStopGenerateExtendedBhv() {
         return getProperties().getLittleAdjustmentProperties().isStopGenerateExtendedBhv();
     }
