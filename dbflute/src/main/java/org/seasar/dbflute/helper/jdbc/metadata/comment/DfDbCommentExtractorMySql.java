@@ -16,32 +16,49 @@
 package org.seasar.dbflute.helper.jdbc.metadata.comment;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 /**
  * @author jflute
+ * @since 0.9.6 (2009/10/31 Saturday)
  */
-public class DfDbCommentExtractorOracle extends DfDbCommentExtractorBase {
+public class DfDbCommentExtractorMySql extends DfDbCommentExtractorBase {
 
     // ===================================================================================
     //                                                                    Select Meta Data
     //                                                                    ================
     protected List<UserTabComments> selectUserTabComments(Connection conn, Set<String> tableSet) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select * from ALL_TAB_COMMENTS");
-        sb.append(" where OWNER = '").append(_schema).append("'");
-        sb.append(" order by TABLE_NAME asc");
+        sb.append("select table_type as OBJECT_TYPE");
+        sb.append(", table_name as TABLE_NAME");
+        sb.append(", table_comment as COMMENTS");
+        sb.append(" from information_schema.tables");
+        sb.append(" where table_schema = '").append(_schema).append("'");
+        sb.append(" order by table_name asc");
         final String sql = sb.toString();
         return doSelectUserTabComments(sql, conn, tableSet);
     }
 
     protected List<UserColComments> selectUserColComments(Connection conn, Set<String> tableSet) {
+        final List<UserColComments> resultList = new ArrayList<UserColComments>();
+        for (String tableName : tableSet) {
+            final String sql = buildUserColCommentsSql(tableName);
+            final List<UserColComments> userColComments = doSelectUserColComments(sql, conn, tableSet);
+            resultList.addAll(userColComments);
+        }
+        return resultList;
+    }
+
+    protected String buildUserColCommentsSql(String tableName) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select * from ALL_COL_COMMENTS");
-        sb.append(" where OWNER = '").append(_schema).append("'");
-        sb.append(" order by TABLE_NAME asc, COLUMN_NAME asc");
-        final String sql = sb.toString();
-        return doSelectUserColComments(sql, conn, tableSet);
+        sb.append("select table_name as TABLE_NAME");
+        sb.append(", column_name as COLUMN_NAME");
+        sb.append(", column_comment as COMMENTS");
+        sb.append(" from information_schema.columns");
+        sb.append(" where table_schema = '").append(_schema).append("'");
+        sb.append(" order by table_name asc, column_name asc");
+        return sb.toString();
     }
 }

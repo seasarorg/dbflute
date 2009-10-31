@@ -504,7 +504,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     public List<DfTableMetaInfo> getTableNames(DatabaseMetaData dbMeta) throws SQLException {
         final List<DfTableMetaInfo> tableList = _tableHandler.getTableList(dbMeta, _schema);
-        helpTableComments(tableList, _schema);
+        helpTableComments(tableList, _url, _schema);
         resolveAdditionalSchema(dbMeta, tableList);
         return tableList;
     }
@@ -521,13 +521,14 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                     metaInfo.setTableSchema(additionalSchema);
                 }
             }
-            helpTableComments(additionalTableList, additionalSchema);
+            // URL is null because of for additional schema here
+            helpTableComments(additionalTableList, null, additionalSchema);
             tableList.addAll(additionalTableList);
         }
     }
 
-    protected void helpTableComments(List<DfTableMetaInfo> tableList, String schema) {
-        final DfDbCommentExtractor extractor = createDbCommentExtractor(schema);
+    protected void helpTableComments(List<DfTableMetaInfo> tableList, String url, String schema) {
+        final DfDbCommentExtractor extractor = createDbCommentExtractor(url, schema);
         if (extractor != null) {
             final Set<String> tableSet = new HashSet<String>();
             for (DfTableMetaInfo table : tableList) {
@@ -868,13 +869,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // ===================================================================================
     //                                                                           Extractor
     //                                                                           =========
-    protected DfDbCommentExtractor createDbCommentExtractor(String schema) {
-        final DfDbCommentExtractorFactory factory = createDbCommentExtractorFactory(schema);
+    protected DfDbCommentExtractor createDbCommentExtractor(String url, String schema) {
+        final DfDbCommentExtractorFactory factory = createDbCommentExtractorFactory(url, schema);
         return factory.createDbCommentExtractor();
     }
 
-    protected DfDbCommentExtractorFactory createDbCommentExtractorFactory(String schema) {
-        return new DfDbCommentExtractorFactory(getBasicProperties(), getDataSource(), schema);
+    protected DfDbCommentExtractorFactory createDbCommentExtractorFactory(String url, String schema) {
+        return new DfDbCommentExtractorFactory(getBasicProperties(), getDataSource(), url, schema);
     }
 
     protected DfIdentityExtractor createIdentityExtractor() {

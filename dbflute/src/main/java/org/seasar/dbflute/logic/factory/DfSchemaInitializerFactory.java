@@ -5,12 +5,12 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializer;
-import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerDB2;
-import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerJdbc;
-import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerMySQL;
-import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerOracle;
-import org.seasar.dbflute.helper.jdbc.schemainitializer.DfSchemaInitializerSqlServer;
+import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializer;
+import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerDB2;
+import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerJdbc;
+import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerMySQL;
+import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerOracle;
+import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerSqlServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;

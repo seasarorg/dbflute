@@ -13,11 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.jdbc.schemainitializer;
+package org.seasar.dbflute.logic.schemainitializer;
 
 /**
- * The schema initializer for SqlServer.
  * @author jflute
  */
-public class DfSchemaInitializerSqlServer extends DfSchemaInitializerJdbc {
+public interface DfSchemaInitializer {
+    
+    public void initializeSchema();
 }
