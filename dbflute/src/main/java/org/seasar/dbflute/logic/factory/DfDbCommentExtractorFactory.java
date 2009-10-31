@@ -29,8 +29,8 @@ public class DfDbCommentExtractorFactory {
     /**
      * @param basicProperties The basic properties. (NotNull)
      * @param dataSource The data source. (NotNull)
-     * @param url The url to extract. (Nullable)
-     * @param schema The schema to extract. (Nullable)
+     * @param url The url to extract at a database that does not have schema. (Nullable)
+     * @param schema The schema to extract mainly. (Nullable)
      */
     public DfDbCommentExtractorFactory(DfBasicProperties basicProperties, DataSource dataSource, String url,
             String schema) {
