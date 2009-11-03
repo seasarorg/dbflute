@@ -6,7 +6,7 @@
 
 	<!-- Version -->
 	<property name="version" value="0.8.9.6"/>
-	<property name="internal.version" value="${version}-RC2"/>
+	<property name="internal.version" value="${version}"/>
 
 	<!-- Directories and Module Files -->
 	<property name="dbflute.dist" value="dist/net"/>
