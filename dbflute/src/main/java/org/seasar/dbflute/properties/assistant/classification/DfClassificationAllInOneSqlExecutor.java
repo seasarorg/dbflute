@@ -62,6 +62,7 @@ public class DfClassificationAllInOneSqlExecutor {
                 }
 
                 final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
+                selectedTmpMap.put("classificationName", tmpClassificationNameValue);
                 selectedTmpMap.put(DfClassificationElement.KEY_CODE, tmpCodeValue);
                 selectedTmpMap.put(DfClassificationElement.KEY_NAME, tmpNameValue);
                 selectedTmpMap.put(DfClassificationElement.KEY_ALIAS, tmpAliasValue);
