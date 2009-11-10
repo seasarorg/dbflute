@@ -5,11 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,7 +35,6 @@ public class DfClassificationAllInOneSqlExecutor {
             _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             _log.debug("The classification sql: " + sql);
             rs = stmt.executeQuery(sql);
-            final Set<String> classificationNameDuplicateCheckSet = new HashSet<String>();
             while (rs.next()) {
                 final String tmpClassificationNameValue = rs.getString("classificationName");
                 final String tmpCodeValue = rs.getString(DfClassificationElement.KEY_CODE);
@@ -56,11 +53,6 @@ public class DfClassificationAllInOneSqlExecutor {
                 final String tmpCommentValue = rs.getString(DfClassificationElement.KEY_COMMENT);
                 final String tmpTopCommentValue = rs.getString(DfClassificationTop.KEY_TOP_COMMENT);
 
-                if (classificationNameDuplicateCheckSet.contains(tmpClassificationNameValue)) {
-                    _log.debug("    duplicate: " + tmpClassificationNameValue);
-                    continue;
-                }
-
                 final Map<String, String> selectedTmpMap = new LinkedHashMap<String, String>();
                 selectedTmpMap.put("classificationName", tmpClassificationNameValue);
                 selectedTmpMap.put(DfClassificationElement.KEY_CODE, tmpCodeValue);
@@ -74,7 +66,6 @@ public class DfClassificationAllInOneSqlExecutor {
                 }
 
                 elementList.add(selectedTmpMap);
-                classificationNameDuplicateCheckSet.add(tmpClassificationNameValue);
             }
             _log.debug("- - - - - - - - /");
         } catch (SQLException e) {
