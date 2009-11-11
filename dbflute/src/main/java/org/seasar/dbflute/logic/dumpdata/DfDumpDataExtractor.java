@@ -50,16 +50,18 @@ public class DfDumpDataExtractor {
      */
     public Map<String, List<Map<String, String>>> extractData(Map<String, List<String>> tableColumnMap, int limit) {
         final Map<String, List<Map<String, String>>> dumpDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
+        Connection conn = null;
         try {
+            conn = _dataSource.getConnection();
             final Set<String> tableNameSet = tableColumnMap.keySet();
             for (String tableName : tableNameSet) {
                 final List<String> columnNameList = tableColumnMap.get(tableName);
-                final Connection conn = _dataSource.getConnection();
-                final Statement statement = conn.createStatement();
                 final String selectClause = buildSelectClause(columnNameList);
                 final String fromClause = buildFromClause(tableName);
                 final List<Map<String, String>> recordList = new ArrayList<Map<String, String>>();
+                Statement statement = null;
                 try {
+                    statement = conn.createStatement();
                     final String sql = selectClause + " " + fromClause;
                     final ResultSet rs = statement.executeQuery(sql);
                     int count = 0;
@@ -78,11 +80,22 @@ public class DfDumpDataExtractor {
                     _log.info("    " + tableName + "(" + recordList.size() + ")");
                 } catch (SQLException ignored) {
                     _log.info("Failed to extract data of " + tableName + ": " + ignored.getMessage());
+                } finally {
+                    if (statement != null) {
+                        statement.close();
+                    }
                 }
                 dumpDataMap.put(tableName, recordList);
             }
         } catch (SQLException e) {
             throw new IllegalStateException(e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
         }
         return dumpDataMap;
     }
