@@ -81,9 +81,6 @@ public abstract class DfAbstractTask extends Task {
                 connectSchema();
             }
             doExecute();
-            if (isUseDataSource()) {
-                closingDataSource();
-            }
         } catch (RuntimeException e) {
             try {
                 logRuntimeException(e);
@@ -101,6 +98,9 @@ public abstract class DfAbstractTask extends Task {
             }
             throwTaskFailure();
         } finally {
+            if (isUseDataSource()) {
+                closingDataSource();
+            }
             long after = getTaskAfterTimeMillis();
             if (isValidTaskEndInformation()) {
                 String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();

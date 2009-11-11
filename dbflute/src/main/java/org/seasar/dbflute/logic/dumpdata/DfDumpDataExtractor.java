@@ -1,10 +1,5 @@
 package org.seasar.dbflute.logic.dumpdata;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.properties.DfAbstractHelperProperties;
 
 /**
@@ -22,9 +18,9 @@ import org.seasar.dbflute.properties.DfAbstractHelperProperties;
  */
 public class DfDumpDataExtractor {
 
-    // ===============================================================================
-    //                                                                      Definition
-    //                                                                      ==========
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log-instance */
     private static final Log _log = LogFactory.getLog(DfAbstractHelperProperties.class);
 
@@ -50,52 +46,16 @@ public class DfDumpDataExtractor {
      */
     public Map<String, List<Map<String, String>>> extractData(Map<String, List<String>> tableColumnMap, int limit) {
         final Map<String, List<Map<String, String>>> dumpDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
-        Connection conn = null;
-        try {
-            conn = _dataSource.getConnection();
-            final Set<String> tableNameSet = tableColumnMap.keySet();
-            for (String tableName : tableNameSet) {
-                final List<String> columnNameList = tableColumnMap.get(tableName);
-                final String selectClause = buildSelectClause(columnNameList);
-                final String fromClause = buildFromClause(tableName);
-                final List<Map<String, String>> recordList = new ArrayList<Map<String, String>>();
-                Statement statement = null;
-                try {
-                    statement = conn.createStatement();
-                    final String sql = selectClause + " " + fromClause;
-                    final ResultSet rs = statement.executeQuery(sql);
-                    int count = 0;
-                    while (rs.next()) {
-                        if (limit >= 0 && limit <= count) {
-                            break;
-                        }
-                        final LinkedHashMap<String, String> recordMap = new LinkedHashMap<String, String>();
-                        for (String columnName : columnNameList) {
-                            final String columnValue = rs.getString(columnName);
-                            recordMap.put(columnName, columnValue);
-                        }
-                        recordList.add(recordMap);
-                        ++count;
-                    }
-                    _log.info("    " + tableName + "(" + recordList.size() + ")");
-                } catch (SQLException ignored) {
-                    _log.info("Failed to extract data of " + tableName + ": " + ignored.getMessage());
-                } finally {
-                    if (statement != null) {
-                        statement.close();
-                    }
-                }
-                dumpDataMap.put(tableName, recordList);
-            }
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                }
-            }
+        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        final Set<String> tableNameSet = tableColumnMap.keySet();
+        for (String tableName : tableNameSet) {
+            final List<String> columnList = tableColumnMap.get(tableName);
+            final String selectClause = buildSelectClause(columnList);
+            final String fromClause = buildFromClause(tableName);
+            final String sql = selectClause + " " + fromClause;
+            final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList, limit);
+            _log.info("    " + tableName + "(" + resultList.size() + ")");
+            dumpDataMap.put(tableName, resultList);
         }
         return dumpDataMap;
     }

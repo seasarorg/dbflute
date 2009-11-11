@@ -110,9 +110,6 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 connectSchema();
             }
             doExecute();
-            if (isUseDataSource()) {
-                closingDataSource();
-            }
         } catch (RuntimeException e) {
             try {
                 logRuntimeException(e);
@@ -130,6 +127,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             }
             throwTaskFailure();
         } finally {
+            if (isUseDataSource()) {
+                closingDataSource();
+            }
             long after = System.currentTimeMillis();
             String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
             StringBuilder sb = new StringBuilder();
