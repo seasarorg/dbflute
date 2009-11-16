@@ -727,10 +727,10 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                                         , String propertyName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
-        
+
         // Because sub-query may be only allowed to return a single column.
         String selectClause = "select " + tableAliasName + "." + relatedColumnNames[0];
-        
+
         String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnNames, propertyName
                                                                        , selectClause, tableAliasName, realColumnNames);
         return selectClause + " " + fromWhereClause;
@@ -1119,13 +1119,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                                                               , String propertyName
                                                               , String tableAliasName) {
         String clause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
-        
+
         // Replace the alias names for local table with alias name of sub-query unique. 
         clause = replaceString(clause, "dflocal", tableAliasName);
-        
+
         // Resolve the location path for the condition-query of sub-query. 
         clause = replaceString(clause, ".conditionQuery.", "." + getLocationBase(propertyName) + ".");
-        
+
         return clause;
     }
     
@@ -1163,7 +1163,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
         String propertyName = dbmeta.findPropertyName(colName);
         String uncapPropName = initUncap(propertyName);
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, it is necessary to use uncapPropName!
+        // If Java, it is necessary to use uncapPropName!
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
     }
 
@@ -1172,7 +1173,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
         String propertyName = dbmeta.findPropertyName(colName);
         String uncapPropName = initUncap(propertyName);
-        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, it is necessary to use uncapPropName!
+        // If Java, it is necessary to use uncapPropName!
+        key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }
 
@@ -1212,11 +1214,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
             final int clauseIndex = whereIndex + "where ".length();
             final String mark = getSqlClause().getUnionWhereFirstConditionMark();
-            unionQueryClause = fromClause + " " + whereClause.substring(0, clauseIndex) + mark + whereClause.substring(clauseIndex);
+            final String markedClause = whereClause.substring(0, clauseIndex) + mark + whereClause.substring(clauseIndex);
+            unionQueryClause = fromClause + " " + markedClause;
         }
         final String oldStr = ".conditionQuery.";
         final String newStr = ".conditionQuery." + unionQueryPropertyName + ".";
-        return replaceString(unionQueryClause, oldStr, newStr);// Very Important!
+        return replaceString(unionQueryClause, oldStr, newStr); // Very Important!
     }
 
     // -----------------------------------------------------

@@ -1,8 +1,8 @@
 <project name="DBFluteRuntime" default="dist" basedir=".">
 
-	<property name="version" value="0.9.6"/>
-	<property name="build.version" value="0.9.6"/>
-	<property name="pre.version" value="0.9.5.5"/>
+	<property name="version" value="0.9.6.1"/>
+	<property name="build.version" value="0.9.6.1-06-SNAPSHOT"/>
+	<property name="pre.version" value="0.9.6"/>
 
 	<target name="dist">
 		<copy file="target/dbflute-runtime-${build.version}.jar"

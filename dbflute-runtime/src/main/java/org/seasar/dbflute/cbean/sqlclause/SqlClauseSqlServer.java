@@ -42,12 +42,31 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     }
 
     // ===================================================================================
+    //                                                                Main Clause Override
+    //                                                                ====================
+    @Override
+    protected boolean isUnionNormalSelectEnclosingRequired() {
+        return true;
+    }
+
+    // ===================================================================================
+    //                                                               Clause Parts Override
+    //                                                               =====================
+    @Override
+    protected void appendSelectHint(StringBuilder sb) {
+        if (needsUnionNormalSelectEnclosing()) {
+            return; // because clause should be enclosed when union normal select
+        }
+        super.appendSelectHint(sb);
+    }
+
+    // ===================================================================================
     //                                                                    OrderBy Override
     //                                                                    ================
-	@Override
+    @Override
     protected OrderByClause.OrderByNullsSetupper createOrderByNullsSetupper() {
-	    return createOrderByNullsSetupperByCaseWhen();
-	}
+        return createOrderByNullsSetupperByCaseWhen();
+    }
 
     // ===================================================================================
     //                                                                 FetchScope Override

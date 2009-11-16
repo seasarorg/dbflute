@@ -48,18 +48,16 @@ public class SqlClauseOracle extends AbstractSqlClause {
     }
 
     // ===================================================================================
-    //                                                          Database Original Override
-    //                                                          ==========================
+    //                                                                Main Clause Override
+    //                                                                ====================
     @Override
-    protected String buildUnionClause(String selectClause) {
-
+    protected String prepareUnionClause(String selectClause) {
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         // Remove select-hint comment from select clause of union
         // for fetch-scope with union().
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
         selectClause = replaceString(selectClause, SELECT_HINT, "");
-        return super.buildUnionClause(selectClause);
+        return super.prepareUnionClause(selectClause);
     }
 
     // ===================================================================================

@@ -172,42 +172,43 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     // ===================================================================================
-    //                                                                              Clause
-    //                                                                              ======
+    //                                                                         Main Clause
+    //                                                                         ===========
     // -----------------------------------------------------
     //                                       Complete Clause
     //                                       ---------------
     public String getClause() {
         StringBuilder sb = new StringBuilder(512);
-        sb.append(getSelectClause());
+        String selectClause = getSelectClause();
+        sb.append(selectClause);
         sb.append(" ");
-        sb.append(buildClauseWithoutMainSelect());
+        buildClauseWithoutMainSelect(sb, selectClause);
         String sql = sb.toString();
-        sql = filterUnionCountOrScalar(sql);
+        sql = filterEnclosingClause(sql);
         sql = filterSubQueryIndent(sql);
         return sql;
     }
 
-    protected String buildClauseWithoutMainSelect() {
-        StringBuilder sb = new StringBuilder(512);
-        sb.append(getFromClause());
+    protected void buildClauseWithoutMainSelect(StringBuilder sb, String selectClause) {
+        buildFromClause(sb);
         sb.append(getFromHint());
         sb.append(" ");
-        sb.append(getWhereClause());
-        String unionClause = buildUnionClause(getSelectClause());
-
-        // Delete template mark! (At the future this will be unnecessary.)
-        unionClause = replaceString(unionClause, getUnionWhereClauseMark(), "");// Required!
-        unionClause = replaceString(unionClause, getUnionWhereFirstConditionMark(), "");// Required!
-
+        buildWhereClause(sb);
+        String unionClause = prepareUnionClause(selectClause);
+        unionClause = deleteUnionWhereTemplateMark(unionClause); // required
         sb.append(unionClause);
-        if (_orderByEffective && !_orderByClause.isEmpty()) {
-            sb.append(" ");
-            sb.append(getOrderByClause());
+        if (!needsUnionNormalSelectEnclosing()) {
+            sb.append(prepareClauseOrderBy());
+            sb.append(prepareClauseSqlSuffix());
         }
-        sb.append(" ");
-        sb.append(getSqlSuffix());
-        return sb.toString();
+    }
+
+    protected String deleteUnionWhereTemplateMark(String unionClause) {
+        if (unionClause != null && unionClause.trim().length() > 0) {
+            unionClause = replaceString(unionClause, getUnionWhereClauseMark(), "");
+            unionClause = replaceString(unionClause, getUnionWhereFirstConditionMark(), "");
+        }
+        return unionClause;
     }
 
     // -----------------------------------------------------
@@ -222,33 +223,74 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     protected String buildClauseFromWhereAsTemplate(boolean template) {
-        StringBuilder sb = new StringBuilder(512);
-        sb.append(getFromClause());
+        StringBuilder sb = new StringBuilder(256);
+        buildFromClause(sb);
         sb.append(getFromHint());
         sb.append(" ");
-        sb.append(buildWhereClause(template));
-        sb.append(buildUnionClause(getUnionSelectClauseMark()));
+        buildWhereClause(sb, template);
+        sb.append(prepareUnionClause(getUnionSelectClauseMark()));
         return sb.toString();
     }
 
-    protected String buildUnionClause(String selectClause) {
+    protected String prepareUnionClause(String selectClause) {
+        if (!hasUnionQuery()) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
-        if (hasUnionQuery()) {
-            for (Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext();) {
-                UnionQueryInfo unionQueryInfo = (UnionQueryInfo) ite.next();
-                String unionQueryClause = unionQueryInfo.getUnionQueryClause();
-                boolean unionAll = unionQueryInfo.isUnionAll();
-                sb.append(ln());
-                sb.append(unionAll ? " union all " : " union ");
-                sb.append(ln());
-                sb.append(selectClause).append(" ").append(unionQueryClause);
-            }
+        for (Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext();) {
+            UnionQueryInfo unionQueryInfo = (UnionQueryInfo) ite.next();
+            String unionQueryClause = unionQueryInfo.getUnionQueryClause();
+            boolean unionAll = unionQueryInfo.isUnionAll();
+            sb.append(ln());
+            sb.append(unionAll ? " union all " : " union ");
+            sb.append(ln());
+            sb.append(selectClause).append(" ").append(unionQueryClause);
         }
         return sb.toString();
     }
 
-    protected String filterUnionCountOrScalar(String sql) {
-        if (!isSelectClauseTypeCountOrScalar() || !hasUnionQuery()) {
+    protected String prepareClauseOrderBy() {
+        if (!_orderByEffective || _orderByClause.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ");
+        sb.append(getOrderByClause());
+        return sb.toString();
+    }
+
+    protected String prepareClauseSqlSuffix() {
+        String sqlSuffix = getSqlSuffix();
+        if (sqlSuffix == null || sqlSuffix.trim().length() == 0) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ");
+        sb.append(sqlSuffix);
+        return sb.toString();
+    }
+
+    protected String filterEnclosingClause(String sql) {
+        sql = filterUnionNormalSelectEnclosing(sql);
+        sql = filterUnionCountOrScalarEnclosing(sql);
+        return sql;
+    }
+
+    protected String filterUnionNormalSelectEnclosing(String sql) {
+        if (!needsUnionNormalSelectEnclosing()) {
+            return sql;
+        }
+        String selectClause = "select" + SELECT_HINT + " *";
+        String ln = ln();
+        String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
+        String endMark = resolveSubQueryEndMark("dfmain");
+        String clause = selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
+        clause = clause + prepareClauseOrderBy() + prepareClauseSqlSuffix();
+        return clause;
+    }
+
+    protected String filterUnionCountOrScalarEnclosing(String sql) {
+        if (!needsUnionCountOrScalarEnclosing()) {
             return sql;
         }
         String selectClause = buildSelectClauseCountOrScalar("dfmain");
@@ -258,9 +300,27 @@ public abstract class AbstractSqlClause implements SqlClause {
         return selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
     }
 
+    protected boolean needsUnionNormalSelectEnclosing() {
+        if (!isUnionNormalSelectEnclosingRequired()) {
+            return false;
+        }
+        return hasUnionQuery() && !isSelectClauseTypeCountOrScalar();
+    }
+
+    protected boolean isUnionNormalSelectEnclosingRequired() { // for extension
+        return false; // false as default
+    }
+
+    protected boolean needsUnionCountOrScalarEnclosing() {
+        return hasUnionQuery() && isSelectClauseTypeCountOrScalar();
+    }
+
     // ===================================================================================
     //                                                                        Clause Parts
     //                                                                        ============
+    // -----------------------------------------------------
+    //                                         Select Clause
+    //                                         -------------
     public String getSelectClause() {
         // [DBFlute-0.8.6]
         if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
@@ -273,8 +333,10 @@ public abstract class AbstractSqlClause implements SqlClause {
         DBMeta dbmeta = findDBMeta(_tableName);
         List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
 
-        Map<String, String> localSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap
-                .get(getLocalTableAliasName()) : null;
+        Map<String, String> localSpecifiedMap = null;
+        if (_specifiedSelectColumnMap != null) {
+            localSpecifiedMap = _specifiedSelectColumnMap.get(getLocalTableAliasName());
+        }
         boolean existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
 
         Integer selectIndex = 0;
@@ -283,6 +345,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         }
 
         // Columns of local table.
+        boolean needsDelimiter = false;
         for (ColumnInfo columnInfo : columnInfoList) {
             String columnName = columnInfo.getColumnDbName();
 
@@ -302,10 +365,13 @@ public abstract class AbstractSqlClause implements SqlClause {
                 }
             }
 
-            if (sb.length() > 0) {
+            if (needsDelimiter) {
                 sb.append(", ");
             } else {
-                sb.append("select").append(SELECT_HINT).append(" ");
+                sb.append("select");
+                appendSelectHint(sb);
+                sb.append(" ");
+                needsDelimiter = true;
             }
             String realColumnName = getLocalTableAliasName() + "." + columnName;
             String onQueryName;
@@ -379,6 +445,9 @@ public abstract class AbstractSqlClause implements SqlClause {
         return sb.toString();
     }
 
+    // -----------------------------------------------------
+    //                                       Count or Scalar
+    //                                       ---------------
     protected boolean isSelectClauseTypeCountOrScalar() {
         if (_selectClauseType.equals(SelectClauseType.COUNT)) {
             return true;
@@ -449,6 +518,9 @@ public abstract class AbstractSqlClause implements SqlClause {
         throw new IllegalStateException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                          Select Index
+    //                                          ------------
     public Map<String, Integer> getSelectIndexMap() {
         return _selectIndexMap;
     }
@@ -473,12 +545,27 @@ public abstract class AbstractSqlClause implements SqlClause {
         return "c" + selectIndex;
     }
 
+    // -----------------------------------------------------
+    //                                           Select Hint
+    //                                           -----------
     public String getSelectHint() {
         return createSelectHint();
     }
 
+    protected void appendSelectHint(StringBuilder sb) { // for extension
+        sb.append(SELECT_HINT);
+    }
+
+    // -----------------------------------------------------
+    //                                           From Clause
+    //                                           -----------
     public String getFromClause() {
         StringBuilder sb = new StringBuilder();
+        buildFromClause(sb);
+        return sb.toString();
+    }
+
+    protected void buildFromClause(StringBuilder sb) {
         sb.append(ln()).append("  ");
         sb.append("from ");
         if (_baseTableInlineWhereList.isEmpty()) {
@@ -488,7 +575,6 @@ public abstract class AbstractSqlClause implements SqlClause {
         }
         sb.append(getFromBaseTableHint());
         sb.append(getLeftOuterJoinClause());
-        return sb.toString();
     }
 
     protected String getLeftOuterJoinClause() {
@@ -558,16 +644,33 @@ public abstract class AbstractSqlClause implements SqlClause {
         return createFromBaseTableHint();
     }
 
+    // -----------------------------------------------------
+    //                                             From Hint
+    //                                             ---------
     public String getFromHint() {
         return createFromHint();
     }
 
+    // -----------------------------------------------------
+    //                                          Where Clause
+    //                                          ------------
     public String getWhereClause() {
-        return buildWhereClause(false);
+        StringBuilder sb = new StringBuilder();
+        buildWhereClause(sb);
+        return sb.toString();
     }
 
-    protected String buildWhereClause(boolean template) {
-        StringBuilder sb = new StringBuilder();
+    protected void buildWhereClause(StringBuilder sb) {
+        buildWhereClause(sb, false);
+    }
+
+    protected void buildWhereClause(StringBuilder sb, boolean template) {
+        if (_whereList.isEmpty()) {
+            if (template) {
+                sb.append(getWhereClauseMark());
+            }
+            return;
+        }
         int count = 0;
         for (Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
             String clauseElement = (String) ite.next();
@@ -580,12 +683,11 @@ public abstract class AbstractSqlClause implements SqlClause {
                 sb.append(" and ").append(clauseElement);
             }
         }
-        if (template && sb.length() == 0) {
-            sb.append(getWhereClauseMark());
-        }
-        return sb.toString();
     }
 
+    // -----------------------------------------------------
+    //                                        OrderBy Clause
+    //                                        --------------
     public String getOrderByClause() {
         String orderByClause = null;
         if (hasUnionQuery()) {
@@ -605,6 +707,9 @@ public abstract class AbstractSqlClause implements SqlClause {
         }
     }
 
+    // -----------------------------------------------------
+    //                                            SQL Suffix
+    //                                            ----------
     public String getSqlSuffix() {
         String sqlSuffix = createSqlSuffix();
         if (sqlSuffix != null && sqlSuffix.trim().length() > 0) {
