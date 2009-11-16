@@ -1206,7 +1206,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String propertyName = dbmeta.FindPropertyName(colName);
         String capPropName = initCap(propertyName);
-        key.setupConditionValue(cvalue, value, getLocation(capPropName, key)); // If CSharp, it is necessary to use capPropName!
+        // If CSharp, it is necessary to use capPropName!
+        key.setupConditionValue(cvalue, value, getLocation(capPropName, key));
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
     }
 
@@ -1215,7 +1216,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(getTableDbName());
         String propertyName = dbmeta.FindPropertyName(colName);
         String capPropName = initCap(propertyName);
-        key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option); // If CSharp, it is necessary to use capPropName!
+        // If CSharp, it is necessary to use capPropName!
+        key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
     }
 	
@@ -1255,11 +1257,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 			}
 			int clauseIndex = whereIndex + "where ".Length;
 			String mark = getSqlClause().getUnionWhereFirstConditionMark();
-			unionQueryClause = fromClause + " " + whereClause.Substring(0, clauseIndex) + mark + whereClause.Substring(clauseIndex);
+			String markedClause = whereClause.Substring(0, clauseIndex) + mark + whereClause.Substring(clauseIndex);
+			unionQueryClause = fromClause + " " + markedClause;
 		}
         String oldStr = "." + CQ_PROPERTY + ".";
         String newStr = "." + CQ_PROPERTY + "." + unionQueryPropertyName + ".";
-        return replaceString(unionQueryClause, oldStr, newStr);// Very Important!
+        return replaceString(unionQueryClause, oldStr, newStr); // Very Important!
     }
 
     // -----------------------------------------------------

@@ -133,26 +133,25 @@ public abstract class ${myClassName} : ${glSqlClause} {
         String selectClause = getSelectClause();
         sb.append(selectClause);
         sb.append(" ");
-        sb.append(buildClauseWithoutMainSelect(sb, selectClause));
+        buildClauseWithoutMainSelect(sb, selectClause);
         String sql = sb.toString();
         sql = filterEnclosingClause(sql);
         sql = filterSubQueryIndent(sql);
         return sql;
     }
 
-    protected String buildClauseWithoutMainSelect(StringBuilder sb, String selectClause) {
-        sb.append(getFromClause());
+    protected void buildClauseWithoutMainSelect(StringBuilder sb, String selectClause) {
+        buildFromClause(sb);
         sb.append(getFromHint());
         sb.append(" ");
-        sb.append(getWhereClause());
-        String unionClause = buildUnionClause(selectClause);
+        buildWhereClause(sb);
+        String unionClause = prepareUnionClause(selectClause);
         unionClause = deleteUnionWhereTemplateMark(unionClause); // required
         sb.append(unionClause);
         if (!needsUnionNormalSelectEnclosing()) {
-            sb.append(buildClauseOrderBy());
-            sb.append(buildClauseSqlSuffix());
+            sb.append(prepareClauseOrderBy());
+            sb.append(prepareClauseSqlSuffix());
         }
-        return sb.toString();
     }
 
     protected virtual String deleteUnionWhereTemplateMark(String unionClause) {
@@ -169,22 +168,22 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public String getClauseFromWhereWithUnionTemplate() {
         return buildClauseFromWhereAsTemplate(false);
     }
-    
+
     public String getClauseFromWhereWithWhereUnionTemplate() {
         return buildClauseFromWhereAsTemplate(true);
     }
-    
+
     protected virtual String buildClauseFromWhereAsTemplate(bool template) {
         StringBuilder sb = new StringBuilder(256);
-        sb.append(getFromClause());
+        buildFromClause(sb);
         sb.append(getFromHint());
         sb.append(" ");
-        sb.append(buildWhereClause(template));
-        sb.append(buildUnionClause(getUnionSelectClauseMark()));
+        sb.append(buildWhereClause(sb, template));
+        sb.append(prepareUnionClause(getUnionSelectClauseMark()));
         return sb.toString();
     }
-    
-    protected virtual String buildUnionClause(String selectClause) {
+
+    protected virtual String prepareUnionClause(String selectClause) {
         if (!hasUnionQuery()) {
             return "";
         }
@@ -204,7 +203,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         return sb.toString();
     }
 
-    protected String buildClauseOrderBy() {
+    protected String prepareClauseOrderBy() {
         if (!_orderByEffective || _orderByClause.isEmpty()) {
             return "";
         }
@@ -214,7 +213,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         return sb.toString();
     }
 
-    protected String buildClauseSqlSuffix() {
+    protected String prepareClauseSqlSuffix() {
         String sqlSuffix = getSqlSuffix();
         if (sqlSuffix == null || sqlSuffix.trim().length() == 0) {
             return "";
@@ -240,7 +239,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
         String endMark = resolveSubQueryEndMark("dfmain");
         String clause = selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
-        clause = clause + buildClauseOrderBy() + buildClauseSqlSuffix();
+        clause = clause + prepareClauseOrderBy() + prepareClauseSqlSuffix();
         return clause;
     }
 
@@ -466,6 +465,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                           -----------
     public String getFromClause() {
         StringBuilder sb = new StringBuilder();
+        buildFromClause(sb);
+        return sb.toString();
+    }
+
+    public void buildFromClause(StringBuilder sb) {
         sb.append(ln()).append("  ");
         sb.append("from ");
         if (_baseTableInlineWhereList.isEmpty()) {
@@ -475,7 +479,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         sb.append(getFromBaseTableHint());
         sb.append(getLeftOuterJoinClause());
-        return sb.toString();
     }
 
     protected String getLeftOuterJoinClause() {
@@ -555,11 +558,16 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                          Where Clause
     //                                          ------------
     public String getWhereClause() {
-        return buildWhereClause(false);
-    }
-    
-    protected String buildWhereClause(bool template) {
         StringBuilder sb = new StringBuilder();
+        buildWhereClause(sb);
+        return sb.toString();
+    }
+
+    protected void buildWhereClause(StringBuilder sb) {
+        buildWhereClause(sb, false);
+    }
+
+    protected void buildWhereClause(StringBuilder sb, bool template) {
         int count = 0;
         for (Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
             String clauseElement = (String)ite.next();
@@ -575,7 +583,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
         if (template && sb.length() == 0) {
             sb.append(getWhereClauseMark());
         }
-        return sb.toString();
     }
 
     // -----------------------------------------------------
