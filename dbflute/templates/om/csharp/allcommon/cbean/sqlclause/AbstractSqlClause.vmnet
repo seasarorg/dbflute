@@ -193,9 +193,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
             String unionQueryClause = unionQueryInfo.getUnionQueryClause();
             bool unionAll = unionQueryInfo.isUnionAll();
             sb.append(ln());
-            if (needsUnionNormalSelectEnclosing()) {
-                sb.append("        ");
-            }
             sb.append(unionAll ? " union all " : " union ");
             sb.append(ln());
             sb.append(selectClause).append(" ").append(unionQueryClause);
@@ -295,6 +292,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         bool existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
 
         // Columns of local table.
+        bool needsDelimiter = false;
         foreach (${glColumnInfo} columnInfo in columnInfoList) {
             String columnName = columnInfo.ColumnDbName;
             
@@ -314,12 +312,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 }
             }
 
-            if (sb.length() > 0) {
+            if (needsDelimiter) {
                 sb.append(", ");
             } else {
                 sb.append("select");
                 appendSelectHint(sb);
                 sb.append(" ");
+                needsDelimiter = true;
             }
             String realColumnName = getLocalTableAliasName() + "." + columnName;
             sb.append(realColumnName).append(" as ").append(columnName);
@@ -568,6 +567,12 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     protected void buildWhereClause(StringBuilder sb, bool template) {
+        if (_whereList.isEmpty()) {
+            if (template) {
+                sb.append(getWhereClauseMark());
+            }
+            return;
+        }
         int count = 0;
         for (Iterator<String> ite = _whereList.iterator(); ite.hasNext(); count++) {
             String clauseElement = (String)ite.next();
@@ -579,9 +584,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
                 sb.append(ln()).append("  ");
                 sb.append(" and ").append(clauseElement);
             }
-        }
-        if (template && sb.length() == 0) {
-            sb.append(getWhereClauseMark());
         }
     }
 
