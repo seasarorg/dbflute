@@ -23,15 +23,13 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         : base(tableName) {}
 
     // ===================================================================================
-    //                                                          Database Original Override
-    //                                                          ==========================
+    //                                                                Main Clause Override
+    //                                                                ====================
     protected override String buildUnionClause(String selectClause) {
-	
 	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	    // Remove select-hint comment from select clause of union
 		// for fetch-scope with union().
 	    // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
         selectClause = replaceString(selectClause, SELECT_HINT, "");
         return base.buildUnionClause(selectClause);
     }
@@ -47,7 +45,7 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
             return;
         }
-		String ln = getLineSeparator();
+		String ln = ln();
         _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (" + ln + "select";
         _fetchScopeSqlSuffix = "";
         if (isFetchStartIndexSupported()) {

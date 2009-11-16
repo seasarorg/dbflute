@@ -123,44 +123,46 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     // ===================================================================================
-    //                                                                              Clause
-    //                                                                              ======
+    //                                                                         Main Clause
+    //                                                                         ===========
     // -----------------------------------------------------
     //                                       Complete Clause
     //                                       ---------------
     public String getClause() {
         StringBuilder sb = new StringBuilder(512);
-        sb.append(getSelectClause());
+        String selectClause = getSelectClause();
+        sb.append(selectClause);
         sb.append(" ");
-        sb.append(buildClauseWithoutMainSelect());
+        sb.append(buildClauseWithoutMainSelect(sb, selectClause));
         String sql = sb.toString();
-        sql = filterUnionCountOrScalar(sql);
+        sql = filterEnclosingClause(sql);
         sql = filterSubQueryIndent(sql);
         return sql;
     }
 
-    protected String buildClauseWithoutMainSelect() {
-        StringBuilder sb = new StringBuilder(512);
+    protected String buildClauseWithoutMainSelect(StringBuilder sb, String selectClause) {
         sb.append(getFromClause());
         sb.append(getFromHint());
         sb.append(" ");
         sb.append(getWhereClause());
-        String unionClause = buildUnionClause(getSelectClause());
-        
-        // Delete template mark! (At the future this will be unnecessary.)
-        unionClause = replaceString(unionClause, getUnionWhereClauseMark(), "");// Required!
-        unionClause = replaceString(unionClause, getUnionWhereFirstConditionMark(), "");// Required!
-        
+        String unionClause = buildUnionClause(selectClause);
+        unionClause = deleteUnionWhereTemplateMark(unionClause); // required
         sb.append(unionClause);
-        if (_orderByEffective && !_orderByClause.isEmpty()) {
-            sb.append(" ");
-            sb.append(getOrderByClause());
+        if (!needsUnionNormalSelectEnclosing()) {
+            sb.append(buildClauseOrderBy());
+            sb.append(buildClauseSqlSuffix());
         }
-        sb.append(" ");
-        sb.append(getSqlSuffix());
         return sb.toString();
     }
-    
+
+    protected virtual String deleteUnionWhereTemplateMark(String unionClause) {
+        if (unionClause != null && unionClause.Trim().Length > 0) {
+            unionClause = replaceString(unionClause, getUnionWhereClauseMark(), "");
+            unionClause = replaceString(unionClause, getUnionWhereFirstConditionMark(), "");
+        }
+        return unionClause;
+    }
+
     // -----------------------------------------------------
     //                                       Fragment Clause
     //                                       ---------------
@@ -173,7 +175,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
     
     protected virtual String buildClauseFromWhereAsTemplate(bool template) {
-        StringBuilder sb = new StringBuilder(512);
+        StringBuilder sb = new StringBuilder(256);
         sb.append(getFromClause());
         sb.append(getFromHint());
         sb.append(" ");
@@ -183,35 +185,97 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
     
     protected virtual String buildUnionClause(String selectClause) {
+        if (!hasUnionQuery()) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
-        if (hasUnionQuery()) {
-            for (Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
-                UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
-                String unionQueryClause = unionQueryInfo.getUnionQueryClause();
-                bool unionAll = unionQueryInfo.isUnionAll();
-                sb.append(getLineSeparator());
-                sb.append(unionAll ? " union all " : " union ");
-                sb.append(getLineSeparator());
-                sb.append(selectClause).append(" ").append(unionQueryClause);
+        for (Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext(); ) {
+            UnionQueryInfo unionQueryInfo = (UnionQueryInfo)ite.next();
+            String unionQueryClause = unionQueryInfo.getUnionQueryClause();
+            bool unionAll = unionQueryInfo.isUnionAll();
+            sb.append(ln());
+            if (needsUnionNormalSelectEnclosing()) {
+                sb.append("        ");
             }
+            sb.append(unionAll ? " union all " : " union ");
+            sb.append(ln());
+            sb.append(selectClause).append(" ").append(unionQueryClause);
         }
         return sb.toString();
     }
 
-    protected String filterUnionCountOrScalar(String sql) {
-        if (!isSelectClauseTypeCountOrScalar() || !hasUnionQuery()) {
+    protected String buildClauseOrderBy() {
+        if (!_orderByEffective || _orderByClause.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ");
+        sb.append(getOrderByClause());
+        return sb.toString();
+    }
+
+    protected String buildClauseSqlSuffix() {
+        String sqlSuffix = getSqlSuffix();
+        if (sqlSuffix == null || sqlSuffix.trim().length() == 0) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ");
+        sb.append(sqlSuffix);
+        return sb.toString();
+    }
+
+    protected String filterEnclosingClause(String sql) {
+        sql = filterUnionNormalSelectEnclosing(sql);
+        sql = filterUnionCountOrScalarEnclosing(sql);
+        return sql;
+    }
+
+    protected virtual String filterUnionNormalSelectEnclosing(String sql) {
+        if (!needsUnionNormalSelectEnclosing()) {
+            return sql;
+        }
+        String selectClause = "select" + SELECT_HINT + " *";
+        String ln = ln();
+        String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
+        String endMark = resolveSubQueryEndMark("dfmain");
+        String clause = selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
+        clause = clause + buildClauseOrderBy() + buildClauseSqlSuffix();
+        return clause;
+    }
+
+    protected virtual String filterUnionCountOrScalarEnclosing(String sql) {
+        if (!needsUnionCountOrScalarEnclosing()) {
             return sql;
         }
         String selectClause = buildSelectClauseCountOrScalar("dfmain");
-        String ln = getLineSeparator();
+        String ln = ln();
         String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
         String endMark = resolveSubQueryEndMark("dfmain");
         return selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
     }
 
+    protected virtual bool needsUnionNormalSelectEnclosing() {
+        if (!isUnionNormalSelectEnclosingRequired()) {
+            return false;
+        }
+        return hasUnionQuery() && !isSelectClauseTypeCountOrScalar();
+    }
+
+    protected virtual bool isUnionNormalSelectEnclosingRequired() { // for extension
+        return false; // false as default
+    }
+
+    protected virtual bool needsUnionCountOrScalarEnclosing() {
+        return hasUnionQuery() && isSelectClauseTypeCountOrScalar();
+    }
+
     // ===================================================================================
     //                                                                        Clause Parts
     //                                                                        ============
+    // -----------------------------------------------------
+    //                                         Select Clause
+    //                                         -------------
     public String getSelectClause() {
         // [DBFlute-0.8.6]
         if (isSelectClauseTypeCountOrScalar() && !hasUnionQuery()) {
@@ -225,9 +289,12 @@ public abstract class ${myClassName} : ${glSqlClause} {
         List<${glColumnInfo}> columnInfoList = dbmeta.ColumnInfoList;
 
         // [DBFlute-0.7.4]
-        Map<String, String> localSpecifiedMap = _specifiedSelectColumnMap != null ? _specifiedSelectColumnMap.get(getLocalTableAliasName()) : null;
+        Map<String, String> localSpecifiedMap = null;
+        if (_specifiedSelectColumnMap != null) {
+            localSpecifiedMap = _specifiedSelectColumnMap.get(getLocalTableAliasName());
+        }
         bool existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
-        
+
         // Columns of local table.
         foreach (${glColumnInfo} columnInfo in columnInfoList) {
             String columnName = columnInfo.ColumnDbName;
@@ -251,7 +318,9 @@ public abstract class ${myClassName} : ${glSqlClause} {
             if (sb.length() > 0) {
                 sb.append(", ");
             } else {
-                sb.append("select").append(SELECT_HINT).append(" ");
+                sb.append("select");
+                appendSelectHint(sb);
+                sb.append(" ");
             }
             String realColumnName = getLocalTableAliasName() + "." + columnName;
             sb.append(realColumnName).append(" as ").append(columnName);
@@ -276,7 +345,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
                 String realColumnName = selectColumnInfo.buildRealColumnName();
                 if (!finishedForeignIndent) {
-                    sb.append(getLineSeparator()).append("     ");
+                    sb.append(ln()).append("     ");
                     finishedForeignIndent = true;
                 }
                 sb.append(", ").append(realColumnName).append(" as ").append(selectColumnInfo.getColumnAliasName());
@@ -288,7 +357,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
             Collection<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.values();
             foreach (String deriveSubQuery in deriveSubQuerySet) {
-                sb.append(getLineSeparator()).append("     ");
+                sb.append(ln()).append("     ");
                 sb.append(", ").append(deriveSubQuery);
                 
                 // [DBFlute-0.8.3]
@@ -308,6 +377,9 @@ public abstract class ${myClassName} : ${glSqlClause} {
         return sb.toString();
     }
 
+    // -----------------------------------------------------
+    //                                       Count or Scalar
+    //                                       ---------------
     protected bool isSelectClauseTypeCountOrScalar() {
         if (_selectClauseType.equals(SelectClauseType.COUNT)) {
             return true;
@@ -378,13 +450,23 @@ public abstract class ${myClassName} : ${glSqlClause} {
         throw new IllegalStateException(msg);
     }
 
+    // -----------------------------------------------------
+    //                                           Select Hint
+    //                                           -----------
     public String getSelectHint() {
         return createSelectHint();
     }
 
+    protected virtual void appendSelectHint(StringBuilder sb) { // for extension
+        sb.append(SELECT_HINT);
+    }
+
+    // -----------------------------------------------------
+    //                                           From Clause
+    //                                           -----------
     public String getFromClause() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getLineSeparator()).append("  ");
+        sb.append(ln()).append("  ");
         sb.append("from ");
         if (_baseTableInlineWhereList.isEmpty()) {
             sb.append(_tableName).append(" dflocal");
@@ -408,7 +490,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
             assertJoinOnMapNotEmpty(joinOnMap, aliasName);
 
-            sb.append(getLineSeparator()).append("   ");
+            sb.append(ln()).append("   ");
             if (joinInfo.isInnerJoin()) {
                 sb.append(" inner join ");
             } else {
@@ -462,10 +544,16 @@ public abstract class ${myClassName} : ${glSqlClause} {
         return createFromBaseTableHint();
     }
 
+    // -----------------------------------------------------
+    //                                             From Hint
+    //                                             ---------
     public String getFromHint() {
         return createFromHint();
     }
 
+    // -----------------------------------------------------
+    //                                          Where Clause
+    //                                          ------------
     public String getWhereClause() {
         return buildWhereClause(false);
     }
@@ -477,10 +565,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
             String clauseElement = (String)ite.next();
             // clauseElement = filterWhereClauseSimply(clauseElement); *Non Support on C#
             if (count == 0) {
-                sb.append(getLineSeparator()).append(" ");
+                sb.append(ln()).append(" ");
                 sb.append("where ").append(template  ? getWhereFirstConditionMark() : "").append(clauseElement);
             } else {
-                sb.append(getLineSeparator()).append("  ");
+                sb.append(ln()).append("  ");
                 sb.append(" and ").append(clauseElement);
             }
         }
@@ -489,7 +577,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         return sb.toString();
     }
-    
+
+    // -----------------------------------------------------
+    //                                        OrderBy Clause
+    //                                        --------------
     public String getOrderByClause() {
         String orderByClause = null;
         if (hasUnionQuery()) {
@@ -502,16 +593,19 @@ public abstract class ${myClassName} : ${glSqlClause} {
             orderByClause = _orderByClause.getOrderByClause();
         }
         if (orderByClause != null && orderByClause.Trim().Length > 0) {
-            return getLineSeparator() + " " + orderByClause;
+            return ln() + " " + orderByClause;
         } else {
             return orderByClause;
         }
     }
 
+    // -----------------------------------------------------
+    //                                            SQL Suffix
+    //                                            ----------
     public String getSqlSuffix() {
         String sqlSuffix = createSqlSuffix();
         if (sqlSuffix != null && sqlSuffix.Trim().Length > 0) {
-            return getLineSeparator() + sqlSuffix;
+            return ln() + sqlSuffix;
         } else {
             return sqlSuffix;
         }
@@ -789,7 +883,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         if (whereList.size() < 2) {
             return;
         }
-        String or = getLineSeparator() + "    or ";
+        String or = ln() + "    or ";
         String newClause = (String)whereList.remove(whereList.size() - 1);
         String preClause = (String)whereList.remove(whereList.size() - 1);
         if (preClause.StartsWith("(") && preClause.Contains(or) && preClause.EndsWith(")")) {
@@ -1035,26 +1129,26 @@ public abstract class ${myClassName} : ${glSqlClause} {
             fetchPageNumber = 1;
         }
         if (_fetchSize <= 0) {
-            String msg = "Fetch size should not be minus or zero!" + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-            msg = msg + "Look! Read the message below." + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Advice]" + getLineSeparator();
-            msg = msg + "When you invoke this method, it is necessary to invoke 'FetchFirst()' or 'FetchScope()' ahead of that. " + getLineSeparator();
-            msg = msg + "Please confirm your program. Does it really invoke 'FetchPage()' with 'FetchFirst()' or 'FetchScope()'?" + getLineSeparator();
-            msg = msg + "  For example:" + getLineSeparator();
-            msg = msg + "    before (x):" + getLineSeparator();
-            msg = msg + "      XxxCB cb = new XxxCB();" + getLineSeparator();
-            msg = msg + "      cb.FetchPage(3);" + getLineSeparator();
-            msg = msg + "    after  (o):" + getLineSeparator();
-            msg = msg + "      XxxCB cb = new XxxCB();" + getLineSeparator();
-            msg = msg + "      cb.FetchFirst(20); // The size of page" + getLineSeparator();
-            msg = msg + "      cb.FetchPage(3);   // The number of target page" + getLineSeparator();
-            msg = msg + getLineSeparator();
-            msg = msg + "[Actual Parameter Value]" + getLineSeparator();
-            msg = msg + "fetchSize=" + _fetchSize + getLineSeparator();
-            msg = msg + "fetchPageNumber=" + fetchPageNumber + getLineSeparator();
-            msg = msg + "* * * * * * * * * */" + getLineSeparator();
+            String msg = "Fetch size should not be minus or zero!" + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "Look! Read the message below." + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "When you invoke this method, it is necessary to invoke 'FetchFirst()' or 'FetchScope()' ahead of that. " + ln();
+            msg = msg + "Please confirm your program. Does it really invoke 'FetchPage()' with 'FetchFirst()' or 'FetchScope()'?" + ln();
+            msg = msg + "  For example:" + ln();
+            msg = msg + "    before (x):" + ln();
+            msg = msg + "      XxxCB cb = new XxxCB();" + ln();
+            msg = msg + "      cb.FetchPage(3);" + ln();
+            msg = msg + "    after  (o):" + ln();
+            msg = msg + "      XxxCB cb = new XxxCB();" + ln();
+            msg = msg + "      cb.FetchFirst(20); // The size of page" + ln();
+            msg = msg + "      cb.FetchPage(3);   // The number of target page" + ln();
+            msg = msg + ln();
+            msg = msg + "[Actual Parameter Value]" + ln();
+            msg = msg + "fetchSize=" + _fetchSize + ln();
+            msg = msg + "fetchPageNumber=" + fetchPageNumber + ln();
+            msg = msg + "* * * * * * * * * */" + ln();
             throw new IllegalStateException(msg);
         }
         _fetchPageNumber = fetchPageNumber;
@@ -1287,7 +1381,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     protected String filterSubQueryIndent(String sql, String preIndent, String originalSql) {
-        String lineSeparator = getLineSeparator();
+        String lineSeparator = ln();
         if (!sql.Contains(getSubQueryBeginMarkPrefix())) {
             return sql;
         }
@@ -1318,7 +1412,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                     subSb.append(clause);
                     indent = buildSpaceBar(markIndex - preIndent.Length);
                 } else {
-                    mainSb.append(line).append(getLineSeparator());
+                    mainSb.append(line).append(ln());
                 }
             } else {
                 // - - - - - - - -
@@ -1332,17 +1426,17 @@ public abstract class ${myClassName} : ${glSqlClause} {
                         throw new SubQueryIndentFailureException(msg);
                     }
                     String clause = line.Substring(0, markIndex) + line.Substring(terminalIndex + terminalLength);
-                    subSb.append(clause).append(getLineSeparator());
+                    subSb.append(clause).append(ln());
                     String currentSql = filterSubQueryIndent(subSb.toString(), preIndent + indent, originalSql);
                     mainSb.append(currentSql);
                     throughBegin = false;
                     throughBeginFirst = false;
                 } else {
                     if (!throughBeginFirst) {
-                        subSb.append(line.Trim()).append(getLineSeparator());
+                        subSb.append(line.Trim()).append(ln());
                         throughBeginFirst = true;
                     } else {
-                        subSb.append(indent).append(line).append(getLineSeparator());
+                        subSb.append(indent).append(line).append(ln());
                     }
                 }
             }
@@ -1351,20 +1445,20 @@ public abstract class ${myClassName} : ${glSqlClause} {
         
         if (throughBegin) {
             String msg = "End Mark Not Found!";
-            msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
-            msg = msg + subQueryIdentity + getLineSeparator();
-            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator();
-            msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
-            msg = msg + getLineSeparator() + "[Original SQL]" + getLineSeparator() + originalSql;
+            msg = msg + ln() + "[Current SubQueryIdentity]" + ln();
+            msg = msg + subQueryIdentity + ln();
+            msg = msg + ln() + "[Before Filter]" + ln();
+            msg = msg + ln() + "[After Filter]" + ln() + filteredSql;
+            msg = msg + ln() + "[Original SQL]" + ln() + originalSql;
             throw new SubQueryIndentFailureException(msg);
         }
         if (filteredSql.Contains(beginMarkPrefix)) {
             String msg = "Any begin marks are not filtered!";
-            msg = msg + getLineSeparator() + "[Current SubQueryIdentity]" + getLineSeparator();
-            msg = msg + subQueryIdentity + getLineSeparator();
-            msg = msg + getLineSeparator() + "[Before Filter]" + getLineSeparator();
-            msg = msg + getLineSeparator() + "[After Filter]" + getLineSeparator() + filteredSql;
-            msg = msg + getLineSeparator() + "[Original SQL]" + getLineSeparator() + originalSql;
+            msg = msg + ln() + "[Current SubQueryIdentity]" + ln();
+            msg = msg + subQueryIdentity + ln();
+            msg = msg + ln() + "[Before Filter]" + ln();
+            msg = msg + ln() + "[After Filter]" + ln() + filteredSql;
+            msg = msg + ln() + "[Original SQL]" + ln() + originalSql;
             throw new SubQueryIndentFailureException(msg);
         }
         return filteredSql;
@@ -1449,7 +1543,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
         StringBuilder sb = new StringBuilder();
-        String ln = getLineSeparator();
+        String ln = ln();
         sb.append("update ").append(_tableName).append(ln);
         int index = 0;
         // It is guaranteed that the map has one or more elements.
@@ -1501,7 +1595,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         if (isUpdateSubQueryUseLocalTableSupported()) {
             String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             StringBuilder sb = new StringBuilder();
-            String ln = getLineSeparator();
+            String ln = ln();
             sb.append("delete from ").append(_tableName).append(ln);
             sb.append(" where ").append(primaryKeyName);
             sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
@@ -1555,7 +1649,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         return ${glSimpleStringUtil}.Replace(text, fromText, toText);
     }
     
-    protected String getLineSeparator() {
+    protected String ln() {
         return ${glSimpleSystemUtil}.GetLineSeparator();
     }
 

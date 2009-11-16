@@ -13,6 +13,17 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     public ${myClassName}(String tableName)
         : base(tableName) {}
 
+    protected override bool isUnionNormalSelectEnclosingRequired() {
+        return true;
+    }
+
+    protected override void appendSelectHint(StringBuilder sb) {
+        if (needsUnionNormalSelectEnclosing()) {
+            return; // because clause should be enclosed when union normal select
+        }
+        base.appendSelectHint(sb);
+    }
+
 	protected override OrderByNullsSetupper createOrderByNullsSetupper() {
 	    return new OrderByNullsSetupperByCaseWhen();
 	}
