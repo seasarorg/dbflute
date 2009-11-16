@@ -27,6 +27,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                                                                           Attribute
     //                                                                           =========
     protected boolean validTaskEndInformation = true;
+    protected DfXlsDataHandlerImpl xlsDataHandlerImpl;
 
     // ===================================================================================
     //                                                                             Execute
@@ -130,26 +131,34 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     //                                     Xls Data
     //                                     --------
     protected void writeDbFromXlsAsCommonData() {
-        writeDbFromXls(getCommonDataDirectoryPath("xls"), "common");
+        writeDbFromXls(getCommonDataDirectoryPath("xls"));
     }
 
     protected void writeDbFromXlsAsAdditionalData() {
-        writeDbFromXls(getAdditionalDataDirectoryPath(getDataLoadingType(), "xls"), getDataLoadingType());
+        writeDbFromXls(getAdditionalDataDirectoryPath(getDataLoadingType(), "xls"));
     }
 
-    protected void writeDbFromXls(String directoryPath, String typeName) {
-        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
-        final DfXlsDataHandlerImpl xlsDataHandler;
-        if (basicProperties.isDatabaseSqlServer()) {
-            xlsDataHandler = new DfXlsDataHandlerSqlServer();
-        } else {
-            xlsDataHandler = new DfXlsDataHandlerImpl();
-        }
-        xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
-        xlsDataHandler.setSuppressBatchUpdate(isSuppressBatchUpdate());
-        xlsDataHandler.setSchemaName(_schema);// For getting database meta data.
-        xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
+    protected void writeDbFromXls(String directoryPath) {
+        final DfXlsDataHandlerImpl xlsDataHandler = getXlsDataHandlerImpl();
         xlsDataHandler.writeSeveralData(directoryPath, getDataSource());
+    }
+
+    protected DfXlsDataHandlerImpl getXlsDataHandlerImpl() {
+        final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
+        if (xlsDataHandlerImpl == null) {
+            final DfXlsDataHandlerImpl xlsDataHandler;
+            if (basicProperties.isDatabaseSqlServer()) {
+                xlsDataHandler = new DfXlsDataHandlerSqlServer();
+            } else {
+                xlsDataHandler = new DfXlsDataHandlerImpl();
+            }
+            xlsDataHandler.setLoggingInsertSql(isLoggingInsertSql());
+            xlsDataHandler.setSuppressBatchUpdate(isSuppressBatchUpdate());
+            xlsDataHandler.setSchemaName(_schema); // for getting database meta data
+            xlsDataHandler.setSkipSheet(getMyProperties().getSkipSheet());
+            xlsDataHandlerImpl = xlsDataHandler;
+        }
+        return xlsDataHandlerImpl;
     }
 
     // ===================================================================================
@@ -158,6 +167,5 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
     public void setValidTaskEndInformation(String validTaskEndInformation) {
         this.validTaskEndInformation = validTaskEndInformation != null
                 && validTaskEndInformation.trim().equalsIgnoreCase("true");
-        ;
     }
 }

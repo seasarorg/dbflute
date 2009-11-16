@@ -14,12 +14,13 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                       =========
         protected ${glDBMeta} dbmeta;
         protected String columnDbName;
+        protected String columnAlias;
         protected String propertyName;
         protected Type propertyType;
         protected bool primary;
+        protected String columnDbName;
         protected int? columnSize;
         protected int? columnDecimalDigits;
-        protected String columnAlias;
         protected bool commonColumn;
         protected OptimisticLockType optimisticLockType;
 
@@ -27,14 +28,15 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         //                                                                     Constructor
         //                                                                     ===========
         public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
-                       , Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits, bool commonColumn)
+                            , Type propertyType, bool primary, String columnDbName, int? columnSize
+                            , int? columnDecimalDigits, bool commonColumn)
             : this (dbmeta, columnDbName, columnAlias, propertyName, propertyType, primary
-                  , columnSize, columnDecimalDigits, commonColumn, OptimisticLockType.NONE) {
+                  , columnDbName, columnSize, columnDecimalDigits, commonColumn, OptimisticLockType.NONE) {
         }
 
         public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
-                       , Type propertyType, bool primary, int? columnSize, int? columnDecimalDigits
-                       , bool commonColumn, OptimisticLockType optimisticLockType) {
+                            , Type propertyType, bool primary, String columnDbName, int? columnSize
+                            , int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType) {
             AssertObjectNotNull("dbmeta", dbmeta);
             AssertObjectNotNull("columnDbName", columnDbName);
             AssertObjectNotNull("propertyName", propertyName);
@@ -46,6 +48,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             this.propertyName = propertyName;
             this.propertyType = propertyType;
             this.primary = primary;
+            this.columnDbName = columnDbName;
             this.columnSize = columnSize;
             this.columnDecimalDigits = columnDecimalDigits;
             this.commonColumn = commonColumn;
@@ -130,6 +133,10 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
 
         public bool IsPrimary {
             get { return primary; }
+        }
+
+        public String ColumnDbName {
+            get { return columnDbName; }
         }
 
         public int? ColumnSize {
