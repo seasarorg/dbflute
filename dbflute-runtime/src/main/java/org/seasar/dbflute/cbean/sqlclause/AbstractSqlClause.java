@@ -1553,11 +1553,10 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     protected String filterSubQueryIndent(String sql, String preIndent, String originalSql) {
-        final String lineSeparator = ln();
         if (!sql.contains(getSubQueryBeginMarkPrefix())) {
             return sql;
         }
-        final String[] lines = sql.split(lineSeparator);
+        final String[] lines = sql.split(ln());
         final String beginMarkPrefix = getSubQueryBeginMarkPrefix();
         final String endMarkPrefix = getSubQueryEndMarkPrefix();
         final String identityTerminal = getSubQueryIdentityTerminal();
