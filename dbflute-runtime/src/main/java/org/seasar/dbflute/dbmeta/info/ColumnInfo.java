@@ -34,6 +34,7 @@ public class ColumnInfo {
     protected final Class<?> propertyType;
     protected final boolean primary;
     protected final boolean autoIncrement;
+    protected final String columnDbType;
     protected final Integer columnSize;
     protected final Integer columnDecimalDigits;
     protected final boolean commonColumn;
@@ -43,7 +44,7 @@ public class ColumnInfo {
     //                                                                         Constructor
     //                                                                         ===========
     public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, String propertyName,
-            Class<?> propertyType, boolean primary, boolean autoIncrement, Integer columnSize,
+            Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
             Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
@@ -57,6 +58,7 @@ public class ColumnInfo {
         this.primary = primary;
         this.autoIncrement = autoIncrement;
         this.columnSize = columnSize;
+        this.columnDbType = columnDbType;
         this.columnDecimalDigits = columnDecimalDigits;
         this.commonColumn = commonColumn;
         this.optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
@@ -189,6 +191,14 @@ public class ColumnInfo {
      */
     public boolean isAutoIncrement() {
         return this.autoIncrement;
+    }
+
+    /**
+     * Get the DB type of the column.
+     * @return The DB type of the column. (NotNull: If the type is unknown, it returns 'UnknownType'.)
+     */
+    public String getColumnDbType() {
+        return this.columnDbType;
     }
 
     /**

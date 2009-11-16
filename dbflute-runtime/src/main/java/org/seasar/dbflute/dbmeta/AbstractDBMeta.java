@@ -167,10 +167,10 @@ public abstract class AbstractDBMeta implements DBMeta {
     }
 
     protected ColumnInfo cci(String columnDbName, String columnAlias, String propertyName, Class<?> propertyType,
-            boolean primary, boolean autoIncrement, Integer columnSize, Integer columnDecimalDigits,
-            boolean commonColumn, OptimisticLockType optimisticLockType) { // createColumnInfo()
+            boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
+            Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType) { // createColumnInfo()
         return new ColumnInfo(this, columnDbName, columnAlias, propertyName, propertyType, primary, autoIncrement,
-                columnSize, columnDecimalDigits, commonColumn, optimisticLockType);
+                columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType);
     }
 
     /**
