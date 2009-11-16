@@ -120,6 +120,36 @@ public class DfStringUtil {
     }
 
     // ===================================================================================
+    //                                                                                Fill
+    //                                                                                ====
+    public static String rfill(String str, int size) {
+        return doFill(str, size, false);
+    }
+
+    public static String lfill(String str, int size) {
+        return doFill(str, size, true);
+    }
+
+    private static String doFill(String str, int size, boolean left) {
+        if (str == null) {
+            return null;
+        }
+        if (str.length() >= size) {
+            return str;
+        }
+        final int addSize = size - str.length();
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < addSize; i++) {
+            sb.append(" ");
+        }
+        if (left) {
+            return sb + str;
+        } else {
+            return str + sb;
+        }
+    }
+
+    // ===================================================================================
     //                                                                     Initial Convert
     //                                                                     ===============
     public static String initCap(String str) {

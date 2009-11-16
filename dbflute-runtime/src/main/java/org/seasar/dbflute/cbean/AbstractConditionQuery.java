@@ -37,6 +37,8 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
+import org.seasar.dbflute.jdbc.ParameterUtil;
+import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -1571,6 +1573,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     
     protected String fxcKey() { // getFixedConditionKey()
         return getSqlClause().getFixedConditionKey();
+    }
+
+    // handleShortChar()
+    protected String hSC(String propertyName, String value, Integer size, String modeCode) {
+        ShortCharHandlingMode mode = ShortCharHandlingMode.codeOf(modeCode);
+        if (mode == null) {
+            String msg = "The modeCode was illegal: modeCode=" + modeCode;
+            throw new IllegalArgumentException(msg);
+        }
+        return ParameterUtil.handleShortChar(propertyName, value, size, mode);
     }
 
     // ===================================================================================
