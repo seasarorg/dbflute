@@ -599,7 +599,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
 #end
     /**
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
@@ -610,7 +610,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
-     * ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end

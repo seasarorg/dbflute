@@ -737,7 +737,7 @@ public class Column {
         return _columnSize != null && _columnSize.trim().length() > 0;
     }
 
-    protected Integer getIntegerColumnSize() {// Without Decimal Digits!
+    protected Integer getIntegerColumnSize() { // without decimal digits!
         if (_columnSize == null) {
             return null;
         }
@@ -1182,6 +1182,13 @@ public class Column {
         return getJavaNative().startsWith("Nullable") || getJavaNative().endsWith("?");
     }
 
+    // - - - - - -
+    // [JDBC Type]
+    // - - - - - -
+    public boolean isJdbcTypeChar() { // as Pinpoint
+        return "CHAR".equals(getJdbcType());
+    }
+    
     public boolean isJdbcTypeClob() { // as Pinpoint
         return "CLOB".equals(getJdbcType());
     }

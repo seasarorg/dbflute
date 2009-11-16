@@ -460,6 +460,31 @@ public class Database {
                 .getPmbMetaDataPropertyOptionClassificationMapList(className, propertyName);
     }
 
+    // -----------------------------------------------------
+    //                                      Option Reference
+    //                                      ----------------
+    public String getPmbMetaDataPropertyRefColumnInfo(String className, String propertyName) {
+        final DfParameterBeanBasicHandler handler = getParameterBeanBasicHandler();
+        String alias = handler.getPmbMetaDataPropertyRefAlias(className, propertyName, _sql2entitySchemaData);
+        String name = handler.getPmbMetaDataPropertyRefName(className, propertyName, _sql2entitySchemaData);
+        String lineDisp = handler.getPmbMetaDataPropertyRefLineDisp(className, propertyName, _sql2entitySchemaData);
+        if (name.trim().length() > 0) {
+            return " - related to " + alias + name + ": " + lineDisp;
+        } else {
+            return "";
+        }
+    }
+
+    public boolean isPmbMetaDataPropertyRefColumnChar(String className, String propertyName) {
+        return getParameterBeanBasicHandler().isPmbMetaDataPropertyRefColumnChar(className, propertyName,
+                _sql2entitySchemaData);
+    }
+
+    public String getPmbMetaDataPropertyRefSize(String className, String propertyName) {
+        return getParameterBeanBasicHandler().getPmbMetaDataPropertyRefSize(className, propertyName,
+                _sql2entitySchemaData);
+    }
+
     // ===================================================================================
     //                                                                         Initializer
     //                                                                         ===========
@@ -1310,6 +1335,18 @@ public class Database {
 
     public String getExtendedS2DaoSettingClass() {
         return getProperties().getLittleAdjustmentProperties().getExtendedS2DaoSettingClass();
+    }
+
+    public boolean isShortCharHandlingValid() {
+        return getProperties().getLittleAdjustmentProperties().isShortCharHandlingValid();
+    }
+
+    public String getShortCharHandlingMode() {
+        return getProperties().getLittleAdjustmentProperties().getShortCharHandlingMode();
+    }
+
+    public String getShortCharHandlingModeCode() {
+        return getProperties().getLittleAdjustmentProperties().getShortCharHandlingModeCode();
     }
 
     public boolean isCDefToStringReturnsName() {

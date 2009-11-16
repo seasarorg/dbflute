@@ -89,7 +89,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     protected void doSet${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+#if ($database.isShortCharHandlingValid() && $col.isJdbcTypeChar())
+        reg${tmpJavaName}(CK_EQ, hSC("${col.name}", ${tmpUncapitalisedJavaName}, ${col.columnSizeSettingExpression}, "${database.shortCharHandlingModeCode}"));
+#else
         reg${tmpJavaName}(CK_EQ, ${tmpUncapitalisedJavaName});
+#end
     }
 #if (${col.isAvailableStringNotEqual()})
 
@@ -123,7 +127,11 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
 #end
 
     protected void doSet${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
+#if ($database.isShortCharHandlingValid() && $col.isJdbcTypeChar())
+        reg${tmpJavaName}(CK_NE, hSC("${col.name}", ${tmpUncapitalisedJavaName}, ${col.columnSizeSettingExpression}, "${database.shortCharHandlingModeCode}"));
+#else
         reg${tmpJavaName}(CK_NE, ${tmpUncapitalisedJavaName});
+#end
     }
 #end
 #if (${col.isAvailableStringGreaterThan()})

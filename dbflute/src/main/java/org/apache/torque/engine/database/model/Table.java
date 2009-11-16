@@ -851,7 +851,7 @@ public class Table {
      * @return Return a Column object or null if it does not exist.
      */
     public Column getColumn(String name) {
-        return (Column) _columnMap.get(name);
+        return _columnMap.get(name);
     }
 
     // -----------------------------------------------------

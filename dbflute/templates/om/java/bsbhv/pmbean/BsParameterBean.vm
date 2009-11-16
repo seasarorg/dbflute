@@ -5,6 +5,8 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 #else
 import org.seasar.dbflute.cbean.FetchBean;
+import org.seasar.dbflute.jdbc.ParameterUtil;
+import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
@@ -54,7 +56,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                                                           =========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-    /** The value of ${propertyName}. */
+    /** ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} */
     protected ${propertyType} _${propertyName};
 
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
@@ -73,7 +75,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                                                         ===========
     public ${myClassName}() {
     }
-    
+
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
     // ===================================================================================
     //                                                                           Procedure
@@ -108,20 +110,12 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    /**
-     * @param value Query value. (Nullable)
-     * @return Converted value. (Nullable)
-     */
-    protected String convertEmptyToNullIfString(String value) {
-        return filterRemoveEmptyString(value);
+    protected String convertEmptyToNull(String value) {
+        return ParameterUtil.convertEmptyToNull(value);
     }
 
-    /**
-     * @param value Query value string. (Nullable)
-     * @return Removed-empty value. (Nullable)
-     */
-    protected String filterRemoveEmptyString(String value) {
-        return ((value != null && !"".equals(value)) ? value : null);
+    protected String handleShortChar(String propertyName, String value, Integer size, ShortCharHandlingMode mode) {
+        return ParameterUtil.handleShortChar(propertyName, value, size, mode);
     }
 
     // ===================================================================================
@@ -154,12 +148,18 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
     /**
-     * Get the value of ${propertyName}. (Converted empty to null)
+     * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
      * @return The value of ${propertyName}. (Nullable & NotEmptyString: if the value is empty string, returns null)
      */
     public ${propertyType} get${database.initCap($propertyName)}() {
 #if ($propertyType.endsWith("String"))
-        return ($propertyType)convertEmptyToNullIfString(_${propertyName});
+#if ($database.isShortCharHandlingValid() && $database.isPmbMetaDataPropertyRefColumnChar($pmbClassName, $propertyName))
+        String filtered = convertEmptyToNull(_${propertyName});
+        filtered = handleShortChar("${propertyName}", filtered, ${database.getPmbMetaDataPropertyRefSize($pmbClassName, $propertyName)}, ShortCharHandlingMode.${database.shortCharHandlingMode});
+        return filtered;
+#else
+        return convertEmptyToNull(_${propertyName});
+#end
 #else
         return _${propertyName};
 #end
@@ -167,7 +167,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if (!$database.hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter($pmbClassName, $propertyName))
 
     /**
-     * Set the value of ${propertyName}.
+     * [set] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}) {
@@ -177,7 +177,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
     /**
-     * Set the value of ${propertyName}.
+     * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      * @param ${propertyName}Option The option of likeSearch for ${propertyName}. (Nullable)
      */
@@ -189,7 +189,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
 
     /**
-     * Set the value of ${propertyName} as prefix-search.
+     * [set as prefixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${propertyName}) {
@@ -200,7 +200,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
 
     /**
-     * Set the value of ${propertyName} as contain-search.
+     * [set as containSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${propertyName}) {
@@ -211,7 +211,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
 
     /**
-     * Set the value of ${propertyName} as suffix-search.
+     * [set as suffixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${propertyName}) {
@@ -232,7 +232,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
 
     /**
-     * Set the value of ${propertyName} as from-date.
+     * [set as fromDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${propertyName}) {
@@ -242,7 +242,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
 
     /**
-     * Set the value of ${propertyName} as to-date.
+     * [set as toDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${propertyName}) {
@@ -254,7 +254,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #foreach ($classificationMap in $database.getPmbMetaDataPropertyOptionClassificationMapList($pmbClassName, $propertyName))
 
     /**
-     * Set the value of ${propertyName} as ${classificationMap.get('name')}. <br />
+     * [set as ${classificationMap.get('name')}] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {

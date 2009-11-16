@@ -113,6 +113,22 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                          Short Char
+    //                                                                          ==========
+    public boolean isShortCharHandlingValid() {
+        return getShortCharHandlingMode().equals("NONE");
+    }
+
+    public String getShortCharHandlingMode() { // It's closet!
+        String property = getProperty("shortCharHandlingMode", "NONE");
+        return property.toUpperCase();
+    }
+
+    public String getShortCharHandlingModeCode() { // It's closet!
+        return getShortCharHandlingMode().substring(1);
+    }
+
+    // ===================================================================================
     //                                                                                CDef
     //                                                                                ====
     public boolean isCDefToStringReturnsName() { // It's closet!
