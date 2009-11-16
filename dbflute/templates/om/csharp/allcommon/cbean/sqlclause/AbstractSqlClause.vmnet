@@ -178,7 +178,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         buildFromClause(sb);
         sb.append(getFromHint());
         sb.append(" ");
-        sb.append(buildWhereClause(sb, template));
+        buildWhereClause(sb, template);
         sb.append(prepareUnionClause(getUnionSelectClauseMark()));
         return sb.toString();
     }
@@ -212,7 +212,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     protected String prepareClauseSqlSuffix() {
         String sqlSuffix = getSqlSuffix();
-        if (sqlSuffix == null || sqlSuffix.trim().length() == 0) {
+        if (sqlSuffix == null || sqlSuffix.Trim().Length == 0) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
@@ -232,7 +232,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             return sql;
         }
         String selectClause = "select" + SELECT_HINT + " *";
-        String ln = ln();
+        String ln = this.ln();
         String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
         String endMark = resolveSubQueryEndMark("dfmain");
         String clause = selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
@@ -245,7 +245,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             return sql;
         }
         String selectClause = buildSelectClauseCountOrScalar("dfmain");
-        String ln = ln();
+        String ln = this.ln();
         String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
         String endMark = resolveSubQueryEndMark("dfmain");
         return selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
@@ -1390,11 +1390,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     protected String filterSubQueryIndent(String sql, String preIndent, String originalSql) {
-        String lineSeparator = ln();
         if (!sql.Contains(getSubQueryBeginMarkPrefix())) {
             return sql;
         }
-        String[] lines = sql.Split(lineSeparator.ToCharArray());// *Attension about difference between Language!
+        String[] lines = sql.Split(ln().ToCharArray());// *Attension about difference between Language!
         String beginMarkPrefix = getSubQueryBeginMarkPrefix();
         String endMarkPrefix = getSubQueryEndMarkPrefix();
         String identityTerminal = getSubQueryIdentityTerminal();
@@ -1552,7 +1551,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         fromWhereClause = replaceString(fromWhereClause, getUnionWhereFirstConditionMark(), "");
 
         StringBuilder sb = new StringBuilder();
-        String ln = ln();
+        String ln = this.ln();
         sb.append("update ").append(_tableName).append(ln);
         int index = 0;
         // It is guaranteed that the map has one or more elements.
@@ -1604,7 +1603,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         if (isUpdateSubQueryUseLocalTableSupported()) {
             String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             StringBuilder sb = new StringBuilder();
-            String ln = ln();
+            String ln = this.ln();
             sb.append("delete from ").append(_tableName).append(ln);
             sb.append(" where ").append(primaryKeyName);
             sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
