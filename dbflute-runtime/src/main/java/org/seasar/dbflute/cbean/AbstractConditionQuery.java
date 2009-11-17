@@ -1576,13 +1576,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     // handleShortChar()
-    protected String hSC(String propertyName, String value, Integer size, String modeCode) {
+    protected String hSC(String columnName, String value, Integer size, String modeCode) {
         ShortCharHandlingMode mode = ShortCharHandlingMode.codeOf(modeCode);
         if (mode == null) {
-            String msg = "The modeCode was illegal: modeCode=" + modeCode;
-            throw new IllegalArgumentException(msg);
+            String msg = "The mode was not found by the code: ";
+            msg = msg + " columnName=" + columnName + " modeCode=" + modeCode;
+            throw new IllegalStateException(msg);
         }
-        return ParameterUtil.handleShortChar(propertyName, value, size, mode);
+        return ParameterUtil.handleShortChar(columnName, value, size, mode);
     }
 
     // ===================================================================================

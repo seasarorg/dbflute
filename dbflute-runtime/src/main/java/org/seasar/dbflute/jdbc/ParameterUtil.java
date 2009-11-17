@@ -31,28 +31,32 @@ public class ParameterUtil {
      * @return Converted value. (Nullable)
      */
     public static String convertEmptyToNull(String value) {
-        return filterRemoveEmptyString(value);
-    }
-
-    protected static String filterRemoveEmptyString(String value) {
         return ((value != null && !"".equals(value)) ? value : null);
     }
 
     /**
-     * @param propertyName The name of the property. (NotNull)
-     * @param value The value of the property. (Nullable)
-     * @param size The size of property type. (Nullable)
+     * @param parameterName The name of the parameter. (NotNull)
+     * @param value The value of the parameter. (Nullable)
+     * @param size The size of parameter type. (Nullable)
      * @param mode The handling mode. (NotNull)
      * @return The filtered value. (Nullable)
      */
-    public static String handleShortChar(String propertyName, String value, Integer size, ShortCharHandlingMode mode) {
-        if (value == null || size == null) {
-            return null;
+    public static String handleShortChar(String parameterName, String value, Integer size, ShortCharHandlingMode mode) {
+        if (parameterName == null || parameterName.trim().length() == 0) {
+            String msg = "The argument 'parameterName' should not be null or empty:";
+            msg = msg + " value=" + value + " size=" + size + " mode=" + mode;
+            throw new IllegalArgumentException(msg);
         }
         if (mode == null) {
             String msg = "The argument 'mode' should not be null:";
-            msg = msg + " propertyName=" + propertyName + " value=" + value + " size=" + size;
+            msg = msg + " parameterName=" + parameterName + " value=" + value + " size=" + size;
             throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            return null;
+        }
+        if (size == null) {
+            return value;
         }
         if (value.length() >= size) {
             return value;
@@ -62,7 +66,7 @@ public class ParameterUtil {
         } else if (mode.equals(ShortCharHandlingMode.LFILL)) {
             return DfStringUtil.lfill(value, size);
         } else if (mode.equals(ShortCharHandlingMode.EXCEPTION)) {
-            String msg = "The size of the parameter '" + propertyName + "' should be " + size + ":";
+            String msg = "The size of the parameter '" + parameterName + "' should be " + size + ":";
             msg = msg + " value=[" + value + "] size=" + value.length();
             throw new CharParameterShortSizeException(msg);
         } else {
