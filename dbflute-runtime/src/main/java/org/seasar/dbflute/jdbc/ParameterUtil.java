@@ -18,6 +18,7 @@ package org.seasar.dbflute.jdbc;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.seasar.dbflute.exception.CharParameterShortSizeException;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -48,6 +49,11 @@ public class ParameterUtil {
         if (value == null || size == null) {
             return null;
         }
+        if (mode == null) {
+            String msg = "The argument 'mode' should not be null:";
+            msg = msg + " propertyName=" + propertyName + " value=" + value + " size=" + size;
+            throw new IllegalArgumentException(msg);
+        }
         if (value.length() >= size) {
             return value;
         }
@@ -56,9 +62,9 @@ public class ParameterUtil {
         } else if (mode.equals(ShortCharHandlingMode.LFILL)) {
             return DfStringUtil.lfill(value, size);
         } else if (mode.equals(ShortCharHandlingMode.EXCEPTION)) {
-            String msg = "The value of property '" + propertyName + "' should have the length '" + size + "':";
-            msg = msg + " value=[" + value + "]";
-            throw new IllegalStateException(msg);
+            String msg = "The size of the parameter '" + propertyName + "' should be " + size + ":";
+            msg = msg + " value=[" + value + "] size=" + value.length();
+            throw new CharParameterShortSizeException(msg);
         } else {
             return value;
         }
