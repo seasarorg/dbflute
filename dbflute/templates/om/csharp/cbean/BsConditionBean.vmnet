@@ -65,7 +65,7 @@ namespace ${glPackageBaseCB} {
         public ${myConditionQueryClassName} ConditionQuery {
             get {
                 if (_conditionQuery == null) {
-                    _conditionQuery = new CreateLocalCQ();
+                    _conditionQuery = CreateLocalCQ();
                 }
                 return _conditionQuery;
             }
