@@ -5,6 +5,7 @@ using System.Collections;
 
 using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBean};
+using ${glPackageBaseCommonSqlClause};
 using ${glPackageBaseCommonHelper};
 
 using ${glPackageCB};
@@ -64,13 +65,21 @@ namespace ${glPackageBaseCB} {
         public ${myConditionQueryClassName} ConditionQuery {
             get {
                 if (_conditionQuery == null) {
-                    _conditionQuery = new ${myConditionQueryClassName}(null, this.SqlClause, this.SqlClause.getLocalTableAliasName(), 0);
+                    _conditionQuery = new CreateLocalCQ();
                 }
                 return _conditionQuery;
             }
         }
 
-        public override ${glPackageBaseCommonCBean}.${glConditionQuery} LocalCQ {
+        protected virtual ${myConditionQueryClassName} CreateLocalCQ() {
+            return xcreateCQ(null, this.SqlClause, this.SqlClause.getLocalTableAliasName(), 0);
+        }
+
+        protected virtual ${myConditionQueryClassName} xcreateCQ(${glConditionQuery} childQuery, ${glSqlClause} sqlClause, String aliasName, int nestLevel) {
+            return new ${myConditionQueryClassName}(childQuery, sqlClause, aliasName, nestLevel);
+        }
+
+        public override ${glConditionQuery} LocalCQ {
             get { return this.ConditionQuery; }
         }
 
