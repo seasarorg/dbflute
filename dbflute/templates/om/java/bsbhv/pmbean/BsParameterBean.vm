@@ -5,10 +5,10 @@ ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 #else
 import org.seasar.dbflute.cbean.FetchBean;
-import org.seasar.dbflute.jdbc.ParameterUtil;
-import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 #end
+import org.seasar.dbflute.jdbc.ParameterUtil;
+import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName))
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 #end
@@ -114,8 +114,13 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return ParameterUtil.convertEmptyToNull(value);
     }
 
-    protected String handleShortChar(String propertyName, String value, Integer size, ShortCharHandlingMode mode) {
+    protected String handleShortChar(String propertyName, String value, Integer size) {
+        ShortCharHandlingMode mode = getShortCharHandlingMode(propertyName, value, size);
         return ParameterUtil.handleShortChar(propertyName, value, size, mode);
+    }
+
+    protected ShortCharHandlingMode getShortCharHandlingMode(String propertyName, String value, Integer size) {
+        return ShortCharHandlingMode.${database.shortCharHandlingMode};
     }
 
     // ===================================================================================
@@ -155,7 +160,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($propertyType.endsWith("String"))
 #if ($database.isShortCharHandlingValid() && $database.isPmbMetaDataPropertyRefColumnChar($pmbClassName, $propertyName))
         String filtered = convertEmptyToNull(_${propertyName});
-        filtered = handleShortChar("${propertyName}", filtered, ${database.getPmbMetaDataPropertyRefSize($pmbClassName, $propertyName)}, ShortCharHandlingMode.${database.shortCharHandlingMode});
+        filtered = handleShortChar("${propertyName}", filtered, ${database.getPmbMetaDataPropertyRefSize($pmbClassName, $propertyName)});
         return filtered;
 #else
         return convertEmptyToNull(_${propertyName});

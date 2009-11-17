@@ -1,6 +1,9 @@
 package org.seasar.dbflute.logic.pmb;
 
+import java.util.List;
 import java.util.Map;
+
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -35,5 +38,13 @@ public class PmbMetaDataPropertyOptionFinder {
         }
         final Map<String, String> optionMap = meta.getPropertyNameOptionMap();
         return optionMap != null ? optionMap.get(propertyName) : null;
+    }
+
+    // ===================================================================================
+    //                                                                         Option Util
+    //                                                                         ===========
+    public static List<String> splitOption(String option) {
+        final String delimiter = "|";
+        return DfStringUtil.splitList(option, delimiter);
     }
 }

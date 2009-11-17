@@ -1186,27 +1186,27 @@ public class Column {
     // [JDBC Type]
     // - - - - - -
     public boolean isJdbcTypeChar() { // as Pinpoint
-        return "CHAR".equals(getJdbcType());
+        return TypeMap.CHAR.equals(getJdbcType());
     }
-    
+
     public boolean isJdbcTypeClob() { // as Pinpoint
-        return "CLOB".equals(getJdbcType());
+        return TypeMap.CLOB.equals(getJdbcType());
     }
 
     public boolean isJdbcTypeDate() { // as Pinpoint
-        return "DATE".equals(getJdbcType());
+        return TypeMap.DATE.equals(getJdbcType());
     }
 
     public boolean isJdbcTypeTime() { // as Pinpoint
-        return "TIME".equals(getJdbcType());
+        return TypeMap.TIME.equals(getJdbcType());
     }
 
     public boolean isJdbcTypeTimestamp() { // as Pinpoint
-        return "TIMESTAMP".equals(getJdbcType());
+        return TypeMap.TIMESTAMP.equals(getJdbcType());
     }
 
     public boolean isJdbcTypeBlob() { // as Pinpoint
-        return "BLOB".equals(getJdbcType());
+        return TypeMap.BLOB.equals(getJdbcType());
     }
 
     protected boolean containsAsEndsWith(String str, List<Object> ls) {

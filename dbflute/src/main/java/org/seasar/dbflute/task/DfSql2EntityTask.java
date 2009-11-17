@@ -460,39 +460,29 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 final List<String> parameterBeanElement = getParameterBeanPropertyTypeList(sql);
                 for (String element : parameterBeanElement) {
                     final String nameDelimiter = " ";
-                    final int nameDelimiterLength = nameDelimiter.length();
                     final String optionDelimiter = ":";
-                    final int optionDelimiterLength = optionDelimiter.length();
                     element = element.trim();
-                    final int nameIndex;
-                    if (optionDelimiterLength >= 0) {
-                        nameIndex = element.lastIndexOf(nameDelimiter.substring(0, optionDelimiterLength));
+                    final int optionIndex = element.indexOf(optionDelimiter);
+                    final String propertyDef;
+                    final String optionDef;
+                    if (optionIndex > 0) {
+                        propertyDef = element.substring(0, optionIndex).trim();
+                        optionDef = element.substring(optionIndex + optionDelimiter.length()).trim();
                     } else {
-                        nameIndex = element.lastIndexOf(nameDelimiter);
+                        propertyDef = element;
+                        optionDef = null;
                     }
+                    final int nameIndex = propertyDef.lastIndexOf(nameDelimiter);
                     if (nameIndex <= 0) {
                         String msg = "The parameter bean element should be [typeName propertyName].";
-                        msg = msg + " But: element=" + element;
-                        msg = msg + " srcFile=" + _sqlFile;
+                        msg = msg + " But: element=" + element + " srcFile=" + _sqlFile;
                         throw new IllegalStateException(msg);
                     }
-                    final String typeName = resolvePackageName(element.substring(0, nameIndex).trim());
-                    final String rearString = element.substring(nameIndex + nameDelimiterLength).trim();
-                    final int optionIndex = rearString.indexOf(":");
-                    if (optionIndex == 0) {
-                        String msg = "The parameter bean element should be [typeName propertyName:option].";
-                        msg = msg + " But: element=" + element;
-                        msg = msg + " srcFile=" + _sqlFile;
-                        throw new IllegalStateException(msg);
-                    }
-                    if (optionIndex > 0) {
-                        final String propertyName = rearString.substring(0, optionIndex).trim();
-                        propertyNameTypeMap.put(propertyName, typeName);
-                        final String optionName = rearString.substring(optionIndex + optionDelimiterLength).trim();
-                        propertyNameOptionMap.put(propertyName, optionName);
-                    } else {
-                        final String propertyName = rearString;
-                        propertyNameTypeMap.put(propertyName, typeName);
+                    final String typeName = resolvePackageName(propertyDef.substring(0, nameIndex).trim());
+                    final String propertyName = propertyDef.substring(nameIndex + nameDelimiter.length()).trim();
+                    propertyNameTypeMap.put(propertyName, typeName);
+                    if (optionDef != null) {
+                        propertyNameOptionMap.put(propertyName, optionDef);
                     }
                 }
                 pmbMetaData.setSqlFile(_sqlFile);

@@ -464,14 +464,22 @@ public class Database {
     //                                      Option Reference
     //                                      ----------------
     public String getPmbMetaDataPropertyRefColumnInfo(String className, String propertyName) {
-        final DfParameterBeanBasicHandler handler = getParameterBeanBasicHandler();
-        String alias = handler.getPmbMetaDataPropertyRefAlias(className, propertyName, _sql2entitySchemaData);
-        String name = handler.getPmbMetaDataPropertyRefName(className, propertyName, _sql2entitySchemaData);
-        String lineDisp = handler.getPmbMetaDataPropertyRefLineDisp(className, propertyName, _sql2entitySchemaData);
-        if (name.trim().length() > 0) {
-            return " - related to " + alias + name + ": " + lineDisp;
-        } else {
-            return "";
+        try {
+            final DfParameterBeanBasicHandler handler = getParameterBeanBasicHandler();
+            final AppData data = _sql2entitySchemaData;
+            final String alias = handler.getPmbMetaDataPropertyRefAlias(className, propertyName, data);
+            final String name = handler.getPmbMetaDataPropertyRefName(className, propertyName, data);
+            final String lineDisp = handler.getPmbMetaDataPropertyRefLineDisp(className, propertyName, data);
+            if (name != null && name.trim().length() > 0) {
+                return " :: related to " + alias + name + ": " + lineDisp;
+            } else {
+                return "";
+            }
+        } catch (RuntimeException e) {
+            String msg = "Failed to execute getPmbMetaDataPropertyRefColumnInfo(): ";
+            msg = msg + " " + className + "." + propertyName;
+            _log.debug(msg, e);
+            throw new IllegalStateException(msg, e);
         }
     }
 

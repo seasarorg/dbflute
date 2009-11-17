@@ -5,19 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
-import org.apache.torque.engine.database.model.Database;
-import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.exception.DfParameterBeanReferenceColumnNotFoundException;
-import org.seasar.dbflute.exception.DfParameterBeanReferenceTableNotFoundException;
 import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -281,137 +275,37 @@ public class DfParameterBeanBasicHandler {
 
     public String getPmbMetaDataPropertyRefName(String className, String propertyName, AppData appData) {
         Column column = getPmbMetaDataPropertyOptionReferenceColumn(className, propertyName, appData);
-        if (column == null) {
-            return "";
-        }
-        return column.getName();
+        return column != null ? column.getName() : "";
     }
 
     public String getPmbMetaDataPropertyRefAlias(String className, String propertyName, AppData appData) {
         Column column = getPmbMetaDataPropertyOptionReferenceColumn(className, propertyName, appData);
-        if (column == null) {
-            return "";
-        }
-        return column.getAliasExpression();
+        return column != null ? column.getAliasExpression() : "";
     }
 
     public String getPmbMetaDataPropertyRefLineDisp(String className, String propertyName, AppData appData) {
         Column column = getPmbMetaDataPropertyOptionReferenceColumn(className, propertyName, appData);
-        if (column == null) {
-            return "";
-        }
-        return "{" + column.getColumnDefinitionLineDisp() + "}";
+        return column != null ? "{" + column.getColumnDefinitionLineDisp() + "}" : "";
     }
 
     public boolean isPmbMetaDataPropertyRefColumnChar(String className, String propertyName, AppData appData) {
         Column column = getPmbMetaDataPropertyOptionReferenceColumn(className, propertyName, appData);
-        if (column == null) {
-            return false;
-        }
-        return column.isJdbcTypeChar();
+        return column != null ? column.isJdbcTypeChar() : false;
     }
 
     public String getPmbMetaDataPropertyRefDbType(String className, String propertyName, AppData appData) {
         Column column = getPmbMetaDataPropertyOptionReferenceColumn(className, propertyName, appData);
-        if (column == null) {
-            return "";
-        }
-        return column.getDbType();
+        return column != null ? column.getDbType() : "";
     }
 
     public String getPmbMetaDataPropertyRefSize(String className, String propertyName, AppData appData) {
         Column column = getPmbMetaDataPropertyOptionReferenceColumn(className, propertyName, appData);
-        if (column == null) {
-            return null;
-        }
-        return column.getColumnSizeSettingExpression();
+        return column != null ? column.getColumnSizeSettingExpression() : "";
     }
 
     protected Column getPmbMetaDataPropertyOptionReferenceColumn(String className, String propertyName, AppData appData) {
-        if (appData == null) {
-            return null;
-        }
-        final Database database;
-        try {
-            database = appData.getDatabase();
-        } catch (EngineException e) {
-            throw new IllegalStateException(e);
-        }
-        if (database == null) {
-            return null;
-        }
-        String option = findPmbMetaDataPropertyOption(className, propertyName);
-        if (option == null) {
-            return null;
-        }
-        option = option.trim();
-        if (!option.startsWith("ref(") || !option.endsWith(")")) {
-            return null;
-        }
-        String value = option.substring("ref(".length(), option.length() - ")".length());
-        value = value.trim();
-        final int delimiterIndex = value.indexOf(".");
-        final String tableName;
-        final String columnName;
-        if (delimiterIndex < 0) {
-            tableName = value;
-            columnName = null;
-        } else {
-            tableName = value.substring(0, delimiterIndex);
-            columnName = value.substring(delimiterIndex + ".".length());
-        }
-        final Table table = database.getTable(tableName);
-        if (table == null) {
-            throwParameterBeanReferenceTableNotFoundException(className, propertyName, tableName);
-        }
-        final Column column;
-        if (columnName != null) {
-            column = table.getColumn(columnName);
-        } else {
-            column = table.getColumn(propertyName);
-        }
-        if (column == null) {
-            throwParameterBeanReferenceColumnNotFoundException(className, propertyName, tableName, columnName);
-        }
-        return column;
-    }
-
-    protected void throwParameterBeanReferenceTableNotFoundException(String className, String propertyName,
-            String tableName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The reference table was not found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the table existence." + ln();
-        msg = msg + ln();
-        msg = msg + "[ParameterBean]" + ln() + className + ln();
-        msg = msg + ln();
-        msg = msg + "[Property]" + ln() + propertyName + ln();
-        msg = msg + ln();
-        msg = msg + "[Not Found Table]" + ln() + tableName + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new DfParameterBeanReferenceTableNotFoundException(msg);
-    }
-
-    protected void throwParameterBeanReferenceColumnNotFoundException(String className, String propertyName,
-            String tableName, String columnName) {
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "The reference column was not found!" + ln();
-        msg = msg + ln();
-        msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the column existence." + ln();
-        msg = msg + ln();
-        msg = msg + "[ParameterBean]" + ln() + className + ln();
-        msg = msg + ln();
-        msg = msg + "[Property]" + ln() + propertyName + ln();
-        msg = msg + ln();
-        msg = msg + "[Table]" + ln() + tableName + ln();
-        msg = msg + ln();
-        msg = msg + "[Column]" + ln() + columnName + ln();
-        msg = msg + "* * * * * * * * * */";
-        throw new DfParameterBeanReferenceColumnNotFoundException(msg);
+        PmbMetaDataPropertyOptionReference reference = createPmbMetaDataPropertyOptionReference(className, propertyName);
+        return reference.getPmbMetaDataPropertyOptionReferenceColumn(appData);
     }
 
     // -----------------------------------------------------
@@ -422,22 +316,29 @@ public class DfParameterBeanBasicHandler {
         if (specified == null) {
             return false;
         }
-        final String delimiter = "|";
-        if (specified.contains(delimiter)) {
-            final List<String> splitList = DfStringUtil.splitList(specified, delimiter);
-            for (String element : splitList) {
-                if (element.trim().equalsIgnoreCase(option)) {
-                    return true;
-                }
+        final List<String> splitList = splitOption(specified);
+        for (String element : splitList) {
+            if (element.trim().equalsIgnoreCase(option)) {
+                return true;
             }
         }
-        return specified.trim().equalsIgnoreCase(option);
+        return false;
+    }
+
+    protected List<String> splitOption(String option) {
+        return PmbMetaDataPropertyOptionFinder.splitOption(option);
     }
 
     protected PmbMetaDataPropertyOptionClassification createPmbMetaDataPropertyOptionClassification(String className,
             String propertyName) {
         PmbMetaDataPropertyOptionFinder finder = createPmbMetaDataPropertyOptionFinder(className, propertyName);
         return new PmbMetaDataPropertyOptionClassification(className, propertyName, _classificationProperties, finder);
+    }
+
+    protected PmbMetaDataPropertyOptionReference createPmbMetaDataPropertyOptionReference(String className,
+            String propertyName) {
+        PmbMetaDataPropertyOptionFinder finder = createPmbMetaDataPropertyOptionFinder(className, propertyName);
+        return new PmbMetaDataPropertyOptionReference(className, propertyName, finder);
     }
 
     protected String findPmbMetaDataPropertyOption(String className, String propertyName) {

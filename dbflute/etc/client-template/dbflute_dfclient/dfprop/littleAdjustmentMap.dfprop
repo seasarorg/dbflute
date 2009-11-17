@@ -13,6 +13,7 @@
 # o extendedImplementedInvokerAssistantClass: (NotRequired - Default '')
 # o extendedImplementedCommonColumnAutoSetupperClass: (NotRequired - Default '')
 # o extendedS2DaoSettingClass: (NotRequired - Default '')
+# o shortCharHandlingMode: (NotRequired - Default 'NONE')
 # 
 # *The line that starts with '#' means comment-out.
 #
@@ -131,6 +132,17 @@ map:{
     #
     # @CSharpOnly
     #; extendedS2DaoSettingClass = Com.Example.ExtendedS2DaoSetting
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o shortCharHandlingMode: (NotRequired - Default 'NONE')
+    #  If the parameter of condition-bean or parameter-bean has short size,
+    #   NONE - Do nothing. (default)
+    #   EXCEPTION - It throws an exception.
+    #   RFILL - It fills the parameter by right spaces.
+    #   LFILL - It fills the parameter by left spaces.
+    #
+    #; shortCharHandlingMode = NONE
     # - - - - - - - - - -/
 }
 # ----------------/

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
@@ -11,14 +12,23 @@ import org.seasar.dbflute.properties.DfClassificationProperties;
  */
 public class PmbMetaDataPropertyOptionClassification {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     protected static final String OPTION_PREFIX = "cls(";
     protected static final String OPTION_SUFFIX = ")";
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _className;
     protected String _propertyName;
     protected DfClassificationProperties _classificationProperties;
     protected PmbMetaDataPropertyOptionFinder _pmbMetaDataPropertyOptionFinder;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public PmbMetaDataPropertyOptionClassification(String className, String propertyName,
             DfClassificationProperties classificationProperties,
             PmbMetaDataPropertyOptionFinder pmbMetaDataPropertyOptionFinder) {
@@ -28,6 +38,9 @@ public class PmbMetaDataPropertyOptionClassification {
         _pmbMetaDataPropertyOptionFinder = pmbMetaDataPropertyOptionFinder;
     }
 
+    // ===================================================================================
+    //                                                                      Classification
+    //                                                                      ==============
     public boolean isPmbMetaDataPropertyOptionClassification() {
         return extractClassificationNameFromOption(_className, _propertyName, false) != null;
     }
@@ -41,11 +54,11 @@ public class PmbMetaDataPropertyOptionClassification {
         final List<Map<String, String>> classificationMapList = _classificationProperties
                 .getClassificationMapList(classificationName);
         if (classificationMapList == null) {
-            String msg = "Look the message below:" + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + getLineSeparator();
-            msg = msg + "The classification was Not Found:" + getLineSeparator();
+            String msg = "Look the message below:" + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
+            msg = msg + "The classification was not found:" + ln();
             msg = msg + " " + _className + " " + _propertyName;
-            msg = msg + ":" + OPTION_PREFIX + classificationName + OPTION_SUFFIX + getLineSeparator();
+            msg = msg + ":" + OPTION_PREFIX + classificationName + OPTION_SUFFIX + ln();
             msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg);
         }
@@ -56,56 +69,75 @@ public class PmbMetaDataPropertyOptionClassification {
         final String pmbMetaDataPropertyOption = getPmbMetaDataPropertyOption();
         if (pmbMetaDataPropertyOption == null) {
             if (check) {
-                String msg = "The property name don't have Option:";
+                String msg = "The property name didn't have its option:";
                 msg = msg + " " + className + "." + propertyName;
                 throw new IllegalStateException(msg);
             } else {
                 return null;
             }
         }
-        final String option = pmbMetaDataPropertyOption.trim();
-        if (option.length() == 0) {
-            if (check) {
-                String msg = "The option of the property name should not be empty:";
-                msg = msg + " " + className + "." + propertyName;
-                throw new IllegalStateException(msg);
-            } else {
-                return null;
+        String option = pmbMetaDataPropertyOption.trim();
+        {
+            if (option.trim().length() == 0) {
+                if (check) {
+                    String msg = "The option of the property name should not be empty:";
+                    msg = msg + " property=" + className + "." + propertyName;
+                    throw new IllegalStateException(msg);
+                } else {
+                    return null;
+                }
             }
-        }
-        if (!option.startsWith(OPTION_PREFIX) || !option.endsWith(OPTION_SUFFIX)) {
-            if (check) {
-                String msg = "The option of class name and the property name should be 'cls(xxx)':";
-                msg = msg + " " + className + "." + propertyName + ":" + option;
-                throw new IllegalStateException(msg);
-            } else {
-                return null;
+            final List<String> splitOption = splitOption(option);
+            String firstOption = null;
+            for (String element : splitOption) {
+                element = element.trim();
+                if (element.startsWith(OPTION_PREFIX) && element.endsWith(OPTION_SUFFIX)) {
+                    firstOption = element;
+                    break;
+                }
             }
+            if (firstOption == null) {
+                if (check) {
+                    String msg = "The option of class name and the property name should be 'cls(xxx)':";
+                    msg = msg + " property=" + className + "." + propertyName + ":" + option;
+                    throw new IllegalStateException(msg);
+                } else {
+                    return null;
+                }
+            }
+            option = firstOption;
         }
         final int clsIdx = OPTION_PREFIX.length();
         final int clsEndIdx = option.length() - OPTION_SUFFIX.length();
         try {
             return option.substring(clsIdx, clsEndIdx);
         } catch (StringIndexOutOfBoundsException e) {
-            String msg = "Look the message below:" + getLineSeparator();
-            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + getLineSeparator();
-            msg = msg + "IndexOutOfBounds ocurred:" + getLineSeparator();
+            String msg = "Look the message below:" + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * " + ln();
+            msg = msg + "IndexOutOfBounds ocurred:" + ln();
             msg = msg + " " + _className + " " + _propertyName;
-            msg = msg + ":" + option + getLineSeparator();
-            msg = msg + "{" + option + "}.substring(" + clsIdx + ", " + clsEndIdx + ")" + getLineSeparator();
+            msg = msg + ":" + option + ln();
+            msg = msg + "{" + option + "}.substring(" + clsIdx + ", " + clsEndIdx + ")" + ln();
             msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg, e);
         }
     }
 
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected String getPmbMetaDataPropertyOption() {
         return _pmbMetaDataPropertyOptionFinder.findPmbMetaDataPropertyOption(_className, _propertyName);
     }
 
+    protected List<String> splitOption(String option) {
+        return PmbMetaDataPropertyOptionFinder.splitOption(option);
+    }
+
     // ===================================================================================
-    //                                                                              Helper
-    //                                                                              ======
-    protected String getLineSeparator() {
-        return System.getProperty("line.separator");
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 }
