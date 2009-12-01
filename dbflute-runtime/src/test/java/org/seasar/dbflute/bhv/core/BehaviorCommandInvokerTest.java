@@ -12,10 +12,10 @@ import java.util.concurrent.Future;
 
 import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.Entity;
-import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.EntityRowHandler;
+import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.jdbc.SqlResultHandler;
 import org.seasar.dbflute.jdbc.SqlResultInfo;
 import org.seasar.dbflute.mock.MockConditionBean;
@@ -39,7 +39,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final Object[] args = new Object[] { "foo", "bar" };
         BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
             @Override
-            protected void setupResourceContext() {
+            protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
                 markList.add("setupResourceContext");
             }
 
@@ -120,7 +120,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final Object[] args = new Object[] { "foo", "bar" };
         BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
             @Override
-            protected void setupResourceContext() {
+            protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
                 markList.add("setupResourceContext");
             }
 
@@ -201,7 +201,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final Object[] args = new Object[] { "foo", "bar" };
         BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
             @Override
-            protected void setupResourceContext() {
+            protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
                 markList.add("setupResourceContext");
             }
 
@@ -296,7 +296,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         final List<String> markList = new ArrayList<String>();
         BehaviorCommandInvoker invoker = new BehaviorCommandInvoker() {
             @Override
-            protected void setupResourceContext() {
+            protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
                 markList.add("setupResourceContext");
             }
 

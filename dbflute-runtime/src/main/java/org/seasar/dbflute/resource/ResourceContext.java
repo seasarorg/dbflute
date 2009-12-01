@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.AccessContext;
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.bhv.core.BehaviorCommand;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
@@ -82,6 +83,23 @@ public class ResourceContext {
     //                                                                         Easy-to-Use
     //                                                                         ===========
     /**
+     * @return The behavior command. (NotNull)
+     */
+    public static BehaviorCommand<?> behaviorCommand() {
+        if (!isExistResourceContextOnThread()) {
+            String msg = "The resource context should exist!";
+            throw new IllegalStateException(msg);
+        }
+        ResourceContext context = getResourceContextOnThread();
+        BehaviorCommand<?> behaviorCommand = context.getBehaviorCommand();
+        if (behaviorCommand == null) {
+            String msg = "The behavior command should exist: context=" + context;
+            throw new IllegalStateException(msg);
+        }
+        return behaviorCommand;
+    }
+
+    /**
      * @return The current database definition. (NotNull)
      */
     public static DBDef currentDBDef() {
@@ -107,9 +125,10 @@ public class ResourceContext {
             String msg = "The resource context should exist!";
             throw new IllegalStateException(msg);
         }
-        DBMetaProvider provider = getResourceContextOnThread().getDBMetaProvider();
+        ResourceContext context = getResourceContextOnThread();
+        DBMetaProvider provider = context.getDBMetaProvider();
         if (provider == null) {
-            String msg = "The provider of DB meta should exist!";
+            String msg = "The provider of DB meta should exist: context=" + context;
             throw new IllegalStateException(msg);
         }
         return provider;
@@ -139,9 +158,11 @@ public class ResourceContext {
             String msg = "The resource context should exist: " + tableFlexibleName;
             throw new IllegalStateException(msg);
         }
-        DBMetaProvider provider = getResourceContextOnThread().getDBMetaProvider();
+        ResourceContext context = getResourceContextOnThread();
+        DBMetaProvider provider = context.getDBMetaProvider();
         if (provider == null) {
-            String msg = "The provider of DB meta should exist: " + tableFlexibleName;
+            String msg = "The provider of DB meta should exist:";
+            msg = msg + " tableFlexibleName=" + tableFlexibleName + " context=" + context;
             throw new IllegalStateException(msg);
         }
         return provider.provideDBMetaChecked(tableFlexibleName);
@@ -152,9 +173,10 @@ public class ResourceContext {
             String msg = "The resource context should exist!";
             throw new IllegalStateException(msg);
         }
-        SqlAnalyzerFactory factory = getResourceContextOnThread().getSqlAnalyzerFactory();
+        ResourceContext context = getResourceContextOnThread();
+        SqlAnalyzerFactory factory = context.getSqlAnalyzerFactory();
         if (factory == null) {
-            String msg = "The provider of SQL analyzer should exist!";
+            String msg = "The provider of SQL analyzer should exist: context=" + context;
             throw new IllegalStateException(msg);
         }
         return factory.create(sql, blockNullParameter);
@@ -291,6 +313,7 @@ public class ResourceContext {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected BehaviorCommand<?> _behaviorCommand;
     protected DBDef _currentDBDef;
     protected DBMetaProvider _dbmetaProvider;
     protected SqlClauseCreator _sqlClauseCreator;
@@ -298,8 +321,25 @@ public class ResourceContext {
     protected SqlAnalyzerFactory _sqlAnalyzerFactory;
 
     // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{" + _behaviorCommand + ", " + _currentDBDef + ", " + _dbmetaProvider + ", " + _sqlClauseCreator + ", "
+                + _resourceParameter + ", " + _sqlAnalyzerFactory + "}";
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public BehaviorCommand<?> getBehaviorCommand() {
+        return _behaviorCommand;
+    }
+
+    public void setBehaviorCommand(BehaviorCommand<?> behaviorCommand) {
+        _behaviorCommand = behaviorCommand;
+    }
+
     public DBDef getCurrentDBDef() {
         return _currentDBDef;
     }

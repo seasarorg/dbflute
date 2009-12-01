@@ -150,7 +150,7 @@ public class BehaviorCommandInvoker {
      * @return The result object. (Nullable)
      */
     protected <RESULT> RESULT dispatchInvoking(BehaviorCommand<RESULT> behaviorCommand) {
-        setupResourceContext();
+        setupResourceContext(behaviorCommand);
         final boolean logEnabled = isLogEnabled();
 
         // - - - - - - - - - - - - -
@@ -205,9 +205,10 @@ public class BehaviorCommandInvoker {
         return result;
     }
 
-    protected void setupResourceContext() {
+    protected <RESULT> void setupResourceContext(BehaviorCommand<RESULT> behaviorCommand) {
         assertInvokerAssistant();
         ResourceContext resourceContext = new ResourceContext();
+        resourceContext.setBehaviorCommand(behaviorCommand);
         resourceContext.setCurrentDBDef(_invokerAssistant.assistCurrentDBDef());
         resourceContext.setDBMetaProvider(_invokerAssistant.assistDBMetaProvider());
         resourceContext.setSqlClauseCreator(_invokerAssistant.assistSqlClauseCreator());
