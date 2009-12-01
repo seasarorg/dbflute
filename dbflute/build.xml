@@ -48,6 +48,7 @@
 	<property name="dbflute.sastruts.example.dir" value="${workspace.base}/dbflute-sastruts-example"/>
 	<property name="dbflute.teeda.example.dir" value="${workspace.base}/dbflute-teeda-example"/>
 	<property name="dbflute.buri.example.dir" value="${workspace.base}/dbflute-buri-example"/>
+	<property name="dbflute.doma.example.dir" value="${workspace.base}/dbflute-doma-example"/>
 	<property name="dbflute.hibernate.example.dir" value="${workspace.base}/dbflute-hibernate-example"/>
 	<property name="dbflute.s2jdbc.example.dir" value="${workspace.base}/dbflute-s2jdbc-example"/>
 	<property name="dbflute.flex.example.dir" value="${workspace.base}/dbflute-flexserver-example"/>
@@ -275,6 +276,10 @@
 	  	<copy todir="${dbflute.flex.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
+	<target name="reflect-mac-doma" depends="deploy-dist" description="==> reflect to flex example">
+	  	<copy todir="${dbflute.doma.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	</target>
+
 	<target name="reflect-mac-others" depends="deploy-dist" description="==> reflect to other examples">
 	  	<copy todir="${dbflute.spring.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.guice.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
@@ -317,6 +322,10 @@
 
 	<target name="reflect-win-buri" depends="deploy-dist" description="==> reflect to buri example">
 	  	<copy todir="${dbflute.buri.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	</target>
+
+	<target name="reflect-win-doma" depends="deploy-dist" description="==> reflect to doma example">
+	  	<copy todir="${dbflute.doma.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
 	<target name="reflect-win-others" depends="deploy-dist" description="==> reflect to other examples">
