@@ -66,7 +66,14 @@ public class DfTemplateDataXlsHandler {
         final DataSet dataSet = new DataSet();
         for (String tableName : tableNameSet) {
             final List<String> columnNameList = tableColumnMap.get(tableName);
-            final DataTable dataTable = new DataTable(tableName);
+            final int dotIndex = tableName.indexOf(".");
+            final DataTable dataTable;
+            if (dotIndex >= 0) {
+                // for the table of additional schema
+                dataTable = new DataTable(tableName.substring(dotIndex + ".".length()));
+            } else {
+                dataTable = new DataTable(tableName);
+            }
             int columnIndex = 0;
             for (String columnName : columnNameList) {
                 dataTable.addColumn(columnName, ColumnTypes.STRING);
@@ -91,7 +98,13 @@ public class DfTemplateDataXlsHandler {
 
         // The xls file should have all string cell type for replace-schema. 
         final DfXlsWriter writer = new DfXlsWriter(xlsFile).stringCellType();
-        writer.write(dataSet);
+        try {
+            writer.write(dataSet);
+        } catch (RuntimeException e) {
+            String msg = "Failed to write the xls file: " + xlsFile;
+            msg = msg + " tableNames=" + tableNameSet;
+            throw new IllegalStateException(msg, e);
+        }
 
         final TemplateDataResult templateDataResult = new TemplateDataResult();
         templateDataResult.setOverTableColumnMap(overTableColumnMap);
