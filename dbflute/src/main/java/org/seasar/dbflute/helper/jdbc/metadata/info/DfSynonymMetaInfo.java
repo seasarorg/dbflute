@@ -66,12 +66,12 @@ public class DfSynonymMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + synonymName + ": " + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName
-                + (columnMetaInfoList != null ? "(" + columnMetaInfoList.size() + " columns)" : "") + ", "
+        return synonymName + ": " + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName
+                + (columnMetaInfoList != null ? "(" + columnMetaInfoList.size() + " columns)" : "") + ", PK="
                 + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
                 + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
-                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null)
-                + (selectable ? ", selectable" : "") + ", " + tableComment + "}";
+                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + "selectable="
+                + selectable + ", " + tableComment;
     }
 
     // ===================================================================================

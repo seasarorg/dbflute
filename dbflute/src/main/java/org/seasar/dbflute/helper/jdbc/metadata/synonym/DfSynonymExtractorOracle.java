@@ -84,7 +84,6 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     //                                                                             =======
     public Map<String, DfSynonymMetaInfo> extractSynonymMap() {
         final Map<String, DfSynonymMetaInfo> synonymMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
-        _log.info("...Extracting synonyms");
         final String sql = "select * from ALL_SYNONYMS where OWNER = '" + _schema + "'";
         Connection conn = null;
         Statement statement = null;
@@ -175,19 +174,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         translateFKTable(synonymMap); // It translates foreign key meta informations. 
         judgeSynonymSelectable(synonymMap);
         setupTableColumnComment(synonymMap);
-        showSynonyms(synonymMap);
         return synonymMap;
-    }
-
-    protected void showSynonyms(Map<String, DfSynonymMetaInfo> synonymMap) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("Extracted synonyms:").append(ln()).append("[Synonyms]");
-        final Set<Entry<String, DfSynonymMetaInfo>> entrySet = synonymMap.entrySet();
-        for (Entry<String, DfSynonymMetaInfo> entry : entrySet) {
-            final DfSynonymMetaInfo info = entry.getValue();
-            sb.append(ln()).append(info.toString());
-        }
-        _log.info(sb.toString());
     }
 
     protected DfSynonymMetaInfo setupDBLinkSynonym(Connection conn, String synonymName, String tableName,

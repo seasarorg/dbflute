@@ -66,6 +66,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -795,11 +796,11 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         try {
             _log.info("...Loading synonyms");
             _synonymMap = extractor.extractSynonymMap();
-            final Set<String> keySet = _synonymMap.keySet();
             final StringBuilder sb = new StringBuilder();
-            sb.append("Finished loading synonyms").append(ln()).append("[Synonym Map]");
-            for (String key : keySet) {
-                sb.append(ln()).append(" " + key + " = " + _synonymMap.get(key));
+            sb.append("Finished loading synonyms:").append(ln()).append("[Synonym Map]");
+            final Set<Entry<String, DfSynonymMetaInfo>> entrySet = _synonymMap.entrySet();
+            for (Entry<String, DfSynonymMetaInfo> entry : entrySet) {
+                sb.append(ln()).append(" ").append(entry.getValue().toString());
             }
             _log.info(sb.toString());
         } catch (RuntimeException ignored) {
