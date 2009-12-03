@@ -339,7 +339,15 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 facade.selectStringList(sql, columnList);
                 info.setSelectable(true);
             } catch (RuntimeException ignored) {
+                sb.append(ln()).append(" ");
                 sb.append(synonymName);
+                sb.append(" (");
+                String tableOwner = info.getTableOwner();
+                if (tableOwner != null && tableOwner.trim().length() > 0) {
+                    sb.append(tableOwner).append(".");
+                }
+                sb.append(info.getTableName());
+                sb.append(")");
                 info.setSelectable(false);
             }
         }
