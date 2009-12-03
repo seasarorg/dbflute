@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
@@ -66,12 +67,22 @@ public class DfSynonymMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return synonymName + ": " + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName
+        String comment = "";
+        if (tableComment != null) {
+            final String ln = DfSystemUtil.getLineSeparator();
+            final int indexOf = tableComment.indexOf(ln);
+            if (indexOf > 0) { // not contain 0 because ignore first line separator
+                comment = tableComment.substring(0, indexOf) + "...";
+            } else {
+                comment = tableComment;
+            }
+        }
+        return synonymName + ":{" + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName
                 + (columnMetaInfoList != null ? "(" + columnMetaInfoList.size() + " columns)" : "") + ", PK="
                 + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
                 + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
-                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + "selectable="
-                + selectable + ", " + tableComment;
+                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + ", selectable="
+                + selectable + "} // " + comment;
     }
 
     // ===================================================================================

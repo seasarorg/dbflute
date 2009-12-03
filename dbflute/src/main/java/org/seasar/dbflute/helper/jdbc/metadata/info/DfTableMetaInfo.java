@@ -123,15 +123,15 @@ public class DfTableMetaInfo {
             final String ln = DfSystemUtil.getLineSeparator();
             final int indexOf = _tableComment.indexOf(ln);
             if (indexOf > 0) { // not contain 0 because ignore first line separator
-                comment = _tableComment.substring(0, indexOf);
+                comment = _tableComment.substring(0, indexOf) + "...";
             } else {
                 comment = _tableComment;
             }
         }
         if (_tableSchema != null && _tableSchema.trim().length() != 0) {
-            return _tableSchema + "." + _tableName + "(" + _tableType + "): " + comment;
+            return _tableSchema + "." + _tableName + "(" + _tableType + ") // " + comment;
         } else {
-            return _tableName + "(" + _tableType + "): " + comment;
+            return _tableName + "(" + _tableType + ") // " + comment;
         }
     }
 
