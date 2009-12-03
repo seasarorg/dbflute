@@ -327,6 +327,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     protected void judgeSynonymSelectable(Map<String, DfSynonymMetaInfo> synonymMap) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final Set<Entry<String, DfSynonymMetaInfo>> entrySet = synonymMap.entrySet();
+        final StringBuilder sb = new StringBuilder();
+        sb.append("...Judging synonyms to be selectable:").append(ln()).append("[NOT SELECTABLE]");
         for (Entry<String, DfSynonymMetaInfo> entry : entrySet) {
             final DfSynonymMetaInfo info = entry.getValue();
             final String synonymName = info.getSynonymName();
@@ -337,9 +339,11 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 facade.selectStringList(sql, columnList);
                 info.setSelectable(true);
             } catch (RuntimeException ignored) {
+                sb.append(synonymName);
                 info.setSelectable(false);
             }
         }
+        _log.info(sb.toString());
     }
 
     /**
