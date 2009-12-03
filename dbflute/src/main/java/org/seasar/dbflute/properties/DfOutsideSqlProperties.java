@@ -1,5 +1,6 @@
 package org.seasar.dbflute.properties;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -43,6 +44,19 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return isProperty("isGenerateProcedureParameterBean", false);
     }
 
+    protected List<String> _targetProcedureCatalogList;
+
+    protected List<String> getTargetProcedureCatalogList() {
+        if (_targetProcedureCatalogList != null) {
+            return _targetProcedureCatalogList;
+        }
+        _targetProcedureCatalogList = getOutsideSqlPropertyAsList("targetProcedureCatalogList");
+        if (_targetProcedureCatalogList == null) {
+            _targetProcedureCatalogList = new ArrayList<String>();
+        }
+        return _targetProcedureCatalogList;
+    }
+
     public boolean isTargetProcedureCatalog(String procedureCatalog) {
         final List<String> targetProcedureList = getTargetProcedureCatalogList();
         if (targetProcedureList == null || targetProcedureList.isEmpty()) {
@@ -63,8 +77,17 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return false;
     }
 
-    protected List<String> getTargetProcedureCatalogList() {
-        return getOutsideSqlPropertyAsList("targetProcedureCatalogList");
+    protected List<String> _targetProcedureSchemaList;
+
+    protected List<String> getTargetProcedureSchemaList() {
+        if (_targetProcedureSchemaList != null) {
+            return _targetProcedureSchemaList;
+        }
+        _targetProcedureSchemaList = getOutsideSqlPropertyAsList("targetProcedureSchemaList");
+        if (_targetProcedureSchemaList == null) {
+            _targetProcedureSchemaList = new ArrayList<String>();
+        }
+        return _targetProcedureSchemaList;
     }
 
     public boolean isTargetProcedureSchema(String procedureSchema) {
@@ -87,8 +110,17 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return false;
     }
 
-    protected List<String> getTargetProcedureSchemaList() {
-        return getOutsideSqlPropertyAsList("targetProcedureSchemaList");
+    protected List<String> _targetProcedureNameList;
+
+    protected List<String> getTargetProcedureNameList() {
+        if (_targetProcedureNameList != null) {
+            return _targetProcedureNameList;
+        }
+        _targetProcedureNameList = getOutsideSqlPropertyAsList("targetProcedureNameList");
+        if (_targetProcedureNameList == null) {
+            _targetProcedureNameList = new ArrayList<String>();
+        }
+        return _targetProcedureNameList;
     }
 
     public boolean isTargetProcedureName(String procedureName) {
@@ -102,10 +134,6 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             }
         }
         return false;
-    }
-
-    protected List<String> getTargetProcedureNameList() {
-        return getOutsideSqlPropertyAsList("targetProcedureNameList");
     }
 
     // ===================================================================================

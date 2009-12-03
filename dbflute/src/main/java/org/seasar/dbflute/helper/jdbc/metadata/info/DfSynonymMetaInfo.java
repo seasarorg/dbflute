@@ -40,6 +40,7 @@ public class DfSynonymMetaInfo {
     protected Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap;
     protected Map<String, Map<Integer, String>> indexMap;
     protected String dbLinkName;
+    protected boolean procedureSynonym;
     protected boolean sequenceSynonym;
     protected String tableComment;
     protected Map<String, UserColComments> columnCommentMap;
@@ -69,7 +70,8 @@ public class DfSynonymMetaInfo {
                 + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
                 + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
                 + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null)
-                + (sequenceSynonym ? ", SEQ" : "") + ", " + tableComment + "}";
+                + (procedureSynonym ? ", PROC" : "") + ", " + (sequenceSynonym ? ", SEQ" : "") + ", " + tableComment
+                + "}";
     }
 
     // ===================================================================================
@@ -153,6 +155,14 @@ public class DfSynonymMetaInfo {
 
     public void setDbLinkName(String dbLinkName) {
         this.dbLinkName = dbLinkName;
+    }
+
+    public boolean isProcedureSynonym() {
+        return procedureSynonym;
+    }
+
+    public void setProcedureSynonym(boolean procedureSynonym) {
+        this.procedureSynonym = procedureSynonym;
     }
 
     public boolean isSequenceSynonym() {
