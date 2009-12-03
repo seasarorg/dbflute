@@ -90,7 +90,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 }
                 resultList.add(metaInfo);
             }
-            return procedures;
+            return resultList;
         } finally {
             if (conn != null) {
                 conn.close();
