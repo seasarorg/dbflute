@@ -23,17 +23,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
@@ -82,17 +83,13 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     //                                                                             Extract
     //                                                                             =======
     public Map<String, DfSynonymMetaInfo> extractSynonymMap() {
-        final Connection conn;
-        try {
-            conn = _dataSource.getConnection();
-        } catch (SQLException e) {
-            throw new IllegalStateException(e);
-        }
+        final Map<String, DfSynonymMetaInfo> synonymMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
         final String sql = "select * from ALL_SYNONYMS where OWNER = '" + _schema + "'";
+        Connection conn = null;
         Statement statement = null;
         ResultSet rs = null;
         try {
-            final Map<String, DfSynonymMetaInfo> synonymMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
+            conn = _dataSource.getConnection();
             statement = conn.createStatement();
             _log.info(sql);
             rs = statement.executeQuery(sql);
@@ -152,11 +149,6 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 }
                 synonymMap.put(synonymName, info);
             }
-            translateFKTable(synonymMap); // It translates foreign key meta informations. 
-            judgeProcedureSynonym(synonymMap, conn);
-            judgeSequenceSynonym(synonymMap, conn);
-            setupTableColumnComment(synonymMap);
-            return synonymMap;
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         } finally {
@@ -179,6 +171,10 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 }
             }
         }
+        translateFKTable(synonymMap); // It translates foreign key meta informations. 
+        judgeSynonymSelectable(synonymMap);
+        setupTableColumnComment(synonymMap);
+        return synonymMap;
     }
 
     protected DfSynonymMetaInfo setupDBLinkSynonym(Connection conn, String synonymName, String tableName,
@@ -325,171 +321,25 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     }
 
     /**
-     * Judge where it is procedure synonym or not. <br />
-     * This does not support DB link synonym. <br />
-     * And also this does not support the procedure with package
-     * because TABLE_OWNER of ALL_SYNONYMS has its package name.
+     * Judge where it is select-able synonym or not. <br />
      * @param synonymMap The map of synonym. (NotNull)
-     * @param conn The connection to database. (NotNull)
      */
-    protected void judgeProcedureSynonym(Map<String, DfSynonymMetaInfo> synonymMap, Connection conn) {
-        final Set<String> ownerSet = createOwnerSet(synonymMap);
-        if (ownerSet.isEmpty()) {
-            return;
-        }
-        final StringBuilder inSb = new StringBuilder();
-        for (String owner : ownerSet) {
-            if (inSb.length() > 0) {
-                inSb.append(", ");
-            }
-            inSb.append("'").append(owner).append("'");
-        }
-        final Set<String> procedureNameSet = new HashSet<String>();
-        final String metaDataSql = "select * from ALL_PROCEDURES where OWNER in (" + inSb.toString() + ")";
-        Statement statement = null;
-        ResultSet rs = null;
-        try {
-            statement = conn.createStatement();
-            _log.info(metaDataSql);
-            rs = statement.executeQuery(metaDataSql);
-            while (rs.next()) {
-                final String owner = rs.getString("OWNER");
-                final String objectNameCol = rs.getString("OBJECT_NAME");
-                final String procedureNameCol = rs.getString("PROCEDURE_NAME");
-                final StringBuilder tmpSb = new StringBuilder();
-                tmpSb.append(owner).append(".").append(objectNameCol);
-                if (procedureNameCol != null && procedureNameCol.trim().length() > 0) {
-                    tmpSb.append(".").append(procedureNameCol);
-                }
-                procedureNameSet.add(tmpSb.toString());
-            }
-        } catch (SQLException continued) {
-            String msg = "*Failed to the SQL:" + ln();
-            msg = msg + (continued.getMessage() != null ? continued.getMessage() : null) + ln();
-            msg = msg + metaDataSql;
-            _log.info(metaDataSql);
-            return;
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException ignored) {
-                    _log.info("statement.close() threw the exception!", ignored);
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ignored) {
-                    _log.info("rs.close() threw the exception!", ignored);
-                }
+    protected void judgeSynonymSelectable(Map<String, DfSynonymMetaInfo> synonymMap) {
+        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        final Set<Entry<String, DfSynonymMetaInfo>> entrySet = synonymMap.entrySet();
+        for (Entry<String, DfSynonymMetaInfo> entry : entrySet) {
+            final DfSynonymMetaInfo info = entry.getValue();
+            final String synonymName = info.getSynonymName();
+            final String sql = "select * from " + synonymName + " where 0=1";
+            try {
+                final List<String> columnList = new ArrayList<String>();
+                columnList.add("dummy");
+                facade.selectStringList(sql, columnList);
+                info.setSelectable(true);
+            } catch (RuntimeException ignored) {
+                info.setSelectable(false);
             }
         }
-        final StringBuilder logSb = new StringBuilder();
-        logSb.append("...Judging procedure synonym: ");
-        logSb.append(ln()).append("[Procedure Synonym]");
-        boolean exists = false;
-        for (String synonymKey : synonymMap.keySet()) {
-            final DfSynonymMetaInfo synonym = synonymMap.get(synonymKey);
-            if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
-                continue;
-            }
-            final String name = synonym.getTableOwner() + "." + synonym.getTableName();
-            if (procedureNameSet.contains(name)) {
-                exists = true;
-                logSb.append(ln()).append(" " + name);
-                synonym.setProcedureSynonym(true);
-            }
-        }
-        if (exists) {
-            _log.info(logSb.toString());
-        }
-    }
-
-    /**
-     * Judge where it is sequence synonym or not. <br />
-     * This does not support DB link synonym.
-     * @param synonymMap The map of synonym. (NotNull)
-     * @param conn The connection to database. (NotNull)
-     */
-    protected void judgeSequenceSynonym(Map<String, DfSynonymMetaInfo> synonymMap, Connection conn) {
-        final Set<String> ownerSet = createOwnerSet(synonymMap);
-        if (ownerSet.isEmpty()) {
-            return;
-        }
-        final StringBuilder inSb = new StringBuilder();
-        for (String owner : ownerSet) {
-            if (inSb.length() > 0) {
-                inSb.append(", ");
-            }
-            inSb.append("'").append(owner).append("'");
-        }
-        final Set<String> sequenceNameSet = new HashSet<String>();
-        final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER in (" + inSb.toString() + ")";
-        Statement statement = null;
-        ResultSet rs = null;
-        try {
-            statement = conn.createStatement();
-            _log.info(metaDataSql);
-            rs = statement.executeQuery(metaDataSql);
-            while (rs.next()) {
-                final String sequenceOwner = rs.getString("SEQUENCE_OWNER");
-                final String sequenceName = rs.getString("SEQUENCE_NAME");
-                sequenceNameSet.add(sequenceOwner + "." + sequenceName);
-            }
-        } catch (SQLException continued) {
-            String msg = "*Failed to the SQL:" + ln();
-            msg = msg + (continued.getMessage() != null ? continued.getMessage() : null) + ln();
-            msg = msg + metaDataSql;
-            _log.info(metaDataSql);
-            return;
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException ignored) {
-                    _log.info("statement.close() threw the exception!", ignored);
-                }
-            }
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ignored) {
-                    _log.info("rs.close() threw the exception!", ignored);
-                }
-            }
-        }
-        final StringBuilder logSb = new StringBuilder();
-        logSb.append("...Judging sequence synonym: ");
-        logSb.append(ln()).append("[Sequence Synonym]");
-        boolean exists = false;
-        for (String synonymKey : synonymMap.keySet()) {
-            final DfSynonymMetaInfo synonym = synonymMap.get(synonymKey);
-            if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
-                continue;
-            }
-            final String name = synonym.getTableOwner() + "." + synonym.getTableName();
-            if (sequenceNameSet.contains(name)) {
-                exists = true;
-                logSb.append(ln()).append(" " + name);
-                synonym.setSequenceSynonym(true);
-            }
-        }
-        if (exists) {
-            _log.info(logSb.toString());
-        }
-    }
-
-    protected Set<String> createOwnerSet(Map<String, DfSynonymMetaInfo> synonymMap) {
-        final Set<String> ownerSet = new LinkedHashSet<String>();
-        for (DfSynonymMetaInfo synonym : synonymMap.values()) {
-            if (synonym.isDBLink()) { // Synonym of DB Link is out of target!
-                continue;
-            }
-            final String owner = synonym.getTableOwner();
-            ownerSet.add(owner);
-        }
-        return ownerSet;
     }
 
     /**

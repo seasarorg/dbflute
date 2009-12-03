@@ -566,15 +566,15 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @param tableList The list of meta information of table. (NotNull)
      */
     protected void processSynonymTable(List<DfTableMetaInfo> tableList) {
-        judgeSequenceSynonym(tableList);
+        judgeOutOfTargetSynonym(tableList);
         helpSynonymTableComments(tableList);
     }
 
-    protected void judgeSequenceSynonym(List<DfTableMetaInfo> tableList) {
+    protected void judgeOutOfTargetSynonym(List<DfTableMetaInfo> tableList) {
         for (DfTableMetaInfo table : tableList) {
             if (canHandleSynonym(table)) {
                 DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
-                if (synonym != null && (synonym.isSequenceSynonym() || synonym.isProcedureSynonym())) {
+                if (synonym != null && !synonym.isSelectable()) {
                     table.setOutOfGenerateTarget(true);
                 }
             }
