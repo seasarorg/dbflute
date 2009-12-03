@@ -29,7 +29,7 @@ public class DfDumpDataXlsHandlerTest extends PlainTestCase {
     @Test
     public void test_transferToXls() throws IOException {
         // ## Arrange ##
-        final DfDumpDataXlsHandler target = createDumpDataXlsHandler(null);
+        final DfTemplateDataXlsHandler target = createDumpDataXlsHandler(null);
         final String canonicalPath = getCanonicalPath();
 
         final File dir = new File(canonicalPath);
@@ -99,7 +99,7 @@ public class DfDumpDataXlsHandlerTest extends PlainTestCase {
         assertTrue(existsJapaneseColumn);
     }
 
-    protected DfDumpDataXlsHandler createDumpDataXlsHandler(DataSource dataSource) {
-        return new DfDumpDataXlsHandler(dataSource);
+    protected DfTemplateDataXlsHandler createDumpDataXlsHandler(DataSource dataSource) {
+        return new DfTemplateDataXlsHandler(dataSource);
     }
 }

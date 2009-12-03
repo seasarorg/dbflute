@@ -78,8 +78,8 @@ import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
-import org.seasar.dbflute.logic.dumpdata.DfDumpDataXlsHandler;
-import org.seasar.dbflute.logic.dumpdata.DfDumpDataXlsHandler.DumpResult;
+import org.seasar.dbflute.logic.dumpdata.DfTemplateDataXlsHandler;
+import org.seasar.dbflute.logic.dumpdata.DfTemplateDataXlsHandler.TemplateDataResult;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -166,20 +166,20 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected void dumpDataXlsTemplate(Map<String, List<String>> tableColumnMap) {
-        final DfDumpDataXlsHandler xlsHandler = new DfDumpDataXlsHandler(getDataSource());
+        final DfTemplateDataXlsHandler xlsHandler = new DfTemplateDataXlsHandler(getDataSource());
         final Integer limit = getDataXlsTemplateRecordLimit();
         final File xlsFile = getDataXlsTemplateFile();
-        final DumpResult dumpResult = xlsHandler.dumpToXls(tableColumnMap, limit, xlsFile);
+        final TemplateDataResult dumpResult = xlsHandler.dumpToXls(tableColumnMap, limit, xlsFile);
         dumpDataCsvTemplate(dumpResult);
     }
 
-    protected void dumpDataCsvTemplate(DumpResult dumpResult) {
+    protected void dumpDataCsvTemplate(TemplateDataResult dumpResult) {
         final Map<String, List<String>> overTableColumnMap = dumpResult.getOverTableColumnMap();
         if (overTableColumnMap.isEmpty()) {
             return;
         }
         _log.info("...Creating data csv template(over 65000): tables=" + overTableColumnMap.size());
-        final Map<String, List<Map<String, String>>> overDumpDataMap = dumpResult.getOverDumpDataMap();
+        final Map<String, List<Map<String, String>>> overDumpDataMap = dumpResult.getOverTemplateDataMap();
         final FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf();
         final File csvDir = getDataCsvTemplateDir();
         if (!csvDir.exists()) {

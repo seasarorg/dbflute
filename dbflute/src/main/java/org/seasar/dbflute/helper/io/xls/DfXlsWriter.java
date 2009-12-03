@@ -107,7 +107,13 @@ public class DfXlsWriter implements DataSetConstants {
         for (int i = 0; i < dataSet.getTableSize(); ++i) {
             final DataTable table = dataSet.getTable(i);
             final HSSFSheet sheet = workbook.createSheet();
-            workbook.setSheetName(i, table.getTableName());
+            final String tableName = table.getTableName();
+            try {
+                workbook.setSheetName(i, tableName);
+            } catch (RuntimeException e) {
+                String msg = "Failed to set the sheet name: " + tableName;
+                throw new IllegalStateException(msg, e);
+            }
             final HSSFRow headerRow = sheet.createRow(0);
             for (int j = 0; j < table.getColumnSize(); ++j) {
                 final HSSFCell cell = headerRow.createCell(j);

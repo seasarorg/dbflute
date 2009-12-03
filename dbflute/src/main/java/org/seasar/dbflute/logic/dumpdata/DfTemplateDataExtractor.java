@@ -16,7 +16,7 @@ import org.seasar.dbflute.properties.DfAbstractHelperProperties;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfDumpDataExtractor {
+public class DfTemplateDataExtractor {
 
     // ===================================================================================
     //                                                                          Definition
@@ -32,7 +32,7 @@ public class DfDumpDataExtractor {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDumpDataExtractor(DataSource dataSource) {
+    public DfTemplateDataExtractor(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
@@ -45,7 +45,7 @@ public class DfDumpDataExtractor {
      * @param limit The limit of records. (If it's minus value, extracts all records.)
      */
     public Map<String, List<Map<String, String>>> extractData(Map<String, List<String>> tableColumnMap, int limit) {
-        final Map<String, List<Map<String, String>>> dumpDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
+        final Map<String, List<Map<String, String>>> templateDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final Set<String> tableNameSet = tableColumnMap.keySet();
         for (String tableName : tableNameSet) {
@@ -55,9 +55,9 @@ public class DfDumpDataExtractor {
             final String sql = selectClause + " " + fromClause;
             final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList, limit);
             _log.info("    " + tableName + "(" + resultList.size() + ")");
-            dumpDataMap.put(tableName, resultList);
+            templateDataMap.put(tableName, resultList);
         }
-        return dumpDataMap;
+        return templateDataMap;
     }
 
     protected String buildSelectClause(List<String> columnNameList) {

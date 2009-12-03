@@ -18,7 +18,7 @@ import org.seasar.dbflute.helper.io.xls.DfXlsWriter;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfDumpDataXlsHandler {
+public class DfTemplateDataXlsHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -28,7 +28,7 @@ public class DfDumpDataXlsHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDumpDataXlsHandler(DataSource dataSource) {
+    public DfTemplateDataXlsHandler(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
@@ -42,27 +42,27 @@ public class DfDumpDataXlsHandler {
      * @param xlsFile The file of xls. (NotNull)
      * @return The result of dump. (NotNull)
      */
-    public DumpResult dumpToXls(Map<String, List<String>> tableColumnMap, int limit, File xlsFile) {
-        final DfDumpDataExtractor extractor = new DfDumpDataExtractor(_dataSource);
+    public TemplateDataResult dumpToXls(Map<String, List<String>> tableColumnMap, int limit, File xlsFile) {
+        final DfTemplateDataExtractor extractor = new DfTemplateDataExtractor(_dataSource);
         final Map<String, List<Map<String, String>>> dumpDataMap = extractor.extractData(tableColumnMap, limit);
         return transferToXls(tableColumnMap, dumpDataMap, xlsFile);
     }
 
     /**
      * Transfer data to xls. {Stateless}
-     * @param dumpDataMap The map of dump data. (NotNull)
+     * @param templateDataMap The map of template data. (NotNull)
      * @param xlsFile The file of xls. (NotNull)
      * @return The result of dump. (NotNull)
      */
-    protected DumpResult transferToXls(Map<String, List<String>> tableColumnMap,
-            Map<String, List<Map<String, String>>> dumpDataMap, File xlsFile) {
+    protected TemplateDataResult transferToXls(Map<String, List<String>> tableColumnMap,
+            Map<String, List<Map<String, String>>> templateDataMap, File xlsFile) {
 
         final Map<String, List<String>> overTableColumnMap = new LinkedHashMap<String, List<String>>();
-        final Map<String, List<Map<String, String>>> overDumpDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
+        final Map<String, List<Map<String, String>>> overTemplateDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
 
-        final Set<String> tableNameSet = dumpDataMap.keySet();
+        final Set<String> tableNameSet = templateDataMap.keySet();
         // If the Apache POI version is 2.5, this is necessary to handle Japanese. 
-        // writer.setCellEncoding(CellEncoding.ENCODING_UTF_16); // for Japanese
+        //writer.setCellEncoding(CellEncoding.ENCODING_UTF_16); // for Japanese
         final DataSet dataSet = new DataSet();
         for (String tableName : tableNameSet) {
             final List<String> columnNameList = tableColumnMap.get(tableName);
@@ -72,10 +72,10 @@ public class DfDumpDataXlsHandler {
                 dataTable.addColumn(columnName, ColumnTypes.STRING);
                 ++columnIndex;
             }
-            final List<Map<String, String>> recordList = dumpDataMap.get(tableName);
+            final List<Map<String, String>> recordList = templateDataMap.get(tableName);
             if (recordList.size() > 65000) { // against Excel limit!
                 overTableColumnMap.put(tableName, columnNameList);
-                overDumpDataMap.put(tableName, recordList);
+                overTemplateDataMap.put(tableName, recordList);
                 continue;
             }
             for (Map<String, String> recordMap : recordList) {
@@ -93,15 +93,15 @@ public class DfDumpDataXlsHandler {
         final DfXlsWriter writer = new DfXlsWriter(xlsFile).stringCellType();
         writer.write(dataSet);
 
-        DumpResult dumpResult = new DumpResult();
-        dumpResult.setOverTableColumnMap(overTableColumnMap);
-        dumpResult.setOverDumpDataMap(overDumpDataMap);
-        return dumpResult;
+        final TemplateDataResult templateDataResult = new TemplateDataResult();
+        templateDataResult.setOverTableColumnMap(overTableColumnMap);
+        templateDataResult.setOverTemplateDataMap(overTemplateDataMap);
+        return templateDataResult;
     }
 
-    public static class DumpResult {
+    public static class TemplateDataResult {
         protected Map<String, List<String>> overTableColumnMap;
-        protected Map<String, List<Map<String, String>>> overDumpDataMap;
+        protected Map<String, List<Map<String, String>>> overTemplateDataMap;
 
         public Map<String, List<String>> getOverTableColumnMap() {
             return overTableColumnMap;
@@ -111,12 +111,12 @@ public class DfDumpDataXlsHandler {
             this.overTableColumnMap = overTableColumnMap;
         }
 
-        public Map<String, List<Map<String, String>>> getOverDumpDataMap() {
-            return overDumpDataMap;
+        public Map<String, List<Map<String, String>>> getOverTemplateDataMap() {
+            return overTemplateDataMap;
         }
 
-        public void setOverDumpDataMap(Map<String, List<Map<String, String>>> overDumpDataMap) {
-            this.overDumpDataMap = overDumpDataMap;
+        public void setOverTemplateDataMap(Map<String, List<Map<String, String>>> overTemplateDataMap) {
+            this.overTemplateDataMap = overTemplateDataMap;
         }
     }
 }
