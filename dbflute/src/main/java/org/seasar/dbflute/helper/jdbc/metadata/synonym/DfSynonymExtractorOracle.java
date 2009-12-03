@@ -79,8 +79,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     protected DfIndexHandler _indexHandler = new DfIndexHandler();
 
     // ===================================================================================
-    //                                                                                Main
-    //                                                                                ====
+    //                                                                             Extract
+    //                                                                             =======
     public Map<String, DfSynonymMetaInfo> extractSynonymMap() {
         final Connection conn;
         try {
