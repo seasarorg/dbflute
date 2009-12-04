@@ -254,7 +254,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         info.setTableName(tableName);
         info.setDbLinkName(dbLinkName);
         final List<DfColumnMetaInfo> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymName);
-        info.setColumnMetaInfoList(columnMetaInfoList);
+        info.setColumnMetaInfoList4DBLink(columnMetaInfoList);
         final List<String> primaryKeyNameList = getDBLinkSynonymPKList(conn, tableName, dbLinkName);
         info.setPrimaryKeyNameList(primaryKeyNameList);
         final Map<String, Map<Integer, String>> uniqueKeyMap = getDBLinkSynonymUQMap(conn, tableName, dbLinkName);

@@ -34,13 +34,13 @@ public class DfSynonymMetaInfo {
     protected String synonymName;
     protected String tableOwner;
     protected String tableName;
-    protected List<DfColumnMetaInfo> columnMetaInfoList;
     protected List<String> primaryKeyNameList;
     protected boolean autoIncrement;
     protected Map<String, Map<Integer, String>> uniqueKeyMap;
     protected Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap;
     protected Map<String, Map<Integer, String>> indexMap;
     protected String dbLinkName;
+    protected List<DfColumnMetaInfo> columnMetaInfoList4DBLink;
     protected boolean selectable;
     protected boolean procedureSynonym;
     protected boolean sequenceSynonym;
@@ -77,9 +77,12 @@ public class DfSynonymMetaInfo {
                 comment = tableComment;
             }
         }
-        return synonymName + ":{" + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName
-                + (columnMetaInfoList != null ? "(" + columnMetaInfoList.size() + " columns)" : "") + ", PK="
-                + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
+        String columns = "";
+        if (columnMetaInfoList4DBLink != null) {
+            columns = "(" + columnMetaInfoList4DBLink.size() + " columns for DB link)";
+        }
+        return synonymName + ":{" + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName + columns
+                + ", PK=" + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
                 + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
                 + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + ", selectable="
                 + selectable + "} " + ((comment != null && comment.trim().length() > 0) ? "// " + comment : "");
@@ -110,14 +113,6 @@ public class DfSynonymMetaInfo {
 
     public void setTableName(String tableName) {
         this.tableName = tableName;
-    }
-
-    public List<DfColumnMetaInfo> getColumnMetaInfoList() {
-        return columnMetaInfoList != null ? columnMetaInfoList : new ArrayList<DfColumnMetaInfo>();
-    }
-
-    public void setColumnMetaInfoList(List<DfColumnMetaInfo> columnMetaInfoList) {
-        this.columnMetaInfoList = columnMetaInfoList;
     }
 
     public List<String> getPrimaryKeyNameList() {
@@ -166,6 +161,14 @@ public class DfSynonymMetaInfo {
 
     public void setDbLinkName(String dbLinkName) {
         this.dbLinkName = dbLinkName;
+    }
+
+    public List<DfColumnMetaInfo> getColumnMetaInfoList4DBLink() {
+        return columnMetaInfoList4DBLink != null ? columnMetaInfoList4DBLink : new ArrayList<DfColumnMetaInfo>();
+    }
+
+    public void setColumnMetaInfoList4DBLink(List<DfColumnMetaInfo> columnMetaInfoList4DBLink) {
+        this.columnMetaInfoList4DBLink = columnMetaInfoList4DBLink;
     }
 
     public boolean isSelectable() {
