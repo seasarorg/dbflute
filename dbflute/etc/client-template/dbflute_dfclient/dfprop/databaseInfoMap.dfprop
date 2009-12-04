@@ -79,6 +79,7 @@ map:{
         #    o tableExceptList: (NotRequired - Default 'list:{}')
         #    o tableTargetList: (NotRequired - Default 'list:{}')
         #    o isSuppressCommonColumn: (NotRequired - Default 'false')
+        #    o supplementaryDataSourceMap: (NotRequired - Default 'map:{}')
         #
         #; additionalSchemaMap = map:{
         #    ; NEXTEXAMPLEDB = map:{
@@ -86,6 +87,7 @@ map:{
         #        ; tableExceptList=list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
         #        ; tableTargetList=list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
         #        ; isSuppressCommonColumn=false
+        #        ; supplementaryDataSourceMap=map:{ user = nextexampledb ; password = ... }
         #    }
         #}
     }

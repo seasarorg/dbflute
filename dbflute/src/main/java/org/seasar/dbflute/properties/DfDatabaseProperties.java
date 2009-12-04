@@ -41,8 +41,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                       Database Info
-    //                                                                       =============
+    //                                                                          Basic Info
+    //                                                                          ==========
     protected DatabaseInfo _databaseInfo = new DatabaseInfo();
 
     public String getDatabaseDriver() {
@@ -155,6 +155,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return resultList;
     }
 
+    // ===================================================================================
+    //                                                                   Additional Schema
+    //                                                                   =================
     // -----------------------------------------------------
     //                                 Additional Schema Map
     //                                 ---------------------
@@ -207,7 +210,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
                 final List<String> objectTypeTargetList = Collections.EMPTY_LIST;
                 info.setObjectTypeTargetList(objectTypeTargetList);
             } else if (!(obj instanceof List<?>)) {
-                String msg = "The type of objectTypeTargetList in the property 'additionalDropMapList' should be List:";
+                String msg = "The type of objectTypeTargetList in the property 'additionalSchemaMap' should be List:";
                 msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
                 throw new DfIllegalPropertyTypeException(msg);
             } else {
@@ -222,7 +225,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
                 final List<String> tableExceptList = Collections.EMPTY_LIST;
                 info.setTableExceptList(tableExceptList);
             } else if (!(obj instanceof List<?>)) {
-                String msg = "The type of tableExceptList in the property 'additionalDropMapList' should be List:";
+                String msg = "The type of tableExceptList in the property 'additionalSchemaMap' should be List:";
                 msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
                 throw new DfIllegalPropertyTypeException(msg);
             } else {
@@ -237,7 +240,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
                 final List<String> tableTargetList = Collections.EMPTY_LIST;
                 info.setTableTargetList(tableTargetList);
             } else if (!(obj instanceof List<?>)) {
-                String msg = "The type of tableTargetList in the property 'additionalDropMapList' should be List:";
+                String msg = "The type of tableTargetList in the property 'additionalSchemaMap' should be List:";
                 msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
                 throw new DfIllegalPropertyTypeException(msg);
             } else {
@@ -245,7 +248,23 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
                 final List<String> tableTargetList = (List<String>) obj;
                 info.setTableTargetList(tableTargetList);
             }
+
             info.setSuppressCommonColumn(isProperty("isSuppressCommonColumn", false, elementMap));
+
+            obj = elementMap.get("supplementaryDataSourceMap");
+            if (obj == null) {
+                @SuppressWarnings("unchecked")
+                final Map<String, String> supplementaryDataSourceMap = Collections.EMPTY_MAP;
+                info.setSupplementaryDataSourceMap(supplementaryDataSourceMap);
+            } else if (!(obj instanceof List<?>)) {
+                String msg = "The type of supplementaryDataSourceMap in the property 'additionalSchemaMap' should be Map:";
+                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+                throw new DfIllegalPropertyTypeException(msg);
+            } else {
+                @SuppressWarnings("unchecked")
+                final Map<String, String> supplementaryDataSourceMap = (Map<String, String>) obj;
+                info.setSupplementaryDataSourceMap(supplementaryDataSourceMap);
+            }
 
             _additionalSchemaMap.put(schemaName, info);
         }
@@ -258,6 +277,59 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
 
     public boolean isAdditionalSchema(String schema) {
         return getAdditionalSchemaMap().containsKey(schema);
+    }
+
+    // -----------------------------------------------------
+    //                              Supplementary DataSource
+    //                              ------------------------
+    public Connection getAdditionalSchemaSupplementaryConnection(String schema) {
+        if (!hasAdditionalSchemaSupplementaryDataSource(schema)) {
+            String msg = "The additional schema should have supplementary data source information:";
+            msg = msg + " schema=" + schema;
+            throw new IllegalStateException(msg);
+        }
+        final String driver = getDatabaseDriver();
+        try {
+            Class.forName(driver);
+        } catch (ClassNotFoundException e) {
+            String msg = "The driver was not found: " + driver;
+            throw new IllegalStateException(msg, e);
+        }
+        final String url = getAdditionalSchemaSupplementaryDataSourceUrl(schema);
+        final String user = getAdditionalSchemaSupplementaryDataSourceUser(schema);
+        final String password = getAdditionalSchemaSupplementaryDataSourcePassword(schema);
+        try {
+            return DriverManager.getConnection(url, user, password);
+        } catch (SQLException e) {
+            String msg = "Failed to connect: url=" + url + ", user=" + user;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    public boolean hasAdditionalSchemaSupplementaryDataSource(String schema) {
+        if (!isAdditionalSchema(schema)) {
+            return false;
+        }
+        final String user = getAdditionalSchemaMap().get(schema).getSupplementaryDataSourceUser();
+        return user != null && user.trim().length() > 0;
+    }
+
+    protected String getAdditionalSchemaSupplementaryDataSourceUrl(String schema) {
+        return getDatabaseUrl();
+    }
+
+    protected String getAdditionalSchemaSupplementaryDataSourceUser(String schema) {
+        if (!hasAdditionalSchemaSupplementaryDataSource(schema)) {
+            return null;
+        }
+        return getAdditionalSchemaMap().get(schema).getSupplementaryDataSourceUser();
+    }
+
+    protected String getAdditionalSchemaSupplementaryDataSourcePassword(String schema) {
+        if (!hasAdditionalSchemaSupplementaryDataSource(schema)) {
+            return null;
+        }
+        return getAdditionalSchemaMap().get(schema).getSupplementaryDataSourcePassword();
     }
 
     // -----------------------------------------------------

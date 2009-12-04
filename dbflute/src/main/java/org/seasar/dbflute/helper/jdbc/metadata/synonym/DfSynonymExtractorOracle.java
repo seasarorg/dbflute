@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -34,6 +35,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
@@ -47,6 +49,7 @@ import org.seasar.dbflute.logic.metahandler.DfForeignKeyHandler;
 import org.seasar.dbflute.logic.metahandler.DfIndexHandler;
 import org.seasar.dbflute.logic.metahandler.DfTableHandler;
 import org.seasar.dbflute.logic.metahandler.DfUniqueKeyHandler;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 
 /**
  * @author jflute
@@ -78,6 +81,35 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
     };
     protected DfIndexHandler _indexHandler = new DfIndexHandler();
+
+    protected Map<String, Connection> _supplementaryConnection = new HashMap<String, Connection>();
+
+    protected Connection getSupplementaryConnection(String tableOwner) {
+        if (_supplementaryConnection.containsKey(tableOwner)) {
+            return _supplementaryConnection.get(tableOwner);
+        }
+        final DfDatabaseProperties databaseProperties = DfBuildProperties.getInstance().getDatabaseProperties();
+        Connection conn = null;
+        if (databaseProperties.hasAdditionalSchemaSupplementaryDataSource(tableOwner)) {
+            conn = databaseProperties.getAdditionalSchemaSupplementaryConnection(tableOwner);
+        }
+        _supplementaryConnection.put(tableOwner, conn);
+        return conn;
+    }
+
+    protected void destroySupplementaryConnection() {
+        final Set<Entry<String, Connection>> entrySet = _supplementaryConnection.entrySet();
+        for (Entry<String, Connection> entry : entrySet) {
+            final Connection conn = entry.getValue();
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                    _log.info("Failed to close the connection: " + conn);
+                }
+            }
+        }
+    }
 
     // ===================================================================================
     //                                                                             Extract
@@ -129,20 +161,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
 
                 // PK, ID, UQ, FK, Index
                 try {
-                    final DatabaseMetaData metaData = conn.getMetaData();
-                    info.setPrimaryKeyNameList(getPKList(metaData, tableOwner, tableName));
-                    final List<String> primaryKeyNameList = info.getPrimaryKeyNameList();
-                    for (String primaryKeyName : primaryKeyNameList) {
-                        final boolean autoIncrement = isAutoIncrement(conn, tableOwner, tableName, primaryKeyName);
-                        if (autoIncrement) {
-                            info.setAutoIncrement(autoIncrement);
-                            break;
-                        }
-                    }
-                    info.setUniqueKeyMap(getUQMap(metaData, tableOwner, tableName, primaryKeyNameList));
-                    info.setForeignKeyMetaInfoMap(getFKMap(metaData, tableOwner, tableName)); // It's tentative information at this timing!
-                    final Map<String, Map<Integer, String>> uniqueKeyMap = info.getUniqueKeyMap();
-                    info.setIndexMap(_indexHandler.getIndexMap(metaData, tableOwner, tableName, uniqueKeyMap));
+                    setupBasicConstraintInfo(info, tableOwner, tableName, conn);
                 } catch (Exception continued) {
                     _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
                     continue;
@@ -174,7 +193,57 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         translateFKTable(synonymMap); // It translates foreign key meta informations. 
         judgeSynonymSelectable(synonymMap);
         setupTableColumnComment(synonymMap);
+        destroySupplementaryConnection(); // after care
         return synonymMap;
+    }
+
+    protected void setupBasicConstraintInfo(DfSynonymMetaInfo info, String tableOwner, String tableName, Connection conn)
+            throws SQLException {
+        final DatabaseMetaData metaData = conn.getMetaData();
+        final Connection spConn = getSupplementaryConnection(tableOwner);
+        final boolean supplementValid = spConn != null;
+        final DatabaseMetaData spMetaData = supplementValid ? spConn.getMetaData() : null;
+        {
+            List<String> pkList = getPKList(metaData, tableOwner, tableName);
+            if (supplementValid && pkList.isEmpty()) {
+                pkList = getPKList(spMetaData, tableOwner, tableName);
+            }
+            info.setPrimaryKeyNameList(pkList);
+        }
+        final List<String> primaryKeyNameList = info.getPrimaryKeyNameList();
+        for (String primaryKeyName : primaryKeyNameList) {
+            final boolean autoIncrement = isAutoIncrement(conn, tableOwner, tableName, primaryKeyName);
+            if (autoIncrement) {
+                info.setAutoIncrement(autoIncrement);
+                break;
+            } else {
+                if (supplementValid) {
+                    info.setAutoIncrement(isAutoIncrement(spConn, tableOwner, tableName, primaryKeyName));
+                }
+            }
+        }
+        {
+            Map<String, Map<Integer, String>> uqMap = getUQMap(metaData, tableOwner, tableName, primaryKeyNameList);
+            if (supplementValid && uqMap.isEmpty()) {
+                uqMap = getUQMap(spMetaData, tableOwner, tableName, primaryKeyNameList);
+            }
+            info.setUniqueKeyMap(uqMap);
+        }
+        {
+            Map<String, DfForeignKeyMetaInfo> fkMap = getFKMap(metaData, tableOwner, tableName);
+            if (supplementValid && fkMap.isEmpty()) {
+                fkMap = getFKMap(spMetaData, tableOwner, tableName);
+            }
+            info.setForeignKeyMetaInfoMap(fkMap); // It's tentative information at this timing!
+        }
+        final Map<String, Map<Integer, String>> uniqueKeyMap = info.getUniqueKeyMap();
+        {
+            Map<String, Map<Integer, String>> indexMap = getIndexMap(metaData, tableOwner, tableName, uniqueKeyMap);
+            if (supplementValid && indexMap.isEmpty()) {
+                indexMap = getIndexMap(spMetaData, tableOwner, tableName, uniqueKeyMap);
+            }
+            info.setIndexMap(indexMap);
+        }
     }
 
     protected DfSynonymMetaInfo setupDBLinkSynonym(Connection conn, String synonymName, String tableName,
@@ -225,6 +294,15 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     protected Map<String, DfForeignKeyMetaInfo> getFKMap(DatabaseMetaData metaData, String tableOwner, String tableName) {
         try {
             return _foreignKeyHandler.getForeignKeyMetaInfo(metaData, tableOwner, tableName);
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData metaData, String tableOwner,
+            String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) {
+        try {
+            return _indexHandler.getIndexMap(metaData, tableOwner, tableName, uniqueKeyMap);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }

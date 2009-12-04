@@ -1,6 +1,7 @@
 package org.seasar.dbflute.properties.assistant;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jflute
@@ -13,6 +14,21 @@ public class DfAdditionalSchemaInfo {
     protected List<String> _tableExceptList;
     protected List<String> _tableTargetList;
     protected boolean _suppressCommonColumn;
+    protected Map<String, String> _supplementaryDataSourceMap;
+
+    public String getSupplementaryDataSourceUser() {
+        if (_supplementaryDataSourceMap == null) {
+            return null;
+        }
+        return _supplementaryDataSourceMap.get("user");
+    }
+
+    public String getSupplementaryDataSourcePassword() {
+        if (_supplementaryDataSourceMap == null) {
+            return null;
+        }
+        return _supplementaryDataSourceMap.get("password");
+    }
 
     public String getSchemaName() {
         return _schemaName;
@@ -52,5 +68,13 @@ public class DfAdditionalSchemaInfo {
 
     public void setSuppressCommonColumn(boolean suppressCommonColumn) {
         this._suppressCommonColumn = suppressCommonColumn;
+    }
+
+    public Map<String, String> getSupplementaryDataSourceMap() {
+        return _supplementaryDataSourceMap;
+    }
+
+    public void setSupplementaryDataSourceMap(Map<String, String> supplementaryDataSourceMap) {
+        this._supplementaryDataSourceMap = supplementaryDataSourceMap;
     }
 }
