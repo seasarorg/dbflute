@@ -48,7 +48,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserT
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 
 /**
@@ -271,6 +270,10 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         info.setSynonymName(synonymName);
         info.setTableName(tableName);
         info.setDbLinkName(dbLinkName);
+
+        // Select-able?
+        judgeSynonymSelectable(info);
+
         final List<DfColumnMetaInfo> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymName);
         info.setColumnMetaInfoList4DBLink(columnMetaInfoList);
         final List<String> primaryKeyNameList = getDBLinkSynonymPKList(conn, tableName, dbLinkName);
@@ -328,15 +331,16 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     }
 
     protected boolean isAutoIncrement(Connection conn, String tableOwner, String tableName, String primaryKeyColumnName) {
-        try {
-            final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
-            tableMetaInfo.setTableName(tableName);
-            tableMetaInfo.setTableSchema(tableOwner);
-            return _autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName);
-        } catch (RuntimeException continued) { // because the priority is low and it needs select
-            _log.info(continued.getMessage());
-            return false;
-        }
+        return false; // because Oracle does not support identity
+        //try {
+        //    final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
+        //    tableMetaInfo.setTableName(tableName);
+        //    tableMetaInfo.setTableSchema(tableOwner);
+        //    return _autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName);
+        //} catch (RuntimeException continued) { // because the priority is low and it needs select
+        //    _log.info(continued.getMessage());
+        //    return false;
+        //}
     }
 
     protected void translateFKTable(Map<String, DfSynonymMetaInfo> synonymMap) {
@@ -491,7 +495,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         ResultSet rs = null;
         try {
             statement = conn.createStatement();
-            rs = statement.executeQuery("select * from " + dbLinkSynonymName + " where 1=0");
+            rs = statement.executeQuery("select * from " + dbLinkSynonymName + " where 0 = 1");
             final ResultSetMetaData metaData = rs.getMetaData();
             int count = metaData.getColumnCount();
             for (int i = 0; i < count; i++) {
