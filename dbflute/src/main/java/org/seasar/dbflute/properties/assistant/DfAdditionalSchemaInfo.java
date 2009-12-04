@@ -14,20 +14,20 @@ public class DfAdditionalSchemaInfo {
     protected List<String> _tableExceptList;
     protected List<String> _tableTargetList;
     protected boolean _suppressCommonColumn;
-    protected Map<String, String> _supplementaryDataSourceMap;
+    protected Map<String, String> _supplementaryConnectionMap;
 
-    public String getSupplementaryDataSourceUser() {
-        if (_supplementaryDataSourceMap == null) {
+    public String getSupplementaryConnectionUser() {
+        if (_supplementaryConnectionMap == null) {
             return null;
         }
-        return _supplementaryDataSourceMap.get("user");
+        return _supplementaryConnectionMap.get("user");
     }
 
-    public String getSupplementaryDataSourcePassword() {
-        if (_supplementaryDataSourceMap == null) {
+    public String getSupplementaryConnectionPassword() {
+        if (_supplementaryConnectionMap == null) {
             return null;
         }
-        return _supplementaryDataSourceMap.get("password");
+        return _supplementaryConnectionMap.get("password");
     }
 
     public String getSchemaName() {
@@ -70,11 +70,11 @@ public class DfAdditionalSchemaInfo {
         this._suppressCommonColumn = suppressCommonColumn;
     }
 
-    public Map<String, String> getSupplementaryDataSourceMap() {
-        return _supplementaryDataSourceMap;
+    public Map<String, String> getSupplementaryConnectionMap() {
+        return _supplementaryConnectionMap;
     }
 
-    public void setSupplementaryDataSourceMap(Map<String, String> supplementaryDataSourceMap) {
-        this._supplementaryDataSourceMap = supplementaryDataSourceMap;
+    public void setSupplementaryConnectionMap(Map<String, String> supplementaryConnectionMap) {
+        this._supplementaryConnectionMap = supplementaryConnectionMap;
     }
 }

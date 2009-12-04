@@ -255,7 +255,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             if (obj == null) {
                 @SuppressWarnings("unchecked")
                 final Map<String, String> supplementaryDataSourceMap = Collections.EMPTY_MAP;
-                info.setSupplementaryDataSourceMap(supplementaryDataSourceMap);
+                info.setSupplementaryConnectionMap(supplementaryDataSourceMap);
             } else if (!(obj instanceof List<?>)) {
                 String msg = "The type of supplementaryDataSourceMap in the property 'additionalSchemaMap' should be Map:";
                 msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
@@ -263,7 +263,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             } else {
                 @SuppressWarnings("unchecked")
                 final Map<String, String> supplementaryDataSourceMap = (Map<String, String>) obj;
-                info.setSupplementaryDataSourceMap(supplementaryDataSourceMap);
+                info.setSupplementaryConnectionMap(supplementaryDataSourceMap);
             }
 
             _additionalSchemaMap.put(schemaName, info);
@@ -280,11 +280,11 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     // -----------------------------------------------------
-    //                              Supplementary DataSource
+    //                              Supplementary Connection
     //                              ------------------------
     public Connection getAdditionalSchemaSupplementaryConnection(String schema) {
-        if (!hasAdditionalSchemaSupplementaryDataSource(schema)) {
-            String msg = "The additional schema should have supplementary data source information:";
+        if (!hasAdditionalSchemaSupplementaryConnection(schema)) {
+            String msg = "The additional schema should have supplementary connection informations:";
             msg = msg + " schema=" + schema;
             throw new IllegalStateException(msg);
         }
@@ -295,9 +295,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             String msg = "The driver was not found: " + driver;
             throw new IllegalStateException(msg, e);
         }
-        final String url = getAdditionalSchemaSupplementaryDataSourceUrl(schema);
-        final String user = getAdditionalSchemaSupplementaryDataSourceUser(schema);
-        final String password = getAdditionalSchemaSupplementaryDataSourcePassword(schema);
+        final String url = getAdditionalSchemaSupplementaryConnectionUrl(schema);
+        final String user = getAdditionalSchemaSupplementaryConnectionUser(schema);
+        final String password = getAdditionalSchemaSupplementaryConnectionPassword(schema);
         try {
             return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
@@ -306,30 +306,30 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
     }
 
-    public boolean hasAdditionalSchemaSupplementaryDataSource(String schema) {
+    public boolean hasAdditionalSchemaSupplementaryConnection(String schema) {
         if (!isAdditionalSchema(schema)) {
             return false;
         }
-        final String user = getAdditionalSchemaMap().get(schema).getSupplementaryDataSourceUser();
+        final String user = getAdditionalSchemaMap().get(schema).getSupplementaryConnectionUser();
         return user != null && user.trim().length() > 0;
     }
 
-    protected String getAdditionalSchemaSupplementaryDataSourceUrl(String schema) {
+    protected String getAdditionalSchemaSupplementaryConnectionUrl(String schema) {
         return getDatabaseUrl();
     }
 
-    protected String getAdditionalSchemaSupplementaryDataSourceUser(String schema) {
-        if (!hasAdditionalSchemaSupplementaryDataSource(schema)) {
+    protected String getAdditionalSchemaSupplementaryConnectionUser(String schema) {
+        if (!hasAdditionalSchemaSupplementaryConnection(schema)) {
             return null;
         }
-        return getAdditionalSchemaMap().get(schema).getSupplementaryDataSourceUser();
+        return getAdditionalSchemaMap().get(schema).getSupplementaryConnectionUser();
     }
 
-    protected String getAdditionalSchemaSupplementaryDataSourcePassword(String schema) {
-        if (!hasAdditionalSchemaSupplementaryDataSource(schema)) {
+    protected String getAdditionalSchemaSupplementaryConnectionPassword(String schema) {
+        if (!hasAdditionalSchemaSupplementaryConnection(schema)) {
             return null;
         }
-        return getAdditionalSchemaMap().get(schema).getSupplementaryDataSourcePassword();
+        return getAdditionalSchemaMap().get(schema).getSupplementaryConnectionPassword();
     }
 
     // -----------------------------------------------------
