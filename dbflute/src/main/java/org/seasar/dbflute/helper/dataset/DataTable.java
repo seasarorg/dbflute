@@ -13,9 +13,9 @@ import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.dataset.states.RowStates;
 import org.seasar.dbflute.helper.dataset.types.ColumnType;
 import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
+import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
+import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
-import org.seasar.dbflute.logic.metahandler.DfColumnHandler;
-import org.seasar.dbflute.logic.metahandler.DfUniqueKeyHandler;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
