@@ -27,7 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.metahandler.DfColumnHandler;
 import org.seasar.dbflute.util.DfTypeUtil;
 

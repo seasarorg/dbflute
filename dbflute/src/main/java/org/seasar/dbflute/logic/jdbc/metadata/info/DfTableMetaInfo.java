@@ -13,11 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.jdbc.metadata.info.copy;
+package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import java.util.Map;
 
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
+import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
@@ -117,10 +118,22 @@ public class DfTableMetaInfo {
 
     @Override
     public String toString() {
+        String comment = "";
+        if (_tableComment != null) {
+            final String ln = DfSystemUtil.getLineSeparator();
+            final int indexOf = _tableComment.indexOf(ln);
+            if (indexOf > 0) { // not contain 0 because ignore first line separator
+                comment = _tableComment.substring(0, indexOf) + "...";
+            } else {
+                comment = _tableComment;
+            }
+        }
         if (_tableSchema != null && _tableSchema.trim().length() != 0) {
-            return _tableSchema + "." + _tableName + "(" + _tableType + "): " + _tableComment;
+            return _tableSchema + "." + _tableName + "(" + _tableType + ") "
+                    + ((comment != null && comment.trim().length() > 0) ? "// " + comment : "");
         } else {
-            return _tableName + "(" + _tableType + "): " + _tableComment;
+            return _tableName + "(" + _tableType + ") "
+                    + ((comment != null && comment.trim().length() > 0) ? "// " + comment : "");
         }
     }
 

@@ -13,14 +13,15 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.jdbc.metadata.info.copy;
+package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
@@ -40,6 +41,8 @@ public class DfSynonymMetaInfo {
     protected Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap;
     protected Map<String, Map<Integer, String>> indexMap;
     protected String dbLinkName;
+    protected boolean selectable;
+    protected boolean procedureSynonym;
     protected boolean sequenceSynonym;
     protected String tableComment;
     protected Map<String, UserColComments> columnCommentMap;
@@ -64,12 +67,22 @@ public class DfSynonymMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + synonymName + ": " + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName
-                + (columnMetaInfoList != null ? "(" + columnMetaInfoList.size() + " columns)" : "") + ", "
+        String comment = "";
+        if (tableComment != null) {
+            final String ln = DfSystemUtil.getLineSeparator();
+            final int indexOf = tableComment.indexOf(ln);
+            if (indexOf > 0) { // not contain 0 because ignore first line separator
+                comment = tableComment.substring(0, indexOf) + "...";
+            } else {
+                comment = tableComment;
+            }
+        }
+        return synonymName + ":{" + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName
+                + (columnMetaInfoList != null ? "(" + columnMetaInfoList.size() + " columns)" : "") + ", PK="
                 + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
                 + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
-                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null)
-                + (sequenceSynonym ? ", SEQ" : "") + ", " + tableComment + "}";
+                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + ", selectable="
+                + selectable + "} " + ((comment != null && comment.trim().length() > 0) ? "// " + comment : "");
     }
 
     // ===================================================================================
@@ -155,12 +168,12 @@ public class DfSynonymMetaInfo {
         this.dbLinkName = dbLinkName;
     }
 
-    public boolean isSequenceSynonym() {
-        return sequenceSynonym;
+    public boolean isSelectable() {
+        return selectable;
     }
 
-    public void setSequenceSynonym(boolean sequenceSynonym) {
-        this.sequenceSynonym = sequenceSynonym;
+    public void setSelectable(boolean selectable) {
+        this.selectable = selectable;
     }
 
     public String getTableComment() {

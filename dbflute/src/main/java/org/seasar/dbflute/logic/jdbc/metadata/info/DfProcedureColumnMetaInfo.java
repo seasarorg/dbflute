@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.jdbc.metadata.info;
+package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.metahandler.DfColumnHandler;

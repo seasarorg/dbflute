@@ -35,7 +35,7 @@ import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataWriter;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuilder;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuildingResult;
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**

@@ -2,11 +2,11 @@ package org.seasar.dbflute.logic.factory;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor;
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorMySql;
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorOracle;
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractorSqlServer;
 import org.seasar.dbflute.helper.jdbc.urlanalyzer.DfUrlAnalyzerMySql;
+import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor;
+import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorMySql;
+import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
+import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorSqlServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**

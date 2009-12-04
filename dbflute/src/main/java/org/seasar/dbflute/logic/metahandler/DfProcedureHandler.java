@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureColumnMetaInfo;
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureMetaInfo;
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
-import org.seasar.dbflute.helper.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;

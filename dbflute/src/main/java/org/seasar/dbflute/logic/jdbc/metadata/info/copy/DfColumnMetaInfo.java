@@ -13,11 +13,11 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.jdbc.metadata.info;
+package org.seasar.dbflute.logic.jdbc.metadata.info.copy;
 
 import java.util.Map;
 
-import org.seasar.dbflute.helper.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
+import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 
 /**
  * @author jflute
@@ -35,9 +35,8 @@ public class DfColumnMetaInfo {
     protected boolean required;
     protected String columnComment;
     protected String defaultValue;
-    protected String sql2entityRelatedTableName;
-    protected String sql2entityRelatedColumnName;
-    protected String sql2entityForcedJavaNative;
+    protected String sql2entityTableName;
+    protected String sql2entityJavaNative;
 
     // ===================================================================================
     //                                                                       Determination
@@ -68,8 +67,8 @@ public class DfColumnMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + columnName + ", " + dbTypeName + "(" + columnSize + "," + decimalDigits + "), " + jdbcDefValue
-                + ", " + required + ", " + columnComment + ", " + defaultValue + "}";
+        return "{" + columnName + ", " + dbTypeName + "(" + columnSize + "," + decimalDigits + "), " + jdbcDefValue + ", "
+                + required + ", " + columnComment + ", " + defaultValue + "}";
     }
 
     // ===================================================================================
@@ -139,27 +138,19 @@ public class DfColumnMetaInfo {
         this.columnComment = columnComment;
     }
 
-    public String getSql2EntityRelatedTableName() {
-        return sql2entityRelatedTableName;
+    public String getSql2EntityTableName() {
+        return sql2entityTableName;
     }
 
-    public void setSql2EntityRelatedTableName(String sql2entityRelatedTableName) {
-        this.sql2entityRelatedTableName = sql2entityRelatedTableName;
+    public void setSql2EntityTableName(String sql2entityTableName) {
+        this.sql2entityTableName = sql2entityTableName;
     }
 
-    public String getSql2EntityRelatedColumnName() {
-        return sql2entityRelatedColumnName;
+    public String getSql2EntityJavaNative() {
+        return sql2entityJavaNative;
     }
 
-    public void setSql2EntityRelatedColumnName(String sql2entityRelatedColumnName) {
-        this.sql2entityRelatedColumnName = sql2entityRelatedColumnName;
-    }
-
-    public String getSql2EntityForcedJavaNative() {
-        return sql2entityForcedJavaNative;
-    }
-
-    public void setSql2EntityForcedJavaNative(String sql2entityForcedJavaNative) {
-        this.sql2entityForcedJavaNative = sql2entityForcedJavaNative;
+    public void setSql2EntityJavaNative(String sql2entityJavaNative) {
+        this.sql2entityJavaNative = sql2entityJavaNative;
     }
 }

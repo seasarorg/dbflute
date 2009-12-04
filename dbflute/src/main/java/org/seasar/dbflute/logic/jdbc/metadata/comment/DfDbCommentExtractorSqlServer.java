@@ -13,35 +13,54 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.jdbc.metadata.comment;
+package org.seasar.dbflute.logic.jdbc.metadata.comment;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 /**
  * @author jflute
+ * @since 0.9.5.3 (2009/08/06 Thursday)
  */
-public class DfDbCommentExtractorOracle extends DfDbCommentExtractorBase {
+public class DfDbCommentExtractorSqlServer extends DfDbCommentExtractorBase {
 
     // ===================================================================================
     //                                                                    Select Meta Data
     //                                                                    ================
     protected List<UserTabComments> selectUserTabComments(Connection conn, Set<String> tableSet) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select * from ALL_TAB_COMMENTS");
-        sb.append(" where OWNER = '").append(_schema).append("'");
+        sb.append("select cast(objtype as nvarchar(500)) as OBJECT_TYPE");
+        sb.append(", cast(objname as nvarchar(500)) as TABLE_NAME");
+        sb.append(", cast(value as nvarchar(4000)) as COMMENTS");
+        sb.append(" from fn_listextendedproperty");
+        sb.append("('MS_Description', 'schema', '").append(_schema).append("'");
+        sb.append(", 'table', default, default, default)");
         sb.append(" order by TABLE_NAME asc");
         final String sql = sb.toString();
         return doSelectUserTabComments(sql, conn, tableSet);
     }
 
     protected List<UserColComments> selectUserColComments(Connection conn, Set<String> tableSet) {
+        final List<UserColComments> resultList = new ArrayList<UserColComments>();
+        for (String tableName : tableSet) {
+            final String sql = buildUserColCommentsSql(tableName);
+            final List<UserColComments> userColComments = doSelectUserColComments(sql, conn, tableSet);
+            resultList.addAll(userColComments);
+        }
+        return resultList;
+    }
+
+    protected String buildUserColCommentsSql(String tableName) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("select * from ALL_COL_COMMENTS");
-        sb.append(" where OWNER = '").append(_schema).append("'");
+        sb.append("select '").append(tableName).append("' as TABLE_NAME");
+        sb.append(", cast(objname as nvarchar(500)) as COLUMN_NAME");
+        sb.append(", cast(value as nvarchar(4000)) as COMMENTS");
+        sb.append(" from fn_listextendedproperty");
+        sb.append("('MS_Description', 'schema', '").append(_schema).append("'");
+        sb.append(", 'table', '").append(tableName).append("', 'column', default)");
         sb.append(" order by TABLE_NAME asc, COLUMN_NAME asc");
-        final String sql = sb.toString();
-        return doSelectUserColComments(sql, conn, tableSet);
+        return sb.toString();
     }
 }

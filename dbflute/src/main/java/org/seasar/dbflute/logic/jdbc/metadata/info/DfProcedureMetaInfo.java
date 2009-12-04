@@ -1,4 +1,4 @@
-package org.seasar.dbflute.helper.jdbc.metadata.info;
+package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import java.util.ArrayList;
 import java.util.List;
