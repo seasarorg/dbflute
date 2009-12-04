@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.jdbc.sequence;
+package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,12 +25,12 @@ import javax.sql.DataSource;
  * @author jflute
  * @since 0.9.5.2 (2009/07/09 Thursday)
  */
-public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
+public class DfSequenceHandlerDB2 extends DfSequenceHandlerJdbc {
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerOracle(DataSource dataSource, String schema) {
+    public DfSequenceHandlerDB2(DataSource dataSource, String schema) {
         super(dataSource, schema);
     }
 
@@ -39,7 +39,7 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
     //                                                                          ==========
     @Override
     protected Integer selectNextVal(Statement statement, String sequenceName) throws SQLException {
-        ResultSet rs = statement.executeQuery("select " + sequenceName + ".nextval from dual");
+        ResultSet rs = statement.executeQuery("values nextval for " + sequenceName);
         rs.next();
         return rs.getInt(1);
     }
