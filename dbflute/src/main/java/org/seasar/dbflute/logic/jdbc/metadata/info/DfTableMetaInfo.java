@@ -129,11 +129,11 @@ public class DfTableMetaInfo {
             }
         }
         if (_tableSchema != null && _tableSchema.trim().length() != 0) {
-            return _tableSchema + "." + _tableName + "(" + _tableType + ") "
-                    + ((comment != null && comment.trim().length() > 0) ? "// " + comment : "");
+            return _tableSchema + "." + _tableName + "(" + _tableType + ")"
+                    + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
         } else {
-            return _tableName + "(" + _tableType + ") "
-                    + ((comment != null && comment.trim().length() > 0) ? "// " + comment : "");
+            return _tableName + "(" + _tableType + ")"
+                    + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
         }
     }
 
