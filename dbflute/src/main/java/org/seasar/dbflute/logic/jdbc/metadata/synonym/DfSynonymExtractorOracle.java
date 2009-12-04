@@ -315,7 +315,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             tableMetaInfo.setTableName(tableName);
             tableMetaInfo.setTableSchema(tableOwner);
             return _autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName);
-        } catch (RuntimeException ignored) { // because the priority is low and it needs select
+        } catch (RuntimeException continued) { // because the priority is low and it needs select
+            _log.info(continued.getMessage());
             return false;
         }
     }
