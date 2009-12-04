@@ -91,6 +91,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         final DfDatabaseProperties databaseProperties = DfBuildProperties.getInstance().getDatabaseProperties();
         Connection conn = null;
         if (databaseProperties.hasAdditionalSchemaSupplementaryConnection(tableOwner)) {
+            _log.info("...Creating a supplementary connection to " + tableOwner);
             conn = databaseProperties.getAdditionalSchemaSupplementaryConnection(tableOwner);
         }
         _supplementaryConnection.put(tableOwner, conn);
