@@ -1,4 +1,4 @@
-package org.seasar.dbflute.logic.jdbcdl;
+package org.seasar.dbflute.logic.jdbc.download;
 
 import java.io.File;
 import java.io.FileFilter;
