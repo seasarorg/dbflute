@@ -35,18 +35,17 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
      * @param tableMetaInfo The meta information of table from which to retrieve PK information.
      * @param primaryKeyColumnName Primary-key column-name.
      * @return Auto-increment column name. (Nullable)
-     * @throws SQLException
      */
-    public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName)
-            throws SQLException {
+    public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName) {
         final String tableName = tableMetaInfo.getTableName();
         Statement stmt = null;
         ResultSet rs = null;
         String ignoredMessage = null;
         try {
             stmt = conn.createStatement();
+            final String sql = buildMetaDataSql(primaryKeyColumnName, tableName);
             try {
-                rs = stmt.executeQuery(buildMetaDataSql(primaryKeyColumnName, tableName));
+                rs = stmt.executeQuery(sql);
             } catch (SQLException e) {
                 // Basically it does not come here.
                 // But if it's schema requirement or reservation word, it comes here. 
@@ -57,12 +56,13 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                     rs = retryForReservationWordTable(stmt, tableName, primaryKeyColumnName);
                     if (rs == null) {
                         ignoredMessage = ignored.getMessage();
-                        throw e;
+                        String msg = "Failed to execute the SQL for getting auto-increment information:";
+                        msg = msg + " sql=" + sql + " ignoredMessage=" + ignoredMessage;
+                        throw new IllegalStateException(msg, e);
                     }
                 }
             }
             final ResultSetMetaData md = rs.getMetaData();
-
             for (int i = 1; i <= md.getColumnCount(); i++) {
                 final String currentColumnName = md.getColumnName(i);
                 if (primaryKeyColumnName.equals(currentColumnName)) {
@@ -70,16 +70,22 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 }
             }
         } catch (SQLException e) {
-            String msg = "The handling for AutoIncrement threw the SQLException:";
+            String msg = "The handling for auto-increment threw the SQLException:";
             msg = msg + " primaryKeyColumnName=" + primaryKeyColumnName + " tableMetaInfo=" + tableMetaInfo;
             msg = msg + " ignoredMessage=" + ignoredMessage;
             throw new IllegalStateException(msg, e);
         } finally {
             if (stmt != null) {
-                stmt.close();
+                try {
+                    stmt.close();
+                } catch (SQLException ignored) {
+                }
             }
             if (rs != null) {
-                rs.close();
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                }
             }
         }
         String msg = "The primaryKeyColumnName is not found in the table: ";
