@@ -37,6 +37,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.handler.DfAutoIncrementHandler;
+import org.seasar.dbflute.logic.jdbc.handler.DfForeignKeyHandler;
+import org.seasar.dbflute.logic.jdbc.handler.DfIndexHandler;
+import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
+import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
@@ -44,11 +49,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.logic.metahandler.DfAutoIncrementHandler;
-import org.seasar.dbflute.logic.metahandler.DfForeignKeyHandler;
-import org.seasar.dbflute.logic.metahandler.DfIndexHandler;
-import org.seasar.dbflute.logic.metahandler.DfTableHandler;
-import org.seasar.dbflute.logic.metahandler.DfUniqueKeyHandler;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 
 /**
