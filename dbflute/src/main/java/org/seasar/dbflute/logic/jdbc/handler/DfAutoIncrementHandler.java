@@ -96,7 +96,7 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
     }
 
     protected String buildMetaDataSql(String primaryKeyColumnName, String tableName) {
-        return "select " + primaryKeyColumnName + " from " + tableName + " where 1 = 0";
+        return "select " + primaryKeyColumnName + " from " + tableName + " where 0 = 1";
     }
 
     protected ResultSet retryForReservationWordTable(Statement stmt, String tableName, String primaryKeyColumnName) {
