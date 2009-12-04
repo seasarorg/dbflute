@@ -160,6 +160,9 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 info.setTableOwner(tableOwner);
                 info.setTableName(tableName);
 
+                // Select-able?
+                judgeSynonymSelectable(info);
+
                 // PK, ID, UQ, FK, Index
                 try {
                     setupBasicConstraintInfo(info, tableOwner, tableName, conn);
@@ -192,10 +195,23 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             }
         }
         translateFKTable(synonymMap); // It translates foreign key meta informations. 
-        judgeSynonymSelectable(synonymMap);
         setupTableColumnComment(synonymMap);
         destroySupplementaryConnection(); // after care
         return synonymMap;
+    }
+
+    protected void judgeSynonymSelectable(DfSynonymMetaInfo info) {
+        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        final String synonymName = info.getSynonymName();
+        final String sql = "select * from " + synonymName + " where 0=1";
+        try {
+            final List<String> columnList = new ArrayList<String>();
+            columnList.add("dummy");
+            facade.selectStringList(sql, columnList);
+            info.setSelectable(true);
+        } catch (RuntimeException ignored) {
+            info.setSelectable(false);
+        }
     }
 
     protected void setupBasicConstraintInfo(DfSynonymMetaInfo info, String tableOwner, String tableName, Connection conn)
@@ -212,14 +228,16 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             info.setPrimaryKeyNameList(pkList);
         }
         final List<String> primaryKeyNameList = info.getPrimaryKeyNameList();
-        for (String primaryKeyName : primaryKeyNameList) {
-            final boolean autoIncrement = isAutoIncrement(conn, tableOwner, tableName, primaryKeyName);
-            if (autoIncrement) {
-                info.setAutoIncrement(autoIncrement);
-                break;
-            } else {
-                if (supplementValid) {
-                    info.setAutoIncrement(isAutoIncrement(spConn, tableOwner, tableName, primaryKeyName));
+        if (info.isSelectable()) { // because it needs a select statement
+            for (String primaryKeyName : primaryKeyNameList) {
+                final boolean autoIncrement = isAutoIncrement(conn, tableOwner, tableName, primaryKeyName);
+                if (autoIncrement) {
+                    info.setAutoIncrement(autoIncrement);
+                    break;
+                } else {
+                    if (supplementValid) {
+                        info.setAutoIncrement(isAutoIncrement(spConn, tableOwner, tableName, primaryKeyName));
+                    }
                 }
             }
         }
@@ -398,40 +416,6 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 _log.info(sb.toString());
             }
         }
-    }
-
-    /**
-     * Judge where it is select-able synonym or not. <br />
-     * @param synonymMap The map of synonym. (NotNull)
-     */
-    protected void judgeSynonymSelectable(Map<String, DfSynonymMetaInfo> synonymMap) {
-        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final Set<Entry<String, DfSynonymMetaInfo>> entrySet = synonymMap.entrySet();
-        final StringBuilder sb = new StringBuilder();
-        sb.append("...Judging synonyms to be selectable:").append(ln()).append("[NOT SELECTABLE]");
-        for (Entry<String, DfSynonymMetaInfo> entry : entrySet) {
-            final DfSynonymMetaInfo info = entry.getValue();
-            final String synonymName = info.getSynonymName();
-            final String sql = "select * from " + synonymName + " where 0=1";
-            try {
-                final List<String> columnList = new ArrayList<String>();
-                columnList.add("dummy");
-                facade.selectStringList(sql, columnList);
-                info.setSelectable(true);
-            } catch (RuntimeException ignored) {
-                sb.append(ln()).append(" ");
-                sb.append(synonymName);
-                sb.append(" (");
-                String tableOwner = info.getTableOwner();
-                if (tableOwner != null && tableOwner.trim().length() > 0) {
-                    sb.append(tableOwner).append(".");
-                }
-                sb.append(info.getTableName());
-                sb.append(")");
-                info.setSelectable(false);
-            }
-        }
-        _log.info(sb.toString());
     }
 
     /**

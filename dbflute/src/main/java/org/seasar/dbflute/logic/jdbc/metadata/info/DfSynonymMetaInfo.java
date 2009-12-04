@@ -84,8 +84,9 @@ public class DfSynonymMetaInfo {
         return synonymName + ":{" + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName + columns
                 + ", PK=" + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
                 + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
-                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + ", selectable="
-                + selectable + "}" + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
+                + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + ", "
+                + (selectable ? "selectable" : "NOT selectable") + "}"
+                + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
     }
 
     // ===================================================================================
