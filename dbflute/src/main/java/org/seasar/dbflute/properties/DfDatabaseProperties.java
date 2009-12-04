@@ -203,72 +203,84 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
 
             final DfAdditionalSchemaInfo info = new DfAdditionalSchemaInfo();
             info.setSchemaName(schemaName);
-
-            obj = elementMap.get("objectTypeTargetList");
-            if (obj == null) {
-                @SuppressWarnings("unchecked")
-                final List<String> objectTypeTargetList = Collections.EMPTY_LIST;
-                info.setObjectTypeTargetList(objectTypeTargetList);
-            } else if (!(obj instanceof List<?>)) {
-                String msg = "The type of objectTypeTargetList in the property 'additionalSchemaMap' should be List:";
-                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
-                throw new DfIllegalPropertyTypeException(msg);
-            } else {
-                @SuppressWarnings("unchecked")
-                final List<String> objectTypeTargetList = (List<String>) obj;
-                info.setObjectTypeTargetList(objectTypeTargetList);
-            }
-
-            obj = elementMap.get("tableExceptList");
-            if (obj == null) {
-                @SuppressWarnings("unchecked")
-                final List<String> tableExceptList = Collections.EMPTY_LIST;
-                info.setTableExceptList(tableExceptList);
-            } else if (!(obj instanceof List<?>)) {
-                String msg = "The type of tableExceptList in the property 'additionalSchemaMap' should be List:";
-                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
-                throw new DfIllegalPropertyTypeException(msg);
-            } else {
-                @SuppressWarnings("unchecked")
-                final List<String> tableExceptList = (List<String>) obj;
-                info.setTableExceptList(tableExceptList);
-            }
-
-            obj = elementMap.get("tableTargetList");
-            if (obj == null) {
-                @SuppressWarnings("unchecked")
-                final List<String> tableTargetList = Collections.EMPTY_LIST;
-                info.setTableTargetList(tableTargetList);
-            } else if (!(obj instanceof List<?>)) {
-                String msg = "The type of tableTargetList in the property 'additionalSchemaMap' should be List:";
-                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
-                throw new DfIllegalPropertyTypeException(msg);
-            } else {
-                @SuppressWarnings("unchecked")
-                final List<String> tableTargetList = (List<String>) obj;
-                info.setTableTargetList(tableTargetList);
-            }
-
+            setupAdditionalSchemaObjectTypeTargetList(info, elementMap);
+            setupAdditionalSchemaTableExceptList(info, elementMap);
+            setupAdditionalSchemaTableTargetList(info, elementMap);
             info.setSuppressCommonColumn(isProperty("isSuppressCommonColumn", false, elementMap));
-
-            obj = elementMap.get("supplementaryConnectionMap");
-            if (obj == null) {
-                @SuppressWarnings("unchecked")
-                final Map<String, String> supplementaryConnectionMap = Collections.EMPTY_MAP;
-                info.setSupplementaryConnectionMap(supplementaryConnectionMap);
-            } else if (!(obj instanceof List<?>)) {
-                String msg = "The type of supplementaryConnectionMap in the property 'additionalSchemaMap' should be Map:";
-                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
-                throw new DfIllegalPropertyTypeException(msg);
-            } else {
-                @SuppressWarnings("unchecked")
-                final Map<String, String> supplementaryConnectionMap = (Map<String, String>) obj;
-                info.setSupplementaryConnectionMap(supplementaryConnectionMap);
-            }
+            setupAdditionalSchemaSupplementaryConnectionMap(info, elementMap);
 
             _additionalSchemaMap.put(schemaName, info);
         }
         return _additionalSchemaMap;
+    }
+
+    protected void setupAdditionalSchemaObjectTypeTargetList(DfAdditionalSchemaInfo info, Map<String, Object> elementMap) {
+        final Object obj = elementMap.get("objectTypeTargetList");
+        if (obj == null) {
+            @SuppressWarnings("unchecked")
+            final List<String> objectTypeTargetList = Collections.EMPTY_LIST;
+            info.setObjectTypeTargetList(objectTypeTargetList);
+        } else if (!(obj instanceof List<?>)) {
+            String msg = "The type of objectTypeTargetList in the property 'additionalSchemaMap' should be List:";
+            msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+            throw new DfIllegalPropertyTypeException(msg);
+        } else {
+            @SuppressWarnings("unchecked")
+            final List<String> objectTypeTargetList = (List<String>) obj;
+            info.setObjectTypeTargetList(objectTypeTargetList);
+        }
+    }
+
+    protected void setupAdditionalSchemaTableExceptList(DfAdditionalSchemaInfo info, Map<String, Object> elementMap) {
+        final Object obj = elementMap.get("tableExceptList");
+        if (obj == null) {
+            @SuppressWarnings("unchecked")
+            final List<String> tableExceptList = Collections.EMPTY_LIST;
+            info.setTableExceptList(tableExceptList);
+        } else if (!(obj instanceof List<?>)) {
+            String msg = "The type of tableExceptList in the property 'additionalSchemaMap' should be List:";
+            msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+            throw new DfIllegalPropertyTypeException(msg);
+        } else {
+            @SuppressWarnings("unchecked")
+            final List<String> tableExceptList = (List<String>) obj;
+            info.setTableExceptList(tableExceptList);
+        }
+    }
+
+    protected void setupAdditionalSchemaTableTargetList(DfAdditionalSchemaInfo info, Map<String, Object> elementMap) {
+        final Object obj = elementMap.get("tableTargetList");
+        if (obj == null) {
+            @SuppressWarnings("unchecked")
+            final List<String> tableTargetList = Collections.EMPTY_LIST;
+            info.setTableTargetList(tableTargetList);
+        } else if (!(obj instanceof List<?>)) {
+            String msg = "The type of tableTargetList in the property 'additionalSchemaMap' should be List:";
+            msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+            throw new DfIllegalPropertyTypeException(msg);
+        } else {
+            @SuppressWarnings("unchecked")
+            final List<String> tableTargetList = (List<String>) obj;
+            info.setTableTargetList(tableTargetList);
+        }
+    }
+
+    protected void setupAdditionalSchemaSupplementaryConnectionMap(DfAdditionalSchemaInfo info,
+            Map<String, Object> elementMap) {
+        final Object obj = elementMap.get("supplementaryConnectionMap"); // It's closet!
+        if (obj == null) {
+            @SuppressWarnings("unchecked")
+            final Map<String, String> supplementaryConnectionMap = Collections.EMPTY_MAP;
+            info.setSupplementaryConnectionMap(supplementaryConnectionMap);
+        } else if (!(obj instanceof Map<?, ?>)) {
+            String msg = "The type of supplementaryConnectionMap in the property 'additionalSchemaMap' should be Map:";
+            msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+            throw new DfIllegalPropertyTypeException(msg);
+        } else {
+            @SuppressWarnings("unchecked")
+            final Map<String, String> supplementaryConnectionMap = (Map<String, String>) obj;
+            info.setSupplementaryConnectionMap(supplementaryConnectionMap);
+        }
     }
 
     public boolean hasAdditionalSchema() {
