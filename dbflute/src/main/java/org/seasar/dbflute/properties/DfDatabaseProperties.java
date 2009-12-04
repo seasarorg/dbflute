@@ -251,19 +251,19 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
 
             info.setSuppressCommonColumn(isProperty("isSuppressCommonColumn", false, elementMap));
 
-            obj = elementMap.get("supplementaryDataSourceMap");
+            obj = elementMap.get("supplementaryConnectionMap");
             if (obj == null) {
                 @SuppressWarnings("unchecked")
-                final Map<String, String> supplementaryDataSourceMap = Collections.EMPTY_MAP;
-                info.setSupplementaryConnectionMap(supplementaryDataSourceMap);
+                final Map<String, String> supplementaryConnectionMap = Collections.EMPTY_MAP;
+                info.setSupplementaryConnectionMap(supplementaryConnectionMap);
             } else if (!(obj instanceof List<?>)) {
-                String msg = "The type of supplementaryDataSourceMap in the property 'additionalSchemaMap' should be Map:";
+                String msg = "The type of supplementaryConnectionMap in the property 'additionalSchemaMap' should be Map:";
                 msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
                 throw new DfIllegalPropertyTypeException(msg);
             } else {
                 @SuppressWarnings("unchecked")
-                final Map<String, String> supplementaryDataSourceMap = (Map<String, String>) obj;
-                info.setSupplementaryConnectionMap(supplementaryDataSourceMap);
+                final Map<String, String> supplementaryConnectionMap = (Map<String, String>) obj;
+                info.setSupplementaryConnectionMap(supplementaryConnectionMap);
             }
 
             _additionalSchemaMap.put(schemaName, info);
