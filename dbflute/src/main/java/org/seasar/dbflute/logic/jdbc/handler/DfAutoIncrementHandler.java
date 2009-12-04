@@ -38,12 +38,13 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
      */
     public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName) {
         final String tableName = tableMetaInfo.getTableName();
+        final String sql = buildMetaDataSql(primaryKeyColumnName, tableName);
+        String recoverySql = null;
         Statement stmt = null;
         ResultSet rs = null;
         String ignoredMessage = null;
         try {
             stmt = conn.createStatement();
-            final String sql = buildMetaDataSql(primaryKeyColumnName, tableName);
             try {
                 rs = stmt.executeQuery(sql);
             } catch (SQLException e) {
@@ -51,14 +52,13 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 // But if it's schema requirement or reservation word, it comes here. 
                 try {
                     final String tableNameWithSchema = tableMetaInfo.buildTableNameWithSchema();
-                    rs = stmt.executeQuery(buildMetaDataSql(primaryKeyColumnName, tableNameWithSchema));
+                    recoverySql = buildMetaDataSql(primaryKeyColumnName, tableNameWithSchema);
+                    rs = stmt.executeQuery(recoverySql);
                 } catch (SQLException ignored) {
                     rs = retryForReservationWordTable(stmt, tableName, primaryKeyColumnName);
                     if (rs == null) {
                         ignoredMessage = ignored.getMessage();
-                        String msg = "Failed to execute the SQL for getting auto-increment information:";
-                        msg = msg + " sql=" + sql + " ignoredMessage=" + ignoredMessage;
-                        throw new IllegalStateException(msg, e);
+                        throw e;
                     }
                 }
             }
@@ -70,9 +70,11 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 }
             }
         } catch (SQLException e) {
-            String msg = "The handling for auto-increment threw the SQLException:";
-            msg = msg + " primaryKeyColumnName=" + primaryKeyColumnName + " tableMetaInfo=" + tableMetaInfo;
-            msg = msg + " ignoredMessage=" + ignoredMessage;
+            String msg = "Failed to execute the SQL for getting auto-increment:";
+            msg = msg + " sql=" + sql;
+            msg = msg + " message=" + e.getMessage();
+            msg = msg + " recoverySql=" + recoverySql;
+            msg = msg + " recoveryMessage=" + ignoredMessage;
             throw new IllegalStateException(msg, e);
         } finally {
             if (stmt != null) {
