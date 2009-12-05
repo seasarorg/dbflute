@@ -797,7 +797,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             _log.info("...Loading synonyms");
             _synonymMap = extractor.extractSynonymMap();
             final StringBuilder sb = new StringBuilder();
-            sb.append("Finished loading synonyms:").append(ln()).append("[Synonym Map]");
+            sb.append("Finished loading synonyms:").append(ln()).append("[Synonym]");
             final Set<Entry<String, DfSynonymMetaInfo>> entrySet = _synonymMap.entrySet();
             for (Entry<String, DfSynonymMetaInfo> entry : entrySet) {
                 sb.append(ln()).append(" ").append(entry.getValue().toString());
