@@ -15,6 +15,8 @@
 # o isSuppressTruncateTable: (NotRequired - Default false)
 # o isSuppressDropForeignKey: (NotRequired - Default false)
 # o isSuppressDropTable: (NotRequired - Default false)
+# o isSuppressDropSequence: (NotRequired - Default false)
+# o isSuppressDropDBLink: (NotRequired - Default false)
 # 
 # Example:
 # map:{
@@ -146,6 +148,20 @@ map:{
     #  You can suppress dropping tables at initializing schema.
     # 
     #; isSuppressDropTable = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isSuppressDropSequence: (NotRequired - Default false)
+    #  You can suppress dropping sequences at initializing schema.
+    # 
+    #; isSuppressDropSequence = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isSuppressDropDBLink: (NotRequired - Default false)
+    #  You can suppress dropping DB links at initializing schema.
+    # 
+    #; isSuppressDropDBLink = false
     # - - - - - - - - - -/
 }
 # ----------------/

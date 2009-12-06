@@ -261,6 +261,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return isProperty("isSuppressDropTable", false, getReplaceSchemaDefinitionMap());
     }
 
+    public boolean isSuppressDropSequence() {
+        return isProperty("isSuppressDropSequence", false, getReplaceSchemaDefinitionMap());
+    }
+
+    public boolean isSuppressDropDBLink() {
+        return isProperty("isSuppressDropDBLink", false, getReplaceSchemaDefinitionMap());
+    }
+
     // ===================================================================================
     //                                                                        Other Closet
     //                                                                        ============

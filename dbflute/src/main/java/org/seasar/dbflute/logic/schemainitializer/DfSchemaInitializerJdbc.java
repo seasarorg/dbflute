@@ -70,6 +70,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected boolean _suppressDropTable;
 
+    protected boolean _suppressDropSequence;
+
+    protected boolean _suppressDropDBLink;
+
     // ===================================================================================
     //                                                                   Initialize Schema
     //                                                                   =================
@@ -144,6 +148,20 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         if (!_suppressDropTable) {
             dropTable(conn, tableMetaInfoList);
         }
+        if (!_suppressDropSequence) {
+            dropSequence(conn, tableMetaInfoList);
+        }
+        if (!_suppressDropDBLink) {
+            dropDBLink(conn, tableMetaInfoList);
+        }
+    }
+
+    protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        // override if it needs
+    }
+
+    protected void dropDBLink(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        // override if it needs
     }
 
     // ===================================================================================
@@ -440,5 +458,21 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setSuppressDropTable(boolean suppressDropTable) {
         this._suppressDropTable = suppressDropTable;
+    }
+
+    public boolean isSuppressDropSequence() {
+        return _suppressDropSequence;
+    }
+
+    public void setSuppressDropSequence(boolean suppressDropSequence) {
+        this._suppressDropSequence = suppressDropSequence;
+    }
+
+    public boolean isSuppressDropDBLink() {
+        return _suppressDropDBLink;
+    }
+
+    public void setSuppressDropDBLink(boolean suppressDropDBLink) {
+        this._suppressDropDBLink = suppressDropDBLink;
     }
 }

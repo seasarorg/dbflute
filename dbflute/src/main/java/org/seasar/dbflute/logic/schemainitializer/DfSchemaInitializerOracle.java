@@ -50,13 +50,6 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     //                                                                          Drop Table
     //                                                                          ==========
     @Override
-    protected void dropTable(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
-        super.dropTable(conn, tableMetaInfoList);
-        dropSequence(conn);
-        dropDbLink(conn);
-    }
-
-    @Override
     protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
         if (metaInfo.isTableTypeSynonym()) {
             final String tableName = filterTableName(metaInfo.getTableName());
@@ -64,6 +57,14 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
         } else {
             super.setupDropTable(sb, metaInfo);
         }
+    }
+
+    // ===================================================================================
+    //                                                                       Drop Sequence
+    //                                                                       =============
+    @Override
+    protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        dropSequence(conn);
     }
 
     protected void dropSequence(Connection conn) {
@@ -129,9 +130,17 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
         }
     }
 
-    protected void dropDbLink(Connection conn) {
+    // ===================================================================================
+    //                                                                        Drop DB Link
+    //                                                                        ============
+    @Override
+    protected void dropDBLink(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        dropDBLink(conn);
+    }
+
+    protected void dropDBLink(Connection conn) {
         final List<String> dbLinkNameList = new ArrayList<String>();
-        final List<String> publicDbLinkNameList = new ArrayList<String>();
+        final List<String> publicDBLinkNameList = new ArrayList<String>();
         final String metaDataSql = "select * from ALL_DB_LINKS where OWNER = '" + _schema + "'";
         Statement statement = null;
         ResultSet rs = null;
@@ -145,7 +154,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
                 if (userName != null && userName.trim().length() > 0) {
                     dbLinkNameList.add(dbLinkName);
                 } else {
-                    publicDbLinkNameList.add(dbLinkName);
+                    publicDBLinkNameList.add(dbLinkName);
                 }
             }
         } catch (SQLException continued) {
@@ -177,7 +186,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
                 _log.info(dropDbLinkSql);
                 statement.execute(dropDbLinkSql);
             }
-            for (String dbLinkName : publicDbLinkNameList) {
+            for (String dbLinkName : publicDBLinkNameList) {
                 String dropDbLinkSql = "drop database link " + dbLinkName;
                 _log.info(dropDbLinkSql);
                 try {
