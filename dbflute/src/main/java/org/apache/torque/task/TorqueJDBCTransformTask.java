@@ -156,7 +156,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                      Direct Meta Data
     //                                      ----------------
     protected Map<String, String> _identityMap;
-    protected Map<String, DfSynonymMetaInfo> _synonymMap;
+    protected Map<String, DfSynonymMetaInfo> _supplementarySynonymInfoMap;
 
     // -----------------------------------------------------
     //                                          Check Object
@@ -250,7 +250,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         _foreignKeyHandler.setRefTableCheckSet(_refTableCheckSet);
 
         // Load synonym information for merging additional meta data if it needs.
-        loadSynonymInfoIfNeeds();
+        loadSupplementarySynonymInfoIfNeeds();
 
         // This should be after loading synonyms so it is executed at this timing!
         processSynonymTable(tableList);
@@ -788,17 +788,17 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     // -----------------------------------------------------
     //                                               Synonym
     //                                               -------
-    protected void loadSynonymInfoIfNeeds() {
+    protected void loadSupplementarySynonymInfoIfNeeds() { // is only for main schema
         final DfSynonymExtractor extractor = createSynonymExtractor();
         if (extractor == null) {
             return;
         }
         try {
-            _log.info("...Loading synonyms");
-            _synonymMap = extractor.extractSynonymMap();
+            _log.info("...Loading supplementary synonym informations");
+            _supplementarySynonymInfoMap = extractor.extractSynonymMap();
             final StringBuilder sb = new StringBuilder();
-            sb.append("Finished loading synonyms:").append(ln()).append("[Synonym]");
-            final Set<Entry<String, DfSynonymMetaInfo>> entrySet = _synonymMap.entrySet();
+            sb.append("Finished loading synonyms:").append(ln()).append("[Supplementary Synonyms]");
+            final Set<Entry<String, DfSynonymMetaInfo>> entrySet = _supplementarySynonymInfoMap.entrySet();
             for (Entry<String, DfSynonymMetaInfo> entry : entrySet) {
                 sb.append(ln()).append(" ").append(entry.getValue().toString());
             }
@@ -809,7 +809,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected boolean canHandleSynonym(DfTableMetaInfo table) {
-        return _synonymMap != null && table.canHandleSynonym();
+        return _supplementarySynonymInfoMap != null && table.canHandleSynonym();
     }
 
     protected DfSynonymMetaInfo getSynonymMetaInfo(DfTableMetaInfo table) {
@@ -817,7 +817,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             String msg = "The table meta information should be for synonym: " + table;
             throw new IllegalStateException(msg);
         }
-        return _synonymMap.get(table.getTableName());
+        final String key = table.buildTableNameWithSchema();
+        return _supplementarySynonymInfoMap.get(key);
     }
 
     // ===================================================================================
@@ -894,9 +895,8 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected DfSynonymExtractorFactory createSynonymExtractorFactory() {
-        // The schema to extract is only main schema.
         // The synonym extractor may need the set collection for reference table check.
-        return new DfSynonymExtractorFactory(getBasicProperties(), getDatabaseProperties(), getDataSource(), _schema,
+        return new DfSynonymExtractorFactory(getDataSource(), getBasicProperties(), getDatabaseProperties(),
                 _refTableCheckSet);
     }
 

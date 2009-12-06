@@ -1,5 +1,8 @@
 package org.seasar.dbflute.logic.factory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.helper.StringSet;
@@ -14,24 +17,22 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
  */
 public class DfSynonymExtractorFactory {
 
+    protected DataSource _dataSource;
     protected DfBasicProperties _basicProperties;
     protected DfDatabaseProperties _databaseProperties;
-    protected DataSource _dataSource;
-    protected String _schema;
     protected StringSet _refTableCheckSet;
 
     /**
+     * @param dataSource The data source. (NotNull)
      * @param basicProperties The basic properties. (NotNull)
      * @param databaseProperties The database properties. (NotNull)
-     * @param dataSource The data source. (NotNull)
-     * @param schema The schema to extract. (NotNull)
+     * @param refTableCheckSet The set for checking reference tables. (NotNull)
      */
-    public DfSynonymExtractorFactory(DfBasicProperties basicProperties, DfDatabaseProperties databaseProperties,
-            DataSource dataSource, String schema, StringSet refTableCheckSet) {
+    public DfSynonymExtractorFactory(DataSource dataSource, DfBasicProperties basicProperties,
+            DfDatabaseProperties databaseProperties, StringSet refTableCheckSet) {
+        _dataSource = dataSource;
         _basicProperties = basicProperties;
         _databaseProperties = databaseProperties;
-        _schema = schema;
-        _dataSource = dataSource;
         _refTableCheckSet = refTableCheckSet;
     }
 
@@ -42,10 +43,18 @@ public class DfSynonymExtractorFactory {
         if (_basicProperties.isDatabaseOracle() && _databaseProperties.hasObjectTypeSynonym()) {
             final DfSynonymExtractorOracle extractor = new DfSynonymExtractorOracle();
             extractor.setDataSource(_dataSource);
-            extractor.setSchema(_schema);
+            extractor.setSchemaList(createAllSchemaList());
             extractor.setRefTableCheckSet(_refTableCheckSet);
             return extractor;
         }
         return null;
+    }
+
+    protected List<String> createAllSchemaList() { // not only main schema but also additional schemas
+        final String mainSchema = _databaseProperties.getDatabaseSchema();
+        final List<String> schemaList = new ArrayList<String>();
+        schemaList.add(mainSchema);
+        schemaList.addAll(_databaseProperties.getAdditionalSchemaMap().keySet());
+        return schemaList;
     }
 }

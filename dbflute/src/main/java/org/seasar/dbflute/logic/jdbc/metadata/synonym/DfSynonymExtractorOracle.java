@@ -23,19 +23,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.handler.DfAutoIncrementHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfForeignKeyHandler;
@@ -48,7 +45,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserT
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
 
 /**
  * @author jflute
@@ -65,9 +61,12 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected String _schema;
+    protected List<String> _schemaList;
     protected Set<String> _refTableCheckSet;
 
+    // -----------------------------------------------------
+    //                                     Meta Data Handler
+    //                                     -----------------
     protected DfTableHandler _tableHandler = new DfTableHandler();
     protected DfUniqueKeyHandler _uniqueKeyHandler = new DfUniqueKeyHandler();
     protected DfAutoIncrementHandler _autoIncrementHandler = new DfAutoIncrementHandler();
@@ -81,42 +80,12 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     };
     protected DfIndexHandler _indexHandler = new DfIndexHandler();
 
-    protected Map<String, Connection> _supplementaryConnection = new HashMap<String, Connection>();
-
-    protected Connection getSupplementaryConnection(String tableOwner) {
-        if (_supplementaryConnection.containsKey(tableOwner)) {
-            return _supplementaryConnection.get(tableOwner);
-        }
-        final DfDatabaseProperties databaseProperties = DfBuildProperties.getInstance().getDatabaseProperties();
-        Connection conn = null;
-        if (databaseProperties.hasAdditionalSchemaSupplementaryConnection(tableOwner)) {
-            _log.info("...Creating a supplementary connection to " + tableOwner);
-            conn = databaseProperties.getAdditionalSchemaSupplementaryConnection(tableOwner);
-        }
-        _supplementaryConnection.put(tableOwner, conn);
-        return conn;
-    }
-
-    protected void destroySupplementaryConnection() {
-        final Set<Entry<String, Connection>> entrySet = _supplementaryConnection.entrySet();
-        for (Entry<String, Connection> entry : entrySet) {
-            final Connection conn = entry.getValue();
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                    _log.info("Failed to close the connection: " + conn);
-                }
-            }
-        }
-    }
-
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
     public Map<String, DfSynonymMetaInfo> extractSynonymMap() {
         final Map<String, DfSynonymMetaInfo> synonymMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
-        final String sql = "select * from ALL_SYNONYMS where OWNER = '" + _schema + "'";
+        final String sql = buildSynonymSelect();
         Connection conn = null;
         Statement statement = null;
         ResultSet rs = null;
@@ -126,12 +95,14 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             _log.info(sql);
             rs = statement.executeQuery(sql);
             while (rs.next()) {
+                final String owner = rs.getString("OWNER");
                 final String synonymName = rs.getString("SYNONYM_NAME");
                 final String tableOwner = rs.getString("TABLE_OWNER");
                 final String tableName = rs.getString("TABLE_NAME");
                 final String dbLinkName = rs.getString("DB_LINK");
 
-                if (_tableHandler.isTableExcept(tableOwner, synonymName)) {
+                if (_tableHandler.isTableExcept(owner, synonymName)) {
+                    // because it is not necessary to handle excepted tables 
                     continue;
                 }
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) {
@@ -169,7 +140,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                     _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
                     continue;
                 }
-                synonymMap.put(synonymName, info);
+                synonymMap.put(owner + "." + synonymName, info);
             }
         } catch (SQLException e) {
             throw new IllegalStateException(e);
@@ -195,8 +166,21 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
         translateFKTable(synonymMap); // It translates foreign key meta informations. 
         setupTableColumnComment(synonymMap);
-        destroySupplementaryConnection(); // after care
         return synonymMap;
+    }
+
+    protected String buildSynonymSelect() {
+        final StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (String schema : _schemaList) {
+            if (count > 0) {
+                sb.append(", ");
+            }
+            sb.append("'").append(schema).append("'");
+            ++count;
+        }
+        final String sql = "select * from ALL_SYNONYMS where OWNER in('" + sb.toString() + ")";
+        return sql;
     }
 
     protected void judgeSynonymSelectable(DfSynonymMetaInfo info) {
@@ -215,51 +199,32 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
 
     protected void setupBasicConstraintInfo(DfSynonymMetaInfo info, String tableOwner, String tableName, Connection conn)
             throws SQLException {
-        final DatabaseMetaData metaData = conn.getMetaData();
-        final Connection spConn = getSupplementaryConnection(tableOwner);
-        final boolean supplementValid = spConn != null;
-        final DatabaseMetaData spMetaData = supplementValid ? spConn.getMetaData() : null;
+        final DatabaseMetaData md = conn.getMetaData();
         {
-            List<String> pkList = getPKList(metaData, tableOwner, tableName);
-            if (supplementValid && pkList.isEmpty()) {
-                pkList = getPKList(spMetaData, tableOwner, tableName);
-            }
+            final List<String> pkList = getPKList(md, tableOwner, tableName);
             info.setPrimaryKeyNameList(pkList);
         }
-        final List<String> primaryKeyNameList = info.getPrimaryKeyNameList();
+        final List<String> pkNameList = info.getPrimaryKeyNameList();
         if (info.isSelectable()) { // because it needs a select statement
-            for (String primaryKeyName : primaryKeyNameList) {
+            for (String primaryKeyName : pkNameList) {
                 final boolean autoIncrement = isAutoIncrement(conn, tableOwner, tableName, primaryKeyName);
                 if (autoIncrement) {
                     info.setAutoIncrement(autoIncrement);
                     break;
-                } else {
-                    if (supplementValid) {
-                        info.setAutoIncrement(isAutoIncrement(spConn, tableOwner, tableName, primaryKeyName));
-                    }
                 }
             }
         }
         {
-            Map<String, Map<Integer, String>> uqMap = getUQMap(metaData, tableOwner, tableName, primaryKeyNameList);
-            if (supplementValid && uqMap.isEmpty()) {
-                uqMap = getUQMap(spMetaData, tableOwner, tableName, primaryKeyNameList);
-            }
+            final Map<String, Map<Integer, String>> uqMap = getUQMap(md, tableOwner, tableName, pkNameList);
             info.setUniqueKeyMap(uqMap);
         }
         {
-            Map<String, DfForeignKeyMetaInfo> fkMap = getFKMap(metaData, tableOwner, tableName);
-            if (supplementValid && fkMap.isEmpty()) {
-                fkMap = getFKMap(spMetaData, tableOwner, tableName);
-            }
+            final Map<String, DfForeignKeyMetaInfo> fkMap = getFKMap(md, tableOwner, tableName);
             info.setForeignKeyMetaInfoMap(fkMap); // It's tentative information at this timing!
         }
-        final Map<String, Map<Integer, String>> uniqueKeyMap = info.getUniqueKeyMap();
         {
-            Map<String, Map<Integer, String>> indexMap = getIndexMap(metaData, tableOwner, tableName, uniqueKeyMap);
-            if (supplementValid && indexMap.isEmpty()) {
-                indexMap = getIndexMap(spMetaData, tableOwner, tableName, uniqueKeyMap);
-            }
+            final Map<String, Map<Integer, String>> uqMap = info.getUniqueKeyMap();
+            final Map<String, Map<Integer, String>> indexMap = getIndexMap(md, tableOwner, tableName, uqMap);
             info.setIndexMap(indexMap);
         }
     }
@@ -624,16 +589,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         _dataSource = dataSource;
     }
 
-    public String getSchema() {
-        return _schema;
-    }
-
-    public void setSchema(String schema) {
-        this._schema = schema;
-    }
-
-    public Set<String> getRefTableCheckSet() {
-        return _refTableCheckSet;
+    public void setSchemaList(List<String> schemaList) {
+        this._schemaList = schemaList;
     }
 
     public void setRefTableCheckSet(Set<String> refTableCheckSet) {
