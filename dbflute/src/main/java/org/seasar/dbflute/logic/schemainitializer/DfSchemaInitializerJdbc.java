@@ -341,7 +341,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                         statement.execute(dropMaterializedViewSql);
                         _log.info("  --> (o) " + dropMaterializedViewSql);
                     } catch (SQLException ignored) {
-                        _log.info("  --> (x) " + dropMaterializedViewSql);
+                        if (metaInfo.isTableTypeView()) {
+                            _log.info("  --> (x) " + dropMaterializedViewSql);
+                        }
                         throw e;
                     }
                 }
