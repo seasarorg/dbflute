@@ -95,13 +95,13 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             _log.info(sql);
             rs = statement.executeQuery(sql);
             while (rs.next()) {
-                final String owner = rs.getString("OWNER");
+                final String synonymOwner = rs.getString("OWNER");
                 final String synonymName = rs.getString("SYNONYM_NAME");
                 final String tableOwner = rs.getString("TABLE_OWNER");
                 final String tableName = rs.getString("TABLE_NAME");
                 final String dbLinkName = rs.getString("DB_LINK");
 
-                if (_tableHandler.isTableExcept(owner, synonymName)) {
+                if (_tableHandler.isTableExcept(synonymOwner, synonymName)) {
                     // because it is not necessary to handle excepted tables 
                     continue;
                 }
@@ -111,7 +111,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                     // It's a DB Link Synonym!
                     // = = = = = = = = = = = = 
                     try {
-                        final String synonymKey = buildSynonymMapKey(owner, synonymName);
+                        final String synonymKey = buildSynonymMapKey(synonymOwner, synonymName);
                         synonymMap.put(synonymKey, setupDBLinkSynonym(conn, synonymName, tableName, dbLinkName));
                     } catch (Exception continued) {
                         _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
@@ -128,6 +128,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 final DfSynonymMetaInfo info = new DfSynonymMetaInfo();
 
                 // Basic
+                info.setSynonymOwner(synonymOwner);
                 info.setSynonymName(synonymName);
                 info.setTableOwner(tableOwner);
                 info.setTableName(tableName);
@@ -142,7 +143,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                     _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
                     continue;
                 }
-                final String synonymKey = buildSynonymMapKey(owner, synonymName);
+                final String synonymKey = buildSynonymMapKey(synonymOwner, synonymName);
                 synonymMap.put(synonymKey, info);
             }
         } catch (SQLException e) {
@@ -186,14 +187,15 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         return sql;
     }
 
-    protected String buildSynonymMapKey(String owner, String synonymName) {
-        return owner + "." + synonymName;
+    protected String buildSynonymMapKey(String synonymOwner, String synonymName) {
+        return synonymOwner + "." + synonymName;
     }
 
     protected void judgeSynonymSelectable(DfSynonymMetaInfo info) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        final String synonymOwner = info.getSynonymOwner();
         final String synonymName = info.getSynonymName();
-        final String sql = "select * from " + synonymName + " where 0=1";
+        final String sql = "select * from " + synonymOwner + "." + synonymName + " where 0=1";
         try {
             final List<String> columnList = new ArrayList<String>();
             columnList.add("dummy");

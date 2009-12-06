@@ -31,6 +31,7 @@ public class DfSynonymMetaInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected String synonymOwner;
     protected String synonymName;
     protected String tableOwner;
     protected String tableName;
@@ -81,8 +82,8 @@ public class DfSynonymMetaInfo {
         if (columnMetaInfoList4DBLink != null) {
             columns = "(" + columnMetaInfoList4DBLink.size() + " columns for DB link)";
         }
-        return synonymName + ":{" + (dbLinkName != null ? dbLinkName : tableOwner) + "." + tableName + columns
-                + ", PK=" + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
+        return synonymOwner + "." + synonymName + ":{" + (dbLinkName != null ? dbLinkName : tableOwner) + "."
+                + tableName + columns + ", PK=" + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
                 + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
                 + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + ", "
                 + (selectable ? "selectable" : "unselectable") + "}"
@@ -92,6 +93,14 @@ public class DfSynonymMetaInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    public String getSynonymOwner() {
+        return synonymOwner;
+    }
+
+    public void setSynonymOwner(String synonymOwner) {
+        this.synonymOwner = synonymOwner;
+    }
+
     public String getSynonymName() {
         return synonymName;
     }
