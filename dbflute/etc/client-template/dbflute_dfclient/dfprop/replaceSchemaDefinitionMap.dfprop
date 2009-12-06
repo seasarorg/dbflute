@@ -37,9 +37,11 @@
 #             ; isDropAllTable = false
 #         }
 #     }
-#     ; isSuppressTruncateTable = true
-#     ; isSuppressDropForeignKey = true
-#     ; isSuppressDropTable = true
+#     ; isSuppressTruncateTable = false
+#     ; isSuppressDropForeignKey = false
+#     ; isSuppressDropTable = false
+#     ; isSuppressDropSequence = false
+#     ; isSuppressDropDBLink = false
 # }
 #
 # *The line that starts with '#' means comment-out.

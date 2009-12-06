@@ -141,18 +141,28 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected void executeObject(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         if (!_suppressTruncateTable) {
             truncateTableIfPossible(conn, tableMetaInfoList);
+        } else {
+            _log.info("*Suppress truncating tables");
         }
         if (!_suppressDropForeignKey) {
             dropForeignKey(conn, tableMetaInfoList);
+        } else {
+            _log.info("*Suppress dropping foreign keys");
         }
         if (!_suppressDropTable) {
             dropTable(conn, tableMetaInfoList);
+        } else {
+            _log.info("*Suppress dropping tables");
         }
         if (!_suppressDropSequence) {
             dropSequence(conn, tableMetaInfoList);
+        } else {
+            _log.info("*Suppress dropping sequences");
         }
         if (!_suppressDropDBLink) {
             dropDBLink(conn, tableMetaInfoList);
+        } else {
+            _log.info("*Suppress dropping DB links");
         }
     }
 
