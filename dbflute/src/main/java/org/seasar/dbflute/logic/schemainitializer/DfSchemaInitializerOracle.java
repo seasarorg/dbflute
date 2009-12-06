@@ -178,14 +178,14 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
                 statement.execute(dropDbLinkSql);
             }
             for (String dbLinkName : publicDbLinkNameList) {
-                String dropDbLinkSql = "drop public database link " + dbLinkName;
+                String dropDbLinkSql = "drop database link " + dbLinkName;
                 _log.info(dropDbLinkSql);
                 try {
-                    statement.execute(dropDbLinkSql); // should be OK
+                    statement.execute(dropDbLinkSql);
                 } catch (SQLException e) {
                     try {
-                        // follow
-                        dropDbLinkSql = "drop database link " + dbLinkName;
+                        // retry with 'public' option
+                        dropDbLinkSql = "drop public database link " + dbLinkName;
                         statement.execute(dropDbLinkSql);
                         _log.info("  --> (o) " + dropDbLinkSql);
                     } catch (SQLException ignored) {
