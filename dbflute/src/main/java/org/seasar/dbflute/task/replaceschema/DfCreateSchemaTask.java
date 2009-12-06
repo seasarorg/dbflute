@@ -230,7 +230,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         execute.setDispatcher(new DfSqlFileRunnerDispatcher() {
             public boolean dispatch(File sqlFile, Statement stmt, String sql) throws SQLException {
                 final boolean checkUser = analyzeCheckUser(sql);
-                if (_currentUser == null && _currentUser.trim().length() == 0) {
+                if (_currentUser == null || _currentUser.trim().length() == 0) {
                     return false;
                 }
                 Connection conn = _changeUserConnectionMap.get(_currentUser);
