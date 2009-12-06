@@ -105,12 +105,14 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                     // because it is not necessary to handle excepted tables 
                     continue;
                 }
+
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) {
                     // = = = = = = = = = = = = 
                     // It's a DB Link Synonym!
                     // = = = = = = = = = = = = 
                     try {
-                        synonymMap.put(synonymName, setupDBLinkSynonym(conn, synonymName, tableName, dbLinkName));
+                        final String synonymKey = buildSynonymMapKey(owner, synonymName);
+                        synonymMap.put(synonymKey, setupDBLinkSynonym(conn, synonymName, tableName, dbLinkName));
                     } catch (Exception continued) {
                         _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
                     }
@@ -140,7 +142,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                     _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
                     continue;
                 }
-                synonymMap.put(owner + "." + synonymName, info);
+                final String synonymKey = buildSynonymMapKey(owner, synonymName);
+                synonymMap.put(synonymKey, info);
             }
         } catch (SQLException e) {
             throw new IllegalStateException(e);
@@ -181,6 +184,10 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
         final String sql = "select * from ALL_SYNONYMS where OWNER in(" + sb.toString() + ")";
         return sql;
+    }
+
+    protected String buildSynonymMapKey(String owner, String synonymName) {
+        return owner + "." + synonymName;
     }
 
     protected void judgeSynonymSelectable(DfSynonymMetaInfo info) {

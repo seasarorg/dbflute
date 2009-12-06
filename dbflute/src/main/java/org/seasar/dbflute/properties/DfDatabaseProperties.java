@@ -294,7 +294,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                              Supplementary Connection
     //                              ------------------------
-    public Connection getAdditionalSchemaSupplementaryConnection(String schema) {
+    // Maybe it is available at the future. (@0.9.6.2) 
+    // So this method modifier is protected until it will be available.
+    protected Connection getAdditionalSchemaSupplementaryConnection(String schema) {
         if (!hasAdditionalSchemaSupplementaryConnection(schema)) {
             String msg = "The additional schema should have supplementary connection informations:";
             msg = msg + " schema=" + schema;
