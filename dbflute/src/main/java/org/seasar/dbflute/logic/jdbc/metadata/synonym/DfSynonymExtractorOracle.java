@@ -240,10 +240,11 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     }
 
     protected DfSynonymMetaInfo setupDBLinkSynonym(Connection conn, DfSynonymMetaInfo info) throws SQLException {
+        final String synonymOwner = info.getSynonymOwner();
         final String synonymName = info.getSynonymName();
         final String tableName = info.getTableName();
         final String dbLinkName = info.getDbLinkName();
-        final List<DfColumnMetaInfo> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymName);
+        final List<DfColumnMetaInfo> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymOwner, synonymName);
         info.setColumnMetaInfoList4DBLink(columnMetaInfoList);
         final List<String> primaryKeyNameList = getDBLinkSynonymPKList(conn, tableName, dbLinkName);
         info.setPrimaryKeyNameList(primaryKeyNameList);
@@ -457,14 +458,14 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     // -----------------------------------------------------
     //                                   For DB Link Synonym
     //                                   -------------------
-    protected List<DfColumnMetaInfo> getDBLinkSynonymColumns(Connection conn, String dbLinkSynonymName)
+    protected List<DfColumnMetaInfo> getDBLinkSynonymColumns(Connection conn, String synonymOwner, String synonymName)
             throws SQLException {
         final List<DfColumnMetaInfo> columnList = new ArrayList<DfColumnMetaInfo>();
         Statement statement = null;
         ResultSet rs = null;
         try {
             statement = conn.createStatement();
-            rs = statement.executeQuery("select * from " + dbLinkSynonymName + " where 0 = 1");
+            rs = statement.executeQuery("select * from " + synonymOwner + "." + synonymName + " where 0=1");
             final ResultSetMetaData metaData = rs.getMetaData();
             int count = metaData.getColumnCount();
             for (int i = 0; i < count; i++) {
