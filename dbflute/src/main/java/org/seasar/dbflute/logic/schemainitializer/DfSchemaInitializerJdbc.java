@@ -339,18 +339,15 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(metaInfo);
                     try {
                         statement.execute(dropMaterializedViewSql);
-                        _log.info("  --> " + dropMaterializedViewSql);
+                        _log.info("  --> (o) " + dropMaterializedViewSql);
                     } catch (SQLException ignored) {
-                        if (metaInfo.isTableTypeView()) {
-                            _log.info("The drop view failed to execute: msg=" + e.getMessage());
-                        } else {
-                            throw e;
-                        }
+                        _log.info("  --> (x) " + dropMaterializedViewSql);
+                        throw e;
                     }
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         } finally {
             if (statement != null) {
                 try {

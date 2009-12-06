@@ -53,6 +53,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     protected void dropTable(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         super.dropTable(conn, tableMetaInfoList);
         dropSequence(conn);
+        dropDbLink(conn);
     }
 
     @Override
@@ -109,6 +110,91 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             }
         } catch (SQLException e) {
             String msg = "Failed to drop sequences: " + sequenceNameList;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ignored) {
+                    _log.info("statement.close() threw the exception!", ignored);
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                    _log.info("rs.close() threw the exception!", ignored);
+                }
+            }
+        }
+    }
+
+    protected void dropDbLink(Connection conn) {
+        final List<String> dbLinkNameList = new ArrayList<String>();
+        final List<String> publicDbLinkNameList = new ArrayList<String>();
+        final String metaDataSql = "select * from ALL_DB_LINKS where OWNER = '" + _schema + "'";
+        Statement statement = null;
+        ResultSet rs = null;
+        try {
+            statement = conn.createStatement();
+            _log.info("...Executing helper SQL:" + ln() + metaDataSql);
+            rs = statement.executeQuery(metaDataSql);
+            while (rs.next()) {
+                final String dbLinkName = rs.getString("DB_LINK");
+                final String userName = rs.getString("USERNAME");
+                if (userName != null && userName.trim().length() > 0) {
+                    dbLinkNameList.add(dbLinkName);
+                } else {
+                    publicDbLinkNameList.add(dbLinkName);
+                }
+            }
+        } catch (SQLException continued) {
+            String msg = "*Failed to the SQL:" + ln();
+            msg = msg + (continued.getMessage() != null ? continued.getMessage() : null) + ln();
+            msg = msg + metaDataSql;
+            _log.info(metaDataSql);
+            return;
+        } finally {
+            if (statement != null) {
+                try {
+                    statement.close();
+                } catch (SQLException ignored) {
+                    _log.info("statement.close() threw the exception!", ignored);
+                }
+            }
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                    _log.info("rs.close() threw the exception!", ignored);
+                }
+            }
+        }
+        try {
+            statement = conn.createStatement();
+            for (String dbLinkName : dbLinkNameList) {
+                final String dropDbLinkSql = "drop database link " + _schema + "." + dbLinkName;
+                _log.info(dropDbLinkSql);
+                statement.execute(dropDbLinkSql);
+            }
+            for (String dbLinkName : publicDbLinkNameList) {
+                String dropDbLinkSql = "drop public database link " + _schema + "." + dbLinkName;
+                _log.info(dropDbLinkSql);
+                try {
+                    statement.execute(dropDbLinkSql);
+                } catch (SQLException e) {
+                    try {
+                        dropDbLinkSql = "drop database link " + _schema + "." + dbLinkName;
+                        statement.execute(dropDbLinkSql);
+                        _log.info("  --> (o) " + dropDbLinkSql);
+                    } catch (SQLException ignored) {
+                        _log.info("  --> (x) " + dropDbLinkSql);
+                        throw e;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            String msg = "Failed to drop DB links: " + dbLinkNameList;
             throw new IllegalStateException(msg, e);
         } finally {
             if (statement != null) {
