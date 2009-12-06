@@ -172,6 +172,63 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
+    //                                                                     Additional User
+    //                                                                     ===============
+    protected Map<String, Map<String, String>> _additionalUesrMap;
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Map<String, String>> getAdditionalUserMap() {
+        if (_additionalUesrMap != null) {
+            return _additionalUesrMap;
+        }
+        Object obj = getReplaceSchemaDefinitionMap().get("additionalUserMap");
+        if (obj == null) {
+            return new HashMap<String, Map<String, String>>();
+        }
+        if (!(obj instanceof Map<?, ?>)) {
+            String msg = "The type of the property 'additionalUserMap' should be Map: " + obj;
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        _additionalUesrMap = (Map<String, Map<String, String>>) obj;
+        return _additionalUesrMap;
+    }
+
+    protected Map<String, String> getAdditionalUserPropertyMap(String additonalUser) {
+        return getAdditionalUserMap().get(additonalUser);
+    }
+
+    public Connection createAdditionalUserConnection(String additonalUser) {
+        final Map<String, String> propertyMap = getAdditionalUserPropertyMap(additonalUser);
+        if (propertyMap == null) {
+            return null;
+        }
+        final String url;
+        {
+            String property = propertyMap.get("url");
+            if (property != null && property.trim().length() > 0) {
+                url = property;
+            } else {
+                url = getDatabaseProperties().getDatabaseUrl();
+            }
+        }
+        final String user = propertyMap.get("user");
+        final String password = propertyMap.get("password");
+        try {
+            final Connection conn = DriverManager.getConnection(url, user, password);
+            if (isAutoCommit()) {
+                conn.setAutoCommit(true);
+            }
+            if (isRollbackOnly()) {
+                conn.setReadOnly(true);
+            }
+            return conn;
+        } catch (SQLException e) {
+            String msg = "Failed to connect: url=" + url + ", user=" + user;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    // ===================================================================================
     //                                                                     Additional Drop
     //                                                                     ===============
     @SuppressWarnings("unchecked")
@@ -247,63 +304,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public boolean isAdditionalDropAllTable(Map<String, Object> additionalDropMap) {
         return isProperty("isDropAllTable", false, additionalDropMap);
-    }
-
-    // ===================================================================================
-    //                                                                     Additional User
-    //                                                                     ===============
-    protected Map<String, Map<String, String>> _additionalUesrMap;
-
-    @SuppressWarnings("unchecked")
-    public Map<String, Map<String, String>> getAdditionalUserMap() {
-        if (_additionalUesrMap != null) {
-            return _additionalUesrMap;
-        }
-        Object obj = getReplaceSchemaDefinitionMap().get("additionalUserMap");
-        if (obj == null) {
-            return new HashMap<String, Map<String, String>>();
-        }
-        if (!(obj instanceof Map<?, ?>)) {
-            String msg = "The type of the property 'additionalUserMap' should be Map: " + obj;
-            throw new DfIllegalPropertyTypeException(msg);
-        }
-        _additionalUesrMap = (Map<String, Map<String, String>>) obj;
-        return _additionalUesrMap;
-    }
-
-    protected Map<String, String> getAdditionalUserPropertyMap(String additonalUser) {
-        return getAdditionalUserMap().get(additonalUser);
-    }
-
-    public Connection createAdditionalUserConnection(String additonalUser) {
-        final Map<String, String> propertyMap = getAdditionalUserPropertyMap(additonalUser);
-        if (propertyMap == null) {
-            return null;
-        }
-        final String url;
-        {
-            String property = propertyMap.get("url");
-            if (property != null && property.trim().length() > 0) {
-                url = property;
-            } else {
-                url = getDatabaseProperties().getDatabaseUrl();
-            }
-        }
-        final String user = propertyMap.get("user");
-        final String password = propertyMap.get("password");
-        try {
-            final Connection conn = DriverManager.getConnection(url, user, password);
-            if (isAutoCommit()) {
-                conn.setAutoCommit(true);
-            }
-            if (isRollbackOnly()) {
-                conn.setReadOnly(true);
-            }
-            return conn;
-        } catch (SQLException e) {
-            String msg = "Failed to connect: url=" + url + ", user=" + user;
-            throw new IllegalStateException(msg, e);
-        }
     }
 
     // ===================================================================================
