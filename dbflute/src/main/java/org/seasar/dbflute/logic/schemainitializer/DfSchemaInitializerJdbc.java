@@ -341,9 +341,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(metaInfo);
                     try {
                         statement.execute(dropMaterializedViewSql);
-                        _log.info("  --> (retry:o) " + dropMaterializedViewSql);
+                        _log.info("  *retry (o) " + dropMaterializedViewSql);
                     } catch (SQLException ignored) {
-                        _log.info("  --> (retry:x) " + dropMaterializedViewSql);
+                        _log.info("  *retry (x) " + dropMaterializedViewSql);
                         throw e;
                     }
                 }
