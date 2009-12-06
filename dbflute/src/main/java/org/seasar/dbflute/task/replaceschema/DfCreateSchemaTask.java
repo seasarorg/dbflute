@@ -327,7 +327,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                     if (logSql.length() > 30) {
                         logSql = logSql.substring(0, 27) + "...";
                     }
-                    _log.info("...Skipping the SQL: " + logSql);
+                    _log.info("*Passed: " + logSql);
                     return false;
                 }
             }
