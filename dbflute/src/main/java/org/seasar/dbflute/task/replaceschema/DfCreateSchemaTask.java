@@ -8,18 +8,28 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.Map.Entry;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
+import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerDispatcher;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerExecute;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan.FireResult;
 import org.seasar.dbflute.logic.factory.DfSchemaInitializerFactory;
@@ -35,13 +45,19 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                                                          ==========
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfCreateSchemaTask.class);
-
     protected static final String LOG_PATH = "./log/create-schema.log";
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected boolean validTaskEndInformation = true;
+    protected boolean _validTaskEndInformation = true;
+
+    // -----------------------------------------------------
+    //                                           Change User
+    //                                           -----------
+    protected String _currentUser;
+    protected StringSet _goodByeUserSet = StringSet.createAsCaseInsensitive();
+    protected StringKeyMap<Connection> _changeUserConnectionMap = StringKeyMap.createAsCaseInsensitive();
 
     // ===================================================================================
     //                                                                             Execute
@@ -62,7 +78,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
     @Override
     protected boolean isValidTaskEndInformation() {
-        return validTaskEndInformation;
+        return _validTaskEndInformation;
     }
 
     // --------------------------------------------
@@ -166,6 +182,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         if (_log.isInfoEnabled()) {
             _log.info("");
         }
+        destroyChangeUserConnection();
     }
 
     protected void dumpFireResult(FireResult result) {
@@ -209,29 +226,124 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
     protected DfSqlFileRunner getSqlFileRunner(final DfRunnerInformation runInfo) {
         final DfReplaceSchemaProperties prop = getMyProperties();
-        return new DfSqlFileRunnerExecute(runInfo, getDataSource()) {
-            @Override
-            protected String filterSql(String sql) {
-                sql = super.filterSql(sql);
-                sql = prop.resolveFilterVariablesIfNeeds(sql);
-                return sql;
+        final DfSqlFileRunnerExecute execute = new DfSqlFileRunnerExecuteCreateSchema(runInfo, getDataSource());
+        execute.setDispatcher(new DfSqlFileRunnerDispatcher() {
+            public boolean dispatch(File sqlFile, Statement stmt, String sql) throws SQLException {
+                final boolean checkUser = analyzeCheckUser(sql);
+                if (_currentUser == null && _currentUser.trim().length() == 0) {
+                    return false;
+                }
+                Connection conn = _changeUserConnectionMap.get(_currentUser);
+                if (conn == null) {
+                    if (!_changeUserConnectionMap.isEmpty()) {
+                        _log.info("...Creating a connection to " + _currentUser);
+                    }
+                    conn = prop.createAdditionalUserConnection(_currentUser);
+                    if (conn != null) {
+                        _changeUserConnectionMap.put(_currentUser, conn);
+                    }
+                    if (conn == null) {
+                        _log.info("*The user '" + _currentUser + "' is good-bye!");
+                        _goodByeUserSet.add(_currentUser);
+                        return true;
+                    }
+                }
+                Statement dispatchStmt = null;
+                try {
+                    dispatchStmt = conn.createStatement();
+                } catch (SQLException e) {
+                    throw e;
+                }
+                try {
+                    dispatchStmt.execute(sql);
+                    return true;
+                } catch (SQLException e) {
+                    if (checkUser) {
+                        _log.info("*The user '" + _currentUser + "' is good-bye!");
+                        _goodByeUserSet.add(_currentUser);
+                        return true;
+                    }
+                    throw e;
+                } finally {
+                    if (dispatchStmt != null) {
+                        dispatchStmt.close();
+                    }
+                }
             }
+        });
+        return execute;
+    }
 
-            @Override
-            protected boolean isSqlTrimAndRemoveLineSeparator() {
-                return true;
-            }
+    protected class DfSqlFileRunnerExecuteCreateSchema extends DfSqlFileRunnerExecute {
+        public DfSqlFileRunnerExecuteCreateSchema(DfRunnerInformation runInfo, DataSource dataSource) {
+            super(runInfo, dataSource);
+        }
 
-            @Override
-            protected boolean isHandlingCommentOnLineSeparator() {
-                return true;
-            }
+        @Override
+        protected String filterSql(String sql) {
+            sql = super.filterSql(sql);
+            sql = getMyProperties().resolveFilterVariablesIfNeeds(sql);
+            return sql;
+        }
 
-            @Override
-            protected String getTerminater4Tool() {
-                return resolveTerminater4Tool();
+        @Override
+        protected boolean isSqlTrimAndRemoveLineSeparator() {
+            return true;
+        }
+
+        @Override
+        protected boolean isHandlingCommentOnLineSeparator() {
+            return true;
+        }
+
+        @Override
+        protected String getTerminater4Tool() {
+            return resolveTerminater4Tool();
+        }
+
+        @Override
+        protected boolean isTargetSql(String sql) {
+            final String changeUesr = analyzeChangeUser(sql);
+            if (changeUesr != null) {
+                _currentUser = changeUesr;
             }
-        };
+            final boolean backToMainUser = analyzeBackToMainUser(sql);
+            if (backToMainUser) {
+                _currentUser = null;
+            }
+            if (_currentUser != null && _currentUser.trim().length() > 0) {
+                if (_goodByeUserSet.contains(_currentUser)) {
+                    return false;
+                }
+            }
+            return super.isTargetSql(sql);
+        }
+    }
+
+    protected String analyzeChangeUser(String sql) {
+        final String beginMark = "#df:changeUser(";
+        final int markIndex = sql.indexOf(beginMark);
+        if (markIndex < 0) {
+            return null;
+        }
+        final String rear = sql.substring(markIndex + beginMark.length());
+        final int endIndex = rear.indexOf(")");
+        if (endIndex < 0) {
+            String msg = "The command changeUser should have its end mark ')':";
+            msg = msg + " example=[#df:changeUser(system)#], sql=" + sql;
+            throw new IllegalStateException(msg);
+        }
+        return rear.substring(0, endIndex).trim();
+    }
+
+    protected boolean analyzeCheckUser(String sql) {
+        final String mark = "#df:checkUser()#";
+        return sql.contains(mark);
+    }
+
+    protected boolean analyzeBackToMainUser(String sql) {
+        final String mark = "#df:backToMainUser()#";
+        return sql.contains(mark);
     }
 
     protected List<File> getReplaceSchemaSqlFileList() {
@@ -289,6 +401,27 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         return sqlFileName.substring(sqlFileName.lastIndexOf(".") + 1);
     }
 
+    protected void destroyChangeUserConnection() {
+        final Set<Entry<String, Connection>> entrySet = _changeUserConnectionMap.entrySet();
+        if (!_changeUserConnectionMap.isEmpty()) {
+            _log.info("...Closing connections to change users");
+        }
+        for (Entry<String, Connection> entry : entrySet) {
+            final String changeUser = entry.getKey();
+            final Connection conn = entry.getValue();
+            try {
+                conn.close();
+            } catch (SQLException continued) {
+                String msg = "Failed to close the connection for " + changeUser + ":";
+                msg = msg + " message=" + continued.getMessage();
+                _log.info(msg);
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected DfReplaceSchemaProperties getMyProperties() {
         return DfBuildProperties.getInstance().getReplaceSchemaProperties();
     }
@@ -304,7 +437,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                                                            Accessor
     //                                                                            ========
     public void setValidTaskEndInformation(String validTaskEndInformation) {
-        this.validTaskEndInformation = validTaskEndInformation != null
+        this._validTaskEndInformation = validTaskEndInformation != null
                 && validTaskEndInformation.trim().equalsIgnoreCase("true");
         ;
     }

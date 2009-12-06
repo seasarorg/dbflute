@@ -302,13 +302,6 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             msg = msg + " schema=" + schema;
             throw new IllegalStateException(msg);
         }
-        final String driver = getDatabaseDriver();
-        try {
-            Class.forName(driver);
-        } catch (ClassNotFoundException e) {
-            String msg = "The driver was not found: " + driver;
-            throw new IllegalStateException(msg, e);
-        }
         final String url = getAdditionalSchemaSupplementaryConnectionUrl(schema);
         final String user = getAdditionalSchemaSupplementaryConnectionUser(schema);
         final String password = getAdditionalSchemaSupplementaryConnectionPassword(schema);
@@ -573,10 +566,13 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+        final String url = getDatabaseUrl();
+        final String user = getDatabaseUser();
         try {
-            return DriverManager.getConnection(getDatabaseUrl(), getDatabaseUser(), getDatabasePassword());
+            return DriverManager.getConnection(url, user, getDatabasePassword());
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            String msg = "Failed to connect: url=" + url + ", user=" + user;
+            throw new IllegalStateException(msg, e);
         }
     }
 }
