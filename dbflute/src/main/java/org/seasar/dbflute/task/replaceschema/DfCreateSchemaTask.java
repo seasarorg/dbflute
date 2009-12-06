@@ -243,7 +243,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                         _changeUserConnectionMap.put(_currentUser, conn);
                     }
                     if (conn == null) {
-                        _log.info("...Saying good-bye to the user '" + _currentUser + "'!");
+                        _log.info("...Saying good-bye to the user '" + _currentUser + "'");
                         _goodByeUserSet.add(_currentUser);
                         return true;
                     }
@@ -259,7 +259,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                     return true;
                 } catch (SQLException e) {
                     if (checkUser) {
-                        _log.info("*The user '" + _currentUser + "' is good-bye!");
+                        _log.info("...Saying good-bye to the user '" + _currentUser + "'");
                         _goodByeUserSet.add(_currentUser);
                         return true;
                     }
@@ -324,8 +324,8 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             if (_currentUser != null && _currentUser.trim().length() > 0) {
                 if (_goodByeUserSet.contains(_currentUser)) {
                     String logSql = sql;
-                    if (logSql.length() > 20) {
-                        logSql = logSql.substring(0, 17) + "...";
+                    if (logSql.length() > 30) {
+                        logSql = logSql.substring(0, 27) + "...";
                     }
                     _log.info("...Skipping the SQL: " + logSql);
                     return false;
