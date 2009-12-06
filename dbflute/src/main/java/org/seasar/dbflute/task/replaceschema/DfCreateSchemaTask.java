@@ -323,6 +323,11 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             }
             if (_currentUser != null && _currentUser.trim().length() > 0) {
                 if (_goodByeUserSet.contains(_currentUser)) {
+                    String logSql = sql;
+                    if (logSql.length() > 20) {
+                        logSql = logSql.substring(0, 17) + "...";
+                    }
+                    _log.info("...Skipping the SQL: " + logSql);
                     return false;
                 }
             }
