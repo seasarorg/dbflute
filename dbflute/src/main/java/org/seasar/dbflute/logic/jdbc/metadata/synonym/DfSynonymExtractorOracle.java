@@ -106,13 +106,25 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                     continue;
                 }
 
+                final DfSynonymMetaInfo info = new DfSynonymMetaInfo();
+
+                // Basic
+                info.setSynonymOwner(synonymOwner);
+                info.setSynonymName(synonymName);
+                info.setTableOwner(tableOwner);
+                info.setTableName(tableName);
+                info.setDbLinkName(dbLinkName);
+
+                // Select-able?
+                judgeSynonymSelectable(info);
+
                 if (dbLinkName != null && dbLinkName.trim().length() > 0) {
                     // = = = = = = = = = = = = 
                     // It's a DB Link Synonym!
                     // = = = = = = = = = = = = 
                     try {
                         final String synonymKey = buildSynonymMapKey(synonymOwner, synonymName);
-                        synonymMap.put(synonymKey, setupDBLinkSynonym(conn, synonymName, tableName, dbLinkName));
+                        synonymMap.put(synonymKey, setupDBLinkSynonym(conn, info));
                     } catch (Exception continued) {
                         _log.info("Failed to get meta data of " + synonymName + ": " + continued.getMessage());
                     }
@@ -125,17 +137,6 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 // = = = = = = = = = = = = 
                 // It's a normal Synonym!
                 // = = = = = = = = = = = = 
-                final DfSynonymMetaInfo info = new DfSynonymMetaInfo();
-
-                // Basic
-                info.setSynonymOwner(synonymOwner);
-                info.setSynonymName(synonymName);
-                info.setTableOwner(tableOwner);
-                info.setTableName(tableName);
-
-                // Select-able?
-                judgeSynonymSelectable(info);
-
                 // PK, ID, UQ, FK, Index
                 try {
                     setupBasicConstraintInfo(info, tableOwner, tableName, conn);
@@ -238,16 +239,10 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
     }
 
-    protected DfSynonymMetaInfo setupDBLinkSynonym(Connection conn, String synonymName, String tableName,
-            String dbLinkName) throws SQLException {
-        final DfSynonymMetaInfo info = new DfSynonymMetaInfo();
-        info.setSynonymName(synonymName);
-        info.setTableName(tableName);
-        info.setDbLinkName(dbLinkName);
-
-        // Select-able?
-        judgeSynonymSelectable(info);
-
+    protected DfSynonymMetaInfo setupDBLinkSynonym(Connection conn, DfSynonymMetaInfo info) throws SQLException {
+        final String synonymName = info.getSynonymName();
+        final String tableName = info.getTableName();
+        final String dbLinkName = info.getDbLinkName();
         final List<DfColumnMetaInfo> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymName);
         info.setColumnMetaInfoList4DBLink(columnMetaInfoList);
         final List<String> primaryKeyNameList = getDBLinkSynonymPKList(conn, tableName, dbLinkName);
