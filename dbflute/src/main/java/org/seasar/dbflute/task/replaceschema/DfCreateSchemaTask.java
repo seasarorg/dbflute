@@ -280,6 +280,12 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         }
 
         @Override
+        public void prepare(File sqlFile) {
+            super.prepare(sqlFile);
+            _currentUser = null; // because the max scope of change user is one SQL file
+        }
+
+        @Override
         protected String filterSql(String sql) {
             sql = super.filterSql(sql);
             sql = getMyProperties().resolveFilterVariablesIfNeeds(sql);

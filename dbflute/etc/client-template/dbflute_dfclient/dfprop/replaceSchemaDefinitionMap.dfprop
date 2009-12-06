@@ -12,6 +12,7 @@
 # o isDropGenerateTableOnly: (NotRequired - Default false)
 # o filterVariablesMap: (NotRequired - Default 'map:{}')
 # o additionalDropMapList: (NotRequired - Default 'list:{}')
+# o additionalUserMap: (NotRequired - Default 'map:{}')
 # o isSuppressTruncateTable: (NotRequired - Default false)
 # o isSuppressDropForeignKey: (NotRequired - Default false)
 # o isSuppressDropTable: (NotRequired - Default false)
@@ -36,6 +37,9 @@
 #             ; tableTargetList = list:{BBB}
 #             ; isDropAllTable = false
 #         }
+#     }
+#     ; additionalUserMap = map:{
+#         ; system = map:{user=system ; password=system}
 #     }
 #     ; isSuppressTruncateTable = false
 #     ; isSuppressDropForeignKey = false
@@ -115,10 +119,10 @@ map:{
     #  You can drop additional other schemas.
     #  Elements of this map are as below:
     #   o schema: (Required)
-    #   o objectTypeTargetList:: (NotRequired - Default 'list{TABLE;VIEW}')
-    #   o tableExceptList:: (NotRequired - Default 'list{}')
-    #   o tableTargetList:: (NotRequired - Default 'list{}')
-    #   o isDropAllTable:: (NotRequired - Default false)
+    #   o objectTypeTargetList: (NotRequired - Default 'list{TABLE;VIEW}')
+    #   o tableExceptList: (NotRequired - Default 'list{}')
+    #   o tableTargetList: (NotRequired - Default 'list{}')
+    #   o isDropAllTable: (NotRequired - Default false)
     #
     #; additionalDropMapList = list:{
     #    ; map:{
@@ -127,6 +131,24 @@ map:{
     #        ; tableExceptList = list:{FULL_NAME ; prefix:PREFIX_ ; ...}
     #        ; tableTargetList = list:{FULL_NAME ; prefix:PREFIX_ ; ...}
     #        ; isDropAllTable = false
+    #    }
+    #}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o additionalUserMap: (NotRequired - Default 'map:{}')
+    #  You can set additional users.
+    #  Elements of this map are as below:
+    #   o key of map: User Definition Name (userDefName)
+    #   o url: (NotRequired - Default same as one of main schema)
+    #   o user: (Required)
+    #   o password: (NotRequired - Default '')
+    #
+    #; additionalUserMap = map:{
+    #    ; system = map:{
+    #        #; url = ...
+    #        ; user = system
+    #        ; password = system
     #    }
     #}
     # - - - - - - - - - -/
