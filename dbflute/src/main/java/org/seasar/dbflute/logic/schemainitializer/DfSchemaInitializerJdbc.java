@@ -324,11 +324,13 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     protected void callbackDropTableByJdbc(Connection connection, List<DfTableMetaInfo> tableMetaInfoList,
             DfDropTableByJdbcCallback callback) {
+        String currentSql = null;
         Statement statement = null;
         try {
             statement = connection.createStatement();
             for (DfTableMetaInfo metaInfo : tableMetaInfoList) {
                 final String dropTableSql = callback.buildDropTableSql(metaInfo);
+                currentSql = dropTableSql;
                 _log.info(dropTableSql);
                 try {
                     statement.execute(dropTableSql);
@@ -339,15 +341,16 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                     final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(metaInfo);
                     try {
                         statement.execute(dropMaterializedViewSql);
-                        _log.info("  --> (o) " + dropMaterializedViewSql);
+                        _log.info("  --> (retry:o) " + dropMaterializedViewSql);
                     } catch (SQLException ignored) {
-                        _log.info("  --> (x) " + dropMaterializedViewSql);
+                        _log.info("  --> (retry:x) " + dropMaterializedViewSql);
                         throw e;
                     }
                 }
             }
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            String msg = "Failed to execute the SQL: " + currentSql;
+            throw new IllegalStateException(msg, e);
         } finally {
             if (statement != null) {
                 try {
