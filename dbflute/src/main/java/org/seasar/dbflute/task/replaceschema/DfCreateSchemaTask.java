@@ -243,7 +243,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                         _changeUserConnectionMap.put(_currentUser, conn);
                     }
                     if (conn == null) {
-                        _log.info("*The user '" + _currentUser + "' is good-bye!");
+                        _log.info("...Saying good-bye to the user '" + _currentUser + "'!");
                         _goodByeUserSet.add(_currentUser);
                         return true;
                     }
@@ -282,7 +282,10 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         @Override
         public void prepare(File sqlFile) {
             super.prepare(sqlFile);
-            _currentUser = null; // because the max scope of change user is one SQL file
+            if (_currentUser != null) {
+                _log.info("...Coming back to the main user from the user '" + _currentUser + "'");
+                _currentUser = null; // because the max scope of change user is one SQL file
+            }
         }
 
         @Override
@@ -315,6 +318,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             }
             final boolean backToMainUser = analyzeBackToMainUser(sql);
             if (backToMainUser) {
+                _log.info("...Coming back to the main user from the user '" + _currentUser + "'");
                 _currentUser = null;
             }
             if (_currentUser != null && _currentUser.trim().length() > 0) {
