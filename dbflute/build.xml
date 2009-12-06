@@ -335,5 +335,6 @@
 	  	<copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.buri.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	  	<copy todir="${dbflute.doma.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 </project>
