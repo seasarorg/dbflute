@@ -55,16 +55,22 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
      * @param sql SQL. (NotNull)
      */
     protected void execSQL(String sql) {
+        boolean lazyConnectFailed = false;
         try {
             final boolean dispatched = dispatch(sql);
             if (!dispatched) {
-                lazyConnectIfNeeds();
+                try {
+                    lazyConnectIfNeeds();
+                } catch (SQLException e) {
+                    lazyConnectFailed = true;
+                    throw e;
+                }
                 checkStatement(sql);
                 _currentStatement.execute(sql);
             }
             _goodSqlCount++;
         } catch (SQLException e) {
-            if (_runInfo.isErrorContinue()) {
+            if (!lazyConnectFailed && _runInfo.isErrorContinue()) {
                 showContinueWarnLog(e, sql);
                 _result.addErrorContinuedSql(e, sql);
                 return;
