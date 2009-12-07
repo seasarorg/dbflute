@@ -52,8 +52,8 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected List<String> _schemaList;
-    protected String _schemaName;
+    protected List<String> _schemaNameList;
+    protected String _mainSchemaName;
 
     // TODO @jflute - in development
 
@@ -72,7 +72,7 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
             conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
             final List<DfProcedureMetaInfo> procedureList = procedureHandler.getAvailableProcedureList(metaData,
-                    _schemaName);
+                    _mainSchemaName);
             final StringKeyMap<DfProcedureMetaInfo> procedureMap = StringKeyMap.createAsCaseInsensitive();
             for (DfProcedureMetaInfo procedureMetaInfo : procedureList) {
                 final String procedureSqlName = procedureHandler.buildProcedureFullName(procedureMetaInfo);
@@ -161,7 +161,7 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     protected String buildSynonymSelect() {
         final StringBuilder sb = new StringBuilder();
         int count = 0;
-        for (String schema : _schemaList) {
+        for (String schema : _schemaNameList) {
             if (count > 0) {
                 sb.append(", ");
             }
@@ -199,10 +199,10 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     }
 
     public void setSchemaList(List<String> schemaList) {
-        this._schemaList = schemaList;
+        this._schemaNameList = schemaList;
     }
 
     public void setSchemaName(String schemaName) {
-        this._schemaName = schemaName;
+        this._mainSchemaName = schemaName;
     }
 }
