@@ -831,21 +831,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
-        final String procedureCatalog = metaInfo.getProcedureCatalog();
-        final StringBuilder sb = new StringBuilder();
-        final String procedureSchema = metaInfo.getProcedureSchema();
-        if (procedureSchema != null && procedureSchema.trim().length() > 0) {
-            if (getDatabaseInfoProperties().isAdditionalSchema(procedureSchema)) {
-                sb.append(procedureSchema).append(".");
-            }
-        }
-        if (procedureCatalog != null && procedureCatalog.trim().length() > 0) {
-            if (getBasicProperties().isDatabaseOracle()) { // needs to confirm other DB.
-                sb.append(procedureCatalog).append(".");
-            }
-        }
-        final String procedureName = metaInfo.getProcedureName();
-        return sb.append(procedureName).toString();
+        return new DfProcedureHandler().buildProcedureSqlName(metaInfo);
     }
 
     protected boolean isAllUpperCase(String name) {

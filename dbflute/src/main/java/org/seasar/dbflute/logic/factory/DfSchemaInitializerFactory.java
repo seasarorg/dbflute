@@ -133,6 +133,7 @@ public class DfSchemaInitializerFactory {
         initializer.setSuppressDropForeignKey(_replaceSchemaProperties.isSuppressDropForeignKey());
         initializer.setSuppressDropTable(_replaceSchemaProperties.isSuppressDropTable());
         initializer.setSuppressDropSequence(_replaceSchemaProperties.isSuppressDropSequence());
+        initializer.setSuppressDropProcedure(_replaceSchemaProperties.isSuppressDropProcedure());
         initializer.setSuppressDropDBLink(_replaceSchemaProperties.isSuppressDropDBLink());
     }
 

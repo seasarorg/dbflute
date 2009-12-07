@@ -180,12 +180,12 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     protected void initializeDatabaseInfo() {
-        _driver = getDatabaseInfoProperties().getDatabaseDriver();
-        _url = getDatabaseInfoProperties().getDatabaseUrl();
-        _userId = getDatabaseInfoProperties().getDatabaseUser();
-        _schema = getDatabaseInfoProperties().getDatabaseSchema();
-        _password = getDatabaseInfoProperties().getDatabasePassword();
-        _connectionProperties = getDatabaseInfoProperties().getDatabaseConnectionProperties();
+        _driver = getDatabaseProperties().getDatabaseDriver();
+        _url = getDatabaseProperties().getDatabaseUrl();
+        _userId = getDatabaseProperties().getDatabaseUser();
+        _schema = getDatabaseProperties().getDatabaseSchema();
+        _password = getDatabaseProperties().getDatabasePassword();
+        _connectionProperties = getDatabaseProperties().getDatabaseConnectionProperties();
     }
 
     abstract protected void doExecute();
@@ -622,7 +622,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return getProperties().getBasicProperties();
     }
 
-    protected DfDatabaseProperties getDatabaseInfoProperties() {
+    protected DfDatabaseProperties getDatabaseProperties() {
         return getProperties().getDatabaseProperties();
     }
 

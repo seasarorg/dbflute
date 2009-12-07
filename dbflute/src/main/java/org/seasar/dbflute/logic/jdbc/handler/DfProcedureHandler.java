@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
@@ -122,8 +123,9 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 setupProcedureColumnMetaInfo(procedureMetaInfo, columnRs);
             }
         } catch (SQLException e) {
-            String msg = "SQLException occured: schemaName=" + schemaName;
-            throw new IllegalStateException(msg);
+            String msg = "Failed to get a list of procedures:";
+            msg = msg + " schemaName=" + schemaName;
+            throw new SQLFailureException(msg, e);
         } finally {
             if (columnResultSet != null) {
                 try {
@@ -229,5 +231,24 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             procedureColumnMetaInfo.setColumnComment(columnComment);
             procedureMetaInfo.addProcedureColumnMetaInfo(procedureColumnMetaInfo);
         }
+    }
+
+    public String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
+        final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
+        final String procedureCatalog = metaInfo.getProcedureCatalog();
+        final StringBuilder sb = new StringBuilder();
+        final String procedureSchema = metaInfo.getProcedureSchema();
+        if (procedureSchema != null && procedureSchema.trim().length() > 0) {
+            if (databaseProperties.isAdditionalSchema(procedureSchema)) {
+                sb.append(procedureSchema).append(".");
+            }
+        }
+        if (procedureCatalog != null && procedureCatalog.trim().length() > 0) {
+            if (getBasicProperties().isDatabaseOracle()) { // needs to confirm other DB.
+                sb.append(procedureCatalog).append(".");
+            }
+        }
+        final String procedureName = metaInfo.getProcedureName();
+        return sb.append(procedureName).toString();
     }
 }

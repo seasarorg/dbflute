@@ -325,6 +325,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return isProperty("isSuppressDropSequence", false, getReplaceSchemaDefinitionMap());
     }
 
+    public boolean isSuppressDropProcedure() {
+        return isProperty("isSuppressDropProcedure", false, getReplaceSchemaDefinitionMap());
+    }
+
     public boolean isSuppressDropDBLink() {
         return isProperty("isSuppressDropDBLink", false, getReplaceSchemaDefinitionMap());
     }

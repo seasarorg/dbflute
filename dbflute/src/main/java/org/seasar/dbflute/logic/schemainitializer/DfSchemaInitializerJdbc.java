@@ -28,9 +28,12 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.logic.jdbc.handler.DfForeignKeyHandler;
+import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -48,30 +51,21 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-
     protected String _schema;
-
     protected boolean _tableNameWithSchema;
-
     protected List<String> _dropObjectTypeList;
-
     protected List<String> _dropTableTargetList;
-
     protected List<String> _dropTableExceptList;
-
     protected boolean _dropGenerateTableOnly;
 
     // /= = = = = = = = = = = = =
     // Detail execution handling!
     // = = = = = = = = = =/
     protected boolean _suppressTruncateTable;
-
     protected boolean _suppressDropForeignKey;
-
     protected boolean _suppressDropTable;
-
     protected boolean _suppressDropSequence;
-
+    protected boolean _suppressDropProcedure;
     protected boolean _suppressDropDBLink;
 
     // ===================================================================================
@@ -126,7 +120,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             }
             executeObject(conn, tableMetaInfoList);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            String msg = "Failed to the initialize schema: " + _schema;
+            throw new SQLFailureException(msg, e);
         } finally {
             if (conn != null) {
                 try {
@@ -159,19 +154,16 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         } else {
             _log.info("*Suppress dropping sequences");
         }
+        if (!_suppressDropProcedure) {
+            dropProcedures(conn, tableMetaInfoList);
+        } else {
+            _log.info("*Suppress dropping procedures");
+        }
         if (!_suppressDropDBLink) {
             dropDBLink(conn, tableMetaInfoList);
         } else {
             _log.info("*Suppress dropping DB links");
         }
-    }
-
-    protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
-        // override if it needs
-    }
-
-    protected void dropDBLink(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
-        // override if it needs
     }
 
     // ===================================================================================
@@ -284,7 +276,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            String msg = "Failed to drop foreign keys!";
+            throw new SQLFailureException(msg, e);
         } finally {
             if (statement != null) {
                 try {
@@ -319,7 +312,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         sortedList.addAll(viewList);
         sortedList.addAll(otherList);
 
-        final DfDropTableByJdbcCallback callback = new DfDropTableByJdbcCallback() {
+        callbackDropTableByJdbc(conn, sortedList, new DfDropTableByJdbcCallback() {
             public String buildDropTableSql(DfTableMetaInfo metaInfo) {
                 final StringBuilder sb = new StringBuilder();
                 setupDropTable(sb, metaInfo);
@@ -331,8 +324,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 sb.append("drop materialized view ").append(metaInfo.getTableName());
                 return sb.toString();
             }
-        };
-        callbackDropTableByJdbc(conn, sortedList, callback);
+        });
     }
 
     protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
@@ -350,25 +342,25 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         public String buildDropMaterializedViewSql(DfTableMetaInfo metaInfo);
     }
 
-    protected void callbackDropTableByJdbc(Connection connection, List<DfTableMetaInfo> tableMetaInfoList,
+    protected void callbackDropTableByJdbc(Connection conn, List<DfTableMetaInfo> tableMetaInfoList,
             DfDropTableByJdbcCallback callback) {
         String currentSql = null;
-        Statement statement = null;
+        Statement stmt = null;
         try {
-            statement = connection.createStatement();
+            stmt = conn.createStatement();
             for (DfTableMetaInfo metaInfo : tableMetaInfoList) {
                 final String dropTableSql = callback.buildDropTableSql(metaInfo);
                 currentSql = dropTableSql;
                 _log.info(dropTableSql);
                 try {
-                    statement.execute(dropTableSql);
+                    stmt.execute(dropTableSql);
                 } catch (SQLException e) {
                     // = = = = = = = = = = = =
                     // for materialized view!
                     // = = = = = = = = = = = =
                     final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(metaInfo);
                     try {
-                        statement.execute(dropMaterializedViewSql);
+                        stmt.execute(dropMaterializedViewSql);
                         _log.info("  (o) retry:  " + dropMaterializedViewSql);
                     } catch (SQLException ignored) {
                         _log.info("  (x) retry: " + dropMaterializedViewSql);
@@ -377,17 +369,87 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 }
             }
         } catch (SQLException e) {
-            String msg = "Failed to execute the SQL: " + currentSql;
-            throw new IllegalStateException(msg, e);
+            String msg = "Failed to drop the table: " + currentSql;
+            throw new SQLFailureException(msg, e);
         } finally {
-            if (statement != null) {
+            if (stmt != null) {
                 try {
-                    statement.close();
+                    stmt.close();
                 } catch (SQLException ignored) {
-                    _log.info("statement.close() threw the exception!", ignored);
+                    _log.info("Statement#close() threw the exception!", ignored);
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                       Drop Sequence
+    //                                                                       =============
+    protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        // override if it needs
+    }
+
+    // ===================================================================================
+    //                                                                      Drop Procedure
+    //                                                                      ==============
+    protected void dropProcedures(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        final DfProcedureHandler handler = new DfProcedureHandler();
+        DatabaseMetaData metaData;
+        try {
+            metaData = conn.getMetaData();
+        } catch (SQLException e) {
+            String msg = "Failed to get meta data of the connection:";
+            msg = msg + " connection=" + conn;
+            throw new SQLFailureException(msg, e);
+        }
+        final List<DfProcedureMetaInfo> procedureList = handler.getPlainProcedureList(metaData, _schema);
+        callbackDropProcedureByJdbc(conn, procedureList, new DfDropProcedureByJdbcCallback() {
+            public String buildDropProcedureSql(DfProcedureMetaInfo metaInfo) {
+                final String procedureSqlName = handler.buildProcedureSqlName(metaInfo);
+                return "drop procedure " + procedureSqlName;
+            }
+        });
+    }
+
+    protected static interface DfDropProcedureByJdbcCallback {
+        String buildDropProcedureSql(DfProcedureMetaInfo metaInfo);
+    }
+
+    protected void callbackDropProcedureByJdbc(Connection conn, List<DfProcedureMetaInfo> procedureMetaInfoList,
+            DfDropProcedureByJdbcCallback callback) {
+        String currentSql = null;
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            for (DfProcedureMetaInfo metaInfo : procedureMetaInfoList) {
+                final String procedureSchema = metaInfo.getProcedureSchema();
+                if (_schema != null && !_schema.equalsIgnoreCase(procedureSchema)) {
+                    continue;
+                }
+                final String dropProcedureSql = callback.buildDropProcedureSql(metaInfo);
+                currentSql = dropProcedureSql;
+                _log.info(dropProcedureSql);
+                stmt.execute(dropProcedureSql);
+            }
+        } catch (SQLException e) {
+            String msg = "Failed to drop the table: " + currentSql;
+            throw new SQLFailureException(msg, e);
+        } finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException ignored) {
+                    _log.info("Statement#close() threw the exception!", ignored);
+                }
+            }
+        }
+    }
+
+    // ===================================================================================
+    //                                                                        Drop DB Link
+    //                                                                        ============
+    protected void dropDBLink(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        // override if it needs
     }
 
     // ===================================================================================
@@ -476,6 +538,14 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setSuppressDropSequence(boolean suppressDropSequence) {
         this._suppressDropSequence = suppressDropSequence;
+    }
+
+    public boolean isSuppressDropProcedure() {
+        return _suppressDropProcedure;
+    }
+
+    public void setSuppressDropProcedure(boolean suppressDropProcedure) {
+        this._suppressDropProcedure = suppressDropProcedure;
     }
 
     public boolean isSuppressDropDBLink() {

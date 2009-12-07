@@ -17,6 +17,7 @@
 # o isSuppressDropForeignKey: (NotRequired - Default false)
 # o isSuppressDropTable: (NotRequired - Default false)
 # o isSuppressDropSequence: (NotRequired - Default false)
+# o isSuppressDropProcedure: (NotRequired - Default false)
 # o isSuppressDropDBLink: (NotRequired - Default false)
 # 
 # Example:
@@ -45,6 +46,7 @@
 #     ; isSuppressDropForeignKey = false
 #     ; isSuppressDropTable = false
 #     ; isSuppressDropSequence = false
+#     ; isSuppressDropProcedure = false
 #     ; isSuppressDropDBLink = false
 # }
 #
@@ -179,6 +181,13 @@ map:{
     #  You can suppress dropping sequences at initializing schema.
     # 
     #; isSuppressDropSequence = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isSuppressDropProcedure: (NotRequired - Default false)
+    #  You can suppress dropping procedures at initializing schema.
+    # 
+    #; isSuppressDropProcedure = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
