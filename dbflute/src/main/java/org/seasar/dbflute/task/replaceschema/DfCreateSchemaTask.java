@@ -87,8 +87,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     protected void doExecute() {
         _log.info("");
         _log.info("{Replace Schema Properties}");
-        _log.info("autoCommit        = " + getMyProperties().isAutoCommit());
-        _log.info("rollbackOnly      = " + getMyProperties().isRollbackOnly());
         _log.info("errorContinue     = " + getMyProperties().isErrorContinue());
         _log.info("sqlFileEncoding   = " + getMyProperties().getSqlFileEncoding());
         initializeSchema();
@@ -179,9 +177,9 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
         runInfo.setEncoding(getReplaceSchemaSqlFileEncoding());
-        runInfo.setAutoCommit(getMyProperties().isAutoCommit());
+        runInfo.setAutoCommit(true);
         runInfo.setErrorContinue(getMyProperties().isErrorContinue());
-        runInfo.setRollbackOnly(getMyProperties().isRollbackOnly());
+        runInfo.setRollbackOnly(false);
         return runInfo;
     }
 

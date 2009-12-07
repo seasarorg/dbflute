@@ -215,12 +215,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final String password = propertyMap.get("password");
         try {
             final Connection conn = DriverManager.getConnection(url, user, password);
-            if (isAutoCommit()) {
-                conn.setAutoCommit(true);
-            }
-            if (isRollbackOnly()) {
-                conn.setReadOnly(true);
-            }
+            conn.setAutoCommit(true);
             return conn;
         } catch (SQLException e) {
             String msg = "Failed to connect: url=" + url + ", user=" + user;
@@ -336,14 +331,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                        Other Closet
     //                                                                        ============
-    public boolean isAutoCommit() { // It's closet! No useful!
-        return isProperty("isAutoCommit", true, getReplaceSchemaDefinitionMap());
-    }
-
-    public boolean isRollbackOnly() { // It's closet! No useful!
-        return isProperty("isRollbackOnly", false, getReplaceSchemaDefinitionMap());
-    }
-
     public boolean isErrorContinue() { // It's closet!
         return isProperty("isErrorContinue", true, getReplaceSchemaDefinitionMap());
     }

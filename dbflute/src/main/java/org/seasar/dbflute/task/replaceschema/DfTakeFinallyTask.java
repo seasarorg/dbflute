@@ -86,9 +86,9 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         runInfo.setUser(_userId);
         runInfo.setPassword(_password);
         runInfo.setEncoding(getReplaceSchemaSqlFileEncoding());
-        runInfo.setAutoCommit(getMyProperties().isAutoCommit());
+        runInfo.setAutoCommit(true);
         runInfo.setErrorContinue(getMyProperties().isErrorContinue());
-        runInfo.setRollbackOnly(getMyProperties().isRollbackOnly());
+        runInfo.setRollbackOnly(false);
         return runInfo;
     }
 

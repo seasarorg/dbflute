@@ -83,7 +83,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         _goodSqlCount = 0;
         _totalSqlCount = 0;
         if (_sqlFile == null) {
-            throw new BuildException("Attribute[_srcFile] must not be null.");
+            String msg = "The attribute '_srcFile' should not be null.";
+            throw new IllegalStateException(msg);
         }
 
         String currentSql = null;
@@ -104,19 +105,20 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 traceSql(realSql);
                 execSQL(realSql);
             }
-            Boolean autoCommit = null;
-            try {
-                checkConnection();
-                autoCommit = _currentConn.getAutoCommit();
-            } catch (SQLException continued) {
-                // Because it it possible that the connection would have already closed.
-                _log.warn("Connection#getAutoCommit() said: " + continued.getMessage());
-            }
-            if (autoCommit != null && !autoCommit) {
-                if (_runInfo.isRollbackOnly()) {
-                    _currentConn.rollback();
-                } else {
-                    _currentConn.commit();
+            if (_currentConn != null) {
+                Boolean autoCommit = null;
+                try {
+                    autoCommit = _currentConn.getAutoCommit();
+                } catch (SQLException continued) {
+                    // Because it it possible that the connection would have already closed.
+                    _log.warn("Connection#getAutoCommit() said: " + continued.getMessage());
+                }
+                if (autoCommit != null && !autoCommit) {
+                    if (_runInfo.isRollbackOnly()) {
+                        _currentConn.rollback();
+                    } else {
+                        _currentConn.commit();
+                    }
                 }
             }
         } catch (SQLException e) {
