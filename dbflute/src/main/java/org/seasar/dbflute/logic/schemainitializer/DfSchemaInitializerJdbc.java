@@ -443,7 +443,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 final String procedureSchema = metaInfo.getProcedureSchema();
                 if (_schema != null && !_schema.equalsIgnoreCase(procedureSchema)) {
                     // because of main schema only
-                    // (the procedure list contains those of additional schema)
+                    // (the procedure list may contain those of additional schema)
                     continue;
                 }
                 final String dropProcedureSql = callback.buildDropProcedureSql(metaInfo);
