@@ -117,7 +117,7 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
                 }
             } catch (SQLException ignored) {
             } finally {
-                DfDataSourceContext.setDataSource(null);
+                DfDataSourceContext.clearDataSource();
             }
         }
     }

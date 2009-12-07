@@ -98,7 +98,11 @@ public abstract class DfAbstractTask extends Task {
             throwTaskFailure();
         } finally {
             if (isUseDataSource()) {
-                commitAndDestroyDataSource();
+                try {
+                    commitDataSource();
+                } finally {
+                    destroyDataSource();
+                }
             }
             long after = getTaskAfterTimeMillis();
             if (isValidTaskEndInformation()) {
@@ -225,12 +229,8 @@ public abstract class DfAbstractTask extends Task {
         connectSchema();
     }
 
-    protected void commitAndDestroyDataSource() {
-        try {
-            _dataSourceCreator.commit();
-        } finally {
-            destroyDataSource();
-        }
+    protected void commitDataSource() {
+        _dataSourceCreator.commit();
     }
 
     protected void destroyDataSource() {
