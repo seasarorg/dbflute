@@ -408,11 +408,18 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 final String procedureSqlName = handler.buildProcedureSqlName(metaInfo);
                 return "drop procedure " + procedureSqlName;
             }
+
+            public String buildDropFunctionSql(DfProcedureMetaInfo metaInfo) {
+                final String procedureSqlName = handler.buildProcedureSqlName(metaInfo);
+                return "drop function " + procedureSqlName;
+            }
         });
     }
 
     protected static interface DfDropProcedureByJdbcCallback {
         String buildDropProcedureSql(DfProcedureMetaInfo metaInfo);
+
+        String buildDropFunctionSql(DfProcedureMetaInfo metaInfo);
     }
 
     protected void callbackDropProcedureByJdbc(Connection conn, List<DfProcedureMetaInfo> procedureMetaInfoList,
@@ -431,7 +438,18 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 final String dropProcedureSql = callback.buildDropProcedureSql(metaInfo);
                 currentSql = dropProcedureSql;
                 _log.info(dropProcedureSql);
-                stmt.execute(dropProcedureSql);
+                try {
+                    stmt.execute(dropProcedureSql);
+                } catch (SQLException e) {
+                    final String dropFunctionSql = callback.buildDropFunctionSql(metaInfo);
+                    try {
+                        stmt.execute(dropFunctionSql);
+                        _log.info("  (o) retry: " + dropFunctionSql);
+                    } catch (SQLException ignored) {
+                        _log.info("  (x) retry: " + dropFunctionSql);
+                        throw e;
+                    }
+                }
             }
         } catch (SQLException e) {
             String msg = "Failed to drop the table: " + currentSql;
