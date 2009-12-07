@@ -235,7 +235,6 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
     public String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
         final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
-        final String procedureCatalog = metaInfo.getProcedureCatalog();
         final StringBuilder sb = new StringBuilder();
         final String procedureSchema = metaInfo.getProcedureSchema();
         if (procedureSchema != null && procedureSchema.trim().length() > 0) {
@@ -243,9 +242,11 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 sb.append(procedureSchema).append(".");
             }
         }
+        final String procedureCatalog = metaInfo.getProcedureCatalog();
         if (procedureCatalog != null && procedureCatalog.trim().length() > 0) {
-            if (getBasicProperties().isDatabaseOracle()) { // needs to confirm other DB.
-                sb.append(procedureCatalog).append(".");
+            // It needs to confirm other DB...
+            if (getBasicProperties().isDatabaseOracle()) {
+                sb.append(procedureCatalog).append("."); // a catalog is package if Oracle
             }
         }
         final String procedureName = metaInfo.getProcedureName();

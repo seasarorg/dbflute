@@ -425,9 +425,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected void callbackDropProcedureByJdbc(Connection conn, List<DfProcedureMetaInfo> procedureMetaInfoList,
             DfDropProcedureByJdbcCallback callback) {
         String currentSql = null;
-        Statement stmt = null;
+        Statement st = null;
         try {
-            stmt = conn.createStatement();
+            st = conn.createStatement();
             for (DfProcedureMetaInfo metaInfo : procedureMetaInfoList) {
                 final String procedureSchema = metaInfo.getProcedureSchema();
                 if (_schema != null && !_schema.equalsIgnoreCase(procedureSchema)) {
@@ -439,30 +439,35 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 currentSql = dropProcedureSql;
                 _log.info(dropProcedureSql);
                 try {
-                    stmt.execute(dropProcedureSql);
+                    st.execute(dropProcedureSql);
                 } catch (SQLException e) {
                     final String dropFunctionSql = callback.buildDropFunctionSql(metaInfo);
                     try {
-                        stmt.execute(dropFunctionSql);
+                        st.execute(dropFunctionSql);
                         _log.info("  (o) retry: " + dropFunctionSql);
                     } catch (SQLException ignored) {
                         _log.info("  (x) retry: " + dropFunctionSql);
-                        throw e;
+                        handlePackageProcedure(metaInfo, st, e);
                     }
                 }
             }
         } catch (SQLException e) {
-            String msg = "Failed to drop the table: " + currentSql;
+            String msg = "Failed to drop the procedure: " + currentSql;
             throw new SQLFailureException(msg, e);
         } finally {
-            if (stmt != null) {
+            if (st != null) {
                 try {
-                    stmt.close();
+                    st.close();
                 } catch (SQLException ignored) {
                     _log.info("Statement#close() threw the exception!", ignored);
                 }
             }
         }
+    }
+
+    protected void handlePackageProcedure(DfProcedureMetaInfo metaInfo, Statement st, SQLException e)
+            throws SQLException {
+        throw e; // override if it needs
     }
 
     // ===================================================================================
