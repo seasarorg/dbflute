@@ -59,8 +59,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     protected DfSqlFileRunnerResult _result = new DfSqlFileRunnerResult(); // is an empty result as default
     protected int _goodSqlCount = 0;
     protected int _totalSqlCount = 0;
-    protected Connection _currentConn;
-    protected Statement _currentStmt;
+    protected Connection _currentConnection;
+    protected Statement _currentStatement;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -105,19 +105,19 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 traceSql(realSql);
                 execSQL(realSql);
             }
-            if (_currentConn != null) {
+            if (_currentConnection != null) {
                 Boolean autoCommit = null;
                 try {
-                    autoCommit = _currentConn.getAutoCommit();
+                    autoCommit = _currentConnection.getAutoCommit();
                 } catch (SQLException continued) {
                     // Because it it possible that the connection would have already closed.
                     _log.warn("Connection#getAutoCommit() said: " + continued.getMessage());
                 }
                 if (autoCommit != null && !autoCommit) {
                     if (_runInfo.isRollbackOnly()) {
-                        _currentConn.rollback();
+                        _currentConnection.rollback();
                     } else {
-                        _currentConn.commit();
+                        _currentConnection.commit();
                     }
                 }
             }
@@ -127,26 +127,26 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             throw new SQLFailureException(msg, e);
         } finally {
             try {
-                if (_currentConn != null && !_currentConn.getAutoCommit()) {
-                    _currentConn.rollback();
+                if (_currentConnection != null && !_currentConnection.getAutoCommit()) {
+                    _currentConnection.rollback();
                 }
             } catch (SQLException ignored) {
             }
             try {
-                if (_currentStmt != null) {
-                    _currentStmt.close();
+                if (_currentStatement != null) {
+                    _currentStatement.close();
                 }
             } catch (SQLException ignored) {
             } finally {
-                _currentStmt = null;
+                _currentStatement = null;
             }
             try {
-                if (_currentConn != null) {
-                    _currentConn.close();
+                if (_currentConnection != null) {
+                    _currentConnection.close();
                 }
             } catch (SQLException ignored) {
             } finally {
-                _currentConn = null;
+                _currentConnection = null;
             }
             try {
                 if (reader != null) {
@@ -198,8 +198,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             return;
         }
         try {
-            _currentConn = _dataSource.getConnection();
-            _currentConn.setAutoCommit(_runInfo.isAutoCommit());
+            _currentConnection = _dataSource.getConnection();
+            _currentConnection.setAutoCommit(_runInfo.isAutoCommit());
         } catch (SQLException e) {
             String msg = "DataSource#getConnection() threw the exception:";
             msg = msg + " dataSource=" + _dataSource;
@@ -208,27 +208,27 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     protected void checkConnection() {
-        if (_currentConn == null) {
+        if (_currentConnection == null) {
             String msg = "The connection should not be null at this timing!";
             throw new IllegalStateException(msg);
         }
     }
 
     protected void setupStatement() {
-        if (_currentConn == null) {
+        if (_currentConnection == null) {
             return;
         }
         try {
-            _currentStmt = _currentConn.createStatement();
+            _currentStatement = _currentConnection.createStatement();
         } catch (SQLException e) {
             String msg = "Connection#createStatement() threw the exception:";
-            msg = msg + " connection=" + _currentConn;
+            msg = msg + " connection=" + _currentConnection;
             throw new SQLFailureException(msg, e);
         }
     }
 
     protected void checkStatement(String sql) {
-        if (_currentStmt == null) {
+        if (_currentStatement == null) {
             String msg = "The statement should not be null at this timing:";
             msg = msg + " sql=" + sql;
             throw new IllegalStateException(msg);

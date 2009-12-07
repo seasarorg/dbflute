@@ -156,14 +156,14 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
             }
         };
         runnerExecute.setDispatcher(new DfSqlFileRunnerDispatcher() {
-            public boolean dispatch(File sqlFile, Statement stmt, String sql) throws SQLException {
+            public boolean dispatch(File sqlFile, Statement st, String sql) throws SQLException {
                 final String dataLoadingType = getMyProperties().getDataLoadingType();
                 final DfDataAssertProvider dataAssertProvider = new DfDataAssertProvider(dataLoadingType);
                 final DfDataAssertHandler dataAssertHandler = dataAssertProvider.provideDataAssertHandler(sql);
                 if (dataAssertHandler == null) {
                     return false;
                 }
-                dataAssertHandler.handle(sqlFile, stmt, sql);
+                dataAssertHandler.handle(sqlFile, st, sql);
                 return true;
             }
         });

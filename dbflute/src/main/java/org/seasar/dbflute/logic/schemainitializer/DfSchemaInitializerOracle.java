@@ -77,12 +77,12 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     protected void dropSequence(Connection conn) {
         final List<String> sequenceNameList = new ArrayList<String>();
         final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + _schema + "'";
-        Statement statement = null;
+        Statement st = null;
         ResultSet rs = null;
         try {
-            statement = conn.createStatement();
+            st = conn.createStatement();
             _log.info("...Executing helper SQL:" + ln() + metaDataSql);
-            rs = statement.executeQuery(metaDataSql);
+            rs = st.executeQuery(metaDataSql);
             while (rs.next()) {
                 final String sequenceName = rs.getString("SEQUENCE_NAME");
                 sequenceNameList.add(sequenceName);
@@ -94,9 +94,9 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             _log.info(metaDataSql);
             return;
         } finally {
-            if (statement != null) {
+            if (st != null) {
                 try {
-                    statement.close();
+                    st.close();
                 } catch (SQLException ignored) {
                     _log.info("statement.close() threw the exception!", ignored);
                 }
@@ -110,19 +110,19 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             }
         }
         try {
-            statement = conn.createStatement();
+            st = conn.createStatement();
             for (String sequenceName : sequenceNameList) {
                 final String dropSequenceSql = "drop sequence " + _schema + "." + sequenceName;
                 _log.info(dropSequenceSql);
-                statement.execute(dropSequenceSql);
+                st.execute(dropSequenceSql);
             }
         } catch (SQLException e) {
             String msg = "Failed to drop sequences: " + sequenceNameList;
             throw new IllegalStateException(msg, e);
         } finally {
-            if (statement != null) {
+            if (st != null) {
                 try {
-                    statement.close();
+                    st.close();
                 } catch (SQLException ignored) {
                     _log.info("statement.close() threw the exception!", ignored);
                 }
@@ -148,6 +148,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             throw e; // not package so pure exception
         }
         if (_droppedPackageSet.contains(catalog)) {
+            _log.info("  (o) already dropped: " + catalog);
             return; // already dropped
         }
         final String sql = "drop package " + catalog; // a catalog is package if Oracle
@@ -173,12 +174,12 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
         final List<String> dbLinkNameList = new ArrayList<String>();
         final List<String> publicDBLinkNameList = new ArrayList<String>();
         final String metaDataSql = "select * from ALL_DB_LINKS where OWNER = '" + _schema + "'";
-        Statement statement = null;
+        Statement st = null;
         ResultSet rs = null;
         try {
-            statement = conn.createStatement();
+            st = conn.createStatement();
             _log.info("...Executing helper SQL:" + ln() + metaDataSql);
-            rs = statement.executeQuery(metaDataSql);
+            rs = st.executeQuery(metaDataSql);
             while (rs.next()) {
                 final String dbLinkName = rs.getString("DB_LINK");
                 final String userName = rs.getString("USERNAME");
@@ -195,9 +196,9 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             _log.info(metaDataSql);
             return;
         } finally {
-            if (statement != null) {
+            if (st != null) {
                 try {
-                    statement.close();
+                    st.close();
                 } catch (SQLException ignored) {
                     _log.info("statement.close() threw the exception!", ignored);
                 }
@@ -211,22 +212,22 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             }
         }
         try {
-            statement = conn.createStatement();
+            st = conn.createStatement();
             for (String dbLinkName : dbLinkNameList) {
                 final String dropDbLinkSql = "drop database link " + dbLinkName;
                 _log.info(dropDbLinkSql);
-                statement.execute(dropDbLinkSql);
+                st.execute(dropDbLinkSql);
             }
             for (String dbLinkName : publicDBLinkNameList) {
                 String dropDbLinkSql = "drop database link " + dbLinkName;
                 _log.info(dropDbLinkSql);
                 try {
-                    statement.execute(dropDbLinkSql);
+                    st.execute(dropDbLinkSql);
                 } catch (SQLException e) {
                     try {
                         // retry with 'public' option
                         dropDbLinkSql = "drop public database link " + dbLinkName;
-                        statement.execute(dropDbLinkSql);
+                        st.execute(dropDbLinkSql);
                         _log.info("  (o) retry: " + dropDbLinkSql);
                     } catch (SQLException ignored) {
                         _log.info("  (x) retry: " + dropDbLinkSql);
@@ -238,9 +239,9 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             String msg = "Failed to drop DB links: " + dbLinkNameList;
             throw new IllegalStateException(msg, e);
         } finally {
-            if (statement != null) {
+            if (st != null) {
                 try {
-                    statement.close();
+                    st.close();
                 } catch (SQLException ignored) {
                     _log.info("statement.close() threw the exception!", ignored);
                 }

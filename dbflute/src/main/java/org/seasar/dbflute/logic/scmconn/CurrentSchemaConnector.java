@@ -47,9 +47,9 @@ public class CurrentSchemaConnector {
     //                                                                                ====
     public void connectSchema() {
         if (_basicProperties.isDatabaseDB2() && _schema != null) {
-            final Statement statement;
+            final Statement st;
             try {
-                statement = _dataSource.getConnection().createStatement();
+                st = _dataSource.getConnection().createStatement();
             } catch (SQLException e) {
                 _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
                 return;
@@ -57,7 +57,7 @@ public class CurrentSchemaConnector {
             final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
             try {
                 _log.info("...Executing helper SQL:\n" + sql);
-                statement.execute(sql);
+                st.execute(sql);
             } catch (SQLException e) {
                 _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
                 return;

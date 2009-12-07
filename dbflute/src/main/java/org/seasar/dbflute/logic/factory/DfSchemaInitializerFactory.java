@@ -102,6 +102,7 @@ public class DfSchemaInitializerFactory {
         if (_initializeType.equals(InitializeType.FIRST)) { // Normal
             initializer.setSchema(_databaseProperties.getDatabaseSchema());
             initializer.setDropGenerateTableOnly(_replaceSchemaProperties.isDropGenerateTableOnly());
+            initializer.setDropGenerateProcedureOnly(_replaceSchemaProperties.isDropGenerateProcedureOnly());
             return;
         }
 

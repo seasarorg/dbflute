@@ -10,6 +10,7 @@
 # o isIncrementSequenceToDataMax: (NotRequired - Default false)
 # o isSuppressBatchUpdate: (NotRequired - Default false)
 # o isDropGenerateTableOnly: (NotRequired - Default false)
+# o isDropGenerateProcedureOnly: (NotRequired - Default false)
 # o filterVariablesMap: (NotRequired - Default 'map:{}')
 # o additionalUserMap: (NotRequired - Default 'map:{}')
 # o additionalDropMapList: (NotRequired - Default 'list:{}')
@@ -29,6 +30,7 @@
 #     ; isIncrementSequenceToDataMax = false
 #     ; isSuppressBatchUpdate = false
 #     ; isDropGenerateTableOnly = false
+#     ; isDropGenerateProcedureOnly = false
 #     ; filterVariablesMap = map:{abc=AAA}
 #     ; additionalUserMap = map:{
 #         ; system = map:{user=system ; password=system}
@@ -107,6 +109,14 @@ map:{
     #  in table-target or table-except setting?
     #
     #; isDropGenerateTableOnly = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isDropGenerateProcedureOnly: (NotRequired - Default false)
+    #  Does it drop only generating target procedures that are specified
+    #  in table-target or table-except setting?
+    #
+    #; isDropGenerateProcedureOnly = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -267,7 +267,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             executedActuallySql = sql;
                         }
                         checkStatement(sql);
-                        rs = _currentStmt.executeQuery(executedActuallySql);
+                        rs = _currentStatement.executeQuery(executedActuallySql);
 
                         _goodSqlCount++;
                         alreadyIncrementGoodSqlCount = true;

@@ -40,22 +40,22 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
         final String tableName = tableMetaInfo.getTableName();
         final String sql = buildMetaDataSql(primaryKeyColumnName, tableName);
         String recoverySql = null;
-        Statement stmt = null;
+        Statement st = null;
         ResultSet rs = null;
         String ignoredMessage = null;
         try {
-            stmt = conn.createStatement();
+            st = conn.createStatement();
             try {
-                rs = stmt.executeQuery(sql);
+                rs = st.executeQuery(sql);
             } catch (SQLException e) {
                 // Basically it does not come here.
                 // But if it's schema requirement or reservation word, it comes here. 
                 try {
                     final String tableNameWithSchema = tableMetaInfo.buildTableNameWithSchema();
                     recoverySql = buildMetaDataSql(primaryKeyColumnName, tableNameWithSchema);
-                    rs = stmt.executeQuery(recoverySql);
+                    rs = st.executeQuery(recoverySql);
                 } catch (SQLException ignored) {
-                    rs = retryForReservationWordTable(stmt, tableName, primaryKeyColumnName);
+                    rs = retryForReservationWordTable(st, tableName, primaryKeyColumnName);
                     if (rs == null) {
                         ignoredMessage = ignored.getMessage();
                         throw e;
@@ -77,9 +77,9 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
             msg = msg + " recoveryMessage=" + ignoredMessage;
             throw new IllegalStateException(msg, e);
         } finally {
-            if (stmt != null) {
+            if (st != null) {
                 try {
-                    stmt.close();
+                    st.close();
                 } catch (SQLException ignored) {
                 }
             }

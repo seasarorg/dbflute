@@ -57,6 +57,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected List<String> _dropTableTargetList;
     protected List<String> _dropTableExceptList;
     protected boolean _dropGenerateTableOnly;
+    protected boolean _dropGenerateProcedureOnly;
 
     // /= = = = = = = = = = = = =
     // Detail execution handling!
@@ -345,22 +346,22 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected void callbackDropTableByJdbc(Connection conn, List<DfTableMetaInfo> tableMetaInfoList,
             DfDropTableByJdbcCallback callback) {
         String currentSql = null;
-        Statement stmt = null;
+        Statement st = null;
         try {
-            stmt = conn.createStatement();
+            st = conn.createStatement();
             for (DfTableMetaInfo metaInfo : tableMetaInfoList) {
                 final String dropTableSql = callback.buildDropTableSql(metaInfo);
                 currentSql = dropTableSql;
                 _log.info(dropTableSql);
                 try {
-                    stmt.execute(dropTableSql);
+                    st.execute(dropTableSql);
                 } catch (SQLException e) {
                     // = = = = = = = = = = = =
                     // for materialized view!
                     // = = = = = = = = = = = =
                     final String dropMaterializedViewSql = callback.buildDropMaterializedViewSql(metaInfo);
                     try {
-                        stmt.execute(dropMaterializedViewSql);
+                        st.execute(dropMaterializedViewSql);
                         _log.info("  (o) retry:  " + dropMaterializedViewSql);
                     } catch (SQLException ignored) {
                         _log.info("  (x) retry: " + dropMaterializedViewSql);
@@ -372,9 +373,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             String msg = "Failed to drop the table: " + currentSql;
             throw new SQLFailureException(msg, e);
         } finally {
-            if (stmt != null) {
+            if (st != null) {
                 try {
-                    stmt.close();
+                    st.close();
                 } catch (SQLException ignored) {
                     _log.info("Statement#close() threw the exception!", ignored);
                 }
@@ -402,7 +403,17 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             msg = msg + " connection=" + conn;
             throw new SQLFailureException(msg, e);
         }
-        final List<DfProcedureMetaInfo> procedureList = handler.getPlainProcedureList(metaData, _schema);
+        final List<DfProcedureMetaInfo> procedureList;
+        try {
+            if (_dropGenerateProcedureOnly) {
+                procedureList = handler.getAvailableProcedureList(metaData, _schema);
+            } else {
+                procedureList = handler.getPlainProcedureList(metaData, _schema);
+            }
+        } catch (SQLException e) {
+            String msg = "Failed to get procedure meta data: " + _schema;
+            throw new IllegalStateException(msg, e);
+        }
         callbackDropProcedureByJdbc(conn, procedureList, new DfDropProcedureByJdbcCallback() {
             public String buildDropProcedureSql(DfProcedureMetaInfo metaInfo) {
                 final String procedureSqlName = handler.buildProcedureSqlName(metaInfo);
@@ -527,6 +538,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
 
     public void setDropGenerateTableOnly(boolean dropGenerateTableOnly) {
         this._dropGenerateTableOnly = dropGenerateTableOnly;
+    }
+
+    public void setDropGenerateProcedureOnly(boolean dropGenerateProcedureOnly) {
+        this._dropGenerateProcedureOnly = dropGenerateProcedureOnly;
     }
 
     // /= = = = = = = = = = = = =

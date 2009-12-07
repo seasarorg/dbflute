@@ -165,10 +165,14 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                          Drop Table
-    //                                                                          ==========
+    //                                                                  Drop Generate Only
+    //                                                                  ==================
     public boolean isDropGenerateTableOnly() {
         return isProperty("isDropGenerateTableOnly", false, getReplaceSchemaDefinitionMap());
+    }
+
+    public boolean isDropGenerateProcedureOnly() {
+        return isProperty("isDropGenerateProcedureOnly", false, getReplaceSchemaDefinitionMap());
     }
 
     // ===================================================================================

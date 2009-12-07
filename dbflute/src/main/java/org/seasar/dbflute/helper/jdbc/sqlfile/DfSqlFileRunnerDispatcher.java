@@ -13,10 +13,10 @@ public interface DfSqlFileRunnerDispatcher {
     /**
      * Dispatch executing a SQL.
      * @param sqlFile The SQL file that contains the SQL. (NotNull)
-     * @param stmt Statement. (NotNull)
+     * @param st Statement. (NotNull)
      * @param sql SQL string. (NotNull)
      * @return Is the dispatching success?
      * @throws SQLException
      */
-    boolean dispatch(File sqlFile, Statement stmt, String sql) throws SQLException;
+    boolean dispatch(File sqlFile, Statement st, String sql) throws SQLException;
 }

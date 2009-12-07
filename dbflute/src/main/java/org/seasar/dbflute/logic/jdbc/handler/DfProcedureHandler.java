@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
@@ -48,6 +48,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
      * @param metaData The meta data of database. (NotNull)
      * @param schemaName The name of main schema. (Nullable)
      * @return The list of target procedure meta information.. (NotNull)
+     * @throws SQLException
      */
     public List<DfProcedureMetaInfo> getAvailableProcedureList(DatabaseMetaData metaData, String schemaName)
             throws SQLException {
@@ -99,7 +100,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         }
     }
 
-    public List<DfProcedureMetaInfo> getPlainProcedureList(DatabaseMetaData metaData, String schemaName) {
+    public List<DfProcedureMetaInfo> getPlainProcedureList(DatabaseMetaData metaData, String schemaName)
+            throws SQLException {
         schemaName = filterSchemaName(schemaName);
 
         // /- - - - - - - - - - - - - - - - - - - - - -
@@ -125,7 +127,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         } catch (SQLException e) {
             String msg = "Failed to get a list of procedures:";
             msg = msg + " schemaName=" + schemaName;
-            throw new SQLFailureException(msg, e);
+            throw new DfJDBCException(msg, e);
         } finally {
             if (columnResultSet != null) {
                 try {
