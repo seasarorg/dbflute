@@ -209,6 +209,11 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         public void setLoginTimeout(int seconds) throws SQLException {
             throw new UnsupportedOperationException("setLoginTimeout()");
         }
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + ":" + _dataSourceProvider;
+        }
     }
 
     public static class DfSimpleConnection implements Connection {
@@ -371,6 +376,14 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         public void setTypeMap(Map<String, Class<?>> map) throws SQLException {
             _realConnection.setTypeMap(map);
         }
+    }
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return "{url=" + _url + ", user=" + _userId + ", prop=" + _connectionProperties + "}";
     }
 
     // ===================================================================================
