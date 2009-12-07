@@ -24,7 +24,6 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
@@ -66,8 +65,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         try {
             super.setupDataSource();
             getDataSource().getConnection(); // check
-        } catch (SQLFailureException e) {
-            handleLazyConnection(e);
         } catch (SQLException e) {
             handleLazyConnection(e);
         }

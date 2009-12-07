@@ -32,7 +32,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 
 public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
@@ -86,7 +86,7 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
                 }
             } catch (SQLException e) {
                 String msg = "Failed to commit the conection: conn=" + conn;
-                throw new SQLFailureException(msg, e);
+                throw new DfJDBCException(msg, e);
             } finally {
                 if (conn != null) {
                     try {
@@ -122,14 +122,14 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         }
     }
 
-    public Connection getConnection() {
+    public Connection getConnection() throws SQLException {
         if (_cachedConnection == null) {
             _cachedConnection = new DfSimpleConnection(newConnection());
         }
         return _cachedConnection;
     }
 
-    protected Connection newConnection() {
+    protected Connection newConnection() throws SQLException {
         Connection connection = null;
         final Driver driverInstance = newDriver();
         final Properties info = new Properties();
@@ -144,17 +144,18 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         } catch (SQLException e) {
             String msg = "Driver#connect() threw the exception:";
             msg = msg + " url=" + _url + " user=" + _userId;
-            throw new SQLFailureException(msg, e);
+            throw new DfJDBCException(msg, e);
         }
         if (connection == null) {
-            throw new IllegalStateException("Driver doesn't understand the URL: _url=" + _url);
+            String msg = "Driver doesn't understand the URL: _url=" + _url;
+            throw new IllegalStateException(msg);
         }
         try {
             connection.setAutoCommit(_autoCommit);
         } catch (SQLException e) {
             String msg = "Connection#setAutoCommit() threw the exception:";
             msg = msg + " autocommit=" + _autoCommit;
-            throw new SQLFailureException(msg, e);
+            throw new DfJDBCException(msg, e);
         }
         return connection;
     }
