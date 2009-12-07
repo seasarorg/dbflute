@@ -78,7 +78,6 @@ public abstract class DfAbstractTask extends Task {
             initializeDatabaseInfo();
             if (isUseDataSource()) {
                 setupDataSource();
-                connectSchema();
             }
             doExecute();
         } catch (RuntimeException e) {
@@ -223,6 +222,7 @@ public abstract class DfAbstractTask extends Task {
         _dataSourceCreator.setConnectionProperties(_connectionProperties);
         _dataSourceCreator.setAutoCommit(true);
         _dataSourceCreator.create();
+        connectSchema();
     }
 
     protected void closingDataSource() {

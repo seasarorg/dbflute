@@ -32,7 +32,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.BuildException;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 
 public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
@@ -85,7 +85,8 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
                     conn.commit();
                 }
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                String msg = "Failed to commit the conection: conn=" + conn;
+                throw new SQLFailureException(msg, e);
             } finally {
                 if (conn != null) {
                     try {
@@ -140,16 +141,19 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         try {
             connection = driverInstance.connect(_url, info);
         } catch (SQLException e) {
-            throw new BuildException("Driver#connect() threw the exception: _url=" + _url, e);
+            String msg = "Driver#connect() threw the exception:";
+            msg = msg + " url=" + _url + " user=" + _userId;
+            throw new SQLFailureException(msg, e);
         }
         if (connection == null) {
-            throw new BuildException("Driver doesn't understand the URL: _url=" + _url);
+            throw new IllegalStateException("Driver doesn't understand the URL: _url=" + _url);
         }
         try {
             connection.setAutoCommit(_autoCommit);
         } catch (SQLException e) {
-            String msg = "Connection#setAutoCommit() threw the exception: _autocommit=";
-            throw new BuildException(msg + _autoCommit, e);
+            String msg = "Connection#setAutoCommit() threw the exception:";
+            msg = msg + " autocommit=" + _autoCommit;
+            throw new SQLFailureException(msg, e);
         }
         return connection;
     }
@@ -161,13 +165,13 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
             driverInstance = (Driver) dc.newInstance();
         } catch (ClassNotFoundException e) {
             String msg = "Class Not Found: JDBC driver " + _driver + " could not be loaded.";
-            throw new BuildException(msg, e);
+            throw new IllegalStateException(msg, e);
         } catch (IllegalAccessException e) {
             String msg = "Illegal Access: JDBC driver " + _driver + " could not be loaded.";
-            throw new BuildException(msg, e);
+            throw new IllegalStateException(msg, e);
         } catch (InstantiationException e) {
             String msg = "Instantiation Exception: JDBC driver " + _driver + " could not be loaded.";
-            throw new BuildException(msg, e);
+            throw new IllegalStateException(msg, e);
         }
         return driverInstance;
     }

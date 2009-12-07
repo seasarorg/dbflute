@@ -21,7 +21,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -45,12 +44,12 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfSpecifiedSqlFile;
 import org.seasar.dbflute.exception.DfCustomizeEntityDuplicateException;
 import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.friends.torque.DfSchemaXmlReader;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
-import org.seasar.dbflute.helper.jdbc.sqlfile.DfSQLExecutionFailureException;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunner;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileRunnerBase;
@@ -243,6 +242,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
              * @param sql The string of SQL. (NotNull)
              * @return The filtered string of SQL. (NotNull)
              */
+            @Override
             protected String filterSql(String sql) {
                 if (!jdbcDeterminer.isBlockCommentValid()) {
                     sql = removeBlockComment(sql);
@@ -255,7 +255,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 return super.filterSql(sql);
             }
 
-            protected void execSQL(Statement statement, String sql) {
+            @Override
+            protected void execSQL(String sql) {
                 ResultSet rs = null;
                 try {
                     boolean alreadyIncrementGoodSqlCount = false;
@@ -266,7 +267,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         } else {
                             executedActuallySql = sql;
                         }
-                        rs = statement.executeQuery(executedActuallySql);
+                        checkStatement(sql);
+                        rs = _currentStmt.executeQuery(executedActuallySql);
 
                         _goodSqlCount++;
                         alreadyIncrementGoodSqlCount = true;
@@ -374,7 +376,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                             msg = msg + nextException.getMessage() + ln();
                         }
                         msg = msg + "* * * * * * * * * */";
-                        throw new DfSQLExecutionFailureException(msg, e);
+                        throw new SQLFailureException(msg, e);
                     }
                     _log.warn("Failed to execute: " + sql, e);
                     _exceptionInfoMap.put(_sqlFile.getName(), e.getMessage() + ln() + sql);

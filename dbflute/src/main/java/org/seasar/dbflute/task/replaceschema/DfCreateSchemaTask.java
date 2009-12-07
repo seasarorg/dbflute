@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
@@ -51,6 +52,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                                                           Attribute
     //                                                                           =========
     protected boolean _validTaskEndInformation = true;
+    protected boolean _lazyConnection = false;
 
     // -----------------------------------------------------
     //                                           Change User
@@ -58,6 +60,20 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     protected String _currentUser;
     protected StringSet _goodByeUserSet = StringSet.createAsCaseInsensitive();
     protected StringKeyMap<Connection> _changeUserConnectionMap = StringKeyMap.createAsCaseInsensitive();
+
+    @Override
+    protected void setupDataSource() {
+        try {
+            super.setupDataSource();
+        } catch (SQLFailureException e) {
+            String msg = e.getMessage();
+            if (msg.length() > 30) {
+                msg = msg.substring(0, 27) + "...";
+            }
+            _log.info("...Being a lazy connection: " + msg);
+            _lazyConnection = true;
+        }
+    }
 
     // ===================================================================================
     //                                                                             Execute
@@ -81,9 +97,9 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         return _validTaskEndInformation;
     }
 
-    // --------------------------------------------
-    //                            Initialize Schema
-    //                            -----------------
+    // ===================================================================================
+    //                                                                   Initialize Schema
+    //                                                                   =================
     protected void initializeSchema() {
         _log.info("");
         _log.info("* * * * * * * * * * *");
@@ -91,6 +107,10 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         _log.info("* Initialize Schema *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
+        if (_lazyConnection) {
+            _log.info("*Passed because it's a lazy connection");
+            return;
+        }
         final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.FIRST);
         if (initializer != null) {
             initializer.initializeSchema();
@@ -143,9 +163,9 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                 getMyProperties(), initializeType);
     }
 
-    // --------------------------------------------
-    //                                Create Schema
-    //                                -------------
+    // ===================================================================================
+    //                                                                       Create Schema
+    //                                                                       =============
     protected DfRunnerInformation createRunnerInformation() {
         final DfRunnerInformation runInfo = new DfRunnerInformation();
         runInfo.setDriver(_driver);
@@ -332,6 +352,18 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                 }
             }
             return super.isTargetSql(sql);
+        }
+
+        @Override
+        protected void lazyConnectIfNeeds() throws SQLException {
+            if (_lazyConnection) {
+                _log.info("...Connecting by main user lazily");
+                _lazyConnection = false;
+                setupDataSource();
+                _dataSource = getDataSource();
+                setupConnection();
+                setupStatement();
+            }
         }
     }
 

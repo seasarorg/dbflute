@@ -16,12 +16,12 @@
 package org.seasar.dbflute.helper.jdbc.sqlfile;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 
 /**
@@ -52,14 +52,15 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
     //                                                                         ===========
     /**
      * Execute the SQL statement.
-     * @param stmt Statement. (NotNull)
      * @param sql SQL. (NotNull)
      */
-    protected void execSQL(Statement stmt, String sql) {
+    protected void execSQL(String sql) {
         try {
-            final boolean dispatched = dispatch(stmt, sql);
+            final boolean dispatched = dispatch(sql);
             if (!dispatched) {
-                stmt.execute(sql);
+                lazyConnectIfNeeds();
+                checkStatement(sql);
+                _currentStmt.execute(sql);
             }
             _goodSqlCount++;
         } catch (SQLException e) {
@@ -97,12 +98,16 @@ public class DfSqlFileRunnerExecute extends DfSqlFileRunnerBase {
                 }
             }
             msg = msg + "* * * * * * * * * */";
-            throw new DfSQLExecutionFailureException(msg, e);
+            throw new SQLFailureException(msg, e);
         }
     }
 
-    protected boolean dispatch(Statement stmt, String sql) throws SQLException {
-        return _dispatcher != null && _dispatcher.dispatch(_sqlFile, stmt, sql);
+    protected boolean dispatch(String sql) throws SQLException {
+        return _dispatcher != null && _dispatcher.dispatch(_sqlFile, _currentStmt, sql);
+    }
+
+    protected void lazyConnectIfNeeds() throws SQLException {
+        // override if it needs
     }
 
     protected void showContinueWarnLog(SQLException e, String sql) {
