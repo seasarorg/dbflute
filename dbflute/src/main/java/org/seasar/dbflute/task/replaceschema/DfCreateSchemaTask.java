@@ -66,11 +66,14 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             super.setupDataSource();
             getDataSource().getConnection(); // check
         } catch (SQLException e) {
-            handleLazyConnection(e);
+            setupLazyConnection(e);
         }
     }
 
-    protected void handleLazyConnection(SQLException e) throws SQLException {
+    protected void setupLazyConnection(SQLException e) throws SQLException {
+        if (_lazyConnection) { // already lazy
+            throw e;
+        }
         String msg = e.getMessage();
         if (msg.length() > 50) {
             msg = msg.substring(0, 47) + "...";
@@ -362,11 +365,11 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         protected void lazyConnectIfNeeds() throws SQLException {
             if (_lazyConnection) {
                 _log.info("...Connecting by main user lazily");
-                _lazyConnection = false;
                 setupDataSource();
                 _dataSource = getDataSource();
                 setupConnection();
                 setupStatement();
+                _lazyConnection = false;
             }
         }
     }
