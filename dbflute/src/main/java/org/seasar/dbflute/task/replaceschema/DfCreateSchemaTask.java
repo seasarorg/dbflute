@@ -270,7 +270,9 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                         _changeUserConnectionMap.put(_currentUser, conn);
                     }
                     if (conn == null) {
-                        _log.info("...Saying good-bye to the user '" + _currentUser + "'");
+                        String msg = "...Saying good-bye to the user '" + _currentUser + "'";
+                        msg = msg + " because of no definition";
+                        _log.info(msg);
                         _goodByeUserSet.add(_currentUser);
                         return true;
                     }
@@ -286,7 +288,9 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                     return true;
                 } catch (SQLException e) {
                     if (checkUser) {
-                        _log.info("...Saying good-bye to the user '" + _currentUser + "'");
+                        String msg = "...Saying good-bye to the user '" + _currentUser + "'";
+                        msg = msg + " because of checked";
+                        _log.info(msg);
                         _goodByeUserSet.add(_currentUser);
                         return true;
                     }
