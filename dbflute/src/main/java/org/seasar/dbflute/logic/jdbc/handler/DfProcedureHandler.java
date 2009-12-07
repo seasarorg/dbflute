@@ -114,9 +114,12 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema)) {
                 continue;
             }
-            final String procedureName = metaInfo.getProcedureName();
-            if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
-                continue;
+            final String procedureSqlName = buildProcedureSqlName(metaInfo);
+            if (!outsideSqlProperties.isTargetProcedureName(procedureSqlName)) {
+                final String procedureName = metaInfo.getProcedureName();
+                if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
+                    continue;
+                }
             }
             resultList.add(metaInfo);
         }
