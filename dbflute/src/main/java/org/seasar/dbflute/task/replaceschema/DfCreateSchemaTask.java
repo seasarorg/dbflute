@@ -65,14 +65,22 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     protected void setupDataSource() {
         try {
             super.setupDataSource();
+            getDataSource().getConnection(); // check
         } catch (SQLFailureException e) {
-            String msg = e.getMessage();
-            if (msg.length() > 30) {
-                msg = msg.substring(0, 27) + "...";
-            }
-            _log.info("...Being a lazy connection: " + msg);
-            _lazyConnection = true;
+            handleLazyConnection(e);
+        } catch (SQLException e) {
+            handleLazyConnection(e);
         }
+    }
+
+    protected void handleLazyConnection(Throwable e) {
+        String msg = e.getMessage();
+        if (msg.length() > 50) {
+            msg = msg.substring(0, 47) + "...";
+        }
+        _log.info("...Being a lazy connection: " + msg);
+        destroyDataSource();
+        _lazyConnection = true;
     }
 
     // ===================================================================================
@@ -109,6 +117,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         _log.info("* * * * * * * * * * *");
         if (_lazyConnection) {
             _log.info("*Passed because it's a lazy connection");
+            _log.info("");
             return;
         }
         final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.FIRST);

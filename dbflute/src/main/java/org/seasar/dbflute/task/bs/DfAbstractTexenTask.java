@@ -127,7 +127,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             throwTaskFailure();
         } finally {
             if (isUseDataSource()) {
-                closingDataSource();
+                commitAndDestroyDataSource();
             }
             long after = System.currentTimeMillis();
             String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
@@ -401,8 +401,15 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         connectSchema();
     }
 
-    protected void closingDataSource() {
-        _dataSourceCreator.commit();
+    protected void commitAndDestroyDataSource() {
+        try {
+            _dataSourceCreator.commit();
+        } finally {
+            _dataSourceCreator.destroy();
+        }
+    }
+
+    protected void destroyDataSource() {
         _dataSourceCreator.destroy();
     }
 

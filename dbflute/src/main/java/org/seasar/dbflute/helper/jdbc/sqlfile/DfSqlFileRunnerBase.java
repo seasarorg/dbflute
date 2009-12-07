@@ -124,15 +124,8 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             msg = msg + " currentSql=" + currentSql;
             throw new SQLFailureException(msg, e);
         } finally {
-            Boolean autoCommit = null;
             try {
-                if (_currentConn != null) {
-                    autoCommit = _currentConn.getAutoCommit();
-                }
-            } catch (SQLException continued) {
-            }
-            try {
-                if (autoCommit != null && _currentConn != null && !_currentConn.getAutoCommit()) {
+                if (_currentConn != null && !_currentConn.getAutoCommit()) {
                     _currentConn.rollback();
                 }
             } catch (SQLException ignored) {
