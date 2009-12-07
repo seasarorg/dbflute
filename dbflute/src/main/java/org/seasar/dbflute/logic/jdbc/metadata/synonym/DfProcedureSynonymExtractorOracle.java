@@ -55,16 +55,15 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     protected List<String> _schemaList;
     protected String _schemaName;
 
-    // -----------------------------------------------------
-    //                                     Meta Data Handler
-    //                                     -----------------
-    protected DfProcedureHandler _procedureHandler = new DfProcedureHandler();
+    // TODO @jflute - in development
 
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
     public Map<String, DfProcedureSynonymMetaInfo> extractProcedureSynonymMap() {
         final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = new LinkedHashMap<String, DfProcedureSynonymMetaInfo>();
+        final DfProcedureHandler procedureHandler = new DfProcedureHandler();
+        procedureHandler.suppressFilterByProperty();
         final String sql = buildSynonymSelect();
         Connection conn = null;
         Statement statement = null;
@@ -72,11 +71,11 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
         try {
             conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final List<DfProcedureMetaInfo> procedureList = _procedureHandler.getPlainProcedureList(metaData,
+            final List<DfProcedureMetaInfo> procedureList = procedureHandler.getAvailableProcedureList(metaData,
                     _schemaName);
             final StringKeyMap<DfProcedureMetaInfo> procedureMap = StringKeyMap.createAsCaseInsensitive();
             for (DfProcedureMetaInfo procedureMetaInfo : procedureList) {
-                final String procedureSqlName = _procedureHandler.buildProcedureSqlName(procedureMetaInfo);
+                final String procedureSqlName = procedureHandler.buildProcedureSqlName(procedureMetaInfo);
                 procedureMap.put(procedureSqlName, procedureMetaInfo);
             }
             statement = conn.createStatement();
@@ -112,7 +111,7 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
                 }
 
                 final String procedureKey = tableOwner + "." + tableName;
-                DfProcedureMetaInfo procedureMetaInfo = procedureMap.get(procedureKey);
+                final DfProcedureMetaInfo procedureMetaInfo = procedureMap.get(procedureKey);
                 if (procedureMetaInfo == null) {
                     // Synonym for Package Procedure has several problems.
                     // So it is not supported here.

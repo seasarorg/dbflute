@@ -41,6 +41,12 @@ import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected boolean _suppressAdditionalSchema;
+    protected boolean _suppressFilterByProperty;
+
+    // ===================================================================================
     //                                                                        Meta Getting
     //                                                                        ============
     /**
@@ -56,48 +62,65 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
             return new ArrayList<DfProcedureMetaInfo>();
         }
-        final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
         Connection conn = null;
         try {
             // main schema
             final List<DfProcedureMetaInfo> procedures = getPlainProcedureList(metaData, schemaName);
 
             // additional schema
-            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = databaseProperties.getAdditionalSchemaMap();
-            final Set<String> additionalSchemaSet = additionalSchemaMap.keySet();
-            for (String additionalSchema : additionalSchemaSet) {
-                final List<DfProcedureMetaInfo> additionalProcedureList = getPlainProcedureList(metaData,
-                        additionalSchema);
-                for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
-                    final String procedureSchema = metaInfo.getProcedureSchema();
-                    if (procedureSchema == null || procedureSchema.trim().length() == 0) {
-                        metaInfo.setProcedureSchema(additionalSchema);
-                    }
-                }
-                procedures.addAll(additionalProcedureList);
-            }
-            final List<DfProcedureMetaInfo> resultList = new ArrayList<DfProcedureMetaInfo>();
-            for (DfProcedureMetaInfo metaInfo : procedures) {
-                final String procedureCatalog = metaInfo.getProcedureCatalog();
-                if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
-                    continue;
-                }
-                final String procedureSchema = metaInfo.getProcedureSchema();
-                if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema)) {
-                    continue;
-                }
-                final String procedureName = metaInfo.getProcedureName();
-                if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
-                    continue;
-                }
-                resultList.add(metaInfo);
-            }
-            return resultList;
+            setupAdditionalSchemaProcedure(metaData, procedures);
+
+            // filter by property
+            return filterByProperty(metaData, procedures);
         } finally {
             if (conn != null) {
                 conn.close();
             }
         }
+    }
+
+    protected void setupAdditionalSchemaProcedure(DatabaseMetaData metaData, List<DfProcedureMetaInfo> procedures)
+            throws SQLException {
+        if (_suppressAdditionalSchema) {
+            return;
+        }
+        final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
+        final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = databaseProperties.getAdditionalSchemaMap();
+        final Set<String> additionalSchemaSet = additionalSchemaMap.keySet();
+        for (String additionalSchema : additionalSchemaSet) {
+            final List<DfProcedureMetaInfo> additionalProcedureList = getPlainProcedureList(metaData, additionalSchema);
+            for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
+                final String procedureSchema = metaInfo.getProcedureSchema();
+                if (procedureSchema == null || procedureSchema.trim().length() == 0) {
+                    metaInfo.setProcedureSchema(additionalSchema);
+                }
+            }
+            procedures.addAll(additionalProcedureList);
+        }
+    }
+
+    protected List<DfProcedureMetaInfo> filterByProperty(DatabaseMetaData metaData, List<DfProcedureMetaInfo> procedures) {
+        if (_suppressFilterByProperty) {
+            return procedures;
+        }
+        final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
+        final List<DfProcedureMetaInfo> resultList = new ArrayList<DfProcedureMetaInfo>();
+        for (DfProcedureMetaInfo metaInfo : procedures) {
+            final String procedureCatalog = metaInfo.getProcedureCatalog();
+            if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
+                continue;
+            }
+            final String procedureSchema = metaInfo.getProcedureSchema();
+            if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema)) {
+                continue;
+            }
+            final String procedureName = metaInfo.getProcedureName();
+            if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
+                continue;
+            }
+            resultList.add(metaInfo);
+        }
+        return resultList;
     }
 
     public List<DfProcedureMetaInfo> getPlainProcedureList(DatabaseMetaData metaData, String schemaName)
@@ -253,5 +276,16 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         }
         final String procedureName = metaInfo.getProcedureName();
         return sb.append(procedureName).toString();
+    }
+
+    // ===================================================================================
+    //                                                                              Option
+    //                                                                              ======
+    public void suppressAdditionalSchema() {
+        _suppressAdditionalSchema = true;
+    }
+
+    public void suppressFilterByProperty() {
+        _suppressFilterByProperty = true;
     }
 }
