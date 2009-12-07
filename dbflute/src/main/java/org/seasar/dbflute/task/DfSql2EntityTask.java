@@ -120,7 +120,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     @Override
     protected void doExecute() {
         setupControlTemplate();
-        setupDataSource();
         setupSchemaInformation();
 
         final DfRunnerInformation runInfo = new DfRunnerInformation();

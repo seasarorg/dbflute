@@ -67,14 +67,14 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public void create() {
+    public void create() throws SQLException {
         if (!DfDataSourceContext.isExistDataSource()) {
             _log.info("...create()");
             DfDataSourceContext.setDataSource(new DfSimpleDataSource(this));
         }
     }
 
-    public void commit() {
+    public void commit() throws SQLException {
         if (DfDataSourceContext.isExistDataSource()) {
             final DataSource dataSource = DfDataSourceContext.getDataSource();
             Connection conn = null;
@@ -98,7 +98,7 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         }
     }
 
-    public void destroy() {
+    public void destroy() throws SQLException {
         if (DfDataSourceContext.isExistDataSource()) {
             final DataSource dataSource = DfDataSourceContext.getDataSource();
             Connection conn;

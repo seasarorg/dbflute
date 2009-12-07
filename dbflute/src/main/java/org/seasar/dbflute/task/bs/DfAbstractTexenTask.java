@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -109,10 +110,10 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 setupDataSource();
             }
             doExecute();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             try {
-                logRuntimeException(e);
-            } catch (RuntimeException ignored) {
+                logException(e);
+            } catch (Throwable ignored) {
                 _log.warn("Ignored exception occured!", ignored);
                 _log.error("Failed to execute DBFlute Task!", e);
             }
@@ -120,7 +121,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         } catch (Error e) {
             try {
                 logError(e);
-            } catch (RuntimeException ignored) {
+            } catch (Throwable ignored) {
                 _log.warn("Ignored exception occured!", ignored);
                 _log.error("Failed to execute DBFlute Task!", e);
             }
@@ -129,8 +130,12 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             if (isUseDataSource()) {
                 try {
                     commitDataSource();
+                } catch (SQLException ignored) {
                 } finally {
-                    destroyDataSource();
+                    try {
+                        destroyDataSource();
+                    } catch (SQLException ignored) {
+                    }
                 }
             }
             long after = System.currentTimeMillis();
@@ -162,8 +167,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         }
     }
 
-    protected void logRuntimeException(RuntimeException e) {
-        DfAntTaskUtil.logRuntimeException(e, getDisplayTaskName());
+    protected void logException(Exception e) {
+        DfAntTaskUtil.logException(e, getDisplayTaskName());
     }
 
     protected void logError(Error e) {
@@ -394,7 +399,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                           -----------
     abstract protected boolean isUseDataSource();
 
-    protected void setupDataSource() {
+    protected void setupDataSource() throws SQLException {
         _dataSourceCreator.setUserId(_userId);
         _dataSourceCreator.setPassword(_password);
         _dataSourceCreator.setDriver(_driver);
@@ -405,11 +410,11 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         connectSchema();
     }
 
-    protected void commitDataSource() {
+    protected void commitDataSource() throws SQLException {
         _dataSourceCreator.commit();
     }
 
-    protected void destroyDataSource() {
+    protected void destroyDataSource() throws SQLException {
         _dataSourceCreator.destroy();
     }
 

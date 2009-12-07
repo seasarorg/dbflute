@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.helper.jdbc.connection;
 
+import java.sql.SQLException;
+
 /**
  * @author jflute
  */
@@ -48,11 +50,11 @@ public interface DfDataSourceCreator {
      * Set the autoCommit for the DB connection.
      * @param autoCommit Is auto commit?
      */
-    public void setAutoCommit(boolean autoCommit);
+    public void setAutoCommit(boolean autoCommit) throws SQLException;
 
-    public void create();
+    public void create() throws SQLException;
 
-    public void commit();
-    
-    public void destroy();
+    public void commit() throws SQLException;
+
+    public void destroy() throws SQLException;
 }

@@ -61,7 +61,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     protected StringKeyMap<Connection> _changeUserConnectionMap = StringKeyMap.createAsCaseInsensitive();
 
     @Override
-    protected void setupDataSource() {
+    protected void setupDataSource() throws SQLException {
         try {
             super.setupDataSource();
             getDataSource().getConnection(); // check
@@ -70,7 +70,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         }
     }
 
-    protected void handleLazyConnection(Throwable e) {
+    protected void handleLazyConnection(SQLException e) throws SQLException {
         String msg = e.getMessage();
         if (msg.length() > 50) {
             msg = msg.substring(0, 47) + "...";

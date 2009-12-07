@@ -16,6 +16,7 @@
 package org.seasar.dbflute.task.bs;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Properties;
 
@@ -80,10 +81,10 @@ public abstract class DfAbstractTask extends Task {
                 setupDataSource();
             }
             doExecute();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             try {
-                logRuntimeException(e);
-            } catch (RuntimeException ignored) {
+                logException(e);
+            } catch (Throwable ignored) {
                 _log.warn("Ignored exception occured!", ignored);
                 _log.error("Failed to execute DBFlute Task!", e);
             }
@@ -91,7 +92,7 @@ public abstract class DfAbstractTask extends Task {
         } catch (Error e) {
             try {
                 logError(e);
-            } catch (RuntimeException ignored) {
+            } catch (Throwable ignored) {
                 _log.warn("Ignored exception occured!", ignored);
                 _log.error("Failed to execute DBFlute Task!", e);
             }
@@ -100,8 +101,12 @@ public abstract class DfAbstractTask extends Task {
             if (isUseDataSource()) {
                 try {
                     commitDataSource();
+                } catch (SQLException ignored) {
                 } finally {
-                    destroyDataSource();
+                    try {
+                        destroyDataSource();
+                    } catch (SQLException ignored) {
+                    }
                 }
             }
             long after = getTaskAfterTimeMillis();
@@ -147,8 +152,8 @@ public abstract class DfAbstractTask extends Task {
         return true;
     }
 
-    protected void logRuntimeException(RuntimeException e) {
-        DfAntTaskUtil.logRuntimeException(e, getDisplayTaskName());
+    protected void logException(Exception e) {
+        DfAntTaskUtil.logException(e, getDisplayTaskName());
     }
 
     protected void logError(Error e) {
@@ -218,7 +223,7 @@ public abstract class DfAbstractTask extends Task {
 
     abstract protected boolean isUseDataSource();
 
-    protected void setupDataSource() {
+    protected void setupDataSource() throws SQLException {
         _dataSourceCreator.setUserId(_userId);
         _dataSourceCreator.setPassword(_password);
         _dataSourceCreator.setDriver(_driver);
@@ -229,11 +234,11 @@ public abstract class DfAbstractTask extends Task {
         connectSchema();
     }
 
-    protected void commitDataSource() {
+    protected void commitDataSource() throws SQLException {
         _dataSourceCreator.commit();
     }
 
-    protected void destroyDataSource() {
+    protected void destroyDataSource() throws SQLException {
         _dataSourceCreator.destroy();
     }
 

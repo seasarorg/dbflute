@@ -110,7 +110,7 @@ public final class DfAntTaskUtil {
         return prop;
     }
 
-    public static void logRuntimeException(RuntimeException e, String taskName) {
+    public static void logException(Exception e, String taskName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "Failed to execute DBFlute Task '" + taskName + "'!" + ln();
@@ -126,7 +126,7 @@ public final class DfAntTaskUtil {
         msg = msg + "schema = " + getDatabaseProperties().getDatabaseSchema() + ln();
         msg = msg + "user   = " + getDatabaseProperties().getDatabaseUser() + ln();
         msg = msg + ln();
-        msg = msg + "[Runtime Exception]" + ln();
+        msg = msg + "[Exception]" + ln();
         msg = msg + "exception class   = " + e.getClass() + ln();
         msg = msg + "* * * * * * * * * */";
         _log.error(msg, e);
