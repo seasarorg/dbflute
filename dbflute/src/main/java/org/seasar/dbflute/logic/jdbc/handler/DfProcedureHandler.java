@@ -114,8 +114,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema)) {
                 continue;
             }
-            final String procedureSqlName = buildProcedureSqlName(metaInfo);
-            if (!outsideSqlProperties.isTargetProcedureName(procedureSqlName)) {
+            final String procedureFullName = buildProcedureFullName(metaInfo);
+            if (!outsideSqlProperties.isTargetProcedureName(procedureFullName)) {
                 final String procedureName = metaInfo.getProcedureName();
                 if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
                     continue;
@@ -261,12 +261,24 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         }
     }
 
+    public String buildProcedureFullName(DfProcedureMetaInfo metaInfo) {
+        return buildProcedureArrangeName(metaInfo, false);
+    }
+
     public String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
+        return buildProcedureArrangeName(metaInfo, true);
+    }
+
+    protected String buildProcedureArrangeName(DfProcedureMetaInfo metaInfo, boolean omitMainSchema) {
         final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
         final StringBuilder sb = new StringBuilder();
         final String procedureSchema = metaInfo.getProcedureSchema();
         if (procedureSchema != null && procedureSchema.trim().length() > 0) {
-            if (databaseProperties.isAdditionalSchema(procedureSchema)) {
+            if (omitMainSchema) {
+                if (databaseProperties.isAdditionalSchema(procedureSchema)) {
+                    sb.append(procedureSchema).append(".");
+                }
+            } else {
                 sb.append(procedureSchema).append(".");
             }
         }

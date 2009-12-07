@@ -75,7 +75,7 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
                     _schemaName);
             final StringKeyMap<DfProcedureMetaInfo> procedureMap = StringKeyMap.createAsCaseInsensitive();
             for (DfProcedureMetaInfo procedureMetaInfo : procedureList) {
-                final String procedureSqlName = procedureHandler.buildProcedureSqlName(procedureMetaInfo);
+                final String procedureSqlName = procedureHandler.buildProcedureFullName(procedureMetaInfo);
                 procedureMap.put(procedureSqlName, procedureMetaInfo);
             }
             statement = conn.createStatement();
