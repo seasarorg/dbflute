@@ -39,9 +39,15 @@ public class DfProcedureSynonymMetaInfo {
             String msg = "The synonymMetaInfo should not be null!";
             throw new IllegalStateException(msg);
         }
+        final String synonymOwner = _synonymMetaInfo.getSynonymOwner();
+        final String synonymName = _synonymMetaInfo.getSynonymName();
+        final String synonymFullName = synonymOwner + "." + synonymName;
         _procedureMetaInfo.setProcedureCatalog(null);
-        _procedureMetaInfo.setProcedureSchema(_synonymMetaInfo.getSynonymOwner());
+        _procedureMetaInfo.setProcedureSchema(synonymOwner);
         _procedureMetaInfo.setProcedureName(_synonymMetaInfo.getSynonymName());
+        _procedureMetaInfo.setProcedureFullName(synonymFullName);
+        _procedureMetaInfo.setProcedureSqlName(synonymFullName);
+        _procedureMetaInfo.setProcedureUniqueName(synonymFullName);
     }
 
     // ===================================================================================

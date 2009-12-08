@@ -17,11 +17,11 @@ public class DfProcedureMetaInfo {
     protected String procedureCatalog;
     protected String procedureSchema;
     protected String procedureName;
-    protected DfProcedureType procedureType;
-    protected String procedureComment;
     protected String procedureFullName;
     protected String procedureSqlName;
+    protected DfProcedureType procedureType;
     protected String procedureUniqueName;
+    protected String procedureComment;
     protected boolean procedureSynonym;
 
     protected List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = new ArrayList<DfProcedureColumnMetaInfo>();
@@ -104,22 +104,6 @@ public class DfProcedureMetaInfo {
         this.procedureName = procedureName;
     }
 
-    public DfProcedureType getProcedureType() {
-        return procedureType;
-    }
-
-    public void setProcedureType(DfProcedureType procedureType) {
-        this.procedureType = procedureType;
-    }
-
-    public String getProcedureComment() {
-        return procedureComment;
-    }
-
-    public void setProcedureComment(String procedureComment) {
-        this.procedureComment = procedureComment;
-    }
-
     public String getProcedureFullName() {
         return procedureFullName;
     }
@@ -142,6 +126,22 @@ public class DfProcedureMetaInfo {
 
     public void setProcedureUniqueName(String procedureUniqueName) {
         this.procedureUniqueName = procedureUniqueName;
+    }
+
+    public DfProcedureType getProcedureType() {
+        return procedureType;
+    }
+
+    public void setProcedureType(DfProcedureType procedureType) {
+        this.procedureType = procedureType;
+    }
+
+    public String getProcedureComment() {
+        return procedureComment;
+    }
+
+    public void setProcedureComment(String procedureComment) {
+        this.procedureComment = procedureComment;
     }
 
     public boolean isProcedureSynonym() {
