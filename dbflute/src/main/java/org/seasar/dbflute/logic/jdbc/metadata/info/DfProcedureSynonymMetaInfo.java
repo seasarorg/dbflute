@@ -30,7 +30,7 @@ public class DfProcedureSynonymMetaInfo {
     // ===================================================================================
     //                                                                              Switch
     //                                                                              ======
-    public void reflectSynonymToProcedure(String mainSchemaName) {
+    public DfProcedureMetaInfo createMergedProcedure(String mainSchemaName) {
         if (_procedureMetaInfo == null) {
             String msg = "The procedureMetaInfo should not be null!";
             throw new IllegalStateException(msg);
@@ -39,6 +39,7 @@ public class DfProcedureSynonymMetaInfo {
             String msg = "The synonymMetaInfo should not be null!";
             throw new IllegalStateException(msg);
         }
+        final DfProcedureMetaInfo metaInfo = new DfProcedureMetaInfo();
         final String synonymOwner = _synonymMetaInfo.getSynonymOwner();
         final String synonymName = _synonymMetaInfo.getSynonymName();
         final String synonymFullName = synonymOwner + "." + synonymName;
@@ -49,12 +50,16 @@ public class DfProcedureSynonymMetaInfo {
             synonymSqlName = synonymOwner + "." + synonymName;
         }
         final String synonymUniqueName = synonymName;
-        _procedureMetaInfo.setProcedureCatalog(null);
-        _procedureMetaInfo.setProcedureSchema(synonymOwner);
-        _procedureMetaInfo.setProcedureName(synonymName);
-        _procedureMetaInfo.setProcedureFullName(synonymFullName);
-        _procedureMetaInfo.setProcedureSqlName(synonymSqlName);
-        _procedureMetaInfo.setProcedureUniqueName(synonymUniqueName);
+        metaInfo.setProcedureCatalog(null);
+        metaInfo.setProcedureSchema(synonymOwner);
+        metaInfo.setProcedureName(synonymName);
+        metaInfo.setProcedureFullName(synonymFullName);
+        metaInfo.setProcedureSqlName(synonymSqlName);
+        metaInfo.setProcedureUniqueName(synonymUniqueName);
+        metaInfo.setProcedureSynonym(_procedureMetaInfo.isProcedureSynonym());
+        metaInfo.setProcedureType(_procedureMetaInfo.getProcedureType());
+        metaInfo.setProcedureComment(_procedureMetaInfo.getProcedureComment());
+        return metaInfo;
     }
 
     // ===================================================================================

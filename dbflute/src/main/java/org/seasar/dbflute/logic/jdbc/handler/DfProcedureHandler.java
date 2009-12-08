@@ -173,20 +173,23 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             throw new IllegalStateException(msg);
         }
         final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
+        final String mainSchemaName = databaseProperties.getDatabaseSchema();
         _log.info("...Adding procedure synonyms as procedure: count=" + procedureSynonymMap.size());
         final Set<Entry<String, DfProcedureSynonymMetaInfo>> entrySet = procedureSynonymMap.entrySet();
         final List<DfProcedureMetaInfo> procedureSynonymList = new ArrayList<DfProcedureMetaInfo>();
         for (Entry<String, DfProcedureSynonymMetaInfo> entry : entrySet) {
-            final DfProcedureSynonymMetaInfo procedureSynonymMetaInfo = entry.getValue();
-            if (!isSynonymAllowedSchema(procedureSynonymMetaInfo)) {
+            final DfProcedureSynonymMetaInfo metaInfo = entry.getValue();
+            if (!isSynonymAllowedSchema(metaInfo)) {
                 continue;
             }
-            final DfProcedureMetaInfo procedureMetaInfo = procedureSynonymMetaInfo.getProcedureMetaInfo();
-            final String beforeName = procedureMetaInfo.getProcedureFullName();
-            procedureSynonymMetaInfo.reflectSynonymToProcedure(databaseProperties.getDatabaseSchema());
-            final String afterName = procedureMetaInfo.getProcedureFullName();
+
+            // merge synonym to procedure (create copied instance)
+            final String beforeName = metaInfo.getProcedureMetaInfo().getProcedureFullName();
+            final DfProcedureMetaInfo mergedProcedure = metaInfo.createMergedProcedure(mainSchemaName);
+            final String afterName = mergedProcedure.getProcedureFullName();
             _log.info("  " + beforeName + " to " + afterName);
-            procedureSynonymList.add(procedureMetaInfo);
+
+            procedureSynonymList.add(mergedProcedure);
         }
         procedureList.addAll(procedureSynonymList);
     }
