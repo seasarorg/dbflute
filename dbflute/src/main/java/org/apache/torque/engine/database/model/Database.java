@@ -98,7 +98,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
-import org.seasar.dbflute.properties.assistant.TableFinder;
+import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.xml.sax.Attributes;
 
@@ -524,7 +524,7 @@ public class Database {
         // Set up implicit foreign key for Buri before initializing
         // - - - - - - - - - -/
         final DfBuriProperties buriProperties = getProperties().getBuriProperties();
-        buriProperties.setupImplicitAdditionalForeignKey(new TableFinder() {
+        buriProperties.setupImplicitAdditionalForeignKey(new DfTableFinder() {
             public Table findTable(String tableName) {
                 return getTable(tableName);
             }
@@ -564,7 +564,7 @@ public class Database {
     public void initializeIncludeQuery() {
         IncludeQueryInitializer initializer = new IncludeQueryInitializer();
         initializer.setIncludeQueryProperties(getProperties().getIncludeQueryProperties());
-        initializer.setTableFinder(new TableFinder() {
+        initializer.setTableFinder(new DfTableFinder() {
             public Table findTable(String name) {
                 return getTable(name);
             }
@@ -1405,7 +1405,7 @@ public class Database {
     }
 
     public boolean hasBuriAllRoundStateHistory() {
-        return getProperties().getBuriProperties().hasBuriAllRoundStateHistory(new TableFinder() {
+        return getProperties().getBuriProperties().hasBuriAllRoundStateHistory(new DfTableFinder() {
             public Table findTable(String name) {
                 return getTable(name);
             }

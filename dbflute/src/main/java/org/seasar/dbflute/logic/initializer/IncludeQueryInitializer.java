@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Table;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
-import org.seasar.dbflute.properties.assistant.TableFinder;
+import org.seasar.dbflute.properties.assistant.DfTableFinder;
 
 /**
  * @author jflute
@@ -28,7 +28,7 @@ public class IncludeQueryInitializer {
     //                                                                           =========
     protected DfIncludeQueryProperties includeQueryProperties;
 
-    protected TableFinder tableFinder;
+    protected DfTableFinder tableFinder;
 
     // ===================================================================================
     //                                                                          Initialize
@@ -166,11 +166,11 @@ public class IncludeQueryInitializer {
         this.includeQueryProperties = includeQueryProperties;
     }
 
-    public TableFinder getTableFinder() {
+    public DfTableFinder getTableFinder() {
         return tableFinder;
     }
 
-    public void setTableFinder(TableFinder tableFinder) {
+    public void setTableFinder(DfTableFinder tableFinder) {
         this.tableFinder = tableFinder;
     }
 }

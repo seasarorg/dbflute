@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
@@ -53,7 +51,6 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected String _mainSchemaName;
     protected List<String> _allSchemaList;
 
     // ===================================================================================
@@ -61,8 +58,6 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     //                                                                             =======
     public Map<String, DfProcedureSynonymMetaInfo> extractProcedureSynonymMap() {
         final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = new LinkedHashMap<String, DfProcedureSynonymMetaInfo>();
-        final DfProcedureHandler procedureHandler = new DfProcedureHandler();
-        procedureHandler.suppressFilterByProperty();
         final String sql = buildSynonymSelect();
         Connection conn = null;
         Statement statement = null;
@@ -70,12 +65,15 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
         try {
             conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final Map<String, DfProcedureMetaInfo> procedureMap = procedureHandler.getAvailableProcedureMap(metaData);
-            final Set<Entry<String, DfProcedureMetaInfo>> entrySet = procedureMap.entrySet();
-            for (Entry<String, DfProcedureMetaInfo> entry : entrySet) {
-                final DfProcedureMetaInfo metaInfo = entry.getValue();
-                final String procedureSqlName = metaInfo.getProcedureFullName();
-                procedureMap.put(procedureSqlName, metaInfo);
+            final Map<String, DfProcedureMetaInfo> procedureFullNameKeyMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
+            final List<DfProcedureMetaInfo> procedureList = new ArrayList<DfProcedureMetaInfo>();
+            final DfProcedureHandler procedureHandler = new DfProcedureHandler();
+            for (String schemaName : _allSchemaList) {
+                procedureList.addAll(procedureHandler.getPlainProcedureList(metaData, schemaName));
+            }
+            for (DfProcedureMetaInfo metaInfo : procedureList) {
+                final String procedureFullName = metaInfo.getProcedureFullName();
+                procedureFullNameKeyMap.put(procedureFullName, metaInfo);
             }
             statement = conn.createStatement();
             _log.info(sql);
@@ -109,8 +107,8 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
                     continue; // basically no way because it may be for DB Link Synonym
                 }
 
-                final String procedureKey = tableOwner + "." + tableName;
-                final DfProcedureMetaInfo procedureMetaInfo = procedureMap.get(procedureKey);
+                final String procedureKey = tableOwner + "." + tableName; // as procedure full name
+                final DfProcedureMetaInfo procedureMetaInfo = procedureFullNameKeyMap.get(procedureKey);
                 if (procedureMetaInfo == null) {
                     // Synonym for Package Procedure has several problems.
                     // So it is not supported here.
@@ -194,10 +192,6 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     //                                                                            ========
     public void setDataSource(DataSource dataSource) {
         _dataSource = dataSource;
-    }
-
-    public void setMainSchemaName(String mainSchemaName) {
-        this._mainSchemaName = mainSchemaName;
     }
 
     public void setAllSchemaList(List<String> allSchemaList) {

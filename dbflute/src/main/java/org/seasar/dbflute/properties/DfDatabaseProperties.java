@@ -15,19 +15,12 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
 
 /**
  * @author jflute
  */
 public final class DfDatabaseProperties extends DfAbstractHelperProperties {
-
-    // ===================================================================================
-    //                                                                          Definition
-    //                                                                          ==========
-    protected static final String OBJECT_TYPE_TABLE = "TABLE";
-    protected static final String OBJECT_TYPE_VIEW = "VIEW";
-    protected static final String OBJECT_TYPE_SYNONYM = "SYNONYM";
-    protected static final String OBJECT_TYPE_ALIAS = "ALIAS";
 
     // ===================================================================================
     //                                                                         Constructor
@@ -86,19 +79,13 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     public boolean hasObjectTypeSynonym() {
-        List<String> objectTypeList = getObjectTypeTargetList();
-        for (String objectType : objectTypeList) {
-            if (OBJECT_TYPE_SYNONYM.equalsIgnoreCase(objectType)) {
-                return true;
-            }
-        }
-        return false;
+        return DfConnectionProperties.hasObjectTypeSynonym(getObjectTypeTargetList());
     }
 
     protected List<String> getDatabaseTypeList() { // Old Style
         final List<Object> defaultList = new ArrayList<Object>();
-        defaultList.add(OBJECT_TYPE_TABLE);
-        defaultList.add(OBJECT_TYPE_VIEW);
+        defaultList.add(DfConnectionProperties.OBJECT_TYPE_TABLE);
+        defaultList.add(DfConnectionProperties.OBJECT_TYPE_VIEW);
         final List<String> resultList = new ArrayList<String>();
         final List<Object> listProp = listProp("torque.database.type.list", defaultList);
         for (Object object : listProp) {

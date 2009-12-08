@@ -16,6 +16,10 @@ public class DfAdditionalSchemaInfo {
     protected boolean _suppressCommonColumn;
     protected Map<String, String> _supplementaryConnectionMap;
 
+    public boolean hasObjectTypeSynonym() {
+        return DfConnectionProperties.hasObjectTypeSynonym(getObjectTypeTargetList());
+    }
+
     public String getSupplementaryConnectionUser() {
         if (_supplementaryConnectionMap == null) {
             return null;

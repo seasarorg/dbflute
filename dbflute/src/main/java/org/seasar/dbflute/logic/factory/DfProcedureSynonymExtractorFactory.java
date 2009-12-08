@@ -39,7 +39,6 @@ public class DfProcedureSynonymExtractorFactory {
         if (_basicProperties.isDatabaseOracle()) {
             final DfProcedureSynonymExtractorOracle extractor = new DfProcedureSynonymExtractorOracle();
             extractor.setDataSource(_dataSource);
-            extractor.setMainSchemaName(_databaseProperties.getDatabaseSchema());
             extractor.setAllSchemaList(createAllSchemaList());
             return extractor;
         }

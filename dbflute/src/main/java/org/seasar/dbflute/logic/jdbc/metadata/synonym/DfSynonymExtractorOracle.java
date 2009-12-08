@@ -61,7 +61,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected List<String> _schemaList;
+    protected List<String> _allSchemaList;
     protected Set<String> _refTableCheckSet;
 
     // -----------------------------------------------------
@@ -177,7 +177,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     protected String buildSynonymSelect() {
         final StringBuilder sb = new StringBuilder();
         int count = 0;
-        for (String schema : _schemaList) {
+        for (String schema : _allSchemaList) {
             if (count > 0) {
                 sb.append(", ");
             }
@@ -594,8 +594,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         _dataSource = dataSource;
     }
 
-    public void setSchemaList(List<String> schemaList) {
-        this._schemaList = schemaList;
+    public void setAllSchemaList(List<String> allSchemaList) {
+        this._allSchemaList = allSchemaList;
     }
 
     public void setRefTableCheckSet(Set<String> refTableCheckSet) {

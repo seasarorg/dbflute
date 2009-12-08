@@ -36,6 +36,7 @@ import org.seasar.dbflute.logic.factory.DfProcedureSynonymExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
@@ -160,10 +161,31 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         final List<DfProcedureMetaInfo> procedureSynonymList = new ArrayList<DfProcedureMetaInfo>();
         for (Entry<String, DfProcedureSynonymMetaInfo> entry : entrySet) {
             final DfProcedureSynonymMetaInfo procedureSynonymMetaInfo = entry.getValue();
+            if (!isSynonymAllowedSchema(procedureSynonymMetaInfo)) {
+                continue;
+            }
             procedureSynonymMetaInfo.reflectSynonymToProcedure();
             procedureSynonymList.add(procedureSynonymMetaInfo.getProcedureMetaInfo());
         }
         procedureList.addAll(filterByProperty(procedureSynonymList));
+    }
+
+    protected boolean isSynonymAllowedSchema(DfProcedureSynonymMetaInfo procedureSynonymMetaInfo) {
+        final DfSynonymMetaInfo synonymMetaInfo = procedureSynonymMetaInfo.getSynonymMetaInfo();
+        final String synonymOwner = synonymMetaInfo.getSynonymOwner();
+        final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
+        final String mainSchema = databaseProperties.getDatabaseSchema();
+        if (mainSchema != null && mainSchema.equalsIgnoreCase(synonymOwner)) {
+            if (databaseProperties.hasObjectTypeSynonym()) {
+                return true;
+            }
+        }
+        final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = databaseProperties.getAdditionalSchemaMap();
+        final DfAdditionalSchemaInfo additionalSchemaInfo = additionalSchemaMap.get(synonymOwner);
+        if (additionalSchemaInfo != null && additionalSchemaInfo.hasObjectTypeSynonym()) {
+            return true;
+        }
+        return false;
     }
 
     protected DfProcedureSynonymExtractor createProcedureSynonymExtractor() {

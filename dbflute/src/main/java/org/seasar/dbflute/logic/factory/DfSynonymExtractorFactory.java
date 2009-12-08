@@ -43,7 +43,7 @@ public class DfSynonymExtractorFactory {
         if (_basicProperties.isDatabaseOracle()) {
             final DfSynonymExtractorOracle extractor = new DfSynonymExtractorOracle();
             extractor.setDataSource(_dataSource);
-            extractor.setSchemaList(createAllSchemaList());
+            extractor.setAllSchemaList(createAllSchemaList());
             extractor.setRefTableCheckSet(_refTableCheckSet);
             return extractor;
         }
@@ -51,9 +51,8 @@ public class DfSynonymExtractorFactory {
     }
 
     protected List<String> createAllSchemaList() { // not only main schema but also additional schemas
-        final String mainSchema = _databaseProperties.getDatabaseSchema();
         final List<String> schemaList = new ArrayList<String>();
-        schemaList.add(mainSchema);
+        schemaList.add(_databaseProperties.getDatabaseSchema());
         schemaList.addAll(_databaseProperties.getAdditionalSchemaMap().keySet());
         return schemaList;
     }
