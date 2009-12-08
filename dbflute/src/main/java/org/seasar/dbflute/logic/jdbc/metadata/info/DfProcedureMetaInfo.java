@@ -22,6 +22,8 @@ public class DfProcedureMetaInfo {
     protected String procedureFullName;
     protected String procedureSqlName;
     protected String procedureUniqueName;
+    protected boolean procedureSynonym;
+
     protected List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = new ArrayList<DfProcedureColumnMetaInfo>();
 
     public String getProcedureDisplayNameForSchemaHtml() {
@@ -140,6 +142,14 @@ public class DfProcedureMetaInfo {
 
     public void setProcedureUniqueName(String procedureUniqueName) {
         this.procedureUniqueName = procedureUniqueName;
+    }
+
+    public boolean isProcedureSynonym() {
+        return procedureSynonym;
+    }
+
+    public void setProcedureSynonym(boolean procedureSynonym) {
+        this.procedureSynonym = procedureSynonym;
     }
 
     public List<DfProcedureColumnMetaInfo> getProcedureColumnMetaInfoList() {

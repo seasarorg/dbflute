@@ -251,23 +251,32 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         // If both are additional schema, it selects first. 
         if (firstSchema != null && !firstSchema.equalsIgnoreCase(secondSchema)
                 && firstSchema.equalsIgnoreCase(schemaName)) {
-            String msg = "*Found the same-name procedure, so elects main schema:";
-            msg = msg + " elect=" + first.getProcedureFullName() + " skipped=" + metaInfo.getProcedureFullName();
-            _log.info(msg);
+            showDuplicateProcedure(first, metaInfo, true, "main schema");
             return true;
         } else if (secondSchema != null && !secondSchema.equalsIgnoreCase(firstSchema)
                 && secondSchema.equalsIgnoreCase(schemaName)) {
-            String msg = "*Found the same-name procedure, so elects main schema:";
-            msg = msg + " elect=" + metaInfo.getProcedureFullName() + " skipped=" + first.getProcedureFullName();
-            _log.info(msg);
             procdureMap.remove(procedureUniqueName);
+            showDuplicateProcedure(first, metaInfo, false, "main schema");
             return false;
         } else {
-            String msg = "*Found the same-name procedure, so elects first one:";
-            msg = msg + " elect=" + first.getProcedureFullName() + " skipped=" + metaInfo.getProcedureFullName();
-            _log.info(msg);
+            showDuplicateProcedure(first, metaInfo, true, "first one");
             return true;
         }
+    }
+
+    protected void showDuplicateProcedure(DfProcedureMetaInfo first, DfProcedureMetaInfo second, boolean electFirst,
+            String reason) {
+        final String firstName = first.getProcedureFullName();
+        final String secondName = second.getProcedureFullName();
+        final String firstType = first.isProcedureSynonym() ? "(synonym)" : "";
+        final String secondType = second.isProcedureSynonym() ? "(synonym)" : "";
+        String msg = "*Found the same-name procedure, so elects " + reason + ":";
+        if (electFirst) {
+            msg = msg + " elect=" + firstName + firstType + " skipped=" + secondName + secondType;
+        } else {
+            msg = msg + " elect=" + secondName + secondType + " skipped=" + firstName + firstType;
+        }
+        _log.info(msg);
     }
 
     // ===================================================================================

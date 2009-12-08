@@ -122,6 +122,7 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
                     continue;
                     //}
                 }
+                procedureMetaInfo.setProcedureSynonym(true);
                 final DfProcedureSynonymMetaInfo procedureSynonymMetaInfo = new DfProcedureSynonymMetaInfo();
                 procedureSynonymMetaInfo.setProcedureMetaInfo(procedureMetaInfo);
                 procedureSynonymMetaInfo.setSynonymMetaInfo(synonymMetaInfo);
