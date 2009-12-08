@@ -170,9 +170,12 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
         dropDBLink(conn);
     }
 
+    /**
+     * Drop DB links that are private DB links. <br />
+     * @param conn The connection to main schema. (NotNull)
+     */
     protected void dropDBLink(Connection conn) {
         final List<String> dbLinkNameList = new ArrayList<String>();
-        final List<String> publicDBLinkNameList = new ArrayList<String>();
         final String metaDataSql = "select * from ALL_DB_LINKS where OWNER = '" + _schema + "'";
         Statement st = null;
         ResultSet rs = null;
@@ -182,12 +185,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
             rs = st.executeQuery(metaDataSql);
             while (rs.next()) {
                 final String dbLinkName = rs.getString("DB_LINK");
-                final String userName = rs.getString("USERNAME");
-                if (userName != null && userName.trim().length() > 0) {
-                    dbLinkNameList.add(dbLinkName);
-                } else {
-                    publicDBLinkNameList.add(dbLinkName);
-                }
+                dbLinkNameList.add(dbLinkName);
             }
         } catch (SQLException continued) {
             String msg = "*Failed to the SQL:" + ln();
@@ -217,23 +215,6 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
                 final String dropDbLinkSql = "drop database link " + dbLinkName;
                 _log.info(dropDbLinkSql);
                 st.execute(dropDbLinkSql);
-            }
-            for (String dbLinkName : publicDBLinkNameList) {
-                String dropDbLinkSql = "drop database link " + dbLinkName;
-                _log.info(dropDbLinkSql);
-                try {
-                    st.execute(dropDbLinkSql);
-                } catch (SQLException e) {
-                    try {
-                        // retry with 'public' option
-                        dropDbLinkSql = "drop public database link " + dbLinkName;
-                        st.execute(dropDbLinkSql);
-                        _log.info("  (o) retry: " + dropDbLinkSql);
-                    } catch (SQLException ignored) {
-                        _log.info("  (x) retry: " + dropDbLinkSql);
-                        throw e;
-                    }
-                }
             }
         } catch (SQLException e) {
             String msg = "Failed to drop DB links: " + dbLinkNameList;
