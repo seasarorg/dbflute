@@ -52,7 +52,7 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected List<String> _schemaNameList;
+    protected List<String> _schemaNameAllList;
     protected String _mainSchemaName;
 
     // TODO @jflute - in development
@@ -161,7 +161,7 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     protected String buildSynonymSelect() {
         final StringBuilder sb = new StringBuilder();
         int count = 0;
-        for (String schema : _schemaNameList) {
+        for (String schema : _schemaNameAllList) {
             if (count > 0) {
                 sb.append(", ");
             }
@@ -199,7 +199,7 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     }
 
     public void setSchemaList(List<String> schemaList) {
-        this._schemaNameList = schemaList;
+        this._schemaNameAllList = schemaList;
     }
 
     public void setSchemaName(String schemaName) {

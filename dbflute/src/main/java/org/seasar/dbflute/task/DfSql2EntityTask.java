@@ -23,6 +23,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +98,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, String> _columnJdbcTypeMap = new LinkedHashMap<String, String>();
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
-    protected final Map<String, DfProcedureMetaInfo> _procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
 
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
     protected DfOutsideSqlMarkAnalyzer _markAnalyzer = new DfOutsideSqlMarkAnalyzer();
@@ -687,9 +687,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         final List<DfProcedureMetaInfo> procedures = getAvailableProcedures();
         _log.info(" ");
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
+        final Map<String, DfProcedureMetaInfo> procdureHandlingMap = new HashMap<String, DfProcedureMetaInfo>();
         for (DfProcedureMetaInfo metaInfo : procedures) {
             final String procedureName = metaInfo.getProcedureName();
-            _procedureMap.put(procedureName, metaInfo);
 
             final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
@@ -705,8 +705,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             if (procedureColumnMetaInfoList.isEmpty()) {
                 _log.info("    *No Parameter");
             }
-            if (_pmbMetaDataMap.containsKey(pmbName)) {
-                _log.info("    *It was found the same name of parameter bean, so skip and continue!");
+            if (handleDuplicateProcedureIfNeeds(pmbName, metaInfo, procdureHandlingMap)) {
                 continue;
             }
             for (DfProcedureColumnMetaInfo columnMetaInfo : procedureColumnMetaInfoList) {
@@ -739,6 +738,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             parameterBeanMetaData.setPropertyNameColumnNameMap(propertyNameColumnNameMap);
             parameterBeanMetaData.setProcedureName(procedureSqlName);
             _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
+            procdureHandlingMap.put(pmbName, metaInfo); // for duplicate check
         }
         _log.info("= = = = = = = = = =/");
         _log.info(" ");
@@ -756,6 +756,36 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             if (conn != null) {
                 conn.close();
             }
+        }
+    }
+
+    protected boolean handleDuplicateProcedureIfNeeds(String pmbName, DfProcedureMetaInfo metaInfo,
+            Map<String, DfProcedureMetaInfo> procdureHandlingMap) {
+        final DfProcedureMetaInfo first = procdureHandlingMap.get(pmbName);
+        if (first == null) {
+            return false;
+        }
+        final String firstSchema = first.getProcedureSchema();
+        final String secondSchema = metaInfo.getProcedureSchema();
+        // Basically select the one of main schema.
+        // If both are additional schema, it selects first. 
+        if (firstSchema != null && firstSchema.equalsIgnoreCase(_schema)) {
+            String msg = "    *It was found the same name of parameter bean, so it selected the one of main schema:";
+            msg = msg + " " + firstSchema + "." + first.getProcedureName();
+            _log.info(msg);
+            return true;
+        } else if (secondSchema != null && secondSchema.equalsIgnoreCase(_schema)) {
+            String msg = "    *It was found the same name of parameter bean, so it selected the one of main schema:";
+            msg = msg + " " + secondSchema + "." + metaInfo.getProcedureName();
+            _log.info(msg);
+            procdureHandlingMap.remove(pmbName);
+            _pmbMetaDataMap.remove(pmbName);
+            return false;
+        } else {
+            String msg = "    *It was found the same name of parameter bean, so it skipped and continued:";
+            msg = msg + " skipped=" + secondSchema + "." + metaInfo.getProcedureName();
+            _log.info(msg);
+            return true;
         }
     }
 
