@@ -46,7 +46,8 @@ public class DfProcedureMetaInfo {
             }
         }
         sb.append(procedureName);
-        sb.append(" <span class=\"type\">(").append(procedureType.alias()).append(")</span>");
+        final String typeDisp = procedureType.alias() + (procedureSynonym ? ", Synonym" : "");
+        sb.append(" <span class=\"type\">(").append(typeDisp).append(")</span>");
         return sb.toString();
     }
 
