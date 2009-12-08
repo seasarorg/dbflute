@@ -118,20 +118,20 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final String procedureFullName = buildProcedureFullName(metaInfo);
             final String procedureCatalog = metaInfo.getProcedureCatalog();
             if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
-                _log.info("passed: non-target catalog - " + procedureFullName);
+                _log.info("  passed: non-target catalog - " + procedureFullName);
                 ++passedCount;
                 continue;
             }
             final String procedureSchema = metaInfo.getProcedureSchema();
             if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema)) {
-                _log.info("passed: non-target schema - " + procedureFullName);
+                _log.info("  passed: non-target schema - " + procedureFullName);
                 ++passedCount;
                 continue;
             }
             if (!outsideSqlProperties.isTargetProcedureName(procedureFullName)) {
                 final String procedureName = metaInfo.getProcedureName();
                 if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
-                    _log.info("passed: non-target name - " + procedureFullName);
+                    _log.info("  passed: non-target name - " + procedureFullName);
                     ++passedCount;
                     continue;
                 }
@@ -139,7 +139,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             resultList.add(metaInfo);
         }
         if (passedCount == 0) {
-            _log.info("All procedures are target: count=" + procedureList.size());
+            _log.info("  --> All procedures are target: count=" + procedureList.size());
         }
         return resultList;
     }
