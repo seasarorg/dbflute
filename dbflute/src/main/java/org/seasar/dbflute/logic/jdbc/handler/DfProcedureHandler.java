@@ -249,19 +249,21 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         final String secondSchema = metaInfo.getProcedureSchema();
         // Basically select the one of main schema.
         // If both are additional schema, it selects first. 
-        if (firstSchema != null && firstSchema.equalsIgnoreCase(schemaName)) {
+        if (firstSchema != null && !firstSchema.equalsIgnoreCase(secondSchema)
+                && firstSchema.equalsIgnoreCase(schemaName)) {
             String msg = "*Found the same-name procedure, so elects main schema:";
             msg = msg + " elect=" + first.getProcedureFullName() + " skipped=" + metaInfo.getProcedureFullName();
             _log.info(msg);
             return true;
-        } else if (secondSchema != null && secondSchema.equalsIgnoreCase(schemaName)) {
+        } else if (secondSchema != null && !secondSchema.equalsIgnoreCase(firstSchema)
+                && secondSchema.equalsIgnoreCase(schemaName)) {
             String msg = "*Found the same-name procedure, so elects main schema:";
             msg = msg + " elect=" + metaInfo.getProcedureFullName() + " skipped=" + first.getProcedureFullName();
             _log.info(msg);
             procdureMap.remove(procedureUniqueName);
             return false;
         } else {
-            String msg = "*Found the same-name procedure:";
+            String msg = "*Found the same-name procedure, so elects first one:";
             msg = msg + " elect=" + first.getProcedureFullName() + " skipped=" + metaInfo.getProcedureFullName();
             _log.info(msg);
             return true;
