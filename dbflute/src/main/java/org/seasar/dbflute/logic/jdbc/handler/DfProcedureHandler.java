@@ -113,26 +113,33 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
         final List<DfProcedureMetaInfo> resultList = new ArrayList<DfProcedureMetaInfo>();
         _log.info("...Filtering procedures by the property: before=" + procedureList.size());
+        int passedCount = 0;
         for (DfProcedureMetaInfo metaInfo : procedureList) {
             final String procedureFullName = buildProcedureFullName(metaInfo);
             final String procedureCatalog = metaInfo.getProcedureCatalog();
             if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
                 _log.info("passed: non-target catalog - " + procedureFullName);
+                ++passedCount;
                 continue;
             }
             final String procedureSchema = metaInfo.getProcedureSchema();
             if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema)) {
                 _log.info("passed: non-target schema - " + procedureFullName);
+                ++passedCount;
                 continue;
             }
             if (!outsideSqlProperties.isTargetProcedureName(procedureFullName)) {
                 final String procedureName = metaInfo.getProcedureName();
                 if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
                     _log.info("passed: non-target name - " + procedureFullName);
+                    ++passedCount;
                     continue;
                 }
             }
             resultList.add(metaInfo);
+        }
+        if (passedCount == 0) {
+            _log.info("All procedures are target: count=" + procedureList.size());
         }
         return resultList;
     }
