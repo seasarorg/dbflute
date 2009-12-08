@@ -314,18 +314,26 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         @Override
         public void prepare(File sqlFile) {
             super.prepare(sqlFile);
-            if (_currentUser != null) {
-                _log.info("...Coming back to the main user from the user '" + _currentUser + "'");
-                _currentUser = null; // because the max scope of change user is one SQL file
-            }
+            restoreRevivedUser();
+            restoreCurrentUser();
+        }
+
+        protected void restoreRevivedUser() {
             for (String revivedUser : _revivedUserSet) {
                 if (_goodByeUserSet.contains(revivedUser)) {
                     continue; // already good-bye again
                 }
-                _log.info("...Saying good-bye to the user '" + _currentUser + "' again");
+                _log.info("...Saying good-bye to the user '" + revivedUser + "' again");
                 _goodByeUserSet.add(revivedUser);
             }
             _revivedUserSet.clear();
+        }
+
+        protected void restoreCurrentUser() {
+            if (_currentUser != null) {
+                _log.info("...Coming back to the main user from the user '" + _currentUser + "'");
+                _currentUser = null; // because the max scope of change user is one SQL file
+            }
         }
 
         @Override
