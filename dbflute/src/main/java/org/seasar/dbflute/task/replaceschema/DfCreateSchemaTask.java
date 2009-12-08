@@ -384,10 +384,14 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                         _log.info("passed: " + logSql);
                         return false;
                     }
+                } else {
+                    if (reviveUser) {
+                        _log.warn("*The mark 'reviveUser()' is unsupported at the timing!");
+                    }
                 }
             } else {
                 if (reviveUser) {
-                    _log.warn("*The mark 'reviveUser()' is unsupported at the timing: sql=" + sql);
+                    _log.warn("*The mark 'reviveUser()' is unsupported at the timing!");
                 }
             }
             return super.isTargetSql(sql);
