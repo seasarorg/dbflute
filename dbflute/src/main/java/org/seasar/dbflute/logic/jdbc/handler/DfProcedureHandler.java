@@ -156,6 +156,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             String msg = "Unexpected handling type of procedure sysnonym: " + handlingType;
             throw new IllegalStateException(msg);
         }
+        final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
         _log.info("...Adding procedure synonyms as procedure: count=" + procedureSynonymMap.size());
         final Set<Entry<String, DfProcedureSynonymMetaInfo>> entrySet = procedureSynonymMap.entrySet();
         final List<DfProcedureMetaInfo> procedureSynonymList = new ArrayList<DfProcedureMetaInfo>();
@@ -164,7 +165,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             if (!isSynonymAllowedSchema(procedureSynonymMetaInfo)) {
                 continue;
             }
-            procedureSynonymMetaInfo.reflectSynonymToProcedure();
+            procedureSynonymMetaInfo.reflectSynonymToProcedure(databaseProperties.getDatabaseSchema());
             procedureSynonymList.add(procedureSynonymMetaInfo.getProcedureMetaInfo());
         }
         procedureList.addAll(procedureSynonymList);

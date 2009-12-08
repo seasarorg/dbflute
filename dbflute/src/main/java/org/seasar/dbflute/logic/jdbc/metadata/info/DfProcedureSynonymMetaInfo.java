@@ -30,7 +30,7 @@ public class DfProcedureSynonymMetaInfo {
     // ===================================================================================
     //                                                                              Switch
     //                                                                              ======
-    public void reflectSynonymToProcedure() {
+    public void reflectSynonymToProcedure(String mainSchemaName) {
         if (_procedureMetaInfo == null) {
             String msg = "The procedureMetaInfo should not be null!";
             throw new IllegalStateException(msg);
@@ -42,12 +42,19 @@ public class DfProcedureSynonymMetaInfo {
         final String synonymOwner = _synonymMetaInfo.getSynonymOwner();
         final String synonymName = _synonymMetaInfo.getSynonymName();
         final String synonymFullName = synonymOwner + "." + synonymName;
+        final String synonymSqlName;
+        if (mainSchemaName != null && mainSchemaName.equalsIgnoreCase(synonymOwner)) {
+            synonymSqlName = synonymName;
+        } else {
+            synonymSqlName = synonymOwner + "." + synonymName;
+        }
+        final String synonymUniqueName = synonymName;
         _procedureMetaInfo.setProcedureCatalog(null);
         _procedureMetaInfo.setProcedureSchema(synonymOwner);
         _procedureMetaInfo.setProcedureName(_synonymMetaInfo.getSynonymName());
         _procedureMetaInfo.setProcedureFullName(synonymFullName);
-        _procedureMetaInfo.setProcedureSqlName(synonymFullName);
-        _procedureMetaInfo.setProcedureUniqueName(synonymFullName);
+        _procedureMetaInfo.setProcedureSqlName(synonymSqlName);
+        _procedureMetaInfo.setProcedureUniqueName(synonymUniqueName);
     }
 
     // ===================================================================================
