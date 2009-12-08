@@ -112,7 +112,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         }
         final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
         final List<DfProcedureMetaInfo> resultList = new ArrayList<DfProcedureMetaInfo>();
-        _log.info("...Filtering the procedure by property: before=" + procedureList.size());
+        _log.info("...Filtering procedures by the property: before=" + procedureList.size());
         for (DfProcedureMetaInfo metaInfo : procedureList) {
             final String procedureFullName = buildProcedureFullName(metaInfo);
             final String procedureCatalog = metaInfo.getProcedureCatalog();
@@ -128,7 +128,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             if (!outsideSqlProperties.isTargetProcedureName(procedureFullName)) {
                 final String procedureName = metaInfo.getProcedureName();
                 if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
-                    _log.info("passes: non-target name - " + procedureFullName);
+                    _log.info("passed: non-target name - " + procedureFullName);
                     continue;
                 }
             }
