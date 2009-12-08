@@ -240,8 +240,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                   -------------------
     protected boolean handleDuplicateProcedure(DfProcedureMetaInfo metaInfo,
             Map<String, DfProcedureMetaInfo> procdureMap, String schemaName) {
-        final String procedurePmbName = metaInfo.getProcedureUniqueName();
-        final DfProcedureMetaInfo first = procdureMap.get(procedurePmbName);
+        final String procedureUniqueName = metaInfo.getProcedureUniqueName();
+        final DfProcedureMetaInfo first = procdureMap.get(procedureUniqueName);
         if (first == null) {
             return false;
         }
@@ -250,19 +250,19 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         // Basically select the one of main schema.
         // If both are additional schema, it selects first. 
         if (firstSchema != null && firstSchema.equalsIgnoreCase(schemaName)) {
-            String msg = "*It was found the same-name procedure, so it selected the one of main schema:";
-            msg = msg + " " + first.getProcedureFullName();
+            String msg = "*Found the same-name procedure(electing main schema):";
+            msg = msg + " elect=" + first.getProcedureFullName() + " skipped=" + metaInfo.getProcedureFullName();
             _log.info(msg);
             return true;
         } else if (secondSchema != null && secondSchema.equalsIgnoreCase(schemaName)) {
-            String msg = "*It was found the same-name procedure, so it selected the one of main schema:";
-            msg = msg + " " + metaInfo.getProcedureFullName();
+            String msg = "*Found the same-name procedure(electing main schema):";
+            msg = msg + " elect=" + metaInfo.getProcedureFullName() + " skipped=" + first.getProcedureFullName();
             _log.info(msg);
-            procdureMap.remove(procedurePmbName);
+            procdureMap.remove(procedureUniqueName);
             return false;
         } else {
-            String msg = "*It was found the same-name procedure, so it skipped and continued:";
-            msg = msg + " skipped=" + metaInfo.getProcedureFullName();
+            String msg = "*Found the same-name procedure:";
+            msg = msg + " elect=" + first.getProcedureFullName() + " skipped=" + metaInfo.getProcedureFullName();
             _log.info(msg);
             return true;
         }
