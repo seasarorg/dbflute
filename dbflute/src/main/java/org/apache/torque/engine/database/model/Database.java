@@ -1908,7 +1908,8 @@ public class Database {
         try {
             final Connection conn = dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            return handler.getAvailableProcedureList(metaData, getDatabaseSchema());
+            final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(metaData);
+            return new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
         } catch (SQLException e) {
             String msg = "Failed to get the list of available procedure:";
             msg = msg + " schemaName=" + schemaName;

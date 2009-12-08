@@ -59,15 +59,12 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
-import org.seasar.dbflute.logic.factory.DfProcedureSynonymExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
-import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
@@ -76,7 +73,6 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.properties.DfOutsideSqlProperties.ProcedureSynonymHandlingType;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -690,12 +686,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
             return;
         }
-        final List<DfProcedureMetaInfo> procedureList = getAvailableProcedureList();
         _log.info(" ");
+        _log.info("...Setting up procedures for generating paramter beans");
+        final Map<String, DfProcedureMetaInfo> procedureMap = getAvailableProcedureMap();
+        final Set<Entry<String, DfProcedureMetaInfo>> entrySet = procedureMap.entrySet();
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         final Map<String, DfProcedureMetaInfo> procdureHandlingMap = new HashMap<String, DfProcedureMetaInfo>();
-        for (DfProcedureMetaInfo metaInfo : procedureList) {
-            final String procedureName = metaInfo.getProcedureName();
+        for (Entry<String, DfProcedureMetaInfo> entry : entrySet) {
+            final String procedureUniqueName = entry.getKey();
+            final DfProcedureMetaInfo metaInfo = entry.getValue();
 
             final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
             final Map<String, String> propertyNameTypeMap = new LinkedHashMap<String, String>();
@@ -704,15 +703,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = metaInfo
                     .getProcedureColumnMetaInfoList();
             int index = 0;
-            final String pmbName = convertProcedureNameToPmbName(procedureName);
-            final String procedureSqlName = buildProcedureSqlName(metaInfo);
+            final String pmbName = convertProcedureNameToPmbName(procedureUniqueName);
+            final String procedureSqlName = metaInfo.getProcedureSqlName();
 
             _log.info("[" + pmbName + "]: " + procedureSqlName + " // " + metaInfo.getProcedureType());
             if (procedureColumnMetaInfoList.isEmpty()) {
                 _log.info("    *No Parameter");
-            }
-            if (handleDuplicateProcedureIfNeeds(pmbName, metaInfo, procdureHandlingMap)) {
-                continue;
             }
             for (DfProcedureColumnMetaInfo columnMetaInfo : procedureColumnMetaInfoList) {
                 String columnName = columnMetaInfo.getColumnName();
@@ -753,86 +749,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // -----------------------------------------------------
     //                                   Procedure Meta Info
     //                                   -------------------
-    protected List<DfProcedureMetaInfo> getAvailableProcedureList() throws SQLException {
+    protected Map<String, DfProcedureMetaInfo> getAvailableProcedureMap() throws SQLException {
         Connection conn = null;
         try {
             conn = getDataSource().getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final List<DfProcedureMetaInfo> procedureList = _procedureHandler.getAvailableProcedureList(metaData,
-                    _schema);
-            setupProcedureSynonymIfneeds(procedureList);
-            return procedureList;
+            _procedureHandler.includeProcedureSynonym(getDataSource());
+            return _procedureHandler.getAvailableProcedureMap(metaData);
         } finally {
             if (conn != null) {
                 conn.close();
             }
-        }
-    }
-
-    protected void setupProcedureSynonymIfneeds(List<DfProcedureMetaInfo> procedureList) {
-        final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
-        final ProcedureSynonymHandlingType handlingType = prop.getProcedureSynonymHandlingType();
-        if (handlingType.equals(ProcedureSynonymHandlingType.NONE)) {
-            return;
-        }
-        final DfProcedureSynonymExtractor extractor = createProcedureSynonymExtractor();
-        final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = extractor.extractProcedureSynonymMap();
-        if (handlingType.equals(ProcedureSynonymHandlingType.INCLUDE)) {
-            // only add procedure synonyms to the procedure list
-        } else if (handlingType.equals(ProcedureSynonymHandlingType.SWITCH)) {
-            _log.info("...Clearing normal procedures: count=" + procedureList.size());
-            procedureList.clear(); // because of switch
-        } else {
-            String msg = "Unexpected handling type of procedure sysnonym: " + handlingType;
-            throw new IllegalStateException(msg);
-        }
-        _log.info("...Adding procedure synonyms as procedure: count=" + procedureSynonymMap.size());
-        final Set<Entry<String, DfProcedureSynonymMetaInfo>> entrySet = procedureSynonymMap.entrySet();
-        final List<DfProcedureMetaInfo> procedureSynonymList = new ArrayList<DfProcedureMetaInfo>();
-        for (Entry<String, DfProcedureSynonymMetaInfo> entry : entrySet) {
-            final DfProcedureSynonymMetaInfo procedureSynonymMetaInfo = entry.getValue();
-            procedureSynonymMetaInfo.reflectSynonymToProcedure();
-            procedureSynonymList.add(procedureSynonymMetaInfo.getProcedureMetaInfo());
-        }
-        procedureList.addAll(_procedureHandler.filterByProperty(procedureSynonymList));
-    }
-
-    protected DfProcedureSynonymExtractor createProcedureSynonymExtractor() {
-        final DfProcedureSynonymExtractorFactory factory = new DfProcedureSynonymExtractorFactory(getDataSource(),
-                getBasicProperties(), getDatabaseProperties());
-        return factory.createSynonymExtractor();
-    }
-
-    // -----------------------------------------------------
-    //                                   Duplicate Procedure
-    //                                   -------------------
-    protected boolean handleDuplicateProcedureIfNeeds(String pmbName, DfProcedureMetaInfo metaInfo,
-            Map<String, DfProcedureMetaInfo> procdureHandlingMap) {
-        final DfProcedureMetaInfo first = procdureHandlingMap.get(pmbName);
-        if (first == null) {
-            return false;
-        }
-        final String firstSchema = first.getProcedureSchema();
-        final String secondSchema = metaInfo.getProcedureSchema();
-        // Basically select the one of main schema.
-        // If both are additional schema, it selects first. 
-        if (firstSchema != null && firstSchema.equalsIgnoreCase(_schema)) {
-            String msg = "    *It was found the same name of parameter bean, so it selected the one of main schema:";
-            msg = msg + " " + firstSchema + "." + first.getProcedureName();
-            _log.info(msg);
-            return true;
-        } else if (secondSchema != null && secondSchema.equalsIgnoreCase(_schema)) {
-            String msg = "    *It was found the same name of parameter bean, so it selected the one of main schema:";
-            msg = msg + " " + secondSchema + "." + metaInfo.getProcedureName();
-            _log.info(msg);
-            procdureHandlingMap.remove(pmbName);
-            _pmbMetaDataMap.remove(pmbName);
-            return false;
-        } else {
-            String msg = "    *It was found the same name of parameter bean, so it skipped and continued:";
-            msg = msg + " skipped=" + secondSchema + "." + metaInfo.getProcedureName();
-            _log.info(msg);
-            return true;
         }
     }
 
@@ -875,15 +802,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected String convertProcedureNameToPmbName(String procedureName) {
-        procedureName = filterProcedureName4PmbNameAboutVendorDependency(procedureName);
-        if (procedureName.contains("_")) {
-            procedureName = generateCapitalisedJavaName(procedureName.toUpperCase());
+    protected String convertProcedureNameToPmbName(String procedureUniqueName) {
+        procedureUniqueName = replaceString(procedureUniqueName, ".", "_");
+        procedureUniqueName = filterProcedureName4PmbNameAboutVendorDependency(procedureUniqueName);
+        if (procedureUniqueName.contains("_")) {
+            procedureUniqueName = generateCapitalisedJavaName(procedureUniqueName.toUpperCase());
         } else {
-            boolean allUpperCase = isAllUpperCase(procedureName);
-            procedureName = StringUtils.capitalise(allUpperCase ? procedureName.toLowerCase() : procedureName);
+            boolean allUpperCase = isAllUpperCase(procedureUniqueName);
+            procedureUniqueName = StringUtils.capitalise(allUpperCase ? procedureUniqueName.toLowerCase()
+                    : procedureUniqueName);
         }
-        return procedureName + "Pmb";
+        return procedureUniqueName + "Pmb";
     }
 
     protected String filterProcedureName4PmbNameAboutVendorDependency(String procedureName) {
@@ -910,10 +839,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             columnName = StringUtils.uncapitalise(allUpperCase ? columnName.toLowerCase() : columnName);
         }
         return columnName;
-    }
-
-    protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
-        return _procedureHandler.buildProcedureSqlName(metaInfo);
     }
 
     protected boolean isAllUpperCase(String name) {

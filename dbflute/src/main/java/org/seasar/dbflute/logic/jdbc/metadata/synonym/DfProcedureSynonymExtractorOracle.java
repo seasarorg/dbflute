@@ -24,13 +24,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.SQLFailureException;
-import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
@@ -55,8 +56,6 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     protected String _mainSchemaName;
     protected List<String> _allSchemaList;
 
-    // TODO @jflute - in development
-
     // ===================================================================================
     //                                                                             Extract
     //                                                                             =======
@@ -71,12 +70,12 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
         try {
             conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final List<DfProcedureMetaInfo> procedureList = procedureHandler.getAvailableProcedureList(metaData,
-                    _mainSchemaName);
-            final StringKeyMap<DfProcedureMetaInfo> procedureMap = StringKeyMap.createAsCaseInsensitive();
-            for (DfProcedureMetaInfo procedureMetaInfo : procedureList) {
-                final String procedureSqlName = procedureHandler.buildProcedureFullName(procedureMetaInfo);
-                procedureMap.put(procedureSqlName, procedureMetaInfo);
+            final Map<String, DfProcedureMetaInfo> procedureMap = procedureHandler.getAvailableProcedureMap(metaData);
+            final Set<Entry<String, DfProcedureMetaInfo>> entrySet = procedureMap.entrySet();
+            for (Entry<String, DfProcedureMetaInfo> entry : entrySet) {
+                final DfProcedureMetaInfo metaInfo = entry.getValue();
+                final String procedureSqlName = metaInfo.getProcedureFullName();
+                procedureMap.put(procedureSqlName, metaInfo);
             }
             statement = conn.createStatement();
             _log.info(sql);

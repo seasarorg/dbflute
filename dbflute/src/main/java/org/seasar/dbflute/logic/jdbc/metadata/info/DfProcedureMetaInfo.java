@@ -17,8 +17,11 @@ public class DfProcedureMetaInfo {
     protected String procedureCatalog;
     protected String procedureSchema;
     protected String procedureName;
-    protected String procedureComment;
     protected DfProcedureType procedureType;
+    protected String procedureComment;
+    protected String procedureFullName;
+    protected String procedureSqlName;
+    protected String procedureUniqueName;
     protected List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = new ArrayList<DfProcedureColumnMetaInfo>();
 
     public String getProcedureDisplayNameForSchemaHtml() {
@@ -58,7 +61,7 @@ public class DfProcedureMetaInfo {
 
     @Override
     public String toString() {
-        return "{" + procedureName + ", " + procedureType + ", " + procedureComment + ", "
+        return "{" + procedureFullName + ", " + procedureType + ", " + procedureComment + ", "
                 + procedureColumnMetaInfoList + "}";
     }
 
@@ -113,6 +116,30 @@ public class DfProcedureMetaInfo {
 
     public void setProcedureComment(String procedureComment) {
         this.procedureComment = procedureComment;
+    }
+
+    public String getProcedureFullName() {
+        return procedureFullName;
+    }
+
+    public void setProcedureFullName(String procedureFullName) {
+        this.procedureFullName = procedureFullName;
+    }
+
+    public String getProcedureSqlName() {
+        return procedureSqlName;
+    }
+
+    public void setProcedureSqlName(String procedureSqlName) {
+        this.procedureSqlName = procedureSqlName;
+    }
+
+    public String getProcedureUniqueName() {
+        return procedureUniqueName;
+    }
+
+    public void setProcedureUniqueName(String procedureUniqueName) {
+        this.procedureUniqueName = procedureUniqueName;
     }
 
     public List<DfProcedureColumnMetaInfo> getProcedureColumnMetaInfoList() {

@@ -407,7 +407,8 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         final List<DfProcedureMetaInfo> procedureList;
         try {
             if (_dropGenerateProcedureOnly) {
-                procedureList = handler.getAvailableProcedureList(metaData, _schema);
+                final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(metaData);
+                procedureList = new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
             } else {
                 procedureList = handler.getPlainProcedureList(metaData, _schema);
             }
@@ -417,13 +418,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         }
         callbackDropProcedureByJdbc(conn, procedureList, new DfDropProcedureByJdbcCallback() {
             public String buildDropProcedureSql(DfProcedureMetaInfo metaInfo) {
-                final String procedureSqlName = handler.buildProcedureSqlName(metaInfo);
-                return "drop procedure " + procedureSqlName;
+                return "drop procedure " + metaInfo.getProcedureSqlName();
             }
 
             public String buildDropFunctionSql(DfProcedureMetaInfo metaInfo) {
-                final String procedureSqlName = handler.buildProcedureSqlName(metaInfo);
-                return "drop function " + procedureSqlName;
+                return "drop function " + metaInfo.getProcedureSqlName();
             }
         });
     }
