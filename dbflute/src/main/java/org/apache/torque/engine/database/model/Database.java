@@ -1903,6 +1903,7 @@ public class Database {
     //                                                                  ==================
     public List<DfProcedureMetaInfo> getAvailableProcedureList() {
         final DfProcedureHandler handler = new DfProcedureHandler();
+        handler.includeProcedureSynonym(getDataSource());
         final String schemaName = getDatabaseSchema();
         final DataSource dataSource = getDataSource();
         try {
