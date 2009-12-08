@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
+import java.util.List;
+
 /**
  * @author jflute
  * @since 0.9.6.2 (2009/12/08 Tuesday)
@@ -59,6 +61,10 @@ public class DfProcedureSynonymMetaInfo {
         metaInfo.setProcedureSynonym(_procedureMetaInfo.isProcedureSynonym());
         metaInfo.setProcedureType(_procedureMetaInfo.getProcedureType());
         metaInfo.setProcedureComment(_procedureMetaInfo.getProcedureComment());
+        final List<DfProcedureColumnMetaInfo> columnMetaInfoList = _procedureMetaInfo.getProcedureColumnMetaInfoList();
+        for (DfProcedureColumnMetaInfo columnMetaInfo : columnMetaInfoList) {
+            metaInfo.addProcedureColumnMetaInfo(columnMetaInfo);
+        }
         return metaInfo;
     }
 
