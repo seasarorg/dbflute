@@ -1901,7 +1901,14 @@ public class Database {
     // ===================================================================================
     //                                                                  Procedure Document
     //                                                                  ==================
+    protected List<DfProcedureMetaInfo> _procedureMetaInfoList;
+
     public List<DfProcedureMetaInfo> getAvailableProcedureList() {
+        if (_procedureMetaInfoList != null) {
+            return _procedureMetaInfoList;
+        }
+        _log.info(" ");
+        _log.info("...Setting up procedures for documents");
         final DfProcedureHandler handler = new DfProcedureHandler();
         handler.includeProcedureSynonym(getDataSource());
         final String schemaName = getDatabaseSchema();
@@ -1910,9 +1917,10 @@ public class Database {
             final Connection conn = dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
             final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(metaData);
-            return new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
+            _procedureMetaInfoList = new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
+            return _procedureMetaInfoList;
         } catch (SQLException e) {
-            String msg = "Failed to get the list of available procedure:";
+            String msg = "Failed to get the list of available procedures:";
             msg = msg + " schemaName=" + schemaName;
             throw new IllegalStateException(msg);
         }

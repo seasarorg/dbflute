@@ -181,8 +181,12 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             if (!isSynonymAllowedSchema(procedureSynonymMetaInfo)) {
                 continue;
             }
+            final DfProcedureMetaInfo procedureMetaInfo = procedureSynonymMetaInfo.getProcedureMetaInfo();
+            final String beforeName = procedureMetaInfo.getProcedureFullName();
             procedureSynonymMetaInfo.reflectSynonymToProcedure(databaseProperties.getDatabaseSchema());
-            procedureSynonymList.add(procedureSynonymMetaInfo.getProcedureMetaInfo());
+            final String afterName = procedureMetaInfo.getProcedureFullName();
+            _log.info("  " + beforeName + " to " + afterName);
+            procedureSynonymList.add(procedureMetaInfo);
         }
         procedureList.addAll(procedureSynonymList);
     }

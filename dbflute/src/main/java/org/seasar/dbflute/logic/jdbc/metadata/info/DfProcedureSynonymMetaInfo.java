@@ -51,7 +51,7 @@ public class DfProcedureSynonymMetaInfo {
         final String synonymUniqueName = synonymName;
         _procedureMetaInfo.setProcedureCatalog(null);
         _procedureMetaInfo.setProcedureSchema(synonymOwner);
-        _procedureMetaInfo.setProcedureName(_synonymMetaInfo.getSynonymName());
+        _procedureMetaInfo.setProcedureName(synonymName);
         _procedureMetaInfo.setProcedureFullName(synonymFullName);
         _procedureMetaInfo.setProcedureSqlName(synonymSqlName);
         _procedureMetaInfo.setProcedureUniqueName(synonymUniqueName);
