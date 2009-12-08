@@ -58,6 +58,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                           -----------
     protected String _currentUser;
     protected StringSet _goodByeUserSet = StringSet.createAsCaseInsensitive();
+    protected StringSet _revivedUserSet = StringSet.createAsCaseInsensitive();
     protected StringKeyMap<Connection> _changeUserConnectionMap = StringKeyMap.createAsCaseInsensitive();
 
     @Override
@@ -317,6 +318,14 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                 _log.info("...Coming back to the main user from the user '" + _currentUser + "'");
                 _currentUser = null; // because the max scope of change user is one SQL file
             }
+            for (String revivedUser : _revivedUserSet) {
+                if (_goodByeUserSet.contains(revivedUser)) {
+                    continue; // already good-bye again
+                }
+                _log.info("...Saying good-bye to the user '" + _currentUser + "' again");
+                _goodByeUserSet.add(revivedUser);
+            }
+            _revivedUserSet.clear();
         }
 
         @Override
@@ -352,14 +361,25 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                 _log.info("...Coming back to the main user from the user '" + _currentUser + "'");
                 _currentUser = null;
             }
+            final boolean reviveUser = analyzeReviveUser(sql);
             if (_currentUser != null && _currentUser.trim().length() > 0) {
                 if (_goodByeUserSet.contains(_currentUser)) {
-                    String logSql = sql;
-                    if (logSql.length() > 30) {
-                        logSql = logSql.substring(0, 27) + "...";
+                    if (reviveUser) {
+                        _log.info("...Reviving the user '" + _currentUser + "' during current SQL file");
+                        _revivedUserSet.add(_currentUser);
+                        _goodByeUserSet.remove(_currentUser);
+                    } else {
+                        String logSql = sql;
+                        if (logSql.length() > 30) {
+                            logSql = logSql.substring(0, 27) + "...";
+                        }
+                        _log.info("passed: " + logSql);
+                        return false;
                     }
-                    _log.info("passed: " + logSql);
-                    return false;
+                }
+            } else {
+                if (reviveUser) {
+                    _log.warn("*The mark 'reviveUser()' is unsupported at the timing: sql=" + sql);
                 }
             }
             return super.isTargetSql(sql);
@@ -401,6 +421,11 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
 
     protected boolean analyzeBackToMainUser(String sql) {
         final String mark = "#df:backToMainUser()#";
+        return sql.contains(mark);
+    }
+
+    protected boolean analyzeReviveUser(String sql) {
+        final String mark = "#df:reviveUser()#";
         return sql.contains(mark);
     }
 
