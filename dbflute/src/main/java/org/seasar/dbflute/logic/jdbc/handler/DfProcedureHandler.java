@@ -167,7 +167,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             procedureSynonymMetaInfo.reflectSynonymToProcedure();
             procedureSynonymList.add(procedureSynonymMetaInfo.getProcedureMetaInfo());
         }
-        procedureList.addAll(filterByProperty(procedureSynonymList));
+        procedureList.addAll(procedureSynonymList);
     }
 
     protected boolean isSynonymAllowedSchema(DfProcedureSynonymMetaInfo procedureSynonymMetaInfo) {
@@ -250,12 +250,12 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         // Basically select the one of main schema.
         // If both are additional schema, it selects first. 
         if (firstSchema != null && firstSchema.equalsIgnoreCase(schemaName)) {
-            String msg = "*Found the same-name procedure(electing main schema):";
+            String msg = "*Found the same-name procedure, so elects main schema:";
             msg = msg + " elect=" + first.getProcedureFullName() + " skipped=" + metaInfo.getProcedureFullName();
             _log.info(msg);
             return true;
         } else if (secondSchema != null && secondSchema.equalsIgnoreCase(schemaName)) {
-            String msg = "*Found the same-name procedure(electing main schema):";
+            String msg = "*Found the same-name procedure, so elects main schema:";
             msg = msg + " elect=" + metaInfo.getProcedureFullName() + " skipped=" + first.getProcedureFullName();
             _log.info(msg);
             procdureMap.remove(procedureUniqueName);
