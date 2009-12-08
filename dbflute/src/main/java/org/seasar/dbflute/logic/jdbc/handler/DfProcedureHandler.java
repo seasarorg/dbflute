@@ -75,10 +75,9 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     public Map<String, DfProcedureMetaInfo> getAvailableProcedureMap(DatabaseMetaData metaData) throws SQLException {
         final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
         final String schemaName = databaseProperties.getDatabaseSchema();
-        final Map<String, DfProcedureMetaInfo> procedureMap = newLinkedHashMap();
         final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
         if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
-            return procedureMap;
+            return newLinkedHashMap();
         }
         Connection conn = null;
         try {
@@ -95,23 +94,31 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final List<DfProcedureMetaInfo> filteredList = filterByProperty(procedureList);
 
             // create available procedure map
-            final Map<String, DfProcedureMetaInfo> additionalSchemaProcedureMap = newLinkedHashMap();
+            final Map<String, DfProcedureMetaInfo> procedureHandlingMap = newLinkedHashMap();
             for (DfProcedureMetaInfo metaInfo : filteredList) {
                 // handle duplicate
-                if (handleDuplicateProcedure(metaInfo, procedureMap, schemaName)) {
+                if (handleDuplicateProcedure(metaInfo, procedureHandlingMap, schemaName)) {
                     continue;
                 }
-                final String procedureUniqueName = metaInfo.getProcedureUniqueName();
+                procedureHandlingMap.put(metaInfo.getProcedureUniqueName(), metaInfo);
+            }
+
+            // arrange order (additional schema after main schema)
+            final Map<String, DfProcedureMetaInfo> procedureOrderedMap = newLinkedHashMap();
+            final Map<String, DfProcedureMetaInfo> additionalSchemaProcedureMap = newLinkedHashMap();
+            final Set<Entry<String, DfProcedureMetaInfo>> entrySet = procedureHandlingMap.entrySet();
+            for (Entry<String, DfProcedureMetaInfo> entry : entrySet) {
+                final String key = entry.getKey();
+                final DfProcedureMetaInfo metaInfo = entry.getValue();
                 if (databaseProperties.isAdditionalSchema(metaInfo.getProcedureSchema())) {
-                    additionalSchemaProcedureMap.put(procedureUniqueName, metaInfo);
+                    additionalSchemaProcedureMap.put(key, metaInfo);
                 } else {
-                    procedureMap.put(procedureUniqueName, metaInfo);
+                    procedureOrderedMap.put(key, metaInfo); // main schema
                 }
             }
-            // arrange order (additional schema after main schema)
-            procedureMap.putAll(additionalSchemaProcedureMap);
+            procedureOrderedMap.putAll(additionalSchemaProcedureMap);
 
-            return procedureMap;
+            return procedureOrderedMap;
         } finally {
             if (conn != null) {
                 conn.close();
