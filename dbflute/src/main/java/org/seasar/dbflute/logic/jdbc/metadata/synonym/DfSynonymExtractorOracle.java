@@ -184,7 +184,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             sb.append("'").append(schema).append("'");
             ++count;
         }
-        final String sql = "select * from ALL_SYNONYMS where OWNER in(" + sb.toString() + ")";
+        final String sql = "select * from ALL_SYNONYMS where OWNER in (" + sb.toString() + ")";
         return sql;
     }
 

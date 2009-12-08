@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -134,6 +135,25 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
             }
         }
         return false;
+    }
+
+    public ProcedureSynonymHandlingType getProcedureSynonymHandlingType() {
+        final String key = "procedureSynonymHandlingType";
+        final String property = getProperty(key, ProcedureSynonymHandlingType.NONE.name(), getOutsideSqlDefinitionMap());
+        if (property.equalsIgnoreCase(ProcedureSynonymHandlingType.NONE.name())) {
+            return ProcedureSynonymHandlingType.NONE;
+        } else if (property.equalsIgnoreCase(ProcedureSynonymHandlingType.INCLUDE.name())) {
+            return ProcedureSynonymHandlingType.INCLUDE;
+        } else if (property.equalsIgnoreCase(ProcedureSynonymHandlingType.SWITCH.name())) {
+            return ProcedureSynonymHandlingType.SWITCH;
+        } else {
+            String msg = "The property was out of scope for " + key + ": value=" + property;
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+    }
+
+    public static enum ProcedureSynonymHandlingType {
+        NONE, INCLUDE, SWITCH
     }
 
     // ===================================================================================

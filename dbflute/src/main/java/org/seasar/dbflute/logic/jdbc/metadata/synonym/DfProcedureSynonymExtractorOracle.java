@@ -52,8 +52,8 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected List<String> _schemaNameAllList;
     protected String _mainSchemaName;
+    protected List<String> _allSchemaList;
 
     // TODO @jflute - in development
 
@@ -128,7 +128,6 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
                 final DfProcedureSynonymMetaInfo procedureSynonymMetaInfo = new DfProcedureSynonymMetaInfo();
                 procedureSynonymMetaInfo.setProcedureMetaInfo(procedureMetaInfo);
                 procedureSynonymMetaInfo.setSynonymMetaInfo(synonymMetaInfo);
-
                 final String synonymKey = buildSynonymMapKey(synonymOwner, synonymName);
                 procedureSynonymMap.put(synonymKey, procedureSynonymMetaInfo);
             }
@@ -161,14 +160,14 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     protected String buildSynonymSelect() {
         final StringBuilder sb = new StringBuilder();
         int count = 0;
-        for (String schema : _schemaNameAllList) {
+        for (String schema : _allSchemaList) {
             if (count > 0) {
                 sb.append(", ");
             }
             sb.append("'").append(schema).append("'");
             ++count;
         }
-        final String sql = "select * from ALL_SYNONYMS where OWNER in(" + sb.toString() + ")";
+        final String sql = "select * from ALL_SYNONYMS where OWNER in (" + sb.toString() + ")";
         return sql;
     }
 
@@ -198,11 +197,11 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
         _dataSource = dataSource;
     }
 
-    public void setSchemaList(List<String> schemaList) {
-        this._schemaNameAllList = schemaList;
+    public void setMainSchemaName(String mainSchemaName) {
+        this._mainSchemaName = mainSchemaName;
     }
 
-    public void setSchemaName(String schemaName) {
-        this._mainSchemaName = schemaName;
+    public void setAllSchemaList(List<String> allSchemaList) {
+        this._allSchemaList = allSchemaList;
     }
 }

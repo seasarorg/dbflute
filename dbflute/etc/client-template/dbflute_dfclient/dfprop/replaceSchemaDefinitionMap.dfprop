@@ -1,5 +1,5 @@
 # /---------------------------------------------------------------------------
-# replaceSchemaDefinitionMap: (Default 'map:{}')
+# replaceSchemaDefinitionMap: (Default map:{})
 #
 # The various settings about replace-schema.
 # 
@@ -11,9 +11,9 @@
 # o isSuppressBatchUpdate: (NotRequired - Default false)
 # o isDropGenerateTableOnly: (NotRequired - Default false)
 # o isDropGenerateProcedureOnly: (NotRequired - Default false)
-# o filterVariablesMap: (NotRequired - Default 'map:{}')
-# o additionalUserMap: (NotRequired - Default 'map:{}')
-# o additionalDropMapList: (NotRequired - Default 'list:{}')
+# o filterVariablesMap: (NotRequired - Default map:{})
+# o additionalUserMap: (NotRequired - Default map:{})
+# o additionalDropMapList: (NotRequired - Default list:{})
 # o isSuppressTruncateTable: (NotRequired - Default false)
 # o isSuppressDropForeignKey: (NotRequired - Default false)
 # o isSuppressDropTable: (NotRequired - Default false)
@@ -120,14 +120,14 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o filterVariablesMap: (NotRequired - Default 'map:{}')
+    # o filterVariablesMap: (NotRequired - Default map:{})
     #  You can specify the filter variables for DDL.
     # 
     #; filterVariablesMap = map:{abc=AAA}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o additionalUserMap: (NotRequired - Default 'map:{}')
+    # o additionalUserMap: (NotRequired - Default map:{})
     #  You can set additional users.
     #  Elements of this map are as below:
     #   o key of map: User Definition Name (userDefName)
@@ -145,7 +145,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o additionalDropMapList: (NotRequired - Default 'list:{}')
+    # o additionalDropMapList: (NotRequired - Default list:{})
     #  You can drop additional other schemas.
     #  Elements of this map are as below:
     #   o schema: (Required)

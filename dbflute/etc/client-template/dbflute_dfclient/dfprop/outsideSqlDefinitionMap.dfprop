@@ -3,12 +3,13 @@
 #
 # The various settings about outsideSql. 
 # 
-# o isGenerateProcedureParameterBean: (NotRequired - Default 'false')
-# o targetProcedureCatalogList: (NotRequired - Default 'list:{}')
-# o targetProcedureSchemaList: (NotRequired - Default 'list:{}')
-# o targetProcedureNameList: (NotRequired - Default 'list:{}')
-# o isRequiredSqlTitle: (NotRequired - Default 'false')
-# o isRequiredSqlDescription: (NotRequired - Default 'false')
+# o isGenerateProcedureParameterBean: (NotRequired - Default false)
+# o targetProcedureCatalogList: (NotRequired - Default list:{})
+# o targetProcedureSchemaList: (NotRequired - Default list:{})
+# o targetProcedureNameList: (NotRequired - Default list:{})
+# o procedureSynonymHandlingType: (NotRequired - Default NONE)
+# o isRequiredSqlTitle: (NotRequired - Default false)
+# o isRequiredSqlDescription: (NotRequired - Default false)
 # o sqlFileEncoding: (NotRequired - Default 'UTF-8')
 # o sqlDirectory: (NotRequired - Default java.dir & '../src/main/resources')
 # o sqlPackage: (NotRequired - Default '')
@@ -17,7 +18,7 @@
 #
 map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isGenerateProcedureParameterBean: (NotRequired - Default 'false')
+    # o isGenerateProcedureParameterBean: (NotRequired - Default false)
     #   [true]
     #     Does it generate the parameter bean for procedure?
     #     If you call the procedure from DBFlute, you should specify 'true'!
@@ -29,7 +30,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o targetProcedureCatalogList: (NotRequired - Default 'list:{}')
+    # o targetProcedureCatalogList: (NotRequired - Default list:{})
     #  You can specify target catalog of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
     #
@@ -37,23 +38,35 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o targetProcedureSchemaList: (NotRequired - Default 'list:{}')
+    # o targetProcedureSchemaList: (NotRequired - Default list:{})
     #  You can specify target schema of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
     #  ex) list:{PROCEDUREDB}
+    #
     #; targetProcedureSchemaList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o targetProcedureNameList: (NotRequired - Default 'list:{}')
+    # o targetProcedureNameList: (NotRequired - Default list:{})
     #  You can specify target name of generated parameter bean for procedure.
     #  This property is valid only when generateProcedureParameterBean is valid.
     #  ex) list:{prefix:SP_}
+    #
     #; targetProcedureNameList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isRequiredSqlTitle: (NotRequired - Default 'false')
+    # o procedureSynonymHandlingType: (NotRequired - Default NONE)
+    #  You can specify the handling type of procedure synonym.
+    #   NONE - No handling. (default)
+    #   INCLUDE - It includes procedure synonyms.
+    #   SWITCH - It switches all normal procedures to procedure synonyms.
+    #
+    #; procedureSynonymHandlingType = NONE
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isRequiredSqlTitle: (NotRequired - Default false)
     #   [true]
     #     You should always write the title of outsideSql.
     #     If it doesn't exist, the OutsideSqlTest task fails.
@@ -65,7 +78,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isRequiredSqlDescription: (NotRequired - Default 'false')
+    # o isRequiredSqlDescription: (NotRequired - Default false)
     #   [true]
     #     You should always write the description of outsideSql.
     #     If it doesn't exist, the OutsideSqlTest task fails.

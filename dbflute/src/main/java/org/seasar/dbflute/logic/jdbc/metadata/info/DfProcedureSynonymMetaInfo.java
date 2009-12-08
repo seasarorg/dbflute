@@ -28,6 +28,23 @@ public class DfProcedureSynonymMetaInfo {
     protected DfProcedureMetaInfo _procedureMetaInfo;
 
     // ===================================================================================
+    //                                                                              Switch
+    //                                                                              ======
+    public void reflectSynonymToProcedure() {
+        if (_procedureMetaInfo == null) {
+            String msg = "The procedureMetaInfo should not be null!";
+            throw new IllegalStateException(msg);
+        }
+        if (_synonymMetaInfo == null) {
+            String msg = "The synonymMetaInfo should not be null!";
+            throw new IllegalStateException(msg);
+        }
+        _procedureMetaInfo.setProcedureCatalog(null);
+        _procedureMetaInfo.setProcedureSchema(_synonymMetaInfo.getSynonymOwner());
+        _procedureMetaInfo.setProcedureName(_synonymMetaInfo.getSynonymName());
+    }
+
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public DfSynonymMetaInfo getSynonymMetaInfo() {

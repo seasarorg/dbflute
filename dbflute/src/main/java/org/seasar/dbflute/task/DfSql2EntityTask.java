@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -58,12 +59,15 @@ import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.bqp.DfBehaviorQueryPathSetupper;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
+import org.seasar.dbflute.logic.factory.DfProcedureSynonymExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
+import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
@@ -72,6 +76,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties.ProcedureSynonymHandlingType;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
 import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -100,6 +105,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
 
     protected DfColumnHandler _columnHandler = new DfColumnHandler();
+    protected DfProcedureHandler _procedureHandler = new DfProcedureHandler();
     protected DfOutsideSqlMarkAnalyzer _markAnalyzer = new DfOutsideSqlMarkAnalyzer();
 
     // for getting schema
@@ -744,13 +750,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         _log.info(" ");
     }
 
+    // -----------------------------------------------------
+    //                                   Procedure Meta Info
+    //                                   -------------------
     protected List<DfProcedureMetaInfo> getAvailableProcedures() throws SQLException {
         Connection conn = null;
         try {
             conn = getDataSource().getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final DfProcedureHandler handler = new DfProcedureHandler();
-            final List<DfProcedureMetaInfo> procedures = handler.getAvailableProcedureList(metaData, _schema);
+            final List<DfProcedureMetaInfo> procedures = _procedureHandler.getAvailableProcedureList(metaData, _schema);
+            setupProcedureSynonymIfneeds(procedures);
             return procedures;
         } finally {
             if (conn != null) {
@@ -759,6 +768,39 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
+    protected void setupProcedureSynonymIfneeds(List<DfProcedureMetaInfo> procedures) {
+        final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
+        final ProcedureSynonymHandlingType handlingType = prop.getProcedureSynonymHandlingType();
+        if (handlingType.equals(ProcedureSynonymHandlingType.NONE)) {
+            return;
+        }
+        final DfProcedureSynonymExtractor extractor = createProcedureSynonymExtractor();
+        final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = extractor.extractProcedureSynonymMap();
+        if (handlingType.equals(ProcedureSynonymHandlingType.INCLUDE)) {
+            // only add procedure synonyms to the procedure list
+        } else if (handlingType.equals(ProcedureSynonymHandlingType.SWITCH)) {
+            procedures.clear(); // because of switch
+        } else {
+            String msg = "Unexpected handling type of procedure sysnonym: " + handlingType;
+            throw new IllegalStateException(msg);
+        }
+        final Set<Entry<String, DfProcedureSynonymMetaInfo>> entrySet = procedureSynonymMap.entrySet();
+        for (Entry<String, DfProcedureSynonymMetaInfo> entry : entrySet) {
+            final DfProcedureSynonymMetaInfo procedureSynonymMetaInfo = entry.getValue();
+            procedureSynonymMetaInfo.reflectSynonymToProcedure();
+            procedures.add(procedureSynonymMetaInfo.getProcedureMetaInfo());
+        }
+    }
+
+    protected DfProcedureSynonymExtractor createProcedureSynonymExtractor() {
+        final DfProcedureSynonymExtractorFactory factory = new DfProcedureSynonymExtractorFactory(getDataSource(),
+                getBasicProperties(), getDatabaseProperties());
+        return factory.createSynonymExtractor();
+    }
+
+    // -----------------------------------------------------
+    //                                   Duplicate Procedure
+    //                                   -------------------
     protected boolean handleDuplicateProcedureIfNeeds(String pmbName, DfProcedureMetaInfo metaInfo,
             Map<String, DfProcedureMetaInfo> procdureHandlingMap) {
         final DfProcedureMetaInfo first = procdureHandlingMap.get(pmbName);
@@ -789,6 +831,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
+    // -----------------------------------------------------
+    //                                      Procedure Column
+    //                                      ----------------
     protected String getProcedureColumnPropertyType(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
         final String propertyType;
         if (isResultSetProperty(procedureColumnMetaInfo)) {
@@ -810,6 +855,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return propertyType;
     }
 
+    // -----------------------------------------------------
+    //                                        Various Helper
+    //                                        --------------
     protected boolean isResultSetProperty(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
         final int jdbcType = procedureColumnMetaInfo.getJdbcType();
         final String dbTypeName = procedureColumnMetaInfo.getDbTypeName();
@@ -860,7 +908,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
-        return new DfProcedureHandler().buildProcedureSqlName(metaInfo);
+        return _procedureHandler.buildProcedureSqlName(metaInfo);
     }
 
     protected boolean isAllUpperCase(String name) {
