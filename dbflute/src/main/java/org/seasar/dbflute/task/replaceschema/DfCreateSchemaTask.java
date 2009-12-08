@@ -376,7 +376,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             if (_currentUser != null && _currentUser.trim().length() > 0) {
                 if (_goodByeUserSet.contains(_currentUser)) {
                     if (reviveUser) {
-                        _log.info("...Reviving the user '" + _currentUser + "' during current SQL file");
+                        _log.info("...Reviving the user '" + _currentUser + "' until the end of this SQL file");
                         _revivedUserSet.add(_currentUser);
                         _goodByeUserSet.remove(_currentUser);
                     } else {
