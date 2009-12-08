@@ -262,9 +262,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                 }
                 Connection conn = _changeUserConnectionMap.get(_currentUser);
                 if (conn == null) {
-                    if (!_changeUserConnectionMap.isEmpty()) {
-                        _log.info("...Creating a connection to " + _currentUser);
-                    }
+                    _log.info("...Creating a connection to " + _currentUser);
                     conn = prop.createAdditionalUserConnection(_currentUser);
                     if (conn != null) {
                         _changeUserConnectionMap.put(_currentUser, conn);
@@ -496,10 +494,11 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void destroyChangeUserConnection() {
-        final Set<Entry<String, Connection>> entrySet = _changeUserConnectionMap.entrySet();
-        if (!_changeUserConnectionMap.isEmpty()) {
-            _log.info("...Closing connections to change users");
+        if (_changeUserConnectionMap.isEmpty()) {
+            return;
         }
+        _log.info("...Closing connections to change-users: " + _changeUserConnectionMap.keySet());
+        final Set<Entry<String, Connection>> entrySet = _changeUserConnectionMap.entrySet();
         for (Entry<String, Connection> entry : entrySet) {
             final String changeUser = entry.getKey();
             final Connection conn = entry.getValue();
