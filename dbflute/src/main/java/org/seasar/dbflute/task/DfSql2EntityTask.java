@@ -690,11 +690,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
             return;
         }
-        final List<DfProcedureMetaInfo> procedures = getAvailableProcedures();
+        final List<DfProcedureMetaInfo> procedureList = getAvailableProcedureList();
         _log.info(" ");
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         final Map<String, DfProcedureMetaInfo> procdureHandlingMap = new HashMap<String, DfProcedureMetaInfo>();
-        for (DfProcedureMetaInfo metaInfo : procedures) {
+        for (DfProcedureMetaInfo metaInfo : procedureList) {
             final String procedureName = metaInfo.getProcedureName();
 
             final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
@@ -753,14 +753,15 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // -----------------------------------------------------
     //                                   Procedure Meta Info
     //                                   -------------------
-    protected List<DfProcedureMetaInfo> getAvailableProcedures() throws SQLException {
+    protected List<DfProcedureMetaInfo> getAvailableProcedureList() throws SQLException {
         Connection conn = null;
         try {
             conn = getDataSource().getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final List<DfProcedureMetaInfo> procedures = _procedureHandler.getAvailableProcedureList(metaData, _schema);
-            setupProcedureSynonymIfneeds(procedures);
-            return procedures;
+            final List<DfProcedureMetaInfo> procedureList = _procedureHandler.getAvailableProcedureList(metaData,
+                    _schema);
+            setupProcedureSynonymIfneeds(procedureList);
+            return procedureList;
         } finally {
             if (conn != null) {
                 conn.close();
@@ -768,7 +769,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected void setupProcedureSynonymIfneeds(List<DfProcedureMetaInfo> procedures) {
+    protected void setupProcedureSynonymIfneeds(List<DfProcedureMetaInfo> procedureList) {
         final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
         final ProcedureSynonymHandlingType handlingType = prop.getProcedureSynonymHandlingType();
         if (handlingType.equals(ProcedureSynonymHandlingType.NONE)) {
@@ -779,19 +780,21 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (handlingType.equals(ProcedureSynonymHandlingType.INCLUDE)) {
             // only add procedure synonyms to the procedure list
         } else if (handlingType.equals(ProcedureSynonymHandlingType.SWITCH)) {
-            _log.info("...Clearing normal procedures: count=" + procedures.size());
-            procedures.clear(); // because of switch
+            _log.info("...Clearing normal procedures: count=" + procedureList.size());
+            procedureList.clear(); // because of switch
         } else {
             String msg = "Unexpected handling type of procedure sysnonym: " + handlingType;
             throw new IllegalStateException(msg);
         }
         _log.info("...Adding procedure synonyms as procedure: count=" + procedureSynonymMap.size());
         final Set<Entry<String, DfProcedureSynonymMetaInfo>> entrySet = procedureSynonymMap.entrySet();
+        final List<DfProcedureMetaInfo> procedureSynonymList = new ArrayList<DfProcedureMetaInfo>();
         for (Entry<String, DfProcedureSynonymMetaInfo> entry : entrySet) {
             final DfProcedureSynonymMetaInfo procedureSynonymMetaInfo = entry.getValue();
             procedureSynonymMetaInfo.reflectSynonymToProcedure();
-            procedures.add(procedureSynonymMetaInfo.getProcedureMetaInfo());
+            procedureSynonymList.add(procedureSynonymMetaInfo.getProcedureMetaInfo());
         }
+        procedureList.addAll(_procedureHandler.filterByProperty(procedureSynonymList));
     }
 
     protected DfProcedureSynonymExtractor createProcedureSynonymExtractor() {

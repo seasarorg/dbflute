@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
@@ -39,6 +41,11 @@ import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
  * @since 0.7.5 (2008/06/28 Saturday)
  */
 public class DfProcedureHandler extends DfAbstractMetaDataHandler {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfColumnHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -65,13 +72,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         Connection conn = null;
         try {
             // main schema
-            final List<DfProcedureMetaInfo> procedures = getPlainProcedureList(metaData, schemaName);
+            final List<DfProcedureMetaInfo> procedureList = getPlainProcedureList(metaData, schemaName);
 
             // additional schema
-            setupAdditionalSchemaProcedure(metaData, procedures);
+            setupAdditionalSchemaProcedure(metaData, procedureList);
 
             // filter by property
-            return filterByProperty(metaData, procedures);
+            return filterByProperty(procedureList);
         } finally {
             if (conn != null) {
                 conn.close();
@@ -79,7 +86,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         }
     }
 
-    protected void setupAdditionalSchemaProcedure(DatabaseMetaData metaData, List<DfProcedureMetaInfo> procedures)
+    protected void setupAdditionalSchemaProcedure(DatabaseMetaData metaData, List<DfProcedureMetaInfo> procedureList)
             throws SQLException {
         if (_suppressAdditionalSchema) {
             return;
@@ -95,29 +102,33 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                     metaInfo.setProcedureSchema(additionalSchema);
                 }
             }
-            procedures.addAll(additionalProcedureList);
+            procedureList.addAll(additionalProcedureList);
         }
     }
 
-    protected List<DfProcedureMetaInfo> filterByProperty(DatabaseMetaData metaData, List<DfProcedureMetaInfo> procedures) {
+    public List<DfProcedureMetaInfo> filterByProperty(List<DfProcedureMetaInfo> procedureList) {
         if (_suppressFilterByProperty) {
-            return procedures;
+            return procedureList;
         }
         final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
         final List<DfProcedureMetaInfo> resultList = new ArrayList<DfProcedureMetaInfo>();
-        for (DfProcedureMetaInfo metaInfo : procedures) {
+        _log.info("...Filtering the procedure by property: before=" + procedureList.size());
+        for (DfProcedureMetaInfo metaInfo : procedureList) {
+            final String procedureFullName = buildProcedureFullName(metaInfo);
             final String procedureCatalog = metaInfo.getProcedureCatalog();
             if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
+                _log.info("passed: non-target catalog - " + procedureFullName);
                 continue;
             }
             final String procedureSchema = metaInfo.getProcedureSchema();
             if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema)) {
+                _log.info("passed: non-target schema - " + procedureFullName);
                 continue;
             }
-            final String procedureFullName = buildProcedureFullName(metaInfo);
             if (!outsideSqlProperties.isTargetProcedureName(procedureFullName)) {
                 final String procedureName = metaInfo.getProcedureName();
                 if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
+                    _log.info("passes: non-target name - " + procedureFullName);
                     continue;
                 }
             }
