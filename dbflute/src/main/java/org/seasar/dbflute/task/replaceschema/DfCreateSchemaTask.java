@@ -257,7 +257,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         final DfSqlFileRunnerExecute execute = new DfSqlFileRunnerExecuteCreateSchema(runInfo, getDataSource());
         execute.setDispatcher(new DfSqlFileRunnerDispatcher() {
             public boolean dispatch(File sqlFile, Statement st, String sql) throws SQLException {
-                final boolean checkUser = analyzeCheckUser(sql);
                 if (_currentUser == null || _currentUser.trim().length() == 0) {
                     return false;
                 }
@@ -288,6 +287,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                     dispatchStmt.execute(sql);
                     return true;
                 } catch (SQLException e) {
+                    final boolean checkUser = analyzeCheckUser(sql);
                     if (checkUser) {
                         String msg = "...Saying good-bye to the user '" + _currentUser + "'";
                         msg = msg + " because of checked";
@@ -326,7 +326,10 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                 _log.info("...Saying good-bye to the user '" + revivedUser + "' again");
                 _goodByeUserSet.add(revivedUser);
             }
-            _revivedUserSet.clear();
+            if (!_revivedUserSet.isEmpty()) {
+                _log.info("...Clearing revived users");
+                _revivedUserSet.clear();
+            }
         }
 
         protected void restoreCurrentUser() {
@@ -383,10 +386,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
                         }
                         _log.info("passed: " + logSql);
                         return false;
-                    }
-                } else {
-                    if (reviveUser) {
-                        _log.warn("*The mark 'reviveUser()' is unsupported at the timing!");
                     }
                 }
             } else {
