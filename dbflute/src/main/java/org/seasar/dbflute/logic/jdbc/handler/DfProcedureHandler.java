@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,8 +73,9 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
      * @throws SQLException
      */
     public Map<String, DfProcedureMetaInfo> getAvailableProcedureMap(DatabaseMetaData metaData) throws SQLException {
-        final String schemaName = getProperties().getDatabaseProperties().getDatabaseSchema();
-        final Map<String, DfProcedureMetaInfo> procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
+        final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
+        final String schemaName = databaseProperties.getDatabaseSchema();
+        final Map<String, DfProcedureMetaInfo> procedureMap = newLinkedHashMap();
         final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
         if (!outsideSqlProperties.isGenerateProcedureParameterBean()) {
             return procedureMap;
@@ -95,13 +95,22 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final List<DfProcedureMetaInfo> filteredList = filterByProperty(procedureList);
 
             // create available procedure map
+            final Map<String, DfProcedureMetaInfo> additionalSchemaProcedureMap = newLinkedHashMap();
             for (DfProcedureMetaInfo metaInfo : filteredList) {
                 // handle duplicate
                 if (handleDuplicateProcedure(metaInfo, procedureMap, schemaName)) {
                     continue;
                 }
-                procedureMap.put(metaInfo.getProcedureUniqueName(), metaInfo);
+                final String procedureUniqueName = metaInfo.getProcedureUniqueName();
+                if (databaseProperties.isAdditionalSchema(metaInfo.getProcedureSchema())) {
+                    additionalSchemaProcedureMap.put(procedureUniqueName, metaInfo);
+                } else {
+                    procedureMap.put(procedureUniqueName, metaInfo);
+                }
             }
+            // arrange order (additional schema after main schema)
+            procedureMap.putAll(additionalSchemaProcedureMap);
+
             return procedureMap;
         } finally {
             if (conn != null) {

@@ -16,6 +16,7 @@
 package org.seasar.dbflute.logic.jdbc.handler;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -194,5 +195,9 @@ public class DfAbstractMetaDataHandler {
     //                                                                      ==============
     protected String ln() {
         return "\n";
+    }
+
+    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
+        return new LinkedHashMap<KEY, VALUE>();
     }
 }
