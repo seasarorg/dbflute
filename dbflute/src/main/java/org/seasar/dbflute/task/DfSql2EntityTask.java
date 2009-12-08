@@ -687,7 +687,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             return;
         }
         _log.info(" ");
-        _log.info("...Setting up procedures for generating parameter beans");
+        _log.info("...Setting up procedures for generating parameter-beans");
         final Map<String, DfProcedureMetaInfo> procedureMap = getAvailableProcedureMap();
         final Set<Entry<String, DfProcedureMetaInfo>> entrySet = procedureMap.entrySet();
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
