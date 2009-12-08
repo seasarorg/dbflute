@@ -779,11 +779,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (handlingType.equals(ProcedureSynonymHandlingType.INCLUDE)) {
             // only add procedure synonyms to the procedure list
         } else if (handlingType.equals(ProcedureSynonymHandlingType.SWITCH)) {
+            _log.info("...Clearing normal procedures: count=" + procedures.size());
             procedures.clear(); // because of switch
         } else {
             String msg = "Unexpected handling type of procedure sysnonym: " + handlingType;
             throw new IllegalStateException(msg);
         }
+        _log.info("...Adding procedure synonyms as procedure: count=" + procedureSynonymMap.size());
         final Set<Entry<String, DfProcedureSynonymMetaInfo>> entrySet = procedureSynonymMap.entrySet();
         for (Entry<String, DfProcedureSynonymMetaInfo> entry : entrySet) {
             final DfProcedureSynonymMetaInfo procedureSynonymMetaInfo = entry.getValue();

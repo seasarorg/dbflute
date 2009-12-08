@@ -11,7 +11,7 @@
 # o isRequiredSqlTitle: (NotRequired - Default false)
 # o isRequiredSqlDescription: (NotRequired - Default false)
 # o sqlFileEncoding: (NotRequired - Default 'UTF-8')
-# o sqlDirectory: (NotRequired - Default java.dir & '../src/main/resources')
+# o sqlDirectory: (NotRequired - Default generateOutputDirectory & resourceOutputDirectory)
 # o sqlPackage: (NotRequired - Default '')
 # 
 # *The line that starts with '#' means comment-out.
@@ -98,7 +98,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o sqlDirectory: (NotRequired - Default java.dir & '../src/main/resources')
+    # o sqlDirectory: (NotRequired - Default generateOutputDirectory & resourceOutputDirectory)
     #  The directory of SQL file for outsideSql.
     #  Basically you don't need this.
     #
@@ -106,7 +106,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o sqlPackage: (NotRequired - Default 'UTF-8')
+    # o sqlPackage: (NotRequired - Default '')
     #  The package of SQL file for outsideSql.
     #  Basically you don't need this.
     #  You can use variable '$$PACKAGE_BASE$$' that means 'packageBase'.
