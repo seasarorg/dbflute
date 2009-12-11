@@ -156,7 +156,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             _log.info("*Suppress dropping sequences");
         }
         if (!_suppressDropProcedure) {
-            dropProcedures(conn, tableMetaInfoList);
+            dropProcedure(conn, tableMetaInfoList);
         } else {
             _log.info("*Suppress dropping procedures");
         }
@@ -393,7 +393,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     // ===================================================================================
     //                                                                      Drop Procedure
     //                                                                      ==============
-    protected void dropProcedures(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+    protected void dropProcedure(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         final DfProcedureHandler handler = new DfProcedureHandler();
         handler.suppressAdditionalSchema();
         DatabaseMetaData metaData;
@@ -440,12 +440,6 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         try {
             st = conn.createStatement();
             for (DfProcedureMetaInfo metaInfo : procedureMetaInfoList) {
-                final String procedureSchema = metaInfo.getProcedureSchema();
-                if (_schema != null && !_schema.equalsIgnoreCase(procedureSchema)) {
-                    // because of main schema only
-                    // (the procedure list may contain those of additional schema)
-                    continue;
-                }
                 final String dropProcedureSql = callback.buildDropProcedureSql(metaInfo);
                 currentSql = dropProcedureSql;
                 _log.info(dropProcedureSql);
