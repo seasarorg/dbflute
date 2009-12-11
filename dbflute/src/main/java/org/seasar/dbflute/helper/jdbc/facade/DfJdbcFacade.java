@@ -14,6 +14,10 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Super simple facade for JDBC.
+ * @author jflute
+ */
 public class DfJdbcFacade {
 
     // ===================================================================================
@@ -41,14 +45,15 @@ public class DfJdbcFacade {
     }
 
     public List<Map<String, String>> selectStringList(String sql, List<String> columnList, int limit) {
+        // [ATTENTION]: no use bind variables
         final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
         Connection conn = null;
-        Statement stmt = null;
+        Statement st = null;
         ResultSet rs = null;
         try {
             conn = _dataSource.getConnection();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
+            st = conn.createStatement();
+            rs = st.executeQuery(sql);
             int count = 0;
             while (rs.next()) {
                 if (limit >= 0 && limit <= count) {
@@ -72,9 +77,9 @@ public class DfJdbcFacade {
                     _log.info("ResultSet.close() threw the exception!", ignored);
                 }
             }
-            if (stmt != null) {
+            if (st != null) {
                 try {
-                    stmt.close();
+                    st.close();
                 } catch (SQLException ignored) {
                     _log.info("Statement.close() threw the exception!", ignored);
                 }
@@ -88,5 +93,38 @@ public class DfJdbcFacade {
             }
         }
         return resultList;
+    }
+
+    // ===================================================================================
+    //                                                                             Execute
+    //                                                                             =======
+    public boolean execute(String sql) {
+        // [ATTENTION]: no use bind variables
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = _dataSource.getConnection();
+            st = conn.createStatement();
+            return st.execute(sql);
+        } catch (SQLException e) {
+            String msg = "Failed to execute the SQL: sql=" + sql;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (st != null) {
+                try {
+                    st.close();
+                } catch (SQLException ignored) {
+                    _log.info("Statement.close() threw the exception!", ignored);
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                    _log.info("Connection.close() threw the exception!", ignored);
+                }
+            }
+        }
+
     }
 }

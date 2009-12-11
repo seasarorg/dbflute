@@ -27,37 +27,14 @@ import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
- * The schema initializer for DB2.
  * @author jflute
- * @since 0.7.9 (2008/08/24 Monday)
  */
-public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
+public class DfSchemaInitializerH2 extends DfSchemaInitializerJdbc {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSchemaInitializerDB2.class);
-
-    // ===================================================================================
-    //                                                                    Drop Foreign Key
-    //                                                                    ================
-    @Override
-    protected boolean isSkipDropForeignKey(DfTableMetaInfo tableMetaInfo) {
-        return tableMetaInfo.isTableTypeAlias();
-    }
-
-    // ===================================================================================
-    //                                                                          Drop Table
-    //                                                                          ==========
-    @Override
-    protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
-        if (metaInfo.isTableTypeAlias()) {
-            final String tableName = filterTableName(metaInfo.getTableName());
-            sb.append("drop alias ").append(tableName);
-        } else {
-            super.setupDropTable(sb, metaInfo);
-        }
-    }
+    private static final Log _log = LogFactory.getLog(DfSchemaInitializerH2.class);
 
     // ===================================================================================
     //                                                                       Drop Sequence
@@ -66,11 +43,9 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
     protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         final List<String> sequenceNameList = new ArrayList<String>();
         final DfJdbcFacade jdbcFacade = new DfJdbcFacade(_dataSource);
-        final String schema = _schema != null && _schema.trim().length() > 0 ? _schema : "public";
         final String sequenceColumnName = "sequence_name";
         final StringBuilder sb = new StringBuilder();
-        sb.append("select SEQNAME as ").append(sequenceColumnName).append(" from SYSCAT.SEQUENCES");
-        sb.append(" where SEQSCHEMA = '").append(schema).append("'");
+        sb.append("select ").append(sequenceColumnName).append(" from information_schema.sequences");
         final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sb.toString(), Arrays
                 .asList(sequenceColumnName));
         for (Map<String, String> recordMap : resultList) {

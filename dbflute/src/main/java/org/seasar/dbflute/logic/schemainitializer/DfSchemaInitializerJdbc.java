@@ -416,7 +416,11 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             String msg = "Failed to get procedure meta data: " + _schema;
             throw new IllegalStateException(msg, e);
         }
-        callbackDropProcedureByJdbc(conn, procedureList, new DfDropProcedureByJdbcCallback() {
+        callbackDropProcedureByJdbc(conn, procedureList, createDropProcedureByJdbcCallback());
+    }
+
+    protected DfDropProcedureByJdbcCallback createDropProcedureByJdbcCallback() {
+        return new DfDropProcedureByJdbcCallback() {
             public String buildDropProcedureSql(DfProcedureMetaInfo metaInfo) {
                 return "drop procedure " + metaInfo.getProcedureSqlName();
             }
@@ -424,10 +428,10 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             public String buildDropFunctionSql(DfProcedureMetaInfo metaInfo) {
                 return "drop function " + metaInfo.getProcedureSqlName();
             }
-        });
+        };
     }
 
-    protected static interface DfDropProcedureByJdbcCallback {
+    public static interface DfDropProcedureByJdbcCallback {
         String buildDropProcedureSql(DfProcedureMetaInfo metaInfo);
 
         String buildDropFunctionSql(DfProcedureMetaInfo metaInfo);

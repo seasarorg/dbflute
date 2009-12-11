@@ -24,40 +24,18 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
- * The schema initializer for DB2.
  * @author jflute
- * @since 0.7.9 (2008/08/24 Monday)
  */
-public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
+public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfSchemaInitializerDB2.class);
-
-    // ===================================================================================
-    //                                                                    Drop Foreign Key
-    //                                                                    ================
-    @Override
-    protected boolean isSkipDropForeignKey(DfTableMetaInfo tableMetaInfo) {
-        return tableMetaInfo.isTableTypeAlias();
-    }
-
-    // ===================================================================================
-    //                                                                          Drop Table
-    //                                                                          ==========
-    @Override
-    protected void setupDropTable(StringBuilder sb, DfTableMetaInfo metaInfo) {
-        if (metaInfo.isTableTypeAlias()) {
-            final String tableName = filterTableName(metaInfo.getTableName());
-            sb.append("drop alias ").append(tableName);
-        } else {
-            super.setupDropTable(sb, metaInfo);
-        }
-    }
+    private static final Log _log = LogFactory.getLog(DfSchemaInitializerPostgreSQL.class);
 
     // ===================================================================================
     //                                                                       Drop Sequence
@@ -69,8 +47,8 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
         final String schema = _schema != null && _schema.trim().length() > 0 ? _schema : "public";
         final String sequenceColumnName = "sequence_name";
         final StringBuilder sb = new StringBuilder();
-        sb.append("select SEQNAME as ").append(sequenceColumnName).append(" from SYSCAT.SEQUENCES");
-        sb.append(" where SEQSCHEMA = '").append(schema).append("'");
+        sb.append("select ").append(sequenceColumnName).append(" from information_schema.sequences");
+        sb.append(" where sequence_schema = '").append(schema).append("'");
         final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sb.toString(), Arrays
                 .asList(sequenceColumnName));
         for (Map<String, String> recordMap : resultList) {
@@ -81,5 +59,21 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
             _log.info(dropSequenceSql);
             jdbcFacade.execute(dropSequenceSql);
         }
+    }
+
+    // ===================================================================================
+    //                                                                      Drop Procedure
+    //                                                                      ==============
+    @Override
+    protected DfDropProcedureByJdbcCallback createDropProcedureByJdbcCallback() {
+        return new DfDropProcedureByJdbcCallback() {
+            public String buildDropProcedureSql(DfProcedureMetaInfo metaInfo) {
+                return "drop procedure " + metaInfo.getProcedureSqlName() + "()";
+            }
+
+            public String buildDropFunctionSql(DfProcedureMetaInfo metaInfo) {
+                return "drop function " + metaInfo.getProcedureSqlName() + "()";
+            }
+        };
     }
 }

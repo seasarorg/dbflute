@@ -7,9 +7,11 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializer;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerDB2;
+import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerH2;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerJdbc;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerMySQL;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerOracle;
+import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerPostgreSQL;
 import org.seasar.dbflute.logic.schemainitializer.DfSchemaInitializerSqlServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
@@ -54,12 +56,16 @@ public class DfSchemaInitializerFactory {
         final DfSchemaInitializer initializer;
         if (_basicProperties.isDatabaseMySQL()) {
             initializer = createSchemaInitializerMySQL();
+        } else if (_basicProperties.isDatabasePostgreSQL()) {
+            initializer = createSchemaInitializerPostgreSQL();
         } else if (_basicProperties.isDatabaseOracle()) {
             initializer = createSchemaInitializerOracle();
         } else if (_basicProperties.isDatabaseDB2()) {
             initializer = createSchemaInitializerDB2();
         } else if (_basicProperties.isDatabaseSqlServer()) {
             initializer = createSchemaInitializerSqlServer();
+        } else if (_basicProperties.isDatabaseH2()) {
+            initializer = createSchemaInitializerH2();
         } else {
             initializer = createSchemaInitializerJdbc();
         }
@@ -68,6 +74,12 @@ public class DfSchemaInitializerFactory {
 
     protected DfSchemaInitializer createSchemaInitializerJdbc() {
         final DfSchemaInitializerJdbc initializer = new DfSchemaInitializerJdbc();
+        setupSchemaInitializerJdbcProperties(initializer);
+        return initializer;
+    }
+
+    protected DfSchemaInitializer createSchemaInitializerPostgreSQL() {
+        final DfSchemaInitializerPostgreSQL initializer = new DfSchemaInitializerPostgreSQL();
         setupSchemaInitializerJdbcProperties(initializer);
         return initializer;
     }
@@ -92,6 +104,12 @@ public class DfSchemaInitializerFactory {
 
     protected DfSchemaInitializer createSchemaInitializerSqlServer() {
         final DfSchemaInitializerSqlServer initializer = new DfSchemaInitializerSqlServer();
+        setupSchemaInitializerJdbcProperties(initializer);
+        return initializer;
+    }
+
+    protected DfSchemaInitializer createSchemaInitializerH2() {
+        final DfSchemaInitializerH2 initializer = new DfSchemaInitializerH2();
         setupSchemaInitializerJdbcProperties(initializer);
         return initializer;
     }
