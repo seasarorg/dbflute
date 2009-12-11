@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
@@ -55,7 +56,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
             sequenceNameList.add(recordMap.get(sequenceColumnName));
         }
         for (String sequenceName : sequenceNameList) {
-            final String dropSequenceSql = "drop sequence " + _schema + "." + sequenceName;
+            final String dropSequenceSql = "drop sequence " + schema + "." + sequenceName;
             _log.info(dropSequenceSql);
             jdbcFacade.execute(dropSequenceSql);
         }
@@ -68,12 +69,27 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     protected DfDropProcedureByJdbcCallback createDropProcedureByJdbcCallback() {
         return new DfDropProcedureByJdbcCallback() {
             public String buildDropProcedureSql(DfProcedureMetaInfo metaInfo) {
-                return "drop procedure " + metaInfo.getProcedureSqlName() + "()";
+                final String expression = buildProcedureArgExpression(metaInfo);
+                return "drop procedure " + metaInfo.getProcedureSqlName() + "(" + expression + ")";
             }
 
             public String buildDropFunctionSql(DfProcedureMetaInfo metaInfo) {
-                return "drop function " + metaInfo.getProcedureSqlName() + "()";
+                final String expression = buildProcedureArgExpression(metaInfo);
+                return "drop function " + metaInfo.getProcedureSqlName() + "(" + expression + ")";
             }
         };
+    }
+
+    protected String buildProcedureArgExpression(DfProcedureMetaInfo metaInfo) {
+        final List<DfProcedureColumnMetaInfo> metaInfoList = metaInfo.getProcedureColumnMetaInfoList();
+        final StringBuilder sb = new StringBuilder();
+        for (DfProcedureColumnMetaInfo columnMetaInfo : metaInfoList) {
+            final String dbTypeName = columnMetaInfo.getDbTypeName();
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(dbTypeName);
+        }
+        return sb.toString();
     }
 }

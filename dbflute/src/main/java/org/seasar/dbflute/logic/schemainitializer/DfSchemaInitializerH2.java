@@ -43,16 +43,18 @@ public class DfSchemaInitializerH2 extends DfSchemaInitializerJdbc {
     protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
         final List<String> sequenceNameList = new ArrayList<String>();
         final DfJdbcFacade jdbcFacade = new DfJdbcFacade(_dataSource);
+        final String schema = _schema != null && _schema.trim().length() > 0 ? _schema : "PUBLIC";
         final String sequenceColumnName = "sequence_name";
         final StringBuilder sb = new StringBuilder();
         sb.append("select ").append(sequenceColumnName).append(" from information_schema.sequences");
+        sb.append(" where sequence_schema = '").append(schema).append("'");
         final List<Map<String, String>> resultList = jdbcFacade.selectStringList(sb.toString(), Arrays
                 .asList(sequenceColumnName));
         for (Map<String, String> recordMap : resultList) {
             sequenceNameList.add(recordMap.get(sequenceColumnName));
         }
         for (String sequenceName : sequenceNameList) {
-            final String dropSequenceSql = "drop sequence " + _schema + "." + sequenceName;
+            final String dropSequenceSql = "drop sequence " + schema + "." + sequenceName;
             _log.info(dropSequenceSql);
             jdbcFacade.execute(dropSequenceSql);
         }
