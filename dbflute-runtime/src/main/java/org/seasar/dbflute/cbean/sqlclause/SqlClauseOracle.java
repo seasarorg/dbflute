@@ -77,17 +77,16 @@ public class SqlClauseOracle extends AbstractSqlClause {
         if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
             return;
         }
-        String ln = ln();
-        _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (" + ln + "select";
+        _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (" + ln() + "select";
         _fetchScopeSqlSuffix = "";
         if (isFetchStartIndexSupported()) {
-            _fetchScopeSqlSuffix = ") base )" + ln + " where rn > " + getPageStartIndex();
+            _fetchScopeSqlSuffix = ") base )" + ln() + " where rn > " + getPageStartIndex();
         }
         if (isFetchSizeSupported()) {
             if (isFetchStartIndexSupported()) {
                 _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rn <= " + getPageEndIndex();
             } else {
-                _fetchScopeSqlSuffix = ") base )" + ln + " where rn <= " + getPageEndIndex();
+                _fetchScopeSqlSuffix = ") base )" + ln() + " where rn <= " + getPageEndIndex();
             }
         }
     }
