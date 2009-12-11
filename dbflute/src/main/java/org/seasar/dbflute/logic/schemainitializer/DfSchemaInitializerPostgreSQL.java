@@ -27,6 +27,7 @@ import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 
 /**
  * @author jflute
@@ -86,10 +87,21 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         for (DfProcedureColumnMetaInfo columnMetaInfo : metaInfoList) {
             final String dbTypeName = columnMetaInfo.getDbTypeName();
             final String columnName = columnMetaInfo.getColumnName();
+            final DfProcedureColumnType columnType = columnMetaInfo.getProcedureColumnType();
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append(columnName).append(" ").append(dbTypeName);
+            sb.append(columnName);
+            if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
+                sb.append(" in ");
+            } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
+                sb.append(" out ");
+            } else if (DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
+                sb.append(" inout ");
+            } else {
+                sb.append(" ");
+            }
+            sb.append(dbTypeName);
         }
         return sb.toString();
     }
