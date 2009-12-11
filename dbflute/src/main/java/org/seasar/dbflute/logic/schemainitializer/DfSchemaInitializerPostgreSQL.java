@@ -85,10 +85,11 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
         final StringBuilder sb = new StringBuilder();
         for (DfProcedureColumnMetaInfo columnMetaInfo : metaInfoList) {
             final String dbTypeName = columnMetaInfo.getDbTypeName();
+            final String columnName = columnMetaInfo.getColumnName();
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append(dbTypeName);
+            sb.append(columnName).append(" ").append(dbTypeName);
         }
         return sb.toString();
     }
