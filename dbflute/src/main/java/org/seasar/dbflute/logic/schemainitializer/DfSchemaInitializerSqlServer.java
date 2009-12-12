@@ -15,9 +15,27 @@
  */
 package org.seasar.dbflute.logic.schemainitializer;
 
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
+
 /**
  * The schema initializer for SqlServer.
  * @author jflute
  */
 public class DfSchemaInitializerSqlServer extends DfSchemaInitializerJdbc {
+
+    // ===================================================================================
+    //                                                                      Drop Procedure
+    //                                                                      ==============
+    @Override
+    protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
+        return removeSemicolonSuffixIfExists(metaInfo.getProcedureSqlName());
+    }
+
+    protected String removeSemicolonSuffixIfExists(String procedureSqlName) {
+        final int semicolonIndex = procedureSqlName.indexOf(";");
+        if (semicolonIndex >= 0) {
+            procedureSqlName = procedureSqlName.substring(0, semicolonIndex);
+        }
+        return procedureSqlName;
+    }
 }

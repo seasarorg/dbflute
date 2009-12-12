@@ -422,13 +422,17 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     protected DfDropProcedureByJdbcCallback createDropProcedureByJdbcCallback() {
         return new DfDropProcedureByJdbcCallback() {
             public String buildDropProcedureSql(DfProcedureMetaInfo metaInfo) {
-                return "drop procedure " + metaInfo.getProcedureSqlName();
+                return "drop procedure " + buildProcedureSqlName(metaInfo);
             }
 
             public String buildDropFunctionSql(DfProcedureMetaInfo metaInfo) {
-                return "drop function " + metaInfo.getProcedureSqlName();
+                return "drop function " + buildProcedureSqlName(metaInfo);
             }
         };
+    }
+
+    protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
+        return metaInfo.getProcedureSqlName();
     }
 
     public static interface DfDropProcedureByJdbcCallback {

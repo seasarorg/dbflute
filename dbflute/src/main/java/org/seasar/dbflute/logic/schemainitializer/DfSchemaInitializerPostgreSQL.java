@@ -67,18 +67,9 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     //                                                                      Drop Procedure
     //                                                                      ==============
     @Override
-    protected DfDropProcedureByJdbcCallback createDropProcedureByJdbcCallback() {
-        return new DfDropProcedureByJdbcCallback() {
-            public String buildDropProcedureSql(DfProcedureMetaInfo metaInfo) {
-                final String expression = buildProcedureArgExpression(metaInfo);
-                return "drop procedure " + metaInfo.getProcedureSqlName() + "(" + expression + ")";
-            }
-
-            public String buildDropFunctionSql(DfProcedureMetaInfo metaInfo) {
-                final String expression = buildProcedureArgExpression(metaInfo);
-                return "drop function " + metaInfo.getProcedureSqlName() + "(" + expression + ")";
-            }
-        };
+    protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
+        final String expression = "(" + buildProcedureArgExpression(metaInfo) + ")";
+        return metaInfo.getProcedureSqlName() + expression;
     }
 
     protected String buildProcedureArgExpression(DfProcedureMetaInfo metaInfo) {
