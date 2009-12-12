@@ -186,6 +186,10 @@ public class DfAbstractMetaDataHandler {
         return getBasicProperties().isDatabasePostgreSQL();
     }
 
+    protected boolean isDB2() {
+        return getBasicProperties().isDatabaseDB2();
+    }
+
     protected boolean isMsAccess() {
         return getBasicProperties().isDatabaseMsAccess();
     }

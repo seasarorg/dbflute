@@ -462,7 +462,9 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     }
 
     protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
-        return buildProcedureArrangeName(metaInfo, true, false);
+        // DB2 needs schema prefix for calling procedures. (actually tried)
+        final boolean includeMainSchema = isDB2();
+        return buildProcedureArrangeName(metaInfo, true, includeMainSchema);
     }
 
     protected String buildProcedureUniqueName(DfProcedureMetaInfo metaInfo) {
