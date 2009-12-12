@@ -162,6 +162,9 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             return;
         }
         final DfProcedureSynonymExtractor extractor = createProcedureSynonymExtractor();
+        if (extractor == null) {
+            return; // unsupported at the database
+        }
         final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = extractor.extractProcedureSynonymMap();
         if (handlingType.equals(ProcedureSynonymHandlingType.INCLUDE)) {
             // only add procedure synonyms to the procedure list
@@ -212,6 +215,9 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         return false;
     }
 
+    /**
+     * @return The extractor of procedure synonym. (Nullable)
+     */
     protected DfProcedureSynonymExtractor createProcedureSynonymExtractor() {
         final DfProcedureSynonymExtractorFactory factory = new DfProcedureSynonymExtractorFactory(
                 _procedureSynonymDataSource, getBasicProperties(), getProperties().getDatabaseProperties());
