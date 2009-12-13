@@ -65,25 +65,13 @@ map:{
     #  Then the packages of generated class are as follows:
     #
     #  ex) packageBase = com.example.dbflute.basic.dbflute
-    #        baseCommonPackage       --> com.example.dbflute.basic.dbflute.allcommon
-    #        baseBehaviorPackage     --> com.example.dbflute.basic.dbflute.bsbhv
-    #        baseEntityPackage       --> com.example.dbflute.basic.dbflute.bsentity
-    #        conditionBeanPackage    --> com.example.dbflute.basic.dbflute.cbean
-    #        extendedBehaviorPackage --> com.example.dbflute.basic.dbflute.exbhv
-    #        extendedEntityPackage   --> com.example.dbflute.basic.dbflute.exentity
+    #      --> com.example.dbflute.basic.dbflute.allcommon
+    #      --> com.example.dbflute.basic.dbflute.bsbhv
+    #      --> com.example.dbflute.basic.dbflute.bsentity
+    #      --> com.example.dbflute.basic.dbflute.cbean
+    #      --> com.example.dbflute.basic.dbflute.exbhv
+    #      --> com.example.dbflute.basic.dbflute.exentity
     #
-    #  The detail package properties:
-    #
-    #   o baseCommonPackage:            (Default Java:'allcommon' C#:'AllCommon')
-    #   o baseBehaviorPackage:          (Default Java:'bsbhv'     C#:'BsBhv')
-    #   o baseDaoPackage:               (Default Java: ---        C#:'BsDao')
-    #   o baseEntityPackage:            (Default Java:'bsentity'  C#:'BsEntity')
-    #   o conditionBeanPackage:         (Default Java:'cbean'     C#:'CBean')
-    #   o extendedBehaviorPackage:      (Default Java:'exbhv'     C#:'ExBhv')
-    #   o extendedDaoPackage:           (Default Java: ---        C#:'ExDao')
-    #   o extendedEntityPackage:        (Default Java:'exentity'  C#:'ExEntity')
-    #   o extendedConditionBeanPackage: (Default same as conditionBeanPackage)
-    # 
     ; packageBase = com.example.dbflute.basic.dbflute
     # - - - - - - - - - -/
 
