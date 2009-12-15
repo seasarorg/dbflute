@@ -76,17 +76,42 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertNotSame(java.sql.Timestamp.class, DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789").getClass());
     }
 
+    public void test_clearSeconds() {
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.clearSeconds(date);
+
+        // ## Assert ##
+        assertEquals("2008/12/30 00:00:00.000", f.format(date));
+    }
+
     // -----------------------------------------------------
     //                                              SQL Date
     //                                              --------
     public void test_toSqlDate_basic() {
-        // ## Arrange ##
-        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        Date date = DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56.789");
-
-        // ## Act & Assert ##
         assertNull(DfTypeUtil.toSqlDate(null));
         assertNull(DfTypeUtil.toSqlDate(""));
+    }
+
+    public void test_toSqlDate_same() {
+        // ## Arrange ##
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+
+        // ## Act ##
+        java.sql.Date date = DfTypeUtil.toSqlDate(DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789"));
+
+        // ## Assert ##
+        assertEquals("2008/12/30 00:00:00.000", f.format(date));
+    }
+
+    public void test_toSqlDate_timestamp() {
+        // ## Arrange ##
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Timestamp date = DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56.789");
+
+        // ## Act & Assert ##
         assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toSqlDate(date)));
     }
 

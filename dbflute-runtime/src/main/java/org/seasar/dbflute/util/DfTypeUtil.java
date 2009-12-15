@@ -560,7 +560,7 @@ public class DfTypeUtil {
             } else { // sub class
                 // because the Date is not final class.
                 final Date date = new Date();
-                date.setTime(((Date) o).getTime());
+                date.setTime(paramDate.getTime());
                 return date;
             }
         } else if (o instanceof Calendar) {
@@ -607,67 +607,6 @@ public class DfTypeUtil {
         private static final long serialVersionUID = 1L;
 
         public ToDateParseException(String msg, ParseException e) {
-            super(msg, e);
-        }
-    }
-
-    /**
-     * Convert the object to the instance that is SQL-date. <br />
-     * Even if it's the sub class type, it returns a new instance.
-     * @param o The parsed object. (Nullable)
-     * @return The instance of SQL date. (Nullable)
-     * @throws ToDateParseException When it failed to parse the string to SQL date.
-     */
-    public static java.sql.Date toSqlDate(Object o) {
-        return toSqlDate(o, null);
-    }
-
-    /**
-     * Convert the object to the instance that is SQL-date. <br />
-     * Even if it's the sub class type, it returns a new instance.
-     * @param o The parsed object. (Nullable)
-     * @param pattern The pattern format to parse. (Nullable)
-     * @return The instance of SQL date. (Nullable)
-     * @throws ToDateParseException When it failed to parse the string to SQL date.
-     */
-    public static java.sql.Date toSqlDate(Object o, String pattern) {
-        if (o == null) {
-            return null;
-        }
-        if (o instanceof java.sql.Date) {
-            final java.sql.Date paramSqlDate = (java.sql.Date) o;
-            if (java.sql.Date.class.equals(paramSqlDate.getClass())) { // real SQL-date
-                return paramSqlDate;
-            } else { // sub class
-                // because the SQL-date type is not final class.
-                return new java.sql.Date(paramSqlDate.getTime());
-            }
-        }
-        java.util.Date date;
-        try {
-            date = toDate(o, pattern);
-        } catch (ToDateParseException e) {
-            String msg = "Failed to parse the string to date: ";
-            msg = msg + " obj=" + o + " pattern=" + pattern;
-            throw new ToSqlDateParseException(msg, e);
-        }
-        if (date != null) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-            long time = cal.getTimeInMillis();
-            return new java.sql.Date(time);
-        }
-        return null;
-    }
-
-    public static class ToSqlDateParseException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public ToSqlDateParseException(String msg, Exception e) {
             super(msg, e);
         }
     }
@@ -765,6 +704,77 @@ public class DfTypeUtil {
             }
         }
         return value;
+    }
+
+    public static void clearSeconds(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    // -----------------------------------------------------
+    //                                              SQL Date
+    //                                              --------
+    /**
+     * Convert the object to the instance that is SQL-date. <br />
+     * Even if it's the sub class type, it returns a new instance.
+     * @param o The parsed object. (Nullable)
+     * @return The instance of SQL date. (Nullable)
+     * @throws ToDateParseException When it failed to parse the string to SQL date.
+     */
+    public static java.sql.Date toSqlDate(Object o) {
+        return toSqlDate(o, null);
+    }
+
+    /**
+     * Convert the object to the instance that is SQL-date cleared seconds. <br />
+     * Even if it's the sub class type, it returns a new instance.
+     * @param o The parsed object. (Nullable)
+     * @param pattern The pattern format to parse. (Nullable)
+     * @return The instance of SQL date. (Nullable)
+     * @throws ToDateParseException When it failed to parse the string to SQL date.
+     */
+    public static java.sql.Date toSqlDate(Object o, String pattern) {
+        if (o == null) {
+            return null;
+        }
+        if (o instanceof java.sql.Date) {
+            final java.sql.Date resultDate;
+            final java.sql.Date paramSqlDate = (java.sql.Date) o;
+            if (java.sql.Date.class.equals(paramSqlDate.getClass())) { // real SQL-date
+                resultDate = paramSqlDate;
+            } else { // sub class
+                // because the SQL-date type is not final class.
+                resultDate = new java.sql.Date(paramSqlDate.getTime());
+            }
+            clearSeconds(resultDate);
+            return resultDate;
+        }
+        java.util.Date date;
+        try {
+            date = toDate(o, pattern);
+        } catch (ToDateParseException e) {
+            String msg = "Failed to parse the string to date: ";
+            msg = msg + " obj=" + o + " pattern=" + pattern;
+            throw new ToSqlDateParseException(msg, e);
+        }
+        if (date != null) {
+            clearSeconds(date);
+            return new java.sql.Date(date.getTime());
+        }
+        return null;
+    }
+
+    public static class ToSqlDateParseException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToSqlDateParseException(String msg, Exception e) {
+            super(msg, e);
+        }
     }
 
     // -----------------------------------------------------
