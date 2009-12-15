@@ -545,11 +545,23 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         String c = ",";
         StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
+#if ($col.isJavaNativeUtilDate())
+        sb.append(c).append(xfUD(get${col.javaName}()));
+#else
         sb.append(c).append(get${col.javaName}());
+#end
 #end
         if (sb.length() > 0) { sb.delete(0, c.length()); }
         sb.insert(0, "{").append("}");
         return sb.toString();
+    }
+    private String xfUD(java.util.Date date) { // formatUtilDate
+#if ($database.isDatabaseOracle())
+        String pattern = "yyyy-MM-dd HH:mm:ss"; // for Oracle
+#else
+        String pattern = "yyyy-MM-dd";
+#end
+        return date != null ? new java.text.SimpleDateFormat(pattern).format(date) : null;
     }
     private String xbuildRelationString() {
 #if ($table.hasRelation())
