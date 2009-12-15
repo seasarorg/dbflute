@@ -102,7 +102,7 @@ public class DfAdditionalUniqueKeyInitializer {
     }
 
     protected void assertColumnList(final String tableName, List<String> columnNameList) {
-        if (!getTable(tableName).containsColumnsByFlexibleName(columnNameList)) {
+        if (!getTable(tableName).containsColumn(columnNameList)) {
             String msg = "Not found column by the columnNames: " + columnNameList;
             msg = msg + " of the table '" + tableName + "'";
             msg = msg + " additionalUniqueKeyMap=" + getAdditionalUniqueKeyMap();

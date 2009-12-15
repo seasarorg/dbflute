@@ -555,6 +555,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         sb.insert(0, "{").append("}");
         return sb.toString();
     }
+#if ($table.hasUtilDateColumn())
     private String xfUD(java.util.Date date) { // formatUtilDate
 #if ($database.isDatabaseOracle())
         String pattern = "yyyy-MM-dd HH:mm:ss"; // for Oracle
@@ -563,6 +564,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
         return date != null ? new java.text.SimpleDateFormat(pattern).format(date) : null;
     }
+#end
     private String xbuildRelationString() {
 #if ($table.hasRelation())
         StringBuilder sb = new StringBuilder();

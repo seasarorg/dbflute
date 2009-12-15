@@ -857,38 +857,22 @@ public class Table {
     // -----------------------------------------------------
     //                                         Determination
     //                                         -------------
-    /**
-     * Returns true if the table contains a specified column
-     * @param name name of the column
-     * @return true if the table contains the column
-     * @deprecated
-     */
-    public boolean containsColumn(String name) {
-        return _columnMap.containsKey(name);
-    }
-
-    /**
-     * Returns true if the table contains a specified column
-     * @param columnNameList the list of column name.
-     * @return true if the table contains the column
-     * @deprecated
-     */
     public boolean containsColumn(List<String> columnNameList) {
-        for (String columnName : columnNameList) {
-            if (!containsColumn(columnName)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean containsColumnsByFlexibleName(List<String> columnNameList) {
         for (String columnName : columnNameList) {
             if (getColumn(columnName) == null) {
                 return false;
             }
         }
         return true;
+    }
+
+    public boolean hasUtilDateColumn() {
+        for (Column column : _columnList) {
+            if (column.isJavaNativeUtilDate()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ===================================================================================
@@ -1559,7 +1543,6 @@ public class Table {
     //                                                                            ========
     /**
      * Set the parent of the table
-     *
      * @param parent the parant database
      */
     public void setDatabase(Database parent) {
@@ -1568,7 +1551,6 @@ public class Table {
 
     /**
      * Get the parent of the table
-     *
      * @return the parant database
      */
     public Database getDatabase() {
