@@ -662,7 +662,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as equal.
      */
     public void set${tmpJavaName}_Equal($col.javaNative ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_EQ, #if ($col.isJavaNativeUtilDate()) fCTRD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
+        reg${tmpJavaName}(CK_EQ, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #if (${col.isAvailableDateNotEqual()})
 
@@ -671,7 +671,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as notEqual.
      */
     public void set${tmpJavaName}_NotEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_NE, #if ($col.isJavaNativeUtilDate()) fCTRD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
+        reg${tmpJavaName}(CK_NE, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
 #if (${col.isAvailableDateGreaterThan()})
@@ -681,7 +681,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterThan.
      */
     public void set${tmpJavaName}_GreaterThan($col.javaNative ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_GT, #if ($col.isJavaNativeUtilDate()) fCTRD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
+        reg${tmpJavaName}(CK_GT, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
 #if (${col.isAvailableDateLessThan()})
@@ -691,7 +691,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessThan.
      */
     public void set${tmpJavaName}_LessThan($col.javaNative ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_LT, #if ($col.isJavaNativeUtilDate()) fCTRD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
+        reg${tmpJavaName}(CK_LT, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
 #if (${col.isAvailableDateGreaterEqual()})
@@ -701,7 +701,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as greaterEqual.
      */
     public void set${tmpJavaName}_GreaterEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_GE, #if ($col.isJavaNativeUtilDate()) fCTRD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
+        reg${tmpJavaName}(CK_GE, #if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
 #if (${col.isAvailableDateLessEqual()})
@@ -711,7 +711,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * @param ${tmpUncapitalisedJavaName} The value of ${col.uncapitalisedJavaName} as lessEqual.
      */
     public void set${tmpJavaName}_LessEqual($col.javaNative ${tmpUncapitalisedJavaName}) {
-        reg${tmpJavaName}(CK_LE,#if ($col.isJavaNativeUtilDate()) fCTRD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
+        reg${tmpJavaName}(CK_LE,#if ($col.isJavaNativeUtilDate()) fCTPD(${tmpUncapitalisedJavaName})#else ${tmpUncapitalisedJavaName}#end);
     }
 #end
 #if (${col.isAvailableDateFromTo()} && !${col.isJdbcTypeTime()})
@@ -724,7 +724,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      */
     public void set${tmpJavaName}_FromTo(java.util.Date fromDate, java.util.Date toDate, FromToOption fromToOption) {
 #if ($col.isJavaNativeUtilDate())
-        regFTQ(fCTRD(fromDate), fCTRD(toDate), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
+        regFTQ(fCTPD(fromDate), fCTPD(toDate), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #else
         regFTQ((fromDate != null ? new ${col.javaNative}(fromDate.getTime()) : null), (toDate != null ? new ${col.javaNative}(toDate.getTime()) : null), getCValue${tmpJavaName}(), "${col.name}", fromToOption);
 #end

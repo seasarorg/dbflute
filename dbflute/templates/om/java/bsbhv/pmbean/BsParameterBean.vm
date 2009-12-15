@@ -125,7 +125,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     }
 
     protected java.util.Date convertToUtilDate(java.util.Date date) {
-        return DfTypeUtil.toDate(date); // if sub class, re-create as real date
+        return DfTypeUtil.toDate(date); // if sub class, re-create as pure date
     }
 
     protected String formatUtilDate(java.util.Date date) {
