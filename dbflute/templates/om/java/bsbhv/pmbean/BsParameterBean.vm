@@ -128,6 +128,15 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return DfTypeUtil.toDate(date); // if sub class, re-create as real date
     }
 
+    protected String formatUtilDate(java.util.Date date) {
+#if ($database.isDatabaseOracle())
+        String pattern = "yyyy-MM-dd HH:mm:ss"; // for Oracle
+#else
+        String pattern = "yyyy-MM-dd";
+#end
+        return DfTypeUtil.format(date, pattern);
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -142,12 +151,17 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return sb.toString();
     }
     private String xbuildColumnString() {
-        final String delimiter = ",";
+        final String c = ", ";
         final StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-        sb.append(delimiter).append(_${propertyName});
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
+#if ($propertyType.equals("java.util.Date"))
+        sb.append(c).append(formatUtilDate(_${propertyName}));
+#else
+        sb.append(c).append(_${propertyName});
 #end
-        if (sb.length() > 0) { sb.delete(0, delimiter.length()); }
+#end
+        if (sb.length() > 0) { sb.delete(0, c.length()); }
         sb.insert(0, "{").append("}");
         return sb.toString();
     }

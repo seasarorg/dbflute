@@ -542,7 +542,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return sb.toString();
     }
     private String xbuildColumnString() {
-        String c = ",";
+        String c = ", ";
         StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
 #if ($col.isJavaNativeUtilDate())
