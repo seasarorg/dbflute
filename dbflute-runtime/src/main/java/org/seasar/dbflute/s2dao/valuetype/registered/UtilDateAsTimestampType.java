@@ -64,11 +64,11 @@ public class UtilDateAsTimestampType extends TnAbstractValueType {
     //                                                                          Bind Value
     //                                                                          ==========
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
-        _timestampType.bindValue(ps, index, toSqlDate(value));
+        _timestampType.bindValue(ps, index, toTimestamp(value));
     }
 
     public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
-        _timestampType.bindValue(cs, parameterName, toSqlDate(value));
+        _timestampType.bindValue(cs, parameterName, toTimestamp(value));
     }
 
     // ===================================================================================
@@ -91,11 +91,11 @@ public class UtilDateAsTimestampType extends TnAbstractValueType {
         }
     }
 
-    protected java.sql.Date toSqlDate(Object value) {
+    protected java.sql.Timestamp toTimestamp(Object value) {
         try {
-            return DfTypeUtil.toSqlDate(value);
+            return DfTypeUtil.toTimestamp(value);
         } catch (RuntimeException e) {
-            String msg = "Failed to convert the object to java.sql.Date:";
+            String msg = "Failed to convert the object to java.sql.Timestamp:";
             msg = msg + " type=" + (value != null ? value.getClass() : null) + " value=" + value;
             throw new IllegalStateException(msg);
         }
