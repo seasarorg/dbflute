@@ -71,8 +71,8 @@ public class ${glDBFluteConfig} {
     // -----------------------------------------------------
     //                                                  Lock
     //                                                  ----
-	protected boolean _locked = true;
-	
+	protected boolean _locked = false; // at first unlocked
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -81,17 +81,17 @@ public class ${glDBFluteConfig} {
      */
     private ${glDBFluteConfig}() {
 	    if (isCurrentDBDef(DBDef.Oracle)) {
-	        // Date formatting has Two points:
-	        //   o The DATE type of Oracle has seconds.  
-	        //   o It uses a date literal of Oracle.
-	        String dateFormat = "yyyy-MM-dd HH:mm:ss";
-	        _logDateFormat = "timestamp $df:{" + dateFormat + "}";
-	        String timestampFormat = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
-	        _logTimestampFormat = "timestamp $df:{" + timestampFormat + "}";
+            // Date formatting has Two points:
+            //   o The DATE type of Oracle has seconds.  
+            //   o It uses a date literal of Oracle.
+            String dateFormat = "yyyy-MM-dd HH:mm:ss";
+            _logDateFormat = "timestamp $df:{" + dateFormat + "}";
+            String timestampFormat = DisplaySqlBuilder.DEFAULT_TIMESTAMP_FORMAT;
+            _logTimestampFormat = "timestamp $df:{" + timestampFormat + "}";
 
             // It should treat java.util.Date as time-stamp,
-	        // because the DATE type of Oracle has seconds.
-	        registerBasicValueType(java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP); // override
+            // because the DATE type of Oracle has seconds.
+            registerBasicValueType(java.util.Date.class, TnValueTypes.UTILDATE_AS_TIMESTAMP); // override
 	    }
     }
 
