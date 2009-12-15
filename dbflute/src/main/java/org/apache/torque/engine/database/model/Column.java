@@ -1142,6 +1142,10 @@ public class Column {
     // - - - - - -
     // [Pinpoint]
     // - - - - - -
+    public boolean isJavaNativeUtilDate() {
+        return getJavaNative().equals("java.util.Date");
+    }
+
     public boolean isJavaNativeUUIDObject() {
         if (isJavaNativeStringObject() || isJavaNativeNumberObject() || isJavaNativeDateObject()
                 || isJavaNativeBooleanObject() || isJavaNativeBinaryObject()) {

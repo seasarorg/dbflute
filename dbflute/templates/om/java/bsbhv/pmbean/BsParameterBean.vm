@@ -15,6 +15,7 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
 import org.seasar.dbflute.cbean.coption.FromToOption;
 #end
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The parameter-bean of ${pmbClassName}.
@@ -123,6 +124,10 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return ShortCharHandlingMode.${database.shortCharHandlingMode};
     }
 
+    protected java.util.Date convertToUtilDate(java.util.Date date) {
+        return DfTypeUtil.toDate(date); // if sub class, re-create as real date
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -166,7 +171,11 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return convertEmptyToNull(_${propertyName});
 #end
 #else
+#if ($propertyType.equals("java.util.Date"))
+        return convertToUtilDate(_${propertyName});
+#else
         return _${propertyName};
+#end
 #end
     }
 #if (!$database.hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter($pmbClassName, $propertyName))
