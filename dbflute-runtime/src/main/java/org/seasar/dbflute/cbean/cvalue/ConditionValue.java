@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
-import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The value of condition.
@@ -898,23 +897,16 @@ public class ConditionValue {
     //                                                                                ======
     /**
      * Filter value.
-     * If the value is instance of java.util.Date or java.util.Calendar, returns value as java.sql.Date.
      * @param value The value. (Nullable)
      * @return The filtered value. (Nullable)
      */
     protected Object filterValue(Object value) {
-        if (value == null) {
-            return value;
-        }
-        if (value instanceof java.util.Calendar) {
-            return DfTypeUtil.toTimestamp(value);
-        }
+        // do nothing but it may use at the future
         return value;
     }
 
     /**
      * Filter the list of value.
-     * If the value is instance of java.util.Date or java.util.Calendar, returns value as java.sql.Date.
      * @param valueList The list of value. (Nullable)
      * @return The filtered list of value. (Nullable)
      */
@@ -923,7 +915,7 @@ public class ConditionValue {
             return valueList;
         }
         final List<Object> resultList = new ArrayList<Object>();
-        for (Object value : resultList) {
+        for (Object value : valueList) {
             resultList.add(filterValue(value));
         }
         return resultList;

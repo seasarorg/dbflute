@@ -34,6 +34,9 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2008/12/30 00:00:00", f.format(DfTypeUtil.toDateFlexibly("2008-12-30")));
         assertEquals("2008/12/30 12:34:56", f.format(DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56")));
         assertEquals("2008/12/30 12:34:56", f.format(DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789")));
+        assertEquals(java.util.Date.class, DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789").getClass());
+        assertNotSame(java.sql.Date.class, DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789").getClass());
+        assertNotSame(java.sql.Timestamp.class, DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789").getClass());
     }
 
     public void test_format_Date() {

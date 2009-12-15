@@ -214,34 +214,6 @@ public class DfTypeUtil {
     }
 
     // -----------------------------------------------------
-    //                                            BigDecimal
-    //                                            ----------
-    public static BigDecimal toBigDecimal(Object o) {
-        return toBigDecimal(o, null);
-    }
-
-    public static BigDecimal toBigDecimal(Object o, String pattern) {
-        if (o == null) {
-            return null;
-        } else if (o instanceof BigDecimal) {
-            return (BigDecimal) o;
-        } else if (o instanceof java.util.Date) {
-            if (pattern != null) {
-                return new BigDecimal(new SimpleDateFormat(pattern).format(o));
-            }
-            return new BigDecimal(Long.toString(((java.util.Date) o).getTime()));
-        } else if (o instanceof String) {
-            String s = (String) o;
-            if (s == null || s.trim().length() == 0) {
-                return null;
-            }
-            return new BigDecimal(new BigDecimal(s).toPlainString());
-        } else {
-            return new BigDecimal(new BigDecimal(o.toString()).toPlainString());
-        }
-    }
-
-    // -----------------------------------------------------
     //                                                Double
     //                                                ------
     public static Double toDouble(Object o) {
@@ -429,27 +401,6 @@ public class DfTypeUtil {
     }
 
     // -----------------------------------------------------
-    //                                            BigInteger
-    //                                            ----------
-    public static BigInteger toBigInteger(Object o) {
-        return toBigInteger(o, null);
-    }
-
-    public static BigInteger toBigInteger(Object o, String pattern) {
-        if (o == null) {
-            return null;
-        } else if (o instanceof BigInteger) {
-            return (BigInteger) o;
-        } else {
-            Long l = toLong(o, pattern);
-            if (l == null) {
-                return null;
-            }
-            return BigInteger.valueOf(l.longValue());
-        }
-    }
-
-    // -----------------------------------------------------
     //                                                  Byte
     //                                                  ----
     public static Byte toByte(Object o) {
@@ -515,15 +466,72 @@ public class DfTypeUtil {
     }
 
     // -----------------------------------------------------
+    //                                            BigDecimal
+    //                                            ----------
+    public static BigDecimal toBigDecimal(Object o) {
+        return toBigDecimal(o, null);
+    }
+
+    public static BigDecimal toBigDecimal(Object o, String pattern) {
+        if (o == null) {
+            return null;
+        } else if (o instanceof BigDecimal) {
+            final BigDecimal paramBigDecimal = (BigDecimal) o;
+            if (BigDecimal.class.equals(paramBigDecimal.getClass())) { // real big-decimal
+                return paramBigDecimal;
+            } else { // sub class
+                // because the big-decimal type is not final class.
+                return new BigDecimal(paramBigDecimal.toPlainString());
+            }
+        } else if (o instanceof java.util.Date) {
+            if (pattern != null) {
+                return new BigDecimal(new SimpleDateFormat(pattern).format(o));
+            }
+            return new BigDecimal(Long.toString(((java.util.Date) o).getTime()));
+        } else if (o instanceof String) {
+            String s = (String) o;
+            if (s == null || s.trim().length() == 0) {
+                return null;
+            }
+            return new BigDecimal(new BigDecimal(s).toPlainString());
+        } else {
+            return new BigDecimal(new BigDecimal(o.toString()).toPlainString());
+        }
+    }
+
+    // -----------------------------------------------------
+    //                                            BigInteger
+    //                                            ----------
+    public static BigInteger toBigInteger(Object o) {
+        return toBigInteger(o, null);
+    }
+
+    public static BigInteger toBigInteger(Object o, String pattern) {
+        if (o == null) {
+            return null;
+        } else if (o instanceof BigInteger) {
+            final BigInteger paramBigInteger = (BigInteger) o;
+            if (BigInteger.class.equals(paramBigInteger.getClass())) { // real big-integer
+                return paramBigInteger;
+            } else { // sub class
+                // because the big-integer type is not final class.
+                return BigInteger.valueOf(paramBigInteger.longValue());
+            }
+        } else {
+            Long l = toLong(o, pattern);
+            if (l == null) {
+                return null;
+            }
+            return BigInteger.valueOf(l.longValue());
+        }
+    }
+
+    // -----------------------------------------------------
     //                                                  Date
     //                                                  ----
-    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    // The date types cannot be treated as primitive type,
-    // so even if the same type object was specified, it returns a new instance.
-    // = = = = = = = = = =/
     /**
      * Convert the object to the instance that is date. <br />
-     * Even if it's the same type, it returns a new instance.
+     * Even if it's the sub class type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @return The instance of date. (Nullable)
      * @throws ToDateParseException When it failed to parse the string to date.
@@ -534,7 +542,7 @@ public class DfTypeUtil {
 
     /**
      * Convert the object to the instance that is date. <br />
-     * Even if it's the same type, it returns a new instance.
+     * Even if it's the sub class type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of date. (Nullable)
@@ -546,9 +554,15 @@ public class DfTypeUtil {
         } else if (o instanceof String) {
             return toDate((String) o, pattern);
         } else if (o instanceof Date) {
-            final Date date = new Date();
-            date.setTime(((Date) o).getTime());
-            return date;
+            final Date paramDate = (Date) o;
+            if (Date.class.equals(paramDate.getClass())) { // real date
+                return paramDate;
+            } else { // sub class
+                // because the Date is not final class.
+                final Date date = new Date();
+                date.setTime(((Date) o).getTime());
+                return date;
+            }
         } else if (o instanceof Calendar) {
             return ((Calendar) o).getTime();
         } else {
@@ -579,7 +593,7 @@ public class DfTypeUtil {
         if (s == null || s.trim().length() == 0) {
             return null;
         }
-        SimpleDateFormat sdf = getDateFormat(s, pattern, locale);
+        final SimpleDateFormat sdf = getDateFormat(s, pattern, locale);
         try {
             return sdf.parse(s);
         } catch (ParseException e) {
@@ -599,7 +613,7 @@ public class DfTypeUtil {
 
     /**
      * Convert the object to the instance that is SQL-date. <br />
-     * Even if it's the same type, it returns a new instance.
+     * Even if it's the sub class type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @return The instance of SQL date. (Nullable)
      * @throws ToDateParseException When it failed to parse the string to SQL date.
@@ -610,7 +624,7 @@ public class DfTypeUtil {
 
     /**
      * Convert the object to the instance that is SQL-date. <br />
-     * Even if it's the same type, it returns a new instance.
+     * Even if it's the sub class type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of SQL date. (Nullable)
@@ -621,7 +635,13 @@ public class DfTypeUtil {
             return null;
         }
         if (o instanceof java.sql.Date) {
-            return new java.sql.Date(((java.sql.Date) o).getTime());
+            final java.sql.Date paramSqlDate = (java.sql.Date) o;
+            if (java.sql.Date.class.equals(paramSqlDate.getClass())) { // real SQL-date
+                return paramSqlDate;
+            } else { // sub class
+                // because the SQL-date type is not final class.
+                return new java.sql.Date(paramSqlDate.getTime());
+            }
         }
         java.util.Date date;
         try {
@@ -678,7 +698,7 @@ public class DfTypeUtil {
 
     /**
      * Convert the object to the instance that is date flexibly. <br />
-     * Even if it's the same type, it returns a new instance.
+     * Even if it's the sub class type, it returns a new instance.
      * @param obj The parsed object. (Nullable)
      * @return The instance of date. (Nullable: If the value is null or empty, it returns null.)
      * @throws ToDateFlexiblyParseException When it failed to parse the string to date flexibly.
@@ -766,7 +786,7 @@ public class DfTypeUtil {
     //                                             ---------
     /**
      * Convert the object to the instance that is time-stamp. <br />
-     * Even if it's the same type, it returns a new instance.
+     * Even if it's the sub class type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
      * @throws ToTimestampParseException When it failed to parse the string to time-stamp.
@@ -777,7 +797,7 @@ public class DfTypeUtil {
 
     /**
      * Convert the object to the instance that is time-stamp. <br />
-     * Even if it's the same type, it returns a new instance. 
+     * Even if it's the sub class type, it returns a new instance. 
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
@@ -788,7 +808,13 @@ public class DfTypeUtil {
             return null;
         }
         if (o instanceof Timestamp) {
-            return new Timestamp(((Timestamp) o).getTime());
+            final Timestamp paramTimestamp = (Timestamp) o;
+            if (Timestamp.class.equals(paramTimestamp.getClass())) { // real time-stamp
+                return paramTimestamp;
+            } else { // sub class
+                // because the time-stamp type is not final class.
+                return new Timestamp(paramTimestamp.getTime());
+            }
         }
         Date date;
         try {
@@ -818,7 +844,7 @@ public class DfTypeUtil {
 
     /**
      * Convert the object to the instance that is time-stamp flexibly. <br />
-     * Even if it's the same type, it returns a new instance.
+     * Even if it's the sub class type, it returns a new instance.
      * @param obj The time-stamp object. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
      */
@@ -890,7 +916,7 @@ public class DfTypeUtil {
     //                                                  ----
     /**
      * Convert the object to the instance that is time. <br />
-     * Even if it's the same type, it returns a new instance.
+     * Even if it's the sub class type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
      * @throws ToTimeParseException When it failed to parse the string to time.
@@ -901,7 +927,7 @@ public class DfTypeUtil {
 
     /**
      * Convert the object to the instance that is time. <br />
-     * Even if it's the same type, it returns a new instance.
+     * Even if it's the sub class type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
@@ -912,6 +938,14 @@ public class DfTypeUtil {
             return null;
         } else if (o instanceof String) {
             return toTime((String) o, pattern);
+        } else if (o instanceof Time) {
+            final Time paramTime = (Time) o;
+            if (Time.class.equals(paramTime.getClass())) { // real time
+                return paramTime;
+            } else { // sub class
+                // because the time type is not final class.
+                return new Time(paramTime.getTime());
+            }
         } else if (o instanceof Date) {
             Date date = (Date) o;
             Calendar cal = Calendar.getInstance();
@@ -920,8 +954,6 @@ public class DfTypeUtil {
             cal.set(Calendar.MONTH, Calendar.JANUARY);
             cal.set(Calendar.DATE, 1);
             return new Time(cal.getTimeInMillis());
-        } else if (o instanceof Time) {
-            return new Time(((Time) o).getTime());
         } else if (o instanceof Calendar) {
             Calendar cal = (Calendar) o;
             cal.set(Calendar.YEAR, 1970);
@@ -956,7 +988,7 @@ public class DfTypeUtil {
         if (s == null || s.trim().length() == 0) {
             return null;
         }
-        SimpleDateFormat sdf = getTimeDateFormat(s, pattern, locale);
+        final SimpleDateFormat sdf = getTimeDateFormat(s, pattern, locale);
         try {
             return new Time(sdf.parse(s).getTime());
         } catch (ParseException e) {
@@ -1006,6 +1038,35 @@ public class DfTypeUtil {
             }
         }
         return buf.toString();
+    }
+
+    // -----------------------------------------------------
+    //                                              Calendar
+    //                                              --------
+    public static Calendar toCalendar(Object o) {
+        return toCalendar(o, null);
+    }
+
+    public static Calendar toCalendar(Object o, String pattern) {
+        if (o instanceof Calendar) {
+            return (Calendar) o;
+        }
+        java.util.Date date = toDate(o, pattern);
+        if (date != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            return cal;
+        }
+        return null;
+    }
+
+    public static Calendar localize(Calendar calendar) {
+        if (calendar == null) {
+            throw new NullPointerException("calendar");
+        }
+        Calendar localCalendar = Calendar.getInstance();
+        localCalendar.setTimeInMillis(calendar.getTimeInMillis());
+        return localCalendar;
     }
 
     // -----------------------------------------------------
@@ -1127,35 +1188,6 @@ public class DfTypeUtil {
             return Byte.valueOf((byte) 0);
         }
         return o;
-    }
-
-    // -----------------------------------------------------
-    //                                              Calendar
-    //                                              --------
-    public static Calendar toCalendar(Object o) {
-        return toCalendar(o, null);
-    }
-
-    public static Calendar toCalendar(Object o, String pattern) {
-        if (o instanceof Calendar) {
-            return (Calendar) o;
-        }
-        java.util.Date date = toDate(o, pattern);
-        if (date != null) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-            return cal;
-        }
-        return null;
-    }
-
-    public static Calendar localize(Calendar calendar) {
-        if (calendar == null) {
-            throw new NullPointerException("calendar");
-        }
-        Calendar localCalendar = Calendar.getInstance();
-        localCalendar.setTimeInMillis(calendar.getTimeInMillis());
-        return localCalendar;
     }
 
     // -----------------------------------------------------
