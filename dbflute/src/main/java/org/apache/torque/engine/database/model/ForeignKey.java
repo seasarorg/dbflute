@@ -1070,10 +1070,18 @@ public class ForeignKey {
     }
 
     public String getDynamicFixedConditionParameterMapSetup() {
-        final Set<String> parameterNameSet = _dynamicFixedConditionMap.keySet();
+        final Set<Entry<String, String>> entrySet = _dynamicFixedConditionMap.entrySet();
         final StringBuilder sb = new StringBuilder();
-        for (String parameterName : parameterNameSet) {
-            sb.append("parameterMap.put(\"").append(parameterName).append("\", ").append(parameterName).append(");");
+        for (Entry<String, String> entry : entrySet) {
+            final String parameterName = entry.getKey();
+            final String parameterType = entry.getValue();
+            sb.append("parameterMap.put(\"").append(parameterName).append("\", ");
+            if (java.util.Date.class.getName().equals(parameterType)) {
+                sb.append("fCTPD(").append(parameterName).append(")");
+            } else {
+                sb.append(parameterName);
+            }
+            sb.append(");");
         }
         return sb.toString();
     }
