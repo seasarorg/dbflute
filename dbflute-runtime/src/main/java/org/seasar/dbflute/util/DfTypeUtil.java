@@ -517,8 +517,13 @@ public class DfTypeUtil {
     // -----------------------------------------------------
     //                                                  Date
     //                                                  ----
-
+    // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    // The date types cannot be treated as primitive type,
+    // so even if the same type object was specified, it returns a new instance.
+    // = = = = = = = = = =/
     /**
+     * Convert the object to the instance that is date. <br />
+     * Even if it's the same type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @return The instance of date. (Nullable)
      * @throws ToDateParseException When it failed to parse the string to date.
@@ -528,6 +533,8 @@ public class DfTypeUtil {
     }
 
     /**
+     * Convert the object to the instance that is date. <br />
+     * Even if it's the same type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of date. (Nullable)
@@ -539,7 +546,9 @@ public class DfTypeUtil {
         } else if (o instanceof String) {
             return toDate((String) o, pattern);
         } else if (o instanceof Date) {
-            return (Date) o;
+            final Date date = new Date();
+            date.setTime(((Date) o).getTime());
+            return date;
         } else if (o instanceof Calendar) {
             return ((Calendar) o).getTime();
         } else {
@@ -548,6 +557,7 @@ public class DfTypeUtil {
     }
 
     /**
+     * Convert the object to the instance that is date.
      * @param s The parsed string. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of date. (Nullable)
@@ -558,6 +568,7 @@ public class DfTypeUtil {
     }
 
     /**
+     * Convert the object to the instance that is date.
      * @param s The parsed string. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @param locale The locale to parse. (NotNull)
@@ -587,6 +598,8 @@ public class DfTypeUtil {
     }
 
     /**
+     * Convert the object to the instance that is SQL-date. <br />
+     * Even if it's the same type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @return The instance of SQL date. (Nullable)
      * @throws ToDateParseException When it failed to parse the string to SQL date.
@@ -596,6 +609,8 @@ public class DfTypeUtil {
     }
 
     /**
+     * Convert the object to the instance that is SQL-date. <br />
+     * Even if it's the same type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of SQL date. (Nullable)
@@ -606,7 +621,7 @@ public class DfTypeUtil {
             return null;
         }
         if (o instanceof java.sql.Date) {
-            return (java.sql.Date) o;
+            return new java.sql.Date(((java.sql.Date) o).getTime());
         }
         java.util.Date date;
         try {
@@ -662,7 +677,8 @@ public class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance of date flexibly.
+     * Convert the object to the instance that is date flexibly. <br />
+     * Even if it's the same type, it returns a new instance.
      * @param obj The parsed object. (Nullable)
      * @return The instance of date. (Nullable: If the value is null or empty, it returns null.)
      * @throws ToDateFlexiblyParseException When it failed to parse the string to date flexibly.
@@ -749,6 +765,8 @@ public class DfTypeUtil {
     //                                             Timestamp
     //                                             ---------
     /**
+     * Convert the object to the instance that is time-stamp. <br />
+     * Even if it's the same type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
      * @throws ToTimestampParseException When it failed to parse the string to time-stamp.
@@ -758,6 +776,8 @@ public class DfTypeUtil {
     }
 
     /**
+     * Convert the object to the instance that is time-stamp. <br />
+     * Even if it's the same type, it returns a new instance. 
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
@@ -768,7 +788,7 @@ public class DfTypeUtil {
             return null;
         }
         if (o instanceof Timestamp) {
-            return (Timestamp) o;
+            return new Timestamp(((Timestamp) o).getTime());
         }
         Date date;
         try {
@@ -797,7 +817,8 @@ public class DfTypeUtil {
     }
 
     /**
-     * Convert the object to the instance of time-stamp flexibly.
+     * Convert the object to the instance that is time-stamp flexibly. <br />
+     * Even if it's the same type, it returns a new instance.
      * @param obj The time-stamp object. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
      */
@@ -868,6 +889,8 @@ public class DfTypeUtil {
     //                                                  Time
     //                                                  ----
     /**
+     * Convert the object to the instance that is time. <br />
+     * Even if it's the same type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
      * @throws ToTimeParseException When it failed to parse the string to time.
@@ -877,6 +900,8 @@ public class DfTypeUtil {
     }
 
     /**
+     * Convert the object to the instance that is time. <br />
+     * Even if it's the same type, it returns a new instance.
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
@@ -896,7 +921,7 @@ public class DfTypeUtil {
             cal.set(Calendar.DATE, 1);
             return new Time(cal.getTimeInMillis());
         } else if (o instanceof Time) {
-            return (Time) o;
+            return new Time(((Time) o).getTime());
         } else if (o instanceof Calendar) {
             Calendar cal = (Calendar) o;
             cal.set(Calendar.YEAR, 1970);
@@ -909,6 +934,7 @@ public class DfTypeUtil {
     }
 
     /**
+     * Convert the object to the instance that is time.
      * @param s The parsed string. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
@@ -919,6 +945,7 @@ public class DfTypeUtil {
     }
 
     /**
+     * Convert the object to the instance that is time.
      * @param s The parsed string. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @param locale The locale to parse. (NotNull)

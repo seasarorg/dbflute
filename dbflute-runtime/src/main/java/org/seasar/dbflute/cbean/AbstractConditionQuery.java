@@ -31,7 +31,6 @@ import org.seasar.dbflute.cbean.coption.FromToOption;
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
-import org.seasar.dbflute.cbean.sqlclause.SqlClauseMySql;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
@@ -1479,13 +1478,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                       Assist Helper
     //                                                                       =============
     protected ConditionValue nCV() {
-        ConditionValue conditionValue = new ConditionValue();
-        if (getSqlClause() instanceof SqlClauseMySql) { // Is it MySQL?
-            // MySQL does not automatically resolve java.util.Date time parts problem in its JDBC.
-            // So java.util.Date should be treated as java.sql.Date in condition-bean.
-            conditionValue.enableUtilDateToSqlDate();
-        }
-        return conditionValue;
+        return new ConditionValue();
     }
     
     /**

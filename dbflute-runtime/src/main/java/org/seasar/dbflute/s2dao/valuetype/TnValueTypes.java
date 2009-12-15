@@ -60,6 +60,8 @@ import org.seasar.dbflute.s2dao.valuetype.registered.TimeType;
 import org.seasar.dbflute.s2dao.valuetype.registered.TimestampType;
 import org.seasar.dbflute.s2dao.valuetype.registered.UUIDType;
 import org.seasar.dbflute.s2dao.valuetype.registered.UserDefineType;
+import org.seasar.dbflute.s2dao.valuetype.registered.UtilDateAsSqlDateType;
+import org.seasar.dbflute.s2dao.valuetype.registered.UtilDateAsTimestampType;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
@@ -84,6 +86,8 @@ public class TnValueTypes {
     public final static ValueType BIGINTEGER = new BigIntegerType();
     public final static ValueType TIME = new TimeType();
     public final static ValueType SQLDATE = new SqlDateType();
+    public final static ValueType UTILDATE_AS_SQLDATE = new UtilDateAsSqlDateType();
+    public final static ValueType UTILDATE_AS_TIMESTAMP = new UtilDateAsTimestampType();
     public final static ValueType TIMESTAMP = new TimestampType();
     public final static ValueType BINARY = new BinaryType();
     public final static ValueType BINARY_STREAM = new BinaryStreamType();
@@ -135,7 +139,12 @@ public class TnValueTypes {
         registerBasicValueType(BigDecimal.class, BIGDECIMAL);
         registerBasicValueType(java.sql.Date.class, SQLDATE);
         registerBasicValueType(java.sql.Time.class, TIME);
-        registerBasicValueType(java.util.Date.class, TIMESTAMP);
+
+        // The (java.util.)date type is treated as SqlDate by default.
+        // When the DATE type of your database has time, you need to change this.
+        // (But basically DBFlute resolves the problem automatically, for example, Oracle)
+        registerBasicValueType(java.util.Date.class, UTILDATE_AS_SQLDATE);
+
         registerBasicValueType(Timestamp.class, TIMESTAMP);
         registerBasicValueType(Calendar.class, TIMESTAMP);
         registerBasicValueType(BYTE_ARRAY_CLASS, BINARY);

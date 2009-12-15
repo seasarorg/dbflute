@@ -16,7 +16,6 @@
 package org.seasar.dbflute.cbean.cvalue;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.seasar.dbflute.cbean.coption.LikeSearchOption;
@@ -895,14 +894,6 @@ public class ConditionValue {
     }
 
     // =====================================================================================
-    //                                                                                Option
-    //                                                                                ======
-    public ConditionValue enableUtilDateToSqlDate() {
-        _utilDateToSqlDate = true;
-        return this;
-    }
-
-    // =====================================================================================
     //                                                                                Filter
     //                                                                                ======
     /**
@@ -914,19 +905,6 @@ public class ConditionValue {
     protected Object filterValue(Object value) {
         if (value == null) {
             return value;
-        }
-        if (value instanceof java.sql.Time) {
-            return value;
-        }
-        if (value instanceof java.sql.Timestamp) {
-            return value;
-        }
-        if (value instanceof java.util.Date) {
-            if (_utilDateToSqlDate) {
-                return DfTypeUtil.toSqlDate(value);
-            } else {
-                return value;
-            }
         }
         if (value instanceof java.util.Calendar) {
             return DfTypeUtil.toTimestamp(value);
@@ -945,8 +923,7 @@ public class ConditionValue {
             return valueList;
         }
         final List<Object> resultList = new ArrayList<Object>();
-        for (Iterator<?> ite = valueList.iterator(); ite.hasNext();) {
-            Object value = ite.next();
+        for (Object value : resultList) {
             resultList.add(filterValue(value));
         }
         return resultList;
