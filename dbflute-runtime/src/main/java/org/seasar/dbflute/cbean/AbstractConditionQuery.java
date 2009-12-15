@@ -42,6 +42,7 @@ import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTraceViewUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The abstract class of condition-query.
@@ -1478,9 +1479,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                       Assist Helper
     //                                                                       =============
     protected ConditionValue nCV() {
+        return newConditionValue();
+    }
+
+    protected ConditionValue newConditionValue() {
         return new ConditionValue();
     }
-    
+
     /**
      * @param value Query-value-string. (Nullable)
      * @return Filtered value. (Nullable)
@@ -1489,14 +1494,22 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return filterRemoveEmptyString(value);
     }
 
-    /**
-     * @param value Query-value-string. (Nullable)
-     * @return Filtered value. (Nullable)
-     */
     private String filterRemoveEmptyString(String value) {
         return ((value != null && !"".equals(value)) ? value : null);
     }
-    
+
+    /**
+     * @param date The date instance. (Nullable)
+     * @return Filtered date. (Nullable)
+     */
+    protected java.util.Date fCTRD(java.util.Date date) {
+        return filterConvertToRealDate(date);
+    }
+
+    private java.util.Date filterConvertToRealDate(java.util.Date date) {
+        return DfTypeUtil.toDate(date);
+    }
+
     /**
      * create the option of like search as prefix search.
      * @return The option of like search as prefix search. (NotNull)

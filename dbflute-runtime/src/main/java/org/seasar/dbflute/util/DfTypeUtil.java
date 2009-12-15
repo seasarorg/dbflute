@@ -101,7 +101,7 @@ public class DfTypeUtil {
             return toInteger((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Integer(new SimpleDateFormat(pattern).format(o));
+                return new Integer(getDateFormat(pattern).format(o));
             }
             return Integer.valueOf((int) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -131,7 +131,7 @@ public class DfTypeUtil {
             return toPrimitiveInt((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Integer.parseInt(new SimpleDateFormat(pattern).format(o));
+                return Integer.parseInt(getDateFormat(pattern).format(o));
             }
             return (int) ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -166,7 +166,7 @@ public class DfTypeUtil {
             return toLong((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Long(new SimpleDateFormat(pattern).format(o));
+                return new Long(getDateFormat(pattern).format(o));
             }
             return Long.valueOf(((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -196,7 +196,7 @@ public class DfTypeUtil {
             return toPrimitiveLong((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Long.parseLong(new SimpleDateFormat(pattern).format(o));
+                return Long.parseLong(getDateFormat(pattern).format(o));
             }
             return ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -231,7 +231,7 @@ public class DfTypeUtil {
             return toDouble((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Double(new SimpleDateFormat(pattern).format(o));
+                return new Double(getDateFormat(pattern).format(o));
             }
             return new Double(((java.util.Date) o).getTime());
         } else {
@@ -259,7 +259,7 @@ public class DfTypeUtil {
             return toPrimitiveDouble((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Double.parseDouble(new SimpleDateFormat(pattern).format(o));
+                return Double.parseDouble(getDateFormat(pattern).format(o));
             }
             return ((java.util.Date) o).getTime();
         } else {
@@ -292,7 +292,7 @@ public class DfTypeUtil {
             return toFloat((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Float(new SimpleDateFormat(pattern).format(o));
+                return new Float(getDateFormat(pattern).format(o));
             }
             return new Float(((java.util.Date) o).getTime());
         } else {
@@ -320,7 +320,7 @@ public class DfTypeUtil {
             return toPrimitiveFloat((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Float.parseFloat(new SimpleDateFormat(pattern).format(o));
+                return Float.parseFloat(getDateFormat(pattern).format(o));
             }
             return ((java.util.Date) o).getTime();
         } else {
@@ -353,7 +353,7 @@ public class DfTypeUtil {
             return toShort((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Short.valueOf(new SimpleDateFormat(pattern).format(o));
+                return Short.valueOf(getDateFormat(pattern).format(o));
             }
             return Short.valueOf((short) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -383,7 +383,7 @@ public class DfTypeUtil {
             return toPrimitiveShort((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Short.parseShort(new SimpleDateFormat(pattern).format(o));
+                return Short.parseShort(getDateFormat(pattern).format(o));
             }
             return (short) ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -418,7 +418,7 @@ public class DfTypeUtil {
             return toByte((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Byte(new SimpleDateFormat(pattern).format(o));
+                return new Byte(getDateFormat(pattern).format(o));
             }
             return Byte.valueOf((byte) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -448,7 +448,7 @@ public class DfTypeUtil {
             return toPrimitiveByte((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Byte.parseByte(new SimpleDateFormat(pattern).format(o));
+                return Byte.parseByte(getDateFormat(pattern).format(o));
             }
             return (byte) ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -485,7 +485,7 @@ public class DfTypeUtil {
             }
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new BigDecimal(new SimpleDateFormat(pattern).format(o));
+                return new BigDecimal(getDateFormat(pattern).format(o));
             }
             return new BigDecimal(Long.toString(((java.util.Date) o).getTime()));
         } else if (o instanceof String) {
@@ -593,9 +593,9 @@ public class DfTypeUtil {
         if (s == null || s.trim().length() == 0) {
             return null;
         }
-        final SimpleDateFormat sdf = getDateFormat(s, pattern, locale);
+        final DateFormat df = getDateFormat(s, pattern, locale);
         try {
-            return sdf.parse(s);
+            return df.parse(s);
         } catch (ParseException e) {
             String msg = "Failed to parse the string to date: ";
             msg = msg + " string=" + s + " pattern=" + pattern + " locale=" + locale;
@@ -721,7 +721,7 @@ public class DfTypeUtil {
             return null;
         }
         String filtered = filterDateStringValue(value);
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat format = getDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
             return format.parse(filtered);
         } catch (ParseException e) {
@@ -765,20 +765,6 @@ public class DfTypeUtil {
             }
         }
         return value;
-    }
-
-    /**
-     * Format date as specified pattern.
-     * @param date The value of date. (Nullable: If the value is null, it returns null.)
-     * @param pattern The pattern of format for SimpleDateFormat. (NotNull)
-     * @return The formatted string. (Nullable) 
-     */
-    public static String format(Date date, String pattern) {
-        if (date == null) {
-            return null;
-        }
-        SimpleDateFormat format = new SimpleDateFormat(pattern);
-        return format.format(date);
     }
 
     // -----------------------------------------------------
@@ -988,9 +974,9 @@ public class DfTypeUtil {
         if (s == null || s.trim().length() == 0) {
             return null;
         }
-        final SimpleDateFormat sdf = getTimeDateFormat(s, pattern, locale);
+        final DateFormat df = getTimeDateFormat(s, pattern, locale);
         try {
-            return new Time(sdf.parse(s).getTime());
+            return new Time(df.parse(s).getTime());
         } catch (ParseException e) {
             String msg = "Failed to parse the string to time: ";
             msg = msg + " string=" + s + " pattern=" + pattern + " locale=" + locale;
@@ -1006,23 +992,23 @@ public class DfTypeUtil {
         }
     }
 
-    public static SimpleDateFormat getTimeDateFormat(String s, String pattern, Locale locale) {
+    public static DateFormat getTimeDateFormat(String s, String pattern, Locale locale) {
         if (pattern != null) {
-            return new SimpleDateFormat(pattern);
+            return getDateFormat(pattern);
         }
         return getTimeDateFormat(s, locale);
     }
 
-    public static SimpleDateFormat getTimeDateFormat(String s, Locale locale) {
+    public static DateFormat getTimeDateFormat(String s, Locale locale) {
         String pattern = getTimePattern(locale);
         if (s.length() == pattern.length()) {
-            return new SimpleDateFormat(pattern);
+            return getDateFormat(pattern);
         }
         String shortPattern = convertTimeShortPattern(pattern);
         if (s.length() == shortPattern.length()) {
-            return new SimpleDateFormat(shortPattern);
+            return getDateFormat(shortPattern);
         }
-        return new SimpleDateFormat(pattern);
+        return getDateFormat(pattern);
     }
 
     public static String getTimePattern(Locale locale) {
@@ -1206,6 +1192,23 @@ public class DfTypeUtil {
     }
 
     // ===================================================================================
+    //                                                                              Format
+    //                                                                              ======
+    /**
+     * Format date as specified pattern.
+     * @param date The value of date. (Nullable: If the value is null, it returns null.)
+     * @param pattern The pattern of format for SimpleDateFormat. (NotNull)
+     * @return The formatted string. (Nullable) 
+     */
+    public static String format(Date date, String pattern) {
+        if (date == null) {
+            return null;
+        }
+        DateFormat format = getDateFormat(pattern);
+        return format.format(date);
+    }
+
+    // ===================================================================================
     //                                                                           Normalize
     //                                                                           =========
     protected static String normalize(String s) {
@@ -1268,7 +1271,7 @@ public class DfTypeUtil {
     public static String toString(java.util.Date value, String pattern) {
         if (value != null) {
             if (pattern != null) {
-                return new SimpleDateFormat(pattern).format(value);
+                return getDateFormat(pattern).format(value);
             }
             return value.toString();
         }
@@ -1429,23 +1432,31 @@ public class DfTypeUtil {
     // -----------------------------------------------------
     //                                            DateFormat
     //                                            ----------
-    protected static SimpleDateFormat getDateFormat(String s, String pattern, Locale locale) {
+    protected static DateFormat getDateFormat(String s, String pattern, Locale locale) {
         if (pattern != null) {
-            return new SimpleDateFormat(pattern);
+            return getDateFormat(pattern);
         }
         return getDateFormat(s, locale);
     }
 
-    protected static SimpleDateFormat getDateFormat(String s, Locale locale) {
+    protected static DateFormat getDateFormat(String pattern) {
+        if (pattern == null) {
+            String msg = "The argument 'pattern' should not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        return new SimpleDateFormat(pattern);
+    }
+
+    protected static DateFormat getDateFormat(String s, Locale locale) {
         String pattern = getDateFormatPattern(locale);
         String shortPattern = removeDateDelimiter(pattern);
         String delimitor = findDateDelimiter(s);
         if (delimitor == null) {
             if (s.length() == shortPattern.length()) {
-                return new SimpleDateFormat(shortPattern);
+                return getDateFormat(shortPattern);
             }
             if (s.length() == shortPattern.length() + 2) {
-                return new SimpleDateFormat(replace(shortPattern, "yy", "yyyy"));
+                return getDateFormat(replace(shortPattern, "yy", "yyyy"));
             }
         } else {
             String[] array = split(s, delimitor);
@@ -1455,7 +1466,7 @@ public class DfTypeUtil {
                     break;
                 }
             }
-            return new SimpleDateFormat(pattern);
+            return getDateFormat(pattern);
         }
         return new SimpleDateFormat();
     }

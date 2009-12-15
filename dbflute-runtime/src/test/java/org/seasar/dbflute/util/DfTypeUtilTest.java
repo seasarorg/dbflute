@@ -12,11 +12,48 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class DfTypeUtilTest extends PlainTestCase {
 
+    // ===================================================================================
+    //                                                                          Convert To
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                               Boolean
+    //                                               -------
     public void test_toBoolean() {
         // ## Arrange & Act & Assert ##
         assertNull(DfTypeUtil.toBoolean(null));
         assertTrue(DfTypeUtil.toBoolean("true"));
         assertFalse(DfTypeUtil.toBoolean("false"));
+    }
+
+    // -----------------------------------------------------
+    //                                                  Date
+    //                                                  ----
+    public void test_toDateFlexibly_sameClass() {
+        // ## Arrange ##
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date realDate = new Date(DfTypeUtil.toDateFlexibly("2009-12-13 12:34:56.123").getTime());
+
+        // ## Act ##
+        Date date = DfTypeUtil.toDateFlexibly(realDate);
+
+        // ## Assert ##
+        assertEquals(java.util.Date.class, date.getClass());
+        assertFalse(date instanceof Timestamp); // because it returns real date
+        assertEquals("2009/12/13 12:34:56", f.format(date));
+    }
+
+    public void test_toDateFlexibly_subClass() {
+        // ## Arrange ##
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Timestamp timestamp = Timestamp.valueOf("2009-12-13 12:34:56.123");
+
+        // ## Act ##
+        Date date = DfTypeUtil.toDateFlexibly(timestamp);
+
+        // ## Assert ##
+        assertEquals(java.util.Date.class, date.getClass());
+        assertFalse(date instanceof Timestamp); // because it returns real date
+        assertEquals("2009/12/13 12:34:56", f.format(date));
     }
 
     public void test_toDateFlexibly() {
@@ -39,23 +76,9 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertNotSame(java.sql.Timestamp.class, DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789").getClass());
     }
 
-    public void test_format_Date() {
-        // ## Arrange ##
-        Date date = DfTypeUtil.toDateFlexibly("2008/12/30 12:34:56");
-        Timestamp timestamp = DfTypeUtil.toTimestampFlexibly("2008/12/30 12:34:56");
-
-        // ## Act & Assert ##
-        assertNull(DfTypeUtil.format((Date) null, "yyyy/MM/dd HH:mm:ss"));
-        assertEquals("2008/12/30 12:34:56", DfTypeUtil.format(date, "yyyy/MM/dd HH:mm:ss"));
-        assertEquals("2008/12/30", DfTypeUtil.format(date, "yyyy/MM/dd"));
-        assertEquals("2008-12-30", DfTypeUtil.format(date, "yyyy-MM-dd"));
-        assertEquals("2008-12-30 12:34:56.000", DfTypeUtil.format(date, "yyyy-MM-dd HH:mm:ss.SSS"));
-        assertEquals("2008/12/30 12:34:56", DfTypeUtil.format(timestamp, "yyyy/MM/dd HH:mm:ss"));
-        assertEquals("2008/12/30", DfTypeUtil.format(timestamp, "yyyy/MM/dd"));
-        assertEquals("2008-12-30", DfTypeUtil.format(timestamp, "yyyy-MM-dd"));
-        assertEquals("2008-12-30 12:34:56.000", DfTypeUtil.format(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
-    }
-
+    // -----------------------------------------------------
+    //                                              SQL Date
+    //                                              --------
     public void test_toSqlDate_basic() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
@@ -67,6 +90,9 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toSqlDate(date)));
     }
 
+    // -----------------------------------------------------
+    //                                                  Time
+    //                                                  ----
     public void test_toTime() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
@@ -78,6 +104,9 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("1970/01/01 12:34:56.789", f.format(DfTypeUtil.toTime(date)));
     }
 
+    // -----------------------------------------------------
+    //                                             Timestamp
+    //                                             ---------
     public void test_toTimestampFlexibly() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
@@ -95,5 +124,25 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toTimestampFlexibly("2008-12-30")));
         assertEquals("2008/12/30 12:34:56.000", f.format(DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56")));
         assertEquals("2008/12/30 12:34:56.789", f.format(DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56.789")));
+    }
+
+    // ===================================================================================
+    //                                                                              Format
+    //                                                                              ======
+    public void test_format_Date() {
+        // ## Arrange ##
+        Date date = DfTypeUtil.toDateFlexibly("2008/12/30 12:34:56");
+        Timestamp timestamp = DfTypeUtil.toTimestampFlexibly("2008/12/30 12:34:56");
+
+        // ## Act & Assert ##
+        assertNull(DfTypeUtil.format((Date) null, "yyyy/MM/dd HH:mm:ss"));
+        assertEquals("2008/12/30 12:34:56", DfTypeUtil.format(date, "yyyy/MM/dd HH:mm:ss"));
+        assertEquals("2008/12/30", DfTypeUtil.format(date, "yyyy/MM/dd"));
+        assertEquals("2008-12-30", DfTypeUtil.format(date, "yyyy-MM-dd"));
+        assertEquals("2008-12-30 12:34:56.000", DfTypeUtil.format(date, "yyyy-MM-dd HH:mm:ss.SSS"));
+        assertEquals("2008/12/30 12:34:56", DfTypeUtil.format(timestamp, "yyyy/MM/dd HH:mm:ss"));
+        assertEquals("2008/12/30", DfTypeUtil.format(timestamp, "yyyy/MM/dd"));
+        assertEquals("2008-12-30", DfTypeUtil.format(timestamp, "yyyy-MM-dd"));
+        assertEquals("2008-12-30 12:34:56.000", DfTypeUtil.format(timestamp, "yyyy-MM-dd HH:mm:ss.SSS"));
     }
 }
