@@ -31,14 +31,14 @@ public class DfTypeUtilTest extends PlainTestCase {
     public void test_toDateFlexibly_sameClass() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        Date realDate = new Date(DfTypeUtil.toDateFlexibly("2009-12-13 12:34:56.123").getTime());
+        Date pureDate = new Date(DfTypeUtil.toDateFlexibly("2009-12-13 12:34:56.123").getTime());
 
         // ## Act ##
-        Date date = DfTypeUtil.toDateFlexibly(realDate);
+        Date date = DfTypeUtil.toDateFlexibly(pureDate);
 
         // ## Assert ##
         assertEquals(java.util.Date.class, date.getClass());
-        assertFalse(date instanceof Timestamp); // because it returns real date
+        assertFalse(date instanceof Timestamp); // because it returns pure date
         assertEquals("2009/12/13 12:34:56", f.format(date));
     }
 
@@ -52,7 +52,7 @@ public class DfTypeUtilTest extends PlainTestCase {
 
         // ## Assert ##
         assertEquals(java.util.Date.class, date.getClass());
-        assertFalse(date instanceof Timestamp); // because it returns real date
+        assertFalse(date instanceof Timestamp); // because it returns pure date
         assertEquals("2009/12/13 12:34:56", f.format(date));
     }
 

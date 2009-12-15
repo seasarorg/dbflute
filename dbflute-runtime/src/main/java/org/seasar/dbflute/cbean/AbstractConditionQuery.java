@@ -1502,11 +1502,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @param date The date instance. (Nullable)
      * @return Filtered date. (Nullable)
      */
-    protected java.util.Date fCTRD(java.util.Date date) {
-        return filterConvertToRealDate(date);
+    protected java.util.Date fCTPD(java.util.Date date) {
+        return filterConvertToPureDate(date);
     }
 
-    private java.util.Date filterConvertToRealDate(java.util.Date date) {
+    private java.util.Date filterConvertToPureDate(java.util.Date date) {
         return DfTypeUtil.toDate(date);
     }
 

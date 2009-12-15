@@ -477,7 +477,7 @@ public class DfTypeUtil {
             return null;
         } else if (o instanceof BigDecimal) {
             final BigDecimal paramBigDecimal = (BigDecimal) o;
-            if (BigDecimal.class.equals(paramBigDecimal.getClass())) { // real big-decimal
+            if (BigDecimal.class.equals(paramBigDecimal.getClass())) { // pure big-decimal
                 return paramBigDecimal;
             } else { // sub class
                 // because the big-decimal type is not final class.
@@ -511,7 +511,7 @@ public class DfTypeUtil {
             return null;
         } else if (o instanceof BigInteger) {
             final BigInteger paramBigInteger = (BigInteger) o;
-            if (BigInteger.class.equals(paramBigInteger.getClass())) { // real big-integer
+            if (BigInteger.class.equals(paramBigInteger.getClass())) { // pure big-integer
                 return paramBigInteger;
             } else { // sub class
                 // because the big-integer type is not final class.
@@ -555,7 +555,7 @@ public class DfTypeUtil {
             return toDate((String) o, pattern);
         } else if (o instanceof Date) {
             final Date paramDate = (Date) o;
-            if (Date.class.equals(paramDate.getClass())) { // real date
+            if (Date.class.equals(paramDate.getClass())) { // pure date
                 return paramDate;
             } else { // sub class
                 // because the Date is not final class.
@@ -745,7 +745,7 @@ public class DfTypeUtil {
         if (o instanceof java.sql.Date) {
             final java.sql.Date resultDate;
             final java.sql.Date paramSqlDate = (java.sql.Date) o;
-            if (java.sql.Date.class.equals(paramSqlDate.getClass())) { // real SQL-date
+            if (java.sql.Date.class.equals(paramSqlDate.getClass())) { // pure SQL-date
                 resultDate = paramSqlDate;
             } else { // sub class
                 // because the SQL-date type is not final class.
@@ -805,7 +805,7 @@ public class DfTypeUtil {
         }
         if (o instanceof Timestamp) {
             final Timestamp paramTimestamp = (Timestamp) o;
-            if (Timestamp.class.equals(paramTimestamp.getClass())) { // real time-stamp
+            if (Timestamp.class.equals(paramTimestamp.getClass())) { // pure time-stamp
                 return paramTimestamp;
             } else { // sub class
                 // because the time-stamp type is not final class.
@@ -936,7 +936,7 @@ public class DfTypeUtil {
             return toTime((String) o, pattern);
         } else if (o instanceof Time) {
             final Time paramTime = (Time) o;
-            if (Time.class.equals(paramTime.getClass())) { // real time
+            if (Time.class.equals(paramTime.getClass())) { // pure time
                 return paramTime;
             } else { // sub class
                 // because the time type is not final class.
