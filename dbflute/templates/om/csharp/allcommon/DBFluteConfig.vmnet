@@ -63,7 +63,7 @@ public class ${myClassName} {
     protected FileSystemPath _fileSystemPathResolver;
     protected IDbParameterParser _dbParameterParser;
 	protected bool _internalDebug;
-	protected bool _locked = true;
+	protected bool _locked = false;
 
     // ===================================================================================
     //                                                                         Constructor
