@@ -350,7 +350,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                         InScope Query
     //                                         -------------
-    protected void regINS<ELEMENT>(${glConditionKey} key, List<ELEMENT> value, ${glConditionValue} cvalue, String colName) {
+    protected void regINS<ELEMENT>(${glConditionKey} key, System.Collections.IList value, ${glConditionValue} cvalue, String colName) {
         int inScopeLimit = getSqlClause().getInScopeLimit();
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             if (inScopeLimit > 0 && value.size() > inScopeLimit) {
@@ -359,12 +359,12 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 bool asOr = isConditionKeyInScope(key);
 
                 // Split the condition!
-                List<ELEMENT> objectList = value;
-                List<List<ELEMENT>> valueList = splitByLimit(objectList, inScopeLimit);
+                List<Object> objectList = convertToJavaList(value);
+                List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
                 for (int i = 0; i < valueList.size(); i++) {
-                    List<ELEMENT> currentValue = valueList.get(i);
+                    System.Collections.IList currentValue = convertToEmbeddedList(valueList.get(i));
                     if (i == 0) {
-                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
+                        setupConditionValueAndRegisterWhereClause(key, pieceList, cvalue, colName);
                     } else {
                         if (asOr) { // As 'or' Condition
                             getSqlClause().makeOrQueryEffective();
@@ -383,6 +383,22 @@ public abstract class ${myClassName} : ${glConditionQuery} {
 
     static bool isConditionKeyInScope(${glConditionKey} key) { // default scope for test 
         return typeof(${glConditionKey}InScope).IsAssignableFrom(key.GetType());
+    }
+
+    private static List<Object> convertToJavaList(System.Collections.IList list) {
+        List<Object> resultList = new ArrayList<Object>();
+        foreach (Object element in list) {
+            resultList.add(element);
+        }
+        return resultList;
+    }
+
+    private static System.Collections.IList convertToEmbeddedList(List<Object> list) {
+        System.Collections.IList resultList = new System.Collections.ArrayList();
+        foreach (Object element in list) {
+            resultList.Add(element);
+        }
+        return resultList;
     }
 
     private static List<List<ELEMENT>> splitByLimit<ELEMENT>(List<ELEMENT> elementList, int limit) {
