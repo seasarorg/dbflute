@@ -75,7 +75,7 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_PrefixSearch(${col.javaNative} v) { Set${tmpJavaName}_LikeSearch(v, cLSOP()); }
 #end
 #if (${col.isAvailableStringInScope()})
-        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_INS, fRESL(cTL<${col.JavaNative}>(ls))); }
+        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> ls) { regINS(CK_INS, cTL<${col.JavaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
 #end
 #if (${col.isAvailableStringNotInScope()})
         public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(ls))); }

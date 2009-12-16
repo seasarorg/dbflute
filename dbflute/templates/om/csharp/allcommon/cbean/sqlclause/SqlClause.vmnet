@@ -197,6 +197,13 @@ public interface ${myClassName} {
     //                                                                  ==================
     void classifySelectClauseType(SelectClauseType selectClauseType);
     void rollbackSelectClauseType();
+
+    // [DBFlute-0.8.9.9]
+    // ===================================================================================
+    //                                                                       InScope Limit
+    //                                                                       =============
+    int getInScopeLimit();
+
 }
 
     public class SelectClauseType {

@@ -69,6 +69,13 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     // ===================================================================================
+    //                                                                     DBMeta Provider
+    //                                                                     ===============
+    protected ${glDBMeta} findDBMeta(String tableFlexibleName) {
+        return ${glDBMetaInstanceHandler}.FindDBMeta(tableFlexibleName);
+    }
+
+    // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
     public abstract String getTableDbName();
@@ -349,14 +356,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             if (inScopeLimit > 0 && value.size() > inScopeLimit) {
                 // If the key is for inScope, it should be split as 'or'.
                 // (If the key is for notInScope, it should be split as 'and'.)
-                boolean asOr = isConditionKeyInScope(key);
-                
+                bool asOr = isConditionKeyInScope(key);
+
                 // Split the condition!
                 @SuppressWarnings("unchecked")
                 List<Object> objectList = (List<Object>)value;
-                List<List<Object>> valueList = DfCollectionUtil.splitByLimit(objectList, inScopeLimit);
+                List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
                 for (int i = 0; i < valueList.size(); i++) {
-                    final List<Object> currentValue = valueList.get(i);
+                    List<Object> currentValue = valueList.get(i);
                     if (i == 0) {
                         setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
                     } else {
@@ -373,6 +380,28 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
             }
         }
+    }
+
+    static boolean isConditionKeyInScope(${glConditionKey} key) { // default scope for test 
+        return typeof(${glConditionKeyInScope}).IsAssignableFrom(key.GetType());
+    }
+
+    private static List<List<ELEMENT>> splitByLimit<ELEMENT>(List<ELEMENT> elementList, int limit) {
+        List<List<ELEMENT>> valueList = new ArrayList<List<ELEMENT>>();
+        int valueSize = elementList.size();
+        int index = 0;
+        int remainderSize = valueSize;
+        do {
+            int beginIndex = limit * index;
+            int endPoint = beginIndex + limit;
+            int endIndex = limit <= remainderSize ? endPoint : valueSize;
+            List<ELEMENT> splitList = new ArrayList<List<ELEMENT>>();
+            splitList.addAll(elementList.subList(beginIndex, endIndex));
+            valueList.add(splitList);
+            remainderSize = valueSize - endIndex;
+            ++index;
+        } while (remainderSize > 0);
+        return valueList;
     }
 
     // -----------------------------------------------------
@@ -1538,94 +1567,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     // ===================================================================================
-    //                                                                     DBMeta Provider
-    //                                                                     ===============
-    protected ${glDBMeta} findDBMeta(String tableFlexibleName) {
-        return ${glDBMetaInstanceHandler}.FindDBMeta(tableFlexibleName);
-    }
-
-    // ===================================================================================
-    //                                                                 Reflection Invoking
-    //                                                                 ===================
-    public virtual ${glConditionQuery} invokeForeignCQ(String foreignPropertyName) {
-        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
-        final String methodName = "query" + initCap(foreignPropertyName);
-        final MethodInfo method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, foreignPropertyName);
-        return (${glConditionQuery})helpInvokingCQMethod(this, method, new Object[]{});
-    }
-
-    private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {
-        String[] strings = name.Split("\\.");
-        int length = strings.length;
-        String propertyName = null;
-        ConditionQuery cq = this;
-        int index = 0;
-        foreach (String element in strings) {
-            if (length == (index+1)) {// at last loop!
-                propertyName = element;
-                break;
-            }
-            cq = cq.invokeForeignCQ(element);
-            ++index;
-        }
-        return new PropertyNameCQContainer(propertyName, cq);
-    }
-
-    private class PropertyNameCQContainer {
-        protected String _propertyName;
-        protected ${glConditionQuery} _cq;
-        public PropertyNameCQContainer(String propertyName, ${glConditionQuery} cq) {
-            this._propertyName = propertyName;
-            this._cq = cq;
-        }
-        public String getPropertyName() {
-            return _propertyName;
-        }
-        public ${glConditionQuery} getConditionQuery() {
-            return _cq;
-        }
-    }
-
-    private MethodInfo helpGettingCQMethod(${glConditionQuery} cq, String methodName, Type[] argTypes, String property) {
-        try {
-            return cq.GetType().GetMethod(methodName, argTypes);
-        } catch (NoSuchMethodException e) {
-            if (argTypes != null && argTypes.length == 1) {
-                Type argType = argTypes[0];
-                if (List.class.isAssignableFrom(argType)) {
-                    try {
-                        return cq.getClass().getMethod(methodName, new Class<?>[]{Collection.class});
-                    } catch (NoSuchMethodException ignored) {
-                    }
-                }
-                Type[] infs = argType.getInterfaces();
-                foreach (Type inf : infs) {
-                    try {
-                        return cq.getClass().getMethod(methodName, new Class<?>[]{inf});
-                    } catch (NoSuchMethodException ignored) {
-                    }
-                }
-            }
-            String msg = "The method is not existing:";
-            msg = msg + " methodName=" + methodName;
-            msg = msg + " argTypes=" + convertObjectArrayToStringView(argTypes);
-            msg = msg + " tableName=" + cq.getTableDbName();
-            msg = msg + " property=" + property;
-            throw new IllegalStateException(msg, e);
-        }
-    }
-
-    private Object helpInvokingCQMethod(ConditionQuery cq, Method method, Object[] args) {
-        try {
-            return method.invoke(cq, args);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        } catch (InvocationTargetException e) {
-            throw new IllegalStateException(e.getCause());
-        }
-    }
-
-    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected String fRES(String value) {
@@ -1649,13 +1590,13 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             return null;
         }
 		if (col is System.Collections.IList) {
-		    return (System.Collections.IList)col;
+		    return filterRemoveNullOrEmptyValueFromList((System.Collections.IList)col);
 		}
 		System.Collections.IList resultList = new System.Collections.ArrayList();
 		foreach (PROPERTY_TYPE value in col) {
 		    resultList.Add(value);
 		}
-        return resultList;
+        return filterRemoveNullOrEmptyValueFromList(resultList);
     }
 
     private System.Collections.IList filterRemoveEmptyStringFromList(System.Collections.IList ls) {
