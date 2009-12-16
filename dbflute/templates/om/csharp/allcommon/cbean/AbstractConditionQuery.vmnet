@@ -359,10 +359,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 bool asOr = isConditionKeyInScope(key);
 
                 // Split the condition!
-                List<Object> objectList = (List<Object>)value;
-                List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
+                List<ELEMENT> objectList = value;
+                List<List<ELEMENT>> valueList = splitByLimit(objectList, inScopeLimit);
                 for (int i = 0; i < valueList.size(); i++) {
-                    List<Object> currentValue = valueList.get(i);
+                    List<ELEMENT> currentValue = valueList.get(i);
                     if (i == 0) {
                         setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
                     } else {
@@ -382,7 +382,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     static bool isConditionKeyInScope(${glConditionKey} key) { // default scope for test 
-        return typeof(${glConditionKeyInScope}).IsAssignableFrom(key.GetType());
+        return typeof(${glConditionKey}InScope).IsAssignableFrom(key.GetType());
     }
 
     private static List<List<ELEMENT>> splitByLimit<ELEMENT>(List<ELEMENT> elementList, int limit) {

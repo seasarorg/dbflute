@@ -58,7 +58,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         public bool addAll(Collection<ELEMENT> elementList) {
             bool result = false;
             foreach (ELEMENT element in elementList) {
-                if (Add(element)) {
+                if (add(element)) {
                     result = true;
                 }
             }
@@ -170,7 +170,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         public bool addAll(Collection<ELEMENT> elementList) {
             bool result = false;
             foreach (ELEMENT element in elementList) {
-                if (Add(element)) {
+                if (add(element)) {
                     result = true;
                 }
             }
