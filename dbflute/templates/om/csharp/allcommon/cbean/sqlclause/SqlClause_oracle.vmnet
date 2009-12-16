@@ -99,6 +99,14 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     protected override String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
+
+    // [DBFlute-0.8.9.9]
+    // ===================================================================================
+    //                                                                       InScope Limit
+    //                                                                       =============
+    public override int getInScopeLimit() {
+        return 1000;
+    }
 }
 	
 }
