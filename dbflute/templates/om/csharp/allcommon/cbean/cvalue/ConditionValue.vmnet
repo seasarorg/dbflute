@@ -258,7 +258,7 @@ public class ${myClassName} {
             }
         }
         System.Collections.IList inScopeValue = (System.Collections.IList)_inScope[0];
-        _inScope.Remove(0);
+        _inScope.RemoveAt(0);
         return inScopeValue;
     } set {
         if (_inScope == null) {
@@ -273,18 +273,6 @@ public class ${myClassName} {
         _inScope.Add(value);
         _inScope4Spare.Add(value);
     }}
-
-    public bool HasInScope { get {
-        return _inScope != null;
-    }}
-
-    public bool EqualInScope(System.Collections.IList value) {
-        return HasInScope ? _inScope.Equals(value) : value == null;
-    }
-
-    public ${myClassName} OverrideInScope(System.Collections.IList value) {
-        _inScope = value; return this;
-    }
 
     protected String _inScopeLocation;
 
@@ -313,7 +301,7 @@ public class ${myClassName} {
             }
         }
         System.Collections.IList notInScopeValue = (System.Collections.IList)_notInScope[0];
-        _notInScope.Remove(0);
+        _notInScope.RemoveAt(0);
         return notInScopeValue;
     } set {
         if (_notInScope == null) {
@@ -328,18 +316,6 @@ public class ${myClassName} {
         _notInScope.Add(value);
         _notInScope4Spare.Add(value);
     }}
-
-    public bool HasNotInScope { get {
-        return _notInScope != null;
-    }}
-
-    public bool EqualNotInScope(System.Collections.IList value) {
-        return HasNotInScope ? _notInScope.Equals(value) : value == null;
-    }
-
-    public ${myClassName} OverrideNotInScope(System.Collections.IList value) {
-        _notInScope = value; return this;
-    }
 
     protected String _notInScopeLocation;
 

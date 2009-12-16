@@ -24,17 +24,6 @@ public class ${myClassName} : ${glConditionKey} {
         if (value is System.Collections.IList && ((System.Collections.IList)value).Count == 0) {
             return false;
         }
-        if (value is System.Collections.IList) {
-            if (conditionValue.HasInScope) {
-                if (conditionValue.EqualInScope(((System.Collections.IList)value))) {
-                    _log.Debug("The value has already registered at " + callerName + ": value=" + value);
-                    return false;
-                } else {
-                    conditionValue.OverrideInScope(((System.Collections.IList)value));
-                    return false;
-                }
-            }
-        }
         return true;
     }
 
