@@ -1598,7 +1598,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return filterRemoveNullOrEmptyValueFromList(resultList);
     }
 
-    private System.Collections.IList filterRemoveEmptyStringFromList(System.Collections.IList ls) {
+    private System.Collections.IList filterRemoveNullOrEmptyValueFromList(System.Collections.IList ls) {
         if (ls == null) {
             return null;
         }
@@ -1613,10 +1613,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return resultList;
     }
 
-    protected System.Collections.IList fRESL(System.Collections.IList ls) {
-        return filterRemoveEmptyStringFromList(ls);
-    }
-    
     public void doNss(NssCall callback) { // Very Internal
         String foreignPropertyName = callback.Invoke().getForeignPropertyName();
         String foreignTableAliasName = callback.Invoke().getRealAliasName();

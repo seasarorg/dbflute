@@ -7,7 +7,7 @@ namespace ${glPackageBaseCommonJavaLike} {
 
     public interface Collection<ELEMENT> : System.Collections.IEnumerable {
         bool add(ELEMENT element);
-        bool addAll(ELEMENT element);
+        bool addAll(Collection<ELEMENT> element);
         bool remove(ELEMENT element);
         int size();
         bool isEmpty();
@@ -256,6 +256,15 @@ namespace ${glPackageBaseCommonJavaLike} {
             _res.Add(element, null);
             _seq.add(element);
             return true;
+        }
+        public bool addAll(Collection<ELEMENT> elementList) {
+            bool result = false;
+            foreach (ELEMENT element in elementList) {
+                if (add(element)) {
+                    result = true;
+                }
+            }
+            return result;
         }
         public bool remove(ELEMENT element) {
             if (_res.ContainsKey(element)) {

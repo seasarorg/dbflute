@@ -75,10 +75,10 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_PrefixSearch(${col.javaNative} v) { Set${tmpJavaName}_LikeSearch(v, cLSOP()); }
 #end
 #if (${col.isAvailableStringInScope()})
-        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> ls) { regINS(CK_INS, cTL<${col.JavaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
+        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> ls) { regINS<${col.JavaNative}>(CK_INS, cTL<${col.JavaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
 #end
 #if (${col.isAvailableStringNotInScope()})
-        public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_NINS, fRESL(cTL<${col.JavaNative}>(ls))); }
+        public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { regINS<${col.JavaNative}>(CK_NINS, cTL<${col.JavaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
 #end
 #if (${col.isAvailableStringLikeSearch()})
         public void Set${tmpJavaName}_LikeSearch($col.javaNative v, ${glLikeSearchOption} option)
@@ -278,10 +278,10 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_LessEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_LE, v); }
 #end
 #if (${col.isAvailableNumberInScope()})
-        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_INS, cTL<${col.JavaNative}>(ls)); }
+        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> ls) { regINS<${col.JavaNative}>(CK_INS, cTL<${col.JavaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
 #end
 #if (${col.isAvailableNumberNotInScope()})
-        public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { reg${tmpJavaName}(CK_NINS, cTL<${col.JavaNative}>(ls)); }
+        public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { regINS<${col.JavaNative}>(CK_NINS, cTL<${col.JavaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
 #end
 #if (${col.isSingleKeyForeignKey()} && !${col.foreignKey.hasFixedCondition()})
 #set ($relatedCBClassName = "${col.foreignKey.foreignTableExtendedConditionBeanClassName}")
