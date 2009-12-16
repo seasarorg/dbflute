@@ -246,11 +246,33 @@ public class ${myClassName} {
     //                                                                            In Scope
     //                                                                            ========
     protected System.Collections.IList _inScope;
+    protected System.Collections.IList _inScope4Spare;
 
-    public System.Collections.IList InScope {
-        get { return _inScope; }
-        set { _inScope = value; }
-    }
+    public System.Collections.IList InScope { get {
+        if (_inScope == null) {
+            return null;
+        }
+        if (_inScope.Count == 0 && _inScope4Spare.Count > 0) {
+            for (int index = 0; index < _inScope4Spare.Count; index++) {
+                _inScope.Add(_inScope4Spare[index]);
+            }
+        }
+        System.Collections.IList inScopeValue = (System.Collections.IList)_inScope[0];
+        _inScope.Remove(0);
+        return inScopeValue;
+    } set {
+        if (_inScope == null) {
+            _inScope = new System.Collections.ArrayList();
+            _inScope4Spare = new System.Collections.ArrayList();
+        }
+        if (_inScope.Count == 0 && _inScope4Spare.Count > 0) {
+            for (int index = 0; index < _inScope4Spare.Count; index++) {
+                _inScope.Add(_inScope4Spare[index]);
+            }
+        }
+        _inScope.Add(value);
+        _inScope4Spare.Add(value);
+    }}
 
     public bool HasInScope { get {
         return _inScope != null;
@@ -279,11 +301,33 @@ public class ${myClassName} {
     //                                                                        Not In Scope
     //                                                                        ============
     protected System.Collections.IList _notInScope;
+    protected System.Collections.IList _notInScope4Spare;
 
-    public System.Collections.IList NotInScope {
-        get { return _notInScope; }
-        set { _notInScope = value; }
-    }
+    public System.Collections.IList NotInScope { get {
+        if (_notInScope == null) {
+            return null;
+        }
+        if (_notInScope.Count == 0 && _notInScope4Spare.Count > 0) {
+            for (int index = 0; index < _notInScope4Spare.Count; index++) {
+                _notInScope.Add(_notInScope4Spare[index]);
+            }
+        }
+        System.Collections.IList notInScopeValue = (System.Collections.IList)_notInScope[0];
+        _notInScope.Remove(0);
+        return notInScopeValue;
+    } set {
+        if (_notInScope == null) {
+            _notInScope = new System.Collections.ArrayList();
+            _notInScope4Spare = new System.Collections.ArrayList();
+        }
+        if (_notInScope.Count == 0 && _notInScope4Spare.Count > 0) {
+            for (int index = 0; index < _notInScope4Spare.Count; index++) {
+                _notInScope.Add(_notInScope4Spare[index]);
+            }
+        }
+        _notInScope.Add(value);
+        _notInScope4Spare.Add(value);
+    }}
 
     public bool HasNotInScope { get {
         return _notInScope != null;

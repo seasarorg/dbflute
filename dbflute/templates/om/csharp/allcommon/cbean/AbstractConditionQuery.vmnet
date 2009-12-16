@@ -353,7 +353,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     protected void regINS<ELEMENT>(${glConditionKey} key, System.Collections.IList value, ${glConditionValue} cvalue, String colName) {
         int inScopeLimit = getSqlClause().getInScopeLimit();
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            if (inScopeLimit > 0 && value.size() > inScopeLimit) {
+            if (inScopeLimit > 0 && value.Count > inScopeLimit) {
                 // If the key is for inScope, it should be split as 'or'.
                 // (If the key is for notInScope, it should be split as 'and'.)
                 bool asOr = isConditionKeyInScope(key);
@@ -362,9 +362,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 List<Object> objectList = convertToJavaList(value);
                 List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
                 for (int i = 0; i < valueList.size(); i++) {
-                    System.Collections.IList currentValue = convertToEmbeddedList(valueList.get(i));
+                    System.Collections.IList currentValue = convertToEmbeddedList<ELEMENT>(valueList.get(i));
                     if (i == 0) {
-                        setupConditionValueAndRegisterWhereClause(key, pieceList, cvalue, colName);
+                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
                     } else {
                         if (asOr) { // As 'or' Condition
                             getSqlClause().makeOrQueryEffective();
@@ -393,8 +393,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return resultList;
     }
 
-    private static System.Collections.IList convertToEmbeddedList(List<Object> list) {
-        System.Collections.IList resultList = new System.Collections.ArrayList();
+    private static System.Collections.IList convertToEmbeddedList<ELEMENT>(List<Object> list) {
+        System.Collections.IList resultList = new System.Collections.Generic.List<ELEMENT>();
         foreach (Object element in list) {
             resultList.Add(element);
         }
@@ -1567,12 +1567,15 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     private MethodInfo helpGettingCQMethod(${glConditionQuery} cq, String methodName, Type[] argTypes, String property) {
         MethodInfo method = cq.GetType().GetMethod(methodName, argTypes);
         if (method == null) {
-            String msg = "The method is not existing:";
-            msg = msg + " methodName=" + methodName;
-            msg = msg + " argTypes=" + convertObjectArrayToStringView(argTypes);
-            msg = msg + " tableName=" + cq.getTableDbName();
-            msg = msg + " property=" + property;
-            throw new IllegalStateException(msg);
+            method = cq.GetType().GetMethod(methodName);
+            if (method == null) {
+                String msg = "The method is not existing:";
+                msg = msg + " methodName=" + methodName;
+                msg = msg + " argTypes=" + convertObjectArrayToStringView(argTypes);
+                msg = msg + " tableName=" + cq.getTableDbName();
+                msg = msg + " property=" + property;
+                throw new IllegalStateException(msg);
+            }
         }
         return method;
     }
@@ -1618,15 +1621,19 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         if (ls == null) {
             return null;
         }
-        System.Collections.IList resultList = new System.Collections.ArrayList();
-		foreach (Object value in ls) {
-			String str = (String)value;
-            if (str == null || "".Equals(str)) {
-                continue;
+        System.Collections.IList newList = new System.Collections.ArrayList();
+		foreach (Object element in ls) {
+			if (element == null) {
+			    continue;
+			}
+			if (element is String) {
+                if ("".Equals((String)element)) {
+                    continue;
+                }
             }
-		    resultList.Add(str);
+		    newList.Add(element);
 		}
-        return resultList;
+        return newList;
     }
 
     public void doNss(NssCall callback) { // Very Internal
