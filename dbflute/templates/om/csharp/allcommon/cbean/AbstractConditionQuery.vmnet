@@ -350,7 +350,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     // -----------------------------------------------------
     //                                         InScope Query
     //                                         -------------
-    protected void regINS(${glConditionKey} key, List<?> value, ${glConditionValue} cvalue, String colName) {
+    protected void regINS<ELEMENT>(${glConditionKey} key, List<ELEMENT> value, ${glConditionValue} cvalue, String colName) {
         int inScopeLimit = getSqlClause().getInScopeLimit();
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             if (inScopeLimit > 0 && value.size() > inScopeLimit) {
@@ -359,7 +359,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 bool asOr = isConditionKeyInScope(key);
 
                 // Split the condition!
-                @SuppressWarnings("unchecked")
                 List<Object> objectList = (List<Object>)value;
                 List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
                 for (int i = 0; i < valueList.size(); i++) {
@@ -382,7 +381,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         }
     }
 
-    static boolean isConditionKeyInScope(${glConditionKey} key) { // default scope for test 
+    static bool isConditionKeyInScope(${glConditionKey} key) { // default scope for test 
         return typeof(${glConditionKeyInScope}).IsAssignableFrom(key.GetType());
     }
 
@@ -395,7 +394,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
             int beginIndex = limit * index;
             int endPoint = beginIndex + limit;
             int endIndex = limit <= remainderSize ? endPoint : valueSize;
-            List<ELEMENT> splitList = new ArrayList<List<ELEMENT>>();
+            List<ELEMENT> splitList = new ArrayList<ELEMENT>();
             splitList.addAll(elementList.subList(beginIndex, endIndex));
             valueList.add(splitList);
             remainderSize = valueSize - endIndex;

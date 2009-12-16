@@ -32,6 +32,7 @@ namespace ${glPackageBaseCommonJavaLike} {
         ELEMENT get(int index);
 		ELEMENT set(int index, ELEMENT element);
 		ELEMENT remove(int index);
+        List<ELEMENT> subList(int fromIndex, int toIndex);
         IList<ELEMENT> getList();
     }
 
@@ -55,10 +56,13 @@ namespace ${glPackageBaseCommonJavaLike} {
             return true;
         }
         public bool addAll(Collection<ELEMENT> elementList) {
+            bool result = false;
             foreach (ELEMENT element in elementList) {
-                _res.Add(element);
+                if (Add(element)) {
+                    result = true;
+                }
             }
-            return true;
+            return result;
         }
         public ELEMENT get(int index) {
             return _res[index];
@@ -84,6 +88,14 @@ namespace ${glPackageBaseCommonJavaLike} {
         }
         public void clear() {
             _res.Clear();
+        }
+        // merely copied list so not related to original list
+        public List<ELEMENT> subList(int fromIndex, int toIndex) {
+            List<ELEMENT> resultList = new ArrayList<ELEMENT>();
+            for (int i=fromIndex; i < toIndex; i++) {
+                resultList.add(get(i));
+            }
+            return resultList;
         }
         public IList<ELEMENT> getList() {
             return _res;
@@ -154,6 +166,15 @@ namespace ${glPackageBaseCommonJavaLike} {
             }
             _res.Add(element, null);
             return true;
+        }
+        public bool addAll(Collection<ELEMENT> elementList) {
+            bool result = false;
+            foreach (ELEMENT element in elementList) {
+                if (Add(element)) {
+                    result = true;
+                }
+            }
+            return result;
         }
         public bool remove(ELEMENT element) {
             if (_res.ContainsKey(element)) {
