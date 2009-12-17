@@ -373,7 +373,7 @@ public class DfBehaviorQueryPathSetupper {
      * @param resourceElementMap The map of resource element. (NotNull) 
      */
     protected void writeBehaviorQueryPath(File bsbhvFile, Map<String, Map<String, String>> resourceElementMap) {
-        final String encoding = getBasicProperties().getTemplateFileEncoding();
+        final String encoding = getBasicProperties().getSourceFileEncoding();
         final BufferedReader bufferedReader;
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(bsbhvFile), encoding));
@@ -384,7 +384,7 @@ public class DfBehaviorQueryPathSetupper {
             String msg = "The file of base behavior was Not Found: bsbhvFile=" + bsbhvFile;
             throw new IllegalStateException(msg, e);
         }
-        StringBuilder logSb = new StringBuilder();
+        final StringBuilder logSb = new StringBuilder();
         final String path = getSlashPath(bsbhvFile);
         if (path.contains("/")) {
             logSb.append(path.substring(path.lastIndexOf("/") + "/".length()));
