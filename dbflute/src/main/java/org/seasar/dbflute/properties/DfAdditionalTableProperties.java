@@ -37,21 +37,27 @@ public final class DfAdditionalTableProperties extends DfAbstractHelperPropertie
     //                                                                      Finding Helper
     //                                                                      ==============
     @SuppressWarnings("unchecked")
+    public String findTableComment(String tableName) {
+        final Map<String, Object> componentMap = (Map<String, Object>) getAdditionalTableMap().get(tableName);
+        return (String) componentMap.get("comment");
+    }
+
+    @SuppressWarnings("unchecked")
     public Map<String, Map<String, String>> findColumnMap(String tableName) {
         final Map<String, Object> componentMap = (Map<String, Object>) getAdditionalTableMap().get(tableName);
         return (Map<String, Map<String, String>>) componentMap.get("columnMap");
     }
 
-    public String findColumnType(String tableName, String columnName) {
+    public String findColumnType(String tableName, String columnName) { // required
         final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
         final Map<String, String> elementMap = columnMap.get(columnName);
         return elementMap.get("type");
     }
 
-    public boolean isColumnRequired(String tableName, String columnName) {
+    public String findColumnDbType(String tableName, String columnName) {
         final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
         final Map<String, String> elementMap = columnMap.get(columnName);
-        return "true".equalsIgnoreCase(elementMap.get("required"));
+        return elementMap.get("dbType");
     }
 
     public String findColumnSize(String tableName, String columnName) {
@@ -60,15 +66,33 @@ public final class DfAdditionalTableProperties extends DfAbstractHelperPropertie
         return elementMap.get("size");
     }
 
-    public boolean isColumnAutoIncrement(String tableName, String columnName) {
+    public boolean isColumnRequired(String tableName, String columnName) {
         final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
         final Map<String, String> elementMap = columnMap.get(columnName);
-        return "true".equalsIgnoreCase(elementMap.get("autoIncrement"));
+        return "true".equalsIgnoreCase(elementMap.get("required"));
     }
 
     public boolean isColumnPrimaryKey(String tableName, String columnName) {
         final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
         final Map<String, String> elementMap = columnMap.get(columnName);
         return "true".equalsIgnoreCase(elementMap.get("primaryKey"));
+    }
+
+    public boolean isColumnAutoIncrement(String tableName, String columnName) {
+        final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
+        final Map<String, String> elementMap = columnMap.get(columnName);
+        return "true".equalsIgnoreCase(elementMap.get("autoIncrement"));
+    }
+
+    public String findColumnDefault(String tableName, String columnName) {
+        final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
+        final Map<String, String> elementMap = columnMap.get(columnName);
+        return elementMap.get("default");
+    }
+
+    public String findColumnComment(String tableName, String columnName) {
+        final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
+        final Map<String, String> elementMap = columnMap.get(columnName);
+        return elementMap.get("comment");
     }
 }

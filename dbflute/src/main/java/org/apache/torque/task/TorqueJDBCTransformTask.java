@@ -837,35 +837,43 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             tableElement.setAttribute("type", tableType);
 
             final Map<String, Map<String, String>> columnMap = prop.findColumnMap(tableName);
+            final String tableComment = prop.findTableComment(tableName);
+            if (tableComment != null && tableComment.trim().length() > 0) {
+                tableElement.setAttribute("comment", tableComment);
+            }
             final Set<String> columnNameKey = columnMap.keySet();
             for (String columnName : columnNameKey) {
                 final Element columnElement = _doc.createElement("column");
                 columnElement.setAttribute("name", columnName);
 
                 final String columnType = prop.findColumnType(tableName, columnName);
+                final String columnDbType = prop.findColumnDbType(tableName, columnName);
                 final String columnSize = prop.findColumnSize(tableName, columnName);
                 final boolean required = prop.isColumnRequired(tableName, columnName);
                 final boolean primaryKey = prop.isColumnPrimaryKey(tableName, columnName);
                 final boolean autoIncrement = prop.isColumnAutoIncrement(tableName, columnName);
-                columnElement.setAttribute("type", columnType);
-                if (required) {
-                    columnElement.setAttribute("required", String.valueOf(required));
-                }
-                if (columnSize != null && columnSize.trim().length() > 0) {
-                    columnElement.setAttribute("size", columnSize);
-                }
-                if (primaryKey) {
-                    columnElement.setAttribute("primaryKey", String.valueOf(primaryKey));
-                }
-                if (autoIncrement) {
-                    columnElement.setAttribute("autoIncrement", String.valueOf(autoIncrement));
-                }
+                final String columnDefault = prop.findColumnDefault(tableName, columnName);
+                final String columnComment = prop.findColumnComment(tableName, columnName);
+                setupAdditionalTableColumnAttribute(columnElement, "type", columnType);
+                setupAdditionalTableColumnAttribute(columnElement, "dbType", columnDbType);
+                setupAdditionalTableColumnAttribute(columnElement, "size", columnSize);
+                setupAdditionalTableColumnAttribute(columnElement, "required", String.valueOf(required));
+                setupAdditionalTableColumnAttribute(columnElement, "primaryKey", String.valueOf(primaryKey));
+                setupAdditionalTableColumnAttribute(columnElement, "autoIncrement", String.valueOf(autoIncrement));
+                setupAdditionalTableColumnAttribute(columnElement, "default", columnDefault);
+                setupAdditionalTableColumnAttribute(columnElement, "comment", columnComment);
                 tableElement.appendChild(columnElement);
             }
             exists = true;
             _databaseNode.appendChild(tableElement);
         }
         return exists;
+    }
+
+    protected void setupAdditionalTableColumnAttribute(Element columnElement, String key, String value) {
+        if (value != null && value.trim().length() > 0) {
+            columnElement.setAttribute(key, value);
+        }
     }
 
     // ===================================================================================

@@ -17,6 +17,7 @@
 # o isColumnNameCamelCase: (NotRequired - Default false)
 # o projectPrefix: (NotRequired - Default '')
 # o classAuthor: (NotRequired - Default 'DBFlute(AutoGenerator)')
+# o sourceFileEncoding: (NotRequired - Default 'UTF-8')
 # o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
 # o omitDirectoryPackage (NotRequired - Default '') *CSharp Only
 # 
@@ -159,6 +160,15 @@ map:{
     # 
     # @JavaOnly
     #; classAuthor = DBFlute(AutoGenerator)
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o sourceFileEncoding: (NotRequired - Default 'UTF-8')
+    #  The value of an encoding for source files that are generated classes.
+    #  If source files of your project are not UTF-8, specify your encoding here.
+    # 
+    # @JavaOnly
+    #; sourceFileEncoding = UTF-8
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

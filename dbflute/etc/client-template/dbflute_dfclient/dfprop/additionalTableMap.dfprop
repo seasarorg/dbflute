@@ -5,21 +5,21 @@
 # You should use this when JDBC can not provide table information
 # and when you have no table but call stored procedures only.
 # 
-# The element 'type' is only required. 
+# The element 'columnMap' is only required in table elements. 
+# The element 'type' is only required in column elements. 
 # 
 # Specification:
 # map: {
 #     [table-name] = map:{
 #         columnMap = map:{
 #             [column-name] = map:{
-#                 type = [column-JDBC-type]
-#                 ; required = [true or false] ; size = [column-size]
+#                 type = [column JDBC type] ; dbType = [column DB type]
+#                 ; required = [true or false] ; size = [column size]
 #                 ; primaryKey = [true or false] ; autoIncrement = [true or false]
-#             }
-#             [column-name] = map:{
-#                 type = [column-JDBC-type]
+#                 ; default = [default value] ; comment = [column comment]
 #             }
 #         }
+#         ; comment = [table comment]
 #     }
 # }
 # 
@@ -28,7 +28,9 @@
 map:{
     #; FOO_TABLE = map:{
     #    ; columnMap = map:{
-    #        FOO_ID = map:{ type = INTEGER ; required = true ; primaryKey = true ; autoIncrement = true}
+    #        FOO_ID = map:{ type = INTEGER ; dbType = INTEGER
+    #                     ; required = true ; primaryKey = true ; autoIncrement = true
+    #                 }
     #        FOO_NAME = map:{ type = VARCHAR ; required = true ; size = 123 }
     #        FOO_DATE = map:{ type = DATE }
     #    }

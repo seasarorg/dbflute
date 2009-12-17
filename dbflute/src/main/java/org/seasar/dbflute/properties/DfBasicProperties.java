@@ -202,12 +202,12 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                            Encoding
     //                                                                            ========
-    public String getTemplateFileEncoding() { // It's closet!
-        return getProperty("templateFileEncoding", DEFAULT_templateFileEncoding);
+    public String getSourceFileEncoding() {
+        return getProperty("sourceFileEncoding", DEFAULT_sourceFileEncoding);
     }
 
-    public String getSourceFileEncoding() { // It's closet!
-        return getProperty("sourceFileEncoding", DEFAULT_sourceFileEncoding);
+    public String getTemplateFileEncoding() { // It's closet!
+        return getProperty("templateFileEncoding", DEFAULT_templateFileEncoding);
     }
 
     public String getProejctSchemaXMLEncoding() { // It's closet!
