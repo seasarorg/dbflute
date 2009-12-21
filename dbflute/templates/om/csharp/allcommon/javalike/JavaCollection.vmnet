@@ -419,7 +419,7 @@ namespace ${glPackageBaseCommonJavaLike} {
             return valueList;
         }
         public Set<Entry<KEY, VALUE>> entrySet() {
-            Set<Entry<KEY, VALUE>> entrySet = new LinkedHashSet<KEY, VALUE>();
+            Set<Entry<KEY, VALUE>> entrySet = new LinkedHashSet<Entry<KEY, VALUE>>();
             ICollection<KEY> keyCol = _res.Keys;
             foreach (KEY key in keyCol) {
                 entrySet.add(new Entry<KEY, VALUE>(key, _res[key]));
@@ -495,6 +495,14 @@ namespace ${glPackageBaseCommonJavaLike} {
                 valueList.add(_res.get(key));
             }
             return valueList;
+        }
+        public Set<Entry<KEY, VALUE>> entrySet() {
+            Set<Entry<KEY, VALUE>> entrySet = new LinkedHashSet<Entry<KEY, VALUE>>();
+            Set<KEY> keyCol = _res.keySet();
+            foreach (KEY key in keyCol) {
+                entrySet.add(new Entry<KEY, VALUE>(key, _res.get(key)));
+            }
+            return entrySet;
         }
         public Object getAsNg(Object key) {
             return get((KEY)key);

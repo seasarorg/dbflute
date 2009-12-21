@@ -955,7 +955,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             foreach (Entry<String, LeftOuterJoinInfo> entry in entrySet) {
                 String aliasName = entry.getKey();
                 LeftOuterJoinInfo joinInfo = entry.getValue();
-                List<TmpOrScopeQueryGroupInfo> listList = new ArrayList<List<String>>();
+                List<TmpOrScopeQueryGroupInfo> listList = new ArrayList<TmpOrScopeQueryGroupInfo>();
                 listList.addAll(setupTmpOrListList(localInfo, delegate(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
                     return tmpOrScopeQueryInfo.getTmpOrAdditionalOnClauseList(aliasName);
                 }));
@@ -967,7 +967,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             foreach (Entry<String, LeftOuterJoinInfo> entry in entrySet) {
                 String aliasName = entry.getKey();
                 LeftOuterJoinInfo joinInfo = entry.getValue();
-                List<TmpOrScopeQueryGroupInfo> listList = new ArrayList<List<String>>();
+                List<TmpOrScopeQueryGroupInfo> listList = new ArrayList<TmpOrScopeQueryGroupInfo>();
                 listList.addAll(setupTmpOrListList(localInfo, delegate(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
                     return tmpOrScopeQueryInfo.getTmpOrOuterJoinInlineClauseList(aliasName);
                 }));
@@ -1011,7 +1011,8 @@ public abstract class ${myClassName} : ${glSqlClause} {
             }
             int listIndex = 0;
             bool inAndPart = false;
-            foreach (String orClause in orClauseList) {
+            foreach (String element in orClauseList) {
+                String orClause = element;
                 bool currentAndPart = orClause.StartsWith(andPartMark);
                 bool beginAndPart;
                 bool secondAndPart;
@@ -1106,7 +1107,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         protected TmpOrScopeQueryInfo _parentInfo; // null means base point
         protected List<TmpOrScopeQueryInfo> _childInfoList;
 
-        protected List<String> getTmpOrAdditionalOnClauseList(String aliasName) {
+        public List<String> getTmpOrAdditionalOnClauseList(String aliasName) {
             List<String> orClauseList = getTmpOrAdditionalOnClauseListMap().get(aliasName);
             if (orClauseList != null) {
                 return orClauseList;
@@ -1116,7 +1117,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             return orClauseList;
         }
 
-        protected List<String> getTmpOrOuterJoinInlineClauseList(String aliasName) {
+        public List<String> getTmpOrOuterJoinInlineClauseList(String aliasName) {
             List<String> orClauseList = getTmpOrOuterJoinInlineClauseListMap().get(aliasName);
             if (orClauseList != null) {
                 return orClauseList;
@@ -1124,14 +1125,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
             orClauseList = new ArrayList<String>();
             _tmpOrOuterJoinInlineClauseListMap.put(aliasName, orClauseList);
             return orClauseList;
-        }
-
-        protected void addTmpOrAdditionalOnClause(String aliasName, String value) {
-            getTmpOrAdditionalOnClauseList(aliasName).add(value);
-        }
-
-        protected void addTmpOrOuterJoinInlineClause(String aliasName, String value) {
-            getTmpOrOuterJoinInlineClauseList(aliasName).add(value);
         }
 
         public List<String> getTmpOrWhereList() {
@@ -1208,7 +1201,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         protected bool _forcedAnd;
 
         public override String ToString() {
-            return "{orClauseList=" + (_orClauseList != null ? _orClauseList.size() : "null") + "}";
+            return "{orClauseList=" + (_orClauseList != null ? _orClauseList.size().ToString() : "null") + "}";
         }
 
         public List<String> getOrClauseList() {
@@ -1218,6 +1211,16 @@ public abstract class ${myClassName} : ${glSqlClause} {
         public void setOrClauseList(List<String> orClauseList) {
             this._orClauseList = orClauseList;
         }
+    }
+
+    public void beginOrScopeQueryAndPart() {
+        assertCurrentTmpOrScopeQueryInfo();
+        _orScopeQueryAndPart = true;
+    }
+
+    public void endOrScopeQueryAndPart() {
+        assertCurrentTmpOrScopeQueryInfo();
+        _orScopeQueryAndPart = false;
     }
 
     protected void markOrScopeQueryAndPart(List<String> clauseList) {

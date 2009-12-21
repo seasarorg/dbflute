@@ -296,9 +296,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                         if (i == 0) {
                             setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
                         } else {
-                            if (asOr) { // as 'or' condition
-                                getSqlClause().makeOrQueryEffective();
-                            }
                             invokeQuery(colName, key.getConditionKey(), currentValue);
                         }
                     }

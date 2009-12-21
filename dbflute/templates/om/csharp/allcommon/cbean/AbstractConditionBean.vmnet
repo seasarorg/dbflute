@@ -374,9 +374,9 @@ namespace ${glPackageBaseCommonCBean} {
             StringBuilder sb = new StringBuilder();
             sb.append(GetType().Name).append(":").append(ln());
             try {
-                sb.append(toDisplaySql());
-            } catch (Exception e) {
-                sb.append(getSqlClause().getClause());
+                sb.append(ToDisplaySql());
+            } catch (Exception) {
+                sb.append(this.SqlClause.getClause());
             }
             return sb.toString();
         }
