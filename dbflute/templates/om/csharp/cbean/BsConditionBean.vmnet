@@ -162,11 +162,11 @@ namespace ${glPackageBaseCB} {
     		public bool has() { return true; } public ${myConditionQueryClassName} qy() { return _myCB.Query(); }
     	}
 
-        // [DBFlute-0.8.9.5]
+        // [DBFlute-0.8.9.9]
         // ===============================================================================
-        //                                                                         OrQuery
-        //                                                                         =======
-        public void OrQuery(${glOrQuery}<${myConditionBeanClassName}> orQuery) {
+        //                                                                    OrScopeQuery
+        //                                                                    ============
+        public void OrScopeQuery(${glOrQuery}<${myConditionBeanClassName}> orQuery) {
             xorQ((${myConditionBeanClassName})this, orQuery);
         }
     }
