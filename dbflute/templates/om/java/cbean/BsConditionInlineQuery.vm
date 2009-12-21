@@ -13,7 +13,7 @@ import ${glPackageBaseCQ}.*;
 import ${glPackageCQ}.*;
 
 /**
- * The condition-inline-query of ${table.name}.
+ * The condition-query for in-line of ${table.name}.
  * @author ${database.classAuthor}
  */
 public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
@@ -30,8 +30,8 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
                         , String aliasName, int nestLevel, ${myCQClassName} myCQ) {
         super(childQuery, sqlClause, aliasName, nestLevel);
         _myCQ = myCQ;
-        _foreignPropertyName = _myCQ.getForeignPropertyName();// Accept foreign property name.
-        _relationPath = _myCQ.getRelationPath();// Accept relation path.
+        _foreignPropertyName = _myCQ.getForeignPropertyName(); // accept foreign property name
+        _relationPath = _myCQ.getRelationPath(); // accept relation path
     }
 
     // ===================================================================================

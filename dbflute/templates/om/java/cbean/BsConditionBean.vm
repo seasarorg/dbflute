@@ -456,12 +456,12 @@ public class ${myClassName} extends AbstractConditionBean {
         });
     }
 
-    // [DBFlute-0.9.5.5]
+    // [DBFlute-0.9.6.3]
     // ===================================================================================
-    //                                                                             OrQuery
-    //                                                                             =======
-    public void orQuery(OrQuery<${myConditionBeanClassName}> orQuery) {
-        xorQ((${myConditionBeanClassName})this, orQuery);
+    //                                                                        OrScopeQuery
+    //                                                                        ============
+    public void orScopeQuery(OrQuery<${myConditionBeanClassName}> orQuery) {
+        xorSQ((${myConditionBeanClassName})this, orQuery);
     }
 
     // ===================================================================================

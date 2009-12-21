@@ -354,26 +354,33 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         int inScopeLimit = getSqlClause().getInScopeLimit();
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             if (inScopeLimit > 0 && value.Count > inScopeLimit) {
-                // If the key is for inScope, it should be split as 'or'.
-                // (If the key is for notInScope, it should be split as 'and'.)
+                // if the key is for inScope, it should be split as 'or'
+                // (if the key is for notInScope, it should be split as 'and')
                 bool asOr = isConditionKeyInScope(key);
-
-                // Split the condition!
-                List<Object> objectList = convertToJavaList(value);
-                List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
-                for (int i = 0; i < valueList.size(); i++) {
-                    System.Collections.IList currentValue = convertToEmbeddedList<ELEMENT>(valueList.get(i));
-                    if (i == 0) {
-                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
-                    } else {
-                        if (asOr) { // As 'or' Condition
-                            getSqlClause().makeOrQueryEffective();
-                        }
-                        invokeQuery(colName, key.getConditionKey(), currentValue);
-                    }
-                }
                 if (asOr) {
-                    getSqlClause().ignoreOrQuery();
+                    // if or-scope query has already been effective, create new or-scope
+                    getSqlClause().makeOrScopeQueryEffective();
+                }
+
+                try {
+                    // split the condition
+                    List<Object> objectList = convertToJavaList(value);
+                    List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
+                    for (int i = 0; i < valueList.size(); i++) {
+                        System.Collections.IList currentValue = convertToEmbeddedList<ELEMENT>(valueList.get(i));
+                        if (i == 0) {
+                            setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
+                        } else {
+                            if (asOr) { // as 'or' condition
+                                getSqlClause().makeOrQueryEffective();
+                            }
+                            invokeQuery(colName, key.getConditionKey(), currentValue);
+                        }
+                    }
+                } finally {
+                    if (asOr) {
+                        getSqlClause().closeOrScopeQuery();
+                    }
                 }
             } else {
                 setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
