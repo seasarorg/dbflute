@@ -913,34 +913,35 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
             throw new IllegalArgumentException("The argument 'textColumnList' should not be empty list!");
         }
         int index = 0;
-        for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
-            if (columnInfo == null) {
-                continue;
-            }
-            String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
-            if (!tableOfColumn.equalsIgnoreCase(getTableDbName())) {
-                String msg = "The table of the text column should be '" + getTableDbName() + "'";
-                msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
-                throw new IllegalArgumentException(msg);
-            }
-            Class<?> propertyType = columnInfo.getPropertyType();
-            if (!String.class.isAssignableFrom(propertyType)) {
-                String msg = "The text column should be String type:";
-                msg = msg + " type=" + propertyType + " column=" + columnInfo;
-                throw new IllegalArgumentException(msg);
-            }
-            if (index > 0) {
-                getSqlClause().makeOrQueryEffective();
-            }
-            invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
-                @Override
-                public org.seasar.dbflute.dbway.ExtensionOperand getExtensionOperand() {
-                    return ${glDBFluteConfig}.getInstance().getFullTextSearchOperand();
+        getSqlClause().makeOrQueryEffective();
+        try {
+            for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
+                if (columnInfo == null) {
+                    continue;
                 }
-            });
-            ++index;
+                String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
+                if (!tableOfColumn.equalsIgnoreCase(getTableDbName())) {
+                    String msg = "The table of the text column should be '" + getTableDbName() + "'";
+                    msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
+                    throw new IllegalArgumentException(msg);
+                }
+                Class<?> propertyType = columnInfo.getPropertyType();
+                if (!String.class.isAssignableFrom(propertyType)) {
+                    String msg = "The text column should be String type:";
+                    msg = msg + " type=" + propertyType + " column=" + columnInfo;
+                    throw new IllegalArgumentException(msg);
+                }
+                invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
+                    @Override
+                    public org.seasar.dbflute.dbway.ExtensionOperand getExtensionOperand() {
+                        return ${glDBFluteConfig}.getInstance().getFullTextSearchOperand();
+                    }
+                });
+                ++index;
+            }
+        } finally {
+            getSqlClause().closeOrScopeQuery();
         }
-        getSqlClause().ignoreOrQuery();
     }
 #end
 #if ($database.isDatabaseOracle())
@@ -970,35 +971,36 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         }
         conditionValue = escapeFullTextSearchValue(conditionValue);
         int index = 0;
-        for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
-            if (columnInfo == null) {
-                continue;
-            }
-            String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
-            if (!tableOfColumn.equalsIgnoreCase(getTableDbName())) {
-                String msg = "The table of the text column should be '" + getTableDbName() + "'";
-                msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
-                throw new IllegalArgumentException(msg);
-            }
-            Class<?> propertyType = columnInfo.getPropertyType();
-            if (!String.class.isAssignableFrom(propertyType)) {
-                String msg = "The text column should be String type:";
-                msg = msg + " type=" + propertyType + " column=" + columnInfo;
-                throw new IllegalArgumentException(msg);
-            }
-            if (index > 0) {
-                getSqlClause().makeOrQueryEffective();
-            }
-            invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
-                @Override
-                public org.seasar.dbflute.cbean.sqlclause.WhereClauseArranger getWhereClauseArranger() {
-                    return ((org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause())
-                           .createFullTextSearchClauseArranger();
+        getSqlClause().makeOrQueryEffective();
+        try {
+            for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
+                if (columnInfo == null) {
+                    continue;
                 }
-            });
-            ++index;
+                String tableOfColumn = columnInfo.getDBMeta().getTableDbName();
+                if (!tableOfColumn.equalsIgnoreCase(getTableDbName())) {
+                    String msg = "The table of the text column should be '" + getTableDbName() + "'";
+                    msg = msg + " but the table is '" + tableOfColumn + "': column=" + columnInfo;
+                    throw new IllegalArgumentException(msg);
+                }
+                Class<?> propertyType = columnInfo.getPropertyType();
+                if (!String.class.isAssignableFrom(propertyType)) {
+                    String msg = "The text column should be String type:";
+                    msg = msg + " type=" + propertyType + " column=" + columnInfo;
+                    throw new IllegalArgumentException(msg);
+                }
+                invokeQueryLikeSearch(columnInfo.getColumnDbName(), conditionValue, new LikeSearchOption() {
+                    @Override
+                    public org.seasar.dbflute.cbean.sqlclause.WhereClauseArranger getWhereClauseArranger() {
+                        return ((org.seasar.dbflute.cbean.sqlclause.SqlClauseOracle)getSqlClause())
+                               .createFullTextSearchClauseArranger();
+                    }
+                });
+                ++index;
+            }
+        } finally {
+            getSqlClause().closeOrScopeQuery();
         }
-        getSqlClause().ignoreOrQuery();
     }
 
     protected String escapeFullTextSearchValue(String conditionValue) {

@@ -89,8 +89,8 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected bool _fetchScopeEffective = false;
 
     // -----------------------------------------------------
-    //                                               OrQuery
-    //                                               -------
+    //                                          OrScopeQuery
+    //                                          ------------
     protected bool _orScopeQueryEffective;
     protected TmpOrScopeQueryInfo _currentTmpOrScopeQueryInfo;
     protected bool _orScopeQueryAndPart;
@@ -927,9 +927,14 @@ public abstract class ${myClassName} : ${glSqlClause} {
             _currentTmpOrScopeQueryInfo = parentInfo;
         } else {
             reflectTmpOrClauseToRealObject(_currentTmpOrScopeQueryInfo);
-            _currentTmpOrScopeQueryInfo = null;
-            _orScopeQueryEffective = false;
+            clearOrScopeQuery();
         }
+    }
+
+    protected void clearOrScopeQuery() {
+        _currentTmpOrScopeQueryInfo = null;
+        _orScopeQueryEffective = false;
+        _orScopeQueryAndPart = false;
     }
 
     protected void reflectTmpOrClauseToRealObject(TmpOrScopeQueryInfo localInfo) {
