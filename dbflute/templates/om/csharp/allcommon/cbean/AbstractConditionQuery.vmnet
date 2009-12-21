@@ -269,6 +269,93 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     // -----------------------------------------------------
+    //                                         InScope Query
+    //                                         -------------
+    protected void regINS<ELEMENT>(${glConditionKey} key, System.Collections.IList value, ${glConditionValue} cvalue, String colName) {
+        int inScopeLimit = getSqlClause().getInScopeLimit();
+        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+            if (inScopeLimit > 0 && value.Count > inScopeLimit) {
+                // if the key is for inScope, it should be split as 'or'
+                // (if the key is for notInScope, it should be split as 'and')
+                bool alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
+                if (isConditionKeyInScope(key)) {
+                    // if or-scope query has already been effective, create new or-scope
+                    getSqlClause().makeOrScopeQueryEffective();
+                } else {
+                    if (alreadyOrScopeQuery) {
+                        getSqlClause().beginOrScopeQueryAndPart();
+                    }
+                }
+
+                try {
+                    // split the condition
+                    List<Object> objectList = convertToJavaList(value);
+                    List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
+                    for (int i = 0; i < valueList.size(); i++) {
+                        System.Collections.IList currentValue = convertToEmbeddedList<ELEMENT>(valueList.get(i));
+                        if (i == 0) {
+                            setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
+                        } else {
+                            if (asOr) { // as 'or' condition
+                                getSqlClause().makeOrQueryEffective();
+                            }
+                            invokeQuery(colName, key.getConditionKey(), currentValue);
+                        }
+                    }
+                } finally {
+                    if (isConditionKeyInScope(key)) {
+                        getSqlClause().closeOrScopeQuery();
+                    } else {
+                        if (alreadyOrScopeQuery) {
+                            getSqlClause().endOrScopeQueryAndPart();
+                        }
+                    }
+                }
+            } else {
+                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
+            }
+        }
+    }
+
+    static bool isConditionKeyInScope(${glConditionKey} key) { // default scope for test 
+        return typeof(${glConditionKey}InScope).IsAssignableFrom(key.GetType());
+    }
+
+    private static List<Object> convertToJavaList(System.Collections.IList list) {
+        List<Object> resultList = new ArrayList<Object>();
+        foreach (Object element in list) {
+            resultList.add(element);
+        }
+        return resultList;
+    }
+
+    private static System.Collections.IList convertToEmbeddedList<ELEMENT>(List<Object> list) {
+        System.Collections.IList resultList = new System.Collections.Generic.List<ELEMENT>();
+        foreach (Object element in list) {
+            resultList.Add(element);
+        }
+        return resultList;
+    }
+
+    private static List<List<ELEMENT>> splitByLimit<ELEMENT>(List<ELEMENT> elementList, int limit) {
+        List<List<ELEMENT>> valueList = new ArrayList<List<ELEMENT>>();
+        int valueSize = elementList.size();
+        int index = 0;
+        int remainderSize = valueSize;
+        do {
+            int beginIndex = limit * index;
+            int endPoint = beginIndex + limit;
+            int endIndex = limit <= remainderSize ? endPoint : valueSize;
+            List<ELEMENT> splitList = new ArrayList<ELEMENT>();
+            splitList.addAll(elementList.subList(beginIndex, endIndex));
+            valueList.add(splitList);
+            remainderSize = valueSize - endIndex;
+            ++index;
+        } while (remainderSize > 0);
+        return valueList;
+    }
+
+    // -----------------------------------------------------
     //                                          FromTo Query
     //                                          ------------
     protected void regFTQ(DateTime? fromDate, DateTime? toDate, ${glConditionValue} cvalue, String colName, ${glFromToOption} option) {
@@ -345,94 +432,6 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         msg = msg + "    " + beanName + "." + methodName + ln();
         msg = msg + "* * * * * * * * * */" + ln();
         throw new ${glRequiredOptionNotFoundException}(msg);
-    }
-        
-    // -----------------------------------------------------
-    //                                         InScope Query
-    //                                         -------------
-    protected void regINS<ELEMENT>(${glConditionKey} key, System.Collections.IList value, ${glConditionValue} cvalue, String colName) {
-        int inScopeLimit = getSqlClause().getInScopeLimit();
-        if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
-            if (inScopeLimit > 0 && value.Count > inScopeLimit) {
-                // if the key is for inScope, it should be split as 'or'
-                // (if the key is for notInScope, it should be split as 'and')
-                bool asOr = isConditionKeyInScope(key);
-                bool alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
-                if (asOr) {
-                    // if or-scope query has already been effective, create new or-scope
-                    getSqlClause().makeOrScopeQueryEffective();
-                } else {
-                    if (alreadyOrScopeQuery) {
-                        getSqlClause().ignoreOrScopeQueryTemporarily();
-                    }
-                }
-
-                try {
-                    // split the condition
-                    List<Object> objectList = convertToJavaList(value);
-                    List<List<Object>> valueList = splitByLimit(objectList, inScopeLimit);
-                    for (int i = 0; i < valueList.size(); i++) {
-                        System.Collections.IList currentValue = convertToEmbeddedList<ELEMENT>(valueList.get(i));
-                        if (i == 0) {
-                            setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
-                        } else {
-                            if (asOr) { // as 'or' condition
-                                getSqlClause().makeOrQueryEffective();
-                            }
-                            invokeQuery(colName, key.getConditionKey(), currentValue);
-                        }
-                    }
-                } finally {
-                    if (asOr) {
-                        getSqlClause().closeOrScopeQuery();
-                    } else {
-                        if (alreadyOrScopeQuery) {
-                            getSqlClause().reviveOrScopeQueryFromIgnored();
-                        }
-                    }
-                }
-            } else {
-                setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
-            }
-        }
-    }
-
-    static bool isConditionKeyInScope(${glConditionKey} key) { // default scope for test 
-        return typeof(${glConditionKey}InScope).IsAssignableFrom(key.GetType());
-    }
-
-    private static List<Object> convertToJavaList(System.Collections.IList list) {
-        List<Object> resultList = new ArrayList<Object>();
-        foreach (Object element in list) {
-            resultList.add(element);
-        }
-        return resultList;
-    }
-
-    private static System.Collections.IList convertToEmbeddedList<ELEMENT>(List<Object> list) {
-        System.Collections.IList resultList = new System.Collections.Generic.List<ELEMENT>();
-        foreach (Object element in list) {
-            resultList.Add(element);
-        }
-        return resultList;
-    }
-
-    private static List<List<ELEMENT>> splitByLimit<ELEMENT>(List<ELEMENT> elementList, int limit) {
-        List<List<ELEMENT>> valueList = new ArrayList<List<ELEMENT>>();
-        int valueSize = elementList.size();
-        int index = 0;
-        int remainderSize = valueSize;
-        do {
-            int beginIndex = limit * index;
-            int endPoint = beginIndex + limit;
-            int endIndex = limit <= remainderSize ? endPoint : valueSize;
-            List<ELEMENT> splitList = new ArrayList<ELEMENT>();
-            splitList.addAll(elementList.subList(beginIndex, endIndex));
-            valueList.add(splitList);
-            remainderSize = valueSize - endIndex;
-            ++index;
-        } while (remainderSize > 0);
-        return valueList;
     }
 
     // -----------------------------------------------------

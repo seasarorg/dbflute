@@ -93,6 +93,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                               -------
     protected bool _orScopeQueryEffective;
     protected TmpOrScopeQueryInfo _currentTmpOrScopeQueryInfo;
+    protected bool _orScopeQueryAndPart;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -776,18 +777,38 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                                                               =====
     public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
-        key.addWhereClause(getWhereClauseList4Register(), columnFullName, value);
+        List<String> clauseList = getWhereClauseList4Register();
+        doRegisterWhereClause(clauseList, columnFullName, key, value);
     }
 
     public void registerWhereClause(String columnFullName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         assertObjectNotNull("option of " + columnFullName, option);
-        key.addWhereClause(getWhereClauseList4Register(), columnFullName, value, option);
+        List<String> clauseList = getWhereClauseList4Register();
+        doRegisterWhereClause(clauseList, columnFullName, key, value, option);
     }
 
     public void registerWhereClause(String clause) {
         assertStringNotNullAndNotTrimmedEmpty("clause", clause);
-        getWhereClauseList4Register().add(clause);
+        List<String> clauseList = getWhereClauseList4Register();
+        doRegisterWhereClause(clauseList, clause);
+    }
+
+    protected void doRegisterWhereClause(List<String> clauseList, String columnName, ${glConditionKey} key,
+            ${glConditionValue} value) {
+        key.addWhereClause(clauseList, columnName, value);
+        markOrScopeQueryAndPart(clauseList);
+    }
+
+    protected void doRegisterWhereClause(List<String> clauseList, String columnName, ${glConditionKey} key,
+            ${glConditionValue} value, ${glConditionOption} option) {
+        key.addWhereClause(clauseList, columnName, value, option);
+        markOrScopeQueryAndPart(clauseList);
+    }
+
+    protected void doRegisterWhereClause(List<String> clauseList, String clause) {
+        clauseList.add(clause);
+        markOrScopeQueryAndPart(clauseList);
     }
 
     protected List<String> getWhereClauseList4Register() {
@@ -816,13 +837,15 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                                                         ===========
     public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
-        key.addWhereClause(getBaseTableInlineWhereClauseList4Register(), columnName, value);
+        List<String> clauseList = getBaseTableInlineWhereClauseList4Register();
+        doRegisterWhereClause(clauseList, columnName, key, value);
     }
 
     public void registerBaseTableInlineWhereClause(String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         assertObjectNotNull("option of " + columnName, option);
-        key.addWhereClause(getBaseTableInlineWhereClauseList4Register(), columnName, value, option);
+        List<String> clauseList = getBaseTableInlineWhereClauseList4Register();
+        doRegisterWhereClause(clauseList, columnName, key, value, option);
     }
 
     public void registerBaseTableInlineWhereClause(String value) {
@@ -840,67 +863,42 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, bool onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
-        LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-        List<String> clauseList;
-        String realColumnName;
-        if (onClauseInline) {
-            if (_orScopeQueryEffective) {
-                clauseList = getTmpOrAdditionalOnClauseList(aliasName);
-            } else {
-                clauseList = joinInfo.getAdditionalOnClauseList();
-            }
-            realColumnName = aliasName + "." + columnName;
-        } else {
-            if (_orScopeQueryEffective) {
-                clauseList = getTmpOrOuterJoinInlineClauseList(aliasName);
-            } else {
-                clauseList = joinInfo.getInlineWhereClauseList();
-            }
-            realColumnName = columnName;
-        }
-        key.addWhereClause(clauseList, realColumnName, value);
+        List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClauseInline);
+        String realColumnName = (onClauseInline ? aliasName + "." : "") + columnName;
+        doRegisterWhereClause(clauseList, realColumnName, key, value);
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ${glConditionKey} key, ${glConditionValue} value, ${glConditionOption} option, bool onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
-        LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
+        List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClauseInline);
+        String realColumnName = (onClauseInline ? aliasName + "." : "") + columnName;
+        doRegisterWhereClause(clauseList, realColumnName, key, value, option);
+    }
+
+    public void registerOuterJoinInlineWhereClause(String aliasName, String value, bool onClauseInline) {
+        assertNotYetOuterJoin(aliasName);
+        List<String> clauseList = getOuterJoinInlineWhereClauseList4Register(aliasName, onClauseInline);
+        doRegisterWhereClause(clauseList, value);
+    }
+
+    protected List<String> getOuterJoinInlineWhereClauseList4Register(String aliasName, bool onClauseInline) {
+        LeftOuterJoinInfo joinInfo = _outerJoinMap.get(aliasName);
         List<String> clauseList;
-        String realColumnName;
         if (onClauseInline) {
             if (_orScopeQueryEffective) {
                 clauseList = getTmpOrAdditionalOnClauseList(aliasName);
             } else {
                 clauseList = joinInfo.getAdditionalOnClauseList();
             }
-            realColumnName = aliasName + "." + columnName;
         } else {
             if (_orScopeQueryEffective) {
                 clauseList = getTmpOrOuterJoinInlineClauseList(aliasName);
             } else {
                 clauseList = joinInfo.getInlineWhereClauseList();
             }
-            realColumnName = columnName;
         }
-        key.addWhereClause(clauseList, realColumnName, value, option);
-    }
-
-    public void registerOuterJoinInlineWhereClause(String aliasName, String value, bool onClauseInline) {
-        assertNotYetOuterJoin(aliasName);
-        LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo)_outerJoinMap.get(aliasName);
-        if (onClauseInline) {
-            if (_orScopeQueryEffective) {
-                addTmpOrAdditionalOnClause(aliasName, value);
-            } else {
-                joinInfo.addAdditionalOnClause(value);
-            }
-        } else {
-            if (_orScopeQueryEffective) {
-                addTmpOrOuterJoinInlineClause(aliasName, value);
-            } else {
-                joinInfo.addInlineWhereClause(value);
-            }
-        }
+        return clauseList;
     }
 
     protected void assertNotYetOuterJoin(String aliasName) {
@@ -923,9 +921,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     public void closeOrScopeQuery() {
-        if (!_orScopeQueryEffective) {
-            return;
-        }
         assertCurrentTmpOrScopeQueryInfo();
         TmpOrScopeQueryInfo parentInfo = _currentTmpOrScopeQueryInfo.getParentInfo();
         if (parentInfo != null) {
@@ -939,23 +934,23 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     protected void reflectTmpOrClauseToRealObject(TmpOrScopeQueryInfo localInfo) {
         {
-            List<List<String>> listList = setupTmpOrListList(localInfo, delegate(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
+            List<TmpOrScopeQueryGroupInfo> listList = setupTmpOrListList(localInfo, delegate(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
                 return tmpOrScopeQueryInfo.getTmpOrWhereList();
             });
             setupOrScopeQuery(listList, _whereList, true);
         }
         {
-            List<List<String>> listList = setupTmpOrListList(localInfo, delegate(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
+            List<TmpOrScopeQueryGroupInfo> listList = setupTmpOrListList(localInfo, delegate(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
                 return tmpOrScopeQueryInfo.getTmpOrBaseTableInlineWhereList();
             });
             setupOrScopeQuery(listList, _baseTableInlineWhereList, false);
         }
         {
-            final Set<Entry<String, LeftOuterJoinInfo>> entrySet = _outerJoinMap.entrySet();
-            for (Entry<String, LeftOuterJoinInfo> entry : entrySet) {
-                final String aliasName = entry.getKey();
-                final LeftOuterJoinInfo joinInfo = entry.getValue();
-                final List<List<String>> listList = new ArrayList<List<String>>();
+            Set<Entry<String, LeftOuterJoinInfo>> entrySet = _outerJoinMap.entrySet();
+            foreach (Entry<String, LeftOuterJoinInfo> entry in entrySet) {
+                String aliasName = entry.getKey();
+                LeftOuterJoinInfo joinInfo = entry.getValue();
+                List<TmpOrScopeQueryGroupInfo> listList = new ArrayList<List<String>>();
                 listList.addAll(setupTmpOrListList(localInfo, delegate(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
                     return tmpOrScopeQueryInfo.getTmpOrAdditionalOnClauseList(aliasName);
                 }));
@@ -963,11 +958,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
             }
         }
         {
-            final Set<Entry<String, LeftOuterJoinInfo>> entrySet = _outerJoinMap.entrySet();
-            for (Entry<String, LeftOuterJoinInfo> entry : entrySet) {
-                final String aliasName = entry.getKey();
-                final LeftOuterJoinInfo joinInfo = entry.getValue();
-                final List<List<String>> listList = new ArrayList<List<String>>();
+            Set<Entry<String, LeftOuterJoinInfo>> entrySet = _outerJoinMap.entrySet();
+            foreach (Entry<String, LeftOuterJoinInfo> entry in entrySet) {
+                String aliasName = entry.getKey();
+                LeftOuterJoinInfo joinInfo = entry.getValue();
+                List<TmpOrScopeQueryGroupInfo> listList = new ArrayList<List<String>>();
                 listList.addAll(setupTmpOrListList(localInfo, delegate(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
                     return tmpOrScopeQueryInfo.getTmpOrOuterJoinInlineClauseList(aliasName);
                 }));
@@ -976,9 +971,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
     }
 
-    protected List<List<String>> setupTmpOrListList(TmpOrScopeQueryInfo parentInfo, TmpOrClauseListProvider provider) {
-        List<List<String>> resultList = new ArrayList<List<String>>();
-        resultList.add(provider.Invoke(parentInfo));
+    protected List<TmpOrScopeQueryGroupInfo> setupTmpOrListList(TmpOrScopeQueryInfo parentInfo, TmpOrClauseListProvider provider) {
+        List<TmpOrScopeQueryGroupInfo> resultList = new ArrayList<TmpOrScopeQueryGroupInfo>();
+        TmpOrScopeQueryGroupInfo groupInfo = new TmpOrScopeQueryGroupInfo();
+        groupInfo.setOrClauseList(provider.provide(parentInfo));
+        resultList.add(groupInfo);
         if (parentInfo.hasChildInfo()) {
             foreach (TmpOrScopeQueryInfo childInfo in parentInfo.getChildInfoList()) {
                 resultList.addAll(setupTmpOrListList(childInfo, provider)); // recursive call
@@ -989,51 +986,85 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     protected delegate List<String> TmpOrClauseListProvider(TmpOrScopeQueryInfo tmpOrScopeQueryInfo);
 
-    protected void setupOrScopeQuery(List<List<String>> tmpOrListList, List<String> realList, bool line) {
-        if (tmpOrListList == null || tmpOrListList.isEmpty()) {
+    protected void setupOrScopeQuery(List<TmpOrScopeQueryGroupInfo> tmpOrGroupList, List<String> realList, bool line) {
+        if (tmpOrGroupList == null || tmpOrGroupList.isEmpty()) {
             return;
         }
-        String lnIndent = line ? ln() + "   " : "";
         String or = " or ";
+        String and = " and ";
+        String lnIndentOr = line ? ln() + "   " : "";
+        String lnIndentAnd = ""; // no line separator either way
+        String andPartMark = getOrScopeQueryAndPartMark();
         StringBuilder sb = new StringBuilder();
         bool exists = false;
-        int listListIndex = 0;
-        foreach (List<String> tmpOrList in tmpOrListList) {
-            if (tmpOrList == null || tmpOrList.isEmpty()) {
+        int validCount = 0;
+        int groupListIndex = 0;
+        foreach (TmpOrScopeQueryGroupInfo groupInfo in tmpOrGroupList) {
+            List<String> orClauseList = groupInfo.getOrClauseList();
+            if (orClauseList == null || orClauseList.isEmpty()) {
                 continue; // not increment index
             }
             int listIndex = 0;
-            foreach (String orClause in tmpOrList) {
-                if (listListIndex == 0) { // first list
+            bool inAndPart = false;
+            foreach (String orClause in orClauseList) {
+                bool currentAndPart = orClause.StartsWith(andPartMark);
+                bool beginAndPart;
+                bool secondAndPart;
+                if (currentAndPart) {
+                    if (inAndPart) { // already begin
+                        beginAndPart = false;
+                        secondAndPart = true;
+                    } else {
+                        beginAndPart = true;
+                        secondAndPart = false;
+                        inAndPart = true;
+                    }
+                    orClause = orClause.Substring(andPartMark.Length);
+                } else {
+                    if (inAndPart) {
+                        sb.append(")");
+                        inAndPart = false;
+                    }
+                    beginAndPart = false;
+                    secondAndPart = false;
+                }
+                if (groupListIndex == 0) { // first list
                     if (listIndex == 0) {
                         sb.append("(");
                     } else {
-                        sb.append(lnIndent);
-                        sb.append(or);
+                        sb.append(secondAndPart ? lnIndentAnd : lnIndentOr);
+                        sb.append(secondAndPart ? and : or);
                     }
                 } else { // second or more list
                     if (listIndex == 0) {
-                        sb.append(lnIndent);
+                        // always 'or' here
+                        sb.append(lnIndentOr);
                         sb.append(or);
                         sb.append("(");
                     } else {
-                        sb.append(lnIndent);
-                        sb.append(or);
+                        sb.append(secondAndPart ? lnIndentAnd : lnIndentOr);
+                        sb.append(secondAndPart ? and : or);
                     }
                 }
+                sb.append(beginAndPart ? "(" : "");
                 sb.append(orClause);
+                ++validCount;
                 if (!exists) {
                     exists = true;
                 }
                 ++listIndex;
             }
-            if (listListIndex > 0) { // second or more list
+            if (inAndPart) {
+                sb.append(")");
+                inAndPart = false;
+            }
+            if (groupListIndex > 0) { // second or more list
                 sb.append(")");
             }
-            ++listListIndex;
+            ++groupListIndex;
         }
         if (exists) {
-            sb.append(line ? ln() + "       " : "").append(")");
+            sb.append(line && validCount > 1 ? ln() + "       " : "").append(")");
             realList.add(sb.toString());
         }
     }
@@ -1062,14 +1093,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
         return _currentTmpOrScopeQueryInfo.getTmpOrOuterJoinInlineClauseList(aliasName);
     }
 
-    protected void addTmpOrAdditionalOnClause(String aliasName, String value) {
-        getTmpOrAdditionalOnClauseList(aliasName).add(value);
-    }
-
-    protected void addTmpOrOuterJoinInlineClause(String aliasName, String value) {
-        getTmpOrOuterJoinInlineClauseList(aliasName).add(value);
-    }
-
     protected class TmpOrScopeQueryInfo {
         protected List<String> _tmpOrWhereList;
         protected List<String> _tmpOrBaseTableInlineWhereList;
@@ -1077,14 +1100,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
         protected Map<String, List<String>> _tmpOrOuterJoinInlineClauseListMap;
         protected TmpOrScopeQueryInfo _parentInfo; // null means base point
         protected List<TmpOrScopeQueryInfo> _childInfoList;
-
-        public void clear() {
-            _tmpOrWhereList = null;
-            _tmpOrBaseTableInlineWhereList = null;
-            _tmpOrAdditionalOnClauseListMap = null;
-            _tmpOrOuterJoinInlineClauseListMap = null;
-            _childInfoList = null;
-        }
 
         protected List<String> getTmpOrAdditionalOnClauseList(String aliasName) {
             List<String> orClauseList = getTmpOrAdditionalOnClauseListMap().get(aliasName);
@@ -1183,20 +1198,40 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
     }
 
+    protected class TmpOrScopeQueryGroupInfo {
+        protected List<String> _orClauseList;
+        protected bool _forcedAnd;
+
+        public override String ToString() {
+            return "{orClauseList=" + (_orClauseList != null ? _orClauseList.size() : "null") + "}";
+        }
+
+        public List<String> getOrClauseList() {
+            return _orClauseList;
+        }
+
+        public void setOrClauseList(List<String> orClauseList) {
+            this._orClauseList = orClauseList;
+        }
+    }
+
+    protected void markOrScopeQueryAndPart(List<String> clauseList) {
+        if (_orScopeQueryEffective && _orScopeQueryAndPart && !clauseList.isEmpty()) {
+            String original = clauseList.remove(clauseList.size() - 1); // as latest
+            clauseList.add(getOrScopeQueryAndPartMark() + original);
+        }
+    }
+
+    protected String getOrScopeQueryAndPartMark() {
+        return "$$df:AndPart$$";
+    }
+
     protected void assertCurrentTmpOrScopeQueryInfo() {
         if (_currentTmpOrScopeQueryInfo == null) {
             String msg = "The attribute 'currentTmpOrScopeQueryInfo' should not be null in or-scope query:";
             msg = msg + " orScopeQueryEffective=" + _orScopeQueryEffective;
             throw new IllegalStateException(msg);
         }
-    }
-
-    public void ignoreOrScopeQueryTemporarily() {
-        _orScopeQueryEffective = false;
-    }
-
-    public void reviveOrScopeQueryFromIgnored() {
-        _orScopeQueryEffective = true;
     }
 
     // ===================================================================================
@@ -1771,7 +1806,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
         return sb.toString();
     }
-    
+
     public class SubQueryIndentFailureException : RuntimeException {
         public SubQueryIndentFailureException(String msg) : base(msg) {
         }
