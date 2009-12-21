@@ -979,7 +979,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected List<TmpOrScopeQueryGroupInfo> setupTmpOrListList(TmpOrScopeQueryInfo parentInfo, TmpOrClauseListProvider provider) {
         List<TmpOrScopeQueryGroupInfo> resultList = new ArrayList<TmpOrScopeQueryGroupInfo>();
         TmpOrScopeQueryGroupInfo groupInfo = new TmpOrScopeQueryGroupInfo();
-        groupInfo.setOrClauseList(provider.provide(parentInfo));
+        groupInfo.setOrClauseList(provider.Invoke(parentInfo));
         resultList.add(groupInfo);
         if (parentInfo.hasChildInfo()) {
             foreach (TmpOrScopeQueryInfo childInfo in parentInfo.getChildInfoList()) {

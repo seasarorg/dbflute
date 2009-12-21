@@ -150,8 +150,20 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return _target.Current;
             }
         }
+        public override String ToString() {
+            return toString();
+        }
 		public String toString() {
-		    return _res.ToString();
+		    StringBuilder sb = new StringBuilder();
+		    sb.append("{");
+		    int index = 0;
+		    foreach (ELEMENT element in this) {
+		        if (index > 0) { sb.append("{"); }
+		        sb.append(element);
+		        ++index;
+		    }
+		    sb.append("}");
+		    return sb.toString();
 		}
     }
 
@@ -246,8 +258,20 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return _target.Current;
             }
         }
+        public override String ToString() {
+            return toString();
+        }
 		public String toString() {
-		    return _res.ToString();
+		    StringBuilder sb = new StringBuilder();
+		    sb.append("{");
+		    int index = 0;
+		    foreach (ELEMENT element in this) {
+		        if (index > 0) { sb.append("{"); }
+		        sb.append(element);
+		        ++index;
+		    }
+		    sb.append("}");
+		    return sb.toString();
 		}
     }
 
@@ -339,8 +363,20 @@ namespace ${glPackageBaseCommonJavaLike} {
                 return _target.get(_index);
             }
         }
+        public override String ToString() {
+            return toString();
+        }
 		public String toString() {
-		    return _res.ToString();
+		    StringBuilder sb = new StringBuilder();
+		    sb.append("{");
+		    int index = 0;
+		    foreach (ELEMENT element in this) {
+		        if (index > 0) { sb.append("{"); }
+		        sb.append(element);
+		        ++index;
+		    }
+		    sb.append("}");
+		    return sb.toString();
 		}
     }
 
@@ -438,8 +474,21 @@ namespace ${glPackageBaseCommonJavaLike} {
         public bool containsKeyAsNg(Object key) {
             return containsKey((KEY)key);
         }
+		public override String ToString() {
+		    return ToString();
+		}
 		public String toString() {
-		    return _res.ToString();
+		    StringBuilder sb = new StringBuilder();
+		    sb.append("{");
+		    int index = 0;
+		    Set<Entry<KEY, VALUE>> entrySet = entrySet();
+		    foreach (Entry<KEY, VALUE> entry in entrySet) {
+		        if (index > 0) { sb.append("{"); }
+		        sb.append(entry.toString());
+		        ++index;
+		    }
+		    sb.append("}");
+		    return sb.toString();
 		}
     }
 
@@ -516,8 +565,21 @@ namespace ${glPackageBaseCommonJavaLike} {
         public bool containsKeyAsNg(Object key) {
             return containsKey((KEY)key);
         }
+		public override String ToString() {
+		    return ToString();
+		}
 		public String toString() {
-		    return _res.ToString();
+		    StringBuilder sb = new StringBuilder();
+		    sb.append("{");
+		    int index = 0;
+		    Set<Entry<KEY, VALUE>> entrySet = entrySet();
+		    foreach (Entry<KEY, VALUE> entry in entrySet) {
+		        if (index > 0) { sb.append("{"); }
+		        sb.append(entry.toString());
+		        ++index;
+		    }
+		    sb.append("}");
+		    return sb.toString();
 		}
     }
 
@@ -525,8 +587,15 @@ namespace ${glPackageBaseCommonJavaLike} {
     public class Entry<KEY, VALUE> {
         protected KEY _key;
         protected VALUE _value;
+        public override String ToString() {
+            return toString();
+        }
+        public String toString() {
+            return _key + "=" + value;
+        }
         public Entry(KEY key, VALUE value) {
-            
+            _key = key;
+            _value = value;
         }
         public KEY getKey() {
             return _key;
