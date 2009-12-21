@@ -49,7 +49,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  */
 public abstract class AbstractConditionQuery implements ConditionQuery {
-// Don't format!
+    // Don't format!
 
     // ===================================================================================
     //                                                                          Definition
@@ -72,7 +72,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /** The property of condition-query. */
     protected static final String CQ_PROPERTY = "conditionQuery";
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -84,7 +84,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     /** The level of nest. */
     protected final int _nestLevel;
-    
+
     /** The level of subQuery. */
     protected int _subQueryLevel;
 
@@ -105,7 +105,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                ------
     /** Is it the inline for on-clause. (Property for Inline Only) */
     protected boolean _onClauseInline;
-    
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -175,7 +175,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return Next nest level.
      */
     public int getNextNestLevel() {
-        return _nestLevel+1;
+        return _nestLevel + 1;
     }
 
     /**
@@ -194,7 +194,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     public int getSubQueryLevel() {
         return _subQueryLevel;
     }
-    
+
     // -----------------------------------------------------
     //                                             Real Name
     //                                             ---------
@@ -251,7 +251,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     public void xsetOnClauseInline(boolean onClauseInline) {
         _onClauseInline = onClauseInline;
     }
-    
+
     // ===================================================================================
     //                                                                            Location
     //                                                                            ========
@@ -353,14 +353,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @param baseQueryAsSuper Base query as super. (NotNull)
      * @param unionQueryAsSuper Union query as super. (NotNull)
      */
-    protected abstract void reflectRelationOnUnionQuery(ConditionQuery baseQueryAsSuper, ConditionQuery unionQueryAsSuper);
+    protected abstract void reflectRelationOnUnionQuery(ConditionQuery baseQueryAsSuper,
+            ConditionQuery unionQueryAsSuper);
 
     /**
      * Has union query or union all query?
      * @return Determination.
      */
     public boolean hasUnionQueryOrUnionAllQuery() {
-        return (_unionQueryMap != null && !_unionQueryMap.isEmpty()) || (_unionAllQueryMap != null && !_unionAllQueryMap.isEmpty());
+        return (_unionQueryMap != null && !_unionQueryMap.isEmpty())
+                || (_unionAllQueryMap != null && !_unionAllQueryMap.isEmpty());
     }
 
     /**
@@ -368,7 +370,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return The list of union query. (NotNull)
      */
     public List<ConditionQuery> getUnionQueryList() {
-        if (_unionQueryMap == null) { return new ArrayList<ConditionQuery>(); }
+        if (_unionQueryMap == null) {
+            return new ArrayList<ConditionQuery>();
+        }
         return new ArrayList<ConditionQuery>(_unionQueryMap.values());
     }
 
@@ -377,7 +381,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * @return The list of union all query. (NotNull)
      */
     public List<ConditionQuery> getUnionAllQueryList() {
-        if (_unionAllQueryMap == null) { return new ArrayList<ConditionQuery>(); }
+        if (_unionAllQueryMap == null) {
+            return new ArrayList<ConditionQuery>();
+        }
         return new ArrayList<ConditionQuery>(_unionAllQueryMap.values());
     }
 
@@ -392,7 +398,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
         }
     }
-    
+
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String colName, ConditionOption option) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
@@ -406,27 +412,31 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final int inScopeLimit = getSqlClause().getInScopeLimit();
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             if (inScopeLimit > 0 && value.size() > inScopeLimit) {
-                // If the key is for inScope, it should be split as 'or'.
-                // (If the key is for notInScope, it should be split as 'and'.)
+                // if the key is for inScope, it should be split as 'or'
+                // (if the key is for notInScope, it should be split as 'and')
                 final boolean asOr = isConditionKeyInScope(key);
-                
-                // Split the condition!
-                @SuppressWarnings("unchecked")
-                final List<Object> objectList = (List<Object>)value;
-                final List<List<Object>> valueList = DfCollectionUtil.splitByLimit(objectList, inScopeLimit);
-                for (int i = 0; i < valueList.size(); i++) {
-                    final List<Object> currentValue = valueList.get(i);
-                    if (i == 0) {
-                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
-                    } else {
-                        if (asOr) { // As 'or' Condition
-                            getSqlClause().makeOrQueryEffective();
-                        }
-                        invokeQuery(colName, key.getConditionKey(), currentValue);
-                    }
-                }
                 if (asOr) {
-                    getSqlClause().ignoreOrQuery();
+                    // if or-scope query has already been effective, create new or-scope
+                    getSqlClause().makeOrScopeQueryEffective();
+                }
+
+                try {
+                    // split the condition
+                    @SuppressWarnings("unchecked")
+                    final List<Object> objectList = (List<Object>) value;
+                    final List<List<Object>> valueList = DfCollectionUtil.splitByLimit(objectList, inScopeLimit);
+                    for (int i = 0; i < valueList.size(); i++) {
+                        final List<Object> currentValue = valueList.get(i);
+                        if (i == 0) {
+                            setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName);
+                        } else {
+                            invokeQuery(colName, key.getConditionKey(), currentValue);
+                        }
+                    }
+                } finally {
+                    if (asOr) {
+                        getSqlClause().closeOrScopeQuery();
+                    }
                 }
             } else {
                 setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
@@ -437,23 +447,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     static boolean isConditionKeyInScope(ConditionKey key) { // default scope for test 
         return ConditionKeyInScope.class.isAssignableFrom(key.getClass());
     }
-    
+
     // -----------------------------------------------------
     //                                          FromTo Query
     //                                          ------------
-    protected void regFTQ(java.util.Date fromDate, java.util.Date toDate, ConditionValue cvalue
-                        , String colName, FromToOption option) {
+    protected void regFTQ(java.util.Date fromDate, java.util.Date toDate, ConditionValue cvalue, String colName,
+            FromToOption option) {
         {
             final java.util.Date filteredFromDate = option.filterFromDate(fromDate);
             final ConditionKey fromKey = option.getFromDateConditionKey();
-            if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+            if (fromKey.isValidRegistration(cvalue, filteredFromDate, fromKey.getConditionKey() + " of "
+                    + getRealAliasName() + "." + colName)) {
                 setupConditionValueAndRegisterWhereClause(fromKey, filteredFromDate, cvalue, colName);
             }
         }
         {
             final java.util.Date filteredToDate = option.filterToDate(toDate);
             final ConditionKey toKey = option.getToDateConditionKey();
-            if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
+            if (toKey.isValidRegistration(cvalue, filteredToDate, toKey.getConditionKey() + " of " + getRealAliasName()
+                    + "." + colName)) {
                 setupConditionValueAndRegisterWhereClause(toKey, filteredToDate, cvalue, colName);
             }
         }
@@ -462,32 +474,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                      LikeSearch Query
     //                                      ----------------
-    protected void regLSQ(ConditionKey key
-                        , String value
-                        , ConditionValue cvalue
-                        , String colName
-                        , LikeSearchOption option) {
+    protected void regLSQ(ConditionKey key, String value, ConditionValue cvalue, String colName, LikeSearchOption option) {
         registerLikeSearchQuery(key, value, cvalue, colName, option);
     }
 
-    protected void registerLikeSearchQuery(ConditionKey key
-                                         , String value
-                                         , ConditionValue cvalue
-                                         , String colName
-                                         , LikeSearchOption option) {
+    protected void registerLikeSearchQuery(ConditionKey key, String value, ConditionValue cvalue, String colName,
+            LikeSearchOption option) {
         final String validationMsg = key.getConditionKey() + " of " + getRealAliasName() + "." + colName;
         if (!key.isValidRegistration(cvalue, value, validationMsg)) {
             return;
         }
         if (option == null) {
             throwLikeSearchOptionNotFoundException(colName, value);
-            return;// unreachable
+            return; // unreachable
         }
         if (xsuppressEscape()) {
             option.notEscape();
         }
         if (value == null || !option.isSplit()) {
-            // As Normal Condition.
+            // as normal condition
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName, option);
             return;
         }
@@ -496,25 +501,30 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // - - - - - - - - -
         final String[] strArray = option.generateSplitValueArray(value);
         if (!option.isAsOrSplit()) {
-            // As 'and' Condition
+            // as 'and' condition
             for (int i = 0; i < strArray.length; i++) {
                 final String currentValue = strArray[i];
                 setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
             }
         } else {
-            // As 'or' Condition
-            final boolean orQueryEffective = getSqlClause().isOrQueryEffective();
-            for (int i = 0; i < strArray.length; i++) {
-                final String currentValue = strArray[i];
-                if (i == 0) {
-                    setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
-                } else {
-                    getSqlClause().makeOrQueryEffective();
-                    invokeQueryLikeSearch(colName, currentValue, option);
-                }
+            // as 'or' condition
+            final boolean orQueryEffective = getSqlClause().isOrScopeQueryEffective();
+            if (!orQueryEffective) { // create new or-scope query
+                getSqlClause().makeOrScopeQueryEffective();
             }
-            if (!orQueryEffective) {
-                getSqlClause().ignoreOrQuery();
+            try {
+                for (int i = 0; i < strArray.length; i++) {
+                    final String currentValue = strArray[i];
+                    if (i == 0) {
+                        setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
+                    } else {
+                        invokeQueryLikeSearch(colName, currentValue, option);
+                    }
+                }
+            } finally {
+                if (!orQueryEffective) {
+                    getSqlClause().closeOrScopeQuery();
+                }
             }
         }
     }
@@ -531,7 +541,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm your method call:"  + ln();
+        msg = msg + "Please confirm your method call:" + ln();
         final String beanName = getClass().getSimpleName();
         final String methodName = "set" + capPropName + "_LikeSearch('" + value + "', likeSearchOption);";
         msg = msg + "    " + beanName + "." + methodName + ln();
@@ -548,7 +558,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final String methodName = "set" + columnCapPropName + "_LikeSearch";
         Method method = null;
         try {
-            method = this.getClass().getMethod(methodName, new Class[]{value.getClass(), LikeSearchOption.class});
+            method = this.getClass().getMethod(methodName, new Class[] { value.getClass(), LikeSearchOption.class });
         } catch (NoSuchMethodException e) {
             String msg = "The columnFlexibleName is not existing in this table:";
             msg = msg + " columnFlexibleName=" + columnFlexibleName;
@@ -556,7 +566,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             throw new RuntimeException(msg, e);
         }
         try {
-            method.invoke(this, new Object[]{value, option});
+            method.invoke(this, new Object[] { value, option });
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -576,7 +586,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             if (isBaseQuery(this)) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
             } else {
-                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, _onClauseInline);
+                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue,
+                        _onClauseInline);
             }
         }
     }
@@ -590,7 +601,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             if (isBaseQuery(this)) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
             } else {
-                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option, _onClauseInline);
+                getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option,
+                        _onClauseInline);
             }
         }
     }
@@ -599,25 +611,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                       InScopeSubQuery
     //                                       ---------------
     // {Modified at DBFlute-0.7.5}
-    protected void registerInScopeSubQuery(ConditionQuery subQuery
-                                         , String columnName
-                                         , String relatedColumnName
-                                         , String propertyName) {
+    protected void registerInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+            String propertyName) {
         registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
     }
 
-    protected void registerNotInScopeSubQuery(ConditionQuery subQuery
-                                            , String columnName
-                                            , String relatedColumnName
-                                            , String propertyName) {
+    protected void registerNotInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+            String propertyName) {
         registerInScopeSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
     }
 
-    protected void registerInScopeSubQuery(ConditionQuery subQuery
-                                         , String columnName
-                                         , String relatedColumnName
-                                         , String propertyName
-                                         , String inScopeOption) {
+    protected void registerInScopeSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+            String propertyName, String inScopeOption) {
         assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
         inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
         String realColumnName = getInScopeSubQueryRealColumnName(columnName);
@@ -628,8 +633,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
         String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
-        String clause = realColumnName + " " + inScopeOption
-                      + "in (" + beginMark + subQueryClause + ln() + endIndent + ")" + endMark;
+        String clause = realColumnName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln() + endIndent
+                + ")" + endMark;
         registerWhereClause(clause);
     }
 
@@ -637,13 +642,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return getRealColumnName(columnName);
     }
 
-    protected String getInScopeSubQuerySql(ConditionQuery subQuery
-                                         , String relatedColumnName
-                                         , String propertyName) {
+    protected String getInScopeSubQuerySql(ConditionQuery subQuery, String relatedColumnName, String propertyName) {
         String tableAliasName = getSqlClause().getLocalTableAliasName();
-        String selectClause = "select " + tableAliasName+ "." + relatedColumnName;
-        String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
-                                                                 , selectClause, tableAliasName);
+        String selectClause = "select " + tableAliasName + "." + relatedColumnName;
+        String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
+                selectClause, tableAliasName);
         return selectClause + " " + fromWhereClause;
     }
 
@@ -651,40 +654,33 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                        ExistsSubQuery
     //                                        --------------
     // {Modified at DBFlute-0.7.5}
-    protected void registerExistsSubQuery(ConditionQuery subQuery
-                                        , String columnName
-                                        , String relatedColumnName
-                                        , String propertyName) {
+    protected void registerExistsSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+            String propertyName) {
         registerExistsSubQuery(subQuery, columnName, relatedColumnName, propertyName, null);
     }
 
-    protected void registerNotExistsSubQuery(ConditionQuery subQuery
-                                           , String columnName
-                                           , String relatedColumnName
-                                           , String propertyName) {
+    protected void registerNotExistsSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+            String propertyName) {
         registerExistsSubQuery(subQuery, columnName, relatedColumnName, propertyName, "not");
     }
 
-    protected void registerExistsSubQuery(ConditionQuery subQuery
-                                        , String columnName
-                                        , String relatedColumnName
-                                        , String propertyName
-                                        , String existsOption) {
+    protected void registerExistsSubQuery(ConditionQuery subQuery, String columnName, String relatedColumnName,
+            String propertyName, String existsOption) {
         assertObjectNotNull("ExistsSubQyery(" + columnName + ")", subQuery);
         existsOption = existsOption != null ? existsOption + " " : "";
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        
+
         String subQueryClause;
         if (columnName.contains(",") && relatedColumnName.contains(",")) {
             // Two-or-More Primary Keys
             List<String> columnNameSplit = DfStringUtil.splitList(columnName, ",");
             String[] realColumnNames = new String[columnNameSplit.size()];
-            for (int i=0; i < columnNameSplit.size(); i++) {
+            for (int i = 0; i < columnNameSplit.size(); i++) {
                 realColumnNames[i] = getExistsSubQueryRealColumnName(columnNameSplit.get(i).trim());
             }
             List<String> relatedColumnSplit = DfStringUtil.splitList(relatedColumnName, ",");
             String[] relatedColumnNames = new String[columnNameSplit.size()];
-            for (int i=0; i < relatedColumnSplit.size(); i++) {
+            for (int i = 0; i < relatedColumnSplit.size(); i++) {
                 relatedColumnNames[i] = relatedColumnSplit.get(i).trim();
             }
             subQueryClause = getExistsSubQuerySql(subQuery, realColumnNames, relatedColumnNames, propertyName);
@@ -693,7 +689,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String realColumnName = getExistsSubQueryRealColumnName(columnName);
             subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
         }
-        
+
         int subQueryLevel = subQuery.getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
@@ -711,30 +707,26 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return getRealColumnName(columnName);
     }
 
-    protected String getExistsSubQuerySql(ConditionQuery subQuery
-                                        , String realColumnName
-                                        , String relatedColumnName
-                                        , String propertyName) {
+    protected String getExistsSubQuerySql(ConditionQuery subQuery, String realColumnName, String relatedColumnName,
+            String propertyName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String selectClause = "select " + tableAliasName + "." + relatedColumnName;
-        String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
-                                                                       , selectClause, tableAliasName, realColumnName);
+        String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
+                selectClause, tableAliasName, realColumnName);
         return selectClause + " " + fromWhereClause;
     }
-    
-    protected String getExistsSubQuerySql(ConditionQuery subQuery
-                                        , String[] realColumnNames
-                                        , String[] relatedColumnNames
-                                        , String propertyName) {
+
+    protected String getExistsSubQuerySql(ConditionQuery subQuery, String[] realColumnNames,
+            String[] relatedColumnNames, String propertyName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
 
         // Because sub-query may be only allowed to return a single column.
         String selectClause = "select " + tableAliasName + "." + relatedColumnNames[0];
 
-        String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnNames, propertyName
-                                                                       , selectClause, tableAliasName, realColumnNames);
+        String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnNames, propertyName,
+                selectClause, tableAliasName, realColumnNames);
         return selectClause + " " + fromWhereClause;
     }
 
@@ -742,15 +734,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                              (Specify)DerivedReferrer
     //                              ------------------------
-    protected void registerSpecifyDerivedReferrer(String function, ConditionQuery subQuery
-                                                , String columnName, String relatedColumnName
-                                                , String propertyName, String aliasName) {
+    protected void registerSpecifyDerivedReferrer(String function, ConditionQuery subQuery, String columnName,
+            String relatedColumnName, String propertyName, String aliasName) {
         assertObjectNotNull("SpecifyDerivedReferrer(function)", function);
         assertObjectNotNull("SpecifyDerivedReferrer(" + columnName + ")", subQuery);
         String realColumnName = getSpecifyDerivedReferrerRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        String subQueryClause = getSpecifyDerivedReferrerSubQuerySql(function, subQuery, realColumnName
-                                                                   , relatedColumnName, propertyName, aliasName);
+        String subQueryClause = getSpecifyDerivedReferrerSubQuerySql(function, subQuery, realColumnName,
+                relatedColumnName, propertyName, aliasName);
         int subQueryLevel = subQuery.getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
@@ -764,9 +755,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return getRealColumnName(columnName);
     }
 
-    protected String getSpecifyDerivedReferrerSubQuerySql(String function, ConditionQuery subQuery
-                                                        , String realColumnName, String relatedColumnName
-                                                        , String propertyName, String aliasName) {
+    protected String getSpecifyDerivedReferrerSubQuerySql(String function, ConditionQuery subQuery,
+            String realColumnName, String relatedColumnName, String propertyName, String aliasName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
@@ -782,7 +772,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             } else {
                 // The column is on local table.
                 deriveColumnName = tableAliasName + "." + specifiedColumnName;
-                
+
                 // Assert about column type when local table only.
                 assertSpecifyDerivedReferrerColumnType(function, subQuery, deriveColumnName);
             }
@@ -800,21 +790,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 throw new IllegalConditionBeanOperationException(msg);
             }
             String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
-            String selectClause = "select " + tableAliasName + "." + primaryKeyName 
-                                     + ", " + tableAliasName + "." + relatedColumnName
-                                     + ", " + deriveColumnName;
-            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
-                                                                     , selectClause, tableAliasName);
+            String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
+                    + relatedColumnName + ", " + deriveColumnName;
+            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
+                    selectClause, tableAliasName);
             String mainSql = selectClause + " " + fromWhereClause;
             String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
-            return "select " + function + connect + "dfsubquerymain." + specifiedColumnName + ")" + ln()
-                 + "  from (" + beginMark
-                 + mainSql + ln()
-                 + "       ) dfsubquerymain" + endMark + ln() + " where " + joinCondition;
+            return "select " + function + connect + "dfsubquerymain." + specifiedColumnName + ")" + ln() + "  from ("
+                    + beginMark + mainSql + ln() + "       ) dfsubquerymain" + endMark + ln() + " where "
+                    + joinCondition;
         } else {
             String selectClause = "select " + function + connect + deriveColumnName + ")";
-            String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
-                                                                           , selectClause, tableAliasName, realColumnName);
+            String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
+                    selectClause, tableAliasName, realColumnName);
             return selectClause + " " + fromWhereClause;
         }
     }
@@ -823,7 +811,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         ConditionBeanContext.throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
     }
 
-    protected void assertSpecifyDerivedReferrerColumnType(String function, ConditionQuery subQuery, String deriveColumnName) {
+    protected void assertSpecifyDerivedReferrerColumnType(String function, ConditionQuery subQuery,
+            String deriveColumnName) {
         if (deriveColumnName.contains(".")) {
             deriveColumnName = deriveColumnName.substring(deriveColumnName.lastIndexOf(".") + ".".length());
         }
@@ -836,32 +825,32 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    protected void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
-        ConditionBeanContext.throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+    protected void throwSpecifyDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName,
+            Class<?> deriveColumnType) {
+        ConditionBeanContext.throwSpecifyDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName,
+                deriveColumnType);
     }
 
     // [DBFlute-0.8.8.1]
     // -----------------------------------------------------
     //                                (Query)DerivedReferrer
     //                                ----------------------
-    protected void registerQueryDerivedReferrer(String function, ConditionQuery subQuery
-                                              , String columnName, String relatedColumnName, String propertyName
-                                              , String operand, Object value, String parameterPropertyName) {
+    protected void registerQueryDerivedReferrer(String function, ConditionQuery subQuery, String columnName,
+            String relatedColumnName, String propertyName, String operand, Object value, String parameterPropertyName) {
         assertObjectNotNull("QueryDerivedReferrer(function)", function);
         assertObjectNotNull("QueryDerivedReferrer(" + columnName + ")", subQuery);
         String realColumnName = getQueryDerivedReferrerRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        String subQueryClause = getQueryDerivedReferrerSubQuerySql(function, subQuery, realColumnName
-                                                                 , relatedColumnName, propertyName, value);
+        String subQueryClause = getQueryDerivedReferrerSubQuerySql(function, subQuery, realColumnName,
+                relatedColumnName, propertyName, value);
         int subQueryLevel = subQuery.getSubQueryLevel();
         String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
         String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
         String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String parameter = "/*pmb." + getLocationBase(parameterPropertyName) + "*/null";
-        String clause = "(" + beginMark
-                      + subQueryClause + ln() + endIndent
-                      + ") " + operand + " " + parameter + " " + endMark;
+        String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") " + operand + " " + parameter + " "
+                + endMark;
         registerWhereClause(clause);
     }
 
@@ -869,9 +858,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return getRealColumnName(columnName);
     }
 
-    protected String getQueryDerivedReferrerSubQuerySql(String function, ConditionQuery subQuery
-                                                      , String realColumnName, String relatedColumnName
-                                                      , String propertyName, Object value) {
+    protected String getQueryDerivedReferrerSubQuerySql(String function, ConditionQuery subQuery,
+            String realColumnName, String relatedColumnName, String propertyName, Object value) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
@@ -887,7 +875,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             } else {
                 // the column is on local table.
                 deriveColumnName = tableAliasName + "." + specifiedColumnName;
-                
+
                 // Assert about column type when local table only.
                 assertQueryDerivedReferrerColumnType(function, subQuery, deriveColumnName, value);
             }
@@ -905,21 +893,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 throw new IllegalConditionBeanOperationException(msg);
             }
             String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
-            String selectClause = "select " + tableAliasName + "." + primaryKeyName 
-                                     + ", " + tableAliasName + "." + relatedColumnName
-                                     + ", " + deriveColumnName;
-            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
-                                                                     , selectClause, tableAliasName);
+            String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
+                    + relatedColumnName + ", " + deriveColumnName;
+            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
+                    selectClause, tableAliasName);
             String mainSql = selectClause + " " + fromWhereClause;
             String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
-            return "select " + function + connect + "dfsubquerymain." + specifiedColumnName + ")" + ln()
-                 + "  from (" + beginMark
-                 + mainSql + ln()
-                 + "       ) dfsubquerymain" + endMark + ln() + " where " + joinCondition;
+            return "select " + function + connect + "dfsubquerymain." + specifiedColumnName + ")" + ln() + "  from ("
+                    + beginMark + mainSql + ln() + "       ) dfsubquerymain" + endMark + ln() + " where "
+                    + joinCondition;
         } else {
             String selectClause = "select " + function + connect + deriveColumnName + ")";
-            String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName
-                                                                           , selectClause, tableAliasName, realColumnName);
+            String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
+                    selectClause, tableAliasName, realColumnName);
             return selectClause + " " + fromWhereClause;
         }
     }
@@ -928,7 +914,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         ConditionBeanContext.throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
     }
 
-    protected void assertQueryDerivedReferrerColumnType(String function, ConditionQuery subQuery, String deriveColumnName, Object value) {
+    protected void assertQueryDerivedReferrerColumnType(String function, ConditionQuery subQuery,
+            String deriveColumnName, Object value) {
         if (deriveColumnName.contains(".")) {
             deriveColumnName = deriveColumnName.substring(deriveColumnName.lastIndexOf(".") + ".".length());
         }
@@ -936,41 +923,46 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
             if (!Number.class.isAssignableFrom(deriveColumnType)) {
-                throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
+                throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType,
+                        value);
             }
         }
         if (value != null) {
             Class<?> parameterType = value.getClass();
             if (String.class.isAssignableFrom(deriveColumnType)) {
                 if (!String.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
+                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType,
+                            value);
                 }
             }
             if (Number.class.isAssignableFrom(deriveColumnType)) {
                 if (!Number.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
+                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType,
+                            value);
                 }
             }
             if (java.util.Date.class.isAssignableFrom(deriveColumnType)) {
                 if (!java.util.Date.class.isAssignableFrom(parameterType)) {
-                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
+                    throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType,
+                            value);
                 }
             }
         }
     }
 
-    protected void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType, Object value) {
-        ConditionBeanContext.throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType, value);
+    protected void throwQueryDerivedReferrerUnmatchedColumnTypeException(String function, String deriveColumnName,
+            Class<?> deriveColumnType, Object value) {
+        ConditionBeanContext.throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName,
+                deriveColumnType, value);
     }
 
     // [DBFlute-0.8.8]
     // -----------------------------------------------------
     //                                        ScalarSubQuery
     //                                        --------------
-    protected void registerScalarSubQuery(String function, ConditionQuery subQuery
-                                        , String propertyName, String operand) {
+    protected void registerScalarSubQuery(String function, ConditionQuery subQuery, String propertyName, String operand) {
         assertObjectNotNull("ScalarSubQuery(" + propertyName + ")", subQuery);
-        
+
         // Get the specified column before it disappears at sub-query making.
         String deriveRealColumnName;
         {
@@ -988,9 +980,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
         String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
-        String clause = deriveRealColumnName + " " + operand + " ("
-                      + beginMark + subQueryClause + ln() + endIndent
-                      + ") " + endMark;
+        String clause = deriveRealColumnName + " " + operand + " (" + beginMark + subQueryClause + ln() + endIndent
+                + ") " + endMark;
         registerWhereClause(clause);
     }
 
@@ -998,8 +989,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return getRealColumnName(columnName);
     }
 
-    protected String getScalarSubQuerySql(String function, ConditionQuery subQuery
-                                        , String propertyName) {
+    protected String getScalarSubQuerySql(String function, ConditionQuery subQuery, String propertyName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
         String tableAliasName = "dfsublocal_" + subQueryLevel;
         String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
@@ -1019,19 +1009,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
             String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
             String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            String selectClause = "select " + tableAliasName + "." + primaryKeyName
-                                     + ", " + tableAliasName + "." + deriveColumnName;
-            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName
-                                                                     , selectClause, tableAliasName);
+            String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
+                    + deriveColumnName;
+            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName,
+                    selectClause, tableAliasName);
             String mainSql = selectClause + " " + fromWhereClause;
-            return "select " + function + "(dfsubquerymain." + deriveColumnName + ")" + ln()
-                 + "  from (" + beginMark
-                 + mainSql + ln()
-                 + "       ) dfsubquerymain" + endMark;
+            return "select " + function + "(dfsubquerymain." + deriveColumnName + ")" + ln() + "  from (" + beginMark
+                    + mainSql + ln() + "       ) dfsubquerymain" + endMark;
         } else {
             String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
-            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName
-                                                                     , selectClause, tableAliasName);
+            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName,
+                    selectClause, tableAliasName);
             return selectClause + " " + fromWhereClause;
         }
     }
@@ -1050,18 +1038,17 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName, Class<?> deriveColumnType) {
-        ConditionBeanContext.throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
+    protected void throwScalarSubQueryUnmatchedColumnTypeException(String function, String deriveColumnName,
+            Class<?> deriveColumnType) {
+        ConditionBeanContext.throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName,
+                deriveColumnType);
     }
 
     // -----------------------------------------------------
     //                                       SubQuery Common
     //                                       ---------------
-    protected String buildPlainSubQueryFromWhereClause(ConditionQuery subQuery
-                                                     , String relatedColumnName
-                                                     , String propertyName
-                                                     , String selectClause
-                                                     , String tableAliasName) {
+    protected String buildPlainSubQueryFromWhereClause(ConditionQuery subQuery, String relatedColumnName,
+            String propertyName, String selectClause, String tableAliasName) {
         String fromWhereClause = subQuery.getSqlClause().getClauseFromWhereWithUnionTemplate();
 
         // Replace the alias names for local table with alias name of sub-query unique.
@@ -1082,29 +1069,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return fromWhereClause;
     }
 
-    protected String buildCorrelationSubQueryFromWhereClause(ConditionQuery subQuery
-                                                           , String relatedColumnName
-                                                           , String propertyName
-                                                           , String selectClause
-                                                           , String tableAliasName
-                                                           , String realColumnName) {
+    protected String buildCorrelationSubQueryFromWhereClause(ConditionQuery subQuery, String relatedColumnName,
+            String propertyName, String selectClause, String tableAliasName, String realColumnName) {
         String clause = xprepareCorrelationSubQueryFromWhereClause(subQuery, propertyName, tableAliasName);
         String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
         clause = xreplaceCorrelationSubQueryFromWhereClause(clause, selectClause, joinCondition);
         return clause;
     }
-    
-    protected String buildCorrelationSubQueryFromWhereClause(ConditionQuery subQuery
-                                                           , String[] relatedColumnNames
-                                                           , String propertyName
-                                                           , String selectClause
-                                                           , String tableAliasName
-                                                           , String[] realColumnNames) {
+
+    protected String buildCorrelationSubQueryFromWhereClause(ConditionQuery subQuery, String[] relatedColumnNames,
+            String propertyName, String selectClause, String tableAliasName, String[] realColumnNames) {
         String clause = xprepareCorrelationSubQueryFromWhereClause(subQuery, propertyName, tableAliasName);
-        
+
         String joinCondition;
         StringBuilder sb = new StringBuilder();
-        for (int i=0; i < relatedColumnNames.length; i++) {
+        for (int i = 0; i < relatedColumnNames.length; i++) {
             if (sb.length() > 0) {
                 sb.append(ln()).append("   and ");
             }
@@ -1112,14 +1091,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             sb.append(" = ").append(realColumnNames[i]);
         }
         joinCondition = sb.toString();
-        
+
         clause = xreplaceCorrelationSubQueryFromWhereClause(clause, selectClause, joinCondition);
         return clause;
     }
-    
-    protected String xprepareCorrelationSubQueryFromWhereClause(ConditionQuery subQuery
-                                                              , String propertyName
-                                                              , String tableAliasName) {
+
+    protected String xprepareCorrelationSubQueryFromWhereClause(ConditionQuery subQuery, String propertyName,
+            String tableAliasName) {
         String clause = subQuery.getSqlClause().getClauseFromWhereWithWhereUnionTemplate();
 
         // Replace the alias names for local table with alias name of sub-query unique. 
@@ -1130,7 +1108,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
         return clause;
     }
-    
+
     protected String xreplaceCorrelationSubQueryFromWhereClause(String clause, String selectClause, String joinCondition) {
         // Replace template marks. These are very important!
         String firstConditionAfter = ln() + "   and ";
@@ -1161,7 +1139,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     // -----------------------------------------------------
     //                                          Where Clause
     //                                          ------------
-    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
+    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
+            String colName) {
         DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
         String propertyName = dbmeta.findPropertyName(colName);
         String uncapPropName = initUncap(propertyName);
@@ -1170,8 +1149,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
     }
 
-    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue
-                                                           , String colName, ConditionOption option) {
+    protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
+            String colName, ConditionOption option) {
         DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
         String propertyName = dbmeta.findPropertyName(colName);
         String uncapPropName = initUncap(propertyName);
@@ -1197,7 +1176,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                           -----------
     public void registerUnionQuery(ConditionQuery unionQuery, boolean unionAll, String unionQueryPropertyName) {
         final String unionQueryClause = getUnionQuerySql(unionQuery, unionQueryPropertyName);
-        
+
         // At the future, building SQL will be moved to sqlClause.
         getSqlClause().registerUnionQuery(unionQueryClause, unionAll);
     }
@@ -1216,7 +1195,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
             final int clauseIndex = whereIndex + "where ".length();
             final String mark = getSqlClause().getUnionWhereFirstConditionMark();
-            final String markedClause = whereClause.substring(0, clauseIndex) + mark + whereClause.substring(clauseIndex);
+            final String markedClause = whereClause.substring(0, clauseIndex) + mark
+                    + whereClause.substring(clauseIndex);
             unionQueryClause = fromClause + " " + markedClause;
         }
         final String oldStr = ".conditionQuery.";
@@ -1247,7 +1227,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         getSqlClause().changeToInnerJoin(getRealAliasName());
     }
-    
+
     // -----------------------------------------------------
     //                                               OrderBy
     //                                               -------
@@ -1257,14 +1237,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     public void withNullsFirst() { // is User Public!
         getSqlClause().addNullsFirstToPreviousOrderBy();
     }
-    
+
     /**
      * Order with the keyword 'nulls last'.
      */
     public void withNullsLast() { // is User Public!
         getSqlClause().addNullsLastToPreviousOrderBy();
     }
-    
+
     /**
      * Order with the list of manual value. <br />
      * This with Union is unsupported!
@@ -1306,7 +1286,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void regOBD(String columnName) {
         registerOrderBy(columnName, false);
     }
-    
+
     // ===================================================================================
     //                                                                       Name Resolver
     //                                                                       =============
@@ -1332,7 +1312,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         return nextRelationPath;
     }
-    
+
     // ===================================================================================
     //                                                                     Fixed Condition
     //                                                                     ===============
@@ -1343,7 +1323,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         fixedCondition = replaceString(fixedCondition, "$$locationBase$$.", "pmb." + getLocationBase());
         return fixedCondition;
     }
-    
+
     // ===================================================================================
     //                                                                 Reflection Invoking
     //                                                                 ===================
@@ -1355,8 +1335,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
         final String methodName = "get" + columnCapPropName;
-        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, columnFlexibleName);
-        return (ConditionValue)helpInvokingCQMethod(this, method, new Object[]{});
+        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {}, columnFlexibleName);
+        return (ConditionValue) helpInvokingCQMethod(this, method, new Object[] {});
     }
 
     /**
@@ -1374,8 +1354,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
         final String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
-        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{value.getClass()}, propertyName);
-        helpInvokingCQMethod(cq, method, new Object[]{value});
+        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] { value.getClass() }, propertyName);
+        helpInvokingCQMethod(cq, method, new Object[] { value });
     }
 
     /**
@@ -1390,8 +1370,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
-        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{}, propertyName);
-        helpInvokingCQMethod(cq, method, new Object[]{});
+        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] {}, propertyName);
+        helpInvokingCQMethod(cq, method, new Object[] {});
     }
 
     /**
@@ -1400,8 +1380,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     public ConditionQuery invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = "query" + initCap(foreignPropertyName);
-        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[]{}, foreignPropertyName);
-        return (ConditionQuery)helpInvokingCQMethod(this, method, new Object[]{});
+        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {}, foreignPropertyName);
+        return (ConditionQuery) helpInvokingCQMethod(this, method, new Object[] {});
     }
 
     private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {
@@ -1411,7 +1391,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         ConditionQuery cq = this;
         int index = 0;
         for (String element : strings) {
-            if (length == (index+1)) {// at last loop!
+            if (length == (index + 1)) {// at last loop!
                 propertyName = element;
                 break;
             }
@@ -1424,13 +1404,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     private static class PropertyNameCQContainer {
         protected String _propertyName;
         protected ConditionQuery _cq;
+
         public PropertyNameCQContainer(String propertyName, ConditionQuery cq) {
             this._propertyName = propertyName;
             this._cq = cq;
         }
+
         public String getPropertyName() {
             return _propertyName;
         }
+
         public ConditionQuery getConditionQuery() {
             return _cq;
         }
@@ -1444,14 +1427,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                 Class<?> argType = argTypes[0];
                 if (List.class.isAssignableFrom(argType)) {
                     try {
-                        return cq.getClass().getMethod(methodName, new Class<?>[]{Collection.class});
+                        return cq.getClass().getMethod(methodName, new Class<?>[] { Collection.class });
                     } catch (NoSuchMethodException ignored) {
                     }
                 }
                 Class<?>[] infs = argType.getInterfaces();
                 for (Class<?> inf : infs) {
                     try {
-                        return cq.getClass().getMethod(methodName, new Class<?>[]{inf});
+                        return cq.getClass().getMethod(methodName, new Class<?>[] { inf });
                     } catch (NoSuchMethodException ignored) {
                     }
                 }
@@ -1517,7 +1500,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected LikeSearchOption cLSOP() {
         return new LikeSearchOption().likePrefix();
     }
-    
+
     /**
      * @param col Target collection. (Nullable)
      * @param <PROPERTY_TYPE> The type of property.
@@ -1526,7 +1509,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected <PROPERTY_TYPE> List<PROPERTY_TYPE> cTL(Collection<PROPERTY_TYPE> col) {
         return convertToList(col);
     }
-    
+
     /**
      * @param col Target collection. (Nullable)
      * @param <PROPERTY_TYPE> The type of property.
@@ -1537,7 +1520,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             return null;
         }
         if (col instanceof List<?>) {
-            return filterRemoveNullOrEmptyValueFromList((List<PROPERTY_TYPE>)col);
+            return filterRemoveNullOrEmptyValueFromList((List<PROPERTY_TYPE>) col);
         }
         return filterRemoveNullOrEmptyValueFromList(new ArrayList<PROPERTY_TYPE>(col));
     }
@@ -1547,13 +1530,13 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             return null;
         }
         List<PROPERTY_TYPE> newList = new ArrayList<PROPERTY_TYPE>();
-        for (Iterator<PROPERTY_TYPE> ite = ls.iterator(); ite.hasNext(); ) {
+        for (Iterator<PROPERTY_TYPE> ite = ls.iterator(); ite.hasNext();) {
             final PROPERTY_TYPE element = ite.next();
             if (element == null) {
                 continue;
             }
             if (element instanceof String) {
-                if (((String)element).length() == 0) {
+                if (((String) element).length() == 0) {
                     continue;
                 }
             }
@@ -1561,14 +1544,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
         return newList;
     }
-    
+
     public void doNss(NssCall callback) { // Very Internal
         String foreignPropertyName = callback.qf().getForeignPropertyName();
         String foreignTableAliasName = callback.qf().getRealAliasName();
-        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName, getRelationPath());
+        getSqlClause().registerSelectedSelectColumn(foreignTableAliasName, getTableDbName(), foreignPropertyName,
+                getRelationPath());
         getSqlClause().registerSelectedForeignInfo(callback.qf().getRelationPath(), foreignPropertyName);
     }
-    
+
     public static interface NssCall { // Very Internal
         public ConditionQuery qf();
     }
@@ -1576,7 +1560,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap) {
         getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);
     }
-    
+
     protected String fxcKey() { // getFixedConditionKey()
         return getSqlClause().getFixedConditionKey();
     }
@@ -1602,7 +1586,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected String initCap(String str) {
         return DfStringUtil.initCap(str);
     }
-    
+
     protected String initUncap(String str) {
         return DfStringUtil.initUncap(str);
     }
@@ -1621,7 +1605,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
     }
-    
+
     protected <ELEMENT> ArrayList<ELEMENT> newArrayList() {
         return new ArrayList<ELEMENT>();
     }
@@ -1707,19 +1691,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);
         assertObjectNotNull("value", value);
-        if (value.trim().length() ==0) {
+        if (value.trim().length() == 0) {
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
     }
-    
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
     @Override
     public String toString() {
         return getClass().getSimpleName() + ":{aliasName=" + _aliasName + ", nestLevel=" + _nestLevel
-             + ", subQueryLevel=" + _subQueryLevel + ", foreignPropertyName=" + _foreignPropertyName
-             + ", relationPath=" + _relationPath + ", onClauseInline=" + _onClauseInline + "}";
+                + ", subQueryLevel=" + _subQueryLevel + ", foreignPropertyName=" + _foreignPropertyName
+                + ", relationPath=" + _relationPath + ", onClauseInline=" + _onClauseInline + "}";
     }
 }

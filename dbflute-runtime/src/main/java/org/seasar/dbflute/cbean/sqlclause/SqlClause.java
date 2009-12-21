@@ -45,7 +45,7 @@ public interface SqlClause {
      * </pre>
      * @return The clause of all parts. (NotNull)
      */
-    public String getClause();
+    String getClause();
 
     // -----------------------------------------------------
     //                                       Fragment Clause
@@ -58,7 +58,7 @@ public interface SqlClause {
      * </p>
      * @return The 'from-where' clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
-    public String getClauseFromWhereWithUnionTemplate();
+    String getClauseFromWhereWithUnionTemplate();
 
     /**
      * Get from-where clause without select and orderBy and sqlSuffix as template. 
@@ -69,7 +69,7 @@ public interface SqlClause {
      * </p>
      * @return The 'from-where' clause(contains union) without 'select' and 'orderBy' and 'sqlSuffix'. (NotNull)
      */
-    public String getClauseFromWhereWithWhereUnionTemplate();
+    String getClauseFromWhereWithWhereUnionTemplate();
 
     // =====================================================================================
     //                                                                          Clause Parts
@@ -78,68 +78,68 @@ public interface SqlClause {
      * Get the clause of 'select'. This is an internal method.
      * @return The clause of select. {[select ...] from table...} (NotNull)
      */
-    public String getSelectClause();
+    String getSelectClause();
 
     /**
      * Get the map of select index.
      * @return The map of select index. {key:columnName, value:selectIndex}
      *         (Nullable: Null means select index is disabled.)
      */
-    public Map<String, Integer> getSelectIndexMap();
+    Map<String, Integer> getSelectIndexMap();
 
     /**
      * Get the reverse map of select index.
      * @return The reverse map of select index. {key:selectIndex(AliasName), value:columnName}
      *         (Nullable: Null means select index is disabled.)
      */
-    public Map<String, String> getSelectIndexReverseMap();
+    Map<String, String> getSelectIndexReverseMap();
 
     /**
      * Disable select index.
      */
-    public void disableSelectIndex();
+    void disableSelectIndex();
 
     /**
      * Get the hint of 'select'. This is an internal method.
      * @return The hint of 'select'. {select [select-hint] * from table...} (NotNull)
      */
-    public String getSelectHint();
+    String getSelectHint();
 
     /**
      * Get the clause of 'from'. This is an internal method.
      * @return The clause of 'from'. (NotNull)
      */
-    public String getFromClause();
+    String getFromClause();
 
     /**
      * Get the clause of from-base-table. This is an internal method.
      * @return The hint of from-base-table. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
-    public String getFromBaseTableHint();
+    String getFromBaseTableHint();
 
     /**
      * Get the hint of 'from'. This is an internal method.
      * @return The hint of 'from'. {select * from table left outer join ... on ... [from-hint] where ...} (NotNull)
      */
-    public String getFromHint();
+    String getFromHint();
 
     /**
      * Get the clause of 'where'. This is an internal method.
      * @return The clause of 'where'. (NotNull)
      */
-    public String getWhereClause();
+    String getWhereClause();
 
     /**
      * Get the clause of 'order-by'. This is an internal method.
      * @return The clause of 'order-by'. (NotNull)
      */
-    public String getOrderByClause();
+    String getOrderByClause();
 
     /**
      * Get the suffix of SQL. This is an internal method.
      * @return The suffix of SQL. {select * from table where ... order by ... [sql-suffix]} (NotNull)
      */
-    public String getSqlSuffix();
+    String getSqlSuffix();
 
     // ===================================================================================
     //                                                                SelectedSelectColumn
@@ -151,8 +151,8 @@ public interface SqlClause {
      * @param foreignPropertyName The property name of foreign table. (NotNull)
      * @param localRelationPath The path of local relation. (Nullable)
      */
-    public void registerSelectedSelectColumn(String foreignTableAliasName, String localTableName,
-            String foreignPropertyName, String localRelationPath);
+    void registerSelectedSelectColumn(String foreignTableAliasName, String localTableName, String foreignPropertyName,
+            String localRelationPath);
 
     // ===================================================================================
     //                                                                           OuterJoin
@@ -163,19 +163,19 @@ public interface SqlClause {
      * @param aliasName The alias name of join table. {left outer join joinTableName [aliasName]} (NotNull and Unique per invoking method)
      * @param joinOnMap Map that has conditions of on-clause. (NotNull)
      */
-    public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap);
+    void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap);
 
     /**
      * Change the join type for the relation to inner join.
      * @param aliasName The registered alias name of join table. (NotNull and Unique per invoking method)
      */
-    public void changeToInnerJoin(String aliasName);
+    void changeToInnerJoin(String aliasName);
 
-    public SqlClause makeInnerJoinEffective();
+    SqlClause makeInnerJoinEffective();
 
-    public SqlClause backToOuterJoin();
+    SqlClause backToOuterJoin();
 
-    public String getFixedConditionKey();
+    String getFixedConditionKey();
 
     // ===================================================================================
     //                                                                               Where
@@ -186,7 +186,7 @@ public interface SqlClause {
      * @param key Condition-key. (NotNull)
      * @param value Condition-value. (NotNull)
      */
-    public void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value);
+    void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value);
 
     /**
      * Register 'where' clause.
@@ -195,109 +195,107 @@ public interface SqlClause {
      * @param value Condition-value. (NotNull)
      * @param option Condition-option. (NotNull)
      */
-    public void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value,
-            ConditionOption option);
+    void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value, ConditionOption option);
 
     /**
      * Register 'where' clause.
      * @param clause The clause of 'where'. (NotNull)
      */
-    public void registerWhereClause(String clause);
+    void registerWhereClause(String clause);
 
     /**
      * Exchange first The clause of 'where' for last one.
      */
-    public void exchangeFirstWhereClauseForLastOne();
+    void exchangeFirstWhereClauseForLastOne();
 
     /**
      * Does it have where clauses? <br />
      * In-line where clause is NOT contained.
      * @return Determination.
      */
-    public boolean hasWhereClause();
+    boolean hasWhereClause();
 
     // ===================================================================================
     //                                                                         InlineWhere
     //                                                                         ===========
-    public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value);
+    void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value);
 
-    public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value,
+    void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value,
             ConditionOption option);
 
-    public void registerBaseTableInlineWhereClause(String value);
+    void registerBaseTableInlineWhereClause(String value);
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
             ConditionValue value, boolean onClauseInline);
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
+    void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
             ConditionValue value, ConditionOption option, boolean onClauseInline);
 
-    public void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline);
+    void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline);
 
     // ===================================================================================
-    //                                                                             OrQuery
-    //                                                                             =======
+    //                                                                        OrScopeQuery
+    //                                                                        ============
     /**
-     * Make or-query effective.
+     * Make or-scope query effective.
      */
-    public void makeOrQueryEffective();
+    void makeOrScopeQueryEffective();
 
     /**
-     * Ignore or-query.
+     * Close or-scope query.
      */
-    public void ignoreOrQuery();
+    void closeOrScopeQuery();
 
     /**
-     * Is or-query effective?
+     * Is or-scope query effective?
      * @return Determination.
      */
-    public boolean isOrQueryEffective();
+    boolean isOrScopeQueryEffective();
 
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======
-    public OrderByClause getSqlComponentOfOrderByClause();
+    OrderByClause getSqlComponentOfOrderByClause();
 
-    public SqlClause clearOrderBy();
+    SqlClause clearOrderBy();
 
-    public SqlClause ignoreOrderBy();
+    SqlClause ignoreOrderBy();
 
-    public SqlClause makeOrderByEffective();
-
-    /**
-     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
-     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
-     * @param ascOrDesc Is it ascend or descend?
-     */
-    public void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
+    SqlClause makeOrderByEffective();
 
     /**
      * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
      * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
      * @param ascOrDesc Is it ascend or descend?
      */
-    public void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty,
-            boolean ascOrDesc);
+    void registerOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
 
-    public void addNullsFirstToPreviousOrderBy();
+    /**
+     * @param orderByProperty Order-by-property. 'aliasName.columnName/aliasName.columnName/...' (NotNull)
+     * @param registeredOrderByProperty Registered-order-by-property. ([table-name].[column-name]) (Nullable)
+     * @param ascOrDesc Is it ascend or descend?
+     */
+    void reverseOrderBy_Or_OverrideOrderBy(String orderByProperty, String registeredOrderByProperty, boolean ascOrDesc);
 
-    public void addNullsLastToPreviousOrderBy();
+    void addNullsFirstToPreviousOrderBy();
 
-    public void addManualOrderToPreviousOrderByElement(ManumalOrderInfo manumalOrderInfo);
+    void addNullsLastToPreviousOrderBy();
+
+    void addManualOrderToPreviousOrderByElement(ManumalOrderInfo manumalOrderInfo);
 
     /**
      * Does it have order-by clauses? <br />
      * Whether effective or not has no influence.
      * @return Determination.
      */
-    public boolean hasOrderByClause();
+    boolean hasOrderByClause();
 
     // ===================================================================================
     //                                                                               Union
     //                                                                               =====
-    public void registerUnionQuery(String unionClause, boolean unionAll);
+    void registerUnionQuery(String unionClause, boolean unionAll);
 
-    public boolean hasUnionQuery();
+    boolean hasUnionQuery();
 
     // ===================================================================================
     //                                                                          FetchScope
@@ -307,7 +305,7 @@ public interface SqlClause {
      * @param fetchSize Fetch-size. (NotMinus)
      * @return this. (NotNull)
      */
-    public SqlClause fetchFirst(int fetchSize);
+    SqlClause fetchFirst(int fetchSize);
 
     /**
      * Fetch scope.
@@ -315,7 +313,7 @@ public interface SqlClause {
      * @param fetchSize Fetch-size. (NotMinus)
      * @return this. (NotNull)
      */
-    public SqlClause fetchScope(int fetchStartIndex, int fetchSize);
+    SqlClause fetchScope(int fetchStartIndex, int fetchSize);
 
     /**
      * Fetch page.
@@ -327,67 +325,67 @@ public interface SqlClause {
      * @param fetchPageNumber Fetch-page-number. 1 origin. (NotMinus & NotZero: If minus or zero, set one.)
      * @return this. (NotNull)
      */
-    public SqlClause fetchPage(int fetchPageNumber);
+    SqlClause fetchPage(int fetchPageNumber);
 
     /**
      * Get fetch start index.
      * @return Fetch start index.
      */
-    public int getFetchStartIndex();
+    int getFetchStartIndex();
 
     /**
      * Get fetch size.
      * @return Fetch size.
      */
-    public int getFetchSize();
+    int getFetchSize();
 
     /**
      * Get fetch page number.
      * @return Fetch page number.
      */
-    public int getFetchPageNumber();
+    int getFetchPageNumber();
 
     /**
      * Get page start index.
      * @return Page start index. 0 origin. (NotMinus)
      */
-    public int getPageStartIndex();
+    int getPageStartIndex();
 
     /**
      * Get page end index.
      * @return Page end index. 0 origin. (NotMinus)
      */
-    public int getPageEndIndex();
+    int getPageEndIndex();
 
     /**
      * Is fetch scope effective?
      * @return Determiantion.
      */
-    public boolean isFetchScopeEffective();
+    boolean isFetchScopeEffective();
 
     /**
      * Ignore fetch-scope.
      * @return this. (NotNull)
      */
-    public SqlClause ignoreFetchScope();
+    SqlClause ignoreFetchScope();
 
     /**
      * Make fetch-scope effective.
      * @return this. (NotNull)
      */
-    public SqlClause makeFetchScopeEffective();
+    SqlClause makeFetchScopeEffective();
 
     /**
      * Is fetch start index supported?
      * @return Determination.
      */
-    public boolean isFetchStartIndexSupported();
+    boolean isFetchStartIndexSupported();
 
     /**
      * Is fetch size supported?
      * @return Determination.
      */
-    public boolean isFetchSizeSupported();
+    boolean isFetchSizeSupported();
 
     // ===================================================================================
     //                                                                     Fetch Narrowing
@@ -396,19 +394,19 @@ public interface SqlClause {
      * Is fetch-narrowing effective?
      * @return Determiantion.
      */
-    public boolean isFetchNarrowingEffective();
+    boolean isFetchNarrowingEffective();
 
     /**
      * Get fetch-narrowing skip-start-index.
      * @return Skip-start-index.
      */
-    public int getFetchNarrowingSkipStartIndex();
+    int getFetchNarrowingSkipStartIndex();
 
     /**
      * Get fetch-narrowing loop-count.
      * @return Loop-count.
      */
-    public int getFetchNarrowingLoopCount();
+    int getFetchNarrowingLoopCount();
 
     // ===================================================================================
     //                                                                                Lock
@@ -421,7 +419,7 @@ public interface SqlClause {
      * </p>
      * @return this. (NotNull)
      */
-    public SqlClause lockForUpdate();
+    SqlClause lockForUpdate();
 
     // ===================================================================================
     //                                                                            Resolver
@@ -432,7 +430,7 @@ public interface SqlClause {
      * @param cqNestNo The nest no of condition query.
      * @return Resolved join alias name. (NotNull)
      */
-    public String resolveJoinAliasName(String relationPath, int cqNestNo);
+    String resolveJoinAliasName(String relationPath, int cqNestNo);
 
     /**
      * Resolve nest level expression.
@@ -440,7 +438,7 @@ public interface SqlClause {
      * @param cqNestNo The nest no of condition query.
      * @return Resolved name about nest level. (NotNull)
      */
-    public String resolveNestLevelExpression(String name, int cqNestNo);
+    String resolveNestLevelExpression(String name, int cqNestNo);
 
     /**
      * Resolve relation no.
@@ -448,93 +446,93 @@ public interface SqlClause {
      * @param foreignPropertyName The property name of foreign. (NotNull)
      * @return Resolved relation no.
      */
-    public int resolveRelationNo(String baseTableName, String foreignPropertyName);
+    int resolveRelationNo(String baseTableName, String foreignPropertyName);
 
     // ===================================================================================
     //                                                                    Table Alias Info
     //                                                                    ================
-    public String getLocalTableAliasName();
+    String getLocalTableAliasName();
 
-    public String getForeignTableAliasPrefix();
+    String getForeignTableAliasPrefix();
 
     // ===================================================================================
     //                                                                       Template Mark
     //                                                                       =============
-    public String getWhereClauseMark();
+    String getWhereClauseMark();
 
-    public String getWhereFirstConditionMark();
+    String getWhereFirstConditionMark();
 
-    public String getUnionSelectClauseMark();
+    String getUnionSelectClauseMark();
 
-    public String getUnionWhereClauseMark();
+    String getUnionWhereClauseMark();
 
-    public String getUnionWhereFirstConditionMark();
+    String getUnionWhereFirstConditionMark();
 
     // ===================================================================================
     //                                                          Where Clause Simple Filter
     //                                                          ==========================
-    public void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter);
+    void addWhereClauseSimpleFilter(WhereClauseSimpleFilter whereClauseSimpleFilter);
 
     // ===================================================================================
     //                                                               Selected Foreign Info
     //                                                               =====================
-    public boolean isSelectedForeignInfoEmpty();
+    boolean isSelectedForeignInfoEmpty();
 
-    public boolean hasSelectedForeignInfo(String relationPath);
+    boolean hasSelectedForeignInfo(String relationPath);
 
-    public void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
+    void registerSelectedForeignInfo(String relationPath, String foreignPropertyName);
 
     // ===================================================================================
     //                                                                    Sub Query Indent
     //                                                                    ================
-    public String resolveSubQueryBeginMark(String subQueryIdentity);
+    String resolveSubQueryBeginMark(String subQueryIdentity);
 
-    public String resolveSubQueryEndMark(String subQueryIdentity);
+    String resolveSubQueryEndMark(String subQueryIdentity);
 
-    public String filterSubQueryIndent(String sql);
+    String filterSubQueryIndent(String sql);
 
     // [DBFlute-0.7.4]
     // ===================================================================================
     //                                                                       Specification
     //                                                                       =============
-    public void specifySelectColumn(String tableAliasName, String columnName);
+    void specifySelectColumn(String tableAliasName, String columnName);
 
-    public void specifyDeriveSubQuery(String aliasName, String deriveSubQuery);
+    void specifyDeriveSubQuery(String aliasName, String deriveSubQuery);
 
-    public boolean hasSpecifiedDeriveSubQuery(String aliasName);
+    boolean hasSpecifiedDeriveSubQuery(String aliasName);
 
     /**
      * Get the name of only one specified column.
      * @return The name of only one specified column. (Nullable: If it's not found or duplicated, it returns null)
      */
-    public String getSpecifiedColumnNameAsOne();
+    String getSpecifiedColumnNameAsOne();
 
     /**
      * Get the name of only one specified column with alias name.
      * @return The name of only one specified column with alias name. (Nullable: If it's not found or duplicated, it returns null)
      */
-    public String getSpecifiedColumnRealNameAsOne();
+    String getSpecifiedColumnRealNameAsOne();
 
     /**
      * Remove the only one specified column.
      * @return The only one specified column with alias name. (Nullable: If it's not found or duplicated, it returns null)
      */
-    public String removeSpecifiedColumnRealNameAsOne();
+    String removeSpecifiedColumnRealNameAsOne();
 
     /**
      * Back up specified select columns.
      */
-    public void backupSpecifiedSelectColumn();
+    void backupSpecifiedSelectColumn();
 
     /**
      * Restore specified select columns.
      */
-    public void restoreSpecifiedSelectColumn();
+    void restoreSpecifiedSelectColumn();
 
     /**
      * Clear specified select columns.
      */
-    public void clearSpecifiedSelectColumn();
+    void clearSpecifiedSelectColumn();
 
     // [DBFlute-0.7.5]
     // ===================================================================================
@@ -544,9 +542,9 @@ public interface SqlClause {
      * @param columnParameterMap The map of column parameters. (NotNull)
      * @return The clause of query update. (Nullable: If columnParameterMap is empty, return null)
      */
-    public String getClauseQueryUpdate(Map<String, String> columnParameterMap);
+    String getClauseQueryUpdate(Map<String, String> columnParameterMap);
 
-    public String getClauseQueryDelete();
+    String getClauseQueryDelete();
 
     // [DBFlute-0.8.6]
     // ===================================================================================
@@ -556,13 +554,13 @@ public interface SqlClause {
      * Classify the type of select clause into specified type.
      * @param selectClauseType The type of select clause. (NotNull)
      */
-    public void classifySelectClauseType(SelectClauseType selectClauseType);
+    void classifySelectClauseType(SelectClauseType selectClauseType);
 
     /**
      * Roll-back the type of select clause into previous one.
      * If it has no change, classify its type into default type.
      */
-    public void rollbackSelectClauseType();
+    void rollbackSelectClauseType();
 
     /**
      * The type of select clause.
@@ -579,5 +577,5 @@ public interface SqlClause {
      * Get the limit of inScope.
      * @return The limit of inScope. (If it's zero or minus, it means no limit)
      */
-    public int getInScopeLimit();
+    int getInScopeLimit();
 }

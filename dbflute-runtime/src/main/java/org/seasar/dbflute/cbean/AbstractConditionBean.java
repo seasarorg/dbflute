@@ -595,16 +595,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
         getSqlClause().registerWhereClause(clause);
     }
 
-    // [DBFlute-0.9.5.5]
+    // [DBFlute-0.9.6.3]
     // ===================================================================================
-    //                                                                             OrQuery
-    //                                                                             =======
-    protected <CB extends ConditionBean> void xorQ(CB cb, OrQuery<CB> orQuery) {
-        getSqlClause().makeOrQueryEffective();
+    //                                                                        OrScopeQuery
+    //                                                                        ============
+    protected <CB extends ConditionBean> void xorSQ(CB cb, OrQuery<CB> orQuery) {
+        getSqlClause().makeOrScopeQueryEffective();
         try {
             orQuery.query(cb);
         } finally {
-            getSqlClause().ignoreOrQuery();
+            getSqlClause().closeOrScopeQuery();
         }
     }
 

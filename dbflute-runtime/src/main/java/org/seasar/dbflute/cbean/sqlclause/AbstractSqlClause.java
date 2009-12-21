@@ -133,10 +133,10 @@ public abstract class AbstractSqlClause implements SqlClause {
     protected boolean _fetchScopeEffective = false;
 
     // -----------------------------------------------------
-    //                                               OrQuery
-    //                                               -------
-    /** Is or-query effective?*/
-    protected boolean _orQueryEffective = false;
+    //                                          OrScopeQuery
+    //                                          ------------
+    protected boolean _orScopeQueryEffective;
+    protected TmpOrScopeQueryInfo _currentTmpOrScopeQueryInfo;
 
     // -----------------------------------------------------
     //                               WhereClauseSimpleFilter
@@ -178,7 +178,8 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                       Complete Clause
     //                                       ---------------
     public String getClause() {
-        StringBuilder sb = new StringBuilder(512);
+        assertClauseCreatableStatus();
+        final StringBuilder sb = new StringBuilder(512);
         String selectClause = getSelectClause();
         sb.append(selectClause);
         sb.append(" ");
@@ -187,6 +188,14 @@ public abstract class AbstractSqlClause implements SqlClause {
         sql = filterEnclosingClause(sql);
         sql = filterSubQueryIndent(sql);
         return sql;
+    }
+
+    protected void assertClauseCreatableStatus() {
+        if (_orScopeQueryEffective) {
+            String msg = "The or-scope query should be closed here:";
+            msg = msg + " currentTmpOrScopeQueryInfo=" + _currentTmpOrScopeQueryInfo;
+            throw new IllegalStateException(msg);
+        }
     }
 
     protected void buildClauseWithoutMainSelect(StringBuilder sb, String selectClause) {
@@ -236,7 +245,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         if (!hasUnionQuery()) {
             return "";
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         for (Iterator<UnionQueryInfo> ite = _unionQueryInfoList.iterator(); ite.hasNext();) {
             UnionQueryInfo unionQueryInfo = (UnionQueryInfo) ite.next();
             String unionQueryClause = unionQueryInfo.getUnionQueryClause();
@@ -253,7 +262,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         if (!_orderByEffective || _orderByClause.isEmpty()) {
             return "";
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(" ");
         sb.append(getOrderByClause());
         return sb.toString();
@@ -264,7 +273,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         if (sqlSuffix == null || sqlSuffix.trim().length() == 0) {
             return "";
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(" ");
         sb.append(sqlSuffix);
         return sb.toString();
@@ -280,10 +289,10 @@ public abstract class AbstractSqlClause implements SqlClause {
         if (!needsUnionNormalSelectEnclosing()) {
             return sql;
         }
-        String selectClause = "select" + SELECT_HINT + " *";
-        String ln = ln();
-        String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
-        String endMark = resolveSubQueryEndMark("dfmain");
+        final String selectClause = "select" + SELECT_HINT + " *";
+        final String ln = ln();
+        final String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
+        final String endMark = resolveSubQueryEndMark("dfmain");
         String clause = selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
         clause = clause + prepareClauseOrderBy() + prepareClauseSqlSuffix();
         return clause;
@@ -293,10 +302,10 @@ public abstract class AbstractSqlClause implements SqlClause {
         if (!needsUnionCountOrScalarEnclosing()) {
             return sql;
         }
-        String selectClause = buildSelectClauseCountOrScalar("dfmain");
-        String ln = ln();
-        String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
-        String endMark = resolveSubQueryEndMark("dfmain");
+        final String selectClause = buildSelectClauseCountOrScalar("dfmain");
+        final String ln = ln();
+        final String beginMark = resolveSubQueryBeginMark("dfmain") + ln;
+        final String endMark = resolveSubQueryEndMark("dfmain");
         return selectClause + ln + "  from (" + beginMark + sql + ln + "       ) dfmain" + endMark;
     }
 
@@ -329,15 +338,15 @@ public abstract class AbstractSqlClause implements SqlClause {
         // /- - - - - - - - - - - - - - - - - - - - - - - - 
         // The type of select clause is COLUMNS since here.
         // - - - - - - - - - -/
-        StringBuilder sb = new StringBuilder();
-        DBMeta dbmeta = findDBMeta(_tableName);
-        List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
+        final StringBuilder sb = new StringBuilder();
+        final DBMeta dbmeta = findDBMeta(_tableName);
+        final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
 
         Map<String, String> localSpecifiedMap = null;
         if (_specifiedSelectColumnMap != null) {
             localSpecifiedMap = _specifiedSelectColumnMap.get(getLocalTableAliasName());
         }
-        boolean existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
+        final boolean existsSpecifiedLocal = localSpecifiedMap != null && !localSpecifiedMap.isEmpty();
 
         Integer selectIndex = 0;
         if (_useSelectIndex) {
@@ -347,7 +356,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         // Columns of local table.
         boolean needsDelimiter = false;
         for (ColumnInfo columnInfo : columnInfoList) {
-            String columnName = columnInfo.getColumnDbName();
+            final String columnName = columnInfo.getColumnDbName();
 
             // [DBFlute-0.7.4]
             if (existsSpecifiedLocal && !localSpecifiedMap.containsKey(columnName)) {
@@ -373,8 +382,8 @@ public abstract class AbstractSqlClause implements SqlClause {
                 sb.append(" ");
                 needsDelimiter = true;
             }
-            String realColumnName = getLocalTableAliasName() + "." + columnName;
-            String onQueryName;
+            final String realColumnName = getLocalTableAliasName() + "." + columnName;
+            final String onQueryName;
             ++selectIndex;
             if (_useSelectIndex) {
                 _selectIndexMap.put(columnName, selectIndex);
@@ -387,24 +396,24 @@ public abstract class AbstractSqlClause implements SqlClause {
         }
 
         // Columns of foreign tables.
-        Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
+        final Set<String> tableAliasNameSet = _selectedSelectColumnMap.keySet();
         for (String tableAliasName : tableAliasNameSet) {
-            Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
-            Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
+            final Map<String, SelectedSelectColumnInfo> map = _selectedSelectColumnMap.get(tableAliasName);
+            final Collection<SelectedSelectColumnInfo> selectColumnInfoList = map.values();
             Map<String, String> foreginSpecifiedMap = null;
             if (_specifiedSelectColumnMap != null) {
                 foreginSpecifiedMap = _specifiedSelectColumnMap.get(tableAliasName);
             }
-            boolean existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
+            final boolean existsSpecifiedForeign = foreginSpecifiedMap != null && !foreginSpecifiedMap.isEmpty();
             boolean finishedForeignIndent = false;
             for (SelectedSelectColumnInfo selectColumnInfo : selectColumnInfoList) {
                 if (existsSpecifiedForeign && !foreginSpecifiedMap.containsKey(selectColumnInfo.getColumnName())) {
                     continue;
                 }
 
-                String realColumnName = selectColumnInfo.buildRealColumnName();
-                String columnAliasName = selectColumnInfo.getColumnAliasName();
-                String onQueryName;
+                final String realColumnName = selectColumnInfo.buildRealColumnName();
+                final String columnAliasName = selectColumnInfo.getColumnAliasName();
+                final String onQueryName;
                 ++selectIndex;
                 if (_useSelectIndex) {
                     _selectIndexMap.put(columnAliasName, selectIndex);
@@ -423,16 +432,16 @@ public abstract class AbstractSqlClause implements SqlClause {
 
         // [DBFlute-0.7.4]
         if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
-            Collection<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.values();
+            final Collection<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.values();
             for (String deriveSubQuery : deriveSubQuerySet) {
                 sb.append(ln()).append("     ");
                 sb.append(", ").append(deriveSubQuery);
 
                 // [DBFlute-0.8.3]
-                int beginIndex = deriveSubQuery.lastIndexOf(" as ");
+                final int beginIndex = deriveSubQuery.lastIndexOf(" as ");
                 if (beginIndex >= 0) { // basically true
                     String aliasName = deriveSubQuery.substring(beginIndex + " as ".length());
-                    int endIndex = aliasName.indexOf("--df:");
+                    final int endIndex = aliasName.indexOf("--df:");
                     if (endIndex >= 0) { // basically true
                         aliasName = aliasName.substring(0, endIndex);
                     }
@@ -485,25 +494,25 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     protected String buildSelectClauseMax(String aliasName) {
-        String columnName = getSpecifiedColumnNameAsOne();
+        final String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
         return "select max(" + aliasName + "." + columnName + ")";
     }
 
     protected String buildSelectClauseMin(String aliasName) {
-        String columnName = getSpecifiedColumnNameAsOne();
+        final String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
         return "select min(" + aliasName + "." + columnName + ")";
     }
 
     protected String buildSelectClauseSum(String aliasName) {
-        String columnName = getSpecifiedColumnNameAsOne();
+        final String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
         return "select sum(" + aliasName + "." + columnName + ")";
     }
 
     protected String buildSelectClauseAvg(String aliasName) {
-        String columnName = getSpecifiedColumnNameAsOne();
+        final String columnName = getSpecifiedColumnNameAsOne();
         assertScalarSelectSpecifiedColumnOnlyOne(columnName);
         return "select avg(" + aliasName + "." + columnName + ")";
     }
@@ -919,22 +928,27 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                                                               =====
     public void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
-        key.addWhereClause(_whereList, columnFullName, value);
-        arrangeWhereListAsOrQuery(_whereList);
+        key.addWhereClause(getWhereClauseList4Register(), columnFullName, value);
     }
 
     public void registerWhereClause(String columnFullName, ConditionKey key, ConditionValue value,
             ConditionOption option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFullName", columnFullName);
         assertObjectNotNull("option of " + columnFullName, option);
-        key.addWhereClause(_whereList, columnFullName, value, option);
-        arrangeWhereListAsOrQuery(_whereList);
+        key.addWhereClause(getWhereClauseList4Register(), columnFullName, value, option);
     }
 
     public void registerWhereClause(String clause) {
         assertStringNotNullAndNotTrimmedEmpty("clause", clause);
-        _whereList.add(clause);
-        arrangeWhereListAsOrQuery(_whereList);
+        getWhereClauseList4Register().add(clause);
+    }
+
+    protected List<String> getWhereClauseList4Register() {
+        if (_orScopeQueryEffective) {
+            return getTmpOrWhereList();
+        } else {
+            return _whereList;
+        }
     }
 
     public void exchangeFirstWhereClauseForLastOne() {
@@ -955,20 +969,26 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                                                         ===========
     public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
-        key.addWhereClause(_baseTableInlineWhereList, columnName, value);
-        arrangeWhereListAsOrQuery(_baseTableInlineWhereList);
+        key.addWhereClause(getBaseTableInlineWhereClauseList4Register(), columnName, value);
     }
 
     public void registerBaseTableInlineWhereClause(String columnName, ConditionKey key, ConditionValue value,
             ConditionOption option) {
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         assertObjectNotNull("option of " + columnName, option);
-        key.addWhereClause(_baseTableInlineWhereList, columnName, value, option);
-        arrangeWhereListAsOrQuery(_baseTableInlineWhereList);
+        key.addWhereClause(getBaseTableInlineWhereClauseList4Register(), columnName, value, option);
     }
 
     public void registerBaseTableInlineWhereClause(String value) {
-        _baseTableInlineWhereList.add(value);
+        getBaseTableInlineWhereClauseList4Register().add(value);
+    }
+
+    protected List<String> getBaseTableInlineWhereClauseList4Register() {
+        if (_orScopeQueryEffective) {
+            return getTmpOrBaseTableInlineWhereList();
+        } else {
+            return _baseTableInlineWhereList;
+        }
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
@@ -976,12 +996,24 @@ public abstract class AbstractSqlClause implements SqlClause {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo) _outerJoinMap.get(aliasName);
+        final List<String> clauseList;
+        final String realColumnName;
         if (onClauseInline) {
-            key.addWhereClause(joinInfo.getAdditionalOnClauseList(), aliasName + "." + columnName, value);
+            if (_orScopeQueryEffective) {
+                clauseList = getTmpOrAdditionalOnClauseList(aliasName);
+            } else {
+                clauseList = joinInfo.getAdditionalOnClauseList();
+            }
+            realColumnName = aliasName + "." + columnName;
         } else {
-            key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value);
+            if (_orScopeQueryEffective) {
+                clauseList = getTmpOrOuterJoinInlineClauseList(aliasName);
+            } else {
+                clauseList = joinInfo.getInlineWhereClauseList();
+            }
+            realColumnName = columnName;
         }
-        arrangeWhereListAsOrQuery(joinInfo.getInlineWhereClauseList());
+        key.addWhereClause(clauseList, realColumnName, value);
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String columnName, ConditionKey key,
@@ -989,24 +1021,42 @@ public abstract class AbstractSqlClause implements SqlClause {
         assertNotYetOuterJoin(aliasName);
         assertStringNotNullAndNotTrimmedEmpty("columnName", columnName);
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo) _outerJoinMap.get(aliasName);
+
+        final List<String> clauseList;
+        final String realColumnName;
         if (onClauseInline) {
-            key.addWhereClause(joinInfo.getAdditionalOnClauseList(), aliasName + "." + columnName, value, option);
-            arrangeWhereListAsOrQuery(joinInfo.getAdditionalOnClauseList());
+            if (_orScopeQueryEffective) {
+                clauseList = getTmpOrAdditionalOnClauseList(aliasName);
+            } else {
+                clauseList = joinInfo.getAdditionalOnClauseList();
+            }
+            realColumnName = aliasName + "." + columnName;
         } else {
-            key.addWhereClause(joinInfo.getInlineWhereClauseList(), columnName, value, option);
-            arrangeWhereListAsOrQuery(joinInfo.getInlineWhereClauseList());
+            if (_orScopeQueryEffective) {
+                clauseList = getTmpOrOuterJoinInlineClauseList(aliasName);
+            } else {
+                clauseList = joinInfo.getInlineWhereClauseList();
+            }
+            realColumnName = columnName;
         }
+        key.addWhereClause(clauseList, realColumnName, value, option);
     }
 
     public void registerOuterJoinInlineWhereClause(String aliasName, String value, boolean onClauseInline) {
         assertNotYetOuterJoin(aliasName);
         final LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo) _outerJoinMap.get(aliasName);
         if (onClauseInline) {
-            joinInfo.addAdditionalOnClause(value);
-            arrangeWhereListAsOrQuery(joinInfo.getAdditionalOnClauseList());
+            if (_orScopeQueryEffective) {
+                addTmpOrAdditionalOnClause(aliasName, value);
+            } else {
+                joinInfo.addAdditionalOnClause(value);
+            }
         } else {
-            joinInfo.addInlineWhereClause(value);
-            arrangeWhereListAsOrQuery(joinInfo.getInlineWhereClauseList());
+            if (_orScopeQueryEffective) {
+                addTmpOrOuterJoinInlineClause(aliasName, value);
+            } else {
+                joinInfo.addInlineWhereClause(value);
+            }
         }
     }
 
@@ -1018,39 +1068,293 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     // ===================================================================================
-    //                                                                             OrQuery
-    //                                                                             =======
-    public void makeOrQueryEffective() {
-        _orQueryEffective = true;
+    //                                                                        OrScopeQuery
+    //                                                                        ============
+    public void makeOrScopeQueryEffective() {
+        final TmpOrScopeQueryInfo tmpOrScopeQueryInfo = new TmpOrScopeQueryInfo();
+        if (_currentTmpOrScopeQueryInfo != null) {
+            _currentTmpOrScopeQueryInfo.addChildInfo(tmpOrScopeQueryInfo);
+        }
+        _currentTmpOrScopeQueryInfo = tmpOrScopeQueryInfo;
+        _orScopeQueryEffective = true;
     }
 
-    public void ignoreOrQuery() {
-        _orQueryEffective = false;
-    }
-
-    public boolean isOrQueryEffective() {
-        return _orQueryEffective;
-    }
-
-    protected void arrangeWhereListAsOrQuery(List<String> whereList) {
-        if (!_orQueryEffective) {
+    public void closeOrScopeQuery() {
+        if (!_orScopeQueryEffective) {
             return;
         }
-        if (whereList.size() < 2) {
-            return;
-        }
-        final String or = ln() + "    or ";
-        final String newClause = (String) whereList.remove(whereList.size() - 1);
-        final String preClause = (String) whereList.remove(whereList.size() - 1);
-        if (preClause.startsWith("(") && preClause.contains(or) && preClause.endsWith(")")) {
-            // Since the second times
-            final int beginLen = "(".length();
-            final int endLen = ")".length();
-            final String plainClause = preClause.substring(beginLen, preClause.length() - endLen);
-            whereList.add("(" + plainClause + or + newClause + ")");
+        assertCurrentTmpOrScopeQueryInfo();
+        final TmpOrScopeQueryInfo parentInfo = _currentTmpOrScopeQueryInfo.getParentInfo();
+        if (parentInfo != null) {
+            _currentTmpOrScopeQueryInfo = parentInfo;
         } else {
-            // At first
-            whereList.add("(" + preClause + or + newClause + ")");
+            reflectTmpOrClauseToRealObject(_currentTmpOrScopeQueryInfo);
+            _currentTmpOrScopeQueryInfo = null;
+            _orScopeQueryEffective = false;
+        }
+    }
+
+    protected void reflectTmpOrClauseToRealObject(TmpOrScopeQueryInfo localInfo) {
+        {
+            final List<List<String>> listList = setupTmpOrListList(localInfo, new TmpOrClauseListProvider() {
+                public List<String> provide(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
+                    return tmpOrScopeQueryInfo.getTmpOrWhereList();
+                }
+            });
+            setupOrScopeQuery(listList, _whereList, true);
+        }
+        {
+            final List<List<String>> listList = setupTmpOrListList(localInfo, new TmpOrClauseListProvider() {
+                public List<String> provide(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
+                    return tmpOrScopeQueryInfo.getTmpOrBaseTableInlineWhereList();
+                }
+            });
+            setupOrScopeQuery(listList, _baseTableInlineWhereList, false);
+        }
+        {
+            final Set<Entry<String, LeftOuterJoinInfo>> entrySet = _outerJoinMap.entrySet();
+            for (Entry<String, LeftOuterJoinInfo> entry : entrySet) {
+                final String aliasName = entry.getKey();
+                final LeftOuterJoinInfo joinInfo = entry.getValue();
+                final List<List<String>> listList = new ArrayList<List<String>>();
+                listList.addAll(setupTmpOrListList(localInfo, new TmpOrClauseListProvider() {
+                    public List<String> provide(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
+                        return tmpOrScopeQueryInfo.getTmpOrAdditionalOnClauseList(aliasName);
+                    }
+                }));
+                setupOrScopeQuery(listList, joinInfo.getAdditionalOnClauseList(), false);
+            }
+        }
+        {
+            final Set<Entry<String, LeftOuterJoinInfo>> entrySet = _outerJoinMap.entrySet();
+            for (Entry<String, LeftOuterJoinInfo> entry : entrySet) {
+                final String aliasName = entry.getKey();
+                final LeftOuterJoinInfo joinInfo = entry.getValue();
+                final List<List<String>> listList = new ArrayList<List<String>>();
+                listList.addAll(setupTmpOrListList(localInfo, new TmpOrClauseListProvider() {
+                    public List<String> provide(TmpOrScopeQueryInfo tmpOrScopeQueryInfo) {
+                        return tmpOrScopeQueryInfo.getTmpOrOuterJoinInlineClauseList(aliasName);
+                    }
+                }));
+                setupOrScopeQuery(listList, joinInfo.getInlineWhereClauseList(), false);
+            }
+        }
+    }
+
+    protected List<List<String>> setupTmpOrListList(TmpOrScopeQueryInfo parentInfo, TmpOrClauseListProvider provider) {
+        final List<List<String>> resultList = new ArrayList<List<String>>();
+        resultList.add(provider.provide(parentInfo));
+        if (parentInfo.hasChildInfo()) {
+            for (TmpOrScopeQueryInfo childInfo : parentInfo.getChildInfoList()) {
+                resultList.addAll(setupTmpOrListList(childInfo, provider)); // recursive call
+            }
+        }
+        return resultList;
+    }
+
+    protected static interface TmpOrClauseListProvider {
+        List<String> provide(TmpOrScopeQueryInfo tmpOrScopeQueryInfo);
+    }
+
+    protected void setupOrScopeQuery(List<List<String>> tmpOrListList, List<String> realList, boolean line) {
+        if (tmpOrListList == null || tmpOrListList.isEmpty()) {
+            return;
+        }
+        final String lnIndent = line ? ln() + "   " : "";
+        final String or = " or ";
+        final StringBuilder sb = new StringBuilder();
+        boolean exists = false;
+        int listListIndex = 0;
+        for (List<String> tmpOrList : tmpOrListList) {
+            if (tmpOrList == null || tmpOrList.isEmpty()) {
+                continue; // not increment index
+            }
+            int listIndex = 0;
+            for (String orClause : tmpOrList) {
+                if (listListIndex == 0) { // first list
+                    if (listIndex == 0) {
+                        sb.append("(");
+                    } else {
+                        sb.append(lnIndent);
+                        sb.append(or);
+                    }
+                } else { // second or more list
+                    if (listIndex == 0) {
+                        sb.append(lnIndent);
+                        sb.append(or);
+                        sb.append("(");
+                    } else {
+                        sb.append(lnIndent);
+                        sb.append(or);
+                    }
+                }
+                sb.append(orClause);
+                if (!exists) {
+                    exists = true;
+                }
+                ++listIndex;
+            }
+            if (listListIndex > 0) { // second or more list
+                sb.append(")");
+            }
+            ++listListIndex;
+        }
+        if (exists) {
+            sb.append(line ? ln() + "       " : "").append(")");
+            realList.add(sb.toString());
+        }
+    }
+
+    public boolean isOrScopeQueryEffective() {
+        return _orScopeQueryEffective;
+    }
+
+    protected List<String> getTmpOrWhereList() {
+        assertCurrentTmpOrScopeQueryInfo();
+        return _currentTmpOrScopeQueryInfo.getTmpOrWhereList();
+    }
+
+    protected List<String> getTmpOrBaseTableInlineWhereList() {
+        assertCurrentTmpOrScopeQueryInfo();
+        return _currentTmpOrScopeQueryInfo.getTmpOrBaseTableInlineWhereList();
+    }
+
+    protected List<String> getTmpOrAdditionalOnClauseList(String aliasName) {
+        assertCurrentTmpOrScopeQueryInfo();
+        return _currentTmpOrScopeQueryInfo.getTmpOrAdditionalOnClauseList(aliasName);
+    }
+
+    protected List<String> getTmpOrOuterJoinInlineClauseList(String aliasName) {
+        assertCurrentTmpOrScopeQueryInfo();
+        return _currentTmpOrScopeQueryInfo.getTmpOrOuterJoinInlineClauseList(aliasName);
+    }
+
+    protected void addTmpOrAdditionalOnClause(String aliasName, String value) {
+        getTmpOrAdditionalOnClauseList(aliasName).add(value);
+    }
+
+    protected void addTmpOrOuterJoinInlineClause(String aliasName, String value) {
+        getTmpOrOuterJoinInlineClauseList(aliasName).add(value);
+    }
+
+    protected static class TmpOrScopeQueryInfo {
+        protected List<String> _tmpOrWhereList;
+        protected List<String> _tmpOrBaseTableInlineWhereList;
+        protected Map<String, List<String>> _tmpOrAdditionalOnClauseListMap;
+        protected Map<String, List<String>> _tmpOrOuterJoinInlineClauseListMap;
+        protected TmpOrScopeQueryInfo _parentInfo; // null means base point
+        protected List<TmpOrScopeQueryInfo> _childInfoList;
+
+        public void clear() {
+            _tmpOrWhereList = null;
+            _tmpOrBaseTableInlineWhereList = null;
+            _tmpOrAdditionalOnClauseListMap = null;
+            _tmpOrOuterJoinInlineClauseListMap = null;
+            _childInfoList = null;
+        }
+
+        protected List<String> getTmpOrAdditionalOnClauseList(String aliasName) {
+            List<String> orClauseList = getTmpOrAdditionalOnClauseListMap().get(aliasName);
+            if (orClauseList != null) {
+                return orClauseList;
+            }
+            orClauseList = new ArrayList<String>();
+            _tmpOrAdditionalOnClauseListMap.put(aliasName, orClauseList);
+            return orClauseList;
+        }
+
+        protected List<String> getTmpOrOuterJoinInlineClauseList(String aliasName) {
+            List<String> orClauseList = getTmpOrOuterJoinInlineClauseListMap().get(aliasName);
+            if (orClauseList != null) {
+                return orClauseList;
+            }
+            orClauseList = new ArrayList<String>();
+            _tmpOrOuterJoinInlineClauseListMap.put(aliasName, orClauseList);
+            return orClauseList;
+        }
+
+        protected void addTmpOrAdditionalOnClause(String aliasName, String value) {
+            getTmpOrAdditionalOnClauseList(aliasName).add(value);
+        }
+
+        protected void addTmpOrOuterJoinInlineClause(String aliasName, String value) {
+            getTmpOrOuterJoinInlineClauseList(aliasName).add(value);
+        }
+
+        public List<String> getTmpOrWhereList() {
+            if (_tmpOrWhereList == null) {
+                _tmpOrWhereList = new ArrayList<String>();
+            }
+            return _tmpOrWhereList;
+        }
+
+        public void setTmpOrWhereList(List<String> tmpOrWhereList) {
+            this._tmpOrWhereList = tmpOrWhereList;
+        }
+
+        public List<String> getTmpOrBaseTableInlineWhereList() {
+            if (_tmpOrBaseTableInlineWhereList == null) {
+                _tmpOrBaseTableInlineWhereList = new ArrayList<String>();
+            }
+            return _tmpOrBaseTableInlineWhereList;
+        }
+
+        public void setTmpOrBaseTableInlineWhereList(List<String> tmpOrBaseTableInlineWhereList) {
+            this._tmpOrBaseTableInlineWhereList = tmpOrBaseTableInlineWhereList;
+        }
+
+        public Map<String, List<String>> getTmpOrAdditionalOnClauseListMap() {
+            if (_tmpOrAdditionalOnClauseListMap == null) {
+                _tmpOrAdditionalOnClauseListMap = new LinkedHashMap<String, List<String>>();
+            }
+            return _tmpOrAdditionalOnClauseListMap;
+        }
+
+        public void setTmpOrAdditionalOnClauseListMap(Map<String, List<String>> tmpOrAdditionalOnClauseListMap) {
+            this._tmpOrAdditionalOnClauseListMap = tmpOrAdditionalOnClauseListMap;
+        }
+
+        public Map<String, List<String>> getTmpOrOuterJoinInlineClauseListMap() {
+            if (_tmpOrOuterJoinInlineClauseListMap == null) {
+                _tmpOrOuterJoinInlineClauseListMap = new LinkedHashMap<String, List<String>>();
+            }
+            return _tmpOrOuterJoinInlineClauseListMap;
+        }
+
+        public void setTmpOrOuterJoinInlineClauseListMap(Map<String, List<String>> tmpOrOuterJoinInlineClauseListMap) {
+            this._tmpOrOuterJoinInlineClauseListMap = tmpOrOuterJoinInlineClauseListMap;
+        }
+
+        public boolean hasChildInfo() {
+            return _childInfoList != null && !_childInfoList.isEmpty();
+        }
+
+        public TmpOrScopeQueryInfo getParentInfo() {
+            return _parentInfo;
+        }
+
+        public void setParentInfo(TmpOrScopeQueryInfo parentInfo) {
+            _parentInfo = parentInfo;
+        }
+
+        public List<TmpOrScopeQueryInfo> getChildInfoList() {
+            if (_childInfoList == null) {
+                _childInfoList = new ArrayList<TmpOrScopeQueryInfo>();
+            }
+            return _childInfoList;
+        }
+
+        public void addChildInfo(TmpOrScopeQueryInfo childInfo) {
+            childInfo.setParentInfo(this);
+            getChildInfoList().add(childInfo);
+        }
+    }
+
+    protected void assertCurrentTmpOrScopeQueryInfo() {
+        if (_currentTmpOrScopeQueryInfo == null) {
+            String msg = "The attribute 'currentTmpOrScopeQueryInfo' should not be null in or-scope query:";
+            msg = msg + " orScopeQueryEffective=" + _orScopeQueryEffective;
+            throw new IllegalStateException(msg);
         }
     }
 
