@@ -1191,6 +1191,14 @@ public abstract class ${myClassName} : ${glSqlClause} {
         }
     }
 
+    public void ignoreOrScopeQueryTemporarily() {
+        _orScopeQueryEffective = false;
+    }
+
+    public void reviveOrScopeQueryFromIgnored() {
+        _orScopeQueryEffective = true;
+    }
+
     // ===================================================================================
     //                                                                             OrderBy
     //                                                                             =======

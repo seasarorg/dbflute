@@ -71,6 +71,8 @@ public interface ${myClassName} {
     void makeOrScopeQueryEffective();
     void closeOrScopeQuery();
     bool isOrScopeQueryEffective();
+    void ignoreOrScopeQueryTemporarily();
+    void reviveOrScopeQueryFromIgnored();
 
     // ===================================================================================
     //                                                                             OrderBy

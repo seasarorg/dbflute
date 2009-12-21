@@ -357,9 +357,14 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 // if the key is for inScope, it should be split as 'or'
                 // (if the key is for notInScope, it should be split as 'and')
                 bool asOr = isConditionKeyInScope(key);
+                bool alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
                 if (asOr) {
                     // if or-scope query has already been effective, create new or-scope
                     getSqlClause().makeOrScopeQueryEffective();
+                } else {
+                    if (alreadyOrScopeQuery) {
+                        getSqlClause().ignoreOrScopeQueryTemporarily();
+                    }
                 }
 
                 try {
@@ -380,6 +385,10 @@ public abstract class ${myClassName} : ${glConditionQuery} {
                 } finally {
                     if (asOr) {
                         getSqlClause().closeOrScopeQuery();
+                    } else {
+                        if (alreadyOrScopeQuery) {
+                            getSqlClause().reviveOrScopeQueryFromIgnored();
+                        }
                     }
                 }
             } else {
