@@ -391,8 +391,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                            Register
     //                                                                            ========
     // -----------------------------------------------------
-    //                                                 Query
-    //                                                 -----
+    //                                          Normal Query
+    //                                          ------------
     protected void regQ(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             setupConditionValueAndRegisterWhereClause(key, value, cvalue, colName);
@@ -414,10 +414,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             if (inScopeLimit > 0 && value.size() > inScopeLimit) {
                 // if the key is for inScope, it should be split as 'or'
                 // (if the key is for notInScope, it should be split as 'and')
-                final boolean asOr = isConditionKeyInScope(key);
-                if (asOr) {
+                final boolean alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
+                if (isConditionKeyInScope(key)) {
                     // if or-scope query has already been effective, create new or-scope
                     getSqlClause().makeOrScopeQueryEffective();
+                } else {
+                    if (alreadyOrScopeQuery) {
+                        getSqlClause().beginOrScopeQueryAndPart();
+                    }
                 }
 
                 try {
@@ -434,8 +438,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                         }
                     }
                 } finally {
-                    if (asOr) {
+                    if (isConditionKeyInScope(key)) {
                         getSqlClause().closeOrScopeQuery();
+                    } else {
+                        if (alreadyOrScopeQuery) {
+                            getSqlClause().endOrScopeQueryAndPart();
+                        }
                     }
                 }
             } else {
@@ -500,16 +508,28 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         // Use splitByXxx().
         // - - - - - - - - -
         final String[] strArray = option.generateSplitValueArray(value);
+        final boolean alreadyOrScopeQuery = getSqlClause().isOrScopeQueryEffective();
         if (!option.isAsOrSplit()) {
             // as 'and' condition
-            for (int i = 0; i < strArray.length; i++) {
-                final String currentValue = strArray[i];
-                setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
+            if (alreadyOrScopeQuery) {
+                getSqlClause().beginOrScopeQueryAndPart();
+            }
+            try {
+                for (int i = 0; i < strArray.length; i++) {
+                    final String currentValue = strArray[i];
+                    setupConditionValueAndRegisterWhereClause(key, currentValue, cvalue, colName, option);
+                }
+            } finally {
+                if (alreadyOrScopeQuery) {
+                    getSqlClause().endOrScopeQueryAndPart();
+                }
             }
         } else {
             // as 'or' condition
-            final boolean orQueryEffective = getSqlClause().isOrScopeQueryEffective();
-            if (!orQueryEffective) { // create new or-scope query
+            if (!alreadyOrScopeQuery) {
+                // create new or-scope query only when it has already been begun
+                // because this method would be called as recursive call
+                // (or-clause has no problem)
                 getSqlClause().makeOrScopeQueryEffective();
             }
             try {
@@ -522,7 +542,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
                     }
                 }
             } finally {
-                if (!orQueryEffective) {
+                if (!alreadyOrScopeQuery) {
                     getSqlClause().closeOrScopeQuery();
                 }
             }

@@ -247,6 +247,16 @@ public interface SqlClause {
     void closeOrScopeQuery();
 
     /**
+     * Begin or-scope query to and-part.
+     */
+    void beginOrScopeQueryAndPart();
+
+    /**
+     * End or-scope query and-part.
+     */
+    void endOrScopeQueryAndPart();
+
+    /**
      * Is or-scope query effective?
      * @return Determination.
      */
