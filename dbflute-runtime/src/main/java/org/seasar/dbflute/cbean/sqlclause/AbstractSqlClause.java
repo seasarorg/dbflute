@@ -1272,7 +1272,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         protected TmpOrScopeQueryInfo _parentInfo; // null means base point
         protected List<TmpOrScopeQueryInfo> _childInfoList;
 
-        protected List<String> getTmpOrAdditionalOnClauseList(String aliasName) {
+        public List<String> getTmpOrAdditionalOnClauseList(String aliasName) {
             List<String> orClauseList = getTmpOrAdditionalOnClauseListMap().get(aliasName);
             if (orClauseList != null) {
                 return orClauseList;
@@ -1282,7 +1282,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             return orClauseList;
         }
 
-        protected List<String> getTmpOrOuterJoinInlineClauseList(String aliasName) {
+        public List<String> getTmpOrOuterJoinInlineClauseList(String aliasName) {
             List<String> orClauseList = getTmpOrOuterJoinInlineClauseListMap().get(aliasName);
             if (orClauseList != null) {
                 return orClauseList;
@@ -1290,14 +1290,6 @@ public abstract class AbstractSqlClause implements SqlClause {
             orClauseList = new ArrayList<String>();
             _tmpOrOuterJoinInlineClauseListMap.put(aliasName, orClauseList);
             return orClauseList;
-        }
-
-        protected void addTmpOrAdditionalOnClause(String aliasName, String value) {
-            getTmpOrAdditionalOnClauseList(aliasName).add(value);
-        }
-
-        protected void addTmpOrOuterJoinInlineClause(String aliasName, String value) {
-            getTmpOrOuterJoinInlineClauseList(aliasName).add(value);
         }
 
         public List<String> getTmpOrWhereList() {
