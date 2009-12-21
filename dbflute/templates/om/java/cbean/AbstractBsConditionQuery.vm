@@ -913,7 +913,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
             throw new IllegalArgumentException("The argument 'textColumnList' should not be empty list!");
         }
         int index = 0;
-        getSqlClause().makeOrQueryEffective();
+        getSqlClause().makeOrScopeQueryEffective();
         try {
             for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
                 if (columnInfo == null) {
@@ -971,7 +971,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
         }
         conditionValue = escapeFullTextSearchValue(conditionValue);
         int index = 0;
-        getSqlClause().makeOrQueryEffective();
+        getSqlClause().makeOrScopeQueryEffective();
         try {
             for (org.seasar.dbflute.dbmeta.info.ColumnInfo columnInfo : textColumnList) {
                 if (columnInfo == null) {
