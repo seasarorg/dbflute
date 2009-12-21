@@ -481,7 +481,7 @@ namespace ${glPackageBaseCommonJavaLike} {
 		    StringBuilder sb = new StringBuilder();
 		    sb.append("{");
 		    int index = 0;
-		    Set<Entry<KEY, VALUE>> entrySet = entrySet();
+		    Set<Entry<KEY, VALUE>> entrySet = this.entrySet();
 		    foreach (Entry<KEY, VALUE> entry in entrySet) {
 		        if (index > 0) { sb.append("{"); }
 		        sb.append(entry.toString());
@@ -572,7 +572,7 @@ namespace ${glPackageBaseCommonJavaLike} {
 		    StringBuilder sb = new StringBuilder();
 		    sb.append("{");
 		    int index = 0;
-		    Set<Entry<KEY, VALUE>> entrySet = entrySet();
+		    Set<Entry<KEY, VALUE>> entrySet = this.entrySet();
 		    foreach (Entry<KEY, VALUE> entry in entrySet) {
 		        if (index > 0) { sb.append("{"); }
 		        sb.append(entry.toString());
@@ -591,7 +591,7 @@ namespace ${glPackageBaseCommonJavaLike} {
             return toString();
         }
         public String toString() {
-            return _key + "=" + value;
+            return _key + "=" + _value;
         }
         public Entry(KEY key, VALUE value) {
             _key = key;
