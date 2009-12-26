@@ -341,19 +341,20 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 // at first translate a local table name
                 fk.setLocalTableName(synonym.getSynonymName());
 
-                final String foreignTableName = fk.getForeignTableName();
-                final List<String> foreignSynonymList = tableForeignSynonymListMap.get(foreignTableName);
+                final String orignalForeignTableName = fk.getForeignTableName();
+                final List<String> foreignSynonymList = tableForeignSynonymListMap.get(orignalForeignTableName);
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
-                    if (_tableHandler.isTableExcept(synonym.getTableOwner(), foreignTableName)) {
-                        removedFKKeyMap.put(fkName, foreignTableName);
-                    } else if (_refTableCheckSet != null && !_refTableCheckSet.contains(foreignTableName)) {
-                        removedFKKeyMap.put(fkName, foreignTableName);
+                    if (_tableHandler.isTableExcept(synonym.getTableOwner(), orignalForeignTableName)) {
+                        removedFKKeyMap.put(fkName, orignalForeignTableName);
+                    } else if (_refTableCheckSet != null && !_refTableCheckSet.contains(orignalForeignTableName)) {
+                        removedFKKeyMap.put(fkName, orignalForeignTableName);
                     }
                     continue;
                 }
+                final String originalForeignKeyName = fk.getForeignKeyName();
                 boolean firstDone = false;
                 for (int i = 0; i < foreignSynonymList.size(); i++) {
-                    final String newForeignKeyName = fk.getForeignKeyName() + "_SYNONYM" + (i + 1);
+                    final String newForeignKeyName = originalForeignKeyName + "_SYNONYM" + (i + 1);
                     final String newForeignTableName = foreignSynonymList.get(i);
                     if (!firstDone) {
                         // first (switching FK informations)
