@@ -473,6 +473,31 @@ public class Column {
         _primaryKeyName = primaryKeyName;
     }
 
+    public boolean isAdditionalPrimaryKey() {
+        return _additionalPrimaryKey;
+    }
+
+    public void setAdditionalPrimaryKey(boolean additionalPrimaryKey) {
+        _additionalPrimaryKey = additionalPrimaryKey;
+    }
+
+    public boolean isTwoOrMoreColumnPrimaryKey() {
+        return getTable().getPrimaryKey().size() > 1;
+    }
+
+    public String getPrimaryKeyMarkForSchemaHtml() {
+        final StringBuilder sb = new StringBuilder();
+        if (isPrimaryKey()) {
+            sb.append("o");
+            if (isTwoOrMoreColumnPrimaryKey()) {
+                sb.append("<span class=\"flgplus\">+</span>");
+            }
+        } else {
+            sb.append("&nbsp;");
+        }
+        return sb.toString();
+    }
+
     public String getPrimaryKeyTitleForSchemaHtml() {
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final String value = prop.resolveAttributeForSchemaHtml(_primaryKeyName);
@@ -481,14 +506,6 @@ public class Column {
         }
         final String text = prop.resolveAttributeForSchemaHtml(_primaryKeyName);
         return " title=\"" + text + "\"";
-    }
-
-    public boolean isAdditionalPrimaryKey() {
-        return _additionalPrimaryKey;
-    }
-
-    public void setAdditionalPrimaryKey(boolean additionalPrimaryKey) {
-        _additionalPrimaryKey = additionalPrimaryKey;
     }
 
     // -----------------------------------------------------
@@ -563,7 +580,7 @@ public class Column {
         return false;
     }
 
-    public String getUniqueMarkForSchemaHtml() {
+    public String getUniqueKeyMarkForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
         if (isUnique()) {
             sb.append("o");

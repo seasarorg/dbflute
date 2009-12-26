@@ -32,9 +32,9 @@ ${table.aliasExpression}${table.name}
 	</thead>
 #foreach ($col in $table.columns)
 	<tr>
-		<td class="flgcell#if ($col.isAdditionalPrimaryKey()) additionalpk#end"${col.primaryKeyTitleForSchemaHtml}>#if ($col.isPrimaryKey())o#else &nbsp;#end</td>
+		<td class="flgcell#if ($col.isAdditionalPrimaryKey()) additionalpk#end"${col.primaryKeyTitleForSchemaHtml}>${col.primaryKeyMarkForSchemaHtml}</td>
 		<td class="flgcell">#if ($col.isIdentityOrSequence())o#else &nbsp;#end</td>
-		<td class="flgcell#if ($col.isUniqueAllAdditional()) additionalpk#end"${col.uniqueKeyTitleForSchemaHtml}>${col.uniqueMarkForSchemaHtml}</td>
+		<td class="flgcell#if ($col.isUniqueAllAdditional()) additionalpk#end"${col.uniqueKeyTitleForSchemaHtml}>${col.uniqueKeyMarkForSchemaHtml}</td>
 		<td class="flgcell"${col.indexTitleForSchemaHtml}>${col.indexMarkForSchemaHtml}</td>
 		<td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
 #if ($database.isAliasDelimiterInDbCommentValid())
