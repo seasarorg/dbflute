@@ -423,7 +423,7 @@ public class Table {
         return getAliasExpression() + getName() + (type != null ? " that is " + getType() : "");
     }
 
-    public String getToolTipTitle() {
+    public String getTitleForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
         sb.append("type=").append(_type);
         if (isAdditionalSchema()) {
@@ -433,7 +433,7 @@ public class Table {
         sb.append(", nameLength=").append(getName().length());
         sb.append(", columnCount=").append(getColumns().length);
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
-        return prop.resolveAttributeForSchemaHtml(sb.toString());
+        return " title=\"" + prop.resolveAttributeForSchemaHtml(sb.toString()) + "\"";
     }
 
     // -----------------------------------------------------
@@ -1979,7 +1979,7 @@ public class Table {
      * Get the value of sequence-next-sql as java name.
      * @return Name.　(NotNull)
      */
-    public String getSequenceNextSql() {// For String Literal in Program.
+    public String getSequenceNextSql() { // for string literal in program.
         final String sequenceName = getDefinedSequenceName();
         if (sequenceName == null) {
             return "";

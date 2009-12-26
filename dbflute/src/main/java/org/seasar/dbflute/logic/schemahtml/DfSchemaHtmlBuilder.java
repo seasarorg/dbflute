@@ -21,7 +21,7 @@ public class DfSchemaHtmlBuilder {
         final String baseTitle = fk.getName();
         final String contentName;
         if (fk.isAdditionalForeignKey()) {
-            final String addtionalBaseTitle = baseTitle + "(additinal)";
+            final String addtionalBaseTitle = baseTitle;
             if (fk.hasFixedCondition()) {
                 final String fixedCondition = fk.getFixedCondition();
                 final String title = resolveTitle(addtionalBaseTitle + ": fixedCondition=\"" + fixedCondition + "\"");

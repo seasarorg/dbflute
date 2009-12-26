@@ -504,8 +504,14 @@ public class Column {
         if (value == null) {
             return "";
         }
-        final String text = prop.resolveAttributeForSchemaHtml(_primaryKeyName);
-        return " title=\"" + text + "\"";
+        final String title;
+        if (getTable().isUseSequence()) {
+            final String sequenceName = getTable().getDefinedSequenceName();
+            title = _primaryKeyName + ": sequence=" + sequenceName;
+        } else {
+            title = _primaryKeyName;
+        }
+        return " title=\"" + prop.resolveAttributeForSchemaHtml(title) + "\"";
     }
 
     // -----------------------------------------------------

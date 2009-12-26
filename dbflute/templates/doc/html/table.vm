@@ -1,4 +1,4 @@
-<h2 id="${table.name}" title="${table.toolTipTitle}">
+<h2 id="${table.name}"${table.titleForSchemaHtml}>
 ${table.aliasExpression}${table.name}
 #if ($database.hasAdditionalSchema() && $table.hasSchema())
 &nbsp;<span class="tableschema">on ${table.schema}</span>
