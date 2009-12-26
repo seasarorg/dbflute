@@ -81,8 +81,6 @@ Java class or method name.
 <!ATTLIST column
   name CDATA #REQUIRED
   javaName CDATA #IMPLIED
-  primaryKey (true|false) "false"
-  required (true|false) "false"
   type
     (
           BIT  | TINYINT | SMALLINT    | INTEGER    | BIGINT    | FLOAT
@@ -95,6 +93,9 @@ Java class or method name.
   dbType CDATA #IMPLIED
   javaType CDATA #IMPLIED
   size CDATA #IMPLIED
+  required (true|false) "false"
+  primaryKey (true|false) "false"
+  pkName CDATA #IMPLIED
   comment CDATA #IMPLIED
   default CDATA #IMPLIED
   autoIncrement (true|false) "false"

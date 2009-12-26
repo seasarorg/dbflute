@@ -33,6 +33,7 @@ import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -92,7 +93,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
         _log.info("...Incrementing serial type sequence");
         for (DfTableMetaInfo tableMetaInfo : tableList) {
             final String tableName = tableMetaInfo.getTableName();
-            final List<String> pkList = uniqueKeyHandler.getPrimaryColumnNameList(metaData, _schema, tableMetaInfo);
+            final DfPrimaryKeyMetaInfo pkInfo = uniqueKeyHandler.getPrimaryKey(metaData, _schema, tableMetaInfo);
+            final List<String> pkList = pkInfo.getPrimaryKeyList();
             if (pkList.size() != 1) {
                 continue;
             }

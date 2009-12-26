@@ -903,10 +903,6 @@ public class ForeignKey {
         return _fixedSuffix != null && _fixedSuffix.trim().length() > 0;
     }
 
-    // /* * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-    // DynamicFixedCondition is for Java only at DBFlute-0.8.6
-    // * * * * * * * * * */
-
     public boolean hasDynamicFixedCondition() {
         analyzeDynamicFixedConditionIfNeeds();
         return hasFixedCondition() && !_dynamicFixedConditionMap.isEmpty();

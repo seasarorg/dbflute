@@ -94,6 +94,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserT
 import org.seasar.dbflute.logic.jdbc.metadata.identity.DfIdentityExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymExtractor;
@@ -280,9 +281,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             if (tableMataInfo.getTableComment() != null && tableMataInfo.getTableComment().trim().length() != 0) {
                 tableElement.setAttribute("comment", tableMataInfo.getTableComment());
             }
-
-            final List<String> primaryColumnNameList = getPrimaryColumnNameList(dbMetaData, tableMataInfo);
-
+            final DfPrimaryKeyMetaInfo pkInfo = getPrimaryColumnNameList(dbMetaData, tableMataInfo);
             final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, tableMataInfo);
             for (int j = 0; j < columns.size(); j++) {
                 final DfColumnMetaInfo columnMetaInfo = columns.get(j);
@@ -299,9 +298,11 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 if (columnMetaInfo.isRequired()) {
                     columnElement.setAttribute("required", "true");
                 }
-
-                if (primaryColumnNameList.contains(columnName)) {
+                if (pkInfo.containsColumn(columnName)) {
                     columnElement.setAttribute("primaryKey", "true");
+                    if (pkInfo.hasPrimaryKeyName()) {
+                        columnElement.setAttribute("pkName", pkInfo.getPrimaryKeyName());
+                    }
                 }
 
                 final String columnComment = columnMetaInfo.getColumnComment();
@@ -324,7 +325,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                     columnElement.setAttribute("default", defaultValue);
                 }
 
-                if (primaryColumnNameList.contains(columnName)) {
+                if (pkInfo.containsColumn(columnName)) {
                     if (isAutoIncrementColumn(conn, tableMataInfo, columnName)) {
                         columnElement.setAttribute("autoIncrement", "true");
                     }
@@ -651,17 +652,29 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * Retrieves a list of the columns composing the primary key for a given table.
      * @param dbMeta The meta data of a database. (NotNull)
      * @param table The meta information of table. (NotNull)
-     * @return A list of the primary key parts for <code>tableName</code>.
+     * @return The meta information of primary key. (NotNull)
      * @throws SQLException
      */
-    protected List<String> getPrimaryColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo table) throws SQLException {
+    protected DfPrimaryKeyMetaInfo getPrimaryColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo table)
+            throws SQLException {
         final String schema = getHandlerUseSchema(table);
-        final List<String> primaryColumnNameList = _uniqueKeyHandler.getPrimaryColumnNameList(dbMeta, schema, table);
-        if (!canHandleSynonym(table) || !primaryColumnNameList.isEmpty()) {
-            return primaryColumnNameList;
+        final DfPrimaryKeyMetaInfo pkInfo = _uniqueKeyHandler.getPrimaryKey(dbMeta, schema, table);
+        final List<String> pkList = pkInfo.getPrimaryKeyList();
+        if (!canHandleSynonym(table) || !pkList.isEmpty()) {
+            return pkInfo;
         }
         final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
-        return synonym != null ? synonym.getPrimaryKeyNameList() : primaryColumnNameList;
+        if (synonym != null) {
+            final List<String> synonymPKList = synonym.getPrimaryKeyNameList();
+            final DfPrimaryKeyMetaInfo newPKInfo = new DfPrimaryKeyMetaInfo();
+            newPKInfo.setPrimaryKeyName(pkInfo.getPrimaryKeyName());
+            for (String synonymPK : synonymPKList) {
+                newPKInfo.addPrimaryKeyList(synonymPK);
+            }
+            return newPKInfo;
+        } else {
+            return pkInfo;
+        }
     }
 
     // -----------------------------------------------------

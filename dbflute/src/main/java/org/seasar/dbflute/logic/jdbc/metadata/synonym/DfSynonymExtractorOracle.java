@@ -44,6 +44,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserC
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
 
 /**
@@ -211,7 +212,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             throws SQLException {
         final DatabaseMetaData md = conn.getMetaData();
         {
-            final List<String> pkList = getPKList(md, tableOwner, tableName);
+            final DfPrimaryKeyMetaInfo pkInfo = getPKList(md, tableOwner, tableName);
+            final List<String> pkList = pkInfo.getPrimaryKeyList();
             info.setPrimaryKeyNameList(pkList);
         }
         final List<String> pkNameList = info.getPrimaryKeyNameList();
@@ -266,9 +268,9 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     // -----------------------------------------------------
     //                                    For Normal Synonym
     //                                    ------------------
-    protected List<String> getPKList(DatabaseMetaData metaData, String tableOwner, String tableName) {
+    protected DfPrimaryKeyMetaInfo getPKList(DatabaseMetaData metaData, String tableOwner, String tableName) {
         try {
-            return _uniqueKeyHandler.getPrimaryColumnNameList(metaData, tableOwner, tableName);
+            return _uniqueKeyHandler.getPrimaryKey(metaData, tableOwner, tableName);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }

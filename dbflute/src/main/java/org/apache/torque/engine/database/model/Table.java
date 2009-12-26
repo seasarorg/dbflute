@@ -432,7 +432,8 @@ public class Table {
         sb.append(", primaryKey={").append(getPrimaryKeyNameCommaString()).append("}");
         sb.append(", nameLength=").append(getName().length());
         sb.append(", columnCount=").append(getColumns().length);
-        return sb.toString();
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        return prop.resolveAttributeForSchemaHtml(sb.toString());
     }
 
     // -----------------------------------------------------
@@ -982,9 +983,9 @@ public class Table {
 
     public String getForeignTableNameCommaStringWithHtmlHref() { // for SchemaHTML
         final StringBuilder sb = new StringBuilder();
-        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder();
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
         final String delimiter = ", ";
-        final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = _foreignKeys;
         final int size = foreignKeyList.size();
         if (size == 0) {
@@ -992,15 +993,8 @@ public class Table {
         }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
-            final String name = fk.getForeignTableName();
-            if (tableSet.contains(name)) {
-                continue;
-            }
-            if (fk.hasFixedCondition()) {
-                continue;
-            }
-            tableSet.add(name);
-            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, name, delimiter));
+            final String foreignTableName = fk.getForeignTableName();
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, foreignTableName, delimiter));
         }
         sb.delete(0, delimiter.length());
         return sb.toString();
@@ -1452,9 +1446,9 @@ public class Table {
 
     public String getReferrerTableNameCommaStringWithHtmlHref() { // for SchemaHTML
         final StringBuilder sb = new StringBuilder();
-        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder();
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
         final String delimiter = ", ";
-        final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> referrerList = getReferrerList();
         final int size = referrerList.size();
         if (size == 0) {
@@ -1462,15 +1456,8 @@ public class Table {
         }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = referrerList.get(i);
-            final String name = fk.getTable().getName();
-            if (tableSet.contains(name)) {
-                continue;
-            }
-            if (fk.hasFixedCondition()) {
-                continue;
-            }
-            tableSet.add(name);
-            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, name, delimiter));
+            final String referrerTableName = fk.getTable().getName();
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, referrerTableName, delimiter));
         }
         sb.delete(0, delimiter.length());
         return sb.toString();

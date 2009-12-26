@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 
 /**
  * @author jflute
@@ -67,24 +68,25 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();
-            Set<Entry<String, String>> entrySet = tableSequenceMap.entrySet();
+            final Set<Entry<String, String>> entrySet = tableSequenceMap.entrySet();
             for (Entry<String, String> entry : entrySet) {
-                String tableName = entry.getKey();
-                String sequenceName = entry.getValue();
-                DatabaseMetaData metaData = conn.getMetaData();
-                List<String> pkList = uniqueKeyHandler.getPrimaryColumnNameList(metaData, _schema, tableName);
+                final String tableName = entry.getKey();
+                final String sequenceName = entry.getValue();
+                final DatabaseMetaData metaData = conn.getMetaData();
+                final DfPrimaryKeyMetaInfo pkInfo = uniqueKeyHandler.getPrimaryKey(metaData, _schema, tableName);
+                final List<String> pkList = pkInfo.getPrimaryKeyList();
                 if (pkList.size() != 1) {
                     skippedMap.put(tableName, pkList);
                     continue;
                 }
-                String primaryKeyName = pkList.get(0);
-                Statement statement = conn.createStatement();
-                Integer count = selectCount(statement, tableName);
+                final String pkColumnName = pkList.get(0);
+                final Statement statement = conn.createStatement();
+                final Integer count = selectCount(statement, tableName);
                 if (count == null || count == 0) {
                     // It is not necessary to increment because the table has no data.
                     continue;
                 }
-                Integer actualValue = selectDataMax(statement, tableName, primaryKeyName);
+                Integer actualValue = selectDataMax(statement, tableName, pkColumnName);
                 if (actualValue == null) {
                     // It is not necessary to increment because the table has no data.
                     continue;
@@ -126,8 +128,8 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         return rs.getInt(1);
     }
 
-    protected Integer selectDataMax(Statement statement, String tableName, String primaryKeyName) throws SQLException {
-        ResultSet rs = statement.executeQuery("select max(" + primaryKeyName + ") as MAX_VALUE from " + tableName);
+    protected Integer selectDataMax(Statement statement, String tableName, String pkColumnName) throws SQLException {
+        ResultSet rs = statement.executeQuery("select max(" + pkColumnName + ") as MAX_VALUE from " + tableName);
         if (!rs.next()) {
             return null;
         }
@@ -140,7 +142,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
             actualValue = Integer.valueOf(value);
         } catch (NumberFormatException e) {
             String msg = "The type of primary key related to sequece should be Number:";
-            msg = msg + " table=" + tableName + " primaryKey=" + primaryKeyName;
+            msg = msg + " table=" + tableName + " primaryKey=" + pkColumnName;
             msg = msg + " value=" + value;
             throw new IllegalStateException(msg);
         }

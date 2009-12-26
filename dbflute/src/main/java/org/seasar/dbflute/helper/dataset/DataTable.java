@@ -16,6 +16,7 @@ import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -187,7 +188,8 @@ public class DataTable {
 
     protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData, String schemaName) {
         try {
-            List<String> list = new DfUniqueKeyHandler().getPrimaryColumnNameList(metaData, schemaName, tableName);
+            final DfPrimaryKeyMetaInfo pkInfo = new DfUniqueKeyHandler().getPrimaryKey(metaData, schemaName, tableName);
+            final List<String> list = pkInfo.getPrimaryKeyList();
             return new HashSet<String>(list);
         } catch (SQLException e) {
             String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + tableName;

@@ -117,6 +117,20 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return text;
     }
 
+    public String resolveAttributeForSchemaHtml(String text) {
+        if (text == null || text.trim().length() == 0) {
+            return null;
+        }
+        // escape
+        text = DfStringUtil.replace(text, "<", "&lt;");
+        text = DfStringUtil.replace(text, ">", "&gt;");
+        text = DfStringUtil.replace(text, "\"", "&quot;");
+
+        // line separator
+        text = removeCR(text);
+        return text;
+    }
+
     public String resolvePreTextForSchemaHtml(String text) {
         if (text == null || text.trim().length() == 0) {
             return null;
@@ -130,24 +144,24 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
         return text;
     }
 
-    public String resolveTextForJavaDoc(String Text, String indent) {
+    public String resolveTextForJavaDoc(String text, String indent) {
         if (getBasicProperties().isTargetLanguageCSharp()) {
-            return resolveLineSeparatorForCSharpDoc(Text, "    " + indent);
+            return resolveLineSeparatorForCSharpDoc(text, "    " + indent);
         }
-        if (Text == null || Text.trim().length() == 0) {
+        if (text == null || text.trim().length() == 0) {
             return null;
         }
-        Text = removeCR(Text);
+        text = DfStringUtil.replace(text, "<", "&lt;");
+        text = DfStringUtil.replace(text, ">", "&gt;");
+        text = removeCR(text);
         final String javaDocLineSeparator = "<br />" + NORMAL_LINE_SEPARATOR + indent + " * ";
-        if (Text.contains(NORMAL_LINE_SEPARATOR)) {
-            Text = Text.replaceAll(NORMAL_LINE_SEPARATOR, javaDocLineSeparator);
+        if (text.contains(NORMAL_LINE_SEPARATOR)) {
+            text = text.replaceAll(NORMAL_LINE_SEPARATOR, javaDocLineSeparator);
         }
-        if (Text.contains(SPECIAL_LINE_SEPARATOR)) {
-            Text = Text.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
+        if (text.contains(SPECIAL_LINE_SEPARATOR)) {
+            text = text.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
         }
-        Text = DfStringUtil.replace(Text, "<", "&lt;");
-        Text = DfStringUtil.replace(Text, ">", "&gt;");
-        return Text;
+        return text;
     }
 
     protected String resolveLineSeparatorForCSharpDoc(String comment, String indent) {

@@ -56,7 +56,6 @@ package org.apache.torque.engine.database.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -102,13 +101,14 @@ public class Column {
     // -----------------------------------------------------
     //                                     Column Definition
     //                                     -----------------
-    private boolean _isPrimaryKey;
-    private boolean _isAutoIncrement;
-    private boolean _additionalPrimaryKey;
-    private boolean _isNotNull;
     private String _dbType;
     private String _columnSize;
     private String _defaultValue;
+    private boolean _isNotNull;
+    private boolean _isPrimaryKey;
+    private String _primaryKeyName;
+    private boolean _isAutoIncrement;
+    private boolean _additionalPrimaryKey;
     private String _plainComment;
     private List<ForeignKey> _referrers;
 
@@ -176,6 +176,7 @@ public class Column {
 
         // Primary Key
         _isPrimaryKey = ("true".equals(attrib.getValue("primaryKey")));
+        _primaryKeyName = attrib.getValue("pkName");
 
         // HELP: Should primary key, index, and/or idMethod="native"
         // affect isNotNull?  If not, please document why here.
@@ -456,34 +457,36 @@ public class Column {
     // -----------------------------------------------------
     //                                           Primary Key
     //                                           -----------
-    /**
-     * Return true if the column is a primary key
-     * @return Determination.
-     */
     public boolean isPrimaryKey() {
         return _isPrimaryKey;
     }
 
-    /**
-     * Set if the column is a primary key or not
-     * @param pk Determination.
-     */
     public void setPrimaryKey(boolean pk) {
         _isPrimaryKey = pk;
     }
 
-    /**
-     * Return true if the column is an additional primary key
-     * @return Determination.
-     */
+    public String getPrimaryKeyName() {
+        return _primaryKeyName;
+    }
+
+    public void setPrimaryKeyName(String primaryKeyName) {
+        _primaryKeyName = primaryKeyName;
+    }
+
+    public String getPrimaryKeyTitleForSchemaHtml() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String value = prop.resolveAttributeForSchemaHtml(_primaryKeyName);
+        if (value == null) {
+            return "";
+        }
+        final String text = prop.resolveAttributeForSchemaHtml(_primaryKeyName);
+        return " title=\"" + text + "\"";
+    }
+
     public boolean isAdditionalPrimaryKey() {
         return _additionalPrimaryKey;
     }
 
-    /**
-     * Set if the column is an additional primary key or not
-     * @param additionalPrimaryKey Determination.
-     */
     public void setAdditionalPrimaryKey(boolean additionalPrimaryKey) {
         _additionalPrimaryKey = additionalPrimaryKey;
     }
@@ -573,8 +576,8 @@ public class Column {
         return sb.toString();
     }
 
-    public String getUniqueToolTipTitleAttributeForSchemaHtml() {
-        if (!hasTwoOrMoreColumnUnique()) {
+    public String getUniqueKeyTitleForSchemaHtml() {
+        if (!isUnique()) {
             return "";
         }
         final StringBuilder sb = new StringBuilder();
@@ -583,7 +586,13 @@ public class Column {
             if (!unique.hasSameColumn(this)) {
                 continue;
             }
-            sb.append(sb.length() > 0 ? ", {" : "{");
+            final String uniqueKeyName = unique.getName();
+            sb.append(sb.length() > 0 ? ", " : "");
+            if (uniqueKeyName != null && uniqueKeyName.trim().length() > 0) {
+                sb.append(uniqueKeyName + "(");
+            } else {
+                sb.append("(");
+            }
             final Map<Integer, String> indexColumnMap = unique.getIndexColumnMap();
             final Set<Entry<Integer, String>> entrySet = indexColumnMap.entrySet();
             final StringBuilder oneUniqueSb = new StringBuilder();
@@ -595,10 +604,11 @@ public class Column {
                 oneUniqueSb.append(columnName);
             }
             sb.append(oneUniqueSb);
-            sb.append("}");
+            sb.append(")");
         }
-        sb.insert(0, " title=\"").append("\"");
-        return sb.toString();
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
+        return title != null ? " title=\"" + title + "\"" : "";
     }
 
     // -----------------------------------------------------
@@ -651,8 +661,8 @@ public class Column {
         return sb.toString();
     }
 
-    public String getIndexToolTipTitleAttributeForSchemaHtml() {
-        if (!hasTwoOrMoreColumnIndex()) {
+    public String getIndexTitleForSchemaHtml() {
+        if (!hasIndex()) {
             return "";
         }
         final StringBuilder sb = new StringBuilder();
@@ -661,7 +671,13 @@ public class Column {
             if (!index.hasSameColumn(this)) {
                 continue;
             }
-            sb.append(sb.length() > 0 ? ", {" : "{");
+            final String indexName = index.getName();
+            sb.append(sb.length() > 0 ? ", " : "");
+            if (indexName != null && indexName.trim().length() > 0) {
+                sb.append(indexName + "(");
+            } else {
+                sb.append("(");
+            }
             final Map<Integer, String> indexColumnMap = index.getIndexColumnMap();
             final Set<Entry<Integer, String>> entrySet = indexColumnMap.entrySet();
             final StringBuilder oneIndexSb = new StringBuilder();
@@ -673,10 +689,11 @@ public class Column {
                 oneIndexSb.append(columnName);
             }
             sb.append(oneIndexSb);
-            sb.append("}");
+            sb.append(")");
         }
-        sb.insert(0, " title=\"").append("\"");
-        return sb.toString();
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String title = prop.resolveAttributeForSchemaHtml(sb.toString());
+        return title != null ? " title=\"" + title + "\"" : "";
     }
 
     // -----------------------------------------------------
@@ -896,9 +913,9 @@ public class Column {
 
     public String getForeignTableNameCommaStringWithHtmlHref() { // for SchemaHTML
         final StringBuilder sb = new StringBuilder();
-        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder();
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
         final String delimiter = ",<br />";
-        final Set<String> tableSet = new HashSet<String>();
         final List<ForeignKey> foreignKeyList = getForeignKeyList();
         final int size = foreignKeyList.size();
         if (size == 0) {
@@ -906,15 +923,8 @@ public class Column {
         }
         for (int i = 0; i < size; i++) {
             final ForeignKey fk = foreignKeyList.get(i);
-            final String name = fk.getForeignTableName();
-            if (tableSet.contains(name)) {
-                continue;
-            }
-            if (fk.hasFixedCondition()) {
-                continue;
-            }
-            tableSet.add(name);
-            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, name, delimiter));
+            final String foreignTableName = fk.getForeignTableName();
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, foreignTableName, delimiter));
         }
         sb.delete(0, delimiter.length());
         return sb.toString();
@@ -1039,21 +1049,14 @@ public class Column {
         if (_referrers == null) {
             _referrers = new ArrayList<ForeignKey>(5);
         }
-        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder();
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
         final String delimiter = ",<br />";
-        final Set<String> tableSet = new HashSet<String>();
         final StringBuffer sb = new StringBuffer();
         for (ForeignKey fk : _referrers) {
             final Table reffererTable = fk.getTable();
-            final String name = reffererTable.getName();
-            if (tableSet.contains(name)) {
-                continue;
-            }
-            if (fk.hasFixedCondition()) {
-                continue;
-            }
-            tableSet.add(name);
-            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, name, delimiter));
+            final String referrerTableName = reffererTable.getName();
+            sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, referrerTableName, delimiter));
         }
         sb.delete(0, delimiter.length());
         return sb.toString();
