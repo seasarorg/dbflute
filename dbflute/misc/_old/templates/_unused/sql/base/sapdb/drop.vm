@@ -1,4 +1,0 @@
-drop table $table.Name cascade ;
-#if ($table.IdMethod == "native")
-drop sequence $table.SequenceName;
-#end
