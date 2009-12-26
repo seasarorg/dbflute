@@ -211,14 +211,11 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     protected void setupBasicConstraintInfo(DfSynonymMetaInfo info, String tableOwner, String tableName, Connection conn)
             throws SQLException {
         final DatabaseMetaData md = conn.getMetaData();
-        {
-            final DfPrimaryKeyMetaInfo pkInfo = getPKList(md, tableOwner, tableName);
-            final List<String> pkList = pkInfo.getPrimaryKeyList();
-            info.setPrimaryKeyNameList(pkList);
-        }
-        final List<String> pkNameList = info.getPrimaryKeyNameList();
+        final DfPrimaryKeyMetaInfo pkInfo = getPKList(md, tableOwner, tableName);
+        info.setPrimaryKeyMetaInfo(pkInfo);
+        final List<String> pkList = info.getPrimaryKeyMetaInfo().getPrimaryKeyList();
         if (info.isSelectable()) { // because it needs a select statement
-            for (String primaryKeyName : pkNameList) {
+            for (String primaryKeyName : pkList) {
                 final boolean autoIncrement = isAutoIncrement(conn, tableOwner, tableName, primaryKeyName);
                 if (autoIncrement) {
                     info.setAutoIncrement(autoIncrement);
@@ -227,7 +224,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             }
         }
         {
-            final Map<String, Map<Integer, String>> uqMap = getUQMap(md, tableOwner, tableName, pkNameList);
+            final Map<String, Map<Integer, String>> uqMap = getUQMap(md, tableOwner, tableName, pkList);
             info.setUniqueKeyMap(uqMap);
         }
         {
@@ -248,8 +245,8 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         final String dbLinkName = info.getDbLinkName();
         final List<DfColumnMetaInfo> columnMetaInfoList = getDBLinkSynonymColumns(conn, synonymOwner, synonymName);
         info.setColumnMetaInfoList4DBLink(columnMetaInfoList);
-        final List<String> primaryKeyNameList = getDBLinkSynonymPKList(conn, tableName, dbLinkName);
-        info.setPrimaryKeyNameList(primaryKeyNameList);
+        final DfPrimaryKeyMetaInfo pkInfo = getDBLinkSynonymPKInfo(conn, tableName, dbLinkName);
+        info.setPrimaryKeyMetaInfo(pkInfo);
         final Map<String, Map<Integer, String>> uniqueKeyMap = getDBLinkSynonymUQMap(conn, tableName, dbLinkName);
         info.setUniqueKeyMap(uniqueKeyMap);
 
@@ -504,9 +501,9 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         }
     }
 
-    protected List<String> getDBLinkSynonymPKList(Connection conn, String tableName, String dbLinkName)
+    protected DfPrimaryKeyMetaInfo getDBLinkSynonymPKInfo(Connection conn, String tableName, String dbLinkName)
             throws SQLException {
-        final List<String> columnList = new ArrayList<String>();
+        final DfPrimaryKeyMetaInfo pkInfo = new DfPrimaryKeyMetaInfo();
         StringBuilder sb = new StringBuilder();
         sb.append("select cols.OWNER, cols.CONSTRAINT_NAME, cols.TABLE_NAME, cols.COLUMN_NAME");
         sb.append("  from USER_CONS_COLUMNS@" + dbLinkName + " cols");
@@ -522,9 +519,10 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             rs = statement.executeQuery(sb.toString());
             while (rs.next()) {
                 String columnName = rs.getString("COLUMN_NAME");
-                columnList.add(columnName);
+                String pkName = rs.getString("CONSTRAINT_NAME");
+                pkInfo.addPrimaryKeyList(columnName, pkName);
             }
-            return columnList;
+            return pkInfo;
         } finally {
             if (statement != null) {
                 try {

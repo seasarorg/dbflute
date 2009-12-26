@@ -281,7 +281,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             if (tableMataInfo.getTableComment() != null && tableMataInfo.getTableComment().trim().length() != 0) {
                 tableElement.setAttribute("comment", tableMataInfo.getTableComment());
             }
-            final DfPrimaryKeyMetaInfo pkInfo = getPrimaryColumnNameList(dbMetaData, tableMataInfo);
+            final DfPrimaryKeyMetaInfo pkInfo = getPrimaryColumnMetaInfo(dbMetaData, tableMataInfo);
             final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, tableMataInfo);
             for (int j = 0; j < columns.size(); j++) {
                 final DfColumnMetaInfo columnMetaInfo = columns.get(j);
@@ -300,8 +300,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 }
                 if (pkInfo.containsColumn(columnName)) {
                     columnElement.setAttribute("primaryKey", "true");
-                    if (pkInfo.hasPrimaryKeyName()) {
-                        columnElement.setAttribute("pkName", pkInfo.getPrimaryKeyName());
+                    final String pkName = pkInfo.getPrimaryKeyName(columnName);
+                    if (pkName != null && pkName.trim().length() > 0) {
+                        columnElement.setAttribute("pkName", pkInfo.getPrimaryKeyName(columnName));
                     }
                 }
 
@@ -649,13 +650,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                           Primary Key
     //                                           -----------
     /**
-     * Retrieves a list of the columns composing the primary key for a given table.
+     * Get the meta information of primary key.
      * @param dbMeta The meta data of a database. (NotNull)
      * @param table The meta information of table. (NotNull)
      * @return The meta information of primary key. (NotNull)
      * @throws SQLException
      */
-    protected DfPrimaryKeyMetaInfo getPrimaryColumnNameList(DatabaseMetaData dbMeta, DfTableMetaInfo table)
+    protected DfPrimaryKeyMetaInfo getPrimaryColumnMetaInfo(DatabaseMetaData dbMeta, DfTableMetaInfo table)
             throws SQLException {
         final String schema = getHandlerUseSchema(table);
         final DfPrimaryKeyMetaInfo pkInfo = _uniqueKeyHandler.getPrimaryKey(dbMeta, schema, table);
@@ -665,13 +666,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         }
         final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
         if (synonym != null) {
-            final List<String> synonymPKList = synonym.getPrimaryKeyNameList();
-            final DfPrimaryKeyMetaInfo newPKInfo = new DfPrimaryKeyMetaInfo();
-            newPKInfo.setPrimaryKeyName(pkInfo.getPrimaryKeyName());
-            for (String synonymPK : synonymPKList) {
-                newPKInfo.addPrimaryKeyList(synonymPK);
-            }
-            return newPKInfo;
+            return synonym.getPrimaryKeyMetaInfo();
         } else {
             return pkInfo;
         }

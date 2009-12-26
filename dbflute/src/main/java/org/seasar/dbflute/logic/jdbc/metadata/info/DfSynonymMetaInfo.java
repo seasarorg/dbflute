@@ -35,7 +35,7 @@ public class DfSynonymMetaInfo {
     protected String synonymName;
     protected String tableOwner;
     protected String tableName;
-    protected List<String> primaryKeyNameList;
+    protected DfPrimaryKeyMetaInfo primaryKeyMetaInfo;
     protected boolean autoIncrement;
     protected Map<String, Map<Integer, String>> uniqueKeyMap;
     protected Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap;
@@ -83,7 +83,7 @@ public class DfSynonymMetaInfo {
             columns = "(" + columnMetaInfoList4DBLink.size() + " columns for DB link)";
         }
         return synonymOwner + "." + synonymName + ":{" + (dbLinkName != null ? dbLinkName : tableOwner) + "."
-                + tableName + columns + ", PK=" + primaryKeyNameList + (autoIncrement ? ", ID" : "") + ", "
+                + tableName + columns + ", PK=" + primaryKeyMetaInfo + (autoIncrement ? ", ID" : "") + ", "
                 + (uniqueKeyMap != null ? "UQ=" + uniqueKeyMap.size() : null) + ", "
                 + (foreignKeyMetaInfoMap != null ? "FK=" + foreignKeyMetaInfoMap.size() : null) + ", "
                 + (selectable ? "selectable" : "unselectable") + "}"
@@ -125,12 +125,12 @@ public class DfSynonymMetaInfo {
         this.tableName = tableName;
     }
 
-    public List<String> getPrimaryKeyNameList() {
-        return primaryKeyNameList != null ? primaryKeyNameList : new ArrayList<String>();
+    public DfPrimaryKeyMetaInfo getPrimaryKeyMetaInfo() {
+        return primaryKeyMetaInfo;
     }
 
-    public void setPrimaryKeyNameList(List<String> primaryKeyNameList) {
-        this.primaryKeyNameList = primaryKeyNameList;
+    public void setPrimaryKeyMetaInfo(DfPrimaryKeyMetaInfo primaryKeyMetaInfo) {
+        this.primaryKeyMetaInfo = primaryKeyMetaInfo;
     }
 
     public boolean isAutoIncrement() {

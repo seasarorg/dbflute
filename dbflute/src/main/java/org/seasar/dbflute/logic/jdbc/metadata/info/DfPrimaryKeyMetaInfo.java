@@ -16,7 +16,9 @@
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jflute
@@ -26,19 +28,25 @@ public class DfPrimaryKeyMetaInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _primaryKeyName;
-
-    protected List<String> _primaryKeyList = new ArrayList<String>();
+    protected Map<String, String> _primaryKeyMap = new LinkedHashMap<String, String>();
 
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
-    public boolean hasPrimaryKeyName() {
-        return _primaryKeyName != null && _primaryKeyName.trim().length() > 0;
+    public boolean containsColumn(String columnName) {
+        return _primaryKeyMap.containsKey(columnName);
     }
 
-    public boolean containsColumn(String columnName) {
-        return _primaryKeyList.contains(columnName);
+    public List<String> getPrimaryKeyList() {
+        return new ArrayList<String>(_primaryKeyMap.keySet());
+    }
+
+    public void addPrimaryKeyList(String columnName, String pkName) {
+        _primaryKeyMap.put(columnName, pkName);
+    }
+
+    public String getPrimaryKeyName(String columnName) {
+        return _primaryKeyMap.get(columnName);
     }
 
     // ===================================================================================
@@ -46,25 +54,6 @@ public class DfPrimaryKeyMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return _primaryKeyName + _primaryKeyList;
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public String getPrimaryKeyName() {
-        return _primaryKeyName;
-    }
-
-    public void setPrimaryKeyName(String primaryKeyName) {
-        _primaryKeyName = primaryKeyName;
-    }
-
-    public List<String> getPrimaryKeyList() {
-        return _primaryKeyList;
-    }
-
-    public void addPrimaryKeyList(String primaryKey) {
-        _primaryKeyList.add(primaryKey);
+        return getPrimaryKeyList().toString();
     }
 }

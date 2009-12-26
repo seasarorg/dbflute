@@ -76,10 +76,9 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         try {
             parts = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName);
             while (parts.next()) {
-                if (!info.hasPrimaryKeyName()) { // get a name from first record
-                    info.setPrimaryKeyName(getPrimaryKeyNameFromDBMeta(parts));
-                }
-                info.addPrimaryKeyList(getPrimaryKeyColumnNameFromDBMeta(parts));
+                final String columnName = getPrimaryKeyColumnNameFromDBMeta(parts);
+                final String pkName = getPrimaryKeyNameFromDBMeta(parts);
+                info.addPrimaryKeyList(columnName, pkName);
             }
         } finally {
             if (parts != null) {
@@ -94,12 +93,12 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         return dbMeta.getPrimaryKeys(null, schemaName, tableName);
     }
 
-    protected String getPrimaryKeyNameFromDBMeta(ResultSet resultSet) throws SQLException {
-        return resultSet.getString(6); // PK_NAME
-    }
-
     protected String getPrimaryKeyColumnNameFromDBMeta(ResultSet resultSet) throws SQLException {
         return resultSet.getString(4); // COLUMN_NAME
+    }
+
+    protected String getPrimaryKeyNameFromDBMeta(ResultSet resultSet) throws SQLException {
+        return resultSet.getString(6); // PK_NAME
     }
 
     // ===================================================================================
