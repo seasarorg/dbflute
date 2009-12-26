@@ -338,17 +338,10 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
             for (String fkName : fkNameSet) {
                 final DfForeignKeyMetaInfo fk = fkMap.get(fkName);
 
-                // - - - - - - - - - - - - - - -
-                // Translate a local table name.
-                // - - - - - - - - - - - - - - -
-                final String newLocalTableName = synonym.getSynonymName();
-                fk.setLocalTableName(newLocalTableName);
+                // at first translate a local table name
+                fk.setLocalTableName(synonym.getSynonymName());
 
-                // - - - - - - - - - - - - - - - -
-                // Translate a foreign table name.
-                // - - - - - - - - - - - - - - - -
                 final String foreignTableName = fk.getForeignTableName();
-
                 final List<String> foreignSynonymList = tableForeignSynonymListMap.get(foreignTableName);
                 if (foreignSynonymList == null || foreignSynonymList.isEmpty()) {
                     if (_tableHandler.isTableExcept(synonym.getTableOwner(), foreignTableName)) {
@@ -373,7 +366,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                     // second or more (creating new FK instance)
                     final DfForeignKeyMetaInfo additionalFK = new DfForeignKeyMetaInfo();
                     additionalFK.setForeignKeyName(newForeignKeyName);
-                    additionalFK.setLocalTableName(newLocalTableName);
+                    additionalFK.setLocalTableName(fk.getLocalTableName());
                     additionalFK.setForeignTableName(newForeignTableName);
                     additionalFK.setColumnNameMap(fk.getColumnNameMap());
                     additionalFKMap.put(additionalFK.getForeignKeyName(), additionalFK);
