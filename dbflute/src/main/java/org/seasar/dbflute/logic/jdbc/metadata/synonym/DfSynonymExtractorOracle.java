@@ -213,7 +213,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
         final DatabaseMetaData md = conn.getMetaData();
         final DfPrimaryKeyMetaInfo pkInfo = getPKList(md, tableOwner, tableName);
         info.setPrimaryKeyMetaInfo(pkInfo);
-        final List<String> pkList = info.getPrimaryKeyMetaInfo().getPrimaryKeyList();
+        final List<String> pkList = pkInfo.getPrimaryKeyList();
         if (info.isSelectable()) { // because it needs a select statement
             for (String primaryKeyName : pkList) {
                 final boolean autoIncrement = isAutoIncrement(conn, tableOwner, tableName, primaryKeyName);
