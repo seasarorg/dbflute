@@ -864,6 +864,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 final String columnSize = prop.findColumnSize(tableName, columnName);
                 final boolean required = prop.isColumnRequired(tableName, columnName);
                 final boolean primaryKey = prop.isColumnPrimaryKey(tableName, columnName);
+                final String pkName = prop.findColumnPKName(tableName, columnName);
                 final boolean autoIncrement = prop.isColumnAutoIncrement(tableName, columnName);
                 final String columnDefault = prop.findColumnDefault(tableName, columnName);
                 final String columnComment = prop.findColumnComment(tableName, columnName);
@@ -872,6 +873,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
                 setupAdditionalTableColumnAttribute(columnElement, "size", columnSize);
                 setupAdditionalTableColumnAttribute(columnElement, "required", String.valueOf(required));
                 setupAdditionalTableColumnAttribute(columnElement, "primaryKey", String.valueOf(primaryKey));
+                setupAdditionalTableColumnAttribute(columnElement, "pkName", pkName);
                 setupAdditionalTableColumnAttribute(columnElement, "autoIncrement", String.valueOf(autoIncrement));
                 setupAdditionalTableColumnAttribute(columnElement, "default", columnDefault);
                 setupAdditionalTableColumnAttribute(columnElement, "comment", columnComment);

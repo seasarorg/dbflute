@@ -78,6 +78,12 @@ public final class DfAdditionalTableProperties extends DfAbstractHelperPropertie
         return "true".equalsIgnoreCase(elementMap.get("primaryKey"));
     }
 
+    public String findColumnPKName(String tableName, String columnName) {
+        final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
+        final Map<String, String> elementMap = columnMap.get(columnName);
+        return elementMap.get("pkName");
+    }
+
     public boolean isColumnAutoIncrement(String tableName, String columnName) {
         final Map<String, Map<String, String>> columnMap = findColumnMap(tableName);
         final Map<String, String> elementMap = columnMap.get(columnName);

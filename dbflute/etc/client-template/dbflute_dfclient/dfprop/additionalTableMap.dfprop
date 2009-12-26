@@ -15,7 +15,8 @@
 #             [column-name] = map:{
 #                 type = [column JDBC type] ; dbType = [column DB type]
 #                 ; required = [true or false] ; size = [column size]
-#                 ; primaryKey = [true or false] ; autoIncrement = [true or false]
+#                 ; primaryKey = [true or false] ; pkName = [PK constraint name]
+#                 ; autoIncrement = [true or false]
 #                 ; default = [default value] ; comment = [column comment]
 #             }
 #         }
