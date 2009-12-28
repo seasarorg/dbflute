@@ -93,6 +93,7 @@ namespace ${glPackageExtendedParameterBean} {
             String c = ", ";
             StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($propertyType.equals("byte[]"))
             sb.Append(c).Append(FormatByteArray(_${propertyName}));
 #else
