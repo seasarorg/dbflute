@@ -333,7 +333,7 @@ namespace ${myExtendedEntityPackageName} {
             if (value1 == null && value2 == null) { return true; }
             if (value1 == null || value2 == null) { return false; }
 #if ($table.hasByteArrayColumnInEqualsHashcode())
-        if (value1 is byte[] && value2 is byte[]) { return xSVBA((byte[])value1, (byte[])value2); }
+            if (value1 is byte[] && value2 is byte[]) { return xSVBA((byte[])value1, (byte[])value2); }
 #end
             return value1.Equals(value2);
         }
@@ -341,8 +341,8 @@ namespace ${myExtendedEntityPackageName} {
         private bool xSVBA(byte[] byte1, byte[] byte2) { // isSameValueByteArray()
             if (byte1 == null && byte2 == null) { return true; }
             if (byte1 == null || byte2 == null) { return false; }
-            if (byte1.length != byte2.length) { return false; }
-            for (int i=0; i < byte1.length; i++) {
+            if (byte1.Length != byte2.Length) { return false; }
+            for (int i=0; i < byte1.Length; i++) {
                 if (byte1[i] != byte2[i]) { return false; }
             }
             return true;
