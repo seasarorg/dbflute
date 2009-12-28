@@ -414,6 +414,7 @@ namespace ${myExtendedEntityPackageName} {
 #else
             sb.Append(c).Append(this.${col.javaName});
 #end
+#end
             if (sb.Length > 0) { sb.Remove(0, c.Length); }
             sb.Insert(0, "{").Append("}");
             return sb.ToString();
