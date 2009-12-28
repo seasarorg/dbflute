@@ -757,6 +757,13 @@ public class Table {
     }
 
     /**
+     * Returns a List containing all the columns in the table
+     */
+    public List<Column> getColumnList() {
+        return _columnList;
+    }
+
+    /**
      * Returns an Array containing all the columns in the table
      */
     public Column[] getColumns() {
@@ -870,6 +877,24 @@ public class Table {
     public boolean hasUtilDateColumn() {
         for (Column column : _columnList) {
             if (column.isJavaNativeUtilDate()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasByteArrayColumn() {
+        for (Column column : _columnList) {
+            if (column.isJavaNativeByteArray()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasByteArrayColumnInEqualsHashcode() {
+        for (Column column : getEqualsHashcodeColumnList()) {
+            if (column.isJavaNativeByteArray()) {
                 return true;
             }
         }
@@ -1616,6 +1641,14 @@ public class Table {
             return getPrimaryKey().get(0).getName();
         } else {
             return "";
+        }
+    }
+
+    public List<Column> getEqualsHashcodeColumnList() {
+        if (hasPrimaryKey()) {
+            return getPrimaryKey();
+        } else {
+            return getColumnList();
         }
     }
 

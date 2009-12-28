@@ -1172,6 +1172,10 @@ public class Column {
         return getJavaNative().equals("java.util.Date");
     }
 
+    public boolean isJavaNativeByteArray() {
+        return getJavaNative().equals("byte[]");
+    }
+
     public boolean isJavaNativeUUIDObject() {
         if (isJavaNativeStringObject() || isJavaNativeNumberObject() || isJavaNativeDateObject()
                 || isJavaNativeBooleanObject() || isJavaNativeBinaryObject()) {

@@ -6,7 +6,7 @@
 
 	<!-- Version -->
 	<property name="version" value="0.9.6.3"/>
-	<property name="internal.version" value="${version}-SNAPSHOT"/>
+	<property name="internal.version" value="${version}"/>
 
 	<!-- Directories and Module Files -->
 	<property name="dbflute.dist" value="dist"/>
@@ -15,7 +15,7 @@
 	<property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
 	<property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
 	<property name="dbflute.zip.dirfile" value="${dbflute.dist}/${dbflute.zip.file}"/>
-	
+
 	<property name="workspace.base" value=".."/>
 	<property name="dbflute.runtime.dir" value="${workspace.base}/dbflute-runtime"/>
 

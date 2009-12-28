@@ -76,6 +76,10 @@ namespace ${glPackageExtendedParameterBean} {
             return ((value != null && !"".Equals(value)) ? value : null);
         }
 
+        protected String FormatByteArray(byte[] bytes) {
+            return "byte[" + (bytes != null ? bytes.Length.ToString() : "null") + "]";
+        }
+
         // ===============================================================================
         //                                                                  Basic Override
         //                                                                  ==============
@@ -86,12 +90,15 @@ namespace ${glPackageExtendedParameterBean} {
             return sb.ToString();
         }
         private String xbuildColumnString() {
-            String delimiter = ",";
+            String c = ", ";
             StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-            sb.Append(delimiter).Append(_${propertyName});
+#if ($propertyType.equals("byte[]"))
+            sb.Append(c).Append(FormatByteArray(_${propertyName}));
+#else
+            sb.Append(c).Append(_${propertyName});
 #end
-            if (sb.Length > 0) { sb.Remove(0, delimiter.Length); }
+            if (sb.Length > 0) { sb.Remove(0, c.Length); }
             sb.Insert(0, "{").Append("}");
             return sb.ToString();
         }

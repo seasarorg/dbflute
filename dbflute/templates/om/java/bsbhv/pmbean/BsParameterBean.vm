@@ -134,7 +134,11 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #else
         String pattern = "yyyy-MM-dd";
 #end
-        return DfTypeUtil.format(date, pattern);
+        return date != null ? new java.text.SimpleDateFormat(pattern).format(date) : null;
+    }
+
+    protected String formatByteArray(byte[] bytes) {
+        return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
     }
 
     // ===================================================================================
@@ -157,6 +161,8 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($propertyType.equals("java.util.Date"))
         sb.append(c).append(formatUtilDate(_${propertyName}));
+#elseif ($propertyType.equals("byte[]"))
+        sb.append(c).append(formatByteArray(_${propertyName}));
 #else
         sb.append(c).append(_${propertyName});
 #end

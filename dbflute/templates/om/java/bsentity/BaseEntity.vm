@@ -420,69 +420,54 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
-#if ($table.hasPrimaryKey())
     /**
-     * If the primary-key of the other is same as this one, returns true.
-     * @param other Other entity.
+     * If primary-keys or columns of the other are same as this one, returns true.
+     * @param other The other entity. (Nullable)
      * @return Comparing result.
      */
     public boolean equals(Object other) {
         if (other == null || !(other instanceof $myClassName)) { return false; }
         $myClassName otherEntity = ($myClassName)other;
-#foreach ($col in $table.primaryKey)
-        if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
+#foreach ($col in $table.equalsHashcodeColumnList)
+        if (!xSV(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
 #end
         return true;
     }
-
-    protected boolean helpComparingValue(Object value1, Object value2) {
+    private boolean xSV(Object value1, Object value2) { // isSameValue()
         if (value1 == null && value2 == null) { return true; }
-        return value1 != null && value2 != null && value1.equals(value2);
-    }
-
-    /**
-     * Calculates hash-code from primary-key.
-     * @return Hash-code from primary-key.
-     */
-    public int hashCode() {
-        int result = 17;
-#foreach ($col in $table.primaryKey)
-        if (get${col.JavaName}() != null) { result = (31*result) + get${col.JavaName}().hashCode(); }
+        if (value1 == null || value2 == null) { return false; }
+#if ($table.hasByteArrayColumnInEqualsHashcode())
+        if (value1 instanceof byte[] && value2 instanceof byte[]) { return xSVBA((byte[])value1, (byte[])value2); }
 #end
-        return result;
+        return value1.equals(value2);
     }
-#else
-    /**
-     * If the all-column value of the other is same as this one, returns true.
-     * @param other Other entity. (Nullable)
-     * @return Comparing result. If other is null, returns false.
-     */
-    public boolean equals(Object other) {
-        if (other == null || !(other instanceof $myClassName)) { return false; }
-        final $myClassName otherEntity = ($myClassName)other;
-#foreach ($col in $table.columns)
-        if (!helpComparingValue(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
-#end
+#if ($table.hasByteArrayColumnInEqualsHashcode())
+    private boolean xSVBA(byte[] byte1, byte[] byte2) { // isSameValueByteArray()
+        if (byte1 == null && byte2 == null) { return true; }
+        if (byte1 == null || byte2 == null) { return false; }
+        if (byte1.length != byte2.length) { return false; }
+        for (int i=0; i < byte1.length; i++) {
+            if (byte1[i] != byte2[i]) { return false; }
+        }
         return true;
     }
-
-    protected boolean helpComparingValue(Object value1, Object value2) {
-        if (value1 == null && value2 == null) { return true; }
-        return value1 != null && value2 != null && value1.equals(value2);
-    }
+#end
 
     /**
-     * Calculates hash-code from all columns.
-     * @return Hash-code from all columns.
+     * Calculates the hash-code from primary-keys or columns.
+     * @return The hash-code from primary-key or columns.
      */
     public int hashCode() {
         int result = 17;
-#foreach ($col in $table.columns)
-        if (get${col.javaName}() != null) { result = (31*result) + get${col.javaName}().hashCode(); }
+#foreach ($col in $table.equalsHashcodeColumnList)
+        result = xCH(result, get${col.JavaName}());
 #end
         return result;
     }
-#end
+    private int xCH(int result, Object value) { // calculateHashcode()
+        if (value == null) { return result; }
+        return (31*result) + (value instanceof byte[] ? ((byte[])value).length : value.hashCode());
+    }
 
     /**
      * @return The display string of all columns and relation existences. (NotNull)
@@ -547,6 +532,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #foreach ($col in $table.columns)
 #if ($col.isJavaNativeUtilDate())
         sb.append(c).append(xfUD(get${col.javaName}()));
+#elseif ($col.isJavaNativeByteArray())
+        sb.append(c).append(xfBA(get${col.javaName}()));
 #else
         sb.append(c).append(get${col.javaName}());
 #end
@@ -556,13 +543,18 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return sb.toString();
     }
 #if ($table.hasUtilDateColumn())
-    private String xfUD(java.util.Date date) { // formatUtilDate
+    private String xfUD(java.util.Date date) { // formatUtilDate()
 #if ($database.isDatabaseOracle())
         String pattern = "yyyy-MM-dd HH:mm:ss"; // for Oracle
 #else
         String pattern = "yyyy-MM-dd";
 #end
         return date != null ? new java.text.SimpleDateFormat(pattern).format(date) : null;
+    }
+#end
+#if ($table.hasByteArrayColumn())
+    private String xfBA(byte[] byteArray) { // formatByteArray()
+        return "byte[" + (byteArray != null ? String.valueOf(byteArray.length) : "null") + "]";
     }
 #end
     private String xbuildRelationString() {

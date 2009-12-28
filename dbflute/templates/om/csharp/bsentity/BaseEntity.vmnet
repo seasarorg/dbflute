@@ -321,50 +321,45 @@ namespace ${myExtendedEntityPackageName} {
         //                                                                  Basic Override
         //                                                                  ==============
         #region Basic Override
-#if ($table.hasPrimaryKey())
         public override bool Equals(Object other) {
             if (other == null || !(other is $myClassName)) { return false; }
             $myClassName otherEntity = ($myClassName)other;
-#foreach ($col in $table.primaryKey)
-            if (this.${col.javaName} == null || !this.${col.javaName}.Equals(otherEntity.${col.javaName})) { return false; }
+#foreach ($col in $table.equalsHashcodeColumnList)
+            if (!xSV(this.${col.javaName}, otherEntity.${col.javaName})) { return false; }
 #end
             return true;
         }
-
-        public override int GetHashCode() {
-            int result = 17;
-#foreach ($col in $table.primaryKey)
-#if (!${col.isJavaNativeNumberObject()})
-            if (_${col.uncapitalisedJavaName} != null) { result = (31*result) + _${col.uncapitalisedJavaName}.GetHashCode(); }
-#else
-            result = (31*result) + _${col.uncapitalisedJavaName}.GetHashCode();
+        private bool xSV(Object value1, Object value2) { // isSameValue()
+            if (value1 == null && value2 == null) { return true; }
+            if (value1 == null || value2 == null) { return false; }
+#if ($table.hasByteArrayColumnInEqualsHashcode())
+        if (value1 is byte[] && value2 is byte[]) { return xSVBA((byte[])value1, (byte[])value2); }
 #end
-#end
-            return result;
+            return value1.Equals(value2);
         }
-#else
-
-        public override bool Equals(Object other) {
-            if (other == null || !(other is $myClassName)) { return false; }
-            $myClassName otherEntity = ($myClassName)other;
-#foreach ($col in $table.columns)
-            if (this.${col.javaName} == null || !this.${col.javaName}.Equals(otherEntity.${col.javaName})) { return false; }
-#end
+#if ($table.hasByteArrayColumnInEqualsHashcode())
+        private bool xSVBA(byte[] byte1, byte[] byte2) { // isSameValueByteArray()
+            if (byte1 == null && byte2 == null) { return true; }
+            if (byte1 == null || byte2 == null) { return false; }
+            if (byte1.length != byte2.length) { return false; }
+            for (int i=0; i < byte1.length; i++) {
+                if (byte1[i] != byte2[i]) { return false; }
+            }
             return true;
         }
+#end
 
         public override int GetHashCode() {
             int result = 17;
-#foreach ($col in $table.Columns)
-#if (!${col.isJavaNativeNumberObject()})
-            if (_${col.uncapitalisedJavaName} != null) { result = (31*result) + _${col.uncapitalisedJavaName}.GetHashCode(); }
-#else
-            result = (31*result) + _${col.uncapitalisedJavaName}.GetHashCode();
-#end
+#foreach ($col in $table.equalsHashcodeColumnList)
+            result = xCH(result, _${col.uncapitalisedJavaName});
 #end
             return result;
         }
-#end
+        private int xCH(int result, Object value) { // calculateHashcode()
+            if (value == null) { return result; }
+            return (31*result) + (value is byte[] ? ((byte[])value).Length : value.GetHashCode());
+        }
 
         public override String ToString() {
             return "${myClassName}:" + xbuildColumnString() + xbuildRelationString();
@@ -411,15 +406,23 @@ namespace ${myExtendedEntityPackageName} {
             return sb.ToString();
         }
         private String xbuildColumnString() {
-            String c = ",";
+            String c = ", ";
             StringBuilder sb = new StringBuilder();
 #foreach ($col in $table.columns)
+#if ($col.isJavaNativeByteArray())
+            sb.Append(c).Append(xfBA(this.${col.javaName}));
+#else
             sb.Append(c).Append(this.${col.javaName});
 #end
             if (sb.Length > 0) { sb.Remove(0, c.Length); }
             sb.Insert(0, "{").Append("}");
             return sb.ToString();
         }
+#if ($table.hasByteArrayColumn())
+        private String xfBA(byte[] byteArray) { // formatByteArray()
+            return "byte[" + (byteArray != null ? byteArray.Length.ToString() : "null") + "]";
+        }
+#end
         private String xbuildRelationString() {
 #if ($table.hasRelation())
             StringBuilder sb = new StringBuilder();
