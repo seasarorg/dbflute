@@ -154,7 +154,7 @@ namespace ${myExtendedEntityPackageName} {
             return ${glCDef}.${col.classificationName}.CodeOf(_${col.uncapitalisedJavaName});
         }}
 
- #foreach ($classificationMap in $col.ClassificationMapList)
+#foreach ($classificationMap in $col.ClassificationMapList)
         /// <summary>
         /// Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'?
         /// <![CDATA[
