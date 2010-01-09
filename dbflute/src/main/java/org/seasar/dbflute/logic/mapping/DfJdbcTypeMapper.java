@@ -88,6 +88,9 @@ public class DfJdbcTypeMapper {
             // For compatible to Oracle's JDBC driver.
             return getDateJdbcType();
         }
+        if (isOracleBinaryFloatDouble(jdbcDefValue, dbTypeName)) {
+            return getDecimalJdbcType();
+        }
 
         // * * * * * *
         // Priority 3
@@ -144,10 +147,15 @@ public class DfJdbcTypeMapper {
         return _resource.isDatabaseOracle() && "clob".equalsIgnoreCase(dbTypeName);
     }
 
+    public boolean isOracleBinaryFloatDouble(final int jdbcType, final String dbTypeName) {
+        return _resource.isDatabaseOracle()
+                && ("binary_float".equalsIgnoreCase(dbTypeName) || "binary_double".equalsIgnoreCase(dbTypeName));
+    }
+
     public boolean isPostgreSQLBytesOid(final String dbTypeName) {
         return _resource.isDatabasePostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
     }
-    
+
     public boolean isUUID(final String dbTypeName) {
         return "uuid".equalsIgnoreCase(dbTypeName);
     }
@@ -169,6 +177,10 @@ public class DfJdbcTypeMapper {
 
     protected String getCharJdbcType() {
         return TypeMap.findJdbcTypeByJdbcDefValue(java.sql.Types.CHAR);
+    }
+
+    protected String getDecimalJdbcType() {
+        return TypeMap.findJdbcTypeByJdbcDefValue(java.sql.Types.DECIMAL);
     }
 
     protected String getTimestampJdbcType() {
