@@ -88,9 +88,6 @@ public class DfJdbcTypeMapper {
             // For compatible to Oracle's JDBC driver.
             return getDateJdbcType();
         }
-        if (isOracleBinaryFloatDouble(jdbcDefValue, dbTypeName)) {
-            return getDecimalJdbcType();
-        }
 
         // * * * * * *
         // Priority 3
@@ -177,10 +174,6 @@ public class DfJdbcTypeMapper {
 
     protected String getCharJdbcType() {
         return TypeMap.findJdbcTypeByJdbcDefValue(java.sql.Types.CHAR);
-    }
-
-    protected String getDecimalJdbcType() {
-        return TypeMap.findJdbcTypeByJdbcDefValue(java.sql.Types.DECIMAL);
     }
 
     protected String getTimestampJdbcType() {
