@@ -406,18 +406,24 @@ public class TypeMap {
     public static String findJavaNativeByJdbcType(String jdbcType, Integer columnSize, Integer decimalDigits) {
         final String javaType = getJavaNative(jdbcType);
         if (isAutoMappingTargetType(jdbcType) && javaType.equalsIgnoreCase("$$AutoMapping$$")) {
+            final String defaultJavaNativeType;
+            if (NUMERIC.equalsIgnoreCase(jdbcType)) {
+                defaultJavaNativeType = getDefaultNumericJavaNativeType();
+            } else { // DECIMAL
+                defaultJavaNativeType = getDefaultDecimalJavaNativeType();
+            }
             if (decimalDigits != null && decimalDigits > 0) {
-                if (NUMERIC.equalsIgnoreCase(jdbcType)) {
-                    return getDefaultNumericJavaNativeType();
-                } else {// DECIMAL
-                    return getDefaultDecimalJavaNativeType();
-                }
+                return defaultJavaNativeType;
             } else {
                 if (columnSize == null) {
                     return getJavaNative(BIGINT);
                 }
                 if (columnSize > 9) {
-                    return getJavaNative(BIGINT);
+                    if (columnSize > 18) {
+                        return defaultJavaNativeType;
+                    } else {
+                        return getJavaNative(BIGINT);
+                    }
                 } else {
                     return getJavaNative(INTEGER);
                 }
