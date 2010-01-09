@@ -3,6 +3,7 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
+import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
@@ -53,6 +54,14 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return isProperty(key, defaultValue, getBasicInfoMap());
     }
 
+    public void checkBasicInfo() {
+        final String databaseName = getDatabaseName();
+        if (databaseName == null || databaseName.trim().length() == 0) {
+            String msg = "Not found the property 'database' in basicInfoMap.dfprop: " + databaseName;
+            throw new DfRequiredPropertyNotFoundException(msg);
+        }
+    }
+
     // ===================================================================================
     //                                                                             Project
     //                                                                             =======
@@ -64,7 +73,12 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                            Database
     //                                                                            ========
     public String getDatabaseName() {
-        return getProperty("database", "");
+        final String databaseName = getProperty("database", null);
+        if (databaseName == null || databaseName.trim().length() == 0) {
+            String msg = "Not found the property 'database' in basicInfoMap.dfprop: " + databaseName;
+            throw new DfRequiredPropertyNotFoundException(msg);
+        }
+        return databaseName;
     }
 
     public boolean isDatabaseMySQL() {
