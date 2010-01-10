@@ -21,11 +21,19 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author jflute
  * @since 0.9.5.2 (2009/07/09 Thursday)
  */
 public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfSequenceHandlerOracle.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -38,9 +46,20 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
     //                                                                          Next Value
     //                                                                          ==========
     @Override
-    protected Integer selectNextVal(Statement statement, String sequenceName) throws SQLException {
-        ResultSet rs = statement.executeQuery("select " + sequenceName + ".nextval from dual");
-        rs.next();
-        return rs.getInt(1);
+    protected Integer selectNextVal(Statement st, String sequenceName) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = st.executeQuery("select " + sequenceName + ".nextval from dual");
+            rs.next();
+            return rs.getInt(1);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                    _log.info("ResultSet.close() threw the exception!", ignored);
+                }
+            }
+        }
     }
 }

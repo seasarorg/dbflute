@@ -79,58 +79,77 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                 return new ArrayList<String>(); // All table target!
             }
         };
-        final Connection conn = _dataSource.getConnection();
-        final DatabaseMetaData metaData = conn.getMetaData();
-        final List<DfTableMetaInfo> tableList = tableHandler.getTableList(metaData, _schema);
-        final DfUniqueKeyHandler uniqueKeyHandler = new DfUniqueKeyHandler();
-        final DfColumnHandler columnHandler = new DfColumnHandler() {
-            @Override
-            protected List<String> getRealSimpleColumnExceptList(String schemaName) {
-                return new ArrayList<String>(); // All column target!
-            }
-        };
-        final DfAutoIncrementHandler autoIncrementHandler = new DfAutoIncrementHandler();
-        _log.info("...Incrementing serial type sequence");
-        for (DfTableMetaInfo tableMetaInfo : tableList) {
-            final String tableName = tableMetaInfo.getTableName();
-            final DfPrimaryKeyMetaInfo pkInfo = uniqueKeyHandler.getPrimaryKey(metaData, _schema, tableMetaInfo);
-            final List<String> pkList = pkInfo.getPrimaryKeyList();
-            if (pkList.size() != 1) {
-                continue;
-            }
-            final String primaryKeyName = pkList.get(0);
-            if (!autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyName)) {
-                continue;
-            }
-            final Map<String, DfColumnMetaInfo> columnMetaMap = columnHandler.getColumnMetaInfo(metaData, _schema,
-                    tableName);
-            final DfColumnMetaInfo columnMetaInfo = columnMetaMap.get(primaryKeyName);
-            final String defaultValue = columnMetaInfo.getDefaultValue();
-            if (defaultValue == null) {
-                continue;
-            }
-            final String prefix = "nextval('";
-            if (!defaultValue.startsWith(prefix)) {
-                continue;
-            }
-            final String excludedPrefixString = defaultValue.substring(prefix.length());
-            final int endIndex = excludedPrefixString.indexOf("'");
-            if (endIndex < 0) {
-                continue;
-            }
-            final String sequenceName = excludedPrefixString.substring(0, endIndex);
-            Statement statement = conn.createStatement();
+        Connection conn = null;
+        Statement st = null;
+        try {
+            conn = _dataSource.getConnection();
+            st = conn.createStatement();
+            final DatabaseMetaData metaData = conn.getMetaData();
+            final List<DfTableMetaInfo> tableList = tableHandler.getTableList(metaData, _schema);
+            final DfUniqueKeyHandler uniqueKeyHandler = new DfUniqueKeyHandler();
+            final DfColumnHandler columnHandler = new DfColumnHandler() {
+                @Override
+                protected List<String> getRealSimpleColumnExceptList(String schemaName) {
+                    return new ArrayList<String>(); // All column target!
+                }
+            };
+            final DfAutoIncrementHandler autoIncrementHandler = new DfAutoIncrementHandler();
+            _log.info("...Incrementing serial type sequence");
+            for (DfTableMetaInfo tableMetaInfo : tableList) {
+                final String tableName = tableMetaInfo.getTableName();
+                final DfPrimaryKeyMetaInfo pkInfo = uniqueKeyHandler.getPrimaryKey(metaData, _schema, tableMetaInfo);
+                final List<String> pkList = pkInfo.getPrimaryKeyList();
+                if (pkList.size() != 1) {
+                    continue;
+                }
+                final String primaryKeyName = pkList.get(0);
+                if (!autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyName)) {
+                    continue;
+                }
+                final Map<String, DfColumnMetaInfo> columnMetaMap = columnHandler.getColumnMetaInfo(metaData, _schema,
+                        tableName);
+                final DfColumnMetaInfo columnMetaInfo = columnMetaMap.get(primaryKeyName);
+                final String defaultValue = columnMetaInfo.getDefaultValue();
+                if (defaultValue == null) {
+                    continue;
+                }
+                final String prefix = "nextval('";
+                if (!defaultValue.startsWith(prefix)) {
+                    continue;
+                }
+                final String excludedPrefixString = defaultValue.substring(prefix.length());
+                final int endIndex = excludedPrefixString.indexOf("'");
+                if (endIndex < 0) {
+                    continue;
+                }
+                final String sequenceName = excludedPrefixString.substring(0, endIndex);
 
-            Integer count = selectCount(statement, tableName);
-            if (count == null || count == 0) {
-                // It is not necessary to increment because the table has no data.
-                continue;
-            }
+                final Integer count = selectCount(st, tableName);
+                if (count == null || count == 0) {
+                    // It is not necessary to increment because the table has no data.
+                    continue;
+                }
 
-            String sql = "select setval('" + sequenceName + "', (select max(" + primaryKeyName + ")";
-            sql = sql + " from " + tableName + "))";
-            _log.info(sql);
-            statement.execute(sql);
+                String sql = "select setval('" + sequenceName + "', (select max(" + primaryKeyName + ")";
+                sql = sql + " from " + tableName + "))";
+                _log.info(sql);
+                st.execute(sql);
+            }
+        } finally {
+            if (st != null) {
+                try {
+                    st.close();
+                } catch (SQLException ignored) {
+                    _log.info("Statement.close() threw the exception!", ignored);
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                    _log.info("Connection.close() threw the exception!", ignored);
+                }
+            }
         }
     }
 
@@ -138,9 +157,20 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     //                                                                          Next Value
     //                                                                          ==========
     @Override
-    protected Integer selectNextVal(Statement statement, String sequenceName) throws SQLException {
-        ResultSet rs = statement.executeQuery("select nextval ('" + sequenceName + "')");
-        rs.next();
-        return rs.getInt(1);
+    protected Integer selectNextVal(Statement st, String sequenceName) throws SQLException {
+        ResultSet rs = null;
+        try {
+            rs = st.executeQuery("select nextval ('" + sequenceName + "')");
+            rs.next();
+            return rs.getInt(1);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException ignored) {
+                    _log.info("ResultSet.close() threw the exception!", ignored);
+                }
+            }
+        }
     }
 }
