@@ -81,23 +81,18 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
                     skippedMap.put(tableName, pkList);
                     continue;
                 }
-                final String pkColumnName = pkList.get(0);
+                final String primaryKeyColumnName = pkList.get(0);
                 final Integer count = selectCount(st, tableName);
                 if (count == null || count == 0) {
                     // It is not necessary to increment because the table has no data.
                     continue;
                 }
-                final Integer actualValue = selectDataMax(st, tableName, pkColumnName);
+                final Integer actualValue = selectDataMax(st, tableName, primaryKeyColumnName);
                 if (actualValue == null) {
                     // It is not necessary to increment because the table has no data.
                     continue;
                 }
-                Integer sequenceValue = selectNextVal(st, sequenceName);
-                final Integer startPoint = sequenceValue;
-                while (actualValue > sequenceValue) {
-                    sequenceValue = selectNextVal(st, sequenceName);
-                }
-                _log.info("    " + sequenceName + ": " + startPoint + " to " + sequenceValue);
+                callSequenceLoop(st, sequenceName, actualValue);
             }
         } catch (SQLException e) {
             throw new IllegalStateException(e);
@@ -128,6 +123,15 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         }
     }
 
+    protected void callSequenceLoop(Statement st, String sequenceName, Integer actualValue) throws SQLException {
+        Integer sequenceValue = selectNextVal(st, sequenceName);
+        final Integer startPoint = sequenceValue;
+        while (actualValue > sequenceValue) {
+            sequenceValue = selectNextVal(st, sequenceName);
+        }
+        _log.info("    " + sequenceName + ": " + startPoint + " to " + sequenceValue);
+    }
+
     protected Integer selectCount(Statement statement, String tableName) throws SQLException {
         ResultSet rs = null;
         try {
@@ -147,8 +151,9 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         }
     }
 
-    protected Integer selectDataMax(Statement statement, String tableName, String pkColumnName) throws SQLException {
-        final String sql = "select max(" + pkColumnName + ") as MAX_VALUE from " + tableName;
+    protected Integer selectDataMax(Statement statement, String tableName, String primaryKeyColumnName)
+            throws SQLException {
+        final String sql = "select max(" + primaryKeyColumnName + ") as MAX_VALUE from " + tableName;
         ResultSet rs = null;
         try {
             rs = statement.executeQuery(sql);
@@ -164,7 +169,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
                 actualValue = Integer.valueOf(value);
             } catch (NumberFormatException e) {
                 String msg = "The type of primary key related to sequece should be Number:";
-                msg = msg + " table=" + tableName + " primaryKey=" + pkColumnName;
+                msg = msg + " table=" + tableName + " primaryKey=" + primaryKeyColumnName;
                 msg = msg + " value=" + value;
                 throw new IllegalStateException(msg);
             }

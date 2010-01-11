@@ -102,13 +102,13 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                 if (pkList.size() != 1) {
                     continue;
                 }
-                final String primaryKeyName = pkList.get(0);
-                if (!autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyName)) {
+                final String primaryKeyColumnName = pkList.get(0);
+                if (!autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName)) {
                     continue;
                 }
                 final Map<String, DfColumnMetaInfo> columnMetaMap = columnHandler.getColumnMetaInfo(metaData, _schema,
                         tableName);
-                final DfColumnMetaInfo columnMetaInfo = columnMetaMap.get(primaryKeyName);
+                final DfColumnMetaInfo columnMetaInfo = columnMetaMap.get(primaryKeyColumnName);
                 final String defaultValue = columnMetaInfo.getDefaultValue();
                 if (defaultValue == null) {
                     continue;
@@ -129,11 +129,18 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                     // It is not necessary to increment because the table has no data.
                     continue;
                 }
+                final Integer actualValue = selectDataMax(st, tableName, primaryKeyColumnName);
+                if (actualValue == null) {
+                    // It is not necessary to increment because the table has no data.
+                    continue;
+                }
+                callSequenceLoop(st, sequenceName, actualValue);
 
-                String sql = "select setval('" + sequenceName + "', (select max(" + primaryKeyName + ")";
-                sql = sql + " from " + tableName + "))";
-                _log.info(sql);
-                st.execute(sql);
+                // *It's an old style.
+                //String sql = "select setval('" + sequenceName + "', (select max(" + primaryKeyColumnName + ")";
+                //sql = sql + " from " + tableName + "))";
+                //_log.info(sql);
+                //st.execute(sql);
             }
         } finally {
             if (st != null) {
