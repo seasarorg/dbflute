@@ -9,7 +9,8 @@
 # If the database is Oracle, they often use this.
 # For example, if you use this for NUMERIC.
 #   o Numeric( 1 -  9 , 0) is mapping to INTEGER
-#   o Numeric(10 - 38 , 0) is mapping to BIGINT
+#   o Numeric(10 - 18 , 0) is mapping to BIGINT
+#   o Numeric(19 - 38 , 0) is mapping to NUMERIC
 #   o Numeric( 1 - 38 , 2) is mapping to NUMERIC
 # 
 # Example:
