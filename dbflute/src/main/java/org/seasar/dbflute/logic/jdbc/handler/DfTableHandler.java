@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 
@@ -70,8 +71,8 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                     _log.info("$ " + tableName + " is excepted!");
                     continue;
                 }
-                if (isOracle() && tableName.startsWith("BIN$")) {
-                    _log.info("$ " + tableName + " is excepted! {Forced}");
+                if (isSystemTableForDBMS(tableName)) {
+                    _log.info("$ " + tableName + " is excepted! {system table}");
                     continue;
                 }
 
@@ -90,6 +91,22 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
 
         resolveSameNameTable(tableList);
         return tableList;
+    }
+
+    public boolean isSystemTableForDBMS(String tableName) {
+        if (isOracle() && tableName.startsWith("BIN$")) {
+            return true;
+        }
+        if (isSQLServer()) {
+            final Set<String> systemSet = StringSet.createAsCaseInsensitive();
+            systemSet.add("sysobjects");
+            systemSet.add("sysconstraints");
+            systemSet.add("syssegments");
+            if (systemSet.contains(tableName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected String[] getRealObjectTypeTargetArray(String schemaName) {

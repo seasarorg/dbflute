@@ -190,6 +190,10 @@ public class DfAbstractMetaDataHandler {
         return getBasicProperties().isDatabaseDB2();
     }
 
+    protected boolean isSQLServer() {
+        return getBasicProperties().isDatabaseSqlServer();
+    }
+
     protected boolean isMsAccess() {
         return getBasicProperties().isDatabaseMsAccess();
     }
