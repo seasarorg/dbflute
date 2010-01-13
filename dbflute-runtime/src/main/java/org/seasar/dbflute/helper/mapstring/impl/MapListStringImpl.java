@@ -28,9 +28,15 @@ import org.seasar.dbflute.helper.mapstring.MapListString;
  */
 public class MapListStringImpl implements MapListString {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Line separator. */
     public static final String NEW_LINE = System.getProperty("line.separator");
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     /** Map-mark. */
     protected String _mapMark;
 
@@ -55,6 +61,9 @@ public class MapListStringImpl implements MapListString {
     /** Remainder string. */
     protected String _remainderString;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     /**
      * Constructor.
      */
@@ -67,75 +76,11 @@ public class MapListStringImpl implements MapListString {
         _equal = DEFAULT_EQUAL;
     }
 
-    // ==========================================================================================
-    //                                                                                     Setter
-    //                                                                                     ======
+    // ===================================================================================
+    //                                                                            Generate
+    //                                                                            ========
     /**
-     * Set map-mark.
-     * 
-     * @param mapMark Map mark. (NotNull)
-     */
-    public void setMapMark(String mapMark) {
-        _mapMark = mapMark;
-    }
-
-    /**
-     * Set list-mark.
-     * 
-     * @param listMark List mark. (NotNull)
-     */
-    public void setListMark(String listMark) {
-        _listMark = listMark;
-    }
-
-    /**
-     * Set start-brace.
-     * 
-     * @param startBrace Start-brace. (NotNull)
-     */
-    public synchronized void setStartBrace(String startBrace) {
-        _startBrace = startBrace;
-    }
-
-    /**
-     * Set end-brace.
-     * 
-     * @param endBrace End-brace. (NotNull)
-     */
-    public synchronized void setEndBrace(String endBrace) {
-        _endBrace = endBrace;
-    }
-
-    /**
-     * Set delimiter.
-     * 
-     * @param delimiter Delimiter. (NotNull)
-     */
-    public synchronized void setDelimiter(String delimiter) {
-        _delimiter = delimiter;
-    }
-
-    /**
-     * Set equal.
-     * 
-     * @param equal Equal. (NotNull)
-     */
-    public void setEqual(String equal) {
-        _equal = equal;
-    }
-
-    // ****************************************************************************************************
-    //                                                                                          Main Method
-    //                                                                                          ***********
-
-    // ==========================================================================================
-    //                                                                                   Generate
-    //                                                                                   ========
-    /**
-     * Generate map from map-string. {Implement}
-     * 
-     * @param mapString Map-string (NotNull)
-     * @return Generated map. (NotNull)
+     * {@inheritDoc}
      */
     public synchronized Map<String, Object> generateMap(String mapString) {
         assertMapString(mapString);
@@ -159,10 +104,7 @@ public class MapListStringImpl implements MapListString {
     }
 
     /**
-     * Generate map from list-string. {Implement}
-     * 
-     * @param listString List-string (NotNull)
-     * @return Generated list. (NotNull)
+     * {@inheritDoc}
      */
     public synchronized List<Object> generateList(String listString) {
         assertListString(listString);
@@ -185,12 +127,11 @@ public class MapListStringImpl implements MapListString {
         return generatedList;
     }
 
-    // ==========================================================================================
-    //                                                                                      Parse
-    //                                                                                      =====
+    // ===================================================================================
+    //                                                                               Parse
+    //                                                                               =====
     /**
      * Parse remainder map string.
-     * 
      * @param currentMap current map.
      */
     protected void parseRemainderMapString(final Map<String, Object> currentMap) {
@@ -256,7 +197,6 @@ public class MapListStringImpl implements MapListString {
 
     /**
      * Parse remainder list string.
-     * 
      * @param currentList current list.
      */
     protected void parseRemainderListString(final List<Object> currentList) {
@@ -314,7 +254,6 @@ public class MapListStringImpl implements MapListString {
 
     /**
      * Initialize at loop beginning.
-     * 
      * @return Is return?
      */
     protected boolean initializeAtLoopBeginning() {
@@ -337,7 +276,6 @@ public class MapListStringImpl implements MapListString {
 
     /**
      * Close after parse nest map list.
-     * 
      * @return Is return?
      */
     protected boolean closingAfterParseNestMapList() {
@@ -351,7 +289,6 @@ public class MapListStringImpl implements MapListString {
 
     /**
      * Close by end-brace index.
-     * 
      * @param endBraceIndex End-brace index.
      */
     protected void closingByEndBraceIndex(int endBraceIndex) {
@@ -360,13 +297,9 @@ public class MapListStringImpl implements MapListString {
         removePrefixEndBrace();
     }
 
-    // ****************************************************************************************************
-    //                                                                                      StateFul Method
-    //                                                                                      ***************
-
-    // ==========================================================================================
-    //                                                                                     Remove
-    //                                                                                     ======
+    // ===================================================================================
+    //                                                                              Remove
+    //                                                                              ======
     /**
      * Remove prefix map-mark and start-brace.
      */
@@ -397,7 +330,6 @@ public class MapListStringImpl implements MapListString {
 
     /**
      * Remove prefix.
-     * 
      * @param prefixString Prefix string. (NotNull)
      */
     protected void removePrefix(String prefixString) {
@@ -456,7 +388,6 @@ public class MapListStringImpl implements MapListString {
 
     /**
      * Remove prefix (target index plus one).
-     * 
      * @param index Index.
      * @param plusCount Plus count.
      */
@@ -464,16 +395,222 @@ public class MapListStringImpl implements MapListString {
         _remainderString = _remainderString.substring(index + plusCount);
     }
 
-    // ****************************************************************************************************
-    //                                                                                     StateLess Method
-    //                                                                                     ****************
+    // ===================================================================================
+    //                                                                              Filter
+    //                                                                              ======
+    /**
+     * Filter map or list value.
+     * <p>
+     * <pre>
+     * # The value is trimmed.
+     * # If the value is null, this returns null.
+     * # If the value is 'null', this returns null.
+     * # If the trimmed value is empty string, this returns null.
+     * </pre>
+     * @param value value. (Nullable)
+     * @return Filtered value. (Nullable)
+     */
+    protected String filterMapListValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        value = value.trim();
+        return (("".equals(value) || "null".equals(value)) ? null : value);
+    }
 
-    // ==========================================================================================
-    //                                                                                     Assert
-    //                                                                                     ======
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    /**
+     * Does it start with map-prefix?
+     * @param targetString Target-string. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isStartsWithMapPrefix(String targetString) {
+        if (targetString == null) {
+            String msg = "Argument[targetString] must not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        targetString = targetString.trim();
+        if (targetString.startsWith(_mapMark + _startBrace)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Does it start with list-prefix?
+     * @param targetString Target-string. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isStartsWithListPrefix(String targetString) {
+        if (targetString == null) {
+            String msg = "Argument[targetString] must not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        targetString = targetString.trim();
+        if (targetString.startsWith(_listMark + _startBrace)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Does it start with delimiter?
+     * @param targetString Target-string. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isStartsWithDelimiter(String targetString) {
+        if (targetString == null) {
+            String msg = "Argument[targetString] must not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        targetString = targetString.trim();
+        if (targetString.startsWith(_delimiter)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Does it start with end-brace?
+     * @param targetString Target-string. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isStartsWithEndBrace(String targetString) {
+        if (targetString == null) {
+            String msg = "Argument[targetString] must not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        targetString = targetString.trim();
+        if (targetString.startsWith(_endBrace)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Does it end with end-brace?
+     * @param targetString Target-string. (NotNull)
+     * @return Determination.
+     */
+    protected boolean isEndsWithEndBrace(String targetString) {
+        if (targetString == null) {
+            String msg = "Argument[targetString] must not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        targetString = targetString.trim();
+        if (targetString.endsWith(_endBrace)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                             Various
+    //                                                                             =======
+    /**
+     * Setup nest map.
+     * @param currentMap Current-map. (NotNull)
+     * @param mapKey Map-key. (NotNull)
+     * @return Nest map. (NotNull)
+     */
+    protected Map<String, Object> setupNestMap(Map<String, Object> currentMap, String mapKey) {
+        final Map<String, Object> nestMap = newStringObjectMap();
+        currentMap.put(mapKey, nestMap);
+        return nestMap;
+    }
+
+    /**
+     * Setup nest map.
+     * @param currentList Current-list. (NotNull)
+     * @return Nest map. (NotNull)
+     */
+    protected Map<String, Object> setupNestMap(List<Object> currentList) {
+        final Map<String, Object> nestMap = newStringObjectMap();
+        currentList.add(nestMap);
+        return nestMap;
+    }
+
+    /**
+     * Setup nest list.
+     * @param currentMap Current-map. (NotNull)
+     * @param mapKey Map-key. (NotNull)
+     * @return Nest list. (NotNull)
+     */
+    protected List<Object> setupNestList(Map<String, Object> currentMap, String mapKey) {
+        final List<Object> nestList = newObjectList();
+        currentMap.put(mapKey, nestList);
+        return nestList;
+    }
+
+    /**
+     * Setup nest list.
+     * @param currentList Current-list. (NotNull)
+     * @return Nest list. (NotNull)
+     */
+    protected List<Object> setupNestList(List<Object> currentList) {
+        final List<Object> nestList = newObjectList();
+        currentList.add(nestList);
+        return nestList;
+    }
+
+    /**
+     * New string-object-map.
+     * @return String-object-map. (NotNull)
+     */
+    protected Map<String, Object> newStringObjectMap() {
+        return new LinkedHashMap<String, Object>();
+    }
+
+    /**
+     * New object-list.
+     * @return String-object-list. (NotNull)
+     */
+    protected List<Object> newObjectList() {
+        return new ArrayList<Object>();
+    }
+
+    /**
+     * Get new-line and indent.
+     * @return New-line and indent. (NotNull)
+     */
+    protected String getNewLineAndIndent() {
+        return NEW_LINE + "    ";
+    }
+
+    /**
+     * Get count that target string exist in the base string.
+     * @param targetString Target string.
+     * @param delimiter Delimiter
+     * @return Delimiter count that _remainderString contains.
+     */
+    protected int getDelimiterCount(String targetString, String delimiter) {
+        int result = 0;
+        for (int i = 0;;) {
+            if (targetString.indexOf(delimiter, i) != -1) {
+                result++;
+                i = targetString.indexOf(delimiter, i) + 1;
+            } else {
+                break;
+            }
+        }
+        if (result == 0) {
+            result = -1;
+        }
+        return result;
+    }
+
+    // ===================================================================================
+    //                                                                       Assert Helper
+    //                                                                       =============
     /**
      * Assert map-string.
-     * 
      * @param mapString Map-string. (NotNull)
      */
     protected void assertMapString(String mapString) {
@@ -504,7 +641,6 @@ public class MapListStringImpl implements MapListString {
 
     /**
      * Assert list-string.
-     * 
      * @param listString List-string. (NotNull)
      */
     protected void assertListString(String listString) {
@@ -535,7 +671,6 @@ public class MapListStringImpl implements MapListString {
 
     /**
      * Assert equal-index.
-     * 
      * @param remainderMapString Remainder map-string. (NotNull)
      * @param equalIndex Equal-index.
      * @param mapString4Log Map-string for log. (NotNull)
@@ -600,7 +735,6 @@ public class MapListStringImpl implements MapListString {
 
     /**
      * Assert end-brace-index.
-     * 
      * @param remainderMapString Remainder map-string. (NotNull)
      * @param endBraceIndex End-brace-index.
      * @param mapString4Log Map-string for log. (NotNull)
@@ -729,227 +863,30 @@ public class MapListStringImpl implements MapListString {
         }
     }
 
-    // ==========================================================================================
-    //                                                                                     Filter
-    //                                                                                     ======
-    /**
-     * Filter map or list value.
-     * <p>
-     * <pre>
-     * # The value is trimmed.
-     * # If the value is null, this returns null.
-     * # If the value is 'null', this returns null.
-     * # If the trimmed value is empty string, this returns null.
-     * </pre>
-     * @param value value. (Nullable)
-     * @return Filtered value. (Nullable)
-     */
-    protected String filterMapListValue(String value) {
-        if (value == null) {
-            return null;
-        }
-        value = value.trim();
-        return (("".equals(value) || "null".equals(value)) ? null : value);
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setMapMark(String mapMark) {
+        _mapMark = mapMark;
     }
 
-    // ==========================================================================================
-    //                                                                                  Judgement
-    //                                                                                  =========
-    /**
-     * Does it start with map-prefix?
-     * 
-     * @param targetString Target-string. (NotNull)
-     * @return Determination.
-     */
-    protected boolean isStartsWithMapPrefix(String targetString) {
-        if (targetString == null) {
-            String msg = "Argument[targetString] must not be null!";
-            throw new IllegalArgumentException(msg);
-        }
-        targetString = targetString.trim();
-        if (targetString.startsWith(_mapMark + _startBrace)) {
-            return true;
-        } else {
-            return false;
-        }
+    public void setListMark(String listMark) {
+        _listMark = listMark;
     }
 
-    /**
-     * Does it start with list-prefix?
-     * 
-     * @param targetString Target-string. (NotNull)
-     * @return Determination.
-     */
-    protected boolean isStartsWithListPrefix(String targetString) {
-        if (targetString == null) {
-            String msg = "Argument[targetString] must not be null!";
-            throw new IllegalArgumentException(msg);
-        }
-        targetString = targetString.trim();
-        if (targetString.startsWith(_listMark + _startBrace)) {
-            return true;
-        } else {
-            return false;
-        }
+    public synchronized void setStartBrace(String startBrace) {
+        _startBrace = startBrace;
     }
 
-    /**
-     * Does it start with delimiter?
-     * 
-     * @param targetString Target-string. (NotNull)
-     * @return Determination.
-     */
-    protected boolean isStartsWithDelimiter(String targetString) {
-        if (targetString == null) {
-            String msg = "Argument[targetString] must not be null!";
-            throw new IllegalArgumentException(msg);
-        }
-        targetString = targetString.trim();
-        if (targetString.startsWith(_delimiter)) {
-            return true;
-        } else {
-            return false;
-        }
+    public synchronized void setEndBrace(String endBrace) {
+        _endBrace = endBrace;
     }
 
-    /**
-     * Does it start with end-brace?
-     * 
-     * @param targetString Target-string. (NotNull)
-     * @return Determination.
-     */
-    protected boolean isStartsWithEndBrace(String targetString) {
-        if (targetString == null) {
-            String msg = "Argument[targetString] must not be null!";
-            throw new IllegalArgumentException(msg);
-        }
-        targetString = targetString.trim();
-        if (targetString.startsWith(_endBrace)) {
-            return true;
-        } else {
-            return false;
-        }
+    public synchronized void setDelimiter(String delimiter) {
+        _delimiter = delimiter;
     }
 
-    /**
-     * Does it end with end-brace?
-     * 
-     * @param targetString Target-string. (NotNull)
-     * @return Determination.
-     */
-    protected boolean isEndsWithEndBrace(String targetString) {
-        if (targetString == null) {
-            String msg = "Argument[targetString] must not be null!";
-            throw new IllegalArgumentException(msg);
-        }
-        targetString = targetString.trim();
-        if (targetString.endsWith(_endBrace)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    // ==========================================================================================
-    //                                                                                      Other
-    //                                                                                      =====
-    /**
-     * Setup nest map.
-     * 
-     * @param currentMap Current-map. (NotNull)
-     * @param mapKey Map-key. (NotNull)
-     * @return Nest map. (NotNull)
-     */
-    protected Map<String, Object> setupNestMap(Map<String, Object> currentMap, String mapKey) {
-        final Map<String, Object> nestMap = newStringObjectMap();
-        currentMap.put(mapKey, nestMap);
-        return nestMap;
-    }
-
-    /**
-     * Setup nest map.
-     * 
-     * @param currentList Current-list. (NotNull)
-     * @return Nest map. (NotNull)
-     */
-    protected Map<String, Object> setupNestMap(List<Object> currentList) {
-        final Map<String, Object> nestMap = newStringObjectMap();
-        currentList.add(nestMap);
-        return nestMap;
-    }
-
-    /**
-     * Setup nest list.
-     * 
-     * @param currentMap Current-map. (NotNull)
-     * @param mapKey Map-key. (NotNull)
-     * @return Nest list. (NotNull)
-     */
-    protected List<Object> setupNestList(Map<String, Object> currentMap, String mapKey) {
-        final List<Object> nestList = newObjectList();
-        currentMap.put(mapKey, nestList);
-        return nestList;
-    }
-
-    /**
-     * Setup nest list.
-     * 
-     * @param currentList Current-list. (NotNull)
-     * @return Nest list. (NotNull)
-     */
-    protected List<Object> setupNestList(List<Object> currentList) {
-        final List<Object> nestList = newObjectList();
-        currentList.add(nestList);
-        return nestList;
-    }
-
-    /**
-     * New string-object-map.
-     * 
-     * @return String-object-map. (NotNull)
-     */
-    protected Map<String, Object> newStringObjectMap() {
-        return new LinkedHashMap<String, Object>();
-    }
-
-    /**
-     * New object-list.
-     * 
-     * @return String-object-list. (NotNull)
-     */
-    protected List<Object> newObjectList() {
-        return new ArrayList<Object>();
-    }
-
-    /**
-     * Get new-line and indent.
-     * 
-     * @return New-line and indent. (NotNull)
-     */
-    protected String getNewLineAndIndent() {
-        return NEW_LINE + "    ";
-    }
-
-    /**
-     * Get count that target string exist in the base string.
-     * 
-     * @param targetString Target string.
-     * @param delimiter Delimiter
-     * @return Delimiter count that _remainderString contains.
-     */
-    protected int getDelimiterCount(String targetString, String delimiter) {
-        int result = 0;
-        for (int i = 0;;) {
-            if (targetString.indexOf(delimiter, i) != -1) {
-                result++;
-                i = targetString.indexOf(delimiter, i) + 1;
-            } else {
-                break;
-            }
-        }
-        if (result == 0) {
-            result = -1;
-        }
-        return result;
+    public void setEqual(String equal) {
+        _equal = equal;
     }
 }
