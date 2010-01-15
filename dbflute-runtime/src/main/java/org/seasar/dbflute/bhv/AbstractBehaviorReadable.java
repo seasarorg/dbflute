@@ -15,8 +15,8 @@
  */
 package org.seasar.dbflute.bhv;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -53,6 +53,7 @@ import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingSimpleFacade;
 import org.seasar.dbflute.helper.token.file.impl.FileMakingSimpleFacadeImpl;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The abstract class of readable behavior.
@@ -449,14 +450,14 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     /**
      * {@inheritDoc}
      */
-    public java.math.BigDecimal readNextVal() {
+    public BigDecimal readNextVal() {
         try {
             final Method method = getClass().getMethod("selectNextVal", new Class[] {});
-            Object sequenceObject = method.invoke(this, new Object[] {});
-            if (sequenceObject instanceof java.math.BigDecimal) {
-                return (java.math.BigDecimal) sequenceObject;
+            final Object sequenceObject = method.invoke(this, new Object[] {});
+            if (sequenceObject instanceof BigDecimal) {
+                return (BigDecimal) sequenceObject;
             }
-            return (java.math.BigDecimal) helpConvertingSequenceObject(java.math.BigDecimal.class, sequenceObject);
+            return (BigDecimal) helpConvertingSequenceObject(BigDecimal.class, sequenceObject);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("The table does not have sequence: " + getTableDbName(), e);
         } catch (Exception e) {
@@ -465,23 +466,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected Object helpConvertingSequenceObject(Class<?> resultClass, Object sequenceObject) {
-        try {
-            final Constructor<?> constructor = resultClass.getConstructor(new Class[] { String.class });
-            return constructor.newInstance(new Object[] { sequenceObject.toString() });
-        } catch (NoSuchMethodException e) {
-        } catch (Exception e) {
-            throw new RuntimeException("The readNextVal() of the table threw the exception: " + getTableDbName(), e);
-        }
-        try {
-            final Method method = resultClass.getMethod("valueOf", new Class[] { long.class });
-            return method.invoke(null, new Object[] { Long.valueOf(sequenceObject.toString()) });
-        } catch (NoSuchMethodException e) {
-        } catch (Exception e) {
-            throw new RuntimeException("The readNextVal() of the table threw the exception: " + getTableDbName(), e);
-        }
-        String msg = "Cannot convert sequenceObject to resultClass:";
-        msg = msg + " resultClass=" + resultClass + " sequenceObjectType=" + sequenceObject.getClass();
-        throw new IllegalStateException(msg);
+        return DfTypeUtil.toNumber(resultClass, sequenceObject);
     }
 
     // ===================================================================================
@@ -856,6 +841,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         final SelectNextValCommand<RESULT> command = xsetupSelectCommand(new SelectNextValCommand<RESULT>());
         command.setResultType(resultType);
         command.setDBMeta(getDBMeta());
+        command.setSequenceCacheHandler(_behaviorCommandInvoker.getSequenceCacheHandler());
         return command;
     }
 

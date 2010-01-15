@@ -569,6 +569,14 @@ public abstract class AbstractDBMeta implements DBMeta {
         return false;
     }
 
+    public String getSequenceName() {
+        return null;
+    }
+
+    public Integer getSequenceIncrementSize() {
+        return null;
+    }
+
     public String getSequenceNextValSql() {
         return null;
     }

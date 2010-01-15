@@ -238,8 +238,15 @@ public class MockDBMeta implements DBMeta {
     }
 
     public boolean hasSequence() {
-
         return false;
+    }
+
+    public Integer getSequenceIncrementSize() {
+        return null;
+    }
+
+    public String getSequenceName() {
+        return null;
     }
 
     public boolean hasTwoOrMorePrimaryKeys() {
@@ -265,5 +272,4 @@ public class MockDBMeta implements DBMeta {
     public void setupEntityProperty(String propertyName, Object entity, Object value) {
 
     }
-
 }

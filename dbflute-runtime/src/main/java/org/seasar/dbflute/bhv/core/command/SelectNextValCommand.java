@@ -18,11 +18,13 @@ package org.seasar.dbflute.bhv.core.command;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.bhv.core.execution.BasicSelectExecution;
+import org.seasar.dbflute.bhv.core.supplement.SequenceCache;
+import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
+import org.seasar.dbflute.bhv.core.supplement.SequenceCache.SequenceRealExecutor;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
-
 
 /**
  * @author jflute
@@ -35,9 +37,12 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
     //                                                                           =========
     /** The type of result. (NotNull) */
     protected Class<RESULT> _resultType;
-    
+
     /** The provider of DB meta. (NotNull) */
     protected DBMeta _dbmeta;
+
+    /** The handler of sequence cache. (NotNull) */
+    protected SequenceCacheHandler _sequenceCacheHandler;
 
     // ===================================================================================
     //                                                                   Basic Information
@@ -114,11 +119,37 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
             msg = msg + " dbmeta.getSequenceNextValSql()=" + dbmeta.getSequenceNextValSql();
             throw new IllegalStateException(msg);
         }
-        return createBasicSelectExecution(handler, new String[]{}, new Class<?>[]{}, nextValSql);
+        final SequenceCache sequenceCache = findSequenceCache(dbmeta);
+        return createBasicSelectExecution(handler, new String[] {}, new Class<?>[] {}, nextValSql, sequenceCache);
     }
 
-    protected BasicSelectExecution createBasicSelectExecution(TnResultSetHandler handler, String[] argNames, Class<?>[] argTypes, String sql) {
-        final BasicSelectExecution cmd = new BasicSelectExecution(_dataSource, _statementFactory, handler);
+    protected SequenceCache findSequenceCache(DBMeta dbmeta) {
+        final String sequenceName = dbmeta.getSequenceName();
+        final Integer incrementSize = dbmeta.getSequenceIncrementSize();
+        return _sequenceCacheHandler.findSequenceCache(sequenceName, _dataSource, incrementSize, _resultType);
+    }
+
+    protected BasicSelectExecution createBasicSelectExecution(TnResultSetHandler handler, String[] argNames,
+            Class<?>[] argTypes, String sql, final SequenceCache sequenceCache) {
+        final BasicSelectExecution cmd;
+        if (sequenceCache != null) {
+            cmd = new BasicSelectExecution(_dataSource, _statementFactory, handler) {
+                @Override
+                public Object execute(final Object[] args) {
+                    return sequenceCache.nextval(new SequenceRealExecutor() {
+                        public Object execute() {
+                            return executeSuperExecute(args);
+                        }
+                    });
+                }
+
+                protected Object executeSuperExecute(Object[] args) {
+                    return super.execute(args);
+                }
+            };
+        } else {
+            cmd = new BasicSelectExecution(_dataSource, _statementFactory, handler);
+        }
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
         cmd.setSql(sql);
@@ -131,7 +162,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
 
     public Object[] getSqlExecutionArgument() {
         assertStatus("getSqlExecutionArgument");
-        return new Object[]{};
+        return new Object[] {};
     }
 
     // ===================================================================================
@@ -169,5 +200,9 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
 
     public void setDBMeta(DBMeta dbmeta) {
         _dbmeta = dbmeta;
+    }
+
+    public void setSequenceCacheHandler(SequenceCacheHandler sequenceCacheHandler) {
+        _sequenceCacheHandler = sequenceCacheHandler;
     }
 }

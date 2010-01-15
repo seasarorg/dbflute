@@ -24,6 +24,7 @@ import org.seasar.dbflute.CallbackContext;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
+import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.FetchAssistContext;
@@ -68,7 +69,11 @@ public class BehaviorCommandInvoker {
     // -----------------------------------------------------
     //                                       Execution Cache
     //                                       ---------------
+    /** The map of SQL execution. (dispose target) */
     protected final Map<String, SqlExecution> _executionMap = new ConcurrentHashMap<String, SqlExecution>();
+
+    /** The handler of sequence cache. (NOT dispose target) */
+    protected final SequenceCacheHandler _sequenceCacheHandler = createSequenceCacheHandler();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -306,9 +311,9 @@ public class BehaviorCommandInvoker {
             if (isLogEnabled()) {
                 log("...Initializing sqlExecution for the key '" + key + "'");
             }
-            _executionMap.put(key, executionCreator.createSqlExecution());
+            execution = executionCreator.createSqlExecution();
+            _executionMap.put(key, execution);
         }
-        execution = getSqlExecution(key);
         if (execution == null) {
             String msg = "sqlExecutionCreator.createSqlCommand() should not return null:";
             msg = msg + " sqlExecutionCreator=" + executionCreator + " key=" + key;
@@ -815,6 +820,21 @@ public class BehaviorCommandInvoker {
     protected void toBeDisposable() {
         assertInvokerAssistant();
         _invokerAssistant.toBeDisposable();
+    }
+
+    // ===================================================================================
+    //                                                                      Sequence Cache
+    //                                                                      ==============
+    /**
+     * Get the handler of sequence cache.
+     * @return The handler of sequence cache. (NotNull)
+     */
+    public SequenceCacheHandler getSequenceCacheHandler() {
+        return _sequenceCacheHandler;
+    }
+
+    protected SequenceCacheHandler createSequenceCacheHandler() { // for attribute initialization
+        return new SequenceCacheHandler();
     }
 
     // ===================================================================================

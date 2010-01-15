@@ -94,7 +94,7 @@ public interface DBMeta {
      * </pre>
      * @param columnFlexibleName The flexible name of the column. (NotNull)
      * @return The information of the column. (NotNull)
-     */ 
+     */
     public ColumnInfo findColumnInfo(String columnFlexibleName);
 
     /**
@@ -134,7 +134,7 @@ public interface DBMeta {
      * Find relation info.
      * @param relationPropertyName The flexible name of the relation property. (NotNull)
      * @return Relation info. (NotNull)
-     */ 
+     */
     public RelationInfo findRelationInfo(String relationPropertyName);
 
     // -----------------------------------------------------
@@ -174,21 +174,21 @@ public interface DBMeta {
      * Has referrer?
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Determination. (NotNull)
-     */ 
+     */
     public boolean hasReferrer(String referrerPropertyName);
 
     /**
      * Find referrer DB meta.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Referrer DBMeta. (NotNull)
-     */ 
+     */
     public DBMeta findReferrerDBMeta(String referrerPropertyName);
 
     /**
      * Find referrer information.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Referrer information. (NotNull)
-     */ 
+     */
     public ReferrerInfo findReferrerInfo(String referrerPropertyName);
 
     /**
@@ -239,6 +239,18 @@ public interface DBMeta {
      * @return Determination.
      */
     public boolean hasSequence();
+
+    /**
+     * Get the sequence name.
+     * @return The sequence name. (Nullable: If it does not have sequence, returns null.)
+     */
+    public String getSequenceName();
+
+    /**
+     * Get the increment size of sequence.
+     * @return The increment size of sequence. (Nullable: If the size is unknown, returns null.)
+     */
+    public Integer getSequenceIncrementSize();
 
     /**
      * Get the SQL string for getting next value of sequence.
@@ -312,25 +324,25 @@ public interface DBMeta {
     /**
      * Get the type name of entity.
      * @return The type name of entity. (NotNull)
-     */ 
+     */
     public String getEntityTypeName();
 
     /**
      * Get the type name of condition-bean.
      * @return The type name of condition-bean. (Nullable: If the condition-bean does not exist)
-     */ 
+     */
     public String getConditionBeanTypeName();
 
     /**
      * Get the type name of DAO.
      * @return The type name of DAO. (Nullable: If the DAO does not exist)
-     */ 
+     */
     public String getDaoTypeName();
 
     /**
      * Get the type name of behavior.
      * @return The type name of behavior. (Nullable: If the behavior does not exist)
-     */ 
+     */
     public String getBehaviorTypeName();
 
     // ===================================================================================
@@ -339,7 +351,7 @@ public interface DBMeta {
     /**
      * Get the type of entity.
      * @return The type of entity. (NotNull)
-     */ 
+     */
     public Class<? extends Entity> getEntityType();
 
     // ===================================================================================
@@ -348,7 +360,7 @@ public interface DBMeta {
     /**
      * New the instance of entity.
      * @return The instance of entity. (NotNull)
-     */ 
+     */
     public Entity newEntity();
 
     // ===================================================================================
@@ -420,7 +432,8 @@ public interface DBMeta {
      * @param equal Equal. (NotNull)
      * @return Primary-key map-string. (NotNull)
      */
-    public String extractPrimaryKeyMapString(Entity entity, String startBrace, String endBrace, String delimiter, String equal);
+    public String extractPrimaryKeyMapString(Entity entity, String startBrace, String endBrace, String delimiter,
+            String equal);
 
     /**
      * Extract column-value map-string. Delimiter is at-mark and semicolon.
@@ -438,7 +451,8 @@ public interface DBMeta {
      * @param equal Equal. (NotNull)
      * @return Column-value map-string. (NotNull)
      */
-    public String extractColumnValueMapString(Entity entity, String startBrace, String endBrace, String delimiter, String equal);
+    public String extractColumnValueMapString(Entity entity, String startBrace, String endBrace, String delimiter,
+            String equal);
 
     // -----------------------------------------------------
     //                                               Convert
@@ -485,7 +499,7 @@ public interface DBMeta {
      * @return Map string builder that is prepared. (NotNull)
      */
     public MapStringBuilder createMapStringBuilder();
-    
+
     // ===================================================================================
     //                                                               Entity Property Setup
     //                                                               =====================
@@ -496,8 +510,8 @@ public interface DBMeta {
      * @param propertyName The name of the property. (NotNull)
      * @return Determination.
      */
-     public boolean hasEntityPropertySetupper(String propertyName);
-     
+    public boolean hasEntityPropertySetupper(String propertyName);
+
     /**
      * Set up entity property. (for INTERNAL)
      * @param propertyName The name of the property. (NotNull)
@@ -505,14 +519,14 @@ public interface DBMeta {
      * @param value The value of the property. (Nullable)
      */
     public void setupEntityProperty(String propertyName, Object entity, Object value);
-    
+
     /**
      * The setupper of entity property. <br />
      * This class is for Internal. Don't use this!
      * @param <ENTITY_TYPE> The type of entity.
      */
     public interface Eps<ENTITY_TYPE extends Entity> {
-        
+
         /**
          * @param entity Entity. (NotNull)
          * @param value Value. (Nullable)
