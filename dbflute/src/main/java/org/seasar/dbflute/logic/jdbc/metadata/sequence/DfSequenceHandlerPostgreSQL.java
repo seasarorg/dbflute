@@ -51,8 +51,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerPostgreSQL(DataSource dataSource, String schema) {
-        super(dataSource, schema);
+    public DfSequenceHandlerPostgreSQL(DataSource dataSource, String schema, List<String> allSchemaList) {
+        super(dataSource, schema, allSchemaList);
     }
 
     // ===================================================================================

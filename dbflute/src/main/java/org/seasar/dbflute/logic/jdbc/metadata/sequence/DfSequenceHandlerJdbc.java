@@ -20,6 +20,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 
 /**
  * @author jflute
@@ -49,13 +51,15 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     //                                                                           =========
     protected DataSource _dataSource;
     protected String _schema;
+    protected List<String> _allSchemaList;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerJdbc(DataSource dataSource, String schema) {
+    public DfSequenceHandlerJdbc(DataSource dataSource, String schema, List<String> allSchemaList) {
         _dataSource = dataSource;
         _schema = schema;
+        _allSchemaList = allSchemaList;
     }
 
     // ===================================================================================
@@ -186,6 +190,13 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     }
 
     protected abstract Integer selectNextVal(Statement statement, String sequenceName) throws SQLException;
+
+    // ===================================================================================
+    //                                                                        Sequence Map
+    //                                                                        ============
+    public Map<String, DfSequenceMetaInfo> getSequenceMap() {
+        return new HashMap<String, DfSequenceMetaInfo>(); // as default
+    }
 
     // ===================================================================================
     //                                                                      General Helper

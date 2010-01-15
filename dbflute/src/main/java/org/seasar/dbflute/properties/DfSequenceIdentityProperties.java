@@ -1,6 +1,7 @@
 package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,8 +9,13 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import javax.sql.DataSource;
+
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.logic.factory.DfSequenceHandlerFactory;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandler;
 
 /**
  * @author jflute
@@ -73,8 +79,9 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return sequence.substring(0, hintMarkIndex);
     }
 
-    public String getSequenceIncrementSize(String flexibleTableName) {
-        final String sequence = getSequenceName(flexibleTableName);
+    public String getSequenceIncrementSize(DataSource dataSource, String schemaName, String flexibleTableName) {
+        final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
+        final String sequence = flmap.get(flexibleTableName);
         if (sequence == null) {
             return null;
         }
@@ -84,7 +91,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             return null;
         }
         final String hint = sequence.substring(hintMarkIndex + hintMark.length()).trim();
-        final String incrementMark = "increment(";
+        final String incrementMark = "cache(";
         final int incrementMarkIndex = hint.indexOf(incrementMark);
         if (incrementMarkIndex < 0) {
             return null;
@@ -97,7 +104,35 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             msg = msg + " sequence=" + sequence;
             throw new IllegalStateException(msg);
         }
-        return incrementValue.substring(0, endMarkIndex).trim();
+        final String incrementSize = incrementValue.substring(0, endMarkIndex).trim();
+        final String sequenceName = getSequenceName(flexibleTableName);
+        if (sequenceName == null) {
+            return null;
+        }
+        final Map<String, DfSequenceMetaInfo> sequenceMetaInfoMap = getSequenceMetaInfoMap(dataSource);
+        final String sequenceInfoKey = (schemaName != null ? schemaName + "." : "") + sequenceName;
+        final DfSequenceMetaInfo info = sequenceMetaInfoMap.get(sequenceInfoKey);
+        if (info != null && info.getIncrementSize() != null) {
+            return info.getIncrementSize().toString();
+        }
+        return incrementSize;
+    }
+
+    protected Map<String, DfSequenceMetaInfo> _sequenceMetaInfoMap;
+
+    protected Map<String, DfSequenceMetaInfo> getSequenceMetaInfoMap(DataSource dataSource) {
+        if (_sequenceMetaInfoMap != null) {
+            return _sequenceMetaInfoMap;
+        }
+        final DfSequenceHandlerFactory factory = new DfSequenceHandlerFactory(dataSource, getBasicProperties(),
+                getDatabaseProperties());
+        final DfSequenceHandler sequenceHandler = factory.createSequenceHandler();
+        if (sequenceHandler != null) {
+            _sequenceMetaInfoMap = sequenceHandler.getSequenceMap();
+        } else {
+            _sequenceMetaInfoMap = new HashMap<String, DfSequenceMetaInfo>();
+        }
+        return _sequenceMetaInfoMap;
     }
 
     /**

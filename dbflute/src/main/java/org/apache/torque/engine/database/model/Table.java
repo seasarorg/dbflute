@@ -1985,7 +1985,7 @@ public class Table {
         if (hasPostgreSQLSerialSequenceName()) {
             return true;
         }
-        final String sequenceName = getDatabase().getSequenceDefinitionMapSequence(getName());
+        final String sequenceName = getDatabase().getSequenceDefinitionSequenceName(getName());
         if (sequenceName == null) {
             return false;
         } else {
@@ -2005,7 +2005,7 @@ public class Table {
         if (postgreSQLSerialSequenceName != null) {
             return postgreSQLSerialSequenceName;
         }
-        return getDatabase().getSequenceDefinitionMapSequence(getName());
+        return getDatabase().getSequenceDefinitionSequenceName(getName());
     }
 
     /**
@@ -2016,7 +2016,7 @@ public class Table {
         if (!isUseSequence()) {
             return "null";
         }
-        final String size = getDatabase().getSequenceDefinitionMapSequenceIncrementSize(getName());
+        final String size = getDatabase().getSequenceDefinitionSequenceIncrementSize(getSchema(), getName());
         if (size == null) {
             return "null";
         }

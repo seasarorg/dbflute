@@ -18,11 +18,17 @@ package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 
 /**
  * @author jflute
@@ -38,8 +44,8 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerOracle(DataSource dataSource, String schema) {
-        super(dataSource, schema);
+    public DfSequenceHandlerOracle(DataSource dataSource, String schema, List<String> allSchemaList) {
+        super(dataSource, schema, allSchemaList);
     }
 
     // ===================================================================================
@@ -61,5 +67,43 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                        Sequence Map
+    //                                                                        ============
+    public Map<String, DfSequenceMetaInfo> getSequenceMap() {
+        final Map<String, DfSequenceMetaInfo> resultMap = new LinkedHashMap<String, DfSequenceMetaInfo>();
+        final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
+        final StringBuilder sb = new StringBuilder();
+        for (String schema : _allSchemaList) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append("'").append(schema).append("'");
+        }
+        final String sql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER in (" + sb.toString() + ")";
+        final List<String> columnList = new ArrayList<String>();
+        columnList.add("SEQUENCE_OWNER");
+        columnList.add("SEQUENCE_NAME");
+        columnList.add("MIN_VALUE");
+        columnList.add("MAX_VALUE");
+        columnList.add("INCREMENT_BY");
+        final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
+        final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
+        for (Map<String, String> recordMap : resultList) {
+            final String sequenceOwner = recordMap.get("SEQUENCE_OWNER");
+            info.setSequenceOwner(sequenceOwner);
+            final String sequenceName = recordMap.get("SEQUENCE_NAME");
+            info.setSequenceName(sequenceName);
+            final String minValue = recordMap.get("MIN_VALUE");
+            info.setMinValue(minValue != null ? Integer.valueOf(minValue) : null);
+            final String maxValue = recordMap.get("MAX_VALUE");
+            info.setMaxValue(maxValue != null ? Integer.valueOf(maxValue) : null);
+            final String incrementSize = recordMap.get("INCREMENT_BY");
+            info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
+            resultMap.put((sequenceOwner != null ? sequenceOwner + "." : "") + sequenceName, info);
+        }
+        return resultMap;
     }
 }

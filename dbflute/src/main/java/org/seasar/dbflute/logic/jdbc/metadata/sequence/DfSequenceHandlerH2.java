@@ -18,6 +18,7 @@ package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -38,8 +39,8 @@ public class DfSequenceHandlerH2 extends DfSequenceHandlerJdbc {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerH2(DataSource dataSource, String schema) {
-        super(dataSource, schema);
+    public DfSequenceHandlerH2(DataSource dataSource, String schema, List<String> allSchemaList) {
+        super(dataSource, schema, allSchemaList);
     }
 
     // ===================================================================================

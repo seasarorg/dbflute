@@ -1092,12 +1092,13 @@ public class Database {
     // ===================================================================================
     //                                                        Sequence/Identity Properties
     //                                                        ============================
-    public String getSequenceDefinitionMapSequence(String flexibleTableName) {
+    public String getSequenceDefinitionSequenceName(String flexibleTableName) {
         return getProperties().getSequenceIdentityProperties().getSequenceName(flexibleTableName);
     }
 
-    public String getSequenceDefinitionMapSequenceIncrementSize(String flexibleTableName) {
-        return getProperties().getSequenceIdentityProperties().getSequenceIncrementSize(flexibleTableName);
+    public String getSequenceDefinitionSequenceIncrementSize(String schemaName, String flexibleTableName) {
+        return getProperties().getSequenceIdentityProperties().getSequenceIncrementSize(getDataSource(), schemaName,
+                flexibleTableName);
     }
 
     public String getSequenceReturnType() {

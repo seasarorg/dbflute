@@ -32,10 +32,8 @@ import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
 import org.seasar.dbflute.logic.dataassert.DfDataAssertHandler;
 import org.seasar.dbflute.logic.dataassert.DfDataAssertProvider;
-import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandlerDB2;
-import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandlerH2;
-import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandlerOracle;
-import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandlerPostgreSQL;
+import org.seasar.dbflute.logic.factory.DfSequenceHandlerFactory;
+import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandler;
 import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 
@@ -239,23 +237,15 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         _log.info("* * * * * * * * * * **");
         final DfSequenceIdentityProperties sequenceProp = getProperties().getSequenceIdentityProperties();
         final Map<String, String> tableSequenceMap = sequenceProp.getTableSequenceMap();
-        if (getBasicProperties().isDatabasePostgreSQL()) {
-            final DfSequenceHandlerPostgreSQL handler = new DfSequenceHandlerPostgreSQL(getDataSource(), _schema);
-            handler.incrementSequenceToDataMax(tableSequenceMap);
-        } else if (getBasicProperties().isDatabaseOracle()) {
-            final DfSequenceHandlerOracle handler = new DfSequenceHandlerOracle(getDataSource(), _schema);
-            handler.incrementSequenceToDataMax(tableSequenceMap);
-        } else if (getBasicProperties().isDatabaseDB2()) {
-            final DfSequenceHandlerDB2 handler = new DfSequenceHandlerDB2(getDataSource(), _schema);
-            handler.incrementSequenceToDataMax(tableSequenceMap);
-        } else if (getBasicProperties().isDatabaseH2()) {
-            final DfSequenceHandlerH2 handler = new DfSequenceHandlerH2(getDataSource(), _schema);
-            handler.incrementSequenceToDataMax(tableSequenceMap);
-        } else {
+        final DfSequenceHandlerFactory factory = new DfSequenceHandlerFactory(getDataSource(), getBasicProperties(),
+                getDatabaseProperties());
+        final DfSequenceHandler sequenceHandler = factory.createSequenceHandler();
+        if (sequenceHandler == null) {
             String databaseName = getBasicProperties().getDatabaseName();
             String msg = "Unsupported isIncrementSequenceToDataMax at " + databaseName;
             throw new UnsupportedOperationException(msg);
         }
+        sequenceHandler.incrementSequenceToDataMax(tableSequenceMap);
     }
 
     // --------------------------------------------

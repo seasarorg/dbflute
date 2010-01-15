@@ -129,7 +129,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
 
     @Override
     protected boolean isUseDataSource() {
-        return false;
+        return true;
     }
 
     // ===================================================================================

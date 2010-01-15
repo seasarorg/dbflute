@@ -5,6 +5,8 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
+import org.seasar.dbflute.bhv.core.supplement.SequenceCacheKeyGenerator;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.jdbc.DataSourceHandler;
@@ -51,6 +53,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     protected volatile StatementFactory _statementFactory;
     protected volatile TnBeanMetaDataFactory _beanMetaDataFactory;
     protected volatile TnValueTypeFactory _valueTypeFactory;
+    protected volatile SequenceCacheHandler _sequenceCacheHandler;
 
     // -----------------------------------------------------
     //                                       Disposable Flag
@@ -224,6 +227,31 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     //                               -----------------------
     public StatementConfig assistDefaultStatementConfig() {
         return ${glDBFluteConfig}.getInstance().getDefaultStatementConfig();
+    }
+
+    // -----------------------------------------------------
+    //                                        Sequence Cache
+    //                                        --------------
+    public SequenceCacheHandler assistSequenceCacheHandler() {
+        if (_sequenceCacheHandler != null) {
+            return _sequenceCacheHandler;
+        }
+        synchronized (this) {
+            if (_sequenceCacheHandler != null) {
+                return _sequenceCacheHandler;
+            }
+            _sequenceCacheHandler = createSequenceCacheHandler();
+        }
+        return _sequenceCacheHandler;
+    }
+
+    protected SequenceCacheHandler createSequenceCacheHandler() {
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        SequenceCacheKeyGenerator generator = ${glDBFluteConfig}.getInstance().getSequenceCacheKeyGenerator();
+        if (generator != null) {
+            handler.setSequenceCacheKeyGenerator(generator);
+        }
+        return handler;
     }
 
     // ===================================================================================
