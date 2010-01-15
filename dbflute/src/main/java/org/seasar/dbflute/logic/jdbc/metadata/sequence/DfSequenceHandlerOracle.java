@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -83,6 +84,7 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
             sb.append("'").append(schema).append("'");
         }
         final String sql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER in (" + sb.toString() + ")";
+        _log.info(sql);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SEQUENCE_OWNER");
         columnList.add("SEQUENCE_NAME");
@@ -97,9 +99,9 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
             final String sequenceName = recordMap.get("SEQUENCE_NAME");
             info.setSequenceName(sequenceName);
             final String minValue = recordMap.get("MIN_VALUE");
-            info.setMinValue(minValue != null ? Integer.valueOf(minValue) : null);
+            info.setMinValue(minValue != null ? new BigDecimal(minValue) : null);
             final String maxValue = recordMap.get("MAX_VALUE");
-            info.setMaxValue(maxValue != null ? Integer.valueOf(maxValue) : null);
+            info.setMaxValue(maxValue != null ? new BigDecimal(maxValue) : null);
             final String incrementSize = recordMap.get("INCREMENT_BY");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
             resultMap.put((sequenceOwner != null ? sequenceOwner + "." : "") + sequenceName, info);

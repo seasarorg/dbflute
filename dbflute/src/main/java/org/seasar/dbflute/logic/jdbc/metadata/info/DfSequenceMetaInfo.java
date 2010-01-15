@@ -15,6 +15,8 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
+import java.math.BigDecimal;
+
 /**
  * @author jflute
  */
@@ -25,8 +27,8 @@ public class DfSequenceMetaInfo {
     //                                                                           =========
     protected String sequenceOwner;
     protected String sequenceName;
-    protected Integer minValue;
-    protected Integer maxValue;
+    protected BigDecimal minValue;
+    protected BigDecimal maxValue;
     protected Integer incrementSize;
 
     // ===================================================================================
@@ -58,19 +60,19 @@ public class DfSequenceMetaInfo {
         this.sequenceName = sequenceName;
     }
 
-    public Integer getMinValue() {
+    public BigDecimal getMinValue() {
         return minValue;
     }
 
-    public void setMinValue(Integer minValue) {
+    public void setMinValue(BigDecimal minValue) {
         this.minValue = minValue;
     }
 
-    public Integer getMaxValue() {
+    public BigDecimal getMaxValue() {
         return maxValue;
     }
 
-    public void setMaxValue(Integer maxValue) {
+    public void setMaxValue(BigDecimal maxValue) {
         this.maxValue = maxValue;
     }
 

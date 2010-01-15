@@ -79,7 +79,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return sequence.substring(0, hintMarkIndex);
     }
 
-    public String getSequenceIncrementSize(DataSource dataSource, String schemaName, String flexibleTableName) {
+    public String getSequenceCacheSize(DataSource dataSource, String schemaName, String flexibleTableName) {
         final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
         final String sequence = flmap.get(flexibleTableName);
         if (sequence == null) {
@@ -106,9 +106,6 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         }
         final String incrementSize = incrementValue.substring(0, endMarkIndex).trim();
         final String sequenceName = getSequenceName(flexibleTableName);
-        if (sequenceName == null) {
-            return null;
-        }
         final Map<String, DfSequenceMetaInfo> sequenceMetaInfoMap = getSequenceMetaInfoMap(dataSource);
         final String sequenceInfoKey = (schemaName != null ? schemaName + "." : "") + sequenceName;
         final DfSequenceMetaInfo info = sequenceMetaInfoMap.get(sequenceInfoKey);

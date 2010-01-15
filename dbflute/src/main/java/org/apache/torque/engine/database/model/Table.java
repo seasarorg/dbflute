@@ -1981,7 +1981,6 @@ public class Table {
      * @return Determination.
      */
     public boolean isUseSequence() {
-        // PostgreSQLのSerial型だけ自動で出力
         if (hasPostgreSQLSerialSequenceName()) {
             return true;
         }
@@ -2009,23 +2008,8 @@ public class Table {
     }
 
     /**
-     * Get the increment size of sequence from definition map.
-     * @return The defined increment size of sequence. (NotNull: If it does not have sequence, return null string.)
-     */
-    public String getDefinedSequenceIncrementSize() {
-        if (!isUseSequence()) {
-            return "null";
-        }
-        final String size = getDatabase().getSequenceDefinitionSequenceIncrementSize(getSchema(), getName());
-        if (size == null) {
-            return "null";
-        }
-        return size;
-    }
-
-    /**
      * Get the value of sequence-next-sql as java name.
-     * @return Name.　(NotNull)
+     * @return Name. (NotNull)
      */
     public String getSequenceNextSql() { // for string literal in program.
         final String sequenceName = getDefinedSequenceName();
@@ -2041,6 +2025,21 @@ public class Table {
         }
 
         return result;
+    }
+
+    /**
+     * Get the cache size of sequence from definition map.
+     * @return The cache size of sequence. (NotNull: If it does not have sequence, return null string.)
+     */
+    public String getSequenceCacheSize() {
+        if (!isUseSequence()) {
+            return "null";
+        }
+        final String size = getDatabase().getSequenceDefinitionSequenceCacheSize(getSchema(), getName());
+        if (size == null) {
+            return "null";
+        }
+        return size;
     }
 
     public String getSequenceReturnType() {

@@ -1096,8 +1096,8 @@ public class Database {
         return getProperties().getSequenceIdentityProperties().getSequenceName(flexibleTableName);
     }
 
-    public String getSequenceDefinitionSequenceIncrementSize(String schemaName, String flexibleTableName) {
-        return getProperties().getSequenceIdentityProperties().getSequenceIncrementSize(getDataSource(), schemaName,
+    public String getSequenceDefinitionSequenceCacheSize(String schemaName, String flexibleTableName) {
+        return getProperties().getSequenceIdentityProperties().getSequenceCacheSize(getDataSource(), schemaName,
                 flexibleTableName);
     }
 
