@@ -18,6 +18,7 @@ package org.seasar.dbflute.bhv.core;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.cbean.sqlclause.SqlClauseCreator;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.jdbc.StatementConfig;
@@ -86,6 +87,11 @@ public interface InvokerAssistant {
      * @return The default configuration of statement. (NotNull)
      */
     StatementConfig assistDefaultStatementConfig();
+
+    /**
+     * @return The handler of sequence cache. (NotNull)
+     */
+    SequenceCacheHandler assistSequenceCacheHandler();
 
     /**
      * To be disposable.

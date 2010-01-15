@@ -32,6 +32,7 @@ public class SequenceCacheHandler {
     //                                                                           Attribute
     //                                                                           =========
     protected Map<String, SequenceCache> _sequenceCacheMap = new ConcurrentHashMap<String, SequenceCache>();
+    protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
 
     // ===================================================================================
     //                                                                            Handling
@@ -72,7 +73,16 @@ public class SequenceCacheHandler {
     }
 
     protected String generateKey(String sequenceName, DataSource dataSource) {
-        // TODO
-        return sequenceName + "." + dataSource.getClass().getName() + "@" + dataSource.hashCode();
+        if (_sequenceCacheKeyGenerator != null) {
+            return _sequenceCacheKeyGenerator.generateKey(sequenceName, dataSource);
+        }
+        return sequenceName; // as default
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setSequenceCacheKeyGenerator(SequenceCacheKeyGenerator sequenceCacheKeyGenerator) {
+        _sequenceCacheKeyGenerator = sequenceCacheKeyGenerator;
     }
 }

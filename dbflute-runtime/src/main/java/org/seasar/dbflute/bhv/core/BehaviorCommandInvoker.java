@@ -53,6 +53,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  *   o injectComponentProperty(BehaviorCommandComponentSetup behaviorCommand);
  *   o createOutsideSqlBasicExecutor(String tableDbName);
  *   o invoke(BehaviorCommand behaviorCommand);
+ *   o getSequenceCacheHandler();
  * </pre>
  * @author jflute
  */
@@ -71,9 +72,6 @@ public class BehaviorCommandInvoker {
     //                                       ---------------
     /** The map of SQL execution. (dispose target) */
     protected final Map<String, SqlExecution> _executionMap = new ConcurrentHashMap<String, SqlExecution>();
-
-    /** The handler of sequence cache. (NOT dispose target) */
-    protected final SequenceCacheHandler _sequenceCacheHandler = createSequenceCacheHandler();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -830,11 +828,7 @@ public class BehaviorCommandInvoker {
      * @return The handler of sequence cache. (NotNull)
      */
     public SequenceCacheHandler getSequenceCacheHandler() {
-        return _sequenceCacheHandler;
-    }
-
-    protected SequenceCacheHandler createSequenceCacheHandler() { // for attribute initialization
-        return new SequenceCacheHandler();
+        return _invokerAssistant.assistSequenceCacheHandler();
     }
 
     // ===================================================================================
