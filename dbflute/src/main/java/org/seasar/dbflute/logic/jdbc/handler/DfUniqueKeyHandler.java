@@ -146,7 +146,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 if (pkList.contains(columnName)) {
                     continue;
                 }
-                if (isColumnExcept(schemaName, columnName)) {
+                if (isColumnExcept(schemaName, tableName, columnName)) {
                     continue;
                 }
 

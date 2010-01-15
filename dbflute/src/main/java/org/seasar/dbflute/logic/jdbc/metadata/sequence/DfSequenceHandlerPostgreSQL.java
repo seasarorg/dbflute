@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -89,8 +90,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
             final DfUniqueKeyHandler uniqueKeyHandler = new DfUniqueKeyHandler();
             final DfColumnHandler columnHandler = new DfColumnHandler() {
                 @Override
-                protected List<String> getRealSimpleColumnExceptList(String schemaName) {
-                    return new ArrayList<String>(); // All column target!
+                protected Map<String, List<String>> getRealColumnExceptMap(String schemaName) {
+                    return new HashMap<String, List<String>>(); // all column target
                 }
             };
             final DfAutoIncrementHandler autoIncrementHandler = new DfAutoIncrementHandler();

@@ -16,6 +16,7 @@
 package org.seasar.dbflute.logic.jdbc.handler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +42,8 @@ public class DfAbstractMetaDataHandler {
     /** The list for target table. (Lazy) */
     private List<String> _tableTargetList;
 
-    /** The simple list for except column. (Lazy) */
-    private List<String> _simpleColumnExceptList;
+    /** The map for except column. (Lazy) */
+    private Map<String, List<String>> _columnExceptMap;
 
     /** The map of additional schema. (Lazy) */
     private Map<String, DfAdditionalSchemaInfo> _additionalSchemaMap;
@@ -61,11 +62,11 @@ public class DfAbstractMetaDataHandler {
         return _tableTargetList;
     }
 
-    protected final List<String> getSimpleColumnExceptList() { // for main schema
-        if (_simpleColumnExceptList == null) {
-            _simpleColumnExceptList = getProperties().getDatabaseProperties().getSimpleColumnExceptList();
+    protected final Map<String, List<String>> getColumnExceptMap() { // for main schema
+        if (_columnExceptMap == null) {
+            _columnExceptMap = getProperties().getDatabaseProperties().getColumnExceptMap();
         }
-        return _simpleColumnExceptList;
+        return _columnExceptMap;
     }
 
     protected final Map<String, DfAdditionalSchemaInfo> getAdditionalSchemaMap() { // for additional schema
@@ -116,24 +117,36 @@ public class DfAbstractMetaDataHandler {
     }
 
     /**
-     * Is the column name out of sight?
+     * Is the column of the table out of sight?
      * @param schemaName The name of schema. (Nullable)
+     * @param tableName The name of table. (NotNull)
      * @param columnName The name of column. (NotNull)
      * @return Determination.
      */
-    public boolean isColumnExcept(String schemaName, String columnName) {
+    public boolean isColumnExcept(String schemaName, String tableName, String columnName) {
+        if (tableName == null) {
+            throw new IllegalArgumentException("The argument 'tableName' should not be null.");
+        }
         if (columnName == null) {
             throw new IllegalArgumentException("The argument 'columnName' should not be null.");
         }
-        final List<String> columnExceptSimpleList = getRealSimpleColumnExceptList(schemaName);
-        return !isTargetByHint(columnName, new ArrayList<String>(), columnExceptSimpleList);
+        final Map<String, List<String>> columnExceptMap = getRealColumnExceptMap(schemaName);
+        final List<String> columnExceptList = columnExceptMap.get(tableName);
+        if (columnExceptList == null) { // no definition about the table
+            return false;
+        }
+        return !isTargetByHint(columnName, new ArrayList<String>(), columnExceptList);
     }
 
-    protected List<String> getRealSimpleColumnExceptList(String schemaName) { // extension point
+    protected Map<String, List<String>> getRealColumnExceptMap(String schemaName) { // extension point
         if (schemaName != null) {
-            return new ArrayList<String>(); // unsupported at additional schema
+            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getAdditionalSchemaMap();
+            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(schemaName);
+            if (schemaInfo != null) {
+                return new HashMap<String, List<String>>(); // unsupported at additional schema
+            }
         }
-        return getSimpleColumnExceptList();
+        return getColumnExceptMap();
     }
 
     protected boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {

@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
 
@@ -127,19 +128,40 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     // -----------------------------------------------------
-    //                                    Column Except List
-    //                                    ------------------
-    public List<String> getSimpleColumnExceptList() { // for main schema
-        final List<String> vairousList = getVairousStringList("columnExceptList");
-        if (!vairousList.isEmpty()) {
-            return vairousList;
+    //                                     Column Except Map
+    //                                     -----------------
+    protected Map<String, List<String>> _columnExceptMap;
+
+    public Map<String, List<String>> getColumnExceptMap() { // for main schema
+        if (_columnExceptMap != null) {
+            return _columnExceptMap;
         }
-        final List<String> resultList = new ArrayList<String>();
-        final List<Object> listProp = listProp("torque.simple.column.except.list", DEFAULT_EMPTY_LIST);
-        for (Object object : listProp) {
-            resultList.add((String) object);
+        final List<String> oldStyleList = getVairousStringList("columnExceptList");
+        if (!oldStyleList.isEmpty()) {
+            String msg = "You should migrate 'columnExceptList' to 'columnExceptMap'";
+            msg = msg + " in databaseInfoMap.dfprop: columnExceptList=" + oldStyleList;
+            throw new IllegalStateException(msg);
         }
-        return resultList;
+        final Map<String, List<String>> columnExceptMap = StringKeyMap.createAsFlexible();
+        final Map<String, Object> keyMap = getVairousStringKeyMap("columnExceptMap");
+        if (keyMap.isEmpty()) {
+            return columnExceptMap;
+        }
+        final Set<Entry<String, Object>> entrySet = keyMap.entrySet();
+        for (Entry<String, Object> entry : entrySet) {
+            final String tableName = entry.getKey();
+            final Object obj = entry.getValue();
+            if (!(obj instanceof List<?>)) {
+                String msg = "The type of element in the property 'columnExceptMap' should be List:";
+                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+                throw new DfIllegalPropertyTypeException(msg);
+            }
+            @SuppressWarnings("unchecked")
+            final List<String> columnList = (List<String>) obj;
+            columnExceptMap.put(tableName, columnList);
+        }
+        _columnExceptMap = columnExceptMap;
+        return _columnExceptMap;
     }
 
     // ===================================================================================

@@ -144,7 +144,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
 
         while (columnResultSet.next()) {
             final String columnName = columnResultSet.getString(4);
-            if (isColumnExcept(schemaName, columnName)) {
+            if (isColumnExcept(schemaName, tableName, columnName)) {
                 continue;
             }
 

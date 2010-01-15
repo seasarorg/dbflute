@@ -60,13 +60,15 @@ map:{
         #
         #; tableTargetList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
 
-        # o columnExceptList: (NotRequired - Default 'list:{}')
+        # o columnExceptMap: (NotRequired - Default 'map:{}')
         #  If you want to exclude some columns in generating target,
         #  you should specify the list of excepted column hints.
         #  This is only for the main schema. Additional schemas are unconcerned.
-        #    ex) list:{APP_NOT_USED_ID; suffix:_IMAGE}
+        #    ex) map:{ONE_TABLE = list:{APP_NOT_USED_ID; suffix:_IMAGE}}
         #
-        #; columnExceptList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
+        #; columnExceptMap = map:{
+        #    ; TABLE_NAME = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
+        #}
 
         # o additionalSchemaMap: (NotRequired - Default 'map:{}')
         #  If you want to include other schemas in generating target,

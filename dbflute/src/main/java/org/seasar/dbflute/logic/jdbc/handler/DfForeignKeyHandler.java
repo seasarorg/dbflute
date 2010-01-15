@@ -96,7 +96,8 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
 
                 final String localColumnName = foreignKeys.getString(8);
                 final String foreignColumnName = foreignKeys.getString(4);
-                if (isColumnExcept(schemaName, localColumnName) || isColumnExcept(schemaName, foreignColumnName)) {
+                if (isColumnExcept(schemaName, tableName, localColumnName)
+                        || isColumnExcept(schemaName, foreignTableName, foreignColumnName)) {
                     continue;
                 }
 

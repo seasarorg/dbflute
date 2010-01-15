@@ -82,7 +82,7 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
                 if (columnName == null || columnName.trim().length() == 0) {
                     continue;
                 }
-                if (isColumnExcept(schemaName, columnName)) {
+                if (isColumnExcept(schemaName, tableName, columnName)) {
                     continue;
                 }
                 final Integer ordinalPosition;
