@@ -36,7 +36,9 @@ public class SequenceCache {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final BigDecimal _incrementSize;
+    /** The cache size that should be same as increment size of sequence. */
+    protected final BigDecimal _cacheSize;
+
     protected final Class<?> _resultType;
     protected BigDecimal _addedCount = INITIAL_ADDED_COUNT;
     protected BigDecimal _sequenceValue;
@@ -44,8 +46,8 @@ public class SequenceCache {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SequenceCache(BigDecimal incrementSize, Class<?> resultType) {
-        _incrementSize = incrementSize;
+    public SequenceCache(BigDecimal cacheSize, Class<?> resultType) {
+        _cacheSize = cacheSize;
         _resultType = resultType;
     }
 
@@ -54,7 +56,7 @@ public class SequenceCache {
     //                                                                          ==========
     public synchronized Object nextval(SequenceRealExecutor executor) {
         _addedCount = _addedCount.add(getAddSize());
-        if (_sequenceValue != null && _addedCount.compareTo(_incrementSize) < 0) {
+        if (_sequenceValue != null && _addedCount.compareTo(_cacheSize) < 0) {
             final Object number = DfTypeUtil.toNumber(_resultType, _sequenceValue.add(_addedCount));
             if (isLogEnabled()) {
                 String msg = "...Getting sequence value from cache:";
@@ -102,6 +104,6 @@ public class SequenceCache {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + "incrementSize=" + _incrementSize + ", resultType=" + _resultType + "}@" + hashCode();
+        return "{" + "incrementSize=" + _cacheSize + ", resultType=" + _resultType + "}@" + hashCode();
     }
 }

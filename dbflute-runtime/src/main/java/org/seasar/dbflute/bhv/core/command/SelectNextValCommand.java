@@ -125,8 +125,8 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
 
     protected SequenceCache findSequenceCache(DBMeta dbmeta) {
         final String sequenceName = dbmeta.getSequenceName();
-        final Integer incrementSize = dbmeta.getSequenceIncrementSize();
-        return _sequenceCacheHandler.findSequenceCache(sequenceName, _dataSource, incrementSize, _resultType);
+        final Integer cacheSize = dbmeta.getSequenceCacheSize();
+        return _sequenceCacheHandler.findSequenceCache(sequenceName, _dataSource, cacheSize, _resultType);
     }
 
     protected BasicSelectExecution createBasicSelectExecution(TnResultSetHandler handler, String[] argNames,

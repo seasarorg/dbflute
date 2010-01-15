@@ -247,16 +247,16 @@ public interface DBMeta {
     public String getSequenceName();
 
     /**
-     * Get the increment size of sequence.
-     * @return The increment size of sequence. (Nullable: If the size is unknown, returns null.)
-     */
-    public Integer getSequenceIncrementSize();
-
-    /**
      * Get the SQL string for getting next value of sequence.
      * @return The SQL string for getting next value of sequence. (Nullable: If it does not have sequence, returns null.)
      */
     public String getSequenceNextValSql();
+
+    /**
+     * Get the cache size of sequence.
+     * @return The cache size of sequence. (Nullable: If it does not use cache, returns null.)
+     */
+    public Integer getSequenceCacheSize();
 
     // ===================================================================================
     //                                                                Optimistic Lock Info

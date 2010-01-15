@@ -39,9 +39,9 @@ public class SequenceCacheHandler {
     // ===================================================================================
     //                                                                            Handling
     //                                                                            ========
-    public SequenceCache findSequenceCache(String sequenceName, DataSource dataSource, Integer incrementSize,
+    public SequenceCache findSequenceCache(String sequenceName, DataSource dataSource, Integer cacheSize,
             Class<?> resultType) {
-        if (incrementSize == null || incrementSize <= 1) {
+        if (cacheSize == null || cacheSize <= 1) {
             return null;
         }
         final String key = generateKey(sequenceName, dataSource);
@@ -55,9 +55,9 @@ public class SequenceCacheHandler {
                 return sequenceCache;
             }
             if (isLogEnabled()) {
-                log("...Initializing sequence cache: " + sequenceName + ":cache(" + incrementSize + ")");
+                log("...Initializing sequence cache: " + sequenceName + ":cache(" + cacheSize + ")");
             }
-            sequenceCache = createSequenceCache(sequenceName, dataSource, incrementSize, resultType);
+            sequenceCache = createSequenceCache(sequenceName, dataSource, cacheSize, resultType);
             _sequenceCacheMap.put(key, sequenceCache);
         }
         if (sequenceCache == null) {
@@ -72,9 +72,9 @@ public class SequenceCacheHandler {
         return _sequenceCacheMap.get(key);
     }
 
-    protected SequenceCache createSequenceCache(String sequenceName, DataSource dataSource, Integer incrementSize,
+    protected SequenceCache createSequenceCache(String sequenceName, DataSource dataSource, Integer cacheSize,
             Class<?> resultType) {
-        return new SequenceCache(new BigDecimal(incrementSize), resultType);
+        return new SequenceCache(new BigDecimal(cacheSize), resultType);
     }
 
     protected String generateKey(String sequenceName, DataSource dataSource) {

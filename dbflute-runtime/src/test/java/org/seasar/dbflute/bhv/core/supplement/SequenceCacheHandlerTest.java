@@ -39,7 +39,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         // ## Assert ##
         assertEquals(2, handler._sequenceCacheMap.size());
         assertEquals(Long.class, cache._resultType);
-        assertEquals(new BigDecimal(50), cache._incrementSize);
+        assertEquals(new BigDecimal(50), cache._cacheSize);
         assertEquals(cache, sameCache);
         assertNotSame(cache, diffNameCache);
         assertEquals(cache, sameDsCache);
@@ -66,7 +66,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         // ## Assert ##
         assertEquals(3, handler._sequenceCacheMap.size());
         assertEquals(Long.class, cache._resultType);
-        assertEquals(new BigDecimal(50), cache._incrementSize);
+        assertEquals(new BigDecimal(50), cache._cacheSize);
         assertEquals(cache, sameCache);
         assertNotSame(cache, diffNameCache);
         assertNotSame(cache, diffDsCache);
@@ -124,7 +124,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         assertEquals(1, handler._sequenceCacheMap.size());
         assertNotNull(cache);
         assertEquals(Integer.class, cache._resultType);
-        assertEquals(new BigDecimal(2), cache._incrementSize);
+        assertEquals(new BigDecimal(2), cache._cacheSize);
     }
 
     public void test_findSequenceCache_threadSafe_onlyOne() {
