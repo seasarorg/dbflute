@@ -54,6 +54,7 @@ public class ${glDBFluteConfig} {
 	protected String _logDateFormat;
 	protected String _logTimestampFormat;
     protected DataSourceHandler _dataSourceHandler;
+    protected SequenceCacheKeyGenerator _sequenceCacheKeyGenerator;
     protected String _outsideSqlPackage = DEFAULT_OUTSIDE_SQL_PACKAGE;
 	protected boolean _useSqlLogRegistry = DEFAULT_USE_SQL_LOG_REGISTRY;
 	protected boolean _disableSelectIndex;
