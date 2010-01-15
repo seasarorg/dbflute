@@ -24,9 +24,36 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class SequenceCacheHandlerTest extends PlainTestCase {
 
-    public void test_findSequenceCache() {
+    public void test_findSequenceCache_defaultKeyGenerator() {
         // ## Arrange ##
         SequenceCacheHandler handler = new SequenceCacheHandler();
+        DataSource dataSource = new MyDataSource();
+        DataSource dataSource2 = new MyDataSource();
+
+        // ## Act ##
+        SequenceCache cache = handler.findSequenceCache("FOO", dataSource, 50, Long.class);
+        SequenceCache sameCache = handler.findSequenceCache("FOO", dataSource, 50, Long.class);
+        SequenceCache diffNameCache = handler.findSequenceCache("BAR", dataSource, 50, Long.class);
+        SequenceCache sameDsCache = handler.findSequenceCache("FOO", dataSource2, 50, Long.class);
+
+        // ## Assert ##
+        assertEquals(2, handler._sequenceCacheMap.size());
+        assertEquals(Long.class, cache._resultType);
+        assertEquals(new BigDecimal(50), cache._incrementSize);
+        assertEquals(cache, sameCache);
+        assertNotSame(cache, diffNameCache);
+        assertEquals(cache, sameDsCache);
+        assertNotSame(diffNameCache, sameDsCache);
+    }
+
+    public void test_findSequenceCache_dataSourceKeyGenerator() {
+        // ## Arrange ##
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        handler.setSequenceCacheKeyGenerator(new SequenceCacheKeyGenerator() {
+            public String generateKey(String sequenceName, DataSource dataSource) {
+                return sequenceName + "@" + dataSource.hashCode();
+            }
+        });
         DataSource dataSource = new MyDataSource();
         DataSource dataSource2 = new MyDataSource();
 

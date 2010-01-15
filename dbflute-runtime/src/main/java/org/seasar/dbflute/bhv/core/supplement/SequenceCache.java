@@ -17,6 +17,7 @@ package org.seasar.dbflute.bhv.core.supplement;
 
 import java.math.BigDecimal;
 
+import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -54,7 +55,13 @@ public class SequenceCache {
     public synchronized Object nextval(SequenceRealExecutor executor) {
         _addedCount = _addedCount.add(getAddSize());
         if (_sequenceValue != null && _addedCount.compareTo(_incrementSize) < 0) {
-            return DfTypeUtil.toNumber(_resultType, _sequenceValue.add(_addedCount));
+            final Object number = DfTypeUtil.toNumber(_resultType, _sequenceValue.add(_addedCount));
+            if (isLogEnabled()) {
+                String msg = "...Getting sequence value from cache:";
+                msg = msg + " " + number + " (" + _sequenceValue + " + " + _addedCount + ")";
+                log(msg);
+            }
+            return number;
         }
         _sequenceValue = selectSequence(executor);
         _addedCount = INITIAL_ADDED_COUNT;
@@ -77,6 +84,17 @@ public class SequenceCache {
 
     public static interface SequenceRealExecutor {
         Object execute();
+    }
+
+    // ===================================================================================
+    //                                                                                 Log
+    //                                                                                 ===
+    protected void log(String msg) {
+        XLog.log(msg);
+    }
+
+    protected boolean isLogEnabled() {
+        return XLog.isLogEnabled();
     }
 
     // ===================================================================================

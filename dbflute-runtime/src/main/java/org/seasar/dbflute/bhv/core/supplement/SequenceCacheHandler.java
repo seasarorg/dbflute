@@ -21,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.XLog;
+
 /**
  * The handler of sequence cache.
  * @author jflute
@@ -52,6 +54,9 @@ public class SequenceCacheHandler {
             if (sequenceCache != null) {
                 return sequenceCache;
             }
+            if (isLogEnabled()) {
+                log("...Initializing sequence cache: " + sequenceName + ":cache(" + incrementSize + ")");
+            }
             sequenceCache = createSequenceCache(sequenceName, dataSource, incrementSize, resultType);
             _sequenceCacheMap.put(key, sequenceCache);
         }
@@ -77,6 +82,17 @@ public class SequenceCacheHandler {
             return _sequenceCacheKeyGenerator.generateKey(sequenceName, dataSource);
         }
         return sequenceName; // as default
+    }
+
+    // ===================================================================================
+    //                                                                                 Log
+    //                                                                                 ===
+    protected void log(String msg) {
+        XLog.log(msg);
+    }
+
+    protected boolean isLogEnabled() {
+        return XLog.isLogEnabled();
     }
 
     // ===================================================================================
