@@ -125,10 +125,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         final Map<String, DfSequenceMetaInfo> sequenceMetaInfoMap = getSequenceMetaInfoMap(dataSource);
         final String sequenceInfoKey = (schemaName != null ? schemaName + "." : "") + sequenceName;
         final DfSequenceMetaInfo info = sequenceMetaInfoMap.get(sequenceInfoKey);
-        System.out.println("***: " + info);
         if (info != null) {
             final Integer incrementSize = info.getIncrementSize();
-            System.out.println("***: " + incrementSize);
             if (incrementSize != null) {
                 return incrementSize.toString();
             } else {
