@@ -29,7 +29,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     protected static final String KEY_sequenceDefinitionMap = "sequenceDefinitionMap";
     protected Map<String, String> _sequenceDefinitionMap;
 
-    public Map<String, String> getSequenceDefinitionMap() {
+    protected Map<String, String> getSequenceDefinitionMap() {
         if (_sequenceDefinitionMap == null) {
             LinkedHashMap<String, String> tmpMap = new LinkedHashMap<String, String>();
             Map<String, Object> originalMap = mapProp("torque." + KEY_sequenceDefinitionMap, DEFAULT_EMPTY_MAP);
@@ -49,9 +49,55 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return _sequenceDefinitionMap;
     }
 
-    public String getSequenceDefinitionMapSequence(String flexibleTableName) {
+    public Map<String, String> getTableSequenceMap() {
+        final Map<String, String> sequenceDefinitionMap = getSequenceDefinitionMap();
+        final Map<String, String> resultMap = new LinkedHashMap<String, String>();
+        final Set<String> keySet = sequenceDefinitionMap.keySet();
+        for (String tableName : keySet) {
+            resultMap.put(tableName, getSequenceName(tableName));
+        }
+        return resultMap;
+    }
+
+    public String getSequenceName(String flexibleTableName) {
         final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
-        return flmap.get(flexibleTableName);
+        final String sequence = flmap.get(flexibleTableName);
+        if (sequence == null) {
+            return null;
+        }
+        final String hintMark = ":";
+        final int hintMarkIndex = sequence.lastIndexOf(hintMark);
+        if (hintMarkIndex < 0) {
+            return sequence;
+        }
+        return sequence.substring(0, hintMarkIndex);
+    }
+
+    public String getSequenceIncrementSize(String flexibleTableName) {
+        final String sequence = getSequenceName(flexibleTableName);
+        if (sequence == null) {
+            return null;
+        }
+        final String hintMark = ":";
+        final int hintMarkIndex = sequence.lastIndexOf(hintMark);
+        if (hintMarkIndex < 0) {
+            return null;
+        }
+        final String hint = sequence.substring(hintMarkIndex + hintMark.length()).trim();
+        final String incrementMark = "increment(";
+        final int incrementMarkIndex = hint.indexOf(incrementMark);
+        if (incrementMarkIndex < 0) {
+            return null;
+        }
+        final String incrementValue = hint.substring(incrementMarkIndex + incrementMark.length()).trim();
+        final String endMark = ")";
+        final int endMarkIndex = incrementValue.indexOf(endMark);
+        if (endMarkIndex < 0) {
+            String msg = "The increment size setting needs end mark ')':";
+            msg = msg + " sequence=" + sequence;
+            throw new IllegalStateException(msg);
+        }
+        return incrementValue.substring(0, endMarkIndex).trim();
     }
 
     /**
@@ -148,7 +194,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return _identityDefinitionMap;
     }
 
-    public String getIdentityDefinitionMapColumnName(String flexibleTableName) {
+    public String getIdentityColumnName(String flexibleTableName) {
         final DfFlexibleMap<String, Object> flmap = new DfFlexibleMap<String, Object>(getIdentityDefinitionMap());
         return (String) flmap.get(flexibleTableName);
     }

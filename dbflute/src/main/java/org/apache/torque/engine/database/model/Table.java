@@ -1995,7 +1995,7 @@ public class Table {
 
     /**
      * Get the value of sequence name from definition map.
-     * @return Defined sequence name. (NotNull)
+     * @return The defined sequence name. (NotNull: If it does not have sequence, return empty string.)
      */
     public String getDefinedSequenceName() {
         if (!isUseSequence()) {
@@ -2006,6 +2006,21 @@ public class Table {
             return postgreSQLSerialSequenceName;
         }
         return getDatabase().getSequenceDefinitionMapSequence(getName());
+    }
+
+    /**
+     * Get the increment size of sequence from definition map.
+     * @return The defined increment size of sequence. (NotNull: If it does not have sequence, return null string.)
+     */
+    public String getDefinedSequenceIncrementSize() {
+        if (!isUseSequence()) {
+            return "null";
+        }
+        final String size = getDatabase().getSequenceDefinitionMapSequenceIncrementSize(getName());
+        if (size == null) {
+            return "null";
+        }
+        return size;
     }
 
     /**

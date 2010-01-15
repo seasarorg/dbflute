@@ -238,19 +238,19 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
         _log.info("*                    *");
         _log.info("* * * * * * * * * * **");
         final DfSequenceIdentityProperties sequenceProp = getProperties().getSequenceIdentityProperties();
-        final Map<String, String> sequenceDefinitionMap = sequenceProp.getSequenceDefinitionMap();
+        final Map<String, String> tableSequenceMap = sequenceProp.getTableSequenceMap();
         if (getBasicProperties().isDatabasePostgreSQL()) {
             final DfSequenceHandlerPostgreSQL handler = new DfSequenceHandlerPostgreSQL(getDataSource(), _schema);
-            handler.incrementSequenceToDataMax(sequenceDefinitionMap);
+            handler.incrementSequenceToDataMax(tableSequenceMap);
         } else if (getBasicProperties().isDatabaseOracle()) {
             final DfSequenceHandlerOracle handler = new DfSequenceHandlerOracle(getDataSource(), _schema);
-            handler.incrementSequenceToDataMax(sequenceDefinitionMap);
+            handler.incrementSequenceToDataMax(tableSequenceMap);
         } else if (getBasicProperties().isDatabaseDB2()) {
             final DfSequenceHandlerDB2 handler = new DfSequenceHandlerDB2(getDataSource(), _schema);
-            handler.incrementSequenceToDataMax(sequenceDefinitionMap);
+            handler.incrementSequenceToDataMax(tableSequenceMap);
         } else if (getBasicProperties().isDatabaseH2()) {
             final DfSequenceHandlerH2 handler = new DfSequenceHandlerH2(getDataSource(), _schema);
-            handler.incrementSequenceToDataMax(sequenceDefinitionMap);
+            handler.incrementSequenceToDataMax(tableSequenceMap);
         } else {
             String databaseName = getBasicProperties().getDatabaseName();
             String msg = "Unsupported isIncrementSequenceToDataMax at " + databaseName;

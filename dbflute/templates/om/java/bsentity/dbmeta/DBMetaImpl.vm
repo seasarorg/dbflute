@@ -207,6 +207,8 @@ public class ${myClassName} extends AbstractDBMeta {
 #end
 #if ($table.isUseSequence())
     public boolean hasSequence() { return true; }
+    public String getSequenceName() { return "${table.definedSequenceName}"; }
+    public Integer getSequenceIncrementSize() { return ${table.definedSequenceIncrementSize}; }
     public String getSequenceNextValSql() { return "${table.sequenceNextSql}"; }
 #end
 #if ($table.isUseVersionNo())
