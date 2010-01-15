@@ -96,19 +96,25 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         if (incrementMarkIndex < 0) {
             return null;
         }
-        final String incrementValue = hint.substring(incrementMarkIndex + incrementMark.length()).trim();
+        final String cacheValue = hint.substring(incrementMarkIndex + incrementMark.length()).trim();
         final String endMark = ")";
-        final int endMarkIndex = incrementValue.indexOf(endMark);
+        final int endMarkIndex = cacheValue.indexOf(endMark);
         if (endMarkIndex < 0) {
             String msg = "The increment size setting needs end mark ')':";
             msg = msg + " sequence=" + sequence;
             throw new IllegalStateException(msg);
         }
-        final String cacheSize = incrementValue.substring(0, endMarkIndex).trim();
+        final String cacheSize = cacheValue.substring(0, endMarkIndex).trim();
         if (cacheSize != null && cacheSize.trim().length() > 0) {
             return cacheSize;
         }
-        return getSequenceIncrementSize(dataSource, schemaName, flexibleTableName);
+        final String incrementSize = getSequenceIncrementSize(dataSource, schemaName, flexibleTableName);
+        if (incrementSize != null) {
+            return incrementSize;
+        }
+        String msg = "Failed to get the cache size of sequence:";
+        msg = msg + " schema=" + schemaName + " table=" + flexibleTableName + " sequence=" + sequence;
+        throw new IllegalStateException(msg);
     }
 
     protected String getSequenceIncrementSize(DataSource dataSource, String schemaName, String flexibleTableName) {
@@ -119,8 +125,15 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         final Map<String, DfSequenceMetaInfo> sequenceMetaInfoMap = getSequenceMetaInfoMap(dataSource);
         final String sequenceInfoKey = (schemaName != null ? schemaName + "." : "") + sequenceName;
         final DfSequenceMetaInfo info = sequenceMetaInfoMap.get(sequenceInfoKey);
-        if (info != null && info.getIncrementSize() != null) {
-            return info.getIncrementSize().toString();
+        System.out.println("***: " + info);
+        if (info != null) {
+            final Integer incrementSize = info.getIncrementSize();
+            System.out.println("***: " + incrementSize);
+            if (incrementSize != null) {
+                return incrementSize.toString();
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
