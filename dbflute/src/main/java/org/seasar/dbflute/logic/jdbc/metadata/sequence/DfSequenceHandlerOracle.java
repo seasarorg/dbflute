@@ -74,6 +74,7 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
     //                                                                        Sequence Map
     //                                                                        ============
     public Map<String, DfSequenceMetaInfo> getSequenceMap() {
+        _log.info("...Loading sequence informations");
         final Map<String, DfSequenceMetaInfo> resultMap = new LinkedHashMap<String, DfSequenceMetaInfo>();
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String schemaCondition;
@@ -96,10 +97,10 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
         columnList.add("MAX_VALUE");
         columnList.add("INCREMENT_BY");
         final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
-        final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
         final StringBuilder logSb = new StringBuilder();
         logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
+            final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
             final String sequenceOwner = recordMap.get("SEQUENCE_OWNER");
             info.setSequenceOwner(sequenceOwner);
             final String sequenceName = recordMap.get("SEQUENCE_NAME");
