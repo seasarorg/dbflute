@@ -105,12 +105,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             throw new IllegalStateException(msg);
         }
         final String cacheSize = incrementValue.substring(0, endMarkIndex).trim();
-        final String incrementSize = getSequenceIncrementSize(dataSource, schemaName, flexibleTableName);
-        if (incrementSize != null) {
-            return incrementSize;
-        } else {
+        if (cacheSize != null && cacheSize.trim().length() > 0) {
             return cacheSize;
         }
+        return getSequenceIncrementSize(dataSource, schemaName, flexibleTableName);
     }
 
     protected String getSequenceIncrementSize(DataSource dataSource, String schemaName, String flexibleTableName) {

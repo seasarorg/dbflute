@@ -76,14 +76,18 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
     public Map<String, DfSequenceMetaInfo> getSequenceMap() {
         final Map<String, DfSequenceMetaInfo> resultMap = new LinkedHashMap<String, DfSequenceMetaInfo>();
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final StringBuilder sb = new StringBuilder();
-        for (String schema : _allSchemaList) {
-            if (sb.length() > 0) {
-                sb.append(",");
+        final String schemaCondition;
+        {
+            final StringBuilder sb = new StringBuilder();
+            for (String schema : _allSchemaList) {
+                if (sb.length() > 0) {
+                    sb.append(",");
+                }
+                sb.append("'").append(schema).append("'");
             }
-            sb.append("'").append(schema).append("'");
+            schemaCondition = sb.toString();
         }
-        final String sql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER in (" + sb.toString() + ")";
+        final String sql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER in (" + schemaCondition + ")";
         _log.info(sql);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SEQUENCE_OWNER");
@@ -93,6 +97,8 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
         columnList.add("INCREMENT_BY");
         final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
         final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
+        final StringBuilder logSb = new StringBuilder();
+        logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
             final String sequenceOwner = recordMap.get("SEQUENCE_OWNER");
             info.setSequenceOwner(sequenceOwner);
@@ -106,7 +112,9 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
             resultMap.put((sequenceOwner != null ? sequenceOwner + "." : "") + sequenceName, info);
             _log.info(info.toString());
+            logSb.append(ln()).append(" ").append(info.toString());
         }
+        _log.info(logSb.toString());
         return resultMap;
     }
 }
