@@ -57,13 +57,12 @@ public class SequenceCache {
     public synchronized Object nextval(SequenceRealExecutor executor) {
         _addedCount = _addedCount.add(getAddSize());
         if (_sequenceValue != null && _addedCount.compareTo(_cacheSize) < 0) {
-            final Object number = DfTypeUtil.toNumber(_resultType, _sequenceValue.add(_addedCount));
             if (isLogEnabled()) {
-                String msg = "...Getting sequence value from cache:";
-                msg = msg + " " + number + " (" + _sequenceValue + " + " + _addedCount + ")";
+                String msg = "...Getting next value from sequence cache:";
+                msg = msg + " (" + _sequenceValue + " + " + _addedCount + ")";
                 log(msg);
             }
-            return number;
+            return DfTypeUtil.toNumber(_resultType, _sequenceValue.add(_addedCount));
         }
         _sequenceValue = selectSequence(executor);
         _addedCount = INITIAL_ADDED_COUNT;
