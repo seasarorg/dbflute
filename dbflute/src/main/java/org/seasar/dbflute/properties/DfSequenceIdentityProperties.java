@@ -104,15 +104,28 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             msg = msg + " sequence=" + sequence;
             throw new IllegalStateException(msg);
         }
-        final String incrementSize = incrementValue.substring(0, endMarkIndex).trim();
+        final String cacheSize = incrementValue.substring(0, endMarkIndex).trim();
+        final String incrementSize = getSequenceIncrementSize(dataSource, schemaName, flexibleTableName);
+        if (incrementSize != null) {
+            return incrementSize;
+        } else {
+            return cacheSize;
+        }
+    }
+
+    protected String getSequenceIncrementSize(DataSource dataSource, String schemaName, String flexibleTableName) {
         final String sequenceName = getSequenceName(flexibleTableName);
+        if (sequenceName == null) {
+            return null;
+        }
         final Map<String, DfSequenceMetaInfo> sequenceMetaInfoMap = getSequenceMetaInfoMap(dataSource);
         final String sequenceInfoKey = (schemaName != null ? schemaName + "." : "") + sequenceName;
         final DfSequenceMetaInfo info = sequenceMetaInfoMap.get(sequenceInfoKey);
         if (info != null && info.getIncrementSize() != null) {
             return info.getIncrementSize().toString();
+        } else {
+            return null;
         }
-        return incrementSize;
     }
 
     protected Map<String, DfSequenceMetaInfo> _sequenceMetaInfoMap;

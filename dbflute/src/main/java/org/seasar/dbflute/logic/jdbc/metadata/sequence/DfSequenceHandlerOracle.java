@@ -105,6 +105,7 @@ public class DfSequenceHandlerOracle extends DfSequenceHandlerJdbc {
             final String incrementSize = recordMap.get("INCREMENT_BY");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
             resultMap.put((sequenceOwner != null ? sequenceOwner + "." : "") + sequenceName, info);
+            _log.info(info.toString());
         }
         return resultMap;
     }
