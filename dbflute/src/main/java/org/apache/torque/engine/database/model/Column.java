@@ -513,7 +513,7 @@ public class Column {
             if (minimumValue != null && minimumValue.trim().length() > 0
                     && !minimumValue.trim().equalsIgnoreCase("null")) {
                 if (optionSb.length() > 0) {
-                    optionSb.append(", ");
+                    optionSb.append(",");
                 }
                 optionSb.append("minimum(" + minimumValue + ")");
             }
@@ -521,7 +521,7 @@ public class Column {
             if (maximumValue != null && maximumValue.trim().length() > 0
                     && !maximumValue.trim().equalsIgnoreCase("null")) {
                 if (optionSb.length() > 0) {
-                    optionSb.append(", ");
+                    optionSb.append(",");
                 }
                 optionSb.append("maximum(" + maximumValue + ")");
             }
@@ -529,19 +529,19 @@ public class Column {
             if (incrementSize != null && incrementSize.trim().length() > 0
                     && !incrementSize.trim().equalsIgnoreCase("null")) {
                 if (optionSb.length() > 0) {
-                    optionSb.append(", ");
+                    optionSb.append(",");
                 }
                 optionSb.append("increment(" + incrementSize + ")");
             }
             final String cacheSize = table.getSequenceCacheSize();
             if (cacheSize != null && cacheSize.trim().length() > 0 && !cacheSize.trim().equalsIgnoreCase("null")) {
                 if (optionSb.length() > 0) {
-                    optionSb.append(", ");
+                    optionSb.append(",");
                 }
                 optionSb.append("dfcache(" + cacheSize + ")");
             }
             if (optionSb.length() > 0) {
-                optionSb.append(":");
+                optionSb.insert(0, ":");
             }
             title = _primaryKeyName + " -- sequence=" + sequenceName + optionSb;
         } else {
