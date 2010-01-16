@@ -130,7 +130,16 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             return null;
         }
         final Map<String, DfSequenceMetaInfo> sequenceMetaInfoMap = getSequenceMetaInfoMap(dataSource);
-        final String sequenceInfoKey = (schemaName != null ? schemaName + "." : "") + sequenceName;
+        final String sequenceInfoKey;
+        if (schemaName != null && schemaName.trim().length() > 0) {
+            if (getBasicProperties().isDatabasePublicSchemaSupported() && schemaName.trim().equalsIgnoreCase("public")) {
+                sequenceInfoKey = sequenceName;
+            } else {
+                sequenceInfoKey = schemaName + "." + sequenceName;
+            }
+        } else {
+            sequenceInfoKey = sequenceName;
+        }
         final DfSequenceMetaInfo info = sequenceMetaInfoMap.get(sequenceInfoKey);
         if (info != null) {
             final Integer incrementSize = info.getIncrementSize();

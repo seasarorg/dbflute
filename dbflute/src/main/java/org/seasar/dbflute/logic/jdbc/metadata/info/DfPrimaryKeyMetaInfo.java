@@ -37,6 +37,10 @@ public class DfPrimaryKeyMetaInfo {
         return _primaryKeyMap.containsKey(columnName);
     }
 
+    public boolean hasPrimaryKey() {
+        return !_primaryKeyMap.isEmpty();
+    }
+
     public List<String> getPrimaryKeyList() {
         return new ArrayList<String>(_primaryKeyMap.keySet());
     }

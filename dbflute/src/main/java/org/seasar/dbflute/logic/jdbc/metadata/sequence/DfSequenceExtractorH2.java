@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -72,8 +71,6 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SEQUENCE_SCHEMA");
         columnList.add("SEQUENCE_NAME");
-        columnList.add("MINIMUM_VALUE");
-        columnList.add("MAXIMUM_VALUE");
         columnList.add("INCREMENT");
         final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
         final StringBuilder logSb = new StringBuilder();
@@ -84,15 +81,12 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
             info.setSequenceOwner(sequenceOwner);
             final String sequenceName = recordMap.get("SEQUENCE_NAME");
             info.setSequenceName(sequenceName);
-            final String minValue = recordMap.get("MINIMUM_VALUE");
-            info.setMinValue(minValue != null ? new BigDecimal(minValue) : null);
-            final String maxValue = recordMap.get("MAXIMUM_VALUE");
-            info.setMaxValue(maxValue != null ? new BigDecimal(maxValue) : null);
             final String incrementSize = recordMap.get("INCREMENT");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
             final String keyOwner = sequenceOwner.equalsIgnoreCase("public") ? null : sequenceOwner;
-            resultMap.put(buildSequenceMapKey(keyOwner, sequenceName), info);
-            logSb.append(ln()).append(" ").append(info.toString());
+            final String key = buildSequenceMapKey(keyOwner, sequenceName);
+            resultMap.put(key, info);
+            logSb.append(ln()).append(" ").append(key).append(" : ").append(info.toString());
         }
         _log.info(logSb.toString());
         return resultMap;

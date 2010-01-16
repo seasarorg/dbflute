@@ -115,7 +115,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
             }
         }
         if (!skippedMap.isEmpty()) {
-            _log.info("*Skipped incrementing sequences(Not PK Only One):");
+            _log.info("*Skipped incrementing sequences(not PK only one):");
             Set<Entry<String, List<String>>> skippedEntrySet = skippedMap.entrySet();
             for (Entry<String, List<String>> skippedEntry : skippedEntrySet) {
                 String tableName = skippedEntry.getKey();

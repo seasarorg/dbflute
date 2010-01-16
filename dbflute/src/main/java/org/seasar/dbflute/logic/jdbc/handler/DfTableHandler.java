@@ -59,7 +59,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
-            _log.info("$ ...Getting tables: schema=" + schemaName + " objectTypes=" + Arrays.asList(objectTypes));
+            _log.info("...Getting tables: schema=" + schemaName + " objectTypes=" + Arrays.asList(objectTypes));
             resultSet = dbMeta.getTables(null, schemaName, "%", objectTypes);
             while (resultSet.next()) {
                 final String tableName = resultSet.getString(3);
@@ -68,11 +68,11 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final String tableComment = resultSet.getString("REMARKS");
 
                 if (isTableExcept(schemaName, tableName)) {
-                    _log.info("$ " + tableName + " is excepted!");
+                    _log.info(tableName + " is excepted!");
                     continue;
                 }
                 if (isSystemTableForDBMS(tableName)) {
-                    _log.info("$ " + tableName + " is excepted! {system table}");
+                    _log.info(tableName + " is excepted! {system table}");
                     continue;
                 }
 

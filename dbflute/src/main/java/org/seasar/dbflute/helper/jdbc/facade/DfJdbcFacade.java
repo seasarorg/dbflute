@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.SQLFailureException;
 
 /**
  * Super simple facade for JDBC.
@@ -67,8 +68,12 @@ public class DfJdbcFacade {
                 ++count;
             }
         } catch (SQLException e) {
-            String msg = "Failed to execute the SQL: sql=" + sql;
-            throw new IllegalStateException(msg, e);
+            String msg = "Failed to execute the SQL:" + ln();
+            msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
+            msg = msg + " sql = " + sql + ln();
+            msg = msg + " msg = " + e.getMessage() + ln();
+            msg = msg + " - - - - - - - - - -/";
+            throw new SQLFailureException(msg, e);
         } finally {
             if (rs != null) {
                 try {
@@ -107,8 +112,12 @@ public class DfJdbcFacade {
             st = conn.createStatement();
             return st.execute(sql);
         } catch (SQLException e) {
-            String msg = "Failed to execute the SQL: sql=" + sql;
-            throw new IllegalStateException(msg, e);
+            String msg = "Failed to execute the SQL:" + ln();
+            msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
+            msg = msg + " sql = " + sql + ln();
+            msg = msg + " msg = " + e.getMessage() + ln();
+            msg = msg + " - - - - - - - - - -/";
+            throw new SQLFailureException(msg, e);
         } finally {
             if (st != null) {
                 try {
@@ -125,6 +134,12 @@ public class DfJdbcFacade {
                 }
             }
         }
+    }
 
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return "\n";
     }
 }

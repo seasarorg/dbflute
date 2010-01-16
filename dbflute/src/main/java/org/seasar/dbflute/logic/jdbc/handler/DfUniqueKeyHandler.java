@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
@@ -80,6 +81,22 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 final String pkName = getPrimaryKeyNameFromDBMeta(parts);
                 info.addPrimaryKeyList(columnName, pkName);
             }
+            if (!info.hasPrimaryKey()) { // for lower case
+                parts = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName.toLowerCase());
+                while (parts.next()) {
+                    final String columnName = getPrimaryKeyColumnNameFromDBMeta(parts);
+                    final String pkName = getPrimaryKeyNameFromDBMeta(parts);
+                    info.addPrimaryKeyList(columnName, pkName);
+                }
+            }
+            if (!info.hasPrimaryKey()) { // for upper case
+                parts = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName.toUpperCase());
+                while (parts.next()) {
+                    final String columnName = getPrimaryKeyColumnNameFromDBMeta(parts);
+                    final String pkName = getPrimaryKeyNameFromDBMeta(parts);
+                    info.addPrimaryKeyList(columnName, pkName);
+                }
+            }
         } finally {
             if (parts != null) {
                 parts.close();
@@ -117,7 +134,21 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     }
 
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, String schemaName,
-            String tableName, List<String> pkList) throws SQLException { // Non Primary Key Only
+            String tableName, List<String> pkList) throws SQLException { // non primary key only
+        Map<String, Map<Integer, String>> resultMap = doGetUniqueKeyMap(dbMeta, schemaName, tableName, pkList);
+        if (resultMap.isEmpty()) { // for lower case
+            resultMap = doGetUniqueKeyMap(dbMeta, schemaName, tableName.toLowerCase(), pkList);
+        }
+        if (resultMap.isEmpty()) { // for upper case
+            resultMap = doGetUniqueKeyMap(dbMeta, schemaName, tableName.toUpperCase(), pkList);
+        }
+        return resultMap;
+    }
+
+    protected Map<String, Map<Integer, String>> doGetUniqueKeyMap(DatabaseMetaData dbMeta, String schemaName,
+            String tableName, List<String> pkList) throws SQLException { // non primary key only
+        final StringSet pkSet = StringSet.createAsCaseInsensitive();
+        pkSet.addAll(pkList);
         final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {
@@ -143,7 +174,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                     continue;
                 }
 
-                if (pkList.contains(columnName)) {
+                if (pkSet.contains(columnName)) {
                     continue;
                 }
                 if (isColumnExcept(schemaName, tableName, columnName)) {

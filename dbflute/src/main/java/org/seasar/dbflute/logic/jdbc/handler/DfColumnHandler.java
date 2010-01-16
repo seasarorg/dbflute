@@ -99,11 +99,11 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
             final String realSchemaName = schemaName;
             columnResultSet = metaData.getColumns(null, realSchemaName, tableName, null);
             setupColumnMetaInfo(columns, columnResultSet, schemaName, tableName);
-            if (columns.isEmpty()) {
+            if (columns.isEmpty()) { // for lower case
                 lowerSpare = metaData.getColumns(null, realSchemaName, tableName.toLowerCase(), null);
                 setupColumnMetaInfo(columns, lowerSpare, schemaName, tableName);
             }
-            if (columns.isEmpty()) {
+            if (columns.isEmpty()) { // for upper case
                 upperSpare = metaData.getColumns(null, realSchemaName, tableName.toUpperCase(), null);
                 setupColumnMetaInfo(columns, upperSpare, schemaName, tableName);
             }

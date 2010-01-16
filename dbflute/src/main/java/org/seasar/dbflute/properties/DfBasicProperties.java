@@ -113,6 +113,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getDatabaseName().equalsIgnoreCase("msaccess");
     }
 
+    public boolean isDatabasePublicSchemaSupported() {
+        return isDatabasePostgreSQL() || isDatabaseH2();
+    }
+
     // ===================================================================================
     //                                                                            Language
     //                                                                            ========

@@ -51,7 +51,19 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
     }
 
     public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String schemaName, String tableName,
-            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
+            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
+        Map<String, Map<Integer, String>> resultMap = doGetIndexMap(dbMeta, schemaName, tableName, uniqueKeyMap);
+        if (resultMap.isEmpty()) { // for lower case
+            resultMap = doGetIndexMap(dbMeta, schemaName, tableName.toLowerCase(), uniqueKeyMap);
+        }
+        if (resultMap.isEmpty()) { // for upper case
+            resultMap = doGetIndexMap(dbMeta, schemaName, tableName.toUpperCase(), uniqueKeyMap);
+        }
+        return resultMap;
+    }
+
+    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData dbMeta, String schemaName,
+            String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
         final Map<String, Map<Integer, String>> indexMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {

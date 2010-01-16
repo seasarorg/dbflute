@@ -70,6 +70,18 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
      */
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String schemaName,
             String tableName) throws SQLException {
+        Map<String, DfForeignKeyMetaInfo> resultMap = doGetForeignKeyMetaInfo(dbMeta, schemaName, tableName);
+        if (resultMap.isEmpty()) { // for lower case
+            resultMap = doGetForeignKeyMetaInfo(dbMeta, schemaName, tableName.toLowerCase());
+        }
+        if (resultMap.isEmpty()) { // for upper case
+            resultMap = doGetForeignKeyMetaInfo(dbMeta, schemaName, tableName.toUpperCase());
+        }
+        return resultMap;
+    }
+
+    protected Map<String, DfForeignKeyMetaInfo> doGetForeignKeyMetaInfo(DatabaseMetaData dbMeta, String schemaName,
+            String tableName) throws SQLException {
         final Map<String, DfForeignKeyMetaInfo> fkMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
         if (!isForeignKeyExtractingSupported()) {
             return fkMap;
