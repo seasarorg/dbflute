@@ -27,8 +27,8 @@ public class DfSequenceMetaInfo {
     //                                                                           =========
     protected String sequenceOwner;
     protected String sequenceName;
-    protected BigDecimal minValue;
-    protected BigDecimal maxValue;
+    protected BigDecimal minimumValue;
+    protected BigDecimal maximumValue;
     protected Integer incrementSize;
 
     // ===================================================================================
@@ -36,7 +36,7 @@ public class DfSequenceMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return sequenceOwner + "." + sequenceName + ":{" + minValue + " to " + maxValue + ", increment "
+        return sequenceOwner + "." + sequenceName + ":{" + minimumValue + " to " + maximumValue + ", increment "
                 + incrementSize + "}";
     }
 
@@ -60,20 +60,20 @@ public class DfSequenceMetaInfo {
         this.sequenceName = sequenceName;
     }
 
-    public BigDecimal getMinValue() {
-        return minValue;
+    public BigDecimal getMinimumValue() {
+        return minimumValue;
     }
 
-    public void setMinValue(BigDecimal minValue) {
-        this.minValue = minValue;
+    public void setMinimumValue(BigDecimal minimumValue) {
+        this.minimumValue = minimumValue;
     }
 
-    public BigDecimal getMaxValue() {
-        return maxValue;
+    public BigDecimal getMaximumValue() {
+        return maximumValue;
     }
 
-    public void setMaxValue(BigDecimal maxValue) {
-        this.maxValue = maxValue;
+    public void setMaximumValue(BigDecimal maximumValue) {
+        this.maximumValue = maximumValue;
     }
 
     public Integer getIncrementSize() {

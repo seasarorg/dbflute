@@ -504,10 +504,46 @@ public class Column {
         if (value == null) {
             return "";
         }
+        final Table table = getTable();
         final String title;
-        if (getTable().isUseSequence()) {
-            final String sequenceName = getTable().getDefinedSequenceName();
-            title = _primaryKeyName + ": sequence=" + sequenceName;
+        if (table.isUseSequence()) {
+            final String sequenceName = table.getDefinedSequenceName();
+            final String minimumValue = table.getSequenceMinimumValue();
+            final StringBuilder optionSb = new StringBuilder();
+            if (minimumValue != null && minimumValue.trim().length() > 0
+                    && !minimumValue.trim().equalsIgnoreCase("null")) {
+                if (optionSb.length() > 0) {
+                    optionSb.append(", ");
+                }
+                optionSb.append("minimum(" + minimumValue + ")");
+            }
+            final String maximumValue = table.getSequenceMaximumValue();
+            if (maximumValue != null && maximumValue.trim().length() > 0
+                    && !maximumValue.trim().equalsIgnoreCase("null")) {
+                if (optionSb.length() > 0) {
+                    optionSb.append(", ");
+                }
+                optionSb.append("maximum(" + maximumValue + ")");
+            }
+            final String incrementSize = table.getSequenceIncrementSize();
+            if (incrementSize != null && incrementSize.trim().length() > 0
+                    && !incrementSize.trim().equalsIgnoreCase("null")) {
+                if (optionSb.length() > 0) {
+                    optionSb.append(", ");
+                }
+                optionSb.append("increment(" + incrementSize + ")");
+            }
+            final String cacheSize = table.getSequenceCacheSize();
+            if (cacheSize != null && cacheSize.trim().length() > 0 && !cacheSize.trim().equalsIgnoreCase("null")) {
+                if (optionSb.length() > 0) {
+                    optionSb.append(", ");
+                }
+                optionSb.append("dfcache(" + cacheSize + ")");
+            }
+            if (optionSb.length() > 0) {
+                optionSb.append(":");
+            }
+            title = _primaryKeyName + " -- sequence=" + sequenceName + optionSb;
         } else {
             title = _primaryKeyName;
         }

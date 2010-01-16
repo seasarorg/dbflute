@@ -2027,6 +2027,30 @@ public class Table {
         return result;
     }
 
+    public String getSequenceMinimumValue() {
+        if (!isUseSequence()) {
+            return "null";
+        }
+        final String size = getDatabase().getSequenceDefinitionSequenceMinimumValue(getSchema(), getName());
+        return size != null ? size : "null";
+    }
+
+    public String getSequenceMaximumValue() {
+        if (!isUseSequence()) {
+            return "null";
+        }
+        final String size = getDatabase().getSequenceDefinitionSequenceMaximumValue(getSchema(), getName());
+        return size != null ? size : "null";
+    }
+
+    public String getSequenceIncrementSize() {
+        if (!isUseSequence()) {
+            return "null";
+        }
+        final String size = getDatabase().getSequenceDefinitionSequenceIncrementSize(getSchema(), getName());
+        return size != null ? size : "null";
+    }
+
     /**
      * Get the cache size of sequence from definition map.
      * @return The cache size of sequence. (NotNull: If it does not have sequence, return null string.)
@@ -2036,10 +2060,7 @@ public class Table {
             return "null";
         }
         final String size = getDatabase().getSequenceDefinitionSequenceCacheSize(getSchema(), getName());
-        if (size == null) {
-            return "null";
-        }
-        return size;
+        return size != null ? size : "null";
     }
 
     public String getSequenceReturnType() {

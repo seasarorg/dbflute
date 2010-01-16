@@ -222,7 +222,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                         Data Source
     //                                                                         ===========
     protected boolean isUseDataSource() {
-        return isDataXlsTemplateRecordLimitValid() || isGenerateProcedureParameterBean();
+        return true;
     }
 
     // ===================================================================================

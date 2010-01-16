@@ -80,14 +80,18 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
         logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
             final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
-            final String sequenceOwner = recordMap.get("SEQSCHEMA");
+            String sequenceOwner = recordMap.get("SEQSCHEMA");
+
+            // trim because DB2 returns "char(8)-owner"
+            sequenceOwner = sequenceOwner != null ? sequenceOwner.trim() : null;
+
             info.setSequenceOwner(sequenceOwner);
             final String sequenceName = recordMap.get("SEQNAME");
             info.setSequenceName(sequenceName);
             final String minValue = recordMap.get("MINVALUE");
-            info.setMinValue(minValue != null ? new BigDecimal(minValue) : null);
+            info.setMinimumValue(minValue != null ? new BigDecimal(minValue) : null);
             final String maxValue = recordMap.get("MAXVALUE");
-            info.setMaxValue(maxValue != null ? new BigDecimal(maxValue) : null);
+            info.setMaximumValue(maxValue != null ? new BigDecimal(maxValue) : null);
             final String incrementSize = recordMap.get("INCREMENT");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
             final String key = buildSequenceMapKey(sequenceOwner, sequenceName);

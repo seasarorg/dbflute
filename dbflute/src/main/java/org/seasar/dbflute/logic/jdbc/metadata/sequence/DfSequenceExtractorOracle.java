@@ -85,9 +85,9 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
             final String sequenceName = recordMap.get("SEQUENCE_NAME");
             info.setSequenceName(sequenceName);
             final String minValue = recordMap.get("MIN_VALUE");
-            info.setMinValue(minValue != null ? new BigDecimal(minValue) : null);
+            info.setMinimumValue(minValue != null ? new BigDecimal(minValue) : null);
             final String maxValue = recordMap.get("MAX_VALUE");
-            info.setMaxValue(maxValue != null ? new BigDecimal(maxValue) : null);
+            info.setMaximumValue(maxValue != null ? new BigDecimal(maxValue) : null);
             final String incrementSize = recordMap.get("INCREMENT_BY");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
             final String key = buildSequenceMapKey(sequenceOwner, sequenceName);

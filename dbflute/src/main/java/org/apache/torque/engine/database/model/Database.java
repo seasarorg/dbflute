@@ -1092,13 +1092,28 @@ public class Database {
     // ===================================================================================
     //                                                        Sequence/Identity Properties
     //                                                        ============================
-    public String getSequenceDefinitionSequenceName(String flexibleTableName) {
-        return getProperties().getSequenceIdentityProperties().getSequenceName(flexibleTableName);
+    public String getSequenceDefinitionSequenceName(String tableName) {
+        return getProperties().getSequenceIdentityProperties().getSequenceName(tableName);
     }
 
-    public String getSequenceDefinitionSequenceCacheSize(String schemaName, String flexibleTableName) {
+    public String getSequenceDefinitionSequenceCacheSize(String schemaName, String tableName) {
         return getProperties().getSequenceIdentityProperties().getSequenceCacheSize(getDataSource(), schemaName,
-                flexibleTableName);
+                tableName);
+    }
+
+    public String getSequenceDefinitionSequenceIncrementSize(String schemaName, String tableName) {
+        return getProperties().getSequenceIdentityProperties().getSequenceIncrementSize(getDataSource(), schemaName,
+                tableName);
+    }
+
+    public String getSequenceDefinitionSequenceMinimumValue(String schemaName, String tableName) {
+        return getProperties().getSequenceIdentityProperties().getSequenceMinimumValue(getDataSource(), schemaName,
+                tableName);
+    }
+
+    public String getSequenceDefinitionSequenceMaximumValue(String schemaName, String tableName) {
+        return getProperties().getSequenceIdentityProperties().getSequenceMaximumValue(getDataSource(), schemaName,
+                tableName);
     }
 
     public String getSequenceReturnType() {

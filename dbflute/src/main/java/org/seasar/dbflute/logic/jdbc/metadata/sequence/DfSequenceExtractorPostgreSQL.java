@@ -85,9 +85,9 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
             final String sequenceName = recordMap.get("sequence_name");
             info.setSequenceName(sequenceName);
             final String minValue = recordMap.get("mininum_value");
-            info.setMinValue(minValue != null ? new BigDecimal(minValue) : null);
+            info.setMinimumValue(minValue != null ? new BigDecimal(minValue) : null);
             final String maxValue = recordMap.get("maxinum_value");
-            info.setMaxValue(maxValue != null ? new BigDecimal(maxValue) : null);
+            info.setMaximumValue(maxValue != null ? new BigDecimal(maxValue) : null);
             final String incrementSize = recordMap.get("increment");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
             final String keyOwner = sequenceOwner.equalsIgnoreCase("public") ? null : sequenceOwner;
