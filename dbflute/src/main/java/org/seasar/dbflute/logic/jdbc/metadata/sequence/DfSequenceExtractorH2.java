@@ -64,7 +64,7 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
             }
             schemaCondition = sb.toString();
         } else {
-            schemaCondition = "PUBLIC";
+            schemaCondition = "'PUBLIC'";
         }
         final String sql = "select * from INFORMATION_SCHEMA.SEQUENCES where SEQUENCE_SCHEMA in (" + schemaCondition
                 + ")";

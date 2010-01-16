@@ -64,7 +64,7 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
             }
             schemaCondition = sb.toString();
         } else {
-            schemaCondition = "public";
+            schemaCondition = "'public'";
         }
         final String sql = "select * from information_schema.sequences where sequence_schema in (" + schemaCondition
                 + ")";

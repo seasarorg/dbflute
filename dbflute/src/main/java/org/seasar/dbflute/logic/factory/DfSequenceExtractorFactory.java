@@ -45,7 +45,10 @@ public class DfSequenceExtractorFactory {
 
     protected List<String> createAllSchemaList() { // not only main schema but also additional schemas
         final List<String> schemaList = new ArrayList<String>();
-        schemaList.add(_databaseProperties.getDatabaseSchema());
+        final String mainSchema = _databaseProperties.getDatabaseSchema();
+        if (mainSchema != null && mainSchema.trim().length() > 0) {
+            schemaList.add(_databaseProperties.getDatabaseSchema());
+        }
         schemaList.addAll(_databaseProperties.getAdditionalSchemaMap().keySet());
         return schemaList;
     }
