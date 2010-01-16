@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfIllegalPropertyException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.logic.factory.DfSequenceExtractorFactory;
@@ -88,16 +89,16 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     public String getSequenceCacheSize(DataSource dataSource, String schemaName, String flexibleTableName) {
         final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
-        final String sequence = flmap.get(flexibleTableName);
-        if (sequence == null) {
+        final String sequenceExp = flmap.get(flexibleTableName);
+        if (sequenceExp == null) {
             return null;
         }
         final String hintMark = ":";
-        final int hintMarkIndex = sequence.lastIndexOf(hintMark);
+        final int hintMarkIndex = sequenceExp.lastIndexOf(hintMark);
         if (hintMarkIndex < 0) {
             return null;
         }
-        final String hint = sequence.substring(hintMarkIndex + hintMark.length()).trim();
+        final String hint = sequenceExp.substring(hintMarkIndex + hintMark.length()).trim();
         final String incrementMark = "cache(";
         final int incrementMarkIndex = hint.indexOf(incrementMark);
         if (incrementMarkIndex < 0) {
@@ -108,28 +109,30 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         final int endMarkIndex = cacheValue.indexOf(endMark);
         if (endMarkIndex < 0) {
             String msg = "The increment size setting needs end mark ')':";
-            msg = msg + " sequence=" + sequence;
+            msg = msg + " sequence=" + sequenceExp;
             throw new IllegalStateException(msg);
         }
         final String cacheSize = cacheValue.substring(0, endMarkIndex).trim();
         if (cacheSize != null && cacheSize.trim().length() > 0) {
             return cacheSize;
         }
-        final String incrementSize = getSequenceIncrementSize(dataSource, schemaName, flexibleTableName);
+        final String sequenceName = getSequenceName(flexibleTableName);
+        final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
+        final String incrementSize = getSequenceIncrementSize(dataSource, schemaName, sequenceName, sequenceMap);
         if (incrementSize != null) {
             return incrementSize;
         }
-        String msg = "Failed to get the cache size of sequence:";
-        msg = msg + " schema=" + schemaName + " table=" + flexibleTableName + " sequence=" + sequence;
-        throw new IllegalStateException(msg);
+        String msg = "Failed to get the cache size of sequence:" + getLineSeparator();
+        msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + getLineSeparator();
+        msg = msg + " schema=" + schemaName + " table=" + flexibleTableName;
+        msg = msg + " sequence=" + sequenceExp + getLineSeparator();
+        msg = msg + " sequenceMap=" + sequenceMap;
+        msg = msg + " - - - - - - - - - -/";
+        throw new DfIllegalPropertyException(msg);
     }
 
-    protected String getSequenceIncrementSize(DataSource dataSource, String schemaName, String flexibleTableName) {
-        final String sequenceName = getSequenceName(flexibleTableName);
-        if (sequenceName == null) {
-            return null;
-        }
-        final Map<String, DfSequenceMetaInfo> sequenceMetaInfoMap = getSequenceMetaInfoMap(dataSource);
+    protected String getSequenceIncrementSize(DataSource dataSource, String schemaName, String sequenceName,
+            Map<String, DfSequenceMetaInfo> sequenceMap) {
         final String sequenceInfoKey;
         if (schemaName != null && schemaName.trim().length() > 0) {
             if (getBasicProperties().isDatabasePublicSchemaSupported() && schemaName.trim().equalsIgnoreCase("public")) {
@@ -140,7 +143,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         } else {
             sequenceInfoKey = sequenceName;
         }
-        final DfSequenceMetaInfo info = sequenceMetaInfoMap.get(sequenceInfoKey);
+        final DfSequenceMetaInfo info = sequenceMap.get(sequenceInfoKey);
         if (info != null) {
             final Integer incrementSize = info.getIncrementSize();
             if (incrementSize != null) {
@@ -155,7 +158,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     protected Map<String, DfSequenceMetaInfo> _sequenceMetaInfoMap;
 
-    protected Map<String, DfSequenceMetaInfo> getSequenceMetaInfoMap(DataSource dataSource) {
+    protected Map<String, DfSequenceMetaInfo> getSequenceMap(DataSource dataSource) {
         if (_sequenceMetaInfoMap != null) {
             return _sequenceMetaInfoMap;
         }
