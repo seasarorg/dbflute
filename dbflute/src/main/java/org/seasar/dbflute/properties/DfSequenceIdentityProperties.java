@@ -13,7 +13,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.DfIllegalPropertyException;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.logic.factory.DfSequenceExtractorFactory;
@@ -73,9 +73,9 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return resultMap;
     }
 
-    public String getSequenceName(String flexibleTableName) {
+    public String getSequenceName(String tableName) {
         final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
-        final String sequence = flmap.get(flexibleTableName);
+        final String sequence = flmap.get(tableName);
         if (sequence == null) {
             return null;
         }
@@ -87,18 +87,18 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return sequence.substring(0, hintMarkIndex);
     }
 
-    public String getSequenceCacheSize(DataSource dataSource, String schemaName, String flexibleTableName) {
+    public String getSequenceCacheSize(DataSource dataSource, String schemaName, String tableName) {
         final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
-        final String sequenceExp = flmap.get(flexibleTableName);
-        if (sequenceExp == null) {
+        final String sequenceProp = flmap.get(tableName);
+        if (sequenceProp == null) {
             return null;
         }
         final String hintMark = ":";
-        final int hintMarkIndex = sequenceExp.lastIndexOf(hintMark);
+        final int hintMarkIndex = sequenceProp.lastIndexOf(hintMark);
         if (hintMarkIndex < 0) {
             return null;
         }
-        final String hint = sequenceExp.substring(hintMarkIndex + hintMark.length()).trim();
+        final String hint = sequenceProp.substring(hintMarkIndex + hintMark.length()).trim();
         final String incrementMark = "cache(";
         final int incrementMarkIndex = hint.indexOf(incrementMark);
         if (incrementMarkIndex < 0) {
@@ -109,26 +109,31 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         final int endMarkIndex = cacheValue.indexOf(endMark);
         if (endMarkIndex < 0) {
             String msg = "The increment size setting needs end mark ')':";
-            msg = msg + " sequence=" + sequenceExp;
+            msg = msg + " sequence=" + sequenceProp;
             throw new IllegalStateException(msg);
         }
         final String cacheSize = cacheValue.substring(0, endMarkIndex).trim();
         if (cacheSize != null && cacheSize.trim().length() > 0) {
             return cacheSize;
         }
-        final String sequenceName = getSequenceName(flexibleTableName);
+        final String sequenceName = getSequenceName(tableName);
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
         final String incrementSize = getSequenceIncrementSize(dataSource, schemaName, sequenceName, sequenceMap);
         if (incrementSize != null) {
             return incrementSize;
         }
-        String msg = "Failed to get the cache size of sequence:" + getLineSeparator();
-        msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + getLineSeparator();
-        msg = msg + " schema=" + schemaName + " table=" + flexibleTableName;
-        msg = msg + " sequence=" + sequenceExp + getLineSeparator();
-        msg = msg + " sequenceMap=" + sequenceMap;
+        String msg = "Failed to get the cache size of sequence:" + ln();
+        msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+        msg = msg + " schema = " + schemaName + " table = " + tableName;
+        msg = msg + " sequenceProp = " + sequenceProp + ln();
+        msg = msg + " sequenceName = " + sequenceName + ln();
+        msg = msg + " sequenceMap(" + sequenceMap.size() + "):" + ln();
+        final Set<Entry<String, DfSequenceMetaInfo>> entrySet = sequenceMap.entrySet();
+        for (Entry<String, DfSequenceMetaInfo> entry : entrySet) {
+            msg = msg + "   " + entry.getKey() + " = " + entry.getValue() + ln();
+        }
         msg = msg + " - - - - - - - - - -/";
-        throw new DfIllegalPropertyException(msg);
+        throw new DfIllegalPropertySettingException(msg);
     }
 
     protected String getSequenceIncrementSize(DataSource dataSource, String schemaName, String sequenceName,
@@ -196,16 +201,16 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     protected void throwSequenceDefinitionMapNotFoundTableException(List<String> notFoundTableNameList) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The table name was Not Found in the map of sequence definition!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Not Found Table]" + getLineSeparator();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "The table name was Not Found in the map of sequence definition!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Not Found Table]" + ln();
         for (String tableName : notFoundTableNameList) {
-            msg = msg + tableName + getLineSeparator();
+            msg = msg + tableName + ln();
         }
-        msg = msg + getLineSeparator();
-        msg = msg + "[Sequence Definition]" + getLineSeparator() + _sequenceDefinitionMap + getLineSeparator();
+        msg = msg + ln();
+        msg = msg + "[Sequence Definition]" + ln() + _sequenceDefinitionMap + ln();
         msg = msg + "* * * * * * * * * */";
         throw new SequenceDefinitionMapTableNotFoundException(msg);
     }
@@ -222,7 +227,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         }
     }
 
-    protected String getLineSeparator() {
+    protected String ln() {
         return System.getProperty("line.separator");
     }
 

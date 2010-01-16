@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfCommentExtractingFailureException;
+import org.seasar.dbflute.helper.StringKeyMap;
 
 /**
  * @author jflute
@@ -52,7 +53,7 @@ public abstract class DfDbCommentExtractorBase implements DfDbCommentExtractor {
     //                                                                                Main
     //                                                                                ====
     public Map<String, UserTabComments> extractTableComment(Set<String> tableSet) {
-        Map<String, UserTabComments> resultMap = new LinkedHashMap<String, UserTabComments>();
+        Map<String, UserTabComments> resultMap = StringKeyMap.createAsCaseInsensitive();
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();
@@ -76,7 +77,7 @@ public abstract class DfDbCommentExtractorBase implements DfDbCommentExtractor {
     }
 
     public Map<String, Map<String, UserColComments>> extractColumnComment(Set<String> tableSet) {
-        Map<String, Map<String, UserColComments>> resultMap = new LinkedHashMap<String, Map<String, UserColComments>>();
+        Map<String, Map<String, UserColComments>> resultMap = StringKeyMap.createAsCaseInsensitive();
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();

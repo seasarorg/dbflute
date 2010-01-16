@@ -1,6 +1,6 @@
 package org.seasar.dbflute.exception;
 
-public class DfIllegalPropertyTypeException extends DfIllegalPropertyException {
+public class DfIllegalPropertyTypeException extends DfIllegalPropertySettingException {
 
     private static final long serialVersionUID = 1L;
 

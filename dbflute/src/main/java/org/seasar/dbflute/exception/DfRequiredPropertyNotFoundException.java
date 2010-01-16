@@ -1,9 +1,9 @@
 package org.seasar.dbflute.exception;
 
-public class DfRequiredPropertyNotFoundException extends RuntimeException {
+public class DfRequiredPropertyNotFoundException extends DfIllegalPropertySettingException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfRequiredPropertyNotFoundException(String msg) {
         super(msg);
     }
