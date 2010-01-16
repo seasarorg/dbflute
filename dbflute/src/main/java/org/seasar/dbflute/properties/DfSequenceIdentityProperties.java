@@ -123,9 +123,9 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             return incrementSize;
         }
         String msg = "Look! Read the message below." + ln();
-        msg = msg + "Failed to get the cache size of sequence:" + ln();
+        msg = msg + " Failed to get the cache size of sequence:" + ln();
         msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-        msg = msg + " schema = " + schemaName + " table = " + tableName;
+        msg = msg + " schema = " + schemaName + ln() + " table = " + tableName + ln();
         msg = msg + " sequenceProp = " + sequenceProp + ln();
         msg = msg + " sequenceName = " + sequenceName + ln();
         msg = msg + " sequenceMap(" + sequenceMap.size() + "):" + ln();
@@ -139,17 +139,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     protected String getSequenceIncrementSize(DataSource dataSource, String schemaName, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        final String sequenceInfoKey;
-        if (schemaName != null && schemaName.trim().length() > 0) {
-            if (getBasicProperties().isDatabasePublicSchemaSupported() && schemaName.trim().equalsIgnoreCase("public")) {
-                sequenceInfoKey = sequenceName;
-            } else {
-                sequenceInfoKey = schemaName + "." + sequenceName;
-            }
-        } else {
-            sequenceInfoKey = sequenceName;
+        DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
+        if (info == null) {
+            info = sequenceMap.get(schemaName + "." + sequenceName);
         }
-        final DfSequenceMetaInfo info = sequenceMap.get(sequenceInfoKey);
         if (info != null) {
             final Integer incrementSize = info.getIncrementSize();
             if (incrementSize != null) {
