@@ -33,6 +33,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.handler.DfAutoIncrementHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfForeignKeyHandler;
@@ -85,7 +86,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     //                                                                             Extract
     //                                                                             =======
     public Map<String, DfSynonymMetaInfo> extractSynonymMap() {
-        final Map<String, DfSynonymMetaInfo> synonymMap = new LinkedHashMap<String, DfSynonymMetaInfo>();
+        final Map<String, DfSynonymMetaInfo> synonymMap = StringKeyMap.createAsCaseInsensitive();
         final String sql = buildSynonymSelect();
         Connection conn = null;
         Statement statement = null;

@@ -18,7 +18,6 @@ package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +25,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 
@@ -52,7 +52,7 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
     //                                                                        ============
     protected Map<String, DfSequenceMetaInfo> doGetSequenceMap() {
         _log.info("...Loading sequence informations");
-        final Map<String, DfSequenceMetaInfo> resultMap = new LinkedHashMap<String, DfSequenceMetaInfo>();
+        final Map<String, DfSequenceMetaInfo> resultMap = StringKeyMap.createAsCaseInsensitive();
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String schemaCondition;
         if (!_allSchemaList.isEmpty()) {
@@ -90,8 +90,9 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
             info.setMaxValue(maxValue != null ? new BigDecimal(maxValue) : null);
             final String incrementSize = recordMap.get("INCREMENT");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
-            resultMap.put(buildSequenceMapKey(sequenceOwner, sequenceName), info);
-            logSb.append(ln()).append(" ").append(info.toString());
+            final String key = buildSequenceMapKey(sequenceOwner, sequenceName);
+            resultMap.put(key, info);
+            logSb.append(ln()).append(" ").append(key).append(" = ").append(info.toString());
         }
         _log.info(logSb.toString());
         return resultMap;

@@ -16,7 +16,6 @@
 package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +23,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 
@@ -50,7 +50,7 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
     //                                                                        ============
     protected Map<String, DfSequenceMetaInfo> doGetSequenceMap() {
         _log.info("...Loading sequence informations");
-        final Map<String, DfSequenceMetaInfo> resultMap = new LinkedHashMap<String, DfSequenceMetaInfo>();
+        final Map<String, DfSequenceMetaInfo> resultMap = StringKeyMap.createAsCaseInsensitive();
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String schemaCondition;
         if (!_allSchemaList.isEmpty()) {
@@ -86,7 +86,7 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
             final String keyOwner = sequenceOwner.equalsIgnoreCase("public") ? null : sequenceOwner;
             final String key = buildSequenceMapKey(keyOwner, sequenceName);
             resultMap.put(key, info);
-            logSb.append(ln()).append(" ").append(key).append(" : ").append(info.toString());
+            logSb.append(ln()).append(" ").append(key).append(" = ").append(info.toString());
         }
         _log.info(logSb.toString());
         return resultMap;

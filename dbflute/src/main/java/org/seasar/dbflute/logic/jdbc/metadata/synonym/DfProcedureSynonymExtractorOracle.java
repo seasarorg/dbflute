@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
@@ -57,7 +58,7 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     //                                                                             Extract
     //                                                                             =======
     public Map<String, DfProcedureSynonymMetaInfo> extractProcedureSynonymMap() {
-        final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = new LinkedHashMap<String, DfProcedureSynonymMetaInfo>();
+        final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = StringKeyMap.createAsCaseInsensitive();
         final String sql = buildSynonymSelect();
         Connection conn = null;
         Statement statement = null;
