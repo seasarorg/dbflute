@@ -122,7 +122,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         if (incrementSize != null) {
             return incrementSize;
         }
-        String msg = "Failed to get the cache size of sequence:" + ln();
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "Failed to get the cache size of sequence:" + ln();
         msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
         msg = msg + " schema = " + schemaName + " table = " + tableName;
         msg = msg + " sequenceProp = " + sequenceProp + ln();
