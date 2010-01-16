@@ -543,7 +543,7 @@ public class Column {
             if (optionSb.length() > 0) {
                 optionSb.insert(0, ":");
             }
-            title = _primaryKeyName + " -- sequence=" + sequenceName + optionSb;
+            title = _primaryKeyName + " :: sequence=" + sequenceName + optionSb;
         } else {
             title = _primaryKeyName;
         }
