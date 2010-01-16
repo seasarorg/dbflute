@@ -75,6 +75,9 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
     }
 
     protected void dropSequence(Connection conn) {
+        if (_schema == null || _schema.trim().length() == 0) {
+            return;
+        }
         final List<String> sequenceNameList = new ArrayList<String>();
         final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + _schema + "'";
         Statement st = null;
@@ -175,6 +178,9 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
      * @param conn The connection to main schema. (NotNull)
      */
     protected void dropDBLink(Connection conn) {
+        if (_schema == null || _schema.trim().length() == 0) {
+            return;
+        }
         final List<String> dbLinkNameList = new ArrayList<String>();
         final String metaDataSql = "select * from ALL_DB_LINKS where OWNER = '" + _schema + "'";
         Statement st = null;

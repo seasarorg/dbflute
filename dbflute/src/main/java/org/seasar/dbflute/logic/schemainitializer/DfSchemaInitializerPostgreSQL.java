@@ -44,9 +44,9 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
     //                                                                       =============
     @Override
     protected void dropSequence(Connection conn, List<DfTableMetaInfo> tableMetaInfoList) {
+        final String schema = _schema != null && _schema.trim().length() > 0 ? _schema : "public";
         final List<String> sequenceNameList = new ArrayList<String>();
         final DfJdbcFacade jdbcFacade = new DfJdbcFacade(_dataSource);
-        final String schema = _schema != null && _schema.trim().length() > 0 ? _schema : "public";
         final String sequenceColumnName = "sequence_name";
         final StringBuilder sb = new StringBuilder();
         sb.append("select ").append(sequenceColumnName).append(" from information_schema.sequences");

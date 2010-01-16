@@ -11,16 +11,23 @@ import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
-import org.seasar.dbflute.logic.factory.DfSequenceHandlerFactory;
+import org.seasar.dbflute.logic.factory.DfSequenceExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
-import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
 
 /**
  * @author jflute
  */
 public final class DfSequenceIdentityProperties extends DfAbstractHelperProperties {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfSequenceIdentityProperties.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -143,11 +150,16 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         if (_sequenceMetaInfoMap != null) {
             return _sequenceMetaInfoMap;
         }
-        final DfSequenceHandlerFactory factory = new DfSequenceHandlerFactory(dataSource, getBasicProperties(),
+        final DfSequenceExtractorFactory factory = new DfSequenceExtractorFactory(dataSource, getBasicProperties(),
                 getDatabaseProperties());
-        final DfSequenceHandler sequenceHandler = factory.createSequenceHandler();
-        if (sequenceHandler != null) {
-            _sequenceMetaInfoMap = sequenceHandler.getSequenceMap();
+        final DfSequenceExtractor sequenceExtractor = factory.createSequenceExtractor();
+        if (sequenceExtractor != null) {
+            try {
+                _sequenceMetaInfoMap = sequenceExtractor.getSequenceMap();
+            } catch (RuntimeException continued) { // because of supplement
+                _log.info("Failed to get sequence map: " + continued.getMessage());
+                _sequenceMetaInfoMap = new HashMap<String, DfSequenceMetaInfo>();
+            }
         } else {
             _sequenceMetaInfoMap = new HashMap<String, DfSequenceMetaInfo>();
         }

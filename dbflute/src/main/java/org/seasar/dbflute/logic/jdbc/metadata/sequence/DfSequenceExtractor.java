@@ -17,11 +17,13 @@ package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 
 import java.util.Map;
 
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
+
 /**
  * @author jflute
- * @since 0.9.5.2 (2009/07/09 Thursday)
+ * @since 0.9.6.4 (2010/01/16 Saturday)
  */
-public interface DfSequenceHandler {
+public interface DfSequenceExtractor {
 
-    void incrementSequenceToDataMax(Map<String, String> tableSequenceMap);
+    Map<String, DfSequenceMetaInfo> getSequenceMap();
 }
