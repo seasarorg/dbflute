@@ -36,10 +36,12 @@ public class SequenceCache {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The cache size that should be same as increment size of sequence. */
+    /** The cache size that should be same as increment size of sequence. (NotNull) */
     protected final BigDecimal _cacheSize;
 
+    /** The result type of sequence next value. (NotNull) */
     protected final Class<?> _resultType;
+
     protected BigDecimal _addedCount = INITIAL_ADDED_COUNT;
     protected BigDecimal _sequenceValue;
 
@@ -63,6 +65,11 @@ public class SequenceCache {
                 log(msg);
             }
             return DfTypeUtil.toNumber(_resultType, _sequenceValue.add(_addedCount));
+        }
+        if (isLogEnabled()) {
+            String msg = "...Selecting next value and cache values:";
+            msg = msg + " cacheSize=" + _cacheSize;
+            log(msg);
         }
         _sequenceValue = selectSequence(executor);
         _addedCount = INITIAL_ADDED_COUNT;
@@ -103,6 +110,7 @@ public class SequenceCache {
     //                                                                      ==============
     @Override
     public String toString() {
-        return "{" + "incrementSize=" + _cacheSize + ", resultType=" + _resultType + "}@" + hashCode();
+        final String hash = Integer.toHexString(hashCode());
+        return "{" + "cacheSize=" + _cacheSize + ", resultType=" + _resultType + "}@" + hash;
     }
 }

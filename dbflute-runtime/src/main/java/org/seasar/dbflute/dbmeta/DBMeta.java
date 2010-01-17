@@ -253,7 +253,13 @@ public interface DBMeta {
     public String getSequenceNextValSql();
 
     /**
-     * Get the cache size of sequence.
+     * Get the increment size of sequence.
+     * @return The increment size of sequence. (Nullable: If it is unknown, returns null.)
+     */
+    public Integer getSequenceIncrementSize();
+
+    /**
+     * Get the cache size of sequence. (The cache means sequence cache on DBFlute)
      * @return The cache size of sequence. (Nullable: If it does not use cache, returns null.)
      */
     public Integer getSequenceCacheSize();

@@ -241,6 +241,10 @@ public class MockDBMeta implements DBMeta {
         return false;
     }
 
+    public Integer getSequenceIncrementSize() {
+        return null;
+    }
+
     public Integer getSequenceCacheSize() {
         return null;
     }

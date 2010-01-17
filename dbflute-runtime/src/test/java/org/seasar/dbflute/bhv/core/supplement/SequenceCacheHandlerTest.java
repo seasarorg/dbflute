@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -24,6 +25,9 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class SequenceCacheHandlerTest extends PlainTestCase {
 
+    // ===================================================================================
+    //                                                                 findSequenceCache()
+    //                                                                 ===================
     public void test_findSequenceCache_defaultKeyGenerator() {
         // ## Arrange ##
         SequenceCacheHandler handler = new SequenceCacheHandler();
@@ -188,6 +192,68 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         assertEquals(300, allAllSet.size());
     }
 
+    // ===================================================================================
+    //                                                                  filterNextValSql()
+    //                                                                  ==================
+    public void test_filterNextValSql_same() {
+        // ## Arrange ##
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        String sql = "select next value for SEQ_MEMBER";
+
+        // ## Act ##
+        String actual = handler.filterNextValSql(50, 50, sql);
+
+        // ## Assert ##
+        log(actual);
+        assertEquals(sql, actual);
+    }
+
+    public void test_filterNextValSql_half() {
+        // ## Arrange ##
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        String sql = "select next value for SEQ_MEMBER";
+
+        // ## Act ##
+        String actual = handler.filterNextValSql(50, 25, sql);
+
+        // ## Assert ##
+        log(actual);
+        assertEquals(sql + ln() + " union all " + ln() + sql, actual);
+    }
+
+    public void test_filterNextValSql_incrementOne() {
+        // ## Arrange ##
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        String sql = "select next value for SEQ_MEMBER";
+
+        // ## Act ##
+        String actual = handler.filterNextValSql(50, 1, sql);
+
+        // ## Assert ##
+        log(actual);
+        assertTrue(actual.contains(" union all "));
+        String[] split = actual.split(" union all ");
+        assertEquals(50, split.length);
+    }
+
+    public void test_filterNextValSql_cannotDivided() {
+        // ## Arrange ##
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        String sql = "select next value for SEQ_MEMBER";
+
+        // ## Act ##
+        try {
+            // ## Assert ##
+            handler.filterNextValSql(50, 3, sql);
+        } catch (SequenceCacheSizeNotDividedIncrementSizeException e) {
+            // OK
+            log(e.getMessage());
+        }
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     private static class MyDataSource implements DataSource {
 
         public Connection getConnection() throws SQLException {
