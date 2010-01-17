@@ -76,16 +76,20 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     public String getSequenceName(String tableName) {
         final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
-        final String sequence = flmap.get(tableName);
-        if (sequence == null) {
+        final String sequenceProp = flmap.get(tableName);
+        if (sequenceProp == null || sequenceProp.trim().length() == 0) {
             return null;
         }
         final String hintMark = ":";
-        final int hintMarkIndex = sequence.lastIndexOf(hintMark);
+        final int hintMarkIndex = sequenceProp.lastIndexOf(hintMark);
         if (hintMarkIndex < 0) {
-            return sequence;
+            return sequenceProp;
         }
-        return sequence.substring(0, hintMarkIndex);
+        final String sequenceName = sequenceProp.substring(0, hintMarkIndex);
+        if (sequenceName == null || sequenceName.trim().length() == 0) {
+            return null;
+        }
+        return sequenceName;
     }
 
     // -----------------------------------------------------

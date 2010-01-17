@@ -43,7 +43,7 @@ public class ${myClassName} extends AbstractConditionBean {
     protected SqlClause createSqlClause() {
         return new ${glImplementedSqlClauseCreator}().createSqlClause(this);
     }
-    
+
     // ===================================================================================
     //                                                                     DBMeta Provider
     //                                                                     ===============

@@ -64,7 +64,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                   =============
         bool HasSequence { get; }
         String SequenceName { get; }
-        String SequenceNextValSql { get; }
+        String SequenceNextValueSql { get; }
         int? SequenceIncrementSize { get; }
         int? SequenceCacheSize { get; }
 

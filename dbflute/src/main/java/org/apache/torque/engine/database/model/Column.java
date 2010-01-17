@@ -54,6 +54,7 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -508,33 +509,30 @@ public class Column {
         final String title;
         if (table.isUseSequence()) {
             final String sequenceName = table.getDefinedSequenceName();
-            final String minimumValue = table.getSequenceMinimumValue();
+            final BigDecimal minimumValue = table.getSequenceMinimumValue();
             final StringBuilder optionSb = new StringBuilder();
-            if (minimumValue != null && minimumValue.trim().length() > 0
-                    && !minimumValue.trim().equalsIgnoreCase("null")) {
+            if (minimumValue != null) {
                 if (optionSb.length() > 0) {
                     optionSb.append(",");
                 }
                 optionSb.append("minimum(" + minimumValue + ")");
             }
-            final String maximumValue = table.getSequenceMaximumValue();
-            if (maximumValue != null && maximumValue.trim().length() > 0
-                    && !maximumValue.trim().equalsIgnoreCase("null")) {
+            final BigDecimal maximumValue = table.getSequenceMaximumValue();
+            if (maximumValue != null) {
                 if (optionSb.length() > 0) {
                     optionSb.append(",");
                 }
                 optionSb.append("maximum(" + maximumValue + ")");
             }
-            final String incrementSize = table.getSequenceIncrementSize();
-            if (incrementSize != null && incrementSize.trim().length() > 0
-                    && !incrementSize.trim().equalsIgnoreCase("null")) {
+            final Integer incrementSize = table.getSequenceIncrementSize();
+            if (incrementSize != null) {
                 if (optionSb.length() > 0) {
                     optionSb.append(",");
                 }
                 optionSb.append("increment(" + incrementSize + ")");
             }
-            final String cacheSize = table.getSequenceCacheSize();
-            if (cacheSize != null && cacheSize.trim().length() > 0 && !cacheSize.trim().equalsIgnoreCase("null")) {
+            final Integer cacheSize = table.getSequenceCacheSize();
+            if (cacheSize != null) {
                 if (optionSb.length() > 0) {
                     optionSb.append(",");
                 }

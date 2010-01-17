@@ -54,6 +54,7 @@ package org.apache.torque.engine.database.model;
  * <http://www.apache.org/>.
  */
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,10 +63,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.friends.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -79,7 +83,6 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.xml.sax.Attributes;
 
@@ -1960,6 +1963,10 @@ public class Table {
         return getProperties().getDatabaseProperties();
     }
 
+    protected DfSequenceIdentityProperties getSequenceIdentityProperties() {
+        return getProperties().getSequenceIdentityProperties();
+    }
+
     // ===================================================================================
     //                                                                      Classification
     //                                                                      ==============
@@ -1974,18 +1981,18 @@ public class Table {
     }
 
     // ===================================================================================
-    //                                                                     SequenceNextSql
-    //                                                                     ===============
+    //                                                                            Sequence
+    //                                                                            ========
     /**
      * Determine whether this table uses a sequence.
      * @return Determination.
      */
     public boolean isUseSequence() {
-        if (hasPostgreSQLSerialSequenceName()) {
-            return true;
-        }
-        final String sequenceName = getDatabase().getSequenceDefinitionSequenceName(getName());
-        if (sequenceName == null) {
+        final String sequenceName = getSequenceIdentityProperties().getSequenceName(getName());
+        if (sequenceName == null || sequenceName.trim().length() == 0) {
+            if (hasPostgreSQLSerialSequenceName()) {
+                return true;
+            }
             return false;
         } else {
             return true;
@@ -1994,69 +2001,91 @@ public class Table {
 
     /**
      * Get the value of sequence name from definition map.
-     * @return The defined sequence name. (NotNull: If it does not have sequence, return empty string.)
+     * @return The defined sequence name. (NotNull: If a sequence is not found, return empty string.)
      */
     public String getDefinedSequenceName() {
         if (!isUseSequence()) {
             return "";
         }
-        final String postgreSQLSerialSequenceName = extractPostgreSQLSerialSequenceName();
-        if (postgreSQLSerialSequenceName != null) {
-            return postgreSQLSerialSequenceName;
+        final String sequenceName = getSequenceIdentityProperties().getSequenceName(getName());
+        if (sequenceName == null) {
+            final String serialSequenceName = extractPostgreSQLSerialSequenceName();
+            if (serialSequenceName != null && serialSequenceName.trim().length() > 0) {
+                return serialSequenceName;
+            }
+            return ""; // if it uses sequence, unreachable
         }
-        return getDatabase().getSequenceDefinitionSequenceName(getName());
+        return sequenceName;
     }
 
     /**
-     * Get the value of sequence-next-sql as java name.
-     * @return Name. (NotNull)
+     * Get the SQL for next value of sequence.
+     * @return The SQL for next value of sequence. (NotNull: If a sequence is not found, return empty string.)
      */
-    public String getSequenceNextSql() { // for string literal in program.
-        final String sequenceName = getDefinedSequenceName();
-        if (sequenceName == null) {
+    public String getSequenceNextValueSql() {
+        if (!isUseSequence()) {
             return "";
         }
-        String result = getDatabase().getSequenceNextSql();
-        result = DfPropertyUtil.convertAll(result, "$$sequenceName$$", sequenceName);
-
-        // Escape double quotation for String Literal.
-        if (result.contains("\"")) {
-            result = DfPropertyUtil.convertAll(result, "\"", "\\\"");
-        }
-
-        return result;
+        final DBDef dbdef = getBasicProperties().getCurrentDBDef();
+        final String sequenceName = getDefinedSequenceName();
+        final String sql = dbdef.dbway().buildSequenceNextValueSql(sequenceName);
+        return sql != null ? sql : "";
     }
 
-    public String getSequenceMinimumValue() {
+    public BigDecimal getSequenceMinimumValue() {
         if (!isUseSequence()) {
-            return "null";
+            return null;
         }
-        return getDatabase().getSequenceDefinitionSequenceMinimumValue(getSchema(), getName());
+        final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
+        final DataSource ds = getDatabase().getDataSource();
+        return prop.getSequenceMinimumValue(ds, getSchema(), getName());
     }
 
-    public String getSequenceMaximumValue() {
-        if (!isUseSequence()) {
-            return "null";
-        }
-        return getDatabase().getSequenceDefinitionSequenceMaximumValue(getSchema(), getName());
+    public String getSequenceMinimumValueExpression() {
+        final BigDecimal value = getSequenceMinimumValue();
+        return value != null ? value.toString() : "null";
     }
 
-    public String getSequenceIncrementSize() {
+    public BigDecimal getSequenceMaximumValue() {
         if (!isUseSequence()) {
-            return "null";
+            return null;
         }
-        return getDatabase().getSequenceDefinitionSequenceIncrementSize(getSchema(), getName());
+        final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
+        final DataSource ds = getDatabase().getDataSource();
+        return prop.getSequenceMaximumValue(ds, getSchema(), getName());
     }
 
-    /**
-     * Get the cache size of sequence from definition map.
-     * @return The cache size of sequence. (NotNull: If it does not have sequence, return null string.)
-     */
-    public String getSequenceCacheSize() {
+    public String getSequenceMaximumValueExpression() {
+        final BigDecimal value = getSequenceMaximumValue();
+        return value != null ? value.toString() : "null";
+    }
+
+    public Integer getSequenceIncrementSize() {
         if (!isUseSequence()) {
-            return "null";
+            return null;
         }
-        return getDatabase().getSequenceDefinitionSequenceCacheSize(getSchema(), getName());
+        final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
+        final DataSource ds = getDatabase().getDataSource();
+        return prop.getSequenceIncrementSize(ds, getSchema(), getName());
+    }
+
+    public String getSequenceIncrementSizeExpression() {
+        final Integer value = getSequenceIncrementSize();
+        return value != null ? value.toString() : "null";
+    }
+
+    public Integer getSequenceCacheSize() {
+        if (!isUseSequence()) {
+            return null;
+        }
+        final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
+        final DataSource ds = getDatabase().getDataSource();
+        return prop.getSequenceCacheSize(ds, getSchema(), getName());
+    }
+
+    public String getSequenceCacheSizeExpression() {
+        final Integer value = getSequenceCacheSize();
+        return value != null ? value.toString() : "null";
     }
 
     public String getSequenceReturnType() {
@@ -2152,8 +2181,8 @@ public class Table {
         if (hasAutoIncrementColumn()) {
             return true;
         }
-
-        return getDatabase().getIdentityDefinitionMapColumnName(getName()) != null;
+        final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
+        return prop.getIdentityColumnName(getName()) != null;
     }
 
     public String getIdentityColumnName() {
@@ -2176,8 +2205,8 @@ public class Table {
         if (autoIncrementColumn != null) {
             return autoIncrementColumn;
         }
-
-        final String columnName = (String) getDatabase().getIdentityDefinitionMapColumnName(getName());
+        final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
+        final String columnName = prop.getIdentityColumnName(getName());
         final Column column = getColumn(columnName);
         if (column == null) {
             String msg = "The columnName does not exist in the table: ";

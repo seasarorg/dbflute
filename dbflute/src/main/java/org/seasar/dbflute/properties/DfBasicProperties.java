@@ -3,6 +3,7 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
@@ -79,6 +80,11 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
             throw new DfRequiredPropertyNotFoundException(msg);
         }
         return databaseName;
+    }
+
+    public DBDef getCurrentDBDef() {
+        DBDef dbdef = DBDef.codeOf(getDatabaseName());
+        return dbdef != null ? dbdef : DBDef.Unknown;
     }
 
     public boolean isDatabaseMySQL() {

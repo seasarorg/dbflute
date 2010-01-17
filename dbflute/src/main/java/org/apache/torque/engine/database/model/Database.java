@@ -55,7 +55,6 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -79,7 +78,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.config.DfDatabaseConfig;
+import org.seasar.dbflute.config.DfDatabaseNameMapping;
 import org.seasar.dbflute.friends.torque.DfAdditionalForeignKeyInitializer;
 import org.seasar.dbflute.friends.torque.DfAdditionalPrimaryKeyInitializer;
 import org.seasar.dbflute.friends.torque.DfAdditionalUniqueKeyInitializer;
@@ -98,7 +97,6 @@ import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
-import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
@@ -641,13 +639,13 @@ public class Database {
     }
 
     //====================================================================================
-    //                                                                 Database Definition
-    //                                                                 ===================
-    protected Map<String, String> _databaseDefinitionMap;
+    //                                                               Database Name Mapping
+    //                                                               =====================
+    protected Map<String, String> _databaseNameMapping;
 
-    public Map<String, String> getDatabaseDefinitionMap() {
-        if (_databaseDefinitionMap == null) {
-            final DfDatabaseConfig config = new DfDatabaseConfig();
+    protected Map<String, String> getDatabaseNameMapping() {
+        if (_databaseNameMapping == null) {
+            final DfDatabaseNameMapping config = new DfDatabaseNameMapping();
             final Map<String, Map<String, String>> databaseConfigMap = config.analyzeDatabaseBaseInfo();
             Map<String, String> databaseDefinitionMap = databaseConfigMap.get(getDatabaseType());
             if (databaseDefinitionMap == null) {
@@ -657,9 +655,9 @@ public class Database {
                     throw new IllegalStateException(msg + getDatabaseType() + "] and default-database.");
                 }
             }
-            _databaseDefinitionMap = databaseDefinitionMap;
+            _databaseNameMapping = databaseDefinitionMap;
         }
-        return _databaseDefinitionMap;
+        return _databaseNameMapping;
     }
 
     public String getDaoGenDbName() { // for SqlClause. It's Old Style method.
@@ -682,33 +680,13 @@ public class Database {
     }
 
     public String getGenerateDbName() {
-        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
+        final Map<String, String> databaseInfoMap = getDatabaseNameMapping();
         final String dbName = (String) databaseInfoMap.get("dbName");
         if (dbName == null || dbName.trim().length() == 0) {
             String msg = "The database doesn't have dbName in the property[databaseInfoMap]: ";
             throw new IllegalStateException(msg + databaseInfoMap);
         }
         return dbName;
-    }
-
-    public String getWildCard() {
-        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
-        final String wildCard = (String) databaseInfoMap.get("wildCard");
-        if (wildCard == null || wildCard.trim().length() == 0) {
-            String msg = "The database doesn't have wildCard in the property[databaseInfoMap]: ";
-            throw new IllegalStateException(msg + databaseInfoMap);
-        }
-        return wildCard;
-    }
-
-    public String getSequenceNextSql() {
-        final Map<String, String> databaseInfoMap = getDatabaseDefinitionMap();
-        final String sequenceNextSql = (String) databaseInfoMap.get("sequenceNextSql");
-        if (sequenceNextSql == null || sequenceNextSql.trim().length() == 0) {
-            String msg = "The database doesn't have sequenceNextSql in the property[databaseInfoMap]: ";
-            throw new IllegalStateException(msg + databaseInfoMap);
-        }
-        return sequenceNextSql;
     }
 
     // ===================================================================================
@@ -1100,40 +1078,8 @@ public class Database {
     // ===================================================================================
     //                                                        Sequence/Identity Properties
     //                                                        ============================
-    public String getSequenceDefinitionSequenceName(String tableName) {
-        return getProperties().getSequenceIdentityProperties().getSequenceName(tableName);
-    }
-
-    public String getSequenceDefinitionSequenceCacheSize(String schemaName, String tableName) {
-        final DfSequenceIdentityProperties prop = getProperties().getSequenceIdentityProperties();
-        final Integer size = prop.getSequenceCacheSize(getDataSource(), schemaName, tableName);
-        return size != null ? size.toString() : "null";
-    }
-
-    public String getSequenceDefinitionSequenceIncrementSize(String schemaName, String tableName) {
-        final DfSequenceIdentityProperties prop = getProperties().getSequenceIdentityProperties();
-        final Integer size = prop.getSequenceIncrementSize(getDataSource(), schemaName, tableName);
-        return size != null ? size.toString() : "null";
-    }
-
-    public String getSequenceDefinitionSequenceMinimumValue(String schemaName, String tableName) {
-        final DfSequenceIdentityProperties prop = getProperties().getSequenceIdentityProperties();
-        final BigDecimal value = prop.getSequenceMinimumValue(getDataSource(), schemaName, tableName);
-        return value != null ? value.toString() : "null";
-    }
-
-    public String getSequenceDefinitionSequenceMaximumValue(String schemaName, String tableName) {
-        final DfSequenceIdentityProperties prop = getProperties().getSequenceIdentityProperties();
-        final BigDecimal value = prop.getSequenceMaximumValue(getDataSource(), schemaName, tableName);
-        return value != null ? value.toString() : "null";
-    }
-
     public String getSequenceReturnType() {
         return getProperties().getSequenceIdentityProperties().getSequenceReturnType();
-    }
-
-    public String getIdentityDefinitionMapColumnName(String flexibleTableName) {
-        return getProperties().getSequenceIdentityProperties().getIdentityColumnName(flexibleTableName);
     }
 
     // ===================================================================================
@@ -1812,6 +1758,10 @@ public class Database {
     // -----------------------------------------------------
     //                                             Character
     //                                             ---------
+    public String getWildCard() {
+        return "%";
+    }
+
     public String getSharp() {
         return "#";
     }

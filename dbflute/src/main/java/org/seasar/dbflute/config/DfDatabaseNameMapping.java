@@ -26,24 +26,18 @@ import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 /**
  * @author jflute
  */
-public class DfDatabaseConfig {
+public class DfDatabaseNameMapping {
 
     // ===============================================================================
     //                                                                       Attribute
     //                                                                       =========
-    protected String _databaseBaseInfo;
+    protected String _databaseNameMapping;
     {
-        _databaseBaseInfo = "map:{"
-                + "; derby      = map:{dbName = Derby      ; wildCard = % ; sequenceNextSql = Unsupported}"
-                + "; h2         = map:{dbName = H2         ; wildCard = % ; sequenceNextSql = select next value for $$sequenceName$$}"
-                + "; firebird   = map:{dbName = Firebird   ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}"
-                + "; oracle     = map:{dbName = Oracle     ; wildCard = % ; sequenceNextSql = select $$sequenceName$$.nextval from dual}"
-                + "; mysql      = map:{dbName = MySql      ; wildCard = % ; sequenceNextSql = Unsupported}"
-                + "; postgresql = map:{dbName = PostgreSql ; wildCard = % ; sequenceNextSql = select nextval ('$$sequenceName$$')}"
-                + "; mssql      = map:{dbName = SqlServer  ; wildCard = % ; sequenceNextSql = Unsupported}"
-                + "; db2        = map:{dbName = Db2        ; wildCard = % ; sequenceNextSql = values nextval for $$sequenceName$$}"
-                + "; interbase  = map:{dbName = Interbase  ; wildCard = % ; sequenceNextSql = select gen_id($$sequenceName$$, 1) from RDB$DATABASE}"
-                + "; default    = map:{dbName = Default    ; wildCard = % ; sequenceNextSql = Unsupported}" + "}";
+        _databaseNameMapping = "map:{" + "; derby      = map:{dbName = Derby}" + "; h2         = map:{dbName = H2}"
+                + "; firebird   = map:{dbName = Firebird}" + "; oracle     = map:{dbName = Oracle}"
+                + "; mysql      = map:{dbName = MySql}" + "; postgresql = map:{dbName = PostgreSql}"
+                + "; mssql      = map:{dbName = SqlServer}" + "; db2        = map:{dbName = Db2}"
+                + "; interbase  = map:{dbName = Interbase}" + "; default    = map:{dbName = Default}" + "}";
     }
 
     // ===============================================================================
@@ -56,7 +50,7 @@ public class DfDatabaseConfig {
     public Map<String, Map<String, String>> analyzeDatabaseBaseInfo() {
         final MapListString mapListString = new MapListStringImpl();
         mapListString.setDelimiter(";");
-        final Map<String, Object> map = mapListString.generateMap(_databaseBaseInfo);
+        final Map<String, Object> map = mapListString.generateMap(_databaseNameMapping);
         final Map<String, Map<String, String>> realMap = new LinkedHashMap<String, Map<String, String>>();
         final Set<Entry<String, Object>> entrySet = map.entrySet();
         for (Entry<String, Object> entry : entrySet) {
@@ -79,11 +73,11 @@ public class DfDatabaseConfig {
     // ===============================================================================
     //                                                                        Accessor
     //                                                                        ========
-    public String getDatabaseBaseInfo() {
-        return _databaseBaseInfo;
+    public String getDatabaseNameMapping() {
+        return _databaseNameMapping;
     }
 
-    public void setDatabaseBaseInfo(String databaseBaseInfo) {
-        _databaseBaseInfo = databaseBaseInfo;
+    public void setDatabaseNameMapping(String databaseNameMapping) {
+        _databaseNameMapping = databaseNameMapping;
     }
 }

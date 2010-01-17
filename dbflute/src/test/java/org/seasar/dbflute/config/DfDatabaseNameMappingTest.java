@@ -7,14 +7,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.seasar.dbflute.unit.PlainTestCase;
 
-public class DfDatabaseConfigTest extends PlainTestCase {
+public class DfDatabaseNameMappingTest extends PlainTestCase {
 
-    public DfDatabaseConfigTest() {
+    public DfDatabaseNameMappingTest() {
     }
 
     @Test
     public void test_getDatabaseBaseInfo() {
-        final DfDatabaseConfig config = new DfDatabaseConfig();
+        final DfDatabaseNameMapping config = new DfDatabaseNameMapping();
         final Map<String, Map<String, String>> databaseBaseInfo = config.analyzeDatabaseBaseInfo();
         Assert.assertNotNull(databaseBaseInfo);
         final Set<String> keySet = databaseBaseInfo.keySet();
@@ -38,7 +38,7 @@ public class DfDatabaseConfigTest extends PlainTestCase {
 
     @Test
     public void test_getDatabaseBaseInfoTest() {
-        final DfDatabaseConfig component = new DfDatabaseConfig();
+        final DfDatabaseNameMapping component = new DfDatabaseNameMapping();
         final Map<String, Map<String, String>> databaseBaseInfo = component.analyzeDatabaseBaseInfo();
         Assert.assertNotNull(databaseBaseInfo);
         log("databaseBaseInfoTest=" + databaseBaseInfo);

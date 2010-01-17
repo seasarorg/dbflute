@@ -4,10 +4,12 @@ ${database.allClassCopyright}package ${myDBMetaPackageName};
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.AbstractDBMeta;
 import org.seasar.dbflute.dbmeta.info.*;
 import org.seasar.dbflute.helper.StringKeyMap;
+import ${glPackageBaseCommon}.${glDBCurrent};
 import ${myExtendedEntityPackageName}.${myExtendedObjectClassName};
 
 /**
@@ -22,6 +24,11 @@ public class ${myClassName} extends AbstractDBMeta {
     private static final ${myClassName} _instance = new ${myClassName}();
     private ${myClassName}() {}
     public static ${myClassName} getInstance() { return _instance; }
+
+    // ===================================================================================
+    //                                                                       Current DBDef
+    //                                                                       =============
+    public DBDef getCurrentDBDef() { return ${glDBCurrent}.getInstance().currentDBDef(); }
 
     // ===================================================================================
     //                                                                          Table Info
@@ -208,9 +215,8 @@ public class ${myClassName} extends AbstractDBMeta {
 #if ($table.isUseSequence())
     public boolean hasSequence() { return true; }
     public String getSequenceName() { return "${table.definedSequenceName}"; }
-    public String getSequenceNextValSql() { return "${table.sequenceNextSql}"; }
-    public Integer getSequenceIncrementSize() { return ${table.sequenceIncrementSize}; }
-    public Integer getSequenceCacheSize() { return ${table.sequenceCacheSize}; }
+    public Integer getSequenceIncrementSize() { return ${table.sequenceIncrementSizeExpression}; }
+    public Integer getSequenceCacheSize() { return ${table.sequenceCacheSizeExpression}; }
 #end
 #if ($table.isUseVersionNo())
     public boolean hasVersionNo() { return true; }
