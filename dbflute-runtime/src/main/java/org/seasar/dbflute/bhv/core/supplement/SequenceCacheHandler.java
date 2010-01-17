@@ -107,7 +107,7 @@ public class SequenceCacheHandler {
         final Integer divided = cacheSize / incrementSize;
         final Integer unionCount = divided - 1;
         final StringBuilder sb = new StringBuilder();
-        if (unionCount > 0) { // "union" way
+        if (unionCount > 0) { // "batch" way
             if (ResourceContext.isCurrentDBDef(DBDef.Oracle)) { // Oracle patch
                 sb.append(DfStringUtil.replace(nextValueSql, "from dual", "from ("));
                 sb.append(ln()).append("  select * from dual");
