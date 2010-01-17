@@ -88,7 +88,10 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
             info.setMinimumValue(minValue != null ? new BigDecimal(minValue) : null);
             final String maxValue = recordMap.get("maxinum_value");
             info.setMaximumValue(maxValue != null ? new BigDecimal(maxValue) : null);
-            final String incrementSize = recordMap.get("increment");
+            String incrementSize = recordMap.get("increment");
+            if (incrementSize == null || incrementSize.trim().length() == 0) {
+                incrementSize = selectIncrementSize(facade, sequenceName);
+            }
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
             final String keyOwner = sequenceOwner.equalsIgnoreCase("public") ? null : sequenceOwner;
             final String key = buildSequenceMapKey(keyOwner, sequenceName);
@@ -97,5 +100,16 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
         }
         _log.info(logSb.toString());
         return resultMap;
+    }
+
+    protected String selectIncrementSize(DfJdbcFacade facade, String sequenceName) {
+        final String sql = "select increment_by from " + sequenceName;
+        final List<String> columnList = new ArrayList<String>();
+        columnList.add("increment_by");
+        final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
+        if (!resultList.isEmpty()) {
+            return resultList.get(0).get("increment_by"); // only one record exists
+        }
+        return null;
     }
 }
