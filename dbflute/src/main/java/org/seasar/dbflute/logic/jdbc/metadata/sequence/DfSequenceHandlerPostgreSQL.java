@@ -62,13 +62,13 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     public void incrementSequenceToDataMax(Map<String, String> tableSequenceMap) {
         super.incrementSequenceToDataMax(tableSequenceMap);
         try {
-            handleSerialTypeSequence();
+            handleSerialTypeSequence(tableSequenceMap);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    protected void handleSerialTypeSequence() throws SQLException {
+    protected void handleSerialTypeSequence(Map<String, String> tableSequenceMap) throws SQLException {
         final DfTableHandler tableHandler = new DfTableHandler() {
             @Override
             protected List<String> getRealTableExceptList(String schemaName) {
@@ -124,6 +124,9 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                     continue;
                 }
                 final String sequenceName = excludedPrefixString.substring(0, endIndex);
+                if (tableSequenceMap.containsKey(sequenceName)) {
+                    continue; // already incremented
+                }
 
                 final Integer count = selectCount(st, tableName);
                 if (count == null || count == 0) {
