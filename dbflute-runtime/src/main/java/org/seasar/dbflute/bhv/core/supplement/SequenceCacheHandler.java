@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.XLog;
+import org.seasar.dbflute.exception.SequenceCacheIllegalStateException;
 import org.seasar.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -65,7 +66,7 @@ public class SequenceCacheHandler {
         if (sequenceCache == null) {
             String msg = "createSequenceCache() should not return null:";
             msg = msg + " sequenceName=" + sequenceName + " dataSource=" + dataSource;
-            throw new IllegalStateException(msg);
+            throw new SequenceCacheIllegalStateException(msg);
         }
         return sequenceCache;
     }
@@ -114,15 +115,15 @@ public class SequenceCacheHandler {
     protected void assertFilterArgumentValid(Integer cacheSize, Integer incrementSize, String nextValSql) {
         if (cacheSize == null || cacheSize <= 1) {
             String msg = "The argument 'cacheSize' should be cache valid size: " + cacheSize;
-            throw new IllegalStateException(msg);
+            throw new SequenceCacheIllegalStateException(msg);
         }
         if (incrementSize == null || incrementSize <= 0) {
             String msg = "The argument 'incrementSize' should be plus size: " + incrementSize;
-            throw new IllegalStateException(msg);
+            throw new SequenceCacheIllegalStateException(msg);
         }
         if (nextValSql == null || nextValSql.trim().length() == 0) {
             String msg = "The argument 'nextValSql' should be valid: " + nextValSql;
-            throw new IllegalStateException(msg);
+            throw new SequenceCacheIllegalStateException(msg);
         }
     }
 

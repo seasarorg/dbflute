@@ -23,6 +23,8 @@ import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCache.SequenceRealExecutor;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.exception.SequenceCacheIncrementSizeInvalidException;
+import org.seasar.dbflute.exception.SequenceSelectIllegalStateException;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
@@ -128,17 +130,17 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
 
     protected void assertTableHasSequence(DBMeta dbmeta) {
         if (!dbmeta.hasSequence()) {
-            String msg = "If the method 'selectNextVal()' exists, DBMeta.hasSequence() should return true:";
-            msg = msg + " dbmeta.hasSequence()=" + dbmeta.hasSequence();
-            throw new IllegalStateException(msg);
+            String msg = "If it uses sequence, the table should be related to a sequence:";
+            msg = msg + " table=" + dbmeta.getTableDbName() + " sequence=" + dbmeta.getSequenceName();
+            throw new SequenceSelectIllegalStateException(msg);
         }
     }
 
     protected void assertSequenceReturnsNotNull(String nextValSql, DBMeta dbmeta) {
         if (nextValSql == null) {
-            String msg = "If the method 'selectNextVal()' exists, DBMeta.getSequenceNextValSql() should not return null:";
-            msg = msg + " dbmeta.getSequenceNextValSql()=" + dbmeta.getSequenceNextValSql();
-            throw new IllegalStateException(msg);
+            String msg = "If it uses sequence, SQL for next value should exist:";
+            msg = msg + " table=" + dbmeta.getTableDbName() + " sequence=" + dbmeta.getSequenceName();
+            throw new SequenceSelectIllegalStateException(msg);
         }
     }
 
@@ -151,8 +153,10 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
     protected void assertIncrementSizeNotMinusAndNotZero(Integer incrementSize, DBMeta dbmeta) { // precondition: not null
         if (incrementSize <= 0) {
             String msg = "The increment size should not be minus or zero if you use sequence cache:";
-            msg = msg + " dbmeta.getSequenceNextValSql()=" + dbmeta.getSequenceNextValSql();
-            throw new IllegalStateException(msg);
+            msg = msg + " table=" + dbmeta.getTableDbName() + " sequence=" + dbmeta.getSequenceName();
+            msg = msg + " cacheSize=" + dbmeta.getSequenceCacheSize();
+            msg = msg + " incrementSize=" + dbmeta.getSequenceIncrementSize();
+            throw new SequenceCacheIncrementSizeInvalidException(msg);
         }
     }
 
