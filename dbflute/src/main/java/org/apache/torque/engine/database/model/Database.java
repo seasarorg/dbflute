@@ -55,6 +55,7 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -97,6 +98,7 @@ import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
@@ -716,6 +718,12 @@ public class Database {
         return DfBuildProperties.getInstance();
     }
 
+    // /- - - - - - - - - - - - - - - - - - - - - - - -
+    // basically return types of property methods are
+    // String or boolean or List (not Number and Date) 
+    // because Velocity templates use them.
+    // - - - - - - - - - -/
+
     // ===================================================================================
     //                                                                    Basic Properties
     //                                                                    ================
@@ -1097,23 +1105,27 @@ public class Database {
     }
 
     public String getSequenceDefinitionSequenceCacheSize(String schemaName, String tableName) {
-        return getProperties().getSequenceIdentityProperties().getSequenceCacheSize(getDataSource(), schemaName,
-                tableName);
+        final DfSequenceIdentityProperties prop = getProperties().getSequenceIdentityProperties();
+        final Integer size = prop.getSequenceCacheSize(getDataSource(), schemaName, tableName);
+        return size != null ? size.toString() : "null";
     }
 
     public String getSequenceDefinitionSequenceIncrementSize(String schemaName, String tableName) {
-        return getProperties().getSequenceIdentityProperties().getSequenceIncrementSize(getDataSource(), schemaName,
-                tableName);
+        final DfSequenceIdentityProperties prop = getProperties().getSequenceIdentityProperties();
+        final Integer size = prop.getSequenceIncrementSize(getDataSource(), schemaName, tableName);
+        return size != null ? size.toString() : "null";
     }
 
     public String getSequenceDefinitionSequenceMinimumValue(String schemaName, String tableName) {
-        return getProperties().getSequenceIdentityProperties().getSequenceMinimumValue(getDataSource(), schemaName,
-                tableName);
+        final DfSequenceIdentityProperties prop = getProperties().getSequenceIdentityProperties();
+        final BigDecimal value = prop.getSequenceMinimumValue(getDataSource(), schemaName, tableName);
+        return value != null ? value.toString() : "null";
     }
 
     public String getSequenceDefinitionSequenceMaximumValue(String schemaName, String tableName) {
-        return getProperties().getSequenceIdentityProperties().getSequenceMaximumValue(getDataSource(), schemaName,
-                tableName);
+        final DfSequenceIdentityProperties prop = getProperties().getSequenceIdentityProperties();
+        final BigDecimal value = prop.getSequenceMaximumValue(getDataSource(), schemaName, tableName);
+        return value != null ? value.toString() : "null";
     }
 
     public String getSequenceReturnType() {

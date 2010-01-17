@@ -63,7 +63,10 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                   Sequence Info
         //                                                                   =============
         bool HasSequence { get; }
+        String SequenceName { get; }
         String SequenceNextValSql { get; }
+        int? SequenceIncrementSize { get; }
+        int? SequenceCacheSize { get; }
 
         // ===============================================================================
         //                                                            Optimistic Lock Info

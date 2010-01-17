@@ -91,7 +91,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Minimum Value
     //                                         -------------
-    public String getSequenceMinimumValue(DataSource dataSource, String schemaName, String tableName) {
+    public BigDecimal getSequenceMinimumValue(DataSource dataSource, String schemaName, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
@@ -100,7 +100,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return getSequenceMinimumValue(schemaName, sequenceName, sequenceMap);
     }
 
-    protected String getSequenceMinimumValue(String schemaName, String sequenceName,
+    protected BigDecimal getSequenceMinimumValue(String schemaName, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
         DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
         if (info == null) {
@@ -109,7 +109,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         if (info != null) {
             final BigDecimal minimumValue = info.getMinimumValue();
             if (minimumValue != null) {
-                return minimumValue.toString();
+                return minimumValue;
             } else {
                 return null;
             }
@@ -121,7 +121,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Maximum Value
     //                                         -------------
-    public String getSequenceMaximumValue(DataSource dataSource, String schemaName, String tableName) {
+    public BigDecimal getSequenceMaximumValue(DataSource dataSource, String schemaName, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
@@ -130,7 +130,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return getSequenceMaximumValue(schemaName, sequenceName, sequenceMap);
     }
 
-    protected String getSequenceMaximumValue(String schemaName, String sequenceName,
+    protected BigDecimal getSequenceMaximumValue(String schemaName, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
         DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
         if (info == null) {
@@ -139,7 +139,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         if (info != null) {
             final BigDecimal maximumValue = info.getMaximumValue();
             if (maximumValue != null) {
-                return maximumValue.toString();
+                return maximumValue;
             } else {
                 return null;
             }
@@ -151,7 +151,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                        Increment Size
     //                                        --------------
-    public String getSequenceIncrementSize(DataSource dataSource, String schemaName, String tableName) {
+    public Integer getSequenceIncrementSize(DataSource dataSource, String schemaName, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
@@ -160,7 +160,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return getSequenceIncrementSize(schemaName, sequenceName, sequenceMap);
     }
 
-    protected String getSequenceIncrementSize(String schemaName, String sequenceName,
+    protected Integer getSequenceIncrementSize(String schemaName, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
         DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
         if (info == null) {
@@ -169,7 +169,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         if (info != null) {
             final Integer incrementSize = info.getIncrementSize();
             if (incrementSize != null) {
-                return incrementSize.toString();
+                return incrementSize;
             } else {
                 return null;
             }
@@ -206,7 +206,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                  (DBFlute) Cache Size
     //                                  --------------------
-    public String getSequenceCacheSize(DataSource dataSource, String schemaName, String tableName) {
+    public Integer getSequenceCacheSize(DataSource dataSource, String schemaName, String tableName) {
         final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
         final String sequenceProp = flmap.get(tableName);
         if (sequenceProp == null) {
@@ -218,12 +218,12 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             return null;
         }
         final String hint = sequenceProp.substring(hintMarkIndex + hintMark.length()).trim();
-        final String incrementMark = "dfcache(";
-        final int incrementMarkIndex = hint.indexOf(incrementMark);
-        if (incrementMarkIndex < 0) {
+        final String cacheMark = "dfcache(";
+        final int cacheMarkIndex = hint.indexOf(cacheMark);
+        if (cacheMarkIndex < 0) {
             return null;
         }
-        final String cacheValue = hint.substring(incrementMarkIndex + incrementMark.length()).trim();
+        final String cacheValue = hint.substring(cacheMarkIndex + cacheMark.length()).trim();
         final String endMark = ")";
         final int endMarkIndex = cacheValue.indexOf(endMark);
         if (endMarkIndex < 0) {
@@ -231,36 +231,75 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             msg = msg + " sequence=" + sequenceProp;
             throw new IllegalStateException(msg);
         }
-        final String cacheSize = cacheValue.substring(0, endMarkIndex).trim();
-        if (cacheSize != null && cacheSize.trim().length() > 0) {
-            return cacheSize;
-        }
+        final String cacheSizeProp = cacheValue.substring(0, endMarkIndex).trim();
         final String sequenceName = getSequenceName(tableName);
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
-        final String incrementSize = getSequenceIncrementSize(schemaName, sequenceName, sequenceMap);
-        if (incrementSize != null) {
-            return incrementSize;
+        final Integer incrementSize = getSequenceIncrementSize(schemaName, sequenceName, sequenceMap);
+        if (cacheSizeProp != null && cacheSizeProp.trim().length() > 0) { // cacheSize is specified
+            final Integer cacheSize = castCacheSize(cacheSizeProp, tableName, sequenceProp, sequenceName);
+            if (incrementSize != null) { // can get it from meta
+                final Integer extraValue = cacheSize % incrementSize;
+                if (extraValue != 0) {
+                    String msg = "Look! Read the message below." + ln();
+                    msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+                    msg = msg + "A cacheSize can be divided by incrementSize:" + ln();
+                    msg = msg + ln();
+                    msg = msg + "schema = " + schemaName + ln() + " table = " + tableName + ln();
+                    msg = msg + "sequenceProp = " + sequenceProp + ln();
+                    msg = msg + "sequenceName = " + sequenceName + ln();
+                    msg = msg + "cacheSize = " + cacheSize + ln();
+                    msg = msg + "incrementSize = " + incrementSize + ln();
+                    msg = msg + "- - - - - - - - - -/";
+                    throw new DfIllegalPropertySettingException(msg);
+                }
+                return cacheSize;
+            } else {
+                // the specified cacheSize should be same as actual increment size
+                // (DBFlute cannot know it)
+                return cacheSize;
+            }
+        } else { // cacheSize is omitted
+            if (incrementSize != null) { // can get it from meta
+                // the cacheSize is same as actual increment size
+                return incrementSize;
+            } else {
+                String msg = "Look! Read the message below." + ln();
+                msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+                msg = msg + "Failed to get the cache size of sequence:" + ln();
+                msg = msg + ln();
+                msg = msg + "schema = " + schemaName + ln() + " table = " + tableName + ln();
+                msg = msg + "sequenceProp = " + sequenceProp + ln();
+                msg = msg + "sequenceName = " + sequenceName + ln();
+                msg = msg + "sequenceMap(" + sequenceMap.size() + "):" + ln();
+                final Set<Entry<String, DfSequenceMetaInfo>> entrySet = sequenceMap.entrySet();
+                for (Entry<String, DfSequenceMetaInfo> entry : entrySet) {
+                    msg = msg + "  " + entry.getKey() + " = " + entry.getValue() + ln();
+                }
+                msg = msg + "- - - - - - - - - -/";
+                throw new DfIllegalPropertySettingException(msg);
+            }
         }
-        String msg = "Look! Read the message below." + ln();
-        msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-        msg = msg + "Failed to get the cache size of sequence:" + ln();
-        msg = msg + ln();
-        msg = msg + "schema = " + schemaName + ln() + " table = " + tableName + ln();
-        msg = msg + "sequenceProp = " + sequenceProp + ln();
-        msg = msg + "sequenceName = " + sequenceName + ln();
-        msg = msg + "sequenceMap(" + sequenceMap.size() + "):" + ln();
-        final Set<Entry<String, DfSequenceMetaInfo>> entrySet = sequenceMap.entrySet();
-        for (Entry<String, DfSequenceMetaInfo> entry : entrySet) {
-            msg = msg + "  " + entry.getKey() + " = " + entry.getValue() + ln();
+    }
+
+    protected Integer castCacheSize(String cacheSize, String tableName, String sequenceProp, String sequenceName) {
+        try {
+            return Integer.valueOf(cacheSize);
+        } catch (NumberFormatException e) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+            msg = msg + "Failed to cast the cache size to integer:" + ln();
+            msg = msg + ln();
+            msg = msg + "table = " + tableName + ln();
+            msg = msg + "sequenceProp = " + sequenceProp + ln();
+            msg = msg + "sequenceName = " + sequenceName + ln();
+            msg = msg + "- - - - - - - - - -/";
+            throw new DfIllegalPropertySettingException(msg);
         }
-        msg = msg + "- - - - - - - - - -/";
-        throw new DfIllegalPropertySettingException(msg);
     }
 
     // -----------------------------------------------------
     //                                      Check Definition
     //                                      ----------------
-
     /**
      * @param checker The checker for call-back. (NotNull)
      */

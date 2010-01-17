@@ -209,6 +209,7 @@ public class ${myClassName} extends AbstractDBMeta {
     public boolean hasSequence() { return true; }
     public String getSequenceName() { return "${table.definedSequenceName}"; }
     public String getSequenceNextValSql() { return "${table.sequenceNextSql}"; }
+    public Integer getSequenceIncrementSize() { return ${table.sequenceIncrementSize}; }
     public Integer getSequenceCacheSize() { return ${table.sequenceCacheSize}; }
 #end
 #if ($table.isUseVersionNo())

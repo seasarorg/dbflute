@@ -162,7 +162,10 @@ namespace ${glPackageBaseCommonDBMeta} {
         //                                                                    ============
         public virtual bool HasIdentity { get { return false; } }
         public virtual bool HasSequence { get { return false; } }
+        public virtual String SequenceName { get { return null; } }
         public virtual String SequenceNextValSql { get { return null; } }
+        public virtual int? SequenceIncrementSize { get { return null; } }
+        public virtual int? SequenceCacheSize { get { return null; } }
         public virtual bool HasVersionNo { get { return false; } }
         public virtual ${glColumnInfo} VersionNoColumnInfo { get { return null; } }
         public virtual bool HasUpdateDate { get { return false; } }

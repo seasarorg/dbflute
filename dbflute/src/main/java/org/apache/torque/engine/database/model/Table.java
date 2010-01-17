@@ -2031,24 +2031,21 @@ public class Table {
         if (!isUseSequence()) {
             return "null";
         }
-        final String size = getDatabase().getSequenceDefinitionSequenceMinimumValue(getSchema(), getName());
-        return size != null ? size : "null";
+        return getDatabase().getSequenceDefinitionSequenceMinimumValue(getSchema(), getName());
     }
 
     public String getSequenceMaximumValue() {
         if (!isUseSequence()) {
             return "null";
         }
-        final String size = getDatabase().getSequenceDefinitionSequenceMaximumValue(getSchema(), getName());
-        return size != null ? size : "null";
+        return getDatabase().getSequenceDefinitionSequenceMaximumValue(getSchema(), getName());
     }
 
     public String getSequenceIncrementSize() {
         if (!isUseSequence()) {
             return "null";
         }
-        final String size = getDatabase().getSequenceDefinitionSequenceIncrementSize(getSchema(), getName());
-        return size != null ? size : "null";
+        return getDatabase().getSequenceDefinitionSequenceIncrementSize(getSchema(), getName());
     }
 
     /**
@@ -2059,8 +2056,7 @@ public class Table {
         if (!isUseSequence()) {
             return "null";
         }
-        final String size = getDatabase().getSequenceDefinitionSequenceCacheSize(getSchema(), getName());
-        return size != null ? size : "null";
+        return getDatabase().getSequenceDefinitionSequenceCacheSize(getSchema(), getName());
     }
 
     public String getSequenceReturnType() {
