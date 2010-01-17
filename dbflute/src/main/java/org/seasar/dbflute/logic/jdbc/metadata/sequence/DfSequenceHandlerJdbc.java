@@ -126,10 +126,22 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     }
 
     protected void callSequenceLoop(Statement st, String sequenceName, Integer actualValue) throws SQLException {
-        Integer sequenceValue = selectNextVal(st, sequenceName);
-        final Integer startPoint = sequenceValue;
+        Integer sequenceValue = selectNextVal(st, sequenceName); // first next value
+        final Integer startPoint = sequenceValue; // save start point
+        boolean decrementChecked = false;
         while (actualValue > sequenceValue) {
-            sequenceValue = selectNextVal(st, sequenceName);
+            sequenceValue = selectNextVal(st, sequenceName); // second or more next value
+            if (decrementChecked) {
+                continue;
+            }
+            // first loop only here
+            if (startPoint >= sequenceValue) { // if decrement or no change
+                String msg = "    ...Skipping decrement sequence(unsupported): ";
+                msg = msg + " " + sequenceName + "(" + startPoint + " to " + sequenceValue;
+                _log.info(msg);
+                return;
+            }
+            decrementChecked = true;
         }
         _log.info("    " + sequenceName + ": " + startPoint + " to " + sequenceValue);
     }
