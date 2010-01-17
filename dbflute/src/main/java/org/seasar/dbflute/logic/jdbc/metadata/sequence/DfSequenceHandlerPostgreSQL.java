@@ -29,6 +29,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.handler.DfAutoIncrementHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
@@ -69,6 +70,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     }
 
     protected void handleSerialTypeSequence(Map<String, String> tableSequenceMap) throws SQLException {
+        final StringSet doneSequenceSet = StringSet.createAsCaseInsensitive();
+        doneSequenceSet.addAll(tableSequenceMap.values());
         final DfTableHandler tableHandler = new DfTableHandler() {
             @Override
             protected List<String> getRealTableExceptList(String schemaName) {
@@ -124,8 +127,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                     continue;
                 }
                 final String sequenceName = excludedPrefixString.substring(0, endIndex);
-                if (tableSequenceMap.containsKey(sequenceName)) {
-                    continue; // already incremented
+                if (doneSequenceSet.contains(sequenceName)) {
+                    continue; // already done
                 }
 
                 final Integer count = selectCount(st, tableName);
