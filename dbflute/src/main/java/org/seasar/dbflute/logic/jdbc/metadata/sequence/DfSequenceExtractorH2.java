@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +70,9 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SEQUENCE_SCHEMA");
         columnList.add("SEQUENCE_NAME");
-        columnList.add("MINIMUM_VALUE");
-        columnList.add("MAXIMUM_VALUE");
+        // no column on H2 (why?)
+        //columnList.add("MINIMUM_VALUE");
+        //columnList.add("MAXIMUM_VALUE");
         columnList.add("INCREMENT");
         final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
         final StringBuilder logSb = new StringBuilder();
@@ -83,10 +83,10 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
             info.setSequenceOwner(sequenceOwner);
             final String sequenceName = recordMap.get("SEQUENCE_NAME");
             info.setSequenceName(sequenceName);
-            final String minimumValue = recordMap.get("MINIMUM_VALUE");
-            info.setMinimumValue(minimumValue != null ? new BigDecimal(minimumValue) : null);
-            final String maximumValue = recordMap.get("MAXIMUM_VALUE");
-            info.setMaximumValue(maximumValue != null ? new BigDecimal(maximumValue) : null);
+            //final String minimumValue = recordMap.get("MINIMUM_VALUE");
+            //info.setMinimumValue(minimumValue != null ? new BigDecimal(minimumValue) : null);
+            //final String maximumValue = recordMap.get("MAXIMUM_VALUE");
+            //nfo.setMaximumValue(maximumValue != null ? new BigDecimal(maximumValue) : null);
             final String incrementSize = recordMap.get("INCREMENT");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
             final String keyOwner = sequenceOwner.equalsIgnoreCase("public") ? null : sequenceOwner;
