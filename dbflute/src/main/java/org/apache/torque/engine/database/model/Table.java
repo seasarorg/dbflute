@@ -2008,7 +2008,7 @@ public class Table {
             return "";
         }
         final String sequenceName = getSequenceIdentityProperties().getSequenceName(getName());
-        if (sequenceName == null) {
+        if (sequenceName == null || sequenceName.trim().length() == 0) {
             final String serialSequenceName = extractPostgreSQLSerialSequenceName();
             if (serialSequenceName != null && serialSequenceName.trim().length() > 0) {
                 return serialSequenceName;

@@ -66,8 +66,7 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
         } else {
             schemaCondition = "'public'";
         }
-        final String sql = "select * from information_schema.sequences where sequence_schema in (" + schemaCondition
-                + ")";
+        final String sql = buildMetaSelectSql(schemaCondition);
         _log.info(sql);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("sequence_schema");
@@ -84,15 +83,25 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
             info.setSequenceOwner(sequenceOwner);
             final String sequenceName = recordMap.get("sequence_name");
             info.setSequenceName(sequenceName);
-            final String minValue = recordMap.get("mininum_value");
+
+            String minValue = recordMap.get("minimum_value");
+            if (minValue == null || minValue.trim().length() == 0) {
+                minValue = selectMinimumValue(facade, sequenceName);
+            }
             info.setMinimumValue(minValue != null ? new BigDecimal(minValue) : null);
-            final String maxValue = recordMap.get("maxinum_value");
+
+            String maxValue = recordMap.get("maximum_value");
+            if (maxValue == null || maxValue.trim().length() == 0) {
+                maxValue = selectMaximumValue(facade, sequenceName);
+            }
             info.setMaximumValue(maxValue != null ? new BigDecimal(maxValue) : null);
+
             String incrementSize = recordMap.get("increment");
             if (incrementSize == null || incrementSize.trim().length() == 0) {
                 incrementSize = selectIncrementSize(facade, sequenceName);
             }
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
+
             final String keyOwner = sequenceOwner.equalsIgnoreCase("public") ? null : sequenceOwner;
             final String key = buildSequenceMapKey(keyOwner, sequenceName);
             resultMap.put(key, info);
@@ -102,13 +111,29 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
         return resultMap;
     }
 
+    protected String buildMetaSelectSql(String schemas) {
+        return "select * from information_schema.sequences where sequence_schema in (" + schemas + ")";
+    }
+
+    protected String selectMinimumValue(DfJdbcFacade facade, String sequenceName) {
+        return selectElementValue(facade, sequenceName, "min_value");
+    }
+
+    protected String selectMaximumValue(DfJdbcFacade facade, String sequenceName) {
+        return selectElementValue(facade, sequenceName, "max_value");
+    }
+
     protected String selectIncrementSize(DfJdbcFacade facade, String sequenceName) {
-        final String sql = "select increment_by from " + sequenceName;
+        return selectElementValue(facade, sequenceName, "increment_by");
+    }
+
+    protected String selectElementValue(DfJdbcFacade facade, String sequenceName, String elementName) {
+        final String sql = "select " + elementName + " from " + sequenceName;
         final List<String> columnList = new ArrayList<String>();
-        columnList.add("increment_by");
+        columnList.add(elementName);
         final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
         if (!resultList.isEmpty()) {
-            return resultList.get(0).get("increment_by"); // only one record exists
+            return resultList.get(0).get(elementName); // only one record exists
         }
         return null;
     }

@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,12 +66,13 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
         } else {
             schemaCondition = "'PUBLIC'";
         }
-        final String sql = "select * from INFORMATION_SCHEMA.SEQUENCES where SEQUENCE_SCHEMA in (" + schemaCondition
-                + ")";
+        final String sql = buildMetaSelectSql(schemaCondition);
         _log.info(sql);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SEQUENCE_SCHEMA");
         columnList.add("SEQUENCE_NAME");
+        columnList.add("MINIMUM_VALUE");
+        columnList.add("MAXIMUM_VALUE");
         columnList.add("INCREMENT");
         final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);
         final StringBuilder logSb = new StringBuilder();
@@ -81,6 +83,10 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
             info.setSequenceOwner(sequenceOwner);
             final String sequenceName = recordMap.get("SEQUENCE_NAME");
             info.setSequenceName(sequenceName);
+            final String minimumValue = recordMap.get("MINIMUM_VALUE");
+            info.setMinimumValue(minimumValue != null ? new BigDecimal(minimumValue) : null);
+            final String maximumValue = recordMap.get("MAXIMUM_VALUE");
+            info.setMaximumValue(maximumValue != null ? new BigDecimal(maximumValue) : null);
             final String incrementSize = recordMap.get("INCREMENT");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
             final String keyOwner = sequenceOwner.equalsIgnoreCase("public") ? null : sequenceOwner;
@@ -90,5 +96,9 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
         }
         _log.info(logSb.toString());
         return resultMap;
+    }
+
+    protected String buildMetaSelectSql(String schemas) {
+        return "select * from INFORMATION_SCHEMA.SEQUENCES where SEQUENCE_SCHEMA in (" + schemas + ")";
     }
 }
