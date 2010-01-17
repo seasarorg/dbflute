@@ -95,11 +95,16 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Minimum Value
     //                                         -------------
-    public BigDecimal getSequenceMinimumValue(DataSource dataSource, String schemaName, String tableName) {
+    public BigDecimal getSequenceMinimumValueByTableName(DataSource dataSource, String schemaName, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
         }
+        return getSequenceMinimumValueBySequenceName(dataSource, schemaName, sequenceName);
+    }
+
+    public BigDecimal getSequenceMinimumValueBySequenceName(DataSource dataSource, String schemaName,
+            String sequenceName) {
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
         return getSequenceMinimumValue(schemaName, sequenceName, sequenceMap);
     }
@@ -125,11 +130,16 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Maximum Value
     //                                         -------------
-    public BigDecimal getSequenceMaximumValue(DataSource dataSource, String schemaName, String tableName) {
+    public BigDecimal getSequenceMaximumValueByTableName(DataSource dataSource, String schemaName, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
         }
+        return getSequenceMaximumValueBySequenceName(dataSource, schemaName, sequenceName);
+    }
+
+    public BigDecimal getSequenceMaximumValueBySequenceName(DataSource dataSource, String schemaName,
+            String sequenceName) {
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
         return getSequenceMaximumValue(schemaName, sequenceName, sequenceMap);
     }
@@ -155,11 +165,15 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                        Increment Size
     //                                        --------------
-    public Integer getSequenceIncrementSize(DataSource dataSource, String schemaName, String tableName) {
+    public Integer getSequenceIncrementSizeByTableName(DataSource dataSource, String schemaName, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
         }
+        return getSequenceIncrementSizeBySequenceName(dataSource, schemaName, sequenceName);
+    }
+
+    public Integer getSequenceIncrementSizeBySequenceName(DataSource dataSource, String schemaName, String sequenceName) {
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
         return getSequenceIncrementSize(schemaName, sequenceName, sequenceMap);
     }

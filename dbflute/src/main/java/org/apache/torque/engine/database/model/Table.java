@@ -2038,7 +2038,14 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        return prop.getSequenceMinimumValue(ds, getSchema(), getName());
+        BigDecimal value = prop.getSequenceMinimumValueByTableName(ds, getSchema(), getName());
+        if (value == null) {
+            final String sequenceName = extractPostgreSQLSerialSequenceName();
+            if (sequenceName != null && sequenceName.trim().length() > 0) {
+                value = prop.getSequenceMinimumValueBySequenceName(ds, getSchema(), sequenceName);
+            }
+        }
+        return value;
     }
 
     public String getSequenceMinimumValueExpression() {
@@ -2052,7 +2059,14 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        return prop.getSequenceMaximumValue(ds, getSchema(), getName());
+        BigDecimal value = prop.getSequenceMaximumValueByTableName(ds, getSchema(), getName());
+        if (value == null) {
+            final String sequenceName = extractPostgreSQLSerialSequenceName();
+            if (sequenceName != null && sequenceName.trim().length() > 0) {
+                value = prop.getSequenceMaximumValueBySequenceName(ds, getSchema(), sequenceName);
+            }
+        }
+        return value;
     }
 
     public String getSequenceMaximumValueExpression() {
@@ -2066,7 +2080,14 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        return prop.getSequenceIncrementSize(ds, getSchema(), getName());
+        Integer size = prop.getSequenceIncrementSizeByTableName(ds, getSchema(), getName());
+        if (size == null) {
+            final String sequenceName = extractPostgreSQLSerialSequenceName();
+            if (sequenceName != null && sequenceName.trim().length() > 0) {
+                size = prop.getSequenceIncrementSizeBySequenceName(ds, getSchema(), sequenceName);
+            }
+        }
+        return size;
     }
 
     public String getSequenceIncrementSizeExpression() {
