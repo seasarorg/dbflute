@@ -203,7 +203,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         String sql = "select next value for SEQ_MEMBER";
 
         // ## Act ##
-        String actual = handler.filterNextValueSql(50, 50, sql);
+        String actual = handler.filterNextValSql(50, 50, sql);
 
         // ## Assert ##
         log(actual);
@@ -221,7 +221,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
 
         try {
             // ## Act ##
-            String actual = handler.filterNextValueSql(50, 50, sql);
+            String actual = handler.filterNextValSql(50, 50, sql);
 
             // ## Assert ##
             log(actual);
@@ -238,7 +238,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         String sql = "select next value for SEQ_MEMBER";
 
         // ## Act ##
-        String actual = handler.filterNextValueSql(50, 25, sql);
+        String actual = handler.filterNextValSql(50, 25, sql);
 
         // ## Assert ##
         log(actual);
@@ -255,7 +255,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
 
         try {
             // ## Act ##
-            String actual = handler.filterNextValueSql(50, 25, sql);
+            String actual = handler.filterNextValSql(50, 25, sql);
 
             // ## Assert ##
             log(actual);
@@ -273,7 +273,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         String sql = "select next value for SEQ_MEMBER";
 
         // ## Act ##
-        String actual = handler.filterNextValueSql(50, 1, sql);
+        String actual = handler.filterNextValSql(50, 1, sql);
 
         // ## Assert ##
         log(actual);
@@ -291,7 +291,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         // ## Act ##
         try {
             // ## Assert ##
-            handler.filterNextValueSql(50, 3, sql);
+            handler.filterNextValSql(50, 3, sql);
         } catch (SequenceCacheSizeNotDividedIncrementSizeException e) {
             // OK
             log(e.getMessage());

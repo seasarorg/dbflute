@@ -16,6 +16,11 @@
 package org.seasar.dbflute.bhv.core.supplement;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -42,8 +47,20 @@ public class SequenceCache {
     /** The result type of sequence next value. (NotNull) */
     protected final Class<?> _resultType;
 
-    protected BigDecimal _addedCount = INITIAL_ADDED_COUNT;
-    protected BigDecimal _sequenceValue;
+    /** The added count. If cached list is valid, this value is unused. (NotNull) */
+    protected volatile BigDecimal _addedCount = INITIAL_ADDED_COUNT;
+
+    /** The sequence value as base point. (Nullable: only at first null) */
+    protected volatile BigDecimal _sequenceValue;
+
+    protected final List<BigDecimal> _cachedList = new ArrayList<BigDecimal>();
+    protected final SortedSet<BigDecimal> _tmpSortedSet = new TreeSet<BigDecimal>(new Comparator<BigDecimal>() {
+        public int compare(BigDecimal arg0, BigDecimal arg1) {
+            return arg0.compareTo(arg1);
+        }
+    });
+
+    protected volatile boolean _batchWay;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -57,41 +74,90 @@ public class SequenceCache {
     //                                                                          Next Value
     //                                                                          ==========
     public synchronized Object nextval(SequenceRealExecutor executor) {
-        _addedCount = _addedCount.add(getAddSize());
-        if (_sequenceValue != null && _addedCount.compareTo(_cacheSize) < 0) {
-            if (isLogEnabled()) {
-                String msg = "...Getting next value from sequence cache:";
-                msg = msg + " (" + _sequenceValue + " + " + _addedCount + ")";
-                log(msg);
+        if (_batchWay) {
+            if (!_cachedList.isEmpty()) {
+                if (isLogEnabled()) {
+                    String msg = "...Getting next value from cached list:";
+                    msg = msg + " (" + _sequenceValue + " + x)";
+                    log(msg);
+                }
+                return toResultType(_cachedList.remove(0));
             }
-            return DfTypeUtil.toNumber(_resultType, _sequenceValue.add(_addedCount));
+        } else { // incrementWay
+            _addedCount = _addedCount.add(getAddSize());
+            if (_sequenceValue != null && _addedCount.compareTo(_cacheSize) < 0) {
+                if (isLogEnabled()) {
+                    String msg = "...Getting next value from added count:";
+                    msg = msg + " (" + _sequenceValue + " + " + _addedCount + ")";
+                    log(msg);
+                }
+                return toResultType(_sequenceValue.add(_addedCount));
+            }
         }
         if (isLogEnabled()) {
             String msg = "...Selecting next value and cache values:";
             msg = msg + " cacheSize=" + _cacheSize;
             log(msg);
         }
-        _sequenceValue = selectSequence(executor);
-        _addedCount = INITIAL_ADDED_COUNT;
-        return DfTypeUtil.toNumber(_resultType, _sequenceValue);
-    }
-
-    protected BigDecimal selectSequence(SequenceRealExecutor executor) {
-        final Object obj = executor.execute();
-        if (obj == null) {
-            String msg = "The sequence real executor should not return null:";
-            msg = msg + " executor=" + executor;
-            throw new IllegalStateException(msg);
-        }
-        return DfTypeUtil.toBigDecimal(obj);
+        setupSequence(executor);
+        return toResultType(_sequenceValue);
     }
 
     protected BigDecimal getAddSize() {
         return DEFAULT_ADD_SIZE;
     }
 
+    protected void setupSequence(SequenceRealExecutor executor) {
+        initialize();
+        final Object obj = executor.execute();
+        assertSequenceRealExecutorReturnsNotNull(obj, executor);
+        if (obj instanceof List<?>) { // batchWay
+            final List<?> selectedList = (List<?>) obj; // no guarantee of order
+            assertSequenceRealExecutorReturnsNotEmptyList(selectedList, executor);
+            for (Object element : selectedList) {
+                _tmpSortedSet.add(toInternalType(element)); // order ascend
+            }
+            _cachedList.addAll(_tmpSortedSet); // setting up cached list (ordered)
+            _sequenceValue = _cachedList.remove(0);
+            _batchWay = true;
+        } else { // incrementWay
+            _sequenceValue = toInternalType(obj);
+            _batchWay = false;
+        }
+    }
+
+    protected void initialize() {
+        _addedCount = INITIAL_ADDED_COUNT;
+        _cachedList.clear();
+        _tmpSortedSet.clear();
+    }
+
+    protected void assertSequenceRealExecutorReturnsNotNull(Object obj, SequenceRealExecutor executor) {
+        if (obj == null) {
+            String msg = "The sequence real executor should not return null:";
+            msg = msg + " executor=" + executor;
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    protected void assertSequenceRealExecutorReturnsNotEmptyList(List<?> selectedList, SequenceRealExecutor executor) {
+        if (selectedList.isEmpty()) {
+            String msg = "The sequence real executor should not return empty list:";
+            msg = msg + " executor=" + executor;
+            throw new IllegalStateException(msg);
+        }
+    }
+
     public static interface SequenceRealExecutor {
         Object execute();
+    }
+
+    protected BigDecimal toInternalType(Object value) {
+        return DfTypeUtil.toBigDecimal(value);
+    }
+
+    protected Object toResultType(BigDecimal value) {
+        return DfTypeUtil.toNumber(_resultType, value);
     }
 
     // ===================================================================================

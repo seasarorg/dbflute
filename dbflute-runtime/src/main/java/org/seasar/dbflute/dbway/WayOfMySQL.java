@@ -27,7 +27,7 @@ public class WayOfMySQL implements DBWay {
     // ===================================================================================
     //                                                                        Sequence Way
     //                                                                        ============
-    public String buildSequenceNextValueSql(String sequenceName) {
+    public String buildSequenceNextValSql(String sequenceName) {
         return null;
     }
 

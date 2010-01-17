@@ -24,7 +24,7 @@ public class WayOfOracle implements DBWay {
     // ===================================================================================
     //                                                                        Sequence Way
     //                                                                        ============
-    public String buildSequenceNextValueSql(String sequenceName) {
+    public String buildSequenceNextValSql(String sequenceName) {
         return "select " + sequenceName + ".nextval from dual";
     }
 

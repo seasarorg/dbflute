@@ -2,7 +2,7 @@ package org.seasar.dbflute.bhv.core.supplement;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -22,6 +22,9 @@ import org.seasar.dbflute.util.DfTypeUtil;
  */
 public class SequenceCacheTest extends PlainTestCase {
 
+    // ===================================================================================
+    //                                                                               Basic
+    //                                                                               =====
     public void test_nextval_BigDecimal() {
         // ## Arrange ##
         int incrementSize = 10;
@@ -114,7 +117,10 @@ public class SequenceCacheTest extends PlainTestCase {
         assertEquals(2, executor.getCount());
     }
 
-    public void test_nextval_threadSafe() {
+    // ===================================================================================
+    //                                                                         Thread Safe
+    //                                                                         ===========
+    public void test_nextval_threadSafe_incrementWay() {
         // ## Arrange ##
         final int incrementSize = 20;
         final SequenceCache cache = createSequenceCache(incrementSize, Integer.class);
@@ -123,8 +129,8 @@ public class SequenceCacheTest extends PlainTestCase {
             public Execution<Set<Integer>> create() {
                 return new Execution<Set<Integer>>() {
                     public Set<Integer> execute() {
-                        final Set<Integer> valSet = new HashSet<Integer>();
-                        for (int i = 0; i < 5; i++) {
+                        final Set<Integer> valSet = new LinkedHashSet<Integer>();
+                        for (int i = 0; i < 20; i++) {
                             valSet.add((Integer) cache.nextval(executor));
                         }
                         return valSet;
@@ -135,18 +141,57 @@ public class SequenceCacheTest extends PlainTestCase {
 
         // ## Act & Assert ##
         log("...Executing all threads");
-        HashSet<Integer> allAllSet = new HashSet<Integer>();
+        StringBuilder sb = new StringBuilder();
+        Set<Integer> allAllSet = new LinkedHashSet<Integer>();
         for (int i = 0; i < 30; i++) {
             List<Set<Integer>> resultList = fireSameExecution(creator);
-            HashSet<Integer> allSet = new HashSet<Integer>();
+            Set<Integer> allSet = new LinkedHashSet<Integer>();
             for (Set<Integer> set : resultList) {
+                sb.append(ln()).append(set);
                 allSet.addAll(set);
             }
-            assertEquals(50, allSet.size());
+            assertEquals(200, allSet.size());
             allAllSet.addAll(allSet);
-            log(allSet);
         }
-        assertEquals(1500, allAllSet.size());
+        log(sb.toString());
+        assertEquals(6000, allAllSet.size());
+    }
+
+    public void test_nextval_threadSafe_batchWay() {
+        // ## Arrange ##
+        final int incrementSize = 20;
+        final SequenceCache cache = createSequenceCache(incrementSize, Integer.class);
+        final ListResultExecutor executor = new ListResultExecutor(incrementSize);
+        ExecutionCreator<Set<Integer>> creator = new ExecutionCreator<Set<Integer>>() {
+            public Execution<Set<Integer>> create() {
+                return new Execution<Set<Integer>>() {
+                    public Set<Integer> execute() {
+                        final Set<Integer> valSet = new LinkedHashSet<Integer>();
+                        for (int i = 0; i < 20; i++) {
+                            valSet.add((Integer) cache.nextval(executor));
+                        }
+                        return valSet;
+                    }
+                };
+            }
+        };
+
+        // ## Act & Assert ##
+        log("...Executing all threads");
+        StringBuilder sb = new StringBuilder();
+        Set<Integer> allAllSet = new LinkedHashSet<Integer>();
+        for (int i = 0; i < 30; i++) {
+            List<Set<Integer>> resultList = fireSameExecution(creator);
+            Set<Integer> allSet = new LinkedHashSet<Integer>();
+            for (Set<Integer> set : resultList) {
+                sb.append(ln()).append(set);
+                allSet.addAll(set);
+            }
+            assertEquals(200, allSet.size());
+            allAllSet.addAll(allSet);
+        }
+        log(sb.toString());
+        assertEquals(6000, allAllSet.size());
     }
 
     // ===================================================================================
@@ -220,6 +265,30 @@ public class SequenceCacheTest extends PlainTestCase {
             ++_count;
             int result = (_incrementSize * (_count - 1)) + 1;
             return result;
+        }
+
+        public int getCount() {
+            return _count;
+        }
+    }
+
+    protected class ListResultExecutor implements SequenceRealExecutor {
+        protected int _count;
+        protected int _incrementSize;
+
+        public ListResultExecutor(int incrementSize) {
+            _incrementSize = incrementSize;
+        }
+
+        public Object execute() {
+            List<BigDecimal> resultList = new ArrayList<BigDecimal>();
+            for (int i = 0; i < _incrementSize; i++) {
+                synchronized (this) {
+                    ++_count;
+                    resultList.add(new BigDecimal(_count));
+                }
+            }
+            return resultList;
         }
 
         public int getCount() {

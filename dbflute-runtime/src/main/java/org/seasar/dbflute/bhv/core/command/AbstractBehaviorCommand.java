@@ -105,6 +105,11 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         return createScalarListResultSetHandler(valueType);
     }
 
+    protected TnResultSetHandler createDynamicScalarResultSetHandler(Class<?> objectType) {
+        final ValueType valueType = TnValueTypes.getValueType(objectType);
+        return new DynamicScalarResultSetHandler(valueType);
+    }
+
     protected TnResultSetHandler createScalarListResultSetHandler(ValueType valueType) {
         return new ScalarListResultSetHandler(valueType);
     }
@@ -137,6 +142,22 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
                 ret.add(valueType.getValue(rs, 1));
             }
             return ret;
+        }
+    }
+
+    protected static class DynamicScalarResultSetHandler implements TnResultSetHandler {
+        private ValueType valueType;
+
+        public DynamicScalarResultSetHandler(ValueType valueType) {
+            this.valueType = valueType;
+        }
+
+        public Object handle(ResultSet rs) throws SQLException {
+            final List<Object> ret = new ArrayList<Object>();
+            while (rs.next()) {
+                ret.add(valueType.getValue(rs, 1));
+            }
+            return ret.size() == 1 ? ret.get(0) : ret;
         }
     }
 

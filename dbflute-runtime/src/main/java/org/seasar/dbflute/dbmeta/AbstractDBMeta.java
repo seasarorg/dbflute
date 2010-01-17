@@ -577,7 +577,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         if (!hasSequence()) {
             return null;
         }
-        return getCurrentDBDef().dbway().buildSequenceNextValueSql(getSequenceName());
+        return getCurrentDBDef().dbway().buildSequenceNextValSql(getSequenceName());
     }
 
     public Integer getSequenceIncrementSize() {

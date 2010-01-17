@@ -98,18 +98,18 @@ public class SequenceCacheHandler {
      * This method uses ResourceContext.
      * @param cacheSize The cache size of sequence. (NotNull, CacheValidSize)
      * @param incrementSize The increment size of sequence. (NotNull, NotMinus, NotZero)
-     * @param nextValueSql The SQL for next value. (NotNull, NotTrimmedEmpty)
+     * @param nextValSql The SQL for next value. (NotNull, NotTrimmedEmpty)
      * @return The filtered SQL. (NotNull, NotTrimmedEmpty)
      */
-    public String filterNextValueSql(Integer cacheSize, Integer incrementSize, String nextValueSql) {
-        assertFilterArgumentValid(cacheSize, incrementSize, nextValueSql);
-        assertCacheSizeCanBeDividedByIncrementSize(cacheSize, incrementSize, nextValueSql);
+    public String filterNextValSql(Integer cacheSize, Integer incrementSize, String nextValSql) {
+        assertFilterArgumentValid(cacheSize, incrementSize, nextValSql);
+        assertCacheSizeCanBeDividedByIncrementSize(cacheSize, incrementSize, nextValSql);
         final Integer divided = cacheSize / incrementSize;
         final Integer unionCount = divided - 1;
         final StringBuilder sb = new StringBuilder();
         if (unionCount > 0) { // "batch" way
             if (ResourceContext.isCurrentDBDef(DBDef.Oracle)) { // Oracle patch
-                sb.append(DfStringUtil.replace(nextValueSql, "from dual", "from ("));
+                sb.append(DfStringUtil.replace(nextValSql, "from dual", "from ("));
                 sb.append(ln()).append("  select * from dual");
                 for (int i = 0; i < unionCount; i++) {
                     sb.append(ln()).append("   union all ");
@@ -121,24 +121,24 @@ public class SequenceCacheHandler {
                 if (ResourceContext.isCurrentDBDef(DBDef.DB2)) {
                     String msg = "The cacheSize should be same as incrementSize on DB2:";
                     msg = msg + " cacheSize=" + cacheSize + " incrementSize=" + incrementSize;
-                    msg = msg + " nextValueSql=" + nextValueSql;
+                    msg = msg + " nextValueSql=" + nextValSql;
                     throw new UnsupportedOperationException(msg);
                 }
-                sb.append(nextValueSql);
+                sb.append(nextValSql);
                 for (int i = 0; i < unionCount; i++) {
                     sb.append(ln()).append(" union all ");
-                    sb.append(ln()).append(nextValueSql);
+                    sb.append(ln()).append(nextValSql);
                 }
                 sb.append(ln()).append(" order by 1 asc");
 
             }
         } else { // "increment" way
-            sb.append(nextValueSql);
+            sb.append(nextValSql);
         }
         return sb.toString();
     }
 
-    protected void assertFilterArgumentValid(Integer cacheSize, Integer incrementSize, String nextValueSql) {
+    protected void assertFilterArgumentValid(Integer cacheSize, Integer incrementSize, String nextValSql) {
         if (cacheSize == null || cacheSize <= 1) {
             String msg = "The argument 'cacheSize' should be cache valid size: " + cacheSize;
             throw new SequenceCacheIllegalStateException(msg);
@@ -147,8 +147,8 @@ public class SequenceCacheHandler {
             String msg = "The argument 'incrementSize' should be plus size: " + incrementSize;
             throw new SequenceCacheIllegalStateException(msg);
         }
-        if (nextValueSql == null || nextValueSql.trim().length() == 0) {
-            String msg = "The argument 'nextValueSql' should be valid: " + nextValueSql;
+        if (nextValSql == null || nextValSql.trim().length() == 0) {
+            String msg = "The argument 'nextValSql' should be valid: " + nextValSql;
             throw new SequenceCacheIllegalStateException(msg);
         }
     }
@@ -162,7 +162,7 @@ public class SequenceCacheHandler {
     }
 
     protected void throwSequenceCacheSizeNotDividedIncrementSizeException(Integer cacheSize, Integer incrementSize,
-            String nextValueSql) {
+            String nextValSql) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The cache size cannot be divided by increment size!" + ln();
@@ -180,7 +180,7 @@ public class SequenceCacheHandler {
         msg = msg + ln();
         msg = msg + "[Increment Size]" + ln() + incrementSize + ln();
         msg = msg + ln();
-        msg = msg + "[SQL for Next Value]" + ln() + nextValueSql + ln();
+        msg = msg + "[SQL for Next Value]" + ln() + nextValSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new SequenceCacheSizeNotDividedIncrementSizeException(msg);
     }

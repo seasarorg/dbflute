@@ -29,7 +29,7 @@ public interface DBWay {
      * @param sequenceName The sequence name. (NotNull)
      * @return The SQL for next value of sequence. (Nullable: if sequence is unsupported)
      */
-    String buildSequenceNextValueSql(String sequenceName);
+    String buildSequenceNextValSql(String sequenceName);
 
     // ===================================================================================
     //                                                                        Identity Way

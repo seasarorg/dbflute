@@ -24,7 +24,7 @@ public class WayOfFirebird implements DBWay {
     // ===================================================================================
     //                                                                        Sequence Way
     //                                                                        ============
-    public String buildSequenceNextValueSql(String sequenceName) {
+    public String buildSequenceNextValSql(String sequenceName) {
         return "select gen_id(" + sequenceName + ", 1) from RDB$DATABASE";
     }
 
