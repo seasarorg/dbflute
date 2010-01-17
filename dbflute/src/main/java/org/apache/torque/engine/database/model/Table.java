@@ -2022,13 +2022,13 @@ public class Table {
      * Get the SQL for next value of sequence.
      * @return The SQL for next value of sequence. (NotNull: If a sequence is not found, return empty string.)
      */
-    public String getSequenceNextValueSql() {
+    public String getSequenceNextValSql() {
         if (!isUseSequence()) {
             return "";
         }
         final DBDef dbdef = getBasicProperties().getCurrentDBDef();
         final String sequenceName = getDefinedSequenceName();
-        final String sql = dbdef.dbway().buildSequenceNextValueSql(sequenceName);
+        final String sql = dbdef.dbway().buildSequenceNextValSql(sequenceName);
         return sql != null ? sql : "";
     }
 
