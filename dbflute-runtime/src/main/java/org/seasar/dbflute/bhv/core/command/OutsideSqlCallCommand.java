@@ -125,7 +125,7 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
 
     protected TnProcedureCommand createProcedureCommand(TnProcedureMetaData metaData) {
         // Because a procedure command does not use result set handler.
-        final TnResultSetHandler resultSetHandler = new InternalNullResultSetHandler(); 
+        final TnResultSetHandler resultSetHandler = new NullResultSetHandler(); 
         return new TnProcedureCommand(_dataSource, resultSetHandler, _statementFactory, metaData);
     }
 

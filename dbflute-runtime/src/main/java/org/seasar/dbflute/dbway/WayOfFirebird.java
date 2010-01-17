@@ -22,12 +22,19 @@ package org.seasar.dbflute.dbway;
 public class WayOfFirebird implements DBWay {
 
     // ===================================================================================
+    //                                                                        Sequence Way
+    //                                                                        ============
+    public String buildSequenceNextValueSql(String sequenceName) {
+        return "select gen_id(" + sequenceName + ", 1) from RDB$DATABASE";
+    }
+
+    // ===================================================================================
     //                                                                       Identity Info
     //                                                                       =============
     public String getIdentitySelectSql() {
         return null;
     }
-    
+
     // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================

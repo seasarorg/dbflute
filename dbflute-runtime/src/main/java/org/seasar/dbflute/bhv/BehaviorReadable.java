@@ -61,16 +61,6 @@ public interface BehaviorReadable {
     ConditionBean newConditionBean();
 
     // ===================================================================================
-    //                                                                       Basic Get All
-    //                                                                       =============
-    /**
-     * Get count all.
-     * @return Count all.
-     * @deprecated Sorry! Please use selectCount(emptyCB)
-     */
-    int getCountAll();
-
-    // ===================================================================================
     //                                                                    Basic Read Count
     //                                                                    ================
     /**

@@ -22,14 +22,24 @@ package org.seasar.dbflute.dbway;
 public interface DBWay {
 
     // ===================================================================================
+    //                                                                        Sequence Way
+    //                                                                        ============
+    /**
+     * Build the SQL for next value of sequence with a sequence name.
+     * @param sequenceName The sequence name. (NotNull)
+     * @return The SQL for next value of sequence. (Nullable: if sequence is unsupported)
+     */
+    String buildSequenceNextValueSql(String sequenceName);
+
+    // ===================================================================================
     //                                                                        Identity Way
     //                                                                        ============
     /**
-     * Get the SQL string for getting inserted value of identity.
-     * @return The SQL string for getting inserted value of sequence. (Nullable: If it does not have identity, returns null.)
+     * Get the SQL for getting inserted value of identity.
+     * @return The SQL for getting inserted value of sequence. (Nullable: If it does not have identity, returns null.)
      */
     String getIdentitySelectSql();
-    
+
     // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================

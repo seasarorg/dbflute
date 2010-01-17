@@ -16,7 +16,9 @@ import java.util.concurrent.Future;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
+import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -201,11 +203,33 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         String sql = "select next value for SEQ_MEMBER";
 
         // ## Act ##
-        String actual = handler.filterNextValSql(50, 50, sql);
+        String actual = handler.filterNextValueSql(50, 50, sql);
 
         // ## Assert ##
         log(actual);
         assertEquals(sql, actual);
+        assertFalse(actual.contains("order by"));
+    }
+
+    public void test_filterNextValSql_same_Oracle() {
+        // ## Arrange ##
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        String sql = "select SEQ_MEMBER.nextval from dual";
+        ResourceContext context = new ResourceContext();
+        context.setCurrentDBDef(DBDef.Oracle);
+        ResourceContext.setResourceContextOnThread(context);
+
+        try {
+            // ## Act ##
+            String actual = handler.filterNextValueSql(50, 50, sql);
+
+            // ## Assert ##
+            log(actual);
+            assertEquals(sql, actual);
+            assertFalse(actual.contains("order by"));
+        } finally {
+            ResourceContext.clearResourceContextOnThread();
+        }
     }
 
     public void test_filterNextValSql_half() {
@@ -214,11 +238,33 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         String sql = "select next value for SEQ_MEMBER";
 
         // ## Act ##
-        String actual = handler.filterNextValSql(50, 25, sql);
+        String actual = handler.filterNextValueSql(50, 25, sql);
 
         // ## Assert ##
         log(actual);
-        assertEquals(sql + ln() + " union all " + ln() + sql, actual);
+        assertEquals(sql + ln() + " union all " + ln() + sql + ln() + " order by 1 asc", actual);
+    }
+
+    public void test_filterNextValSql_half_Oracle() {
+        // ## Arrange ##
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        String sql = "select SEQ_MEMBER.nextval from dual";
+        ResourceContext context = new ResourceContext();
+        context.setCurrentDBDef(DBDef.Oracle);
+        ResourceContext.setResourceContextOnThread(context);
+
+        try {
+            // ## Act ##
+            String actual = handler.filterNextValueSql(50, 25, sql);
+
+            // ## Assert ##
+            log(actual);
+            assertTrue(actual.contains("nextval"));
+            assertTrue(actual.contains("select * from dual"));
+            assertTrue(actual.contains(" union all "));
+        } finally {
+            ResourceContext.clearResourceContextOnThread();
+        }
     }
 
     public void test_filterNextValSql_incrementOne() {
@@ -227,13 +273,14 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         String sql = "select next value for SEQ_MEMBER";
 
         // ## Act ##
-        String actual = handler.filterNextValSql(50, 1, sql);
+        String actual = handler.filterNextValueSql(50, 1, sql);
 
         // ## Assert ##
         log(actual);
         assertTrue(actual.contains(" union all "));
         String[] split = actual.split(" union all ");
         assertEquals(50, split.length);
+        assertTrue(actual.contains("order by 1"));
     }
 
     public void test_filterNextValSql_cannotDivided() {
@@ -244,7 +291,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         // ## Act ##
         try {
             // ## Assert ##
-            handler.filterNextValSql(50, 3, sql);
+            handler.filterNextValueSql(50, 3, sql);
         } catch (SequenceCacheSizeNotDividedIncrementSizeException e) {
             // OK
             log(e.getMessage());

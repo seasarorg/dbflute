@@ -18,6 +18,7 @@ package org.seasar.dbflute.dbmeta;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
@@ -53,6 +54,15 @@ public interface DBMeta {
 
     /** Map-string equal. */
     public static final String MAP_STRING_EQUAL = "@=";
+
+    // ===================================================================================
+    //                                                                               DBDef
+    //                                                                               =====
+    /**
+     * Get the current DB definition.
+     * @return The current DB definition. (NotNull)
+     */
+    public DBDef getCurrentDBDef();
 
     // ===================================================================================
     //                                                                          Table Info
@@ -247,8 +257,8 @@ public interface DBMeta {
     public String getSequenceName();
 
     /**
-     * Get the SQL string for getting next value of sequence.
-     * @return The SQL string for getting next value of sequence. (Nullable: If it does not have sequence, returns null.)
+     * Get the SQL for next value of sequence.
+     * @return The SQL for next value of sequence. (Nullable: If it does not have sequence, returns null.)
      */
     public String getSequenceNextValSql();
 

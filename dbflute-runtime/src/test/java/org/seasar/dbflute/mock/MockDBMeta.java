@@ -3,6 +3,7 @@ package org.seasar.dbflute.mock;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
@@ -14,6 +15,10 @@ import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
 
 public class MockDBMeta implements DBMeta {
+
+    public DBDef getCurrentDBDef() {
+        return null;
+    }
 
     public void acceptColumnValueMap(Entity entity, Map<String, ? extends Object> columnValueMap) {
     }

@@ -22,6 +22,13 @@ package org.seasar.dbflute.dbway;
 public class WayOfOracle implements DBWay {
 
     // ===================================================================================
+    //                                                                        Sequence Way
+    //                                                                        ============
+    public String buildSequenceNextValueSql(String sequenceName) {
+        return "select " + sequenceName + ".nextval from dual";
+    }
+
+    // ===================================================================================
     //                                                                       Identity Info
     //                                                                       =============
     public String getIdentitySelectSql() {

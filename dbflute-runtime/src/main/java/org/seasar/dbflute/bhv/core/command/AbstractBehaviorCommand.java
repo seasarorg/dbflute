@@ -88,32 +88,34 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         final TnRelationRowCreatorExtension relationRowCreator = createInternalRelationRowCreator(bmd);
         return new TnBeanListMetaDataResultSetHandler(bmd, rowCreator, relationRowCreator);
     }
-    
+
     protected TnResultSetHandler createBeanCursorMetaDataResultSetHandler(TnBeanMetaData bmd) {
         final TnRowCreatorExtension rowCreator = createInternalRowCreator(bmd);
         final TnRelationRowCreatorExtension relationRowCreator = createInternalRelationRowCreator(bmd);
         return new TnBeanCursorMetaDataResultSetHandler(bmd, rowCreator, relationRowCreator);
     }
 
-    protected TnResultSetHandler createObjectResultSetHandler(Class<?> objectType) {
+    protected TnResultSetHandler createScalarResultSetHandler(Class<?> objectType) {
         final ValueType valueType = TnValueTypes.getValueType(objectType);
-        return new InternalObjectResultSetHandler(valueType);
+        return new ScalarResultSetHandler(valueType);
     }
 
-    protected TnResultSetHandler createObjectListResultSetHandler(Class<?> objectType) {
+    protected TnResultSetHandler createScalarListResultSetHandler(Class<?> objectType) {
         final ValueType valueType = TnValueTypes.getValueType(objectType);
-        return createObjectListResultSetHandler(valueType);
+        return createScalarListResultSetHandler(valueType);
     }
 
-    protected TnResultSetHandler createObjectListResultSetHandler(ValueType valueType) {
-        return new InternalObjectListResultSetHandler(valueType);
+    protected TnResultSetHandler createScalarListResultSetHandler(ValueType valueType) {
+        return new ScalarListResultSetHandler(valueType);
     }
 
-    protected static class InternalObjectResultSetHandler implements TnResultSetHandler {
+    protected static class ScalarResultSetHandler implements TnResultSetHandler {
         private ValueType valueType;
-        public InternalObjectResultSetHandler(ValueType valueType) {
+
+        public ScalarResultSetHandler(ValueType valueType) {
             this.valueType = valueType;
         }
+
         public Object handle(ResultSet rs) throws SQLException {
             while (rs.next()) {
                 return valueType.getValue(rs, 1);
@@ -122,11 +124,13 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         }
     }
 
-    protected static class InternalObjectListResultSetHandler implements TnResultSetHandler {
+    protected static class ScalarListResultSetHandler implements TnResultSetHandler {
         private ValueType valueType;
-        public InternalObjectListResultSetHandler(ValueType valueType) {
+
+        public ScalarListResultSetHandler(ValueType valueType) {
             this.valueType = valueType;
         }
+
         public Object handle(ResultSet rs) throws SQLException {
             final List<Object> ret = new ArrayList<Object>();
             while (rs.next()) {
@@ -136,7 +140,7 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         }
     }
 
-    protected static class InternalNullResultSetHandler implements TnResultSetHandler {
+    protected static class NullResultSetHandler implements TnResultSetHandler {
         public Object handle(ResultSet rs) throws SQLException {
             return null;
         }

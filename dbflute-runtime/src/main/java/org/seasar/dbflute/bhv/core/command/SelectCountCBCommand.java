@@ -67,7 +67,7 @@ public class SelectCountCBCommand extends AbstractSelectCBCommand<Integer> {
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
-                TnResultSetHandler handler = createObjectResultSetHandler(getCommandReturnType());
+                TnResultSetHandler handler = createScalarResultSetHandler(getCommandReturnType());
                 return createSelectCBExecution(_conditionBeanType, handler);
             }
         };

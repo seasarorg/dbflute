@@ -25,36 +25,54 @@ import java.util.Map;
 public class WayOfPostgreSQL implements DBWay {
 
     // ===================================================================================
+    //                                                                        Sequence Way
+    //                                                                        ============
+    public String buildSequenceNextValueSql(String sequenceName) {
+        return "select nextval ('" + sequenceName + "')";
+    }
+
+    // ===================================================================================
     //                                                                       Identity Info
     //                                                                       =============
     public String getIdentitySelectSql() {
         return null;
     }
-    
+
     // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return "23505".equals(sqlState);
     }
-    
+
     // ===================================================================================
     //                                                                Extension Definition
     //                                                                ====================
     public enum OperandOfLikeSearch implements ExtensionOperand {
-        BASIC("like")
-        , CASE_INSENSITIVE("ilike")
-        , FULL_TEXT_SEARCH("%%")
-        , OLD_FULL_TEXT_SEARCH("@@")
-        ;
+        BASIC("like"), CASE_INSENSITIVE("ilike"), FULL_TEXT_SEARCH("%%"), OLD_FULL_TEXT_SEARCH("@@");
         private static final Map<String, OperandOfLikeSearch> _codeValueMap = new HashMap<String, OperandOfLikeSearch>();
-        static { for (OperandOfLikeSearch value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
-        private String _code;
-        private OperandOfLikeSearch(String code) { _code = code; }
-        public String code() { return _code; }
-        public static OperandOfLikeSearch codeOf(Object code) {
-            if (code == null) { return null; } return _codeValueMap.get(code.toString().toLowerCase());
+        static {
+            for (OperandOfLikeSearch value : values()) {
+                _codeValueMap.put(value.code().toLowerCase(), value);
+            }
         }
+        private String _code;
+
+        private OperandOfLikeSearch(String code) {
+            _code = code;
+        }
+
+        public String code() {
+            return _code;
+        }
+
+        public static OperandOfLikeSearch codeOf(Object code) {
+            if (code == null) {
+                return null;
+            }
+            return _codeValueMap.get(code.toString().toLowerCase());
+        }
+
         public String operand() {
             return _code;
         }

@@ -101,7 +101,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         assertStatus("createSqlExecutionCreator");
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
-                TnResultSetHandler handler = createObjectResultSetHandler(_resultType);
+                final TnResultSetHandler handler = createScalarResultSetHandler(_resultType);
                 return createSelectNextValExecution(handler);
             }
         };
@@ -121,7 +121,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
             if (incrementSize != null) {
                 assertIncrementSizeNotMinusAndNotZero(incrementSize, dbmeta);
                 final Integer cacheSize = dbmeta.getSequenceCacheSize(); // not null here
-                sql = _sequenceCacheHandler.filterNextValSql(cacheSize, incrementSize, sql);
+                sql = _sequenceCacheHandler.filterNextValueSql(cacheSize, incrementSize, sql);
             }
         }
 

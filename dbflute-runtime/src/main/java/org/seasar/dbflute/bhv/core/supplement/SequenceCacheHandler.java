@@ -21,9 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.exception.SequenceCacheIllegalStateException;
 import org.seasar.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
+import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -91,28 +94,50 @@ public class SequenceCacheHandler {
     //                                                                      Union Sequence
     //                                                                      ==============
     /**
+     * Filter the SQL for next value. <br />
+     * This method uses ResourceContext.
      * @param cacheSize The cache size of sequence. (NotNull, CacheValidSize)
      * @param incrementSize The increment size of sequence. (NotNull, NotMinus, NotZero)
-     * @param nextValSql The SQL for next value. (NotNull, NotTrimmedEmpty)
+     * @param nextValueSql The SQL for next value. (NotNull, NotTrimmedEmpty)
      * @return The filtered SQL. (NotNull, NotTrimmedEmpty)
      */
-    public String filterNextValSql(Integer cacheSize, Integer incrementSize, String nextValSql) {
-        assertFilterArgumentValid(cacheSize, incrementSize, nextValSql);
-        assertCacheSizeCanBeDividedByIncrementSize(cacheSize, incrementSize, nextValSql);
+    public String filterNextValueSql(Integer cacheSize, Integer incrementSize, String nextValueSql) {
+        assertFilterArgumentValid(cacheSize, incrementSize, nextValueSql);
+        assertCacheSizeCanBeDividedByIncrementSize(cacheSize, incrementSize, nextValueSql);
         final Integer divided = cacheSize / incrementSize;
-        final StringBuilder sb = new StringBuilder();
-        sb.append(nextValSql);
         final Integer unionCount = divided - 1;
-        if (unionCount > 0) {
-            for (int i = 0; i < unionCount; i++) {
-                sb.append(ln()).append(" union all ");
-                sb.append(ln()).append(nextValSql);
+        final StringBuilder sb = new StringBuilder();
+        if (unionCount > 0) { // "union" way
+            if (ResourceContext.isCurrentDBDef(DBDef.Oracle)) { // Oracle patch
+                sb.append(DfStringUtil.replace(nextValueSql, "from dual", "from ("));
+                sb.append(ln()).append("  select * from dual");
+                for (int i = 0; i < unionCount; i++) {
+                    sb.append(ln()).append("   union all ");
+                    sb.append(ln()).append("  select * from dual) base");
+                }
+            } else {
+                // PostgreSQL and H2 are OK (but DB2 is NG)
+                if (ResourceContext.isCurrentDBDef(DBDef.DB2)) {
+                    String msg = "The cacheSize should be same as incrementSize on DB2:";
+                    msg = msg + " cacheSize=" + cacheSize + " incrementSize=" + incrementSize;
+                    msg = msg + " nextValueSql=" + nextValueSql;
+                    throw new UnsupportedOperationException(msg);
+                }
+                sb.append(nextValueSql);
+                for (int i = 0; i < unionCount; i++) {
+                    sb.append(ln()).append(" union all ");
+                    sb.append(ln()).append(nextValueSql);
+                }
+                sb.append(ln()).append(" order by 1 asc");
+
             }
+        } else { // "increment" way
+            sb.append(nextValueSql);
         }
         return sb.toString();
     }
 
-    protected void assertFilterArgumentValid(Integer cacheSize, Integer incrementSize, String nextValSql) {
+    protected void assertFilterArgumentValid(Integer cacheSize, Integer incrementSize, String nextValueSql) {
         if (cacheSize == null || cacheSize <= 1) {
             String msg = "The argument 'cacheSize' should be cache valid size: " + cacheSize;
             throw new SequenceCacheIllegalStateException(msg);
@@ -121,8 +146,8 @@ public class SequenceCacheHandler {
             String msg = "The argument 'incrementSize' should be plus size: " + incrementSize;
             throw new SequenceCacheIllegalStateException(msg);
         }
-        if (nextValSql == null || nextValSql.trim().length() == 0) {
-            String msg = "The argument 'nextValSql' should be valid: " + nextValSql;
+        if (nextValueSql == null || nextValueSql.trim().length() == 0) {
+            String msg = "The argument 'nextValueSql' should be valid: " + nextValueSql;
             throw new SequenceCacheIllegalStateException(msg);
         }
     }
@@ -136,7 +161,7 @@ public class SequenceCacheHandler {
     }
 
     protected void throwSequenceCacheSizeNotDividedIncrementSizeException(Integer cacheSize, Integer incrementSize,
-            String nextValSql) {
+            String nextValueSql) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The cache size cannot be divided by increment size!" + ln();
@@ -154,7 +179,7 @@ public class SequenceCacheHandler {
         msg = msg + ln();
         msg = msg + "[Increment Size]" + ln() + incrementSize + ln();
         msg = msg + ln();
-        msg = msg + "[Sequence SQL]" + ln() + nextValSql + ln();
+        msg = msg + "[SQL for Next Value]" + ln() + nextValueSql + ln();
         msg = msg + "* * * * * * * * * */";
         throw new SequenceCacheSizeNotDividedIncrementSizeException(msg);
     }

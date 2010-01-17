@@ -22,12 +22,19 @@ package org.seasar.dbflute.dbway;
 public class WayOfDerby implements DBWay {
 
     // ===================================================================================
+    //                                                                        Sequence Way
+    //                                                                        ============
+    public String buildSequenceNextValueSql(String sequenceName) {
+        return null;
+    }
+
+    // ===================================================================================
     //                                                                       Identity Info
     //                                                                       =============
     public String getIdentitySelectSql() {
         return "values IDENTITY_VAL_LOCAL()";
     }
-    
+
     // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================

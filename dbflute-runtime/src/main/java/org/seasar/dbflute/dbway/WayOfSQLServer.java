@@ -22,12 +22,19 @@ package org.seasar.dbflute.dbway;
 public class WayOfSQLServer implements DBWay {
 
     // ===================================================================================
+    //                                                                        Sequence Way
+    //                                                                        ============
+    public String buildSequenceNextValueSql(String sequenceName) {
+        return null;
+    }
+
+    // ===================================================================================
     //                                                                       Identity Info
     //                                                                       =============
     public String getIdentitySelectSql() {
         return "select @@identity";
     }
-    
+
     // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================

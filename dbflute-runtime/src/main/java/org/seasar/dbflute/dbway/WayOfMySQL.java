@@ -25,34 +25,53 @@ import java.util.Map;
 public class WayOfMySQL implements DBWay {
 
     // ===================================================================================
+    //                                                                        Sequence Way
+    //                                                                        ============
+    public String buildSequenceNextValueSql(String sequenceName) {
+        return null;
+    }
+
+    // ===================================================================================
     //                                                                       Identity Info
     //                                                                       =============
     public String getIdentitySelectSql() {
         return "SELECT LAST_INSERT_ID()";
     }
-    
+
     // ===================================================================================
     //                                                                   SQLException Info
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
         return errorCode != null && errorCode == 1062;
     }
-    
+
     // ===================================================================================
     //                                                                     ENUM Definition
     //                                                                     ===============
     public enum FullTextSearchModifier {
-        InBooleanMode("IN BOOLEAN MODE")
-        , InNaturalLanguageMode("IN NATURAL LANGUAGE MODE")
-        , InNaturalLanguageModeWithQueryExpansion("IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION")
-        , WithQueryExpansion("WITH QUERY EXPANSION");
+        InBooleanMode("IN BOOLEAN MODE"), InNaturalLanguageMode("IN NATURAL LANGUAGE MODE"), InNaturalLanguageModeWithQueryExpansion(
+                "IN NATURAL LANGUAGE MODE WITH QUERY EXPANSION"), WithQueryExpansion("WITH QUERY EXPANSION");
         private static final Map<String, FullTextSearchModifier> _codeValueMap = new HashMap<String, FullTextSearchModifier>();
-        static { for (FullTextSearchModifier value : values()) { _codeValueMap.put(value.code().toLowerCase(), value); } }
+        static {
+            for (FullTextSearchModifier value : values()) {
+                _codeValueMap.put(value.code().toLowerCase(), value);
+            }
+        }
         private String _code;
-        private FullTextSearchModifier(String code) { _code = code; }
-        public String code() { return _code; }
+
+        private FullTextSearchModifier(String code) {
+            _code = code;
+        }
+
+        public String code() {
+            return _code;
+        }
+
         public static FullTextSearchModifier codeOf(Object code) {
-            if (code == null) { return null; } return _codeValueMap.get(code.toString().toLowerCase());
+            if (code == null) {
+                return null;
+            }
+            return _codeValueMap.get(code.toString().toLowerCase());
         }
     }
 }
