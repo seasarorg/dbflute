@@ -195,10 +195,10 @@ namespace ${glPackageBaseCommonS2Dao} {
                 msg = msg + " dbmeta.HasSequence=" + dbmeta.HasSequence + " method=" + methodInfo;
                 throw new SystemException(msg);
             }
-            String nextValueSql = dbmeta.SequenceNextValueSql;
+            String nextValueSql = dbmeta.SequenceNextValSql;
             if (nextValueSql == null) {
-                String msg = "If the method 'SelectNextVal()' exists, DBMeta.SequenceNextValueSql should not return null:";
-                msg = msg + " dbmeta.SequenceNextValueSql=" + dbmeta.SequenceNextValueSql + " method=" + methodInfo;
+                String msg = "If the method 'SelectNextVal()' exists, nextValueSql should not be null:";
+                msg = msg + " nextValueSql=" + nextValueSql + " method=" + methodInfo;
                 throw new SystemException(msg);
             }
             SetupSelectMethodByManual(methodInfo, nextValueSql);
