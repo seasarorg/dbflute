@@ -113,8 +113,9 @@ public class SequenceCacheHandler {
                 sb.append(ln()).append("  select * from dual");
                 for (int i = 0; i < unionCount; i++) {
                     sb.append(ln()).append("   union all ");
-                    sb.append(ln()).append("  select * from dual) base");
+                    sb.append(ln()).append("  select * from dual");
                 }
+                sb.append(") dflocal");
             } else {
                 // PostgreSQL and H2 are OK (but DB2 is NG)
                 if (ResourceContext.isCurrentDBDef(DBDef.DB2)) {
