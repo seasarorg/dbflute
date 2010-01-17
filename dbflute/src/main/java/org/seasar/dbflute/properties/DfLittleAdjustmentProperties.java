@@ -219,4 +219,11 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     protected boolean isTargetLanguageCSharp() {
         return getBasicProperties().isTargetLanguageCSharp();
     }
+
+    // ===================================================================================
+    //                                                                          Compatible
+    //                                                                          ==========
+    public boolean isCompatibleAutoMappingOldStyle() { // It's closet!
+        return isProperty("isCompatibleAutoMappingOldStyle", false);
+    }
 }

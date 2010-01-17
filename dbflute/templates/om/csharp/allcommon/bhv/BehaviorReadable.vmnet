@@ -32,12 +32,6 @@ namespace ${glPackageBaseCommonBhv} {
         ${glConditionBean} NewConditionBean();
 
         // ===============================================================================
-        //                                                                   Basic Get All
-        //                                                                   =============
-        [Obsolete("Use ReadCount(NewConditionBean())")]
-        int GetCountAll();
-
-        // ===============================================================================
         //                                                                    Basic Select
         //                                                                    ============
         /// <summary>

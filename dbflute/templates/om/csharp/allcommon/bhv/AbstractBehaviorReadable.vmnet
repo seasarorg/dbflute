@@ -44,14 +44,6 @@ namespace ${glPackageBaseCommonBhv} {
         public abstract ${glConditionBean} NewConditionBean();
 
         // ===============================================================================
-        //                                                                   Basic Get All
-        //                                                                   =============
-        [Obsolete("Use ReadCount(NewConditionBean())")]
-        public int GetCountAll() {
-            return this.ReadCount(NewConditionBean());
-        }
-
-        // ===============================================================================
         //                                                                      Count Read
         //                                                                      ==========
         public virtual int ReadCount(${glConditionBean} cb) {

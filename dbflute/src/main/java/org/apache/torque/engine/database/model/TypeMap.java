@@ -66,6 +66,7 @@ import org.seasar.dbflute.exception.DfJDBCTypeNotFoundException;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.metadata.LanguageMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 
 /**
  * A class that maps JDBC types to their corresponding
@@ -404,6 +405,7 @@ public class TypeMap {
     //                                           Java Native
     //                                           -----------
     public static String findJavaNativeByJdbcType(String jdbcType, Integer columnSize, Integer decimalDigits) {
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
         final String javaType = getJavaNative(jdbcType);
         if (isAutoMappingTargetType(jdbcType) && javaType.equalsIgnoreCase("$$AutoMapping$$")) {
             final String defaultJavaNativeType;
@@ -420,7 +422,11 @@ public class TypeMap {
                 }
                 if (columnSize > 9) {
                     if (columnSize > 18) {
-                        return defaultJavaNativeType;
+                        if (prop.isCompatibleAutoMappingOldStyle()) {
+                            return getJavaNative(BIGINT); // old style
+                        } else {
+                            return defaultJavaNativeType;
+                        }
                     } else {
                         return getJavaNative(BIGINT);
                     }
