@@ -145,9 +145,9 @@ namespace ${myDBMetaPackageName} {
 #if ($table.isUseSequence())
         public override bool HasSequence { get { return true; } }
         public override String SequenceName { get { return "${table.definedSequenceName}"; } }
-        public override String SequenceNextValueSql { get { return "${table.SequenceNextValueSql}"; } }
-        public override int? SequenceIncrementSize { get { return ${table.sequenceIncrementSize}; } }
-        public override int? SequenceCacheSize { get { return ${table.sequenceCacheSize}; } }
+        public override String SequenceNextValueSql { get { return "${table.sequenceNextValueSql}"; } }
+        public override int? SequenceIncrementSize { get { return ${table.sequenceIncrementSizeExpression}; } }
+        public override int? SequenceCacheSize { get { return ${table.sequenceCacheSizeExpression}; } }
 #end
 #if ($table.isUseVersionNo())
         public override bool HasVersionNo { get { return true; } }
