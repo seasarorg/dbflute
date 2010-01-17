@@ -30,6 +30,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 
@@ -64,18 +65,24 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     //                                                                  Increment Sequence
     //                                                                  ==================
     public void incrementSequenceToDataMax(Map<String, String> tableSequenceMap) {
-        DfUniqueKeyHandler uniqueKeyHandler = new DfUniqueKeyHandler();
-        Map<String, List<String>> skippedMap = new LinkedHashMap<String, List<String>>();
+        final DfUniqueKeyHandler uniqueKeyHandler = new DfUniqueKeyHandler();
+        final Map<String, List<String>> skippedMap = new LinkedHashMap<String, List<String>>();
         _log.info("...Incrementing sequences to max value of table data");
         Connection conn = null;
         Statement st = null;
+        String sequenceName = null;
         try {
             conn = _dataSource.getConnection();
             st = conn.createStatement();
             final Set<Entry<String, String>> entrySet = tableSequenceMap.entrySet();
             for (Entry<String, String> entry : entrySet) {
                 final String tableName = entry.getKey();
-                final String sequenceName = entry.getValue();
+                sequenceName = entry.getValue();
+                if (sequenceName == null || sequenceName.trim().length() == 0) {
+                    String msg = "Not found the sequence name of the table:";
+                    msg = msg + " tableName=" + tableName;
+                    throw new IllegalStateException(msg); // basically unreachable
+                }
                 final DatabaseMetaData metaData = conn.getMetaData();
                 final DfPrimaryKeyMetaInfo pkInfo = uniqueKeyHandler.getPrimaryKey(metaData, _schema, tableName);
                 final List<String> pkList = pkInfo.getPrimaryKeyList();
@@ -97,7 +104,20 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
                 callSequenceLoop(st, sequenceName, actualValue);
             }
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+            msg = msg + "Failed to increment sequences:" + ln();
+            msg = msg + ln();
+            msg = msg + "current = " + sequenceName + ln();
+            msg = msg + "tableSequenceMap:" + ln();
+            final Set<Entry<String, String>> entrySet = tableSequenceMap.entrySet();
+            for (Entry<String, String> entry : entrySet) {
+                msg = msg + "  " + entry.getKey() + " = " + entry.getValue() + ln();
+            }
+            msg = msg + ln();
+            msg = msg + "SQLException = " + e.getMessage() + ln();
+            msg = msg + " - - - - - - - - - -/";
+            throw new SQLFailureException(msg, e);
         } finally {
             if (st != null) {
                 try {
@@ -115,7 +135,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
             }
         }
         if (!skippedMap.isEmpty()) {
-            _log.info("*Skipped incrementing sequences(not PK only one):");
+            _log.info("*Unsupported incrementing sequences(multiple-PK):");
             Set<Entry<String, List<String>>> skippedEntrySet = skippedMap.entrySet();
             for (Entry<String, List<String>> skippedEntry : skippedEntrySet) {
                 String tableName = skippedEntry.getKey();
@@ -136,8 +156,8 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
             }
             // first loop only here
             if (startPoint >= sequenceValue) { // if decrement or no change
-                String msg = "    ...Skipping decrement sequence(unsupported): ";
-                msg = msg + " " + sequenceName + "(" + startPoint + " to " + sequenceValue;
+                String msg = "    " + sequenceName + ": " + startPoint + " to " + sequenceValue;
+                msg = msg + " (unsupported for decrement)";
                 _log.info(msg);
                 return;
             }

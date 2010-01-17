@@ -242,18 +242,18 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             return incrementSize;
         }
         String msg = "Look! Read the message below." + ln();
-        msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-        msg = msg + " Failed to get the cache size of sequence:" + ln();
+        msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+        msg = msg + "Failed to get the cache size of sequence:" + ln();
         msg = msg + ln();
-        msg = msg + " schema = " + schemaName + ln() + " table = " + tableName + ln();
-        msg = msg + " sequenceProp = " + sequenceProp + ln();
-        msg = msg + " sequenceName = " + sequenceName + ln();
-        msg = msg + " sequenceMap(" + sequenceMap.size() + "):" + ln();
+        msg = msg + "schema = " + schemaName + ln() + " table = " + tableName + ln();
+        msg = msg + "sequenceProp = " + sequenceProp + ln();
+        msg = msg + "sequenceName = " + sequenceName + ln();
+        msg = msg + "sequenceMap(" + sequenceMap.size() + "):" + ln();
         final Set<Entry<String, DfSequenceMetaInfo>> entrySet = sequenceMap.entrySet();
         for (Entry<String, DfSequenceMetaInfo> entry : entrySet) {
-            msg = msg + "   " + entry.getKey() + " = " + entry.getValue() + ln();
+            msg = msg + "  " + entry.getKey() + " = " + entry.getValue() + ln();
         }
-        msg = msg + " - - - - - - - - - -/";
+        msg = msg + "- - - - - - - - - -/";
         throw new DfIllegalPropertySettingException(msg);
     }
 
