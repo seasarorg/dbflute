@@ -242,9 +242,9 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
                 if (extraValue != 0) {
                     String msg = "Look! Read the message below." + ln();
                     msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-                    msg = msg + "A cacheSize can be divided by incrementSize:" + ln();
+                    msg = msg + "The cacheSize cannot be divided by incrementSize:" + ln();
                     msg = msg + ln();
-                    msg = msg + "schema = " + schemaName + ln() + " table = " + tableName + ln();
+                    msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
                     msg = msg + "sequenceProp = " + sequenceProp + ln();
                     msg = msg + "sequenceName = " + sequenceName + ln();
                     msg = msg + "cacheSize = " + cacheSize + ln();

@@ -22,6 +22,7 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
+import org.apache.velocity.exception.MethodInvocationException;
 import org.seasar.dbflute.exception.DfTemplateParsingException;
 
 /**
@@ -243,6 +244,7 @@ public class DfOriginalGenerator extends DfGenerator {
     }
 
     protected void throwTemplateParsingException(String inputTemplate, String specifiedInputEncoding, Throwable e) {
+        rethrowIfNestedException(inputTemplate, specifiedInputEncoding, e);
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "Failed to parse the input template!" + ln();
@@ -250,6 +252,22 @@ public class DfOriginalGenerator extends DfGenerator {
         msg = msg + "[Input Template]" + ln() + inputTemplate + " (" + specifiedInputEncoding + ")" + ln();
         msg = msg + "* * * * * * * * * */";
         throw new DfTemplateParsingException(msg, e);
+    }
+
+    protected void rethrowIfNestedException(String inputTemplate, String specifiedInputEncoding, Throwable e) {
+        // avoid being duplicate wrapping
+        if (e instanceof DfTemplateParsingException) {
+            throw (DfTemplateParsingException) e;
+        }
+        if (e.getCause() instanceof DfTemplateParsingException) {
+            throw (DfTemplateParsingException) e.getCause();
+        }
+        if (e instanceof MethodInvocationException) {
+            final Throwable wrapped = ((MethodInvocationException) e).getWrappedThrowable();
+            if (wrapped instanceof DfTemplateParsingException) {
+                throw (DfTemplateParsingException) wrapped;
+            }
+        }
     }
 
     /**
