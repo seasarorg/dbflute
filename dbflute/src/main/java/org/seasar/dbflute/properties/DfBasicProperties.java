@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.seasar.dbflute.DBDef;
+import org.seasar.dbflute.config.DfDatabaseNameMapping;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
@@ -83,7 +84,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public DBDef getCurrentDBDef() {
-        DBDef dbdef = DBDef.codeOf(getDatabaseName());
+        final DfDatabaseNameMapping databaseNameMapping = DfDatabaseNameMapping.getInstance();
+        final Map<String, String> mapping = databaseNameMapping.getMapping(getDatabaseName());
+        final String defName = (String) mapping.get("defName");
+        final DBDef dbdef = DBDef.codeOf(defName);
         return dbdef != null ? dbdef : DBDef.Unknown;
     }
 

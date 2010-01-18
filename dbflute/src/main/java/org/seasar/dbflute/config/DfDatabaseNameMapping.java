@@ -28,29 +28,47 @@ import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
  */
 public class DfDatabaseNameMapping {
 
+    public static final DfDatabaseNameMapping _instance = new DfDatabaseNameMapping();
+
     // ===============================================================================
     //                                                                       Attribute
     //                                                                       =========
-    protected String _databaseNameMapping;
+    protected final String _databaseNameMappingString;
     {
-        _databaseNameMapping = "map:{" + "; derby      = map:{dbName = Derby}" + "; h2         = map:{dbName = H2}"
-                + "; firebird   = map:{dbName = Firebird}" + "; oracle     = map:{dbName = Oracle}"
-                + "; mysql      = map:{dbName = MySql}" + "; postgresql = map:{dbName = PostgreSql}"
-                + "; mssql      = map:{dbName = SqlServer}" + "; db2        = map:{dbName = Db2}"
-                + "; interbase  = map:{dbName = Interbase}" + "; default    = map:{dbName = Default}" + "}";
+        String tmp = "map:{";
+        tmp = tmp + "     ; mysql      = map:{generateName = MySql      ; defName = mysql}";
+        tmp = tmp + "     ; postgresql = map:{generateName = PostgreSql ; defName = postgresql}";
+        tmp = tmp + "     ; oracle     = map:{generateName = Oracle     ; defName = oracle}";
+        tmp = tmp + "     ; db2        = map:{generateName = Db2        ; defName = db2}";
+        tmp = tmp + "     ; mssql      = map:{generateName = SqlServer  ; defName = sqlserver}";
+        tmp = tmp + "     ; h2         = map:{generateName = H2         ; defName = h2}";
+        tmp = tmp + "     ; derby      = map:{generateName = Derby      ; defName = derby}";
+        tmp = tmp + "     ; firebird   = map:{generateName = Firebird   ; defName = firebird}";
+        tmp = tmp + "     ; interbase  = map:{generateName = Interbase  ; defName = unknown}";
+        tmp = tmp + "     ; msaccess   = map:{generateName = Default    ; defName = msaccess}";
+        tmp = tmp + "     ; default    = map:{generateName = Default    ; defName = unknown}";
+        tmp = tmp + "}";
+        _databaseNameMappingString = tmp;
+    }
+    protected final Map<String, Map<String, String>> _databaseNameMappingMap;
+    {
+        _databaseNameMappingMap = analyze();
+    }
+
+    private DfDatabaseNameMapping() {
+    }
+
+    public static DfDatabaseNameMapping getInstance() {
+        return _instance;
     }
 
     // ===============================================================================
     //                                                                       Analyzing
     //                                                                       =========
-    /**
-     * Analyze database base-info.
-     * @return Database base-info. (NotNull)
-     */
-    public Map<String, Map<String, String>> analyzeDatabaseBaseInfo() {
+    protected Map<String, Map<String, String>> analyze() {
         final MapListString mapListString = new MapListStringImpl();
         mapListString.setDelimiter(";");
-        final Map<String, Object> map = mapListString.generateMap(_databaseNameMapping);
+        final Map<String, Object> map = mapListString.generateMap(_databaseNameMappingString);
         final Map<String, Map<String, String>> realMap = new LinkedHashMap<String, Map<String, String>>();
         final Set<Entry<String, Object>> entrySet = map.entrySet();
         for (Entry<String, Object> entry : entrySet) {
@@ -71,13 +89,13 @@ public class DfDatabaseNameMapping {
     }
 
     // ===============================================================================
-    //                                                                        Accessor
-    //                                                                        ========
-    public String getDatabaseNameMapping() {
-        return _databaseNameMapping;
-    }
-
-    public void setDatabaseNameMapping(String databaseNameMapping) {
-        _databaseNameMapping = databaseNameMapping;
+    //                                                                         Mapping
+    //                                                                         =======
+    public Map<String, String> getMapping(String databaseType) {
+        Map<String, String> map = _databaseNameMappingMap.get(databaseType);
+        if (map == null) {
+            map = _databaseNameMappingMap.get("default");
+        }
+        return map;
     }
 }

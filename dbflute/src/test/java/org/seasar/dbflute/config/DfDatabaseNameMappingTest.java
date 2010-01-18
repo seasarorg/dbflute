@@ -14,8 +14,8 @@ public class DfDatabaseNameMappingTest extends PlainTestCase {
 
     @Test
     public void test_getDatabaseBaseInfo() {
-        final DfDatabaseNameMapping config = new DfDatabaseNameMapping();
-        final Map<String, Map<String, String>> databaseBaseInfo = config.analyzeDatabaseBaseInfo();
+        final DfDatabaseNameMapping config = DfDatabaseNameMapping.getInstance();
+        final Map<String, Map<String, String>> databaseBaseInfo = config.analyze();
         Assert.assertNotNull(databaseBaseInfo);
         final Set<String> keySet = databaseBaseInfo.keySet();
         for (String key : keySet) {
@@ -38,8 +38,8 @@ public class DfDatabaseNameMappingTest extends PlainTestCase {
 
     @Test
     public void test_getDatabaseBaseInfoTest() {
-        final DfDatabaseNameMapping component = new DfDatabaseNameMapping();
-        final Map<String, Map<String, String>> databaseBaseInfo = component.analyzeDatabaseBaseInfo();
+        final DfDatabaseNameMapping config = DfDatabaseNameMapping.getInstance();
+        final Map<String, Map<String, String>> databaseBaseInfo = config.analyze();
         Assert.assertNotNull(databaseBaseInfo);
         log("databaseBaseInfoTest=" + databaseBaseInfo);
     }

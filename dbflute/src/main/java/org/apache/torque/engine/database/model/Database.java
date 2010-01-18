@@ -645,46 +645,27 @@ public class Database {
 
     protected Map<String, String> getDatabaseNameMapping() {
         if (_databaseNameMapping == null) {
-            final DfDatabaseNameMapping config = new DfDatabaseNameMapping();
-            final Map<String, Map<String, String>> databaseConfigMap = config.analyzeDatabaseBaseInfo();
-            Map<String, String> databaseDefinitionMap = databaseConfigMap.get(getDatabaseType());
-            if (databaseDefinitionMap == null) {
-                databaseDefinitionMap = databaseConfigMap.get("default");
-                if (databaseDefinitionMap == null) {
-                    String msg = "The property[databaseDefinitionMap] doesn't have the database[";
-                    throw new IllegalStateException(msg + getDatabaseType() + "] and default-database.");
-                }
-            }
-            _databaseNameMapping = databaseDefinitionMap;
+            _databaseNameMapping = DfDatabaseNameMapping.getInstance().getMapping(getDatabaseType());
         }
         return _databaseNameMapping;
     }
 
-    public String getDaoGenDbName() { // for SqlClause. It's Old Style method.
-        return getGenerateDbName();
-    }
-
-    public String getDefaultDBDef() {
-        String dbdef = getSpecialGuestDatabaseDBDef();
-        if (dbdef != null) {
-            return dbdef;
+    public String getDefaultDBDef() { // for DBCurrent
+        final Map<String, String> mapping = getDatabaseNameMapping();
+        final String defName = (String) mapping.get("defName");
+        if (defName == null || defName.trim().length() == 0) {
+            String msg = "The database should have its defName: " + mapping;
+            throw new IllegalStateException(msg);
         }
-        return getGenerateDbName();
+        return defName;
     }
 
-    protected String getSpecialGuestDatabaseDBDef() {
-        if (getBasicProperties().isDatabaseMsAccess()) {
-            return "msaccess";
-        }
-        return null;
-    }
-
-    public String getGenerateDbName() {
-        final Map<String, String> databaseInfoMap = getDatabaseNameMapping();
-        final String dbName = (String) databaseInfoMap.get("dbName");
+    public String getGenerateDbName() { // for Class Name
+        final Map<String, String> mapping = getDatabaseNameMapping();
+        final String dbName = (String) mapping.get("generateName");
         if (dbName == null || dbName.trim().length() == 0) {
-            String msg = "The database doesn't have dbName in the property[databaseInfoMap]: ";
-            throw new IllegalStateException(msg + databaseInfoMap);
+            String msg = "The database should have its generateName: " + mapping;
+            throw new IllegalStateException(msg);
         }
         return dbName;
     }
