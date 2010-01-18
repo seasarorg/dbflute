@@ -255,21 +255,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         final Integer incrementSize = getSequenceIncrementSize(schemaName, sequenceName, sequenceMap);
         if (cacheSizeProp != null && cacheSizeProp.trim().length() > 0) { // cacheSize is specified
             final Integer cacheSize = castCacheSize(cacheSizeProp, tableName, sequenceProp, sequenceName);
+            assertCacheSizeOverOne(cacheSize, schemaName, tableName, sequenceProp, sequenceName, incrementSize);
             if (incrementSize != null) { // can get it from meta
-                final Integer extraValue = cacheSize % incrementSize;
-                if (extraValue != 0) {
-                    String msg = "Look! Read the message below." + ln();
-                    msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-                    msg = msg + "The cacheSize cannot be divided by incrementSize:" + ln();
-                    msg = msg + ln();
-                    msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
-                    msg = msg + "sequenceProp = " + sequenceProp + ln();
-                    msg = msg + "sequenceName = " + sequenceName + ln();
-                    msg = msg + "cacheSize = " + cacheSize + ln();
-                    msg = msg + "incrementSize = " + incrementSize + ln();
-                    msg = msg + "- - - - - - - - - -/";
-                    throw new DfIllegalPropertySettingException(msg);
-                }
+                assertIncrementSizeNotDecrement(incrementSize, schemaName, tableName, sequenceProp, sequenceName);
+                assertExtraValueZero(cacheSize, incrementSize, schemaName, tableName, sequenceProp, sequenceName);
                 return cacheSize;
             } else {
                 // the specified cacheSize should be same as actual increment size
@@ -277,25 +266,11 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
                 return cacheSize;
             }
         } else { // cacheSize is omitted
-            if (incrementSize != null) { // can get it from meta
-                // the cacheSize is same as actual increment size
-                return incrementSize;
-            } else {
-                String msg = "Look! Read the message below." + ln();
-                msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-                msg = msg + "Failed to get the cache size of sequence:" + ln();
-                msg = msg + ln();
-                msg = msg + "schema = " + schemaName + ln() + " table = " + tableName + ln();
-                msg = msg + "sequenceProp = " + sequenceProp + ln();
-                msg = msg + "sequenceName = " + sequenceName + ln();
-                msg = msg + "sequenceMap(" + sequenceMap.size() + "):" + ln();
-                final Set<Entry<String, DfSequenceMetaInfo>> entrySet = sequenceMap.entrySet();
-                for (Entry<String, DfSequenceMetaInfo> entry : entrySet) {
-                    msg = msg + "  " + entry.getKey() + " = " + entry.getValue() + ln();
-                }
-                msg = msg + "- - - - - - - - - -/";
-                throw new DfIllegalPropertySettingException(msg);
-            }
+            assertIncrementSizeExistsIfNoCacheSize(incrementSize, schemaName, tableName, sequenceProp, sequenceName);
+            assertIncrementSizeNotDecrement(incrementSize, schemaName, tableName, sequenceProp, sequenceName);
+            // the cacheSize is same as actual increment size
+            assertCacheSizeOverOne(incrementSize, schemaName, tableName, sequenceProp, sequenceName, incrementSize);
+            return incrementSize;
         }
     }
 
@@ -310,6 +285,74 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             msg = msg + "table = " + tableName + ln();
             msg = msg + "sequenceProp = " + sequenceProp + ln();
             msg = msg + "sequenceName = " + sequenceName + ln();
+            msg = msg + "- - - - - - - - - -/";
+            throw new DfIllegalPropertySettingException(msg);
+        }
+    }
+
+    protected void assertCacheSizeOverOne(Integer cacheSize, String schemaName, String tableName, String sequenceProp,
+            String sequenceName, Integer incrementSize) {
+        if (cacheSize <= 1) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+            msg = msg + "The cacheSize should be over 1. (not minus, not zero, not one)" + ln();
+            msg = msg + ln();
+            msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
+            msg = msg + "sequenceProp = " + sequenceProp + ln();
+            msg = msg + "sequenceName = " + sequenceName + ln();
+            msg = msg + "cacheSize = " + cacheSize + ln();
+            msg = msg + "incrementSize = " + incrementSize + ln();
+            msg = msg + "- - - - - - - - - -/";
+            throw new DfIllegalPropertySettingException(msg);
+        }
+    }
+
+    protected void assertIncrementSizeNotDecrement(Integer incrementSize, String schemaName, String tableName,
+            String sequenceProp, String sequenceName) {
+        if (incrementSize <= 0) { // contains zero just in case
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+            msg = msg + "The incrementSize should be increment! (NOT decrement)" + ln();
+            msg = msg + ln();
+            msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
+            msg = msg + "sequenceProp = " + sequenceProp + ln();
+            msg = msg + "sequenceName = " + sequenceName + ln();
+            msg = msg + "incrementSize = " + incrementSize + ln();
+            msg = msg + "- - - - - - - - - -/";
+            throw new DfIllegalPropertySettingException(msg);
+        }
+    }
+
+    protected void assertExtraValueZero(Integer cacheSize, Integer incrementSize, String schemaName, String tableName,
+            String sequenceProp, String sequenceName) {
+        final Integer extraValue = cacheSize % incrementSize;
+        if (extraValue != 0) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+            msg = msg + "The cacheSize cannot be divided by incrementSize!" + ln();
+            msg = msg + ln();
+            msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
+            msg = msg + "sequenceProp = " + sequenceProp + ln();
+            msg = msg + "sequenceName = " + sequenceName + ln();
+            msg = msg + "cacheSize = " + cacheSize + ln();
+            msg = msg + "incrementSize = " + incrementSize + ln();
+            msg = msg + "extraValue = " + extraValue + ln();
+            msg = msg + "- - - - - - - - - -/";
+            throw new DfIllegalPropertySettingException(msg);
+        }
+    }
+
+    protected void assertIncrementSizeExistsIfNoCacheSize(Integer incrementSize, String schemaName, String tableName,
+            String sequenceProp, String sequenceName) {
+        if (incrementSize == null) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+            msg = msg + "Failed to get the cache size of sequence(by no increment size):" + ln();
+            msg = msg + ln();
+            msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
+            msg = msg + "sequenceProp = " + sequenceProp + ln();
+            msg = msg + "sequenceName = " + sequenceName + ln();
+            msg = msg + "incrementSize = " + incrementSize + ln();
             msg = msg + "- - - - - - - - - -/";
             throw new DfIllegalPropertySettingException(msg);
         }
