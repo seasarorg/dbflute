@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 
@@ -28,7 +29,7 @@ import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
  */
 public class DfDatabaseNameMapping {
 
-    public static final DfDatabaseNameMapping _instance = new DfDatabaseNameMapping();
+    private static final DfDatabaseNameMapping _instance = new DfDatabaseNameMapping();
 
     // ===============================================================================
     //                                                                       Attribute
@@ -91,11 +92,32 @@ public class DfDatabaseNameMapping {
     // ===============================================================================
     //                                                                         Mapping
     //                                                                         =======
-    public Map<String, String> getMapping(String databaseType) {
+    public Map<String, String> findMapping(String databaseType) {
         Map<String, String> map = _databaseNameMappingMap.get(databaseType);
         if (map == null) {
             map = _databaseNameMappingMap.get("default");
         }
         return map;
+    }
+
+    public String findGenerateName(String databaseType) {
+        final Map<String, String> mapping = findMapping(databaseType);
+        final String generateName = (String) mapping.get("generateName");
+        if (generateName == null || generateName.trim().length() == 0) {
+            String msg = "The database should have its generateName: " + mapping;
+            throw new IllegalStateException(msg);
+        }
+        return generateName;
+    }
+
+    public DBDef findDBDef(String databaseType) {
+        final Map<String, String> mapping = findMapping(databaseType);
+        final String defName = (String) mapping.get("defName");
+        if (defName == null || defName.trim().length() == 0) {
+            String msg = "The database should have its defName: " + mapping;
+            throw new IllegalStateException(msg);
+        }
+        final DBDef dbdef = DBDef.codeOf(defName);
+        return dbdef != null ? dbdef : DBDef.Unknown;
     }
 }

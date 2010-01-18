@@ -147,7 +147,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             sb.append(ln).append("[Task End]: " + getPerformanceView(after - before));
             sb.append(ln);
             sb.append(ln).append("  MY_PROJECT_NAME: {" + getBasicProperties().getProjectName() + "}");
-            sb.append(ln).append("    database  = " + getBasicProperties().getDatabaseName());
+            sb.append(ln).append("    database  = " + getBasicProperties().getDatabaseType());
             sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
             sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
             sb.append(ln);
@@ -656,7 +656,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                                                            Accessor
     //                                                                            ========
     public String getTargetDatabase() {
-        return getBasicProperties().getDatabaseName();
+        return getBasicProperties().getDatabaseType();
     }
 
     public void setEnvironmentType(String environmentType) {

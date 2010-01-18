@@ -241,8 +241,8 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
                 getDatabaseProperties());
         final DfSequenceHandler sequenceHandler = factory.createSequenceHandler();
         if (sequenceHandler == null) {
-            String databaseName = getBasicProperties().getDatabaseName();
-            String msg = "Unsupported isIncrementSequenceToDataMax at " + databaseName;
+            String databaseType = getBasicProperties().getDatabaseType();
+            String msg = "Unsupported isIncrementSequenceToDataMax at " + databaseType;
             throw new UnsupportedOperationException(msg);
         }
         sequenceHandler.incrementSequenceToDataMax(tableSequenceMap);

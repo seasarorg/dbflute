@@ -116,7 +116,7 @@ public final class DfAntTaskUtil {
         msg = msg + "Failed to execute DBFlute Task '" + taskName + "'!" + ln();
         msg = msg + ln();
         msg = msg + "[Basic Properties]" + ln();
-        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + ln();
+        msg = msg + "database  = " + getBasicProperties().getDatabaseType() + ln();
         msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + ln();
         msg = msg + "container = " + getBasicProperties().getTargetContainerName() + ln();
         msg = msg + ln();
@@ -138,7 +138,7 @@ public final class DfAntTaskUtil {
         msg = msg + "Failed to execute DBFlute Task '" + taskName + "'!" + ln();
         msg = msg + ln();
         msg = msg + "[Basic Properties]" + ln();
-        msg = msg + "database  = " + getBasicProperties().getDatabaseName() + ln();
+        msg = msg + "database  = " + getBasicProperties().getDatabaseType() + ln();
         msg = msg + "language  = " + getBasicProperties().getTargetLanguage() + ln();
         msg = msg + "container = " + getBasicProperties().getTargetContainerName() + ln();
         msg = msg + ln();

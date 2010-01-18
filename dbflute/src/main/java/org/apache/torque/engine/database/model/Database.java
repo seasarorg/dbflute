@@ -97,6 +97,7 @@ import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
@@ -641,33 +642,12 @@ public class Database {
     //====================================================================================
     //                                                               Database Name Mapping
     //                                                               =====================
-    protected Map<String, String> _databaseNameMapping;
-
-    protected Map<String, String> getDatabaseNameMapping() {
-        if (_databaseNameMapping == null) {
-            _databaseNameMapping = DfDatabaseNameMapping.getInstance().getMapping(getDatabaseType());
-        }
-        return _databaseNameMapping;
-    }
-
     public String getDefaultDBDef() { // for DBCurrent
-        final Map<String, String> mapping = getDatabaseNameMapping();
-        final String defName = (String) mapping.get("defName");
-        if (defName == null || defName.trim().length() == 0) {
-            String msg = "The database should have its defName: " + mapping;
-            throw new IllegalStateException(msg);
-        }
-        return defName;
+        return getBasicProperties().getCurrentDBDef().code();
     }
 
     public String getGenerateDbName() { // for Class Name
-        final Map<String, String> mapping = getDatabaseNameMapping();
-        final String dbName = (String) mapping.get("generateName");
-        if (dbName == null || dbName.trim().length() == 0) {
-            String msg = "The database should have its generateName: " + mapping;
-            throw new IllegalStateException(msg);
-        }
-        return dbName;
+        return DfDatabaseNameMapping.getInstance().findGenerateName(getDatabaseType());
     }
 
     // ===================================================================================
@@ -701,7 +681,7 @@ public class Database {
     //                                              Database
     //                                              --------
     public String getDatabaseName() {
-        return getBasicProperties().getDatabaseName();
+        return getBasicProperties().getDatabaseType();
     }
 
     public boolean isDatabaseMySQL() {
@@ -947,8 +927,12 @@ public class Database {
     // ===================================================================================
     //                                                                 Database Properties
     //                                                                 ===================
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return getProperties().getDatabaseProperties();
+    }
+
     public String getDatabaseSchema() {
-        return getProperties().getDatabaseProperties().getDatabaseSchema();
+        return getDatabaseProperties().getDatabaseSchema();
     }
 
     public boolean hasDatabaseSchema() {
@@ -957,7 +941,7 @@ public class Database {
     }
 
     public boolean hasAdditionalSchema() {
-        return getProperties().getDatabaseProperties().hasAdditionalSchema();
+        return getDatabaseProperties().hasAdditionalSchema();
     }
 
     // ===================================================================================

@@ -57,7 +57,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public void checkBasicInfo() {
-        final String databaseName = getDatabaseName();
+        final String databaseName = getDatabaseType();
         if (databaseName == null || databaseName.trim().length() == 0) {
             String msg = "Not found the property 'database' in basicInfoMap.dfprop: " + databaseName;
             throw new DfRequiredPropertyNotFoundException(msg);
@@ -74,57 +74,56 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                            Database
     //                                                                            ========
-    public String getDatabaseName() {
-        final String databaseName = getProperty("database", null);
-        if (databaseName == null || databaseName.trim().length() == 0) {
-            String msg = "Not found the property 'database' in basicInfoMap.dfprop: " + databaseName;
+    public String getDatabaseType() {
+        final String databaseType = getProperty("database", null);
+        if (databaseType == null || databaseType.trim().length() == 0) {
+            String msg = "Not found the property 'database' in basicInfoMap.dfprop: " + databaseType;
             throw new DfRequiredPropertyNotFoundException(msg);
         }
-        return databaseName;
+        return databaseType;
     }
 
+    protected DBDef _currentDBDef;
+
     public DBDef getCurrentDBDef() {
+        if (_currentDBDef != null) {
+            return _currentDBDef;
+        }
         final DfDatabaseNameMapping databaseNameMapping = DfDatabaseNameMapping.getInstance();
-        final Map<String, String> mapping = databaseNameMapping.getMapping(getDatabaseName());
-        final String defName = (String) mapping.get("defName");
-        final DBDef dbdef = DBDef.codeOf(defName);
-        return dbdef != null ? dbdef : DBDef.Unknown;
+        _currentDBDef = databaseNameMapping.findDBDef(getDatabaseType());
+        return _currentDBDef;
     }
 
     public boolean isDatabaseMySQL() {
-        return getDatabaseName().equalsIgnoreCase("mysql");
+        return getDatabaseType().equalsIgnoreCase("mysql");
     }
 
     public boolean isDatabasePostgreSQL() {
-        return getDatabaseName().equalsIgnoreCase("postgresql");
+        return getDatabaseType().equalsIgnoreCase("postgresql");
     }
 
     public boolean isDatabaseOracle() {
-        return getDatabaseName().equalsIgnoreCase("oracle");
+        return getDatabaseType().equalsIgnoreCase("oracle");
     }
 
     public boolean isDatabaseDB2() {
-        return getDatabaseName().equalsIgnoreCase("db2");
+        return getDatabaseType().equalsIgnoreCase("db2");
     }
 
     public boolean isDatabaseSqlServer() {
-        return getDatabaseName().equalsIgnoreCase("mssql");
-    }
-
-    public boolean isDatabaseDerby() {
-        return getDatabaseName().equalsIgnoreCase("derby");
+        return getDatabaseType().equalsIgnoreCase("mssql");
     }
 
     public boolean isDatabaseH2() {
-        return getDatabaseName().equalsIgnoreCase("h2");
+        return getDatabaseType().equalsIgnoreCase("h2");
+    }
+
+    public boolean isDatabaseDerby() {
+        return getDatabaseType().equalsIgnoreCase("derby");
     }
 
     public boolean isDatabaseMsAccess() {
-        return getDatabaseName().equalsIgnoreCase("msaccess");
-    }
-
-    public boolean isDatabasePublicSchemaSupported() {
-        return isDatabasePostgreSQL() || isDatabaseH2();
+        return getDatabaseType().equalsIgnoreCase("msaccess");
     }
 
     // ===================================================================================

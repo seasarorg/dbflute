@@ -414,7 +414,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
     }
 
     public DelimiterChanger newDelimterChanger() {
-        final String databaseName = DfBuildProperties.getInstance().getBasicProperties().getDatabaseName();
+        final String databaseName = DfBuildProperties.getInstance().getBasicProperties().getDatabaseType();
         final String className = DelimiterChanger.class.getName() + "_" + databaseName;
         DelimiterChanger changer = null;
         try {
