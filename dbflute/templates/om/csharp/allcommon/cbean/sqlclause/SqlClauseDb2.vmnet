@@ -1,4 +1,4 @@
-#set ($myClassName = "${glSqlClause}${database.DaoGenDbName}")
+#set ($myClassName = "${glSqlClause}${database.generateDbName}")
 
 using System;
 
@@ -7,7 +7,7 @@ namespace ${glPackageBaseCommonSqlClause} {
 [System.Serializable]
 public class ${myClassName} : ${glAbstractSqlClause} {
 
-    protected String _fetchScopeSqlSuffix = "";
+    protected String _fetchFirstSqlSuffix = "";
     protected String _lockSqlSuffix = "";
 
     public ${myClassName}(String tableName)
@@ -18,19 +18,31 @@ public class ${myClassName} : ${glAbstractSqlClause} {
 	}
 	
     protected override void doFetchFirst() {
-        doFetchPage();
+        if (isFetchSizeSupported()) {
+            _fetchFirstSqlSuffix = " fetch first " + getFetchSize() + " rows only";
+        }
     }
 
     protected override void doFetchPage() {
-        _fetchScopeSqlSuffix = " limit " + this.getPageStartIndex() + ", " + this.getFetchSize();
+        if (isFetchSizeSupported()) {
+            if (isFetchStartIndexSupported()) {
+                _fetchFirstSqlSuffix = " fetch first " + this.getFetchSize() + " rows only";
+            } else {
+                _fetchFirstSqlSuffix = " fetch first " + this.getPageEndIndex() + " rows only";
+            }
+        }
     }
 
     protected override void doClearFetchPageClause() {
-        _fetchScopeSqlSuffix = "";
+        _fetchFirstSqlSuffix = "";
+    }
+
+    public override bool isFetchStartIndexSupported() {
+        return false; // Default
     }
 
     public override ${glSqlClause} lockForUpdate() {
-        _lockSqlSuffix = " for update";
+        _lockSqlSuffix = " for update with RS";
         return this;
     }
 
@@ -47,16 +59,8 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     }
 
     protected override String createSqlSuffix() {
-        return _fetchScopeSqlSuffix + _lockSqlSuffix;
-    }
-    
-    // [DBFlute-0.7.9]
-    // ===================================================================================
-    //                                                               Query Update Override
-    //                                                               =====================
-    protected override bool isUpdateSubQueryUseLocalTableSupported() {
-        return false;
+        return _fetchFirstSqlSuffix + _lockSqlSuffix;;
     }
 }
-	
+
 }

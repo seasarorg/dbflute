@@ -1014,13 +1014,9 @@ $database.info("    parseAbstractSqlClause")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glAbstractSqlClause}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/AbstractSqlClause.${glTemplateFileExtension}",$path ,"" ,"")
 
-#set ( $sqlClauseSubType = ${database.databaseType} )
-#if ($database.isDatabaseMSAccess())
-  #set ( $sqlClauseSubType = "default" )
-#end
-$database.info("    parse('SqlClause_${sqlClauseSubType}')")
-#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClause}${database.DaoGenDbName}.${glClassFileExtension}" )
-$generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClause_${sqlClauseSubType}.${glTemplateFileExtension}",$path ,"" ,"")
+$database.info("    parse('SqlClause${database.generateDbName}')")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glSqlClause}${database.generateDbName}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/cbean/sqlclause/SqlClause${database.generateDbName}.${glTemplateFileExtension}",$path ,"" ,"")
 
 $database.info("    parseOrderByClause")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonSqlClause})}${glOrderByClause}.${glClassFileExtension}" )

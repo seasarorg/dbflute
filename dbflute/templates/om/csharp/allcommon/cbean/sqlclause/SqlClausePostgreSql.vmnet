@@ -1,41 +1,33 @@
-#set ($myClassName = "${glSqlClause}${database.DaoGenDbName}")
+#set ($myClassName = "${glSqlClause}${database.generateDbName}")
 
 using System;
-
-using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonSqlClause} {
 
 [System.Serializable]
 public class ${myClassName} : ${glAbstractSqlClause} {
 
+    protected String _fetchScopeSqlSuffix = "";
+    protected String _lockSqlSuffix = "";
+
     public ${myClassName}(String tableName)
         : base(tableName) {}
 
-	protected override OrderByNullsSetupper createOrderByNullsSetupper() {
-	    return new OrderByNullsSetupperByCaseWhen();
-	}
-	
-    protected override void doFetchFirst() {
+	protected override void doFetchFirst() {
+        doFetchPage();
     }
 
     protected override void doFetchPage() {
+        _fetchScopeSqlSuffix = " offset " + this.getPageStartIndex() + " limit " + this.getFetchSize();
     }
 
     protected override void doClearFetchPageClause() {
-    }
-
-    public override bool isFetchStartIndexSupported() {
-        return false; // Default
-    }
-
-    public override bool isFetchSizeSupported() {
-        return false; // Default
+        _fetchScopeSqlSuffix = "";
     }
 
     public override ${glSqlClause} lockForUpdate() {
-        String msg = "LockForUpdate-SQL is unsupported in the database. Sorry...: " + ToString();
-        throw new UnsupportedOperationException(msg);
+        _lockSqlSuffix = " for update";
+        return this;
     }
 
     protected override String createSelectHint() {
@@ -51,8 +43,8 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     }
 
     protected override String createSqlSuffix() {
-        return "";
+        return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
 }
-
+	
 }

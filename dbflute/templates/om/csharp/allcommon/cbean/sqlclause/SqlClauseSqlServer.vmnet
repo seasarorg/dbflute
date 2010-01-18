@@ -1,4 +1,4 @@
-#set ($myClassName = "${glSqlClause}${database.DaoGenDbName}")
+#set ($myClassName = "${glSqlClause}${database.generateDbName}")
 
 using System;
 using ${glPackageBaseCommonJavaLike};
