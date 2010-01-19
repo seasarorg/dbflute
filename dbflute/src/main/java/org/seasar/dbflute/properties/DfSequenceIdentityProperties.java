@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.logic.factory.DfSequenceExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
@@ -74,9 +75,28 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return resultMap;
     }
 
+    protected Map<String, String> _tableSequenceCaseInsensitiveMap;
+
+    public Map<String, String> getTableSequenceCaseInsensitiveMap() {
+        if (_tableSequenceCaseInsensitiveMap != null) {
+            return _tableSequenceCaseInsensitiveMap;
+        }
+        final StringKeyMap<String> map = StringKeyMap.createAsCaseInsensitiveOrder();
+        map.putAll(getSequenceDefinitionMap());
+        _tableSequenceCaseInsensitiveMap = map;
+        return _tableSequenceCaseInsensitiveMap;
+    }
+
+    public String getSequenceProp(String tableName) {
+        final String sequenceProp = getTableSequenceCaseInsensitiveMap().get(tableName);
+        if (sequenceProp == null || sequenceProp.trim().length() == 0) {
+            return null;
+        }
+        return sequenceProp;
+    }
+
     public String getSequenceName(String tableName) {
-        final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
-        final String sequenceProp = flmap.get(tableName);
+        final String sequenceProp = getTableSequenceCaseInsensitiveMap().get(tableName);
         if (sequenceProp == null || sequenceProp.trim().length() == 0) {
             return null;
         }
@@ -225,8 +245,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     //                                  (DBFlute) Cache Size
     //                                  --------------------
     public Integer getSequenceCacheSize(DataSource dataSource, String schemaName, String tableName) {
-        final DfFlexibleMap<String, String> flmap = new DfFlexibleMap<String, String>(getSequenceDefinitionMap());
-        final String sequenceProp = flmap.get(tableName);
+        final String sequenceProp = getSequenceProp(tableName);
         if (sequenceProp == null) {
             return null;
         }
