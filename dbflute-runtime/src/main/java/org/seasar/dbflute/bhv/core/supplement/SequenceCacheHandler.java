@@ -45,12 +45,12 @@ public class SequenceCacheHandler {
     // ===================================================================================
     //                                                                            Handling
     //                                                                            ========
-    public SequenceCache findSequenceCache(String sequenceName, DataSource dataSource, Integer cacheSize,
-            Class<?> resultType) {
+    public SequenceCache findSequenceCache(String tableName, String sequenceName, DataSource dataSource,
+            Integer cacheSize, Class<?> resultType) {
         if (cacheSize == null || cacheSize <= 1) { // if it is not cache valid size
             return null;
         }
-        final String key = generateKey(sequenceName, dataSource);
+        final String key = generateKey(tableName, sequenceName, dataSource);
         SequenceCache sequenceCache = getSequenceCache(key);
         if (sequenceCache != null) {
             return sequenceCache;
@@ -83,11 +83,11 @@ public class SequenceCacheHandler {
         return new SequenceCache(new BigDecimal(cacheSize), resultType);
     }
 
-    protected String generateKey(String sequenceName, DataSource dataSource) {
+    protected String generateKey(String tableName, String sequenceName, DataSource dataSource) {
         if (_sequenceCacheKeyGenerator != null) {
-            return _sequenceCacheKeyGenerator.generateKey(sequenceName, dataSource);
+            return _sequenceCacheKeyGenerator.generateKey(tableName, sequenceName, dataSource);
         }
-        return sequenceName; // as default
+        return tableName + "." + sequenceName; // as default
     }
 
     // ===================================================================================

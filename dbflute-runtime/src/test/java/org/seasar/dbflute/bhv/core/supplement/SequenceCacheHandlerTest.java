@@ -37,37 +37,40 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource2 = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("FOO", dataSource, 50, Long.class);
-        SequenceCache sameCache = handler.findSequenceCache("FOO", dataSource, 50, Long.class);
-        SequenceCache diffNameCache = handler.findSequenceCache("BAR", dataSource, 50, Long.class);
-        SequenceCache sameDsCache = handler.findSequenceCache("FOO", dataSource2, 50, Long.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class);
+        SequenceCache sameCache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class);
+        SequenceCache diffNameCache = handler.findSequenceCache("HOO", "BAR", dataSource, 50, Long.class);
+        SequenceCache diffTableCache = handler.findSequenceCache("HEE", "FOO", dataSource2, 50, Long.class);
+        SequenceCache diffDsCache = handler.findSequenceCache("HOO", "FOO", dataSource2, 50, Long.class);
 
         // ## Assert ##
-        assertEquals(2, handler._sequenceCacheMap.size());
+        assertEquals(3, handler._sequenceCacheMap.size());
         assertEquals(Long.class, cache._resultType);
         assertEquals(new BigDecimal(50), cache._cacheSize);
         assertEquals(cache, sameCache);
         assertNotSame(cache, diffNameCache);
-        assertEquals(cache, sameDsCache);
-        assertNotSame(diffNameCache, sameDsCache);
+        assertNotSame(cache, diffTableCache);
+        assertNotSame(diffNameCache, diffTableCache);
+        assertEquals(cache, diffDsCache);
+        assertNotSame(diffTableCache, diffDsCache);
     }
 
     public void test_findSequenceCache_dataSourceKeyGenerator() {
         // ## Arrange ##
         SequenceCacheHandler handler = new SequenceCacheHandler();
         handler.setSequenceCacheKeyGenerator(new SequenceCacheKeyGenerator() {
-            public String generateKey(String sequenceName, DataSource dataSource) {
-                return sequenceName + "@" + dataSource.hashCode();
+            public String generateKey(String tableName, String sequenceName, DataSource dataSource) {
+                return tableName + "." + sequenceName + "@" + dataSource.hashCode();
             }
         });
         DataSource dataSource = new MyDataSource();
         DataSource dataSource2 = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("FOO", dataSource, 50, Long.class);
-        SequenceCache sameCache = handler.findSequenceCache("FOO", dataSource, 50, Long.class);
-        SequenceCache diffNameCache = handler.findSequenceCache("BAR", dataSource, 50, Long.class);
-        SequenceCache diffDsCache = handler.findSequenceCache("FOO", dataSource2, 50, Long.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class);
+        SequenceCache sameCache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class);
+        SequenceCache diffNameCache = handler.findSequenceCache("HOO", "BAR", dataSource, 50, Long.class);
+        SequenceCache diffDsCache = handler.findSequenceCache("HOO", "FOO", dataSource2, 50, Long.class);
 
         // ## Assert ##
         assertEquals(3, handler._sequenceCacheMap.size());
@@ -85,7 +88,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("FOO", dataSource, null, Integer.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, null, Integer.class);
 
         // ## Assert ##
         assertEquals(0, handler._sequenceCacheMap.size());
@@ -98,7 +101,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("FOO", dataSource, 0, Integer.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 0, Integer.class);
 
         // ## Assert ##
         assertEquals(0, handler._sequenceCacheMap.size());
@@ -111,7 +114,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("FOO", dataSource, 1, Integer.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 1, Integer.class);
 
         // ## Assert ##
         assertEquals(0, handler._sequenceCacheMap.size());
@@ -124,7 +127,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("FOO", dataSource, 2, Integer.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 2, Integer.class);
 
         // ## Assert ##
         assertEquals(1, handler._sequenceCacheMap.size());
@@ -142,7 +145,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
             public Execution<SequenceCache> create() {
                 return new Execution<SequenceCache>() {
                     public SequenceCache execute() {
-                        return handler.findSequenceCache("FOO", dataSource, 2, Integer.class);
+                        return handler.findSequenceCache("HOO", "FOO", dataSource, 2, Integer.class);
                     }
                 };
             }
@@ -173,7 +176,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
                 return new Execution<SequenceCache>() {
                     public SequenceCache execute() {
                         long threadId = Thread.currentThread().getId();
-                        return handler.findSequenceCache(threadId + "", dataSource, 10, BigDecimal.class);
+                        return handler.findSequenceCache("HOO", threadId + "", dataSource, 10, BigDecimal.class);
                     }
                 };
             }
