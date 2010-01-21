@@ -47,11 +47,17 @@ public class SequenceCache {
     /** The result type of sequence next value. (NotNull) */
     protected final Class<?> _resultType;
 
+    /** The increment size of sequence. This is used by batch way only. (Nullable: If null, it cannot use batch way) */
+    protected final Integer _incrementSize;
+
     /** The added count. If cached list is valid, this value is unused. (NotNull) */
     protected volatile BigDecimal _addedCount = INITIAL_ADDED_COUNT;
 
     /** The sequence value as base point. (Nullable: only at first null) */
     protected volatile BigDecimal _sequenceValue;
+
+    /** The sequence value as first value for batch. (Nullable: at first or not batch way) */
+    protected volatile BigDecimal _batchFirstValue;
 
     protected final List<BigDecimal> _cachedList = new ArrayList<BigDecimal>();
     protected final SortedSet<BigDecimal> _tmpSortedSet = new TreeSet<BigDecimal>(new Comparator<BigDecimal>() {
@@ -65,9 +71,10 @@ public class SequenceCache {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SequenceCache(BigDecimal cacheSize, Class<?> resultType) {
+    public SequenceCache(BigDecimal cacheSize, Class<?> resultType, Integer incrementSize) {
         _cacheSize = cacheSize;
         _resultType = resultType;
+        _incrementSize = incrementSize;
     }
 
     // ===================================================================================
@@ -75,13 +82,31 @@ public class SequenceCache {
     //                                                                          ==========
     public synchronized Object nextval(SequenceRealExecutor executor) {
         if (_batchWay) {
+            if (_incrementSize == null) {
+                String msg = "The increment size should not be null if it uses batch way!";
+                throw new IllegalStateException(msg); // basically unreachable
+            }
+            if (_incrementSize >= 2) {
+                _addedCount = _addedCount.add(getAddSize());
+                if (_addedCount.intValue() < _incrementSize) {
+                    if (isLogEnabled()) {
+                        String msg = "...Getting next value from (cached-size) added count:";
+                        msg = msg + " (" + _sequenceValue + " + " + _addedCount + ":";
+                        msg = msg + " cache-point=" + _batchFirstValue + ")";
+                        log(msg);
+                    }
+                    return toResultType(_sequenceValue.add(_addedCount));
+                }
+                _addedCount = INITIAL_ADDED_COUNT;
+            }
             if (!_cachedList.isEmpty()) {
+                _sequenceValue = _cachedList.remove(0);
                 if (isLogEnabled()) {
                     String msg = "...Getting next value from cached list:";
-                    msg = msg + " (" + _sequenceValue + " + x)";
+                    msg = msg + " (" + _sequenceValue + ": cache-point=" + _batchFirstValue + ")";
                     log(msg);
                 }
-                return toResultType(_cachedList.remove(0));
+                return toResultType(_sequenceValue);
             }
         } else { // incrementWay
             _addedCount = _addedCount.add(getAddSize());
@@ -119,6 +144,7 @@ public class SequenceCache {
             }
             _cachedList.addAll(_tmpSortedSet); // setting up cached list (ordered)
             _sequenceValue = _cachedList.remove(0);
+            _batchFirstValue = _sequenceValue;
             _batchWay = true;
         } else { // incrementWay
             _sequenceValue = toInternalType(obj);

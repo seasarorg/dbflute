@@ -213,7 +213,7 @@ public class SequenceCacheTest extends PlainTestCase {
     }
 
     protected SequenceCache createSequenceCache(int incrementSize, Class<?> resultType) {
-        return new SequenceCache(new BigDecimal(incrementSize), resultType);
+        return new SequenceCache(new BigDecimal(incrementSize), resultType, 1);
     }
 
     protected class BigDecimalResultExecutor implements SequenceRealExecutor {

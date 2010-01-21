@@ -148,7 +148,9 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         final String tableName = dbmeta.getTableDbName();
         final String sequenceName = dbmeta.getSequenceName();
         final Integer cacheSize = dbmeta.getSequenceCacheSize();
-        return _sequenceCacheHandler.findSequenceCache(tableName, sequenceName, _dataSource, cacheSize, _resultType);
+        final Integer incrementSize = dbmeta.getSequenceIncrementSize();
+        return _sequenceCacheHandler.findSequenceCache(tableName, sequenceName, _dataSource, cacheSize, _resultType,
+                incrementSize);
     }
 
     protected void assertIncrementSizeNotMinusAndNotZero(Integer incrementSize, DBMeta dbmeta) { // precondition: not null

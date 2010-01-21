@@ -37,11 +37,11 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource2 = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class);
-        SequenceCache sameCache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class);
-        SequenceCache diffNameCache = handler.findSequenceCache("HOO", "BAR", dataSource, 50, Long.class);
-        SequenceCache diffTableCache = handler.findSequenceCache("HEE", "FOO", dataSource2, 50, Long.class);
-        SequenceCache diffDsCache = handler.findSequenceCache("HOO", "FOO", dataSource2, 50, Long.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class, 1);
+        SequenceCache sameCache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class, 1);
+        SequenceCache diffNameCache = handler.findSequenceCache("HOO", "BAR", dataSource, 50, Long.class, 1);
+        SequenceCache diffTableCache = handler.findSequenceCache("HEE", "FOO", dataSource2, 50, Long.class, 1);
+        SequenceCache diffDsCache = handler.findSequenceCache("HOO", "FOO", dataSource2, 50, Long.class, 1);
 
         // ## Assert ##
         assertEquals(3, handler._sequenceCacheMap.size());
@@ -67,10 +67,10 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource2 = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class);
-        SequenceCache sameCache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class);
-        SequenceCache diffNameCache = handler.findSequenceCache("HOO", "BAR", dataSource, 50, Long.class);
-        SequenceCache diffDsCache = handler.findSequenceCache("HOO", "FOO", dataSource2, 50, Long.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class, 1);
+        SequenceCache sameCache = handler.findSequenceCache("HOO", "FOO", dataSource, 50, Long.class, 1);
+        SequenceCache diffNameCache = handler.findSequenceCache("HOO", "BAR", dataSource, 50, Long.class, 1);
+        SequenceCache diffDsCache = handler.findSequenceCache("HOO", "FOO", dataSource2, 50, Long.class, 1);
 
         // ## Assert ##
         assertEquals(3, handler._sequenceCacheMap.size());
@@ -88,7 +88,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, null, Integer.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, null, Integer.class, 1);
 
         // ## Assert ##
         assertEquals(0, handler._sequenceCacheMap.size());
@@ -101,7 +101,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 0, Integer.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 0, Integer.class, 0);
 
         // ## Assert ##
         assertEquals(0, handler._sequenceCacheMap.size());
@@ -114,7 +114,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 1, Integer.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 1, Integer.class, 1);
 
         // ## Assert ##
         assertEquals(0, handler._sequenceCacheMap.size());
@@ -127,7 +127,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         DataSource dataSource = new MyDataSource();
 
         // ## Act ##
-        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 2, Integer.class);
+        SequenceCache cache = handler.findSequenceCache("HOO", "FOO", dataSource, 2, Integer.class, 2);
 
         // ## Assert ##
         assertEquals(1, handler._sequenceCacheMap.size());
@@ -145,7 +145,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
             public Execution<SequenceCache> create() {
                 return new Execution<SequenceCache>() {
                     public SequenceCache execute() {
-                        return handler.findSequenceCache("HOO", "FOO", dataSource, 2, Integer.class);
+                        return handler.findSequenceCache("HOO", "FOO", dataSource, 2, Integer.class, 1);
                     }
                 };
             }
@@ -176,7 +176,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
                 return new Execution<SequenceCache>() {
                     public SequenceCache execute() {
                         long threadId = Thread.currentThread().getId();
-                        return handler.findSequenceCache("HOO", threadId + "", dataSource, 10, BigDecimal.class);
+                        return handler.findSequenceCache("HOO", threadId + "", dataSource, 10, BigDecimal.class, 1);
                     }
                 };
             }
