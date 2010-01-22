@@ -234,6 +234,8 @@ public class TnValueTypes {
      * Get the value type by class type. <br />
      * The basic objects are prior to the basic interfaces basically,
      * but only when the ENUM is assignable from the class type, interfaces are prior.
+     * Because frequently the ENUM has application own interfaces.
+     * Actually Classification of DBFlute matches the pattern.
      * @param clazz The type of class. (Nullable: if null, returns object type)
      * @return The value type. (NotNull)
      */
