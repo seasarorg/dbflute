@@ -23,7 +23,7 @@ import org.seasar.dbflute.jdbc.ValueType;
  */
 public interface TnValueTypeFactory {
 
-    public ValueType getValueTypeByName(String name);
+    ValueType getValueTypeByName(String name);
 
-    public ValueType getValueTypeByClass(Class<?> clazz);
+    ValueType getValueTypeByClass(Class<?> clazz);
 }

@@ -16,16 +16,15 @@
 package org.seasar.dbflute.s2dao.valuetype;
 
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.jdbc.Classification;
@@ -49,14 +48,12 @@ import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
 import org.seasar.dbflute.s2dao.valuetype.basic.TimeType;
 import org.seasar.dbflute.s2dao.valuetype.basic.TimestampType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UUIDType;
-import org.seasar.dbflute.s2dao.valuetype.basic.UserDefineType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.SerializableType;
-import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -67,7 +64,7 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    // Basic
+    // basic (registered)
     public final static ValueType STRING = new StringType();
     public final static ValueType CHARACTER = new CharacterType();
     public final static ValueType BYTE = new ByteType();
@@ -88,24 +85,29 @@ public class TnValueTypes {
     public final static ValueType BOOLEAN = new BooleanType();
     public final static ValueType UUID = new UUIDType();
 
+    // basic (interface)
     public final static ValueType CLASSIFICATION = new ClassificationType(); // DBFlute original class
+
+    // basic (object: default)
     public final static ValueType OBJECT = new ObjectType();
 
-    // Plug-in
+    // plug-in
     public final static ValueType ORACLE_RESULT_SET = new OracleResultSetType();
     public final static ValueType POSTGRE_RESULT_SET = new PostgreResultSetType();
     public final static ValueType SERIALIZABLE_BYTE_ARRAY = new SerializableType(BytesType.BYTES_TRAIT);
 
-    // Class
+    // class type
     private static final Class<?> BYTE_ARRAY_CLASS = new byte[0].getClass();
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private static Map<Class<?>, ValueType> basicValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
+    private static Map<Class<?>, ValueType> registeredValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
+    private static Map<Class<?>, ValueType> interfaceValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
     private static Map<String, ValueType> pluginValueTypeMap = new ConcurrentHashMap<String, ValueType>();
 
     static {
+        // basic (registered)
         registerBasicValueType(String.class, STRING);
         registerBasicValueType(char.class, CHARACTER);
         registerBasicValueType(Character.class, CHARACTER);
@@ -139,8 +141,8 @@ public class TnValueTypes {
         registerBasicValueType(Boolean.class, BOOLEAN);
         registerBasicValueType(UUID.class, UUID);
 
-        // Because classification type is to be handle as special type.
-        //registerBasicValueType(Classification.class, CLASSIFICATION); // DBFlute original class
+        // basic (interface)
+        registerInterfaceValueType(Classification.class, CLASSIFICATION); // DBFlute original class
 
         // Because object type is to be handle as special type.
         //registerValueType(Object.class, OBJECT);
@@ -155,6 +157,9 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                            Register
     //                                                                            ========
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
     /**
      * Register the basic value type.
      * @param keyType The key as type. (NotNull)
@@ -163,7 +168,7 @@ public class TnValueTypes {
     public static void registerBasicValueType(Class<?> keyType, ValueType valueType) {
         assertObjectNotNull("keyType", keyType);
         assertObjectNotNull("valueType", valueType);
-        basicValueTypeMap.put(keyType, valueType);
+        registeredValueTypeMap.put(keyType, valueType);
     }
 
     /**
@@ -172,9 +177,35 @@ public class TnValueTypes {
      */
     public static void removeBasicValueType(Class<?> keyType) {
         assertObjectNotNull("keyType", keyType);
-        basicValueTypeMap.remove(keyType);
+        registeredValueTypeMap.remove(keyType);
     }
 
+    // -----------------------------------------------------
+    //                                             Interface
+    //                                             ---------
+    /**
+     * Register the interface value type.
+     * @param keyType The key as type. (NotNull)
+     * @param valueType The value type. (NotNull)
+     */
+    public static void registerInterfaceValueType(Class<?> keyType, ValueType valueType) {
+        assertObjectNotNull("keyType", keyType);
+        assertObjectNotNull("valueType", valueType);
+        interfaceValueTypeMap.put(keyType, valueType);
+    }
+
+    /**
+     * Remove the interface value type.
+     * @param keyType The key as type. (NotNull)
+     */
+    public static void removeInterfaceValueType(Class<?> keyType) {
+        assertObjectNotNull("keyType", keyType);
+        interfaceValueTypeMap.remove(keyType);
+    }
+
+    // -----------------------------------------------------
+    //                                               Plug-in
+    //                                               -------
     /**
      * Register the plug-in value type.
      * @param keyName The key as name. (NotNull)
@@ -198,6 +229,14 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                                 Get
     //                                                                                 ===
+    // -----------------------------------------------------
+    //                                                 Basic
+    //                                                 -----
+    /**
+     * Get the value type by object instance.
+     * @param obj The object instance. (Nullable: if null, returns object type)
+     * @return The value type. (NotNull)
+     */
     public static ValueType getValueType(Object obj) {
         if (obj == null) {
             return OBJECT;
@@ -205,6 +244,11 @@ public class TnValueTypes {
         return getValueType(obj.getClass());
     }
 
+    /**
+     * Get the value type by class type.
+     * @param clazz The type of class. (Nullable: if null, returns object type)
+     * @return The value type. (NotNull)
+     */
     public static ValueType getValueType(Class<?> clazz) {
         if (clazz == null) {
             return OBJECT;
@@ -216,18 +260,33 @@ public class TnValueTypes {
                 return valueType;
             }
         }
-        // from basic (classification)
-        if (Classification.class.isAssignableFrom(clazz)) {
-            return CLASSIFICATION;
+        // from interface (contains classification type)
+        final ValueType interfaceValueType = getInterfaceValueType(clazz);
+        if (interfaceValueType != null) {
+            return interfaceValueType;
         }
         // as default
         return OBJECT;
     }
 
-    private static ValueType getBasicValueType(Class<?> clazz) {
-        return basicValueTypeMap.get(clazz);
+    protected static ValueType getBasicValueType(Class<?> clazz) {
+        return registeredValueTypeMap.get(clazz);
     }
 
+    protected static ValueType getInterfaceValueType(Class<?> clazz) {
+        final Set<Entry<Class<?>, ValueType>> entrySet = interfaceValueTypeMap.entrySet();
+        for (Entry<Class<?>, ValueType> entry : entrySet) {
+            final Class<?> inf = entry.getKey();
+            if (inf.isAssignableFrom(clazz)) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
+    // -----------------------------------------------------
+    //                                               Plug-in
+    //                                               -------
     /**
      * @param valueTypeName The name of value type. (NotNull)
      * @return The value type. (Nullable)
@@ -237,43 +296,18 @@ public class TnValueTypes {
         return pluginValueTypeMap.get(valueTypeName);
     }
 
-    public static ValueType createUserDefineValueType(Class<?> clazz) {
-        List<Method> valueOfMethods = new ArrayList<Method>();
-        Method valueMethod = null;
-        Method[] methods = clazz.getMethods();
-        for (int i = 0; i < methods.length; ++i) {
-            Method method = methods[i];
-            if (DfReflectionUtil.isBridgeMethod(method) || DfReflectionUtil.isSyntheticMethod(method)) {
-                continue;
-            }
-            int mod = method.getModifiers();
-            if (method.getName().equals("valueOf") && method.getParameterTypes().length == 1
-                    && method.getReturnType() == clazz && DfReflectionUtil.isPublic(mod)
-                    && DfReflectionUtil.isStatic(mod)) {
-                valueOfMethods.add(method);
-            } else if (method.getName().equals("value") && method.getParameterTypes().length == 0
-                    && DfReflectionUtil.isPublic(mod) && !DfReflectionUtil.isStatic(mod)) {
-                valueMethod = method;
-            }
-        }
-        if (valueMethod == null) {
-            return null;
-        }
-        for (int i = 0; i < valueOfMethods.size(); ++i) {
-            Method valueOfMethod = (Method) valueOfMethods.get(i);
-            if (valueOfMethod.getParameterTypes()[0] == valueMethod.getReturnType()) {
-                Class<?> baseClass = valueMethod.getReturnType();
-                ValueType baseValueType = getBasicValueType(baseClass);
-                if (baseValueType == null) {
-                    return null;
-                }
-                return new UserDefineType(baseValueType, valueOfMethod, valueMethod);
-            }
-        }
-        return null;
+    // -----------------------------------------------------
+    //                                           By SQL Type
+    //                                           -----------
+    /**
+     * @param sqltype The SQL type of JDBC.
+     * @return The value type. (NotNull)
+     */
+    public static ValueType getValueType(int sqltype) { // for no entity and so on
+        return getValueType(getType(sqltype));
     }
 
-    public static Class<?> getType(int sqltype) {
+    protected static Class<?> getType(int sqltype) {
         switch (sqltype) {
         case Types.TINYINT:
             return Byte.class;
@@ -311,10 +345,6 @@ public class TnValueTypes {
         default:
             return Object.class;
         }
-    }
-
-    public static ValueType getValueType(int sqltype) {
-        return getValueType(getType(sqltype));
     }
 
     // ===================================================================================

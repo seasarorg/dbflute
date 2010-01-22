@@ -149,7 +149,7 @@ public class SelectNextValCommand<RESULT> extends AbstractBehaviorCommand<RESULT
         final String sequenceName = dbmeta.getSequenceName();
         final Integer cacheSize = dbmeta.getSequenceCacheSize();
         final Integer incrementSize = dbmeta.getSequenceIncrementSize();
-        return _sequenceCacheHandler.findSequenceCache(tableName, sequenceName, _dataSource, cacheSize, _resultType,
+        return _sequenceCacheHandler.findSequenceCache(tableName, sequenceName, _dataSource, _resultType, cacheSize,
                 incrementSize);
     }
 

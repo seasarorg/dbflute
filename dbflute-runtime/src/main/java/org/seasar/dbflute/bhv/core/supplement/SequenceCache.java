@@ -41,11 +41,11 @@ public class SequenceCache {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The cache size of sequence. (NotNull) */
-    protected final BigDecimal _cacheSize;
-
     /** The result type of sequence next value. (NotNull) */
     protected final Class<?> _resultType;
+
+    /** The cache size of sequence that is used by increment way only. (NotNull) */
+    protected final BigDecimal _cacheSize;
 
     /** The increment size of sequence that is used by batch way only. (Nullable: If null, it cannot use batch way) */
     protected final Integer _incrementSize;
@@ -72,13 +72,13 @@ public class SequenceCache {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * @param cacheSize The cache size of sequence. (NotNull) 
      * @param resultType The result type of sequence next value.
+     * @param cacheSize The cache size of sequence that is used by increment way only. (NotNull) 
      * @param incrementSize The increment size of sequence that is used by batch way only. (Nullable: If null, it cannot use batch way)
      */
-    public SequenceCache(BigDecimal cacheSize, Class<?> resultType, Integer incrementSize) {
-        _cacheSize = cacheSize;
+    public SequenceCache(Class<?> resultType, BigDecimal cacheSize, Integer incrementSize) {
         _resultType = resultType;
+        _cacheSize = cacheSize;
         _incrementSize = incrementSize;
     }
 
@@ -213,6 +213,6 @@ public class SequenceCache {
     @Override
     public String toString() {
         final String hash = Integer.toHexString(hashCode());
-        return "{" + "cacheSize=" + _cacheSize + ", resultType=" + _resultType + "}@" + hash;
+        return "{" + "type=" + _resultType + ", cache=" + _cacheSize + ", increment=" + _incrementSize + "}@" + hash;
     }
 }

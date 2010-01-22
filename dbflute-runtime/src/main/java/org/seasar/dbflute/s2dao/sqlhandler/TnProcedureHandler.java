@@ -47,17 +47,16 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
     //                                                                           Attribute
     //                                                                           =========
     private TnProcedureMetaData procedureMetaData;
-		
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnProcedureHandler(final DataSource dataSource, final String sql,
-            final TnResultSetHandler resultSetHandler, final StatementFactory statementFactory,
-            final TnProcedureMetaData procedureMetaData) {
+    public TnProcedureHandler(final DataSource dataSource, final String sql, final TnResultSetHandler resultSetHandler,
+            final StatementFactory statementFactory, final TnProcedureMetaData procedureMetaData) {
         super(dataSource, sql, resultSetHandler, statementFactory);
         this.procedureMetaData = procedureMetaData;
     }
-	
+
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
@@ -69,7 +68,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
         try {
             cs = prepareCallableStatement(connection);
             bindArgs(cs, dto);
-            Object returnValue = null; 
+            Object returnValue = null;
             if (cs.execute()) {
                 final ResultSet resultSet = cs.getResultSet();
                 if (resultSet != null) {
@@ -93,7 +92,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
     }
 
     protected TnResultSetHandler createReturnResultSetHandler(ResultSet resultSet) {
-        return new InternalMapListResultSetHandler();
+        return new TnMapListResultSetHandler();
     }
 
     @Override
@@ -123,12 +122,16 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
     }
 
     protected CallableStatement prepareCallableStatement(final Connection connection) {
-        if (getSql() == null) { throw new IllegalStateException("The SQL should not be null!"); }
+        if (getSql() == null) {
+            throw new IllegalStateException("The SQL should not be null!");
+        }
         return getStatementFactory().createCallableStatement(connection, getSql());
     }
 
     protected void bindArgs(final CallableStatement cs, final Object dto) throws SQLException {
-        if (dto == null) { return; }
+        if (dto == null) {
+            return;
+        }
         int i = 0;
         for (TnProcedureParameterType ppt : procedureMetaData.parameterTypes()) {
             final ValueType valueType = ppt.getValueType();
@@ -153,7 +156,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
         }
     }
 
-    protected ResultSet getResultSet(Statement statement)  {
+    protected ResultSet getResultSet(Statement statement) {
         try {
             return statement.getResultSet();
         } catch (SQLException e) {
@@ -162,7 +165,8 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
         }
     }
 
-    protected Object handleOutParameters(final CallableStatement cs, final Object dto, Object returnValue) throws SQLException {
+    protected Object handleOutParameters(final CallableStatement cs, final Object dto, Object returnValue)
+            throws SQLException {
         if (dto == null) {
             return null;
         }
@@ -205,13 +209,13 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
     }
 
     protected TnResultSetHandler createOutParameterResultSetHandler(TnProcedureParameterType ppt, ResultSet resultSet) {
-        return new InternalMapListResultSetHandler();
+        return new TnMapListResultSetHandler();
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                              Map Result Set Handler
     //                                                              ======================
-    protected static abstract class InternalAbstractMapResultSetHandler implements TnResultSetHandler {
+    protected static abstract class TnAbstractMapResultSetHandler implements TnResultSetHandler {
 
         protected Map<String, Object> createRow(ResultSet rs, TnPropertyType[] propertyTypes) throws SQLException {
             Map<String, Object> row = StringKeyMap.createAsFlexible();
@@ -234,7 +238,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
         }
     }
 
-    protected static class InternalMapListResultSetHandler extends InternalAbstractMapResultSetHandler {
+    protected static class TnMapListResultSetHandler extends TnAbstractMapResultSetHandler {
 
         public Object handle(ResultSet resultSet) throws SQLException {
             TnPropertyType[] propertyTypes = createPropertyTypes(resultSet.getMetaData());

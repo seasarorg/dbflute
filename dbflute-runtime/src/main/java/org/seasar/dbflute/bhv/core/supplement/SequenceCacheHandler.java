@@ -49,13 +49,13 @@ public class SequenceCacheHandler {
      * @param tableName The name of table. (NotNull)
      * @param sequenceName The name of sequence. (NotNull)
      * @param dataSource The data source. (NotNull)
-     * @param cacheSize The size of sequence cache. (Nullable: If null, returns null)
      * @param resultType The type of sequence result. (NotNull)
+     * @param cacheSize The size of sequence cache. (Nullable: If null, returns null)
      * @param incrementSize The size of increment of sequence. (Nullable, If null, batch way is invalid) 
      * @return The object for sequence cache. (Nullable) 
      */
     public SequenceCache findSequenceCache(String tableName, String sequenceName, DataSource dataSource,
-            Integer cacheSize, Class<?> resultType, Integer incrementSize) {
+            Class<?> resultType, Integer cacheSize, Integer incrementSize) {
         if (cacheSize == null || cacheSize <= 1) { // if it is not cache valid size
             return null;
         }
@@ -72,7 +72,7 @@ public class SequenceCacheHandler {
             if (isLogEnabled()) {
                 log("...Initializing sequence cache: " + sequenceName + ":cache(" + cacheSize + ")");
             }
-            sequenceCache = createSequenceCache(sequenceName, dataSource, cacheSize, resultType, incrementSize);
+            sequenceCache = createSequenceCache(sequenceName, dataSource, resultType, cacheSize, incrementSize);
             _sequenceCacheMap.put(key, sequenceCache);
         }
         if (sequenceCache == null) {
@@ -87,9 +87,9 @@ public class SequenceCacheHandler {
         return _sequenceCacheMap.get(key);
     }
 
-    protected SequenceCache createSequenceCache(String sequenceName, DataSource dataSource, Integer cacheSize,
-            Class<?> resultType, Integer incrementSize) {
-        return new SequenceCache(new BigDecimal(cacheSize), resultType, incrementSize);
+    protected SequenceCache createSequenceCache(String sequenceName, DataSource dataSource, Class<?> resultType,
+            Integer cacheSize, Integer incrementSize) {
+        return new SequenceCache(resultType, new BigDecimal(cacheSize), incrementSize);
     }
 
     protected String generateKey(String tableName, String sequenceName, DataSource dataSource) {

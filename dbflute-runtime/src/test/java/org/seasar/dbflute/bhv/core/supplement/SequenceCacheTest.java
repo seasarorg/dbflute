@@ -117,6 +117,72 @@ public class SequenceCacheTest extends PlainTestCase {
         assertEquals(2, executor.getCount());
     }
 
+    public void test_nextval_List_batchWay_incrementSizeOne() {
+        // ## Arrange ##
+        int cacheSize = 10;
+        SequenceCache cache = createSequenceCache(cacheSize, Integer.class);
+        ListResultExecutor executor = new ListResultExecutor(cacheSize);
+
+        // ## Act & Assert ##
+        assertEquals(1, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(2, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(3, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(4, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(5, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(6, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(7, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(8, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(9, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(10, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(11, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(12, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(13, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(14, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(15, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(16, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(17, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(18, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(19, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(20, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(2, executor.getCount());
+    }
+
+    public void test_nextval_List_batchWay_incrementSizeThree() {
+        // ## Arrange ##
+        final int cacheSize = 6;
+        final int incrementSize = 3;
+        SequenceCache cache = createSequenceCache(cacheSize, Integer.class, incrementSize);
+        ListResultExecutor executor = new ListResultExecutor(cacheSize / incrementSize) {
+            @Override
+            protected int getIncrementSize() {
+                return incrementSize;
+            }
+        };
+
+        // ## Act & Assert ##
+        assertEquals(1, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(2, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(3, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(4, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(5, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(6, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(7, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(8, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(9, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(10, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(11, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(12, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(13, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(14, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(15, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(16, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(17, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(18, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(19, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(20, convertIntegerToInteger(cache.nextval(executor)));
+        assertEquals(4, executor.getCount());
+    }
+
     // ===================================================================================
     //                                                                         Thread Safe
     //                                                                         ===========
@@ -157,11 +223,54 @@ public class SequenceCacheTest extends PlainTestCase {
         assertEquals(6000, allAllSet.size());
     }
 
-    public void test_nextval_threadSafe_batchWay() {
+    public void test_nextval_threadSafe_batchWay_incrementSizeOne() {
         // ## Arrange ##
-        final int incrementSize = 20;
-        final SequenceCache cache = createSequenceCache(incrementSize, Integer.class);
-        final ListResultExecutor executor = new ListResultExecutor(incrementSize);
+        final int cacheSize = 20;
+        final SequenceCache cache = createSequenceCache(cacheSize, Integer.class);
+        final ListResultExecutor executor = new ListResultExecutor(cacheSize);
+        ExecutionCreator<Set<Integer>> creator = new ExecutionCreator<Set<Integer>>() {
+            public Execution<Set<Integer>> create() {
+                return new Execution<Set<Integer>>() {
+                    public Set<Integer> execute() {
+                        final Set<Integer> valSet = new LinkedHashSet<Integer>();
+                        for (int i = 0; i < 20; i++) {
+                            valSet.add((Integer) cache.nextval(executor));
+                        }
+                        return valSet;
+                    }
+                };
+            }
+        };
+
+        // ## Act & Assert ##
+        log("...Executing all threads");
+        StringBuilder sb = new StringBuilder();
+        Set<Integer> allAllSet = new LinkedHashSet<Integer>();
+        for (int i = 0; i < 30; i++) {
+            List<Set<Integer>> resultList = fireSameExecution(creator);
+            Set<Integer> allSet = new LinkedHashSet<Integer>();
+            for (Set<Integer> set : resultList) {
+                sb.append(ln()).append(set);
+                allSet.addAll(set);
+            }
+            assertEquals(200, allSet.size());
+            allAllSet.addAll(allSet);
+        }
+        log(sb.toString());
+        assertEquals(6000, allAllSet.size());
+    }
+
+    public void test_nextval_threadSafe_batchWay_incrementSizeThree() {
+        // ## Arrange ##
+        final int cacheSize = 20;
+        final int incrementSize = 3;
+        final SequenceCache cache = createSequenceCache(cacheSize, Integer.class, incrementSize);
+        final ListResultExecutor executor = new ListResultExecutor(cacheSize / incrementSize) {
+            @Override
+            protected int getIncrementSize() {
+                return incrementSize;
+            }
+        };
         ExecutionCreator<Set<Integer>> creator = new ExecutionCreator<Set<Integer>>() {
             public Execution<Set<Integer>> create() {
                 return new Execution<Set<Integer>>() {
@@ -212,8 +321,12 @@ public class SequenceCacheTest extends PlainTestCase {
         return DfTypeUtil.toInteger(obj).intValue();
     }
 
-    protected SequenceCache createSequenceCache(int incrementSize, Class<?> resultType) {
-        return new SequenceCache(new BigDecimal(incrementSize), resultType, 1);
+    protected SequenceCache createSequenceCache(int cacheSize, Class<?> resultType) {
+        return new SequenceCache(resultType, new BigDecimal(cacheSize), 1);
+    }
+
+    protected SequenceCache createSequenceCache(int cacheSize, Class<?> resultType, Integer incrementSize) {
+        return new SequenceCache(resultType, new BigDecimal(cacheSize), incrementSize);
     }
 
     protected class BigDecimalResultExecutor implements SequenceRealExecutor {
@@ -274,21 +387,33 @@ public class SequenceCacheTest extends PlainTestCase {
 
     protected class ListResultExecutor implements SequenceRealExecutor {
         protected int _count;
-        protected int _incrementSize;
+        protected int _sequenceCount;
+        protected int _elementSize;
 
-        public ListResultExecutor(int incrementSize) {
-            _incrementSize = incrementSize;
+        public ListResultExecutor(int elementSize) {
+            _elementSize = elementSize;
         }
 
         public Object execute() {
+            ++_count;
             List<BigDecimal> resultList = new ArrayList<BigDecimal>();
-            for (int i = 0; i < _incrementSize; i++) {
+            for (int i = 0; i < _elementSize; i++) {
                 synchronized (this) {
-                    ++_count;
-                    resultList.add(new BigDecimal(_count));
+                    if (_count == 1 && i == 0) { // at first loop of first execution
+                        ++_sequenceCount;
+                    } else {
+                        for (int j = 0; j < getIncrementSize(); j++) {
+                            ++_sequenceCount;
+                        }
+                    }
+                    resultList.add(new BigDecimal(_sequenceCount));
                 }
             }
             return resultList;
+        }
+
+        protected int getIncrementSize() {
+            return 1; // as default
         }
 
         public int getCount() {

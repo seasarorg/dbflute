@@ -47,7 +47,6 @@ public class UserDefineType implements ValueType {
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-
         return fromDbToJava(baseValueType.getValue(resultSet, columnName));
     }
 
