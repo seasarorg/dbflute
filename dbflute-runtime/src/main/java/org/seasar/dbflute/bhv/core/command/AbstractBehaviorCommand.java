@@ -158,7 +158,7 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
             int index = 0;
             while (rs.next()) {
                 if (index == 1) { // second loop
-                    retList = new ArrayList<Object>();
+                    retList = newArrayList();
                     retList.add(ret);
                 }
                 ret = valueType.getValue(rs, 1);
@@ -168,6 +168,10 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
                 ++index;
             }
             return retList != null ? retList : ret;
+        }
+
+        protected <ELEMENT> List<ELEMENT> newArrayList() {
+            return new ArrayList<ELEMENT>();
         }
     }
 

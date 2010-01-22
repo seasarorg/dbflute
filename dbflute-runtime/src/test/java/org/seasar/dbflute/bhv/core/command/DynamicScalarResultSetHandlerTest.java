@@ -4,7 +4,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.seasar.dbflute.bhv.core.command.AbstractBehaviorCommand.DynamicScalarResultSetHandler;
 import org.seasar.dbflute.mock.MockResultSet;
@@ -26,7 +28,13 @@ public class DynamicScalarResultSetHandlerTest extends PlainTestCase {
                 return 99;
             }
         };
-        DynamicScalarResultSetHandler handler = new DynamicScalarResultSetHandler(valueType);
+        DynamicScalarResultSetHandler handler = new DynamicScalarResultSetHandler(valueType) {
+            @Override
+            protected <ELEMENT> List<ELEMENT> newArrayList() {
+                fail("should not be called");
+                return null;
+            }
+        };
         MockResultSet rs = new MockResultSet() {
             private boolean called;
 
@@ -58,7 +66,18 @@ public class DynamicScalarResultSetHandlerTest extends PlainTestCase {
                 return ++count; // 1, 2, 3, ...
             }
         };
-        DynamicScalarResultSetHandler handler = new DynamicScalarResultSetHandler(valueType);
+        final String mark = "called";
+        final Set<String> markSet = new HashSet<String>();
+        DynamicScalarResultSetHandler handler = new DynamicScalarResultSetHandler(valueType) {
+            @Override
+            protected <ELEMENT> List<ELEMENT> newArrayList() {
+                if (markSet.contains(mark)) {
+                    fail("should not be called twice");
+                }
+                markSet.add(mark);
+                return super.newArrayList();
+            }
+        };
         MockResultSet rs = new MockResultSet() {
             private List<Integer> countList = new ArrayList<Integer>();
             {
@@ -83,5 +102,6 @@ public class DynamicScalarResultSetHandlerTest extends PlainTestCase {
         // ## Assert ##
         log("actual=" + actual);
         assertEquals(Arrays.asList(new Integer[] { 1, 2, 3 }), actual);
+        assertTrue(markSet.contains(mark));
     }
 }
