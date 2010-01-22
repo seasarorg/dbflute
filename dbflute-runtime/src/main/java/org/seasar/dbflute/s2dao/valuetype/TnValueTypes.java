@@ -64,7 +64,7 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    // basic (registered)
+    // basic (object)
     public final static ValueType STRING = new StringType();
     public final static ValueType CHARACTER = new CharacterType();
     public final static ValueType BYTE = new ByteType();
@@ -88,7 +88,7 @@ public class TnValueTypes {
     // basic (interface)
     public final static ValueType CLASSIFICATION = new ClassificationType(); // DBFlute original class
 
-    // basic (object: default)
+    // basic (default)
     public final static ValueType OBJECT = new ObjectType();
 
     // plug-in
@@ -231,7 +231,9 @@ public class TnValueTypes {
     }
 
     /**
-     * Get the value type by class type.
+     * Get the value type by class type. <br />
+     * The basic objects are prior to the basic interfaces basically,
+     * but only when the ENUM is assignable from the class type, interfaces are prior.
      * @param clazz The type of class. (Nullable: if null, returns object type)
      * @return The value type. (NotNull)
      */
@@ -239,18 +241,20 @@ public class TnValueTypes {
         if (clazz == null) {
             return OBJECT;
         }
-        // from basic objects
-        final ValueType valueType = getBasicObjectValueType(clazz);
-        if (valueType != null) {
-            return valueType;
+        final boolean interfaceFirst = Enum.class.isAssignableFrom(clazz);
+        ValueType valueType = null;
+        if (interfaceFirst) {
+            valueType = getBasicInterfaceValueType(clazz);
+            if (valueType == null) {
+                valueType = getBasicObjectValueType(clazz);
+            }
+        } else {
+            valueType = getBasicObjectValueType(clazz);
+            if (valueType == null) {
+                valueType = getBasicInterfaceValueType(clazz);
+            }
         }
-        // from basic interfaces
-        final ValueType interfaceValueType = getBasicInterfaceValueType(clazz);
-        if (interfaceValueType != null) {
-            return interfaceValueType;
-        }
-        // as default
-        return OBJECT;
+        return valueType != null ? valueType : OBJECT;
     }
 
     protected static ValueType getBasicObjectValueType(Class<?> clazz) {

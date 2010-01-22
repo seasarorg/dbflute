@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.mock.MockValueType;
 import org.seasar.dbflute.unit.PlainTestCase;
@@ -20,6 +21,81 @@ import org.seasar.dbflute.unit.PlainTestCase;
  * @since 0.9.6.4 (2010/01/22 Friday)
  */
 public class TnValueTypesTest extends PlainTestCase {
+
+    public void test_getBasicValueType_enum_priority_plain() throws Exception {
+        // ## Arrange ##
+        Class<?> keyType = TestPlainStatus.class;
+        MockValueType mockValueType = new MockValueType();
+
+        try {
+            // ## Act ##
+            TnValueTypes.registerBasicValueType(keyType, mockValueType);
+            ValueType valueType = TnValueTypes.getValueType(keyType);
+
+            // ## Assert ##
+            assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
+            assertEquals(mockValueType, valueType);
+        } finally {
+            TnValueTypes.removeBasicValueType(keyType);
+        }
+    }
+
+    public void test_getBasicValueType_enum_priority_classification() throws Exception {
+        // ## Arrange ##
+        Class<?> keyType = TestClassificationStatus.class; // embedded
+        MockValueType mockValueType = new MockValueType();
+
+        try {
+            // ## Act ##
+            TnValueTypes.registerBasicValueType(TestPlainStatus.class, mockValueType);
+            TnValueTypes.registerBasicValueType(Enum.class, mockValueType);
+            ValueType valueType = TnValueTypes.getValueType(keyType);
+
+            // ## Assert ##
+            assertNotSame(mockValueType, valueType);
+            assertEquals(TnValueTypes.CLASSIFICATION, valueType);
+        } finally {
+            TnValueTypes.removeBasicValueType(keyType);
+        }
+    }
+
+    public void test_getBasicValueType_enum_priority_enumKey() throws Exception {
+        // ## Arrange ##
+        Class<?> keyType = Enum.class;
+        MockValueType mockValueType = new MockValueType();
+
+        try {
+            // ## Act ##
+            TnValueTypes.registerBasicValueType(keyType, mockValueType);
+            ValueType valueType = TnValueTypes.getValueType(keyType);
+
+            // ## Assert ##
+            assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
+            assertEquals(mockValueType, valueType);
+        } finally {
+            TnValueTypes.removeBasicValueType(Enum.class);
+        }
+    }
+
+    private static enum TestPlainStatus {
+        FML, PRV, WDL
+    }
+
+    private static enum TestClassificationStatus implements Classification {
+        FML, PRV, WDL;
+
+        public String code() {
+            return null;
+        }
+
+        public String alias() {
+            return null;
+        }
+
+        public DataType dataType() {
+            return null;
+        }
+    }
 
     public void test_registerBasicValueType_interface_basic() throws Exception {
         // ## Arrange ##
