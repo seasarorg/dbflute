@@ -21,20 +21,20 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class TnValueTypesTest extends PlainTestCase {
 
-    public void test_interfaceValueType_basic() throws Exception {
+    public void test_registerBasicValueType_interface_basic() throws Exception {
         // ## Arrange ##
         MockValueType mockValueType = new MockValueType();
 
         // ## Act ##
-        TnValueTypes.registerInterfaceValueType(FilenameFilter.class, mockValueType);
-        ValueType interfaceValueType = TnValueTypes.getInterfaceValueType(FilenameFilter.class);
+        TnValueTypes.registerBasicValueType(FilenameFilter.class, mockValueType);
+        ValueType interfaceValueType = TnValueTypes.getBasicInterfaceValueType(FilenameFilter.class);
 
         // ## Assert ##
         assertEquals(mockValueType, interfaceValueType);
-        assertNull(TnValueTypes.getInterfaceValueType(FileFilter.class));
+        assertNull(TnValueTypes.getBasicInterfaceValueType(FileFilter.class));
     }
 
-    public void test_interfaceValueType_threadSafe() throws Exception {
+    public void test_registerBasicValueType_interface_threadSafe() throws Exception {
         // ## Arrange ##
         ExecutionCreator<ValueType> creator = new ExecutionCreator<ValueType>() {
             public Execution<ValueType> create() {
@@ -42,12 +42,13 @@ public class TnValueTypesTest extends PlainTestCase {
                     public ValueType execute() {
                         MockValueType mockValueType = new MockValueType();
                         if (Thread.currentThread().getId() % 2 == 0) {
-                            TnValueTypes.registerInterfaceValueType(FilenameFilter.class, mockValueType);
-                            ValueType interfaceValueType = TnValueTypes.getInterfaceValueType(FilenameFilter.class);
+                            TnValueTypes.registerBasicValueType(FilenameFilter.class, mockValueType);
+                            ValueType interfaceValueType = TnValueTypes
+                                    .getBasicInterfaceValueType(FilenameFilter.class);
                             return interfaceValueType;
                         } else {
-                            TnValueTypes.registerInterfaceValueType(FileFilter.class, mockValueType);
-                            ValueType interfaceValueType = TnValueTypes.getInterfaceValueType(FileFilter.class);
+                            TnValueTypes.registerBasicValueType(FileFilter.class, mockValueType);
+                            ValueType interfaceValueType = TnValueTypes.getBasicInterfaceValueType(FileFilter.class);
                             return interfaceValueType;
                         }
                     }

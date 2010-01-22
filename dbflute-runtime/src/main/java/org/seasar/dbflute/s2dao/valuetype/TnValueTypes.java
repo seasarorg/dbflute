@@ -102,12 +102,12 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private static Map<Class<?>, ValueType> registeredValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
-    private static Map<Class<?>, ValueType> interfaceValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
+    private static Map<Class<?>, ValueType> basicObjectValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
+    private static Map<Class<?>, ValueType> basicInterfaceValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
     private static Map<String, ValueType> pluginValueTypeMap = new ConcurrentHashMap<String, ValueType>();
 
     static {
-        // basic (registered)
+        // basic (object)
         registerBasicValueType(String.class, STRING);
         registerBasicValueType(char.class, CHARACTER);
         registerBasicValueType(Character.class, CHARACTER);
@@ -142,10 +142,10 @@ public class TnValueTypes {
         registerBasicValueType(UUID.class, UUID);
 
         // basic (interface)
-        registerInterfaceValueType(Classification.class, CLASSIFICATION); // DBFlute original class
+        registerBasicValueType(Classification.class, CLASSIFICATION); // DBFlute original class
 
         // Because object type is to be handle as special type.
-        //registerValueType(Object.class, OBJECT);
+        //registerBasicValueType(Object.class, OBJECT);
     }
 
     // ===================================================================================
@@ -168,7 +168,11 @@ public class TnValueTypes {
     public static void registerBasicValueType(Class<?> keyType, ValueType valueType) {
         assertObjectNotNull("keyType", keyType);
         assertObjectNotNull("valueType", valueType);
-        registeredValueTypeMap.put(keyType, valueType);
+        if (keyType.isInterface()) {
+            basicInterfaceValueTypeMap.put(keyType, valueType);
+        } else {
+            basicObjectValueTypeMap.put(keyType, valueType);
+        }
     }
 
     /**
@@ -177,30 +181,12 @@ public class TnValueTypes {
      */
     public static void removeBasicValueType(Class<?> keyType) {
         assertObjectNotNull("keyType", keyType);
-        registeredValueTypeMap.remove(keyType);
-    }
-
-    // -----------------------------------------------------
-    //                                             Interface
-    //                                             ---------
-    /**
-     * Register the interface value type.
-     * @param keyType The key as type. (NotNull)
-     * @param valueType The value type. (NotNull)
-     */
-    public static void registerInterfaceValueType(Class<?> keyType, ValueType valueType) {
-        assertObjectNotNull("keyType", keyType);
-        assertObjectNotNull("valueType", valueType);
-        interfaceValueTypeMap.put(keyType, valueType);
-    }
-
-    /**
-     * Remove the interface value type.
-     * @param keyType The key as type. (NotNull)
-     */
-    public static void removeInterfaceValueType(Class<?> keyType) {
-        assertObjectNotNull("keyType", keyType);
-        interfaceValueTypeMap.remove(keyType);
+        if (basicObjectValueTypeMap.containsKey(keyType)) {
+            basicObjectValueTypeMap.remove(keyType);
+        }
+        if (basicInterfaceValueTypeMap.containsKey(keyType)) {
+            basicInterfaceValueTypeMap.remove(keyType);
+        }
     }
 
     // -----------------------------------------------------
@@ -253,15 +239,13 @@ public class TnValueTypes {
         if (clazz == null) {
             return OBJECT;
         }
-        // from basic (trace super classes but not interfaces)
-        for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
-            final ValueType valueType = getBasicValueType(c);
-            if (valueType != null) {
-                return valueType;
-            }
+        // from basic objects
+        final ValueType valueType = getBasicObjectValueType(clazz);
+        if (valueType != null) {
+            return valueType;
         }
-        // from interface (contains classification type)
-        final ValueType interfaceValueType = getInterfaceValueType(clazz);
+        // from basic interfaces
+        final ValueType interfaceValueType = getBasicInterfaceValueType(clazz);
         if (interfaceValueType != null) {
             return interfaceValueType;
         }
@@ -269,12 +253,18 @@ public class TnValueTypes {
         return OBJECT;
     }
 
-    protected static ValueType getBasicValueType(Class<?> clazz) {
-        return registeredValueTypeMap.get(clazz);
+    protected static ValueType getBasicObjectValueType(Class<?> clazz) {
+        for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
+            final ValueType valueType = basicObjectValueTypeMap.get(c);
+            if (valueType != null) {
+                return valueType;
+            }
+        }
+        return null;
     }
 
-    protected static ValueType getInterfaceValueType(Class<?> clazz) {
-        final Set<Entry<Class<?>, ValueType>> entrySet = interfaceValueTypeMap.entrySet();
+    protected static ValueType getBasicInterfaceValueType(Class<?> clazz) {
+        final Set<Entry<Class<?>, ValueType>> entrySet = basicInterfaceValueTypeMap.entrySet();
         for (Entry<Class<?>, ValueType> entry : entrySet) {
             final Class<?> inf = entry.getKey();
             if (inf.isAssignableFrom(clazz)) {
