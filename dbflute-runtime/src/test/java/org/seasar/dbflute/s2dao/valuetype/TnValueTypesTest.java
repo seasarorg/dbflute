@@ -22,25 +22,7 @@ import org.seasar.dbflute.unit.PlainTestCase;
  */
 public class TnValueTypesTest extends PlainTestCase {
 
-    public void test_getBasicValueType_enum_priority_plain() throws Exception {
-        // ## Arrange ##
-        Class<?> keyType = TestPlainStatus.class;
-        MockValueType mockValueType = new MockValueType();
-
-        try {
-            // ## Act ##
-            TnValueTypes.registerBasicValueType(keyType, mockValueType);
-            ValueType valueType = TnValueTypes.getValueType(keyType);
-
-            // ## Assert ##
-            assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
-            assertEquals(mockValueType, valueType);
-        } finally {
-            TnValueTypes.removeBasicValueType(keyType);
-        }
-    }
-
-    public void test_getBasicValueType_enum_priority_classification() throws Exception {
+    public void test_getValueType_byClassType_enum_priority_classification() throws Exception {
         // ## Arrange ##
         Class<?> keyType = TestClassificationStatus.class; // embedded
         MockValueType mockValueType = new MockValueType();
@@ -59,7 +41,25 @@ public class TnValueTypesTest extends PlainTestCase {
         }
     }
 
-    public void test_getBasicValueType_enum_priority_enumKey() throws Exception {
+    public void test_getValueType_byClassType_enum_priority_plain() throws Exception {
+        // ## Arrange ##
+        Class<?> keyType = TestPlainStatus.class;
+        MockValueType mockValueType = new MockValueType();
+
+        try {
+            // ## Act ##
+            TnValueTypes.registerBasicValueType(keyType, mockValueType);
+            ValueType valueType = TnValueTypes.getValueType(keyType);
+
+            // ## Assert ##
+            assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
+            assertEquals(mockValueType, valueType);
+        } finally {
+            TnValueTypes.removeBasicValueType(keyType);
+        }
+    }
+
+    public void test_getValueType_byClassType_enum_priority_enumKey() throws Exception {
         // ## Arrange ##
         Class<?> keyType = Enum.class;
         MockValueType mockValueType = new MockValueType();
@@ -74,6 +74,43 @@ public class TnValueTypesTest extends PlainTestCase {
             assertEquals(mockValueType, valueType);
         } finally {
             TnValueTypes.removeBasicValueType(Enum.class);
+        }
+    }
+
+    public void test_getValueType_byInstance_enum_priority_classification() throws Exception {
+        // ## Arrange ##
+        Class<?> keyType = TestClassificationStatus.class; // embedded
+        MockValueType mockValueType = new MockValueType();
+
+        try {
+            // ## Act ##
+            TnValueTypes.registerBasicValueType(TestPlainStatus.class, mockValueType);
+            TnValueTypes.registerBasicValueType(Enum.class, mockValueType);
+            ValueType valueType = TnValueTypes.getValueType(TestClassificationStatus.FML);
+
+            // ## Assert ##
+            assertNotSame(mockValueType, valueType);
+            assertEquals(TnValueTypes.CLASSIFICATION, valueType);
+        } finally {
+            TnValueTypes.removeBasicValueType(keyType);
+        }
+    }
+
+    public void test_getValueType_byInstance_enum_priority_plain() throws Exception {
+        // ## Arrange ##
+        Class<?> keyType = TestPlainStatus.class;
+        MockValueType mockValueType = new MockValueType();
+
+        try {
+            // ## Act ##
+            TnValueTypes.registerBasicValueType(keyType, mockValueType);
+            ValueType valueType = TnValueTypes.getValueType(TestPlainStatus.FML);
+
+            // ## Assert ##
+            assertNotSame(TnValueTypes.CLASSIFICATION, valueType);
+            assertEquals(mockValueType, valueType);
+        } finally {
+            TnValueTypes.removeBasicValueType(keyType);
         }
     }
 
