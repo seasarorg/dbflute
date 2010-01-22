@@ -13,13 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Types;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
@@ -29,33 +28,33 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TimeType extends TnAbstractValueType {
+public class IntegerType extends TnAbstractValueType {
 
-    public TimeType() {
-        super(Types.TIME);
+    public IntegerType() {
+        super(Types.INTEGER);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getTime(index);
+        return DfTypeUtil.toInteger(resultSet.getObject(index));
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getTime(columnName);
+        return DfTypeUtil.toInteger(resultSet.getObject(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return cs.getTime(index);
+        return DfTypeUtil.toInteger(cs.getObject(index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return cs.getTime(parameterName);
+        return DfTypeUtil.toInteger(cs.getObject(parameterName));
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setTime(index, toTime(value));
+            ps.setInt(index, DfTypeUtil.toPrimitiveInt(value));
         }
     }
 
@@ -63,18 +62,16 @@ public class TimeType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setTime(parameterName, toTime(value));
+            cs.setInt(parameterName, DfTypeUtil.toPrimitiveInt(value));
         }
-    }
-
-    protected Time toTime(Object value) {
-        return DfTypeUtil.toTime(value);
     }
 
     public String toText(Object value) {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        return DfTypeUtil.toText(toTime(value));
+        Integer var = DfTypeUtil.toInteger(value);
+        return DfTypeUtil.toText(var);
     }
+
 }

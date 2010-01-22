@@ -13,9 +13,8 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
-import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,33 +28,47 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class BigDecimalType extends TnAbstractValueType {
+public class CharacterType extends TnAbstractValueType {
 
-    public BigDecimalType() {
-        super(Types.DECIMAL);
+    public CharacterType() {
+        super(Types.CHAR);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getBigDecimal(index);
+        return toCharacter(resultSet.getString(index));
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getBigDecimal(columnName);
+        return toCharacter(resultSet.getString(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return cs.getBigDecimal(index);
+        return toCharacter(cs.getString(index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return cs.getBigDecimal(parameterName);
+        return toCharacter(cs.getString(parameterName));
+    }
+
+    private Character toCharacter(final String value) {
+        if (value == null) {
+            return null;
+        }
+        final char[] chars = value.toCharArray();
+        if (chars.length == 1) {
+            return Character.valueOf(chars[0]);
+        }
+        if (chars.length == 0) {
+            return null;
+        }
+        throw new IllegalStateException("length of String should be 1." + " actual is [" + value + "]");
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setBigDecimal(index, DfTypeUtil.toBigDecimal(value));
+            ps.setString(index, DfTypeUtil.toString(value));
         }
     }
 
@@ -63,7 +76,7 @@ public class BigDecimalType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setBigDecimal(parameterName, DfTypeUtil.toBigDecimal(value));
+            cs.setString(parameterName, DfTypeUtil.toString(value));
         }
     }
 
@@ -71,7 +84,7 @@ public class BigDecimalType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        BigDecimal var = DfTypeUtil.toBigDecimal(value);
+        String var = DfTypeUtil.toString(value);
         return DfTypeUtil.toText(var);
     }
 

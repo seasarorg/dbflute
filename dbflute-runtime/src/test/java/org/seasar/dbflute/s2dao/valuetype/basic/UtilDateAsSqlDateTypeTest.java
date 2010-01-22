@@ -1,9 +1,10 @@
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.util.Date;
 
 import junit.framework.TestCase;
 
+import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**

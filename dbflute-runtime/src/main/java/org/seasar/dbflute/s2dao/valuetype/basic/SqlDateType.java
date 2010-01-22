@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -28,33 +28,33 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class LongType extends TnAbstractValueType {
+public class SqlDateType extends TnAbstractValueType {
 
-    public LongType() {
-        super(Types.BIGINT);
+    public SqlDateType() {
+        super(Types.DATE);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return DfTypeUtil.toLong(resultSet.getObject(index));
+        return resultSet.getDate(index);
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return DfTypeUtil.toLong(resultSet.getObject(columnName));
+        return resultSet.getDate(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return DfTypeUtil.toLong(cs.getObject(index));
+        return cs.getDate(index);
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return DfTypeUtil.toLong(cs.getObject(parameterName));
+        return cs.getDate(parameterName);
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setLong(index, DfTypeUtil.toPrimitiveLong(value));
+            ps.setDate(index, toSqlDate(value));
         }
     }
 
@@ -62,16 +62,18 @@ public class LongType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setLong(parameterName, DfTypeUtil.toPrimitiveLong(value));
+            cs.setDate(parameterName, toSqlDate(value));
         }
+    }
+
+    protected java.sql.Date toSqlDate(Object value) {
+        return DfTypeUtil.toSqlDate(value);
     }
 
     public String toText(Object value) {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        Long var = DfTypeUtil.toLong(value);
-        return DfTypeUtil.toText(var);
+        return DfTypeUtil.toText(toSqlDate(value));
     }
-
 }

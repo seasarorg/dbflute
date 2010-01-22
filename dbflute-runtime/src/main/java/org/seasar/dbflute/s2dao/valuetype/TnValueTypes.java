@@ -16,19 +16,13 @@
 package org.seasar.dbflute.s2dao.valuetype;
 
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,32 +30,32 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.s2dao.valuetype.basic.BigDecimalType;
+import org.seasar.dbflute.s2dao.valuetype.basic.BigIntegerType;
+import org.seasar.dbflute.s2dao.valuetype.basic.BinaryStreamType;
+import org.seasar.dbflute.s2dao.valuetype.basic.BinaryType;
+import org.seasar.dbflute.s2dao.valuetype.basic.BooleanType;
+import org.seasar.dbflute.s2dao.valuetype.basic.ByteType;
+import org.seasar.dbflute.s2dao.valuetype.basic.CharacterType;
+import org.seasar.dbflute.s2dao.valuetype.basic.ClassificationType;
+import org.seasar.dbflute.s2dao.valuetype.basic.DoubleType;
+import org.seasar.dbflute.s2dao.valuetype.basic.FloatType;
+import org.seasar.dbflute.s2dao.valuetype.basic.IntegerType;
+import org.seasar.dbflute.s2dao.valuetype.basic.LongType;
+import org.seasar.dbflute.s2dao.valuetype.basic.ObjectType;
+import org.seasar.dbflute.s2dao.valuetype.basic.ShortType;
+import org.seasar.dbflute.s2dao.valuetype.basic.SqlDateType;
+import org.seasar.dbflute.s2dao.valuetype.basic.StringType;
+import org.seasar.dbflute.s2dao.valuetype.basic.TimeType;
+import org.seasar.dbflute.s2dao.valuetype.basic.TimestampType;
+import org.seasar.dbflute.s2dao.valuetype.basic.UUIDType;
+import org.seasar.dbflute.s2dao.valuetype.basic.UserDefineType;
+import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
+import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.SerializableType;
-import org.seasar.dbflute.s2dao.valuetype.registered.BigDecimalType;
-import org.seasar.dbflute.s2dao.valuetype.registered.BigIntegerType;
-import org.seasar.dbflute.s2dao.valuetype.registered.BinaryStreamType;
-import org.seasar.dbflute.s2dao.valuetype.registered.BinaryType;
-import org.seasar.dbflute.s2dao.valuetype.registered.BooleanType;
-import org.seasar.dbflute.s2dao.valuetype.registered.ByteType;
-import org.seasar.dbflute.s2dao.valuetype.registered.CharacterType;
-import org.seasar.dbflute.s2dao.valuetype.registered.ClassificationType;
-import org.seasar.dbflute.s2dao.valuetype.registered.DoubleType;
-import org.seasar.dbflute.s2dao.valuetype.registered.FloatType;
-import org.seasar.dbflute.s2dao.valuetype.registered.IntegerType;
-import org.seasar.dbflute.s2dao.valuetype.registered.LongType;
-import org.seasar.dbflute.s2dao.valuetype.registered.ObjectType;
-import org.seasar.dbflute.s2dao.valuetype.registered.ShortType;
-import org.seasar.dbflute.s2dao.valuetype.registered.SqlDateType;
-import org.seasar.dbflute.s2dao.valuetype.registered.StringType;
-import org.seasar.dbflute.s2dao.valuetype.registered.TimeType;
-import org.seasar.dbflute.s2dao.valuetype.registered.TimestampType;
-import org.seasar.dbflute.s2dao.valuetype.registered.UUIDType;
-import org.seasar.dbflute.s2dao.valuetype.registered.UserDefineType;
-import org.seasar.dbflute.s2dao.valuetype.registered.UtilDateAsSqlDateType;
-import org.seasar.dbflute.s2dao.valuetype.registered.UtilDateAsTimestampType;
 import org.seasar.dbflute.util.DfReflectionUtil;
 
 /**
@@ -73,7 +67,7 @@ public class TnValueTypes {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    // Registered
+    // Basic
     public final static ValueType STRING = new StringType();
     public final static ValueType CHARACTER = new CharacterType();
     public final static ValueType BYTE = new ByteType();
@@ -93,6 +87,7 @@ public class TnValueTypes {
     public final static ValueType BINARY_STREAM = new BinaryStreamType();
     public final static ValueType BOOLEAN = new BooleanType();
     public final static ValueType UUID = new UUIDType();
+
     public final static ValueType CLASSIFICATION = new ClassificationType(); // DBFlute original class
     public final static ValueType OBJECT = new ObjectType();
 
@@ -101,9 +96,7 @@ public class TnValueTypes {
     public final static ValueType POSTGRE_RESULT_SET = new PostgreResultSetType();
     public final static ValueType SERIALIZABLE_BYTE_ARRAY = new SerializableType(BytesType.BYTES_TRAIT);
 
-    // Internal
-    private static final ValueType NULL = new NullType();
-
+    // Class
     private static final Class<?> BYTE_ARRAY_CLASS = new byte[0].getClass();
 
     // ===================================================================================
@@ -111,13 +104,6 @@ public class TnValueTypes {
     //                                                                           =========
     private static Map<Class<?>, ValueType> basicValueTypeMap = new ConcurrentHashMap<Class<?>, ValueType>();
     private static Map<String, ValueType> pluginValueTypeMap = new ConcurrentHashMap<String, ValueType>();
-    private static Method isEnumMethod;
-
-    private static Constructor<?> enumDefaultValueTypeConstructor;
-    private static Constructor<?> enumOrdinalValueTypeConstructor;
-    private static Constructor<?> enumStringValueTypeConstructor;
-
-    private static Map<String, ValueType> valueTypeCache = new ConcurrentHashMap<String, ValueType>(50);
 
     static {
         registerBasicValueType(String.class, STRING);
@@ -152,18 +138,12 @@ public class TnValueTypes {
         registerBasicValueType(boolean.class, BOOLEAN);
         registerBasicValueType(Boolean.class, BOOLEAN);
         registerBasicValueType(UUID.class, UUID);
-        registerBasicValueType(Classification.class, CLASSIFICATION); // DBFlute original class
+
+        // Because classification type is to be handle as special type.
+        //registerBasicValueType(Classification.class, CLASSIFICATION); // DBFlute original class
 
         // Because object type is to be handle as special type.
         //registerValueType(Object.class, OBJECT);
-
-        try {
-            isEnumMethod = Class.class.getMethod("isEnum", (Class[]) null);
-        } catch (Throwable ignore) {
-            isEnumMethod = null;
-            enumStringValueTypeConstructor = null;
-            enumOrdinalValueTypeConstructor = null;
-        }
     }
 
     // ===================================================================================
@@ -229,26 +209,22 @@ public class TnValueTypes {
         if (clazz == null) {
             return OBJECT;
         }
+        // from basic (trace super classes but not interfaces)
         for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
-            final ValueType valueType = getRegisteredValueType(c);
+            final ValueType valueType = getBasicValueType(c);
             if (valueType != null) {
                 return valueType;
             }
         }
+        // from basic (classification)
         if (Classification.class.isAssignableFrom(clazz)) {
-            final ValueType valueType = getRegisteredValueType(Classification.class);
-            if (valueType != null) {
-                return valueType;
-            }
+            return CLASSIFICATION;
         }
-        final ValueType valueType = getCachedValueType(clazz);
-        if (valueType != null) {
-            return valueType;
-        }
+        // as default
         return OBJECT;
     }
 
-    private static ValueType getRegisteredValueType(Class<?> clazz) {
+    private static ValueType getBasicValueType(Class<?> clazz) {
         return basicValueTypeMap.get(clazz);
     }
 
@@ -259,36 +235,6 @@ public class TnValueTypes {
     public static ValueType getPluginValueType(String valueTypeName) {
         assertObjectNotNull("valueTypeName", valueTypeName);
         return pluginValueTypeMap.get(valueTypeName);
-    }
-
-    private static boolean hasCachedValueType(Class<?> clazz) {
-        return getCachedValueType(clazz) != null;
-    }
-
-    private static ValueType getCachedValueType(Class<?> clazz) {
-        if (Map.class.isAssignableFrom(clazz)) {
-            return null;
-        }
-        ValueType valueType = (ValueType) valueTypeCache.get(clazz.getName());
-        if (valueType == NULL) {
-            return null;
-        }
-        if (valueType != null) {
-            return valueType;
-        }
-        Class<?> normalizedEnumClass = normalizeEnum(clazz);
-        if (normalizedEnumClass != null) {
-            valueType = getEnumDefaultValueType(normalizedEnumClass);
-            valueTypeCache.put(normalizedEnumClass.getName(), valueType);
-            return valueType;
-        }
-        valueType = createUserDefineValueType(clazz);
-        if (valueType != null) {
-            valueTypeCache.put(clazz.getName(), valueType);
-            return valueType;
-        }
-        valueTypeCache.put(clazz.getName(), NULL);
-        return null;
     }
 
     public static ValueType createUserDefineValueType(Class<?> clazz) {
@@ -317,7 +263,7 @@ public class TnValueTypes {
             Method valueOfMethod = (Method) valueOfMethods.get(i);
             if (valueOfMethod.getParameterTypes()[0] == valueMethod.getReturnType()) {
                 Class<?> baseClass = valueMethod.getReturnType();
-                ValueType baseValueType = getRegisteredValueType(baseClass);
+                ValueType baseValueType = getBasicValueType(baseClass);
                 if (baseValueType == null) {
                     return null;
                 }
@@ -369,107 +315,6 @@ public class TnValueTypes {
 
     public static ValueType getValueType(int sqltype) {
         return getValueType(getType(sqltype));
-    }
-
-    // ===================================================================================
-    //                                                                                Enum
-    //                                                                                ====
-    public static void setEnumDefaultValueType(Class<?> enumDefaultValueTypeClass) throws NoSuchMethodException {
-        enumDefaultValueTypeConstructor = enumDefaultValueTypeClass.getConstructor(new Class[] { Class.class });
-    }
-
-    public static void setEnumOrdinalValueType(Class<?> enumOrdinalValueTypeClass) throws NoSuchMethodException {
-        enumOrdinalValueTypeConstructor = enumOrdinalValueTypeClass.getConstructor(new Class[] { Class.class });
-    }
-
-    public static void setEnumStringValueType(Class<?> enumStringValueTypeClass) throws NoSuchMethodException {
-        enumStringValueTypeConstructor = enumStringValueTypeClass.getConstructor(new Class[] { Class.class });
-    }
-
-    private static Class<?> normalizeEnum(Class<?> clazz) {
-        if (isEnumMethod == null || enumStringValueTypeConstructor == null) {
-            return null;
-        }
-        for (Class<?> c = clazz; c != null; c = c.getSuperclass()) {
-            if (DfReflectionUtil.invoke(isEnumMethod, c, null).equals(Boolean.TRUE)) {
-                return c;
-            }
-        }
-        return null;
-    }
-
-    public static ValueType getEnumDefaultValueType(Class<?> clazz) {
-        return (ValueType) DfReflectionUtil.newInstance(enumDefaultValueTypeConstructor, new Class<?>[] { clazz });
-    }
-
-    public static ValueType getEnumStringValueType(Class<?> clazz) {
-        return (ValueType) DfReflectionUtil.newInstance(enumStringValueTypeConstructor, new Class<?>[] { clazz });
-    }
-
-    public static ValueType getEnumOrdinalValueType(Class<?> clazz) {
-        return (ValueType) DfReflectionUtil.newInstance(enumOrdinalValueTypeConstructor, new Class<?>[] { clazz });
-    }
-
-    // ===================================================================================
-    //                                                                               Clear
-    //                                                                               =====
-    public static void clear() {
-        valueTypeCache.clear();
-    }
-
-    // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    public static boolean isSimpleType(Class<?> clazz) {
-        if (clazz == null) {
-            throw new NullPointerException("clazz");
-        }
-        return clazz == String.class || clazz.isPrimitive() || clazz == Boolean.class || clazz == Character.class
-                || Number.class.isAssignableFrom(clazz) || Date.class.isAssignableFrom(clazz)
-                || Calendar.class.isAssignableFrom(clazz) || clazz == BYTE_ARRAY_CLASS || hasCachedValueType(clazz);
-    }
-
-    private static class NullType implements ValueType {
-
-        public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
-            throw new SQLException("not supported");
-        }
-
-        public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
-            throw new SQLException("not supported");
-        }
-
-        public Object getValue(CallableStatement cs, int index) throws SQLException {
-            throw new SQLException("not supported");
-        }
-
-        public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-            throw new SQLException("not supported");
-        }
-
-        public Object getValue(ResultSet resultSet, int index) throws SQLException {
-            throw new SQLException("not supported");
-        }
-
-        public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-            throw new SQLException("not supported");
-        }
-
-        public void registerOutParameter(CallableStatement cs, int index) throws SQLException {
-            throw new SQLException("not supported");
-        }
-
-        public void registerOutParameter(CallableStatement cs, String parameterName) throws SQLException {
-            throw new SQLException("not supported");
-        }
-
-        public String toText(Object value) {
-            throw new UnsupportedOperationException("toText");
-        }
-
-        public int getSqlType() {
-            return Types.NULL;
-        }
     }
 
     // ===================================================================================

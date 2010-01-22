@@ -13,10 +13,8 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,61 +22,47 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
-import org.seasar.dbflute.util.DfResourceUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class BinaryStreamType extends TnAbstractValueType {
+public class LongType extends TnAbstractValueType {
 
-    public BinaryStreamType() {
-        super(Types.BINARY);
+    public LongType() {
+        super(Types.BIGINT);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getBinaryStream(index);
+        return DfTypeUtil.toLong(resultSet.getObject(index));
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getBinaryStream(columnName);
+        return DfTypeUtil.toLong(resultSet.getObject(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return toBinaryStream(cs.getBytes(index));
+        return DfTypeUtil.toLong(cs.getObject(index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return toBinaryStream(cs.getBytes(parameterName));
-    }
-
-    private InputStream toBinaryStream(byte[] bytes) {
-        if (bytes == null) {
-            return null;
-        }
-        return new ByteArrayInputStream(bytes);
+        return DfTypeUtil.toLong(cs.getObject(parameterName));
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
-        } else if (value instanceof InputStream) {
-            InputStream is = (InputStream) value;
-            ps.setBinaryStream(index, is, DfResourceUtil.available(is));
         } else {
-            ps.setObject(index, value);
+            ps.setLong(index, DfTypeUtil.toPrimitiveLong(value));
         }
     }
 
     public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
-        } else if (value instanceof InputStream) {
-            InputStream is = (InputStream) value;
-            cs.setBinaryStream(parameterName, is, DfResourceUtil.available(is));
         } else {
-            cs.setObject(parameterName, value);
+            cs.setLong(parameterName, DfTypeUtil.toPrimitiveLong(value));
         }
     }
 
@@ -86,6 +70,8 @@ public class BinaryStreamType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        return DfTypeUtil.toText(value);
+        Long var = DfTypeUtil.toLong(value);
+        return DfTypeUtil.toText(var);
     }
+
 }

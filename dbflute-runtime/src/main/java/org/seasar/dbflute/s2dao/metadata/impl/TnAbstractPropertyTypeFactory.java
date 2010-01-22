@@ -56,31 +56,14 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
         return (TnPropertyType[]) list.toArray(new TnPropertyType[list.size()]);
     }
 
-    /**
-     * {@link DfBeanDesc}を返します。
-     * 
-     * @return {@link DfBeanDesc}
-     */
     protected DfBeanDesc getBeanDesc() {
         return DfBeanDescFactory.getBeanDesc(beanClass);
     }
 
-    /**
-     * 関連を表すのプロパティである場合<code>true</code>を返します。
-     * 
-     * @param propertyDesc {@link DfPropertyDesc}
-     * @return 関連を表すプロパティである場合<code>true</code>、そうでない場合<code>false</code>
-     */
     protected boolean isRelation(DfPropertyDesc propertyDesc) {
         return beanAnnotationReader.hasRelationNo(propertyDesc);
     }
 
-    /**
-     * 主キーを表すプロパティである場合<code>true</code>を返します。
-     * 
-     * @param propertyDesc {@link DfPropertyDesc}
-     * @return　主キーを表すプロパティである場合<code>true</code>、そうでない場合<code>false</code>
-     */
     protected boolean isPrimaryKey(DfPropertyDesc propertyDesc) {
         return beanAnnotationReader.getId(propertyDesc) != null;
     }

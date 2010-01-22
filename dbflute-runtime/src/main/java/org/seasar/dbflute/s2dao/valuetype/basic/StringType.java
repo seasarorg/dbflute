@@ -13,13 +13,12 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
@@ -29,33 +28,33 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TimestampType extends TnAbstractValueType {
+public class StringType extends TnAbstractValueType {
 
-    public TimestampType() {
-        super(Types.TIMESTAMP);
+    public StringType() {
+        super(Types.VARCHAR);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return resultSet.getTimestamp(index);
+        return resultSet.getString(index);
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return resultSet.getTimestamp(columnName);
+        return resultSet.getString(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return cs.getTimestamp(index);
+        return cs.getString(index);
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return cs.getTimestamp(parameterName);
+        return cs.getString(parameterName);
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setTimestamp(index, toTimestamp(value));
+            ps.setString(index, DfTypeUtil.toString(value));
         }
     }
 
@@ -63,18 +62,15 @@ public class TimestampType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setTimestamp(parameterName, toTimestamp(value));
+            cs.setString(parameterName, DfTypeUtil.toString(value));
         }
-    }
-
-    protected Timestamp toTimestamp(Object value) {
-        return DfTypeUtil.toTimestamp(value);
     }
 
     public String toText(Object value) {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        return DfTypeUtil.toText(toTimestamp(value));
+        String var = DfTypeUtil.toString(value);
+        return DfTypeUtil.toText(var);
     }
 }

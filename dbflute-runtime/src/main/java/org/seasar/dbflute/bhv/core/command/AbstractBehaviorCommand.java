@@ -153,11 +153,21 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         }
 
         public Object handle(ResultSet rs) throws SQLException {
-            final List<Object> ret = new ArrayList<Object>();
+            List<Object> retList = null;
+            Object ret = null;
+            int index = 0;
             while (rs.next()) {
-                ret.add(valueType.getValue(rs, 1));
+                if (index == 1) { // second loop
+                    retList = new ArrayList<Object>();
+                    retList.add(ret);
+                }
+                ret = valueType.getValue(rs, 1);
+                if (retList != null) { // true at second or more loop
+                    retList.add(ret);
+                }
+                ++index;
             }
-            return ret.size() == 1 ? ret.get(0) : ret;
+            return retList != null ? retList : ret;
         }
     }
 

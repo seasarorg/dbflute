@@ -22,7 +22,7 @@ import java.sql.Time;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.seasar.dbflute.s2dao.valuetype.registered.TimeType;
+import org.seasar.dbflute.s2dao.valuetype.basic.TimeType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**

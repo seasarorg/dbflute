@@ -51,7 +51,7 @@ public class SequenceCacheHandler {
      * @param dataSource The data source. (NotNull)
      * @param cacheSize The size of sequence cache. (Nullable: If null, returns null)
      * @param resultType The type of sequence result. (NotNull)
-     * @param incrementSize The size of increment of sequence. (Nullable, If null, it cannot use batch way) 
+     * @param incrementSize The size of increment of sequence. (Nullable, If null, batch way is invalid) 
      * @return The object for sequence cache. (Nullable) 
      */
     public SequenceCache findSequenceCache(String tableName, String sequenceName, DataSource dataSource,

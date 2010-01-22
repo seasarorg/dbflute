@@ -13,53 +13,50 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.UUID;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * The value type of UUID.
+ * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class UUIDType extends TnAbstractValueType {
+public class BooleanType extends TnAbstractValueType {
 
-    public UUIDType() {
-        super(Types.OTHER);
+    public BooleanType() {
+        super(Types.BOOLEAN);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        String string = resultSet.getString(index);
-        return string != null ? UUID.fromString(string) : string;
+        return DfTypeUtil.toBoolean(resultSet.getObject(index));
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        String string = resultSet.getString(columnName);
-        return string != null ? UUID.fromString(string) : string;
+
+        return DfTypeUtil.toBoolean(resultSet.getObject(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        String string = cs.getString(index);
-        return string != null ? UUID.fromString(string) : string;
+        return DfTypeUtil.toBoolean(cs.getObject(index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        String string = cs.getString(parameterName);
-        return string != null ? UUID.fromString(string) : string;
+
+        return DfTypeUtil.toBoolean(cs.getObject(parameterName));
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setObject(index, value, getSqlType());
+            ps.setBoolean(index, DfTypeUtil.toPrimitiveBoolean(value));
         }
     }
 
@@ -67,7 +64,7 @@ public class UUIDType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setObject(parameterName, value, getSqlType());
+            cs.setBoolean(parameterName, DfTypeUtil.toPrimitiveBoolean(value));
         }
     }
 
@@ -75,6 +72,7 @@ public class UUIDType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        return DfTypeUtil.toText(value);
+        Boolean var = DfTypeUtil.toBoolean(value);
+        return DfTypeUtil.toText(var);
     }
 }

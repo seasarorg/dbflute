@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -28,42 +28,41 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class ByteType extends TnAbstractValueType {
+public class ShortType extends TnAbstractValueType {
 
-    public ByteType() {
+    public ShortType() {
         super(Types.SMALLINT);
     }
 
-    public Object getValue(final ResultSet resultSet, final int index) throws SQLException {
-        return DfTypeUtil.toByte(resultSet.getObject(index));
+    public Object getValue(ResultSet resultSet, int index) throws SQLException {
+        return DfTypeUtil.toShort(resultSet.getObject(index));
     }
 
-    public Object getValue(final ResultSet resultSet, final String columnName) throws SQLException {
-        return DfTypeUtil.toByte(resultSet.getObject(columnName));
+    public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
+        return DfTypeUtil.toShort(resultSet.getObject(columnName));
     }
 
-    public Object getValue(final CallableStatement cs, final int index) throws SQLException {
-        return DfTypeUtil.toByte(cs.getObject(index));
+    public Object getValue(CallableStatement cs, int index) throws SQLException {
+        return DfTypeUtil.toShort(cs.getObject(index));
     }
 
-    public Object getValue(final CallableStatement cs, final String parameterName) throws SQLException {
-        return DfTypeUtil.toByte(cs.getObject(parameterName));
+    public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
+        return DfTypeUtil.toShort(cs.getObject(parameterName));
     }
 
-    public void bindValue(final PreparedStatement ps, final int index, final Object value) throws SQLException {
+    public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setByte(index, DfTypeUtil.toPrimitiveByte(value));
+            ps.setShort(index, DfTypeUtil.toPrimitiveShort(value));
         }
     }
 
-    public void bindValue(final CallableStatement cs, final String parameterName, final Object value)
-            throws SQLException {
+    public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setByte(parameterName, DfTypeUtil.toPrimitiveByte(value));
+            cs.setShort(parameterName, DfTypeUtil.toPrimitiveShort(value));
         }
     }
 
@@ -71,7 +70,7 @@ public class ByteType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        Byte var = DfTypeUtil.toByte(value);
+        Short var = DfTypeUtil.toShort(value);
         return DfTypeUtil.toText(var);
     }
 }

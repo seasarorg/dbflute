@@ -20,7 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 
-import org.seasar.dbflute.s2dao.valuetype.registered.TimestampType;
+import org.seasar.dbflute.s2dao.valuetype.basic.TimestampType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**

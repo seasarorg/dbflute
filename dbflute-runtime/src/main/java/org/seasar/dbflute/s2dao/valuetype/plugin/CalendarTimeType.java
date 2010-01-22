@@ -21,7 +21,7 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.util.Calendar;
 
-import org.seasar.dbflute.s2dao.valuetype.registered.TimeType;
+import org.seasar.dbflute.s2dao.valuetype.basic.TimeType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**

@@ -41,13 +41,13 @@ public class SequenceCache {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** The cache size that should be same as increment size of sequence. (NotNull) */
+    /** The cache size of sequence. (NotNull) */
     protected final BigDecimal _cacheSize;
 
     /** The result type of sequence next value. (NotNull) */
     protected final Class<?> _resultType;
 
-    /** The increment size of sequence. This is used by batch way only. (Nullable: If null, it cannot use batch way) */
+    /** The increment size of sequence that is used by batch way only. (Nullable: If null, it cannot use batch way) */
     protected final Integer _incrementSize;
 
     /** The added count. If cached list is valid, this value is unused. (NotNull) */
@@ -56,7 +56,7 @@ public class SequenceCache {
     /** The sequence value as base point. (Nullable: only at first null) */
     protected volatile BigDecimal _sequenceValue;
 
-    /** The sequence value as first value for batch. (Nullable: at first or not batch way) */
+    /** The sequence value as first value for batch way only. (Nullable: at first or not batch way) */
     protected volatile BigDecimal _batchFirstValue;
 
     protected final List<BigDecimal> _cachedList = new ArrayList<BigDecimal>();
@@ -71,6 +71,11 @@ public class SequenceCache {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * @param cacheSize The cache size of sequence. (NotNull) 
+     * @param resultType The result type of sequence next value.
+     * @param incrementSize The increment size of sequence that is used by batch way only. (Nullable: If null, it cannot use batch way)
+     */
     public SequenceCache(BigDecimal cacheSize, Class<?> resultType, Integer incrementSize) {
         _cacheSize = cacheSize;
         _resultType = resultType;
@@ -80,6 +85,11 @@ public class SequenceCache {
     // ===================================================================================
     //                                                                          Next Value
     //                                                                          ==========
+    /**
+     * Get a next value of sequence.
+     * @param executor The real executor of sequence. (NotNull)
+     * @return The next value of sequence as result type. (NotNull)
+     */
     public synchronized Object nextval(SequenceRealExecutor executor) {
         if (_batchWay) {
             if (_incrementSize == null) {

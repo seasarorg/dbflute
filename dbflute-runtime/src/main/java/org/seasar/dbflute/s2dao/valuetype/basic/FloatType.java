@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -28,47 +28,36 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class CharacterType extends TnAbstractValueType {
+public class FloatType extends TnAbstractValueType {
 
-    public CharacterType() {
-        super(Types.CHAR);
+    /**
+     * インスタンスを構築します。
+     */
+    public FloatType() {
+        super(Types.FLOAT);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return toCharacter(resultSet.getString(index));
+        return DfTypeUtil.toFloat(resultSet.getObject(index));
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return toCharacter(resultSet.getString(columnName));
+        return DfTypeUtil.toFloat(resultSet.getObject(columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return toCharacter(cs.getString(index));
+        return DfTypeUtil.toFloat(cs.getObject(index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return toCharacter(cs.getString(parameterName));
-    }
-
-    private Character toCharacter(final String value) {
-        if (value == null) {
-            return null;
-        }
-        final char[] chars = value.toCharArray();
-        if (chars.length == 1) {
-            return Character.valueOf(chars[0]);
-        }
-        if (chars.length == 0) {
-            return null;
-        }
-        throw new IllegalStateException("length of String should be 1." + " actual is [" + value + "]");
+        return DfTypeUtil.toFloat(cs.getObject(parameterName));
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setString(index, DfTypeUtil.toString(value));
+            ps.setFloat(index, DfTypeUtil.toPrimitiveFloat(value));
         }
     }
 
@@ -76,7 +65,7 @@ public class CharacterType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setString(parameterName, DfTypeUtil.toString(value));
+            cs.setFloat(parameterName, DfTypeUtil.toPrimitiveFloat(value));
         }
     }
 
@@ -84,7 +73,7 @@ public class CharacterType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        String var = DfTypeUtil.toString(value);
+        Float var = DfTypeUtil.toFloat(value);
         return DfTypeUtil.toText(var);
     }
 

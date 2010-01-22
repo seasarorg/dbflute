@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -28,35 +28,33 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class BooleanType extends TnAbstractValueType {
+public class ObjectType extends TnAbstractValueType {
 
-    public BooleanType() {
-        super(Types.BOOLEAN);
+    public ObjectType() {
+        super(Types.VARCHAR);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return DfTypeUtil.toBoolean(resultSet.getObject(index));
+        return resultSet.getObject(index);
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-
-        return DfTypeUtil.toBoolean(resultSet.getObject(columnName));
+        return resultSet.getObject(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return DfTypeUtil.toBoolean(cs.getObject(index));
+        return cs.getObject(index);
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-
-        return DfTypeUtil.toBoolean(cs.getObject(parameterName));
+        return cs.getObject(parameterName);
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setBoolean(index, DfTypeUtil.toPrimitiveBoolean(value));
+            ps.setObject(index, value);
         }
     }
 
@@ -64,7 +62,7 @@ public class BooleanType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setBoolean(parameterName, DfTypeUtil.toPrimitiveBoolean(value));
+            cs.setObject(parameterName, value);
         }
     }
 
@@ -72,7 +70,6 @@ public class BooleanType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        Boolean var = DfTypeUtil.toBoolean(value);
-        return DfTypeUtil.toText(var);
+        return DfTypeUtil.toText(value);
     }
 }

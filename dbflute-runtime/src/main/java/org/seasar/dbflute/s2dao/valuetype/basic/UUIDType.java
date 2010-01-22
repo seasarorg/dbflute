@@ -13,51 +13,53 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.UUID;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * {Refers to Seasar and Extends its class}
+ * The value type of UUID.
  * @author jflute
  */
-public class FloatType extends TnAbstractValueType {
+public class UUIDType extends TnAbstractValueType {
 
-    /**
-     * インスタンスを構築します。
-     */
-    public FloatType() {
-        super(Types.FLOAT);
+    public UUIDType() {
+        super(Types.OTHER);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return DfTypeUtil.toFloat(resultSet.getObject(index));
+        String string = resultSet.getString(index);
+        return string != null ? UUID.fromString(string) : string;
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return DfTypeUtil.toFloat(resultSet.getObject(columnName));
+        String string = resultSet.getString(columnName);
+        return string != null ? UUID.fromString(string) : string;
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return DfTypeUtil.toFloat(cs.getObject(index));
+        String string = cs.getString(index);
+        return string != null ? UUID.fromString(string) : string;
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return DfTypeUtil.toFloat(cs.getObject(parameterName));
+        String string = cs.getString(parameterName);
+        return string != null ? UUID.fromString(string) : string;
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setFloat(index, DfTypeUtil.toPrimitiveFloat(value));
+            ps.setObject(index, value, getSqlType());
         }
     }
 
@@ -65,7 +67,7 @@ public class FloatType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setFloat(parameterName, DfTypeUtil.toPrimitiveFloat(value));
+            cs.setObject(parameterName, value, getSqlType());
         }
     }
 
@@ -73,8 +75,6 @@ public class FloatType extends TnAbstractValueType {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        Float var = DfTypeUtil.toFloat(value);
-        return DfTypeUtil.toText(var);
+        return DfTypeUtil.toText(value);
     }
-
 }

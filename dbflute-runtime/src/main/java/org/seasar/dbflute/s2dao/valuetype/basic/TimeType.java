@@ -13,12 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Types;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
@@ -28,33 +29,33 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class ShortType extends TnAbstractValueType {
+public class TimeType extends TnAbstractValueType {
 
-    public ShortType() {
-        super(Types.SMALLINT);
+    public TimeType() {
+        super(Types.TIME);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return DfTypeUtil.toShort(resultSet.getObject(index));
+        return resultSet.getTime(index);
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return DfTypeUtil.toShort(resultSet.getObject(columnName));
+        return resultSet.getTime(columnName);
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return DfTypeUtil.toShort(cs.getObject(index));
+        return cs.getTime(index);
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return DfTypeUtil.toShort(cs.getObject(parameterName));
+        return cs.getTime(parameterName);
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
         if (value == null) {
             setNull(ps, index);
         } else {
-            ps.setShort(index, DfTypeUtil.toPrimitiveShort(value));
+            ps.setTime(index, toTime(value));
         }
     }
 
@@ -62,15 +63,18 @@ public class ShortType extends TnAbstractValueType {
         if (value == null) {
             setNull(cs, parameterName);
         } else {
-            cs.setShort(parameterName, DfTypeUtil.toPrimitiveShort(value));
+            cs.setTime(parameterName, toTime(value));
         }
+    }
+
+    protected Time toTime(Object value) {
+        return DfTypeUtil.toTime(value);
     }
 
     public String toText(Object value) {
         if (value == null) {
             return DfTypeUtil.nullText();
         }
-        Short var = DfTypeUtil.toShort(value);
-        return DfTypeUtil.toText(var);
+        return DfTypeUtil.toText(toTime(value));
     }
 }

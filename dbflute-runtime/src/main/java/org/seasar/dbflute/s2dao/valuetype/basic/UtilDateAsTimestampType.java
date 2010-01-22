@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.valuetype.registered;
+package org.seasar.dbflute.s2dao.valuetype.basic;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -27,55 +27,55 @@ import org.seasar.dbflute.util.DfTypeUtil;
 /**
  * @author jflute
  */
-public class UtilDateAsSqlDateType extends TnAbstractValueType {
+public class UtilDateAsTimestampType extends TnAbstractValueType {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final SqlDateType _sqlDateType = new SqlDateType();
+    protected final TimestampType _timestampType = new TimestampType();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public UtilDateAsSqlDateType() {
-        super(Types.DATE);
+    public UtilDateAsTimestampType() {
+        super(Types.TIMESTAMP);
     }
 
     // ===================================================================================
     //                                                                           Get Value
     //                                                                           =========
     public Object getValue(ResultSet resultSet, int index) throws SQLException {
-        return toUtilDate(_sqlDateType.getValue(resultSet, index));
+        return toUtilDate(_timestampType.getValue(resultSet, index));
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-        return toUtilDate(_sqlDateType.getValue(resultSet, columnName));
+        return toUtilDate(_timestampType.getValue(resultSet, columnName));
     }
 
     public Object getValue(CallableStatement cs, int index) throws SQLException {
-        return toUtilDate(_sqlDateType.getValue(cs, index));
+        return toUtilDate(_timestampType.getValue(cs, index));
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-        return toUtilDate(_sqlDateType.getValue(cs, parameterName));
+        return toUtilDate(_timestampType.getValue(cs, parameterName));
     }
 
     // ===================================================================================
     //                                                                          Bind Value
     //                                                                          ==========
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
-        _sqlDateType.bindValue(ps, index, toSqlDate(value));
+        _timestampType.bindValue(ps, index, toTimestamp(value));
     }
 
     public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
-        _sqlDateType.bindValue(cs, parameterName, toSqlDate(value));
+        _timestampType.bindValue(cs, parameterName, toTimestamp(value));
     }
 
     // ===================================================================================
     //                                                                             To Text
     //                                                                             =======
     public String toText(Object value) {
-        return _sqlDateType.toText(value);
+        return _timestampType.toText(value);
     }
 
     // ===================================================================================
@@ -91,11 +91,11 @@ public class UtilDateAsSqlDateType extends TnAbstractValueType {
         }
     }
 
-    protected java.sql.Date toSqlDate(Object value) {
+    protected java.sql.Timestamp toTimestamp(Object value) {
         try {
-            return DfTypeUtil.toSqlDate(value);
+            return DfTypeUtil.toTimestamp(value);
         } catch (RuntimeException e) {
-            String msg = "Failed to convert the object to java.sql.Date:";
+            String msg = "Failed to convert the object to java.sql.Timestamp:";
             msg = msg + " type=" + (value != null ? value.getClass() : null) + " value=" + value;
             throw new IllegalStateException(msg);
         }
