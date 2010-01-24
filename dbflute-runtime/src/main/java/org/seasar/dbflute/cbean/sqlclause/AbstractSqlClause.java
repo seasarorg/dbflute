@@ -106,7 +106,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     protected List<String> _whereList = new ArrayList<String>();
 
     /** The list of in-line where clause for base table. */
-    protected List<String> _baseTableInlineWhereList = new ArrayList<String>();
+    protected List<String> _baseTableInlineWhereList = new ArrayList<String>(2); // because of minor
 
     /** The clause of order-by. (NotNull) */
     protected final OrderByClause _orderByClause = new OrderByClause();
