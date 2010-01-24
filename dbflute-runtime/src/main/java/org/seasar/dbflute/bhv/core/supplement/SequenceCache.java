@@ -42,8 +42,8 @@ public class SequenceCache {
     //                                                                           Attribute
     //                                                                           =========
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // The variables that have a large size are BigDecimal instead of BigInteger
-    // Because the BigDecimal is more friendly than BigInteger at least for the author.
+    // The variables that have a large size are BigDecimal instead of BigInteger,
+    // because the BigDecimal is more friendly than BigInteger at least for the author.
     // - - - - - - - - - -/
     /** The result type of sequence next value. (NotNull) */
     protected final Class<?> _resultType;
