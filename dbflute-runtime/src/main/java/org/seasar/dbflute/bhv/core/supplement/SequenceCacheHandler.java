@@ -119,24 +119,34 @@ public class SequenceCacheHandler {
         if (unionCount > 0) { // "batch" way
             if (ResourceContext.isCurrentDBDef(DBDef.Oracle)) { // Oracle patch
                 sb.append(DfStringUtil.replace(nextValSql, "from dual", ln() + "  from ("));
-                final Integer dualCountInOneJoin = 10;
-                final Integer joinCount = (unionCount / dualCountInOneJoin) + 1;
-                int currentDualCount = 0;
-                for (int i = 0; i < joinCount; i++) {
+                final Integer maxDualCountInOneJoin = 10;
+                int allRecordCount = 0;
+                boolean reached = false;
+                for (int i = 0; !reached; i++) {
                     if (i >= 1) {
                         sb.append(ln()).append("    cross join (");
                     }
+                    int dualCountInOneJoin = 0;
                     sb.append("select * from dual");
-                    ++currentDualCount;
+                    ++dualCountInOneJoin;
                     final String indent = (i >= 1 ? "                " : "        ");
-                    for (int j = 0; j < (dualCountInOneJoin - 1); j++) {
+                    int calculatedRecordCount = 0;
+                    for (int j = 0; j < (maxDualCountInOneJoin - 1); j++) { // always more one loop 
                         sb.append(ln()).append(indent).append(" union all");
                         sb.append(ln()).append(indent).append("select * from dual");
-                        ++currentDualCount;
-                        if (currentDualCount >= divided) {
+                        ++dualCountInOneJoin;
+                        if (allRecordCount == 0) {
+                            calculatedRecordCount = dualCountInOneJoin;
+                        } else {
+                            // cross-joined record count
+                            calculatedRecordCount = (allRecordCount * dualCountInOneJoin);
+                        }
+                        if (calculatedRecordCount >= divided) {
+                            reached = true;
                             break;
                         }
                     }
+                    allRecordCount = calculatedRecordCount;
                     sb.append(") join_" + (i + 1));
                 }
                 sb.append(ln()).append(" where rownum <= " + divided);

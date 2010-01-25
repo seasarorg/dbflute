@@ -20,6 +20,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -267,6 +268,7 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
             assertTrue(actual.contains(" union all"));
             assertTrue(actual.contains(" join_1"));
             assertFalse(actual.contains(" join_2"));
+            assertEquals(3, DfStringUtil.splitList(actual, "select * from dual").size());
             assertTrue(actual.contains(" rownum <= 2"));
         } finally {
             ResourceContext.clearResourceContextOnThread();
@@ -306,9 +308,69 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
             assertTrue(actual.contains("nextval"));
             assertTrue(actual.contains("select * from dual"));
             assertTrue(actual.contains(" union all"));
-            assertTrue(actual.contains(" join_5"));
-            assertTrue(actual.contains(" join_6"));
+            assertTrue(actual.contains(" join_1"));
+            assertTrue(actual.contains(" join_2"));
+            assertFalse(actual.contains(" join_3"));
             assertTrue(actual.contains(" rownum <= 54"));
+        } finally {
+            ResourceContext.clearResourceContextOnThread();
+        }
+    }
+
+    public void test_filterNextValSql_incrementOne_largeSize_Oracle() {
+        // ## Arrange ##
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        String sql = "select SEQ_MEMBER.nextval from dual";
+        ResourceContext context = new ResourceContext();
+        context.setCurrentDBDef(DBDef.Oracle);
+        ResourceContext.setResourceContextOnThread(context);
+
+        try {
+            // ## Act ##
+            String actual = handler.filterNextValSql(10000, 1, sql);
+
+            // ## Assert ##
+            log(actual);
+            assertTrue(actual.contains("nextval"));
+            assertTrue(actual.contains("select * from dual"));
+            assertTrue(actual.contains(" union all"));
+            assertTrue(actual.contains(" join_1"));
+            assertTrue(actual.contains(" join_2"));
+            assertTrue(actual.contains(" join_3"));
+            assertTrue(actual.contains(" join_4"));
+            assertFalse(actual.contains(" join_5"));
+            assertEquals(41, DfStringUtil.splitList(actual, "select * from dual").size());
+            assertTrue(actual.contains(" rownum <= 10000"));
+        } finally {
+            ResourceContext.clearResourceContextOnThread();
+        }
+    }
+
+    public void test_filterNextValSql_incrementOne_largeSize_plus_Oracle() {
+        // ## Arrange ##
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        String sql = "select SEQ_MEMBER.nextval from dual";
+        ResourceContext context = new ResourceContext();
+        context.setCurrentDBDef(DBDef.Oracle);
+        ResourceContext.setResourceContextOnThread(context);
+
+        try {
+            // ## Act ##
+            String actual = handler.filterNextValSql(10001, 1, sql);
+
+            // ## Assert ##
+            log(actual);
+            assertTrue(actual.contains("nextval"));
+            assertTrue(actual.contains("select * from dual"));
+            assertTrue(actual.contains(" union all"));
+            assertTrue(actual.contains(" join_1"));
+            assertTrue(actual.contains(" join_2"));
+            assertTrue(actual.contains(" join_3"));
+            assertTrue(actual.contains(" join_4"));
+            assertTrue(actual.contains(" join_5"));
+            assertFalse(actual.contains(" join_6"));
+            assertEquals(43, DfStringUtil.splitList(actual, "select * from dual").size());
+            assertTrue(actual.contains(" rownum <= 10001"));
         } finally {
             ResourceContext.clearResourceContextOnThread();
         }
