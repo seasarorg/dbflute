@@ -278,18 +278,22 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             if (incrementSize != null) { // can get it from meta
                 assertIncrementSizeNotDecrement(incrementSize, schemaName, tableName, sequenceProp, sequenceName);
                 assertExtraValueZero(cacheSize, incrementSize, schemaName, tableName, sequenceProp, sequenceName);
-                return cacheSize;
+
+                // *no limit because of self-responsibility
+                //assertCacheSizeOfBatchWayNotTooLarge(cacheSize, schemaName, tableName, sequenceProp, sequenceName, incrementSize);
+
+                return cacheSize; // batch way
             } else {
                 // the specified cacheSize should be same as actual increment size
                 // (DBFlute cannot know it)
-                return cacheSize;
+                return cacheSize; // increment way
             }
         } else { // cacheSize is omitted
             assertIncrementSizeExistsIfNoCacheSize(incrementSize, schemaName, tableName, sequenceProp, sequenceName);
             assertIncrementSizeNotDecrement(incrementSize, schemaName, tableName, sequenceProp, sequenceName);
             // the cacheSize is same as actual increment size
             assertCacheSizeOverOne(incrementSize, schemaName, tableName, sequenceProp, sequenceName, incrementSize);
-            return incrementSize;
+            return incrementSize; // increment way
         }
     }
 
@@ -325,6 +329,24 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             throw new DfIllegalPropertySettingException(msg);
         }
     }
+
+    // *no limit because of self-responsibility
+    //protected void assertCacheSizeOfBatchWayNotTooLarge(Integer cacheSize, String schemaName, String tableName,
+    //        String sequenceProp, String sequenceName, Integer incrementSize) {
+    //    if (cacheSize > 2000) {
+    //        String msg = "Look! Read the message below." + ln();
+    //        msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+    //        msg = msg + "The cacheSize of batch way should be under 2000. (not 2001 or more)" + ln();
+    //        msg = msg + ln();
+    //        msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
+    //        msg = msg + "sequenceProp = " + sequenceProp + ln();
+    //        msg = msg + "sequenceName = " + sequenceName + ln();
+    //        msg = msg + "cacheSize = " + cacheSize + ln();
+    //        msg = msg + "incrementSize = " + incrementSize + ln();
+    //        msg = msg + "- - - - - - - - - -/";
+    //        throw new DfIllegalPropertySettingException(msg);
+    //    }
+    //}
 
     protected void assertIncrementSizeNotDecrement(Integer incrementSize, String schemaName, String tableName,
             String sequenceProp, String sequenceName) {
