@@ -118,13 +118,28 @@ public class SequenceCacheHandler {
         final StringBuilder sb = new StringBuilder();
         if (unionCount > 0) { // "batch" way
             if (ResourceContext.isCurrentDBDef(DBDef.Oracle)) { // Oracle patch
-                sb.append(DfStringUtil.replace(nextValSql, "from dual", "from ("));
-                sb.append(ln()).append("  select * from dual");
-                for (int i = 0; i < unionCount; i++) {
-                    sb.append(ln()).append("   union all ");
-                    sb.append(ln()).append("  select * from dual");
+                sb.append(DfStringUtil.replace(nextValSql, "from dual", ln() + "  from ("));
+                final Integer dualCountInOneJoin = 10;
+                final Integer joinCount = (unionCount / dualCountInOneJoin) + 1;
+                int currentDualCount = 0;
+                for (int i = 0; i < joinCount; i++) {
+                    if (i >= 1) {
+                        sb.append(ln()).append("    cross join (");
+                    }
+                    sb.append("select * from dual");
+                    ++currentDualCount;
+                    final String indent = (i >= 1 ? "                " : "        ");
+                    for (int j = 0; j < (dualCountInOneJoin - 1); j++) {
+                        sb.append(ln()).append(indent).append(" union all");
+                        sb.append(ln()).append(indent).append("select * from dual");
+                        ++currentDualCount;
+                        if (currentDualCount >= divided) {
+                            break;
+                        }
+                    }
+                    sb.append(") join_" + (i + 1));
                 }
-                sb.append(") dflocal");
+                sb.append(ln()).append(" where rownum <= " + divided);
             } else {
                 // PostgreSQL and H2 are OK (but DB2 is NG)
                 if (ResourceContext.isCurrentDBDef(DBDef.DB2)) {

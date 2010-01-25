@@ -264,7 +264,10 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
             log(actual);
             assertTrue(actual.contains("nextval"));
             assertTrue(actual.contains("select * from dual"));
-            assertTrue(actual.contains(" union all "));
+            assertTrue(actual.contains(" union all"));
+            assertTrue(actual.contains(" join_1"));
+            assertFalse(actual.contains(" join_2"));
+            assertTrue(actual.contains(" rownum <= 2"));
         } finally {
             ResourceContext.clearResourceContextOnThread();
         }
@@ -284,6 +287,31 @@ public class SequenceCacheHandlerTest extends PlainTestCase {
         String[] split = actual.split(" union all ");
         assertEquals(50, split.length);
         assertTrue(actual.contains("order by 1"));
+    }
+
+    public void test_filterNextValSql_incrementOne_Oracle() {
+        // ## Arrange ##
+        SequenceCacheHandler handler = new SequenceCacheHandler();
+        String sql = "select SEQ_MEMBER.nextval from dual";
+        ResourceContext context = new ResourceContext();
+        context.setCurrentDBDef(DBDef.Oracle);
+        ResourceContext.setResourceContextOnThread(context);
+
+        try {
+            // ## Act ##
+            String actual = handler.filterNextValSql(54, 1, sql);
+
+            // ## Assert ##
+            log(actual);
+            assertTrue(actual.contains("nextval"));
+            assertTrue(actual.contains("select * from dual"));
+            assertTrue(actual.contains(" union all"));
+            assertTrue(actual.contains(" join_5"));
+            assertTrue(actual.contains(" join_6"));
+            assertTrue(actual.contains(" rownum <= 54"));
+        } finally {
+            ResourceContext.clearResourceContextOnThread();
+        }
     }
 
     public void test_filterNextValSql_cannotDivided() {
