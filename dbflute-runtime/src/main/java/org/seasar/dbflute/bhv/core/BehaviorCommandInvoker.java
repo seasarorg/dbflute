@@ -302,7 +302,7 @@ public class BehaviorCommandInvoker {
             execution = getSqlExecution(key);
             if (execution != null) {
                 if (isLogEnabled()) {
-                    log("...Getting sqlExecution as cache because the previous thread have already initialized.");
+                    log("...Getting sqlExecution as cache because the previous thread has already initialized.");
                 }
                 return execution;
             }
