@@ -118,9 +118,9 @@ public class SequenceCacheHandler {
         final StringBuilder sb = new StringBuilder();
         if (unionCount > 0) { // "batch" way
             if (ResourceContext.isCurrentDBDef(DBDef.Oracle)) { // patch
-                sb.append(buildNextValSqlForOracle(nextValSql, divided, unionCount));
+                sb.append(buildNextValSqlOnOracle(nextValSql, divided, unionCount));
             } else if (ResourceContext.isCurrentDBDef(DBDef.DB2)) { // patch
-                sb.append(buildNextValSqlForDB2(nextValSql, divided, unionCount));
+                sb.append(buildNextValSqlOnDB2(nextValSql, divided, unionCount));
             } else { // basically PostgreSQL and H2
                 sb.append(buildNextValSqlUsingUnionAll(nextValSql, divided, unionCount));
             }
@@ -130,7 +130,7 @@ public class SequenceCacheHandler {
         return sb.toString();
     }
 
-    protected String buildNextValSqlForOracle(String nextValSql, Integer divided, Integer unionCount) {
+    protected String buildNextValSqlOnOracle(String nextValSql, Integer divided, Integer unionCount) {
         final StringBuilder sb = new StringBuilder();
         sb.append(DfStringUtil.replace(nextValSql, "from dual", ln() + "  from ("));
         final Integer maxDualCountInOneJoin = 10;
@@ -165,16 +165,19 @@ public class SequenceCacheHandler {
         }
         sb.append(ln()).append(" where rownum <= " + divided);
         return sb.toString();
-
-        // *another way
-        //final String viewSql = "select level from dual connect by level <= " + unionCount;
-        //sb.append(DfStringUtil.replace(nextValSql, "from dual", "from (" + viewSql + ")"));
-        //return sb.toString();
     }
 
-    protected String buildNextValSqlForDB2(String nextValSql, Integer divided, Integer unionCount) {
+    // for override code (so basically unused)
+    protected final String buildNextValSqlOnOracleUsingConnectBy(String nextValSql, Integer divided, Integer unionCount) {
         final StringBuilder sb = new StringBuilder();
-        final String viewSql = "values (1) union all select N + 1 from NUM where n < " + unionCount;
+        final String viewSql = "select level from dual connect by level <= " + unionCount;
+        sb.append(DfStringUtil.replace(nextValSql, "from dual", "from (" + viewSql + ")"));
+        return sb.toString();
+    }
+
+    protected String buildNextValSqlOnDB2(String nextValSql, Integer divided, Integer unionCount) {
+        final StringBuilder sb = new StringBuilder();
+        final String viewSql = "values (1) union all select N + 1 from NUM where n <= " + unionCount;
         sb.append("with NUM (N) as (").append(viewSql).append(")");
         sb.append(ln()).append(DfStringUtil.replace(nextValSql, "values", "select")).append(" from NUM");
         return sb.toString();
