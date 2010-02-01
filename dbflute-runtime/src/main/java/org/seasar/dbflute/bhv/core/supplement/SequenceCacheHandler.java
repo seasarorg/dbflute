@@ -117,58 +117,77 @@ public class SequenceCacheHandler {
         final Integer unionCount = divided - 1;
         final StringBuilder sb = new StringBuilder();
         if (unionCount > 0) { // "batch" way
-            if (ResourceContext.isCurrentDBDef(DBDef.Oracle)) { // Oracle patch
-                sb.append(DfStringUtil.replace(nextValSql, "from dual", ln() + "  from ("));
-                final Integer maxDualCountInOneJoin = 10;
-                int allRecordCount = 0;
-                boolean reached = false;
-                for (int i = 0; !reached; i++) {
-                    if (i >= 1) {
-                        sb.append(ln()).append("    cross join (");
-                    }
-                    int dualCountInOneJoin = 0;
-                    sb.append("select * from dual");
-                    ++dualCountInOneJoin;
-                    final String indent = (i >= 1 ? "                " : "        ");
-                    int calculatedRecordCount = 0;
-                    for (int j = 0; j < (maxDualCountInOneJoin - 1); j++) { // always more one loop 
-                        sb.append(ln()).append(indent).append(" union all");
-                        sb.append(ln()).append(indent).append("select * from dual");
-                        ++dualCountInOneJoin;
-                        if (allRecordCount == 0) {
-                            calculatedRecordCount = dualCountInOneJoin;
-                        } else {
-                            // cross-joined record count
-                            calculatedRecordCount = (allRecordCount * dualCountInOneJoin);
-                        }
-                        if (calculatedRecordCount >= divided) {
-                            reached = true;
-                            break;
-                        }
-                    }
-                    allRecordCount = calculatedRecordCount;
-                    sb.append(") join_" + (i + 1));
-                }
-                sb.append(ln()).append(" where rownum <= " + divided);
-            } else {
-                // PostgreSQL and H2 are OK (but DB2 is NG)
-                if (ResourceContext.isCurrentDBDef(DBDef.DB2)) {
-                    String msg = "The cacheSize should be same as incrementSize on DB2:";
-                    msg = msg + " cacheSize=" + cacheSize + " incrementSize=" + incrementSize;
-                    msg = msg + " nextValueSql=" + nextValSql;
-                    throw new UnsupportedOperationException(msg);
-                }
-                sb.append(nextValSql);
-                for (int i = 0; i < unionCount; i++) {
-                    sb.append(ln()).append(" union all ");
-                    sb.append(ln()).append(nextValSql);
-                }
-                sb.append(ln()).append(" order by 1 asc");
-
+            if (ResourceContext.isCurrentDBDef(DBDef.Oracle)) { // patch
+                sb.append(buildNextValSqlForOracle(nextValSql, divided, unionCount));
+            } else if (ResourceContext.isCurrentDBDef(DBDef.DB2)) { // patch
+                sb.append(buildNextValSqlForDB2(nextValSql, divided, unionCount));
+            } else { // basically PostgreSQL and H2
+                sb.append(buildNextValSqlUsingUnionAll(nextValSql, divided, unionCount));
             }
         } else { // "increment" way
             sb.append(nextValSql);
         }
+        return sb.toString();
+    }
+
+    protected String buildNextValSqlForOracle(String nextValSql, Integer divided, Integer unionCount) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(DfStringUtil.replace(nextValSql, "from dual", ln() + "  from ("));
+        final Integer maxDualCountInOneJoin = 10;
+        int allRecordCount = 0;
+        boolean reached = false;
+        for (int i = 0; !reached; i++) {
+            if (i >= 1) {
+                sb.append(ln()).append("    cross join (");
+            }
+            int dualCountInOneJoin = 0;
+            sb.append("select * from dual");
+            ++dualCountInOneJoin;
+            final String indent = (i >= 1 ? "                " : "        ");
+            int calculatedRecordCount = 0;
+            for (int j = 0; j < (maxDualCountInOneJoin - 1); j++) { // always more one loop 
+                sb.append(ln()).append(indent).append(" union all");
+                sb.append(ln()).append(indent).append("select * from dual");
+                ++dualCountInOneJoin;
+                if (allRecordCount == 0) {
+                    calculatedRecordCount = dualCountInOneJoin;
+                } else {
+                    // cross-joined record count
+                    calculatedRecordCount = (allRecordCount * dualCountInOneJoin);
+                }
+                if (calculatedRecordCount >= divided) {
+                    reached = true;
+                    break;
+                }
+            }
+            allRecordCount = calculatedRecordCount;
+            sb.append(") join_" + (i + 1));
+        }
+        sb.append(ln()).append(" where rownum <= " + divided);
+        return sb.toString();
+
+        // *another way
+        //final String viewSql = "select level from dual connect by level <= " + unionCount;
+        //sb.append(DfStringUtil.replace(nextValSql, "from dual", "from (" + viewSql + ")"));
+        //return sb.toString();
+    }
+
+    protected String buildNextValSqlForDB2(String nextValSql, Integer divided, Integer unionCount) {
+        final StringBuilder sb = new StringBuilder();
+        final String viewSql = "values (1) union all select N + 1 from NUM where n < " + unionCount;
+        sb.append("with NUM (N) as (").append(viewSql).append(")");
+        sb.append(ln()).append(DfStringUtil.replace(nextValSql, "values", "select")).append(" from NUM");
+        return sb.toString();
+    }
+
+    protected String buildNextValSqlUsingUnionAll(String nextValSql, Integer divided, Integer unionCount) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(nextValSql);
+        for (int i = 0; i < unionCount; i++) {
+            sb.append(ln()).append(" union all ");
+            sb.append(ln()).append(nextValSql);
+        }
+        sb.append(ln()).append(" order by 1 asc");
         return sb.toString();
     }
 
