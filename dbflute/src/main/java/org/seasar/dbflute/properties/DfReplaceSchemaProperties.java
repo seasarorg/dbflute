@@ -231,17 +231,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     // ===================================================================================
     //                                                                     Additional Drop
     //                                                                     ===============
-    @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getAdditionalDropMapList() {
-        Object obj = getReplaceSchemaDefinitionMap().get("additionalDropMapList");
+        final Object obj = getReplaceSchemaDefinitionMap().get("additionalDropMapList");
         if (obj == null) {
             return new ArrayList<Map<String, Object>>();
         }
-        if (!(obj instanceof List)) {
-            String msg = "The type of the property 'additionalDropMapList' should be List: " + obj;
-            throw new DfIllegalPropertyTypeException(msg);
-        }
-        return (List<Map<String, Object>>) obj;
+        return castToList(obj, "additionalDropMapList");
     }
 
     public String getAdditionalDropUrl(Map<String, Object> additionalDropMap) {
@@ -249,11 +244,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (obj == null) {
             return null;
         }
-        if (!(obj instanceof String)) {
-            String msg = "The url should be String: url=" + obj + " type=" + obj.getClass();
-            throw new DfIllegalPropertyTypeException(msg);
-        }
-        return (String) obj;
+        return castToString(obj, "additionalDropMapList.url");
     }
 
     public String getAdditionalDropUser(Map<String, Object> additionalDropMap) {
@@ -261,11 +252,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (obj == null) {
             return null;
         }
-        if (!(obj instanceof String)) {
-            String msg = "The user should be String: user=" + obj + " type=" + obj.getClass();
-            throw new DfIllegalPropertyTypeException(msg);
-        }
-        return (String) obj;
+        return castToString(obj, "additionalDropMapList.user");
     }
 
     public String getAdditionalDropPassword(Map<String, Object> additionalDropMap) {
@@ -273,11 +260,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (obj == null) {
             return null;
         }
-        if (!(obj instanceof String)) {
-            String msg = "The password should be String: password=" + obj + " type=" + obj.getClass();
-            throw new DfIllegalPropertyTypeException(msg);
-        }
-        return (String) obj;
+        return castToString(obj, "additionalDropMapList.password");
     }
 
     @SuppressWarnings("unchecked")
@@ -287,8 +270,9 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             return new Properties();
         }
         if (!(obj instanceof Map)) {
-            String msg = "The schema should be Map<String, String>: propertiesMap=" + obj + " type=" + obj.getClass();
-            throw new IllegalStateException(msg);
+            String msg = "The schema should be Map<String, String>:";
+            msg = msg + " propertiesMap=" + obj + " type=" + obj.getClass();
+            throw new DfIllegalPropertyTypeException(msg);
         }
         final Properties prop = new Properties();
         prop.putAll((Map<String, String>) obj);
@@ -299,26 +283,20 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final Object obj = additionalDropMap.get("schema");
         if (obj == null) {
             getBasicProperties().isDatabasePostgreSQL();
-            if (!isSchemaOmittableDBMS()) {
+            if (!isSchemaCanBeOmittedDBMS()) {
                 String msg = "The schema is required:";
                 msg = msg + " additionalDropMap=" + additionalDropMap;
                 throw new DfRequiredPropertyNotFoundException(msg);
             }
             return null;
         }
-        if (!(obj instanceof String)) {
-            String msg = "The schema should be String: schema=" + obj + " type=" + obj.getClass();
-            throw new DfIllegalPropertyTypeException(msg);
-        }
-        return (String) obj;
+        return castToString(obj, "additionalDropMapList.schema");
     }
 
-    protected boolean isSchemaOmittableDBMS() {
-        return getBasicProperties().isDatabaseH2() || getBasicProperties().isDatabasePostgreSQL()
-                || getBasicProperties().isDatabaseMySQL();
+    protected boolean isSchemaCanBeOmittedDBMS() {
+        return getBasicProperties().isDatabaseSchemaCanBeOmitted();
     }
 
-    @SuppressWarnings("unchecked")
     public List<String> getAdditionalDropObjectTypeList(Map<String, Object> additionalDropMap) {
         Object obj = additionalDropMap.get("objectTypeTargetList");
         if (obj == null) {
@@ -330,37 +308,23 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
                 return defaultList;
             }
         }
-        if (!(obj instanceof List)) {
-            String msg = "The schema should be List<String>: objectTypeTargetList=" + obj + " type=" + obj.getClass();
-            throw new IllegalStateException(msg);
-        }
-        return (List<String>) obj;
+        return castToList(obj, "additionalDropMapList.objectTypeTargetList");
     }
 
-    @SuppressWarnings("unchecked")
     public List<String> getAdditionalDropTableTargetList(Map<String, Object> additionalDropMap) {
         Object obj = additionalDropMap.get("tableTargetList");
         if (obj == null) {
             return new ArrayList<String>();
         }
-        if (!(obj instanceof List)) {
-            String msg = "The schema should be List<String>: tableTargetList=" + obj + " type=" + obj.getClass();
-            throw new IllegalStateException(msg);
-        }
-        return (List<String>) obj;
+        return castToList(obj, "additionalDropMapList.tableTargetList");
     }
 
-    @SuppressWarnings("unchecked")
     public List<String> getAdditionalDropTableExceptList(Map<String, Object> additionalDropMap) {
-        Object obj = additionalDropMap.get("tableExceptList");
+        final Object obj = additionalDropMap.get("tableExceptList");
         if (obj == null) {
             return new ArrayList<String>();
         }
-        if (!(obj instanceof List)) {
-            String msg = "The schema should be List<String>: tableExceptList=" + obj + " type=" + obj.getClass();
-            throw new IllegalStateException(msg);
-        }
-        return (List<String>) obj;
+        return castToList(obj, "additionalDropMapList.tableExceptList");
     }
 
     public boolean isAdditionalDropAllTable(Map<String, Object> additionalDropMap) {
@@ -437,6 +401,28 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
      */
     public String getBeforeTakeFinally() { // It's closet!
         return (String) getReplaceSchemaDefinitionMap().get("beforeTakeFinally");
+    }
+
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
+    protected String castToString(Object obj, String property) {
+        if (!(obj instanceof String)) {
+            String msg = "The type of the property '" + property + "' should be String:";
+            msg = msg + " obj=" + obj + " type=" + (obj != null ? obj.getClass() : null);
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        return (String) obj;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <ELEMENT> List<ELEMENT> castToList(Object obj, String property) {
+        if (!(obj instanceof List<?>)) {
+            String msg = "The type of the property '" + property + "' should be List:";
+            msg = msg + " obj=" + obj + " type=" + (obj != null ? obj.getClass() : null);
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        return (List<ELEMENT>) obj;
     }
 
     // ===================================================================================
