@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -297,6 +298,12 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     public String getAdditionalDropSchema(Map<String, Object> additionalDropMap) {
         final Object obj = additionalDropMap.get("schema");
         if (obj == null) {
+            getBasicProperties().isDatabasePostgreSQL();
+            if (!isSchemaOmittableDBMS()) {
+                String msg = "The schema is required:";
+                msg = msg + " additionalDropMap=" + additionalDropMap;
+                throw new DfRequiredPropertyNotFoundException(msg);
+            }
             return null;
         }
         if (!(obj instanceof String)) {
@@ -304,6 +311,11 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             throw new DfIllegalPropertyTypeException(msg);
         }
         return (String) obj;
+    }
+
+    protected boolean isSchemaOmittableDBMS() {
+        return getBasicProperties().isDatabaseH2() || getBasicProperties().isDatabasePostgreSQL()
+                || getBasicProperties().isDatabaseMySQL();
     }
 
     @SuppressWarnings("unchecked")
