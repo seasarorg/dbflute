@@ -112,6 +112,10 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         initializeSchemaAdditionalDrop(); // additional first
 
         _log.info("");
+        initializeSchemaMainDrop();
+    }
+
+    protected void initializeSchemaMainDrop() {
         _log.info("* * * * * * * * * * *");
         _log.info("*                   *");
         _log.info("* Initialize Schema *");
