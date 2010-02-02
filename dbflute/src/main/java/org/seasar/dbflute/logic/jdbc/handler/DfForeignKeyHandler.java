@@ -142,7 +142,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
 
     protected void assertFKColumnNotExcepted(String schemaName, String tableName, String columnName) {
         if (isColumnExcept(schemaName, tableName, columnName)) {
-            String msg = "PK and FK columns are unsupported on 'columnExcept' property:";
+            String msg = "FK columns are unsupported on 'columnExcept' property:";
             msg = msg + " schemaName=" + schemaName;
             msg = msg + " tableName=" + tableName;
             msg = msg + " columnName=" + columnName;

@@ -109,6 +109,9 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                                                   =================
     protected void initializeSchema() {
         _log.info("");
+        initializeSchemaAdditionalDrop(); // additional first
+
+        _log.info("");
         _log.info("* * * * * * * * * * *");
         _log.info("*                   *");
         _log.info("* Initialize Schema *");
@@ -123,8 +126,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         if (initializer != null) {
             initializer.initializeSchema();
         }
-        _log.info("");
-        initializeSchemaAdditionalDrop();
     }
 
     protected void initializeSchemaAdditionalDrop() {
