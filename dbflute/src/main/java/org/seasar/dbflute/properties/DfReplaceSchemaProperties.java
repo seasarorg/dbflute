@@ -12,8 +12,8 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
-import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -243,11 +243,61 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return (List<Map<String, Object>>) obj;
     }
 
+    public String getAdditionalDropUrl(Map<String, Object> additionalDropMap) {
+        final Object obj = additionalDropMap.get("url");
+        if (obj == null) {
+            return null;
+        }
+        if (!(obj instanceof String)) {
+            String msg = "The url should be String: url=" + obj + " type=" + obj.getClass();
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        return (String) obj;
+    }
+
+    public String getAdditionalDropUser(Map<String, Object> additionalDropMap) {
+        final Object obj = additionalDropMap.get("user");
+        if (obj == null) {
+            return null;
+        }
+        if (!(obj instanceof String)) {
+            String msg = "The user should be String: user=" + obj + " type=" + obj.getClass();
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        return (String) obj;
+    }
+
+    public String getAdditionalDropPassword(Map<String, Object> additionalDropMap) {
+        final Object obj = additionalDropMap.get("password");
+        if (obj == null) {
+            return null;
+        }
+        if (!(obj instanceof String)) {
+            String msg = "The password should be String: password=" + obj + " type=" + obj.getClass();
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        return (String) obj;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Properties getAdditionalDropPropertiesMap(Map<String, Object> additionalDropMap) {
+        Object obj = additionalDropMap.get("propertiesMap");
+        if (obj == null) {
+            return new Properties();
+        }
+        if (!(obj instanceof Map)) {
+            String msg = "The schema should be Map<String, String>: propertiesMap=" + obj + " type=" + obj.getClass();
+            throw new IllegalStateException(msg);
+        }
+        final Properties prop = new Properties();
+        prop.putAll((Map<String, String>) obj);
+        return prop;
+    }
+
     public String getAdditionalDropSchema(Map<String, Object> additionalDropMap) {
         final Object obj = additionalDropMap.get("schema");
         if (obj == null) {
-            String msg = "The schema in the property 'additionalDropMapList' should not be null: " + obj;
-            throw new DfRequiredPropertyNotFoundException(msg);
+            return null;
         }
         if (!(obj instanceof String)) {
             String msg = "The schema should be String: schema=" + obj + " type=" + obj.getClass();
@@ -303,6 +353,37 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
 
     public boolean isAdditionalDropAllTable(Map<String, Object> additionalDropMap) {
         return isProperty("isDropAllTable", false, additionalDropMap);
+    }
+
+    public Connection createAdditionalDropConnection(Map<String, Object> additionalDropMap) {
+        String url = getAdditionalDropUrl(additionalDropMap);
+        url = url != null && url.trim().length() > 0 ? url : getDatabaseProperties().getDatabaseUrl();
+        String user = getAdditionalDropUser(additionalDropMap);
+        String password;
+        if (user != null && user.trim().length() > 0) {
+            password = getAdditionalDropPassword(additionalDropMap);
+            if (password == null || password.trim().length() == 0) {
+                String msg = "The password is required when the user is specified:";
+                msg = msg + " user=" + user + " additionalDropMap=" + additionalDropMap;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+        } else {
+            user = getDatabaseProperties().getDatabaseUser();
+            password = getDatabaseProperties().getDatabasePassword();
+        }
+        final Properties prop = getAdditionalDropPropertiesMap(additionalDropMap);
+        Properties info = new Properties();
+        info.putAll(prop);
+        info.put("user", user);
+        info.put("password", password);
+        try {
+            final Connection conn = DriverManager.getConnection(url, info);
+            conn.setAutoCommit(true);
+            return conn;
+        } catch (SQLException e) {
+            String msg = "Failed to connect: url=" + url + ", user=" + user;
+            throw new IllegalStateException(msg, e);
+        }
     }
 
     // ===================================================================================

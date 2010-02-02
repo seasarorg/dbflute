@@ -108,28 +108,12 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                                                   Initialize Schema
     //                                                                   =================
     protected void initializeSchema() {
+        // additional first for dropping references to main schema
         _log.info("");
-        initializeSchemaAdditionalDrop(); // additional first
+        initializeSchemaAdditionalDrop();
 
         _log.info("");
         initializeSchemaMainDrop();
-    }
-
-    protected void initializeSchemaMainDrop() {
-        _log.info("* * * * * * * * * * *");
-        _log.info("*                   *");
-        _log.info("* Initialize Schema *");
-        _log.info("*                   *");
-        _log.info("* * * * * * * * * * *");
-        if (_lazyConnection) {
-            _log.info("*Passed because it's a lazy connection");
-            _log.info("");
-            return;
-        }
-        final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.FIRST);
-        if (initializer != null) {
-            initializer.initializeSchema();
-        }
     }
 
     protected void initializeSchemaAdditionalDrop() {
@@ -150,13 +134,41 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         _log.info("*                                     *");
         _log.info("* * * * * * * * * * * * * * * * * * * *");
         for (Map<String, Object> additionalDropMap : additionalDropMapList) {
-            final String additionalDropSchema = getMyProperties().getAdditionalDropSchema(additionalDropMap);
-            _log.info("{" + additionalDropSchema + "}");
+            final String dropUrl = getMyProperties().getAdditionalDropUrl(additionalDropMap);
+            final String dropUser = getMyProperties().getAdditionalDropUser(additionalDropMap);
+            final String dropSchema = getMyProperties().getAdditionalDropSchema(additionalDropMap);
+            if (dropUrl != null && dropUrl.trim().length() > 0) {
+                _log.info("url    = " + dropUrl);
+            }
+            if (dropSchema != null && dropSchema.trim().length() > 0) {
+                _log.info("schema = " + dropSchema);
+            }
+            if (dropUser != null && dropUser.trim().length() > 0) {
+                _log.info("user   = " + dropUser);
+            }
+            _log.info("- - - - - - - - - -");
             final DfSchemaInitializer initializer = createSchemaInitializerAdditional(additionalDropMap);
             if (initializer != null) {
                 initializer.initializeSchema();
             }
             _log.info("");
+        }
+    }
+
+    protected void initializeSchemaMainDrop() {
+        _log.info("* * * * * * * * * * *");
+        _log.info("*                   *");
+        _log.info("* Initialize Schema *");
+        _log.info("*                   *");
+        _log.info("* * * * * * * * * * *");
+        if (_lazyConnection) {
+            _log.info("*Passed because it's a lazy connection");
+            _log.info("");
+            return;
+        }
+        final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.MAIN);
+        if (initializer != null) {
+            initializer.initializeSchema();
         }
     }
 

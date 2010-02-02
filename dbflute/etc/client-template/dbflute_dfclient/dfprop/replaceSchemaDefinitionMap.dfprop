@@ -21,37 +21,6 @@
 # o isSuppressDropProcedure: (NotRequired - Default false)
 # o isSuppressDropDBLink: (NotRequired - Default false)
 # 
-# Example:
-# map:{
-#     ; dataLoadingType = ut
-#     ; isLoggingInsertSql = true
-#     ; sqlFileEncoding = UTF-8
-#     ; skipSheet = P.+
-#     ; isIncrementSequenceToDataMax = false
-#     ; isSuppressBatchUpdate = false
-#     ; isDropGenerateTableOnly = false
-#     ; isDropGenerateProcedureOnly = false
-#     ; filterVariablesMap = map:{abc=AAA}
-#     ; additionalUserMap = map:{
-#         ; system = map:{user=system ; password=system}
-#     }
-#     ; additionalDropMapList = list:{
-#         ; map:{
-#             ; schema = NEXTEXAMPLEDB
-#             ; objectTypeTargetList = list:{TABLE;VIEW}
-#             ; tableExceptList = list:{AAA}
-#             ; tableTargetList = list:{BBB}
-#             ; isDropAllTable = false
-#         }
-#     }
-#     ; isSuppressTruncateTable = false
-#     ; isSuppressDropForeignKey = false
-#     ; isSuppressDropTable = false
-#     ; isSuppressDropSequence = false
-#     ; isSuppressDropProcedure = false
-#     ; isSuppressDropDBLink = false
-# }
-#
 # *The line that starts with '#' means comment-out.
 #
 map:{
@@ -148,14 +117,22 @@ map:{
     # o additionalDropMapList: (NotRequired - Default list:{})
     #  You can drop additional other schemas.
     #  Elements of this map are as below:
-    #   o schema: (Required)
-    #   o objectTypeTargetList: (NotRequired - Default 'list{TABLE;VIEW}')
-    #   o tableExceptList: (NotRequired - Default 'list{}')
-    #   o tableTargetList: (NotRequired - Default 'list{}')
+    #   o url: (NotRequired - Default same as main schema)
+    #   o user: (NotRequired - Default same as main schema)
+    #   o password: (NotRequired - Default same as main schema)
+    #   o propertiesMap: (NotRequired - Default same as main schema)
+    #   o schema: (NotRequired: if empty schema means 'public' schema - Default '')
+    #   o objectTypeTargetList: (NotRequired - Default list{TABLE;VIEW})
+    #   o tableExceptList: (NotRequired - Default list{})
+    #   o tableTargetList: (NotRequired - Default list{})
     #   o isDropAllTable: (NotRequired - Default false)
     #
     #; additionalDropMapList = list:{
     #    ; map:{
+    #        ; url = jdbc:oracle:thin:...
+    #        ; user = NEXTEXAMPLEDB
+    #        ; password = NEXTEXAMPLEDB
+    #        ; propertiesMap = map:{}
     #        ; schema = NEXTEXAMPLEDB
     #        ; objectTypeTargetList = list:{TABLE;VIEW}
     #        ; tableExceptList = list:{FULL_NAME ; prefix:PREFIX_ ; ...}

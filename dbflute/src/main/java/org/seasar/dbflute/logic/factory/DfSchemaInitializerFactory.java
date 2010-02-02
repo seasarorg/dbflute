@@ -1,5 +1,8 @@
 package org.seasar.dbflute.logic.factory;
 
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -30,10 +33,10 @@ public class DfSchemaInitializerFactory {
     protected DfDatabaseProperties _databaseProperties;
     protected DfReplaceSchemaProperties _replaceSchemaProperties;
     protected InitializeType _initializeType;
-    protected Map<String, Object> additionalDropMap;
+    protected Map<String, Object> _additionalDropMap;
 
     public enum InitializeType {
-        FIRST, ADDTIONAL
+        MAIN, ADDTIONAL
     }
 
     // ===================================================================================
@@ -115,9 +118,10 @@ public class DfSchemaInitializerFactory {
     }
 
     protected void setupSchemaInitializerJdbcProperties(DfSchemaInitializerJdbc initializer) {
-        initializer.setDataSource(_dataSource);
         setupDetailExecutionHandling(initializer);
-        if (_initializeType.equals(InitializeType.FIRST)) { // Normal
+
+        if (_initializeType.equals(InitializeType.MAIN)) {
+            initializer.setDataSource(_dataSource);
             initializer.setSchema(_databaseProperties.getDatabaseSchema());
             initializer.setDropGenerateTableOnly(_replaceSchemaProperties.isDropGenerateTableOnly());
             initializer.setDropGenerateProcedureOnly(_replaceSchemaProperties.isDropGenerateProcedureOnly());
@@ -126,25 +130,49 @@ public class DfSchemaInitializerFactory {
 
         if (_initializeType.equals(InitializeType.ADDTIONAL)) {
             // Here 'Additional'!
-            if (additionalDropMap == null) {
+            if (_additionalDropMap == null) {
                 String msg = "The additional drop map should exist if the initialize type is additional!";
                 throw new IllegalStateException(msg);
             }
-            final String schemaName = getAdditionalDropSchema(additionalDropMap);
-            if (schemaName == null || schemaName.trim().length() == 0) {
-                String msg = "Additional Drop Schema should not be null or empty: schema=" + schemaName;
-                throw new IllegalStateException(msg);
-            }
+            initializer.setDataSource(getAdditionalDataSource());
+            final String schemaName = getAdditionalDropSchema(_additionalDropMap);
             initializer.setSchema(schemaName);
             initializer.setTableNameWithSchema(true); // because it may be other schema!
-            initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(additionalDropMap));
-            initializer.setDropTableTargetList(getAdditionalDropTableTargetList(additionalDropMap));
-            initializer.setDropTableExceptList(getAdditionalDropTableExceptList(additionalDropMap));
+            initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(_additionalDropMap));
+            initializer.setDropTableTargetList(getAdditionalDropTableTargetList(_additionalDropMap));
+            initializer.setDropTableExceptList(getAdditionalDropTableExceptList(_additionalDropMap));
             initializer.setDropGenerateTableOnly(false);
-        } else {
-            String msg = "Unknown initialize type: " + _initializeType;
-            throw new IllegalStateException(msg);
+            return;
         }
+
+        String msg = "Unknown initialize type: " + _initializeType;
+        throw new IllegalStateException(msg);
+    }
+
+    protected DataSource getAdditionalDataSource() {
+        return new DataSource() {
+            public void setLoginTimeout(int i) throws SQLException {
+            }
+
+            public void setLogWriter(PrintWriter printwriter) throws SQLException {
+            }
+
+            public int getLoginTimeout() throws SQLException {
+                return 0;
+            }
+
+            public PrintWriter getLogWriter() throws SQLException {
+                return null;
+            }
+
+            public Connection getConnection(String s, String s1) throws SQLException {
+                return null;
+            }
+
+            public Connection getConnection() throws SQLException {
+                return _replaceSchemaProperties.createAdditionalDropConnection(_additionalDropMap);
+            }
+        };
     }
 
     protected void setupDetailExecutionHandling(DfSchemaInitializerJdbc initializer) {
@@ -180,10 +208,10 @@ public class DfSchemaInitializerFactory {
     }
 
     public Map<String, Object> getAdditionalDropMap() {
-        return additionalDropMap;
+        return _additionalDropMap;
     }
 
     public void setAdditionalDropMap(Map<String, Object> additionalDropMap) {
-        this.additionalDropMap = additionalDropMap;
+        this._additionalDropMap = additionalDropMap;
     }
 }

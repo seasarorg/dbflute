@@ -494,7 +494,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                       Assist Helper
     //                                                                       =============
     protected String filterTableName(String tableName) {
-        if (_tableNameWithSchema) {
+        if (_tableNameWithSchema && _schema != null && _schema.trim().length() > 0) {
             tableName = _schema + "." + tableName;
         }
         return tableName;
