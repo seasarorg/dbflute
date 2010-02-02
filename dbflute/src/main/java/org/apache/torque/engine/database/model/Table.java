@@ -912,12 +912,11 @@ public class Table {
     //                                                 -----
     /**
      * Returns an Array containing all the FKs in the table
-     * 
      * @return Foreign-key array.
      */
     public ForeignKey[] getForeignKeys() {
-        int size = _foreignKeys.size();
-        ForeignKey[] tbls = new ForeignKey[size];
+        final int size = _foreignKeys.size();
+        final ForeignKey[] tbls = new ForeignKey[size];
         for (int i = 0; i < size; i++) {
             tbls[i] = (ForeignKey) _foreignKeys.get(i);
         }
@@ -960,12 +959,11 @@ public class Table {
     /**
      * A utility function to create a new foreign key
      * from attrib and add it to this table.
-     *
      * @param attrib the xml attributes
      * @return the created ForeignKey
      */
     public ForeignKey addForeignKey(Attributes attrib) {
-        ForeignKey fk = new ForeignKey();
+        final ForeignKey fk = new ForeignKey();
         fk.loadFromXML(attrib);
         addForeignKey(fk);
         return fk;
@@ -1066,7 +1064,6 @@ public class Table {
     /**
      * Adds a new FK to the FK list and set the
      * parent table of the column to the current table
-     *
      * @param fk A foreign key
      */
     public void addForeignKey(ForeignKey fk) {

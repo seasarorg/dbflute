@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfForeignKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
@@ -98,21 +99,17 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                     fkName = foreignTableName;
                 }
 
-                if (isTableExcept(foreignSchemaName, foreignTableName)) {
-                    exceptedFKKeyMap.put(fkName, foreignTableName);
-                    continue;
-                }
+                // handling except tables if the set for check is set
                 if (_refTableCheckSet != null && !_refTableCheckSet.contains(foreignTableName)) {
                     exceptedFKKeyMap.put(fkName, foreignTableName);
                     continue;
                 }
 
+                // check except columns
                 final String localColumnName = foreignKeys.getString(8);
                 final String foreignColumnName = foreignKeys.getString(4);
-                if (isColumnExcept(schemaName, tableName, localColumnName)
-                        || isColumnExcept(foreignSchemaName, foreignTableName, foreignColumnName)) {
-                    continue;
-                }
+                assertFKColumnNotExcepted(schemaName, tableName, localColumnName);
+                assertPKColumnNotExcepted(foreignSchemaName, foreignTableName, foreignColumnName);
 
                 DfForeignKeyMetaInfo metaInfo = fkMap.get(fkName);
                 if (metaInfo == null) {
@@ -141,6 +138,26 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
             _log.info(sb.toString());
         }
         return filterSameForeignKeyMetaInfo(fkMap);
+    }
+
+    protected void assertFKColumnNotExcepted(String schemaName, String tableName, String columnName) {
+        if (isColumnExcept(schemaName, tableName, columnName)) {
+            String msg = "PK and FK columns are unsupported on 'columnExcept' property:";
+            msg = msg + " schemaName=" + schemaName;
+            msg = msg + " tableName=" + tableName;
+            msg = msg + " columnName=" + columnName;
+            throw new DfIllegalPropertySettingException(msg);
+        }
+    }
+
+    protected void assertPKColumnNotExcepted(String schemaName, String tableName, String columnName) {
+        if (isColumnExcept(schemaName, tableName, columnName)) {
+            String msg = "PK columns are unsupported on 'columnExcept' property:";
+            msg = msg + " schemaName=" + schemaName;
+            msg = msg + " tableName=" + tableName;
+            msg = msg + " columnName=" + columnName;
+            throw new DfIllegalPropertySettingException(msg);
+        }
     }
 
     protected Map<String, DfForeignKeyMetaInfo> filterSameForeignKeyMetaInfo(Map<String, DfForeignKeyMetaInfo> fks) {

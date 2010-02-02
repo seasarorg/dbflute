@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
@@ -97,6 +98,8 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                     info.addPrimaryKeyList(columnName, pkName);
                 }
             }
+            // check except columns
+            assertPrimaryKeyNotExcepted(info, schemaName, tableName);
         } finally {
             if (parts != null) {
                 parts.close();
@@ -116,6 +119,18 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
 
     protected String getPrimaryKeyNameFromDBMeta(ResultSet resultSet) throws SQLException {
         return resultSet.getString(6); // PK_NAME
+    }
+
+    protected void assertPrimaryKeyNotExcepted(DfPrimaryKeyMetaInfo info, String schemaName, String tableName) {
+        final List<String> primaryKeyList = info.getPrimaryKeyList();
+        for (String primaryKey : primaryKeyList) {
+            if (isColumnExcept(schemaName, tableName, primaryKey)) {
+                String msg = "PK columns are unsupported on 'columnExcept' property:";
+                msg = msg + " schemaName=" + schemaName + " tableName=" + tableName;
+                msg = msg + " primaryKey=" + primaryKey;
+                throw new DfIllegalPropertySettingException(msg);
+            }
+        }
     }
 
     // ===================================================================================
@@ -177,8 +192,10 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 if (pkSet.contains(columnName)) {
                     continue;
                 }
+
+                // check except columns
                 if (isColumnExcept(schemaName, tableName, columnName)) {
-                    continue;
+                    assertUQColumnNotExcepted(schemaName, tableName, columnName);
                 }
 
                 final String indexName = parts.getString(6);
@@ -216,5 +233,15 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             }
         }
         return uniqueMap;
+    }
+
+    protected void assertUQColumnNotExcepted(String schemaName, String tableName, String columnName) {
+        if (isColumnExcept(schemaName, tableName, columnName)) {
+            String msg = "UQ columns are unsupported on 'columnExcept' property:";
+            msg = msg + " schemaName=" + schemaName;
+            msg = msg + " tableName=" + tableName;
+            msg = msg + " columnName=" + columnName;
+            throw new DfIllegalPropertySettingException(msg);
+        }
     }
 }
