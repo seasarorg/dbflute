@@ -819,9 +819,9 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
-        // -------------------------------------------------
-        //                                Clear Thread Local
-        //                                ------------------
+        // ===============================================================================
+        //                                                                  Context Helper
+        //                                                                  ==============
         protected void InitializeContext() {
             if (${glConditionBeanContext}.IsExistConditionBeanOnThread()
                 || ${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()
@@ -858,9 +858,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
-        // ===============================================================================
-        //                                                                  Context Helper
-        //                                                                  ==============
         protected ${glOutsideSqlContext} GetOutsideSqlContext() {
             if (!${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
                 return null;
