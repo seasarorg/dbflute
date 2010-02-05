@@ -139,11 +139,11 @@ public class BehaviorCommandInvoker {
      * @return The result object. (Nullable)
      */
     public <RESULT> RESULT invoke(BehaviorCommand<RESULT> behaviorCommand) {
-        clearContext();
+        initializeContext();
         try {
             return dispatchInvoking(behaviorCommand);
         } finally {
-            clearContext();
+            closeContext();
         }
     }
 
@@ -754,6 +754,47 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      Context Helper
     //                                                                      ==============
+    protected void initializeContext() {
+        if (ResourceContext.isExistResourceContextOnThread()) { // means nested invoking
+            ContextStack.saveAllContextOnThread();
+        }
+        clearCurrentContext();
+    }
+
+    protected void closeContext() {
+        if (FetchAssistContext.isExistFetchNarrowingBeanOnThread()) {
+            // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // Because there is possible that fetch narrowing has been
+            // ignored for manualPaging of outsideSql.
+            // - - - - - - - - - -/
+            final FetchNarrowingBean fnbean = FetchAssistContext.getFetchNarrowingBeanOnThread();
+            fnbean.restoreIgnoredFetchNarrowing();
+        }
+        clearCurrentContext();
+        ContextStack.restoreAllContextOnThreadIfExists();
+    }
+
+    protected void clearCurrentContext() {
+        if (ConditionBeanContext.isExistConditionBeanOnThread()) {
+            ConditionBeanContext.clearConditionBeanOnThread();
+        }
+        if (ConditionBeanContext.isExistEntityRowHandlerOnThread()) {
+            ConditionBeanContext.clearEntityRowHandlerOnThread();
+        }
+        if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
+            OutsideSqlContext.clearOutsideSqlContextOnThread();
+        }
+        if (FetchAssistContext.isExistFetchBeanOnThread()) {
+            FetchAssistContext.clearFetchBeanOnThread();
+        }
+        if (InternalMapContext.isExistInternalMapContextOnThread()) {
+            InternalMapContext.clearInternalMapContextOnThread();
+        }
+        if (ResourceContext.isExistResourceContextOnThread()) {
+            ResourceContext.clearResourceContextOnThread();
+        }
+    }
+
     protected OutsideSqlContext getOutsideSqlContext() {
         if (!OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
             return null;
@@ -770,35 +811,6 @@ public class BehaviorCommandInvoker {
 
     protected void putObjectToMapContext(String key, Object value) {
         InternalMapContext.setObject(key, value);
-    }
-
-    protected void clearContext() {
-        if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
-            OutsideSqlContext.clearOutsideSqlContextOnThread();
-        }
-        if (FetchAssistContext.isExistFetchBeanOnThread()) {
-            if (FetchAssistContext.isExistFetchNarrowingBeanOnThread()) {
-                // /- - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                // Because there is possible that fetch narrowing has been
-                // ignored for manualPaging of outsideSql.
-                // - - - - - - - - - -/
-                final FetchNarrowingBean fnbean = FetchAssistContext.getFetchNarrowingBeanOnThread();
-                fnbean.restoreIgnoredFetchNarrowing();
-            }
-            FetchAssistContext.clearFetchBeanOnThread();
-        }
-        if (ConditionBeanContext.isExistConditionBeanOnThread()) {
-            ConditionBeanContext.clearConditionBeanOnThread();
-        }
-        if (ConditionBeanContext.isExistEntityRowHandlerOnThread()) {
-            ConditionBeanContext.clearEntityRowHandlerOnThread();
-        }
-        if (InternalMapContext.isExistInternalMapContextOnThread()) {
-            InternalMapContext.clearInternalMapContextOnThread();
-        }
-        if (ResourceContext.isExistResourceContextOnThread()) {
-            ResourceContext.clearResourceContextOnThread();
-        }
     }
 
     // ===================================================================================

@@ -39,7 +39,7 @@ public class OutsideSqlContext {
 
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(OutsideSqlContext.class);
-    
+
     // ===================================================================================
     //                                                                        Thread Local
     //                                                                        ============
@@ -51,7 +51,7 @@ public class OutsideSqlContext {
      * @return The context of outside-SQL. (Nullable)
      */
     public static OutsideSqlContext getOutsideSqlContextOnThread() {
-        return (OutsideSqlContext)_threadLocal.get();
+        return (OutsideSqlContext) _threadLocal.get();
     }
 
     /**
@@ -84,7 +84,8 @@ public class OutsideSqlContext {
     // ===================================================================================
     //                                                                          Unique Key
     //                                                                          ==========
-    public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb, OutsideSqlOption option, Class<?> resultType) {
+    public static String generateSpecifiedOutsideSqlUniqueKey(String methodName, String path, Object pmb,
+            OutsideSqlOption option, Class<?> resultType) {
         final String pmbKey = (pmb != null ? pmb.getClass().getName() : "null");
         final String resultKey;
         if (resultType != null) {
@@ -94,7 +95,8 @@ public class OutsideSqlContext {
         }
         final String tableDbName = option.getTableDbName();
         final String generatedUniqueKey = option.generateUniqueKey();
-        return tableDbName + ":" + methodName + "():" + path + ":" + pmbKey + ":" + generatedUniqueKey + ":" + resultKey;
+        return tableDbName + ":" + methodName + "():" + path + ":" + pmbKey + ":" + generatedUniqueKey + ":"
+                + resultKey;
     }
 
     // ===================================================================================
@@ -106,7 +108,8 @@ public class OutsideSqlContext {
         msg = msg + "The outsideSql was Not Found!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "Please confirm the existence of your target file of outsideSql on your classpath." + getLineSeparator();
+        msg = msg + "Please confirm the existence of your target file of outsideSql on your classpath."
+                + getLineSeparator();
         msg = msg + "And please confirm the file name and the file path STRICTLY!" + getLineSeparator();
         msg = msg + getLineSeparator();
         msg = msg + "[Specified OutsideSql Path]" + getLineSeparator() + path + getLineSeparator();
@@ -134,9 +137,9 @@ public class OutsideSqlContext {
     protected Class<?> _resultType;
 
     protected CursorHandler _cursorHandler;
-    
+
     protected String _methodName;
-    
+
     /** The configuration of statement. (Nullable) */
     protected StatementConfig _statementConfig;
 
@@ -210,7 +213,7 @@ public class OutsideSqlContext {
                 sb.append(line).append(lineSeparator);
                 continue;
             }
-            
+
             if (_log.isDebugEnabled()) {
                 _log.debug("...Replacing bind character on line comment: " + lineComment);
             }
@@ -219,7 +222,7 @@ public class OutsideSqlContext {
         }
         return sb.toString();
     }
-    
+
     /**
      * Read outside-SQL path. Required attribute is 'outsideSqlPath'.
      * @param sqlFileEncoding The encoding of SQL file. (NotNull)
@@ -269,20 +272,22 @@ public class OutsideSqlContext {
     //                                                                 Behavior Query Path
     //                                                                 ===================
     public void setupBehaviorQueryPathIfNeeds() {
-	    if (!isBehaviorQueryPathEnabled()) {
-		    return;
-		}
-		if (_outsideSqlPath.contains(":")) {
-		    final String subDirectoryValue = _outsideSqlPath.substring(0, _outsideSqlPath.lastIndexOf(":"));
-		    final String subDirectoryPath = replaceString(subDirectoryValue, ":", "/");
-			final String behaviorQueryPath = _outsideSqlPath.substring(_outsideSqlPath.lastIndexOf(":") + ":".length());
-			final String behaviorClassPath = replaceString(buildBehaviorSqlPackageName(), ".", "/");
-			final String behaviorPackagePath = behaviorClassPath.substring(0, behaviorClassPath.lastIndexOf("/"));
-			final String behaviorClassName = behaviorClassPath.substring(behaviorClassPath.lastIndexOf("/") + "/".length());
-            _outsideSqlPath = behaviorPackagePath + "/" + subDirectoryPath + "/" + behaviorClassName + "_" + behaviorQueryPath + ".sql";
-		} else {
+        if (!isBehaviorQueryPathEnabled()) {
+            return;
+        }
+        if (_outsideSqlPath.contains(":")) {
+            final String subDirectoryValue = _outsideSqlPath.substring(0, _outsideSqlPath.lastIndexOf(":"));
+            final String subDirectoryPath = replaceString(subDirectoryValue, ":", "/");
+            final String behaviorQueryPath = _outsideSqlPath.substring(_outsideSqlPath.lastIndexOf(":") + ":".length());
+            final String behaviorClassPath = replaceString(buildBehaviorSqlPackageName(), ".", "/");
+            final String behaviorPackagePath = behaviorClassPath.substring(0, behaviorClassPath.lastIndexOf("/"));
+            final String behaviorClassName = behaviorClassPath.substring(behaviorClassPath.lastIndexOf("/")
+                    + "/".length());
+            _outsideSqlPath = behaviorPackagePath + "/" + subDirectoryPath + "/" + behaviorClassName + "_"
+                    + behaviorQueryPath + ".sql";
+        } else {
             _outsideSqlPath = replaceString(buildBehaviorSqlPackageName(), ".", "/") + "_" + _outsideSqlPath + ".sql";
-		}
+        }
     }
 
     protected String buildBehaviorSqlPackageName() {
@@ -290,7 +295,8 @@ public class OutsideSqlContext {
         final String behaviorTypeName = dbmeta.getBehaviorTypeName();
         final String outsideSqlPackage = _outsideSqlPackage;
         if (outsideSqlPackage != null && outsideSqlPackage.trim().length() > 0) {
-            final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".") + ".".length());
+            final String behaviorClassName = behaviorTypeName.substring(behaviorTypeName.lastIndexOf(".")
+                    + ".".length());
             String tmp = behaviorTypeName.substring(0, behaviorTypeName.lastIndexOf("."));
             final String exbhvName = tmp.contains(".") ? tmp.substring(tmp.lastIndexOf(".") + ".".length()) : tmp;
             return outsideSqlPackage + "." + exbhvName + "." + behaviorClassName;
@@ -303,7 +309,8 @@ public class OutsideSqlContext {
         if (isProcedure()) { // [DBFlute-0.7.5]
             return false;
         }
-        return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && !_outsideSqlPath.contains(".") && _tableDbName != null;
+        return _outsideSqlPath != null && !_outsideSqlPath.contains("/") && !_outsideSqlPath.contains(".")
+                && _tableDbName != null;
     }
 
     // ===================================================================================
@@ -365,7 +372,7 @@ public class OutsideSqlContext {
     protected static String replaceString(String text, String fromText, String toText) {
         return DfStringUtil.replace(text, fromText, toText);
     }
-    
+
     protected static String getLineSeparator() {
         return DfSystemUtil.getLineSeparator();
     }
@@ -407,7 +414,7 @@ public class OutsideSqlContext {
     public void setCursorHandler(CursorHandler handler) {
         _cursorHandler = handler;
     }
-    
+
     public String getMethodName() {
         return _methodName;
     }
@@ -415,7 +422,7 @@ public class OutsideSqlContext {
     public void setMethodName(String methodName) {
         this._methodName = methodName;
     }
-    
+
     public StatementConfig getStatementConfig() {
         return _statementConfig;
     }
@@ -450,7 +457,7 @@ public class OutsideSqlContext {
     public void setOffsetByCursorForcedly(boolean offsetByCursorForcedly) {
         this._offsetByCursorForcedly = offsetByCursorForcedly;
     }
-    
+
     public boolean isLimitByCursorForcedly() {
         return _limitByCursorForcedly;
     }

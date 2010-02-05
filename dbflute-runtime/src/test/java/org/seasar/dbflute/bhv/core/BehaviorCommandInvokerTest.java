@@ -525,7 +525,7 @@ public class BehaviorCommandInvokerTest extends PlainTestCase {
         assertTrue(ResourceContext.isExistResourceContextOnThread());
 
         // ## Act ##
-        invoker.clearContext();
+        invoker.clearCurrentContext();
 
         // ## Assert ##
         assertFalse(OutsideSqlContext.isExistOutsideSqlContextOnThread());

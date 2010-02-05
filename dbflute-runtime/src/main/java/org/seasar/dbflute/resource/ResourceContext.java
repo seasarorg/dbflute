@@ -58,10 +58,10 @@ public class ResourceContext {
 
     /**
      * Set the context of resource.
-     * @param resourceCountext The context of resource. (NotNull)
+     * @param resourceContext The context of resource. (NotNull)
      */
-    public static void setResourceContextOnThread(ResourceContext resourceCountext) {
-        threadLocal.set(resourceCountext);
+    public static void setResourceContextOnThread(ResourceContext resourceContext) {
+        threadLocal.set(resourceContext);
     }
 
     /**
