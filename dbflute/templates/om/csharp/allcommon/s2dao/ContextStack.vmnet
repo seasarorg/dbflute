@@ -37,7 +37,6 @@ namespace ${glPackageBaseCommonS2Dao} {
             GetContextStackOnThread().Push(contextStack);
         }
 
-
         public static void RestoreAllContextOnThreadIfExists() {
             if (!IsExistContextStackOnThread()) {
                 return;
@@ -48,15 +47,15 @@ namespace ${glPackageBaseCommonS2Dao} {
                 return;
             }
             ${glContextStack} contextStack = stackOnThread.Pop();
-            ${glConditionBean} cb = contextStack.getConditionBean();
+            ${glConditionBean} cb = contextStack.ConditionBean;
             if (cb != null) {
                 ${glConditionBeanContext}.SetConditionBeanOnThread(cb);
             }
-            ${glOutsideSqlContext} outsideSqlContext = contextStack.getOutsideSqlContext();
+            ${glOutsideSqlContext} outsideSqlContext = contextStack.OutsideSqlContext;
             if (outsideSqlContext != null) {
                 ${glOutsideSqlContext}.SetOutsideSqlContextOnThread(outsideSqlContext);
             }
-            ${glFetchNarrowingBean} fetchNarrowingBean = contextStack.getOutsideSqlContext();
+            ${glFetchNarrowingBean} fetchNarrowingBean = contextStack.FetchNarrowingBean;
             if (fetchNarrowingBean != null) {
                 ${glFetchNarrowingBeanContext}.SetFetchNarrowingBeanOnThread(fetchNarrowingBean);
             }

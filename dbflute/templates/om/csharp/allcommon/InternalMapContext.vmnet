@@ -16,7 +16,7 @@ namespace ${glPackageBaseCommon} {
             Thread.SetData(_internalMapSlot, new Dictionary<String, Object>());
         }
 
-        public static IDictionary GetInternalMap() {
+        public static IDictionary<String, Object> GetInternalMap() {
             Initialize();
             return (IDictionary<String, Object>)Thread.GetData(_internalMapSlot);
         }

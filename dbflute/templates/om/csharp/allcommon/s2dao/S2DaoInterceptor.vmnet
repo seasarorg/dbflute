@@ -54,11 +54,11 @@ namespace ${glPackageBaseCommonS2Dao} {
         //                                                                          Invoke
         //                                                                          ======
         public override object Invoke(IMethodInvocation invocation) {
-            ClearThreadLocal();
+            InitializeContext();
             try {
                 return DispatchInvoking(invocation);
             } finally {
-                ClearThreadLocal();
+                CloseContext();
             }
         }
 
@@ -822,20 +822,36 @@ namespace ${glPackageBaseCommonS2Dao} {
         // -------------------------------------------------
         //                                Clear Thread Local
         //                                ------------------
-        protected void ClearThreadLocal() {
-            if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
-                ${glOutsideSqlContext}.ClearOutsideSqlContextOnThread();
+        protected void InitializeContext() {
+            if (${glConditionBeanContext}.IsExistConditionBeanOnThread()
+                || ${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()
+                || ${glFetchNarrowingBeanContext}.IsExistFetchNarrowingBeanOnThread()
+                || ${glInternalMapContext}.IsExistInternalMapOnThread()) { // means nested invoking
+                ${glContextStack}.SaveAllContextOnThread();
             }
+            ClearCurrentContext();
+        }
+
+        protected void CloseContext() {
             if (${glFetchNarrowingBeanContext}.IsExistFetchNarrowingBeanOnThread()) {
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // Because there is possible that fetch narrowing has been ignored for manualPaging of outsideSql.
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 ${glFetchNarrowingBeanContext}.GetFetchNarrowingBeanOnThread().RestoreIgnoredFetchNarrowing();
-
-                ${glFetchNarrowingBeanContext}.ClearFetchNarrowingBeanOnThread();
             }
+            ClearCurrentContext();
+            ${glContextStack}.RestoreAllContextOnThreadIfExists();
+        }
+
+        protected void ClearCurrentContext() {
             if (${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
                 ${glConditionBeanContext}.ClearConditionBeanOnThread();
+            }
+            if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContext}.ClearOutsideSqlContextOnThread();
+            }
+            if (${glFetchNarrowingBeanContext}.IsExistFetchNarrowingBeanOnThread()) {
+                ${glFetchNarrowingBeanContext}.ClearFetchNarrowingBeanOnThread();
             }
             if (${glInternalMapContext}.IsExistInternalMapOnThread()) {
                 ${glInternalMapContext}.ClearInternalMapOnThread();
