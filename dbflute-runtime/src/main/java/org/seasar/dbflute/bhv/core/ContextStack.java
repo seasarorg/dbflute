@@ -33,6 +33,7 @@ import org.seasar.dbflute.resource.ResourceContext;
 /**
  * The context stack for all context.
  * @author jflute
+ * @since 0.9.6.5 (2010/02/05 Friday)
  */
 public class ContextStack {
 
