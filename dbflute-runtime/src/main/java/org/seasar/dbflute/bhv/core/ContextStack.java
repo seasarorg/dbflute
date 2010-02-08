@@ -43,8 +43,8 @@ public class ContextStack {
     private static ThreadLocal<Stack<ContextStack>> _threadLocal = new ThreadLocal<Stack<ContextStack>>();
 
     // ===================================================================================
-    //                                                                          Fetch Bean
-    //                                                                          ==========
+    //                                                                       Context Stack
+    //                                                                       =============
     /**
      * Get context-stack on thread.
      * @return The instance of context-stack. (Nullable)
@@ -53,6 +53,24 @@ public class ContextStack {
         return _threadLocal.get();
     }
 
+    /**
+     * Is existing context-stack on thread?
+     * @return Determination.
+     */
+    public static boolean isExistContextStackOnThread() {
+        return (_threadLocal.get() != null);
+    }
+
+    /**
+     * Clear context-stack on thread.
+     */
+    public static void clearContextStackOnThread() {
+        _threadLocal.set(null);
+    }
+
+    // ===================================================================================
+    //                                                                All Context Handling
+    //                                                                ====================
     public static void saveAllContextOnThread() {
         if (!isExistContextStackOnThread()) {
             _threadLocal.set(new Stack<ContextStack>());
@@ -119,7 +137,7 @@ public class ContextStack {
         }
     }
 
-    protected static void clearAllContext() {
+    public static void clearAllCurrentContext() {
         if (ConditionBeanContext.isExistConditionBeanOnThread()) {
             ConditionBeanContext.clearConditionBeanOnThread();
         }
@@ -138,21 +156,6 @@ public class ContextStack {
         if (ResourceContext.isExistResourceContextOnThread()) {
             ResourceContext.clearResourceContextOnThread();
         }
-    }
-
-    /**
-     * Is existing context-stack on thread?
-     * @return Determination.
-     */
-    public static boolean isExistContextStackOnThread() {
-        return (_threadLocal.get() != null);
-    }
-
-    /**
-     * Clear context-stack on thread.
-     */
-    public static void clearContextStackOnThread() {
-        _threadLocal.set(null);
     }
 
     // ===================================================================================

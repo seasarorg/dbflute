@@ -26,7 +26,6 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.bhv.core.supplement.SequenceCacheHandler;
 import org.seasar.dbflute.bhv.outsidesql.OutsideSqlBasicExecutor;
-import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.FetchNarrowingBean;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -755,10 +754,10 @@ public class BehaviorCommandInvoker {
     //                                                                      Context Helper
     //                                                                      ==============
     protected void initializeContext() {
-        if (ResourceContext.isExistResourceContextOnThread()) { // means nested invoking
-            ContextStack.saveAllContextOnThread();
+        if (ResourceContext.isExistResourceContextOnThread()) { // means recursive invoking
+            saveAllContextOnThread();
         }
-        clearCurrentContext();
+        clearAllCurrentContext();
     }
 
     protected void closeContext() {
@@ -770,29 +769,20 @@ public class BehaviorCommandInvoker {
             final FetchNarrowingBean fnbean = FetchAssistContext.getFetchNarrowingBeanOnThread();
             fnbean.restoreIgnoredFetchNarrowing();
         }
-        clearCurrentContext();
+        clearAllCurrentContext();
+        restoreAllContextOnThreadIfExists();
+    }
+
+    protected void saveAllContextOnThread() {
+        ContextStack.saveAllContextOnThread();
+    }
+
+    protected void restoreAllContextOnThreadIfExists() {
         ContextStack.restoreAllContextOnThreadIfExists();
     }
 
-    protected void clearCurrentContext() {
-        if (ConditionBeanContext.isExistConditionBeanOnThread()) {
-            ConditionBeanContext.clearConditionBeanOnThread();
-        }
-        if (ConditionBeanContext.isExistEntityRowHandlerOnThread()) {
-            ConditionBeanContext.clearEntityRowHandlerOnThread();
-        }
-        if (OutsideSqlContext.isExistOutsideSqlContextOnThread()) {
-            OutsideSqlContext.clearOutsideSqlContextOnThread();
-        }
-        if (FetchAssistContext.isExistFetchBeanOnThread()) {
-            FetchAssistContext.clearFetchBeanOnThread();
-        }
-        if (InternalMapContext.isExistInternalMapContextOnThread()) {
-            InternalMapContext.clearInternalMapContextOnThread();
-        }
-        if (ResourceContext.isExistResourceContextOnThread()) {
-            ResourceContext.clearResourceContextOnThread();
-        }
+    protected void clearAllCurrentContext() {
+        ContextStack.clearAllCurrentContext();
     }
 
     protected OutsideSqlContext getOutsideSqlContext() {
