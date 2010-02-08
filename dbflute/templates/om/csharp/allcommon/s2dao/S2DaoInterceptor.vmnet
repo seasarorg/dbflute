@@ -826,10 +826,10 @@ namespace ${glPackageBaseCommonS2Dao} {
             if (${glConditionBeanContext}.IsExistConditionBeanOnThread()
                 || ${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()
                 || ${glFetchNarrowingBeanContext}.IsExistFetchNarrowingBeanOnThread()
-                || ${glInternalMapContext}.IsExistInternalMapOnThread()) { // means nested invoking
-                ${glContextStack}.SaveAllContextOnThread();
+                || ${glInternalMapContext}.IsExistInternalMapOnThread()) { // means recursive invoking
+                SaveAllContextOnThread();
             }
-            ClearCurrentContext();
+            ClearAllCurrentContext();
         }
 
         protected void CloseContext() {
@@ -839,8 +839,21 @@ namespace ${glPackageBaseCommonS2Dao} {
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 ${glFetchNarrowingBeanContext}.GetFetchNarrowingBeanOnThread().RestoreIgnoredFetchNarrowing();
             }
-            ClearCurrentContext();
+            ClearAllCurrentContext();
+            RestoreAllContextOnThreadIfExists();
+        }
+
+
+        protected void SaveAllContextOnThread() {
+            ${glContextStack}.SaveAllContextOnThread();
+        }
+
+        protected void RestoreAllContextOnThreadIfExists() {
             ${glContextStack}.RestoreAllContextOnThreadIfExists();
+        }
+
+        protected void ClearAllCurrentContext() {
+            ${glContextStack}.ClearAllCurrentContext();
         }
 
         protected void ClearCurrentContext() {

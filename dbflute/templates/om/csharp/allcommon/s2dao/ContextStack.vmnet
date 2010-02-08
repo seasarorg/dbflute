@@ -17,6 +17,14 @@ namespace ${glPackageBaseCommonS2Dao} {
             return (Stack<${glContextStack}>)Thread.GetData(_slot);
         }
 
+        public static void ClearContextStackOnThread() {
+            Thread.SetData(_slot, null);
+        }
+
+        public static bool IsExistContextStackOnThread() {
+            return (Thread.GetData(_slot) != null);
+        }
+
         public static void SaveAllContextOnThread() {
             if (!IsExistContextStackOnThread()) {
                 Thread.SetData(_slot, new List<${glContextStack}>());
@@ -69,12 +77,19 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
         }
 
-        public static void ClearContextStackOnThread() {
-            Thread.SetData(_slot, null);
-        }
-
-        public static bool IsExistContextStackOnThread() {
-            return (Thread.GetData(_slot) != null);
+        public static void ClearAllCurrentContext() {
+            if (${glConditionBeanContext}.IsExistConditionBeanOnThread()) {
+                ${glConditionBeanContext}.ClearConditionBeanOnThread();
+            }
+            if (${glOutsideSqlContext}.IsExistOutsideSqlContextOnThread()) {
+                ${glOutsideSqlContext}.ClearOutsideSqlContextOnThread();
+            }
+            if (${glFetchNarrowingBeanContext}.IsExistFetchNarrowingBeanOnThread()) {
+                ${glFetchNarrowingBeanContext}.ClearFetchNarrowingBeanOnThread();
+            }
+            if (${glInternalMapContext}.IsExistInternalMapOnThread()) {
+                ${glInternalMapContext}.ClearInternalMapOnThread();
+            }
         }
 
         // ===============================================================================
