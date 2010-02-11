@@ -33,6 +33,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.DfTypeUtil.ToBooleanParseException;
+import org.seasar.dbflute.util.DfTypeUtil.ToTimeOutOfCalendarException;
 import org.seasar.dbflute.util.DfTypeUtil.ToTimeParseException;
 import org.seasar.dbflute.util.DfTypeUtil.ToTimestampOutOfCalendarException;
 import org.seasar.dbflute.util.DfTypeUtil.ToTimestampParseException;
@@ -145,7 +146,7 @@ public abstract class DfAbsractDataWriter {
         } catch (ToTimestampOutOfCalendarException e) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-            msg = msg + "Failed to set the timestamp value!" + ln();
+            msg = msg + "Failed to set the timestamp because the value is out of calendar!" + ln();
             msg = msg + ln();
             msg = msg + "[Table]" + ln() + tableName + ln();
             msg = msg + ln();
@@ -178,6 +179,18 @@ public abstract class DfAbsractDataWriter {
             Time time = DfTypeUtil.toTime(value);
             ps.setTime(bindCount, time);
             return true;
+        } catch (ToTimeOutOfCalendarException e) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+            msg = msg + "Failed to set the time because the value is out of calendar!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Table]" + ln() + tableName + ln();
+            msg = msg + ln();
+            msg = msg + "[Column]" + ln() + columnName + ln();
+            msg = msg + ln();
+            msg = msg + "[Value]" + ln() + value + ln();
+            msg = msg + "- - - - - - - - - -/";
+            throw new DfTableDataRegistrationFailureException(msg, e);
         } catch (ToTimeParseException ignored) {
             return false; // couldn't parse as time 
         }
