@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.states.RowStates;
 import org.seasar.dbflute.helper.dataset.types.ColumnType;
 import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
@@ -17,7 +17,6 @@ import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
-import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -29,15 +28,12 @@ public class DataTable {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String tableName;
-
-    private List<DataRow> rows = new ArrayList<DataRow>();
-
-    private List<DataRow> removedRows = new ArrayList<DataRow>();
-
-    private DfFlexibleMap<String, DataColumn> columns = new DfFlexibleMap<String, DataColumn>();
-
-    private boolean hasMetaData = false;
+    private String _tableName;
+    private Map<String, DataColumn> _columnMap = StringKeyMap.createAsCaseInsensitiveOrder();
+    private List<DataColumn> _columnList = new ArrayList<DataColumn>();
+    private List<DataRow> _rows = new ArrayList<DataRow>();
+    private List<DataRow> _removedRows = new ArrayList<DataRow>();
+    private boolean _hasMetaData = false;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -50,76 +46,61 @@ public class DataTable {
     //                                                                                Main
     //                                                                                ====
     public int getRowSize() {
-        return rows.size();
+        return _rows.size();
     }
 
     public DataRow getRow(int index) {
-        return (DataRow) rows.get(index);
+        return (DataRow) _rows.get(index);
     }
 
     public DataRow addRow() {
         DataRow row = new DataRow(this);
-        rows.add(row);
+        _rows.add(row);
         row.setState(RowStates.CREATED);
         return row;
     }
 
     public int getRemovedRowSize() {
-        return removedRows.size();
+        return _removedRows.size();
     }
 
     public DataRow getRemovedRow(int index) {
-        return (DataRow) removedRows.get(index);
+        return (DataRow) _removedRows.get(index);
     }
 
     public DataRow[] removeRows() {
-        for (int i = 0; i < rows.size();) {
+        for (int i = 0; i < _rows.size();) {
             DataRow row = getRow(i);
             if (row.getState().equals(RowStates.REMOVED)) {
-                removedRows.add(row);
-                rows.remove(i);
+                _removedRows.add(row);
+                _rows.remove(i);
             } else {
                 ++i;
             }
         }
-        return (DataRow[]) removedRows.toArray(new DataRow[removedRows.size()]);
+        return (DataRow[]) _removedRows.toArray(new DataRow[_removedRows.size()]);
     }
 
     public int getColumnSize() {
-        return columns.size();
+        return _columnMap.size();
     }
 
     public DataColumn getColumn(int index) {
-        return columns.getValue(index);
+        return _columnList.get(index);
     }
 
     public DataColumn getColumn(String columnName) {
         DataColumn column = getColumn0(columnName);
         if (column == null) {
             String msg = "The column was not found in the table: ";
-            msg = msg + " tableName=" + tableName + " columnName" + columnName;
+            msg = msg + " tableName=" + _tableName + " columnName=" + columnName;
             throw new IllegalStateException(msg);
         }
         return column;
     }
 
     private DataColumn getColumn0(String columnName) {
-        DataColumn column = columns.get(columnName);
-        if (column == null) {
-            String name = DfStringUtil.replace(columnName, "_", "");
-            column = columns.get(name);
-            if (column == null) {
-                for (int i = 0; i < columns.size(); ++i) {
-                    String key = (String) columns.getKey(i);
-                    String key2 = DfStringUtil.replace(key, "_", "");
-                    if (key2.equalsIgnoreCase(name)) {
-                        column = columns.getValue(i);
-                        break;
-                    }
-                }
-            }
-        }
-        return column;
+        return _columnMap.get(columnName);
     }
 
     public boolean hasColumn(String columnName) {
@@ -143,13 +124,14 @@ public class DataTable {
     }
 
     public DataColumn addColumn(String columnName, ColumnType columnType) {
-        DataColumn column = new DataColumn(columnName, columnType, columns.size());
-        columns.put(columnName, column);
+        DataColumn column = new DataColumn(columnName, columnType, _columnMap.size());
+        _columnMap.put(columnName, column);
+        _columnList.add(column);
         return column;
     }
 
     public boolean hasMetaData() {
-        return hasMetaData;
+        return _hasMetaData;
     }
 
     public void setupMetaData(DatabaseMetaData metaData, String schemaName) {
@@ -171,14 +153,14 @@ public class DataTable {
                 column.setWritable(false);
             }
         }
-        hasMetaData = true;
+        _hasMetaData = true;
     }
 
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected Map<String, DfColumnMetaInfo> extractColumnMetaMap(DatabaseMetaData metaData, String schemaName) {
-        final List<DfColumnMetaInfo> metaList = new DfColumnHandler().getColumnList(metaData, schemaName, tableName);
+        final List<DfColumnMetaInfo> metaList = new DfColumnHandler().getColumnList(metaData, schemaName, _tableName);
         final Map<String, DfColumnMetaInfo> metaMap = new HashMap<String, DfColumnMetaInfo>();
         for (DfColumnMetaInfo metaInfo : metaList) {
             metaMap.put(metaInfo.getColumnName(), metaInfo);
@@ -188,11 +170,12 @@ public class DataTable {
 
     protected Set<String> getPrimaryKeySet(DatabaseMetaData metaData, String schemaName) {
         try {
-            final DfPrimaryKeyMetaInfo pkInfo = new DfUniqueKeyHandler().getPrimaryKey(metaData, schemaName, tableName);
+            final DfPrimaryKeyMetaInfo pkInfo = new DfUniqueKeyHandler()
+                    .getPrimaryKey(metaData, schemaName, _tableName);
             final List<String> list = pkInfo.getPrimaryKeyList();
             return new HashSet<String>(list);
         } catch (SQLException e) {
-            String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + tableName;
+            String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + _tableName;
             throw new IllegalStateException(msg);
         }
     }
@@ -202,15 +185,15 @@ public class DataTable {
     //                                                                      ==============
     public String toString() {
         StringBuffer buf = new StringBuffer(100);
-        buf.append(tableName);
+        buf.append(_tableName);
         buf.append(":");
-        for (int i = 0; i < columns.size(); ++i) {
+        for (int i = 0; i < _columnMap.size(); ++i) {
             buf.append(getColumnName(i));
             buf.append(", ");
         }
         buf.setLength(buf.length() - 2);
         buf.append("\n");
-        for (int i = 0; i < rows.size(); ++i) {
+        for (int i = 0; i < _rows.size(); ++i) {
             buf.append(getRow(i) + "\n");
         }
         buf.setLength(buf.length() - 1);
@@ -248,10 +231,10 @@ public class DataTable {
     //                                                                            Accessor
     //                                                                            ========
     public String getTableName() {
-        return tableName;
+        return _tableName;
     }
 
     public void setTableName(String tableName) {
-        this.tableName = tableName;
+        this._tableName = tableName;
     }
 }

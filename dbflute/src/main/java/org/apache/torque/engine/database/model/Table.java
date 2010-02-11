@@ -73,7 +73,7 @@ import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.friends.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.schemahtml.DfSchemaHtmlBuilder;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
@@ -1080,10 +1080,8 @@ public class Table {
 
     public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
             List<String> foreignColumnNameList) {
-
-        final DfFlexibleMap<String, Object> localColumnNameSet = createFlexibleNameMapByKeyList(localColumnNameList);
-        final DfFlexibleMap<String, Object> foreignColumnNameSet = createFlexibleNameMapByKeyList(foreignColumnNameList);
-
+        final Set<String> localColumnNameSet = createCaseInsensitiveSet(localColumnNameList);
+        final Set<String> foreignColumnNameSet = createCaseInsensitiveSet(foreignColumnNameList);
         final ForeignKey[] fkArray = getForeignKeys();
         for (final ForeignKey key : fkArray) {
             if (isSameTableAsFlexible(key.getForeignTableName(), foreignTableName)) {
@@ -1108,14 +1106,14 @@ public class Table {
                 boolean sameAsForeign = false;
                 if (localColumnNameSet.size() == currentLocalColumnNameSet.size()) {
                     for (String currentLocalColumnName : currentLocalColumnNameSet) {
-                        if (localColumnNameSet.containsKey(currentLocalColumnName)) {
+                        if (localColumnNameSet.contains(currentLocalColumnName)) {
                             sameAsLocal = true;
                         }
                     }
                 }
                 if (foreignColumnNameSet.size() == currentForeignColumnNameSet.size()) {
                     for (String currentForeignColumnName : currentForeignColumnNameSet) {
-                        if (foreignColumnNameSet.containsKey(currentForeignColumnName)) {
+                        if (foreignColumnNameSet.contains(currentForeignColumnName)) {
                             sameAsForeign = true;
                         }
                     }
@@ -1140,13 +1138,8 @@ public class Table {
         return false;
     }
 
-    protected <ELEMENT_TYPE> DfFlexibleMap<ELEMENT_TYPE, Object> createFlexibleNameMapByKeyList(
-            List<ELEMENT_TYPE> keyList) {
-        HashMap<ELEMENT_TYPE, Object> map = new HashMap<ELEMENT_TYPE, Object>();
-        for (ELEMENT_TYPE name : keyList) {
-            map.put(name, null);
-        }
-        return new DfFlexibleMap<ELEMENT_TYPE, Object>(map);
+    protected Set<String> createCaseInsensitiveSet(List<String> keyList) {
+        return StringSet.createAsCaseInsensitive(keyList);
     }
 
     public boolean hasForeignKey() {

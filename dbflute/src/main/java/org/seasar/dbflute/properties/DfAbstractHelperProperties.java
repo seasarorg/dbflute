@@ -9,7 +9,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.config.DfEnvironmentType;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfStringFileReader;
@@ -480,7 +480,8 @@ public abstract class DfAbstractHelperProperties {
     //                                                                   Assist Helper
     //                                                                   =============
     protected <VALUE> VALUE getByFlexibleKey(Map<String, VALUE> map, String key) {
-        return new DfFlexibleMap<String, VALUE>(map).get(key);
+        final Map<String, VALUE> flexibleMap = StringKeyMap.createAsFlexible(map);
+        return flexibleMap.get(key);
     }
 
     protected boolean isHitByTheHint(final String name, final String hint) {
@@ -498,10 +499,6 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                  General Helper
     //                                                                  ==============
-    protected <KEY, VALUE> DfFlexibleMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
-        return new DfFlexibleMap<KEY, VALUE>(map);
-    }
-
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
     }

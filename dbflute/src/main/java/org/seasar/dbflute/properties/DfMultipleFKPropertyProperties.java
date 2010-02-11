@@ -3,7 +3,7 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 
 /**
  * @author jflute
@@ -42,17 +42,13 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
         return _multipleFKPropertyMap;
     }
 
-    public DfFlexibleMap<String, Map<String, Map<String, String>>> asFlexible() {
-        return new DfFlexibleMap<String, Map<String, Map<String, String>>>(getMultipleFKPropertyMap());
-    }
-
     public String getMultipleFKPropertyColumnAliasName(String tableName, java.util.List<String> columnNameList) {
         final Map<String, Map<String, String>> foreignKeyMap = asFlexible().get(tableName);
         if (foreignKeyMap == null) {
             return "";
         }
         final String columnKey = createMultipleFKPropertyColumnKey(columnNameList);
-        final DfFlexibleMap<String, Map<String, String>> foreignKeyFxMap = asFlexible(foreignKeyMap);
+        final Map<String, Map<String, String>> foreignKeyFxMap = asFlexible(foreignKeyMap);
         final Map<String, String> foreignPropertyElement = foreignKeyFxMap.get(columnKey);
         if (foreignPropertyElement == null) {
             return "";
@@ -70,7 +66,11 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
         return sb.toString();
     }
 
-    protected DfFlexibleMap<String, Map<String, String>> asFlexible(final Map<String, Map<String, String>> foreignKeyMap) {
-        return new DfFlexibleMap<String, Map<String, String>>(foreignKeyMap);
+    protected Map<String, Map<String, Map<String, String>>> asFlexible() {
+        return StringKeyMap.createAsCaseInsensitive(getMultipleFKPropertyMap());
+    }
+
+    protected Map<String, Map<String, String>> asFlexible(final Map<String, Map<String, String>> foreignKeyMap) {
+        return StringKeyMap.createAsCaseInsensitive(foreignKeyMap);
     }
 }

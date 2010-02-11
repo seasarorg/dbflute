@@ -11,10 +11,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.DataColumn;
 import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
@@ -88,10 +89,10 @@ public class DfXlsReaderTest extends PlainTestCase {
     }
 
     protected DfXlsReader createXlsReader(File xlsFile, Pattern skipSheetPattern) {
-        final DfFlexibleMap<String, String> tableNameMap = new DfFlexibleMap<String, String>();
-        final DfFlexibleMap<String, List<String>> notTrimTableColumnMap = new DfFlexibleMap<String, List<String>>();
+        final Map<String, String> tableNameMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, List<String>> notTrimTableColumnMap = StringKeyMap.createAsCaseInsensitive();
         notTrimTableColumnMap.put("TEST_TABLE", Arrays.asList("EEE"));
-        final DfFlexibleMap<String, List<String>> stringEmptyTableColumnMap = new DfFlexibleMap<String, List<String>>();
+        final Map<String, List<String>> stringEmptyTableColumnMap = StringKeyMap.createAsCaseInsensitive();
         stringEmptyTableColumnMap.put("TEST_TABLE", Arrays.asList("CCC"));
         return new DfXlsReader(xlsFile, tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap,
                 skipSheetPattern);
@@ -123,17 +124,16 @@ public class DfXlsReaderTest extends PlainTestCase {
     }
 
     protected DfXlsReader createEmptyXlsReader(Pattern skipSheetPattern) {
-        final DfFlexibleMap<String, String> tableNameMap = new DfFlexibleMap<String, String>();
-        final DfFlexibleMap<String, List<String>> notTrimTableColumnMap = new DfFlexibleMap<String, List<String>>();
-        final DfFlexibleMap<String, List<String>> stringEmptyTableColumnMap = new DfFlexibleMap<String, List<String>>();
+        final Map<String, String> tableNameMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, List<String>> notTrimTableColumnMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, List<String>> stringEmptyTableColumnMap = StringKeyMap.createAsCaseInsensitive();
         return new DfXlsReaderEmpty(tableNameMap, notTrimTableColumnMap, stringEmptyTableColumnMap, skipSheetPattern);
     }
 
     protected static class DfXlsReaderEmpty extends DfXlsReader {
 
-        public DfXlsReaderEmpty(DfFlexibleMap<String, String> tableNameMap,
-                DfFlexibleMap<String, List<String>> notTrimTableColumnMap,
-                DfFlexibleMap<String, List<String>> stringEmptyTableColumnMap, Pattern skipSheetPattern) {
+        public DfXlsReaderEmpty(Map<String, String> tableNameMap, Map<String, List<String>> notTrimTableColumnMap,
+                Map<String, List<String>> stringEmptyTableColumnMap, Pattern skipSheetPattern) {
             super(new ByteArrayInputStream(new byte[] {}), tableNameMap, notTrimTableColumnMap,
                     stringEmptyTableColumnMap, skipSheetPattern);
         }

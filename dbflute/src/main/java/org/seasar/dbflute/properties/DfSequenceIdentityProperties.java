@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.logic.factory.DfSequenceExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
@@ -497,7 +496,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public String getIdentityColumnName(String flexibleTableName) {
-        final DfFlexibleMap<String, Object> flmap = new DfFlexibleMap<String, Object>(getIdentityDefinitionMap());
+        final Map<String, Object> flmap = StringKeyMap.createAsCaseInsensitive(getIdentityDefinitionMap());
         return (String) flmap.get(flexibleTableName);
     }
 }

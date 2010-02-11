@@ -72,7 +72,7 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
@@ -139,7 +139,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final DfAdditionalTableProperties tableProperties = getProperties().getAdditionalTableProperties();
         final Map<String, Object> additionalTableMap = tableProperties.getAdditionalTableMap();
         final boolean containsCommonColumn = isDataXlsTemplateContainsCommonColumn();
-        final DfFlexibleMap<String, Object> commonColumnMap = getCommonColumnMap();
+        final Map<String, Object> commonColumnMap = getCaseInsensitiveCommonColumnMap();
         try {
             final Database database = _schemaData.getDatabase();
             final List<Table> tableList = database.getTableList();
@@ -256,15 +256,11 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().getDataCsvTemplateDir();
     }
 
-    protected DfFlexibleMap<String, Object> getCommonColumnMap() {
+    protected Map<String, Object> getCaseInsensitiveCommonColumnMap() {
         final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
         final Map<String, Object> commonColumnMap = commonColumnProperties.getCommonColumnMap();
-        final DfFlexibleMap<String, Object> flexibleMap = new DfFlexibleMap<String, Object>();
-        final Set<String> keySet = commonColumnMap.keySet();
-        for (String key : keySet) {
-            flexibleMap.put(key, "dummy");
-        }
-        return flexibleMap;
+        final Map<String, Object> stringKeyMap = StringKeyMap.createAsCaseInsensitive(commonColumnMap);
+        return stringKeyMap;
     }
 
     public boolean isGenerateProcedureParameterBean() {

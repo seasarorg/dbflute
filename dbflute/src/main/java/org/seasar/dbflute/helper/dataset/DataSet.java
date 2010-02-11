@@ -1,6 +1,10 @@
 package org.seasar.dbflute.helper.dataset;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.seasar.dbflute.helper.StringKeyMap;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -12,7 +16,8 @@ public class DataSet {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private DfFlexibleMap<String, DataTable> tables = new DfFlexibleMap<String, DataTable>();
+    private Map<String, DataTable> _tableMap = StringKeyMap.createAsCaseInsensitiveOrder();
+    private List<DataTable> _tableList = new ArrayList<DataTable>();
 
     // ===================================================================================
     //                                                                         Constructor
@@ -24,7 +29,7 @@ public class DataSet {
     //                                                                      Table Handling
     //                                                                      ==============
     public int getTableSize() {
-        return tables.size();
+        return _tableMap.size();
     }
 
     public String getTableName(int index) {
@@ -32,15 +37,15 @@ public class DataSet {
     }
 
     public DataTable getTable(int index) {
-        return (DataTable) tables.getValue(index);
+        return (DataTable) _tableList.get(index);
     }
 
     public boolean hasTable(String tableName) {
-        return tables.containsKey(tableName);
+        return _tableMap.containsKey(tableName);
     }
 
     public DataTable getTable(String tableName) {
-        DataTable table = (DataTable) tables.get(tableName);
+        DataTable table = (DataTable) _tableMap.get(tableName);
         if (table == null) {
             String msg = "The table was Not Found: " + tableName;
             throw new IllegalStateException(msg);
@@ -53,24 +58,8 @@ public class DataSet {
     }
 
     public DataTable addTable(DataTable table) {
-        tables.put(table.getTableName(), table);
-        return table;
-    }
-
-    public DataTable removeTable(DataTable table) {
-        return removeTable(table.getTableName());
-    }
-
-    public DataTable removeTable(int index) {
-        return (DataTable) tables.remove(index);
-    }
-
-    public DataTable removeTable(String tableName) {
-        DataTable table = (DataTable) tables.remove(tableName);
-        if (table == null) {
-            String msg = "The table was Not Found: " + tableName;
-            throw new IllegalStateException(msg);
-        }
+        _tableMap.put(table.getTableName(), table);
+        _tableList.add(table);
         return table;
     }
 

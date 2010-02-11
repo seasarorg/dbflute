@@ -7,18 +7,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 
 /**
  * @author jflute
  */
 public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
 
-    //    private static final Log _log = LogFactory.getLog(GeneratedClassPackageProperties.class);
-
-    /**
-     * Constructor.
-     */
     public DfIncludeQueryProperties(Properties prop) {
         super(prop);
     }
@@ -103,11 +98,11 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableStringPrefixSearch(String tableName, String columnName) {
         return isAvailable("String", "PrefixSearch", tableName, columnName);
     }
-    
+
     public boolean isAvailableStringLikeSearch(String tableName, String columnName) {
         return isAvailable("String", "LikeSearch", tableName, columnName);
     }
-    
+
     public boolean isAvailableStringNotLikeSearch(String tableName, String columnName) {
         return isAvailable("String", "NotLikeSearch", tableName, columnName);
     }
@@ -173,7 +168,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
     public boolean isAvailableDateLessEqual(String tableName, String columnName) {
         return isAvailable("Date", "LessEqual", tableName, columnName);
     }
-    
+
     public boolean isAvailableDateFromTo(String tableName, String columnName) {
         return isAvailable("Date", "FromTo", tableName, columnName);
     }
@@ -345,8 +340,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
                 throw new IllegalStateException(msg);
             }
             final Map<String, List<String>> map = _queryMap.get(javaTypeName).get(queryTypeName);
-            final DfFlexibleMap<String, List<String>> tableNameMap = new DfFlexibleMap<String, List<String>>(
-                    map);
+            final Map<String, List<String>> tableNameMap = StringKeyMap.createAsCaseInsensitive(map);
             if (!tableNameMap.containsKey(tableName) && !tableNameMap.containsKey("$$ALL$$")) {
                 return false;
             }
@@ -358,8 +352,7 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             for (String protoColumnName : columnNameList) {
                 columnTmpMap.put(protoColumnName, new Object());
             }
-
-            final DfFlexibleMap<String, Object> columnNameMap = new DfFlexibleMap<String, Object>(columnTmpMap);
+            final Map<String, Object> columnNameMap = StringKeyMap.createAsCaseInsensitive(columnTmpMap);
             if (!columnNameMap.containsKey(columnName)) {
                 return false;
             }

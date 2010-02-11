@@ -13,15 +13,10 @@ public class DataColumn {
     //                                                                           Attribute
     //                                                                           =========
     private String columnName;
-
     private ColumnType columnType;
-
     private int columnIndex;
-
     private boolean primaryKey = false;
-
     private boolean writable = true;
-
     private String formatPattern;
 
     // ===================================================================================

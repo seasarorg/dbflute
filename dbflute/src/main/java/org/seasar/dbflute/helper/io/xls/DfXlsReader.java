@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
@@ -33,7 +34,7 @@ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.DataColumn;
 import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
@@ -58,10 +59,6 @@ public class DfXlsReader {
     /** Log instance. */
     private static final Log _log = LogFactory.getLog(DfSeparatedDataHandlerImpl.class);
 
-    protected static final DfFlexibleMap<String, String> EMPTY_TABLE_NAME_MAP = new DfFlexibleMap<String, String>();
-    protected static final DfFlexibleMap<String, List<String>> EMPTY_NOT_TRIM_TABLE_COLUMN_MAP = new DfFlexibleMap<String, List<String>>();
-    protected static final DfFlexibleMap<String, List<String>> EMPTY_EMPTY_STRING_TABLE_COLUMN_MAP = new DfFlexibleMap<String, List<String>>();
-
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -69,41 +66,47 @@ public class DfXlsReader {
     //                                          Xls Resource
     //                                          ------------
     protected DataSet _dataSet;
-
     protected HSSFWorkbook _workbook;
-
     protected HSSFDataFormat _dataFormat;
 
     // -----------------------------------------------------
     //                                           Read Option
     //                                           -----------
-    protected DfFlexibleMap<String, String> _tableNameMap;
-
-    protected DfFlexibleMap<String, List<String>> _notTrimTableColumnMap;
-
-    protected DfFlexibleMap<String, List<String>> _emptyStringTableColumnMap;
-
-    protected Pattern _skipSheetPattern;// Not Required
+    protected final Map<String, String> _tableNameMap;
+    protected final Map<String, List<String>> _notTrimTableColumnMap;
+    protected final Map<String, List<String>> _emptyStringTableColumnMap;
+    protected final Pattern _skipSheetPattern; // not required
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfXlsReader(File file) {
-        this(file, EMPTY_TABLE_NAME_MAP, EMPTY_NOT_TRIM_TABLE_COLUMN_MAP, EMPTY_EMPTY_STRING_TABLE_COLUMN_MAP, null);
+        this(file, null, null, null, null);
     }
 
-    public DfXlsReader(File file, DfFlexibleMap<String, String> tableNameMap,
-            DfFlexibleMap<String, List<String>> notTrimTableColumnMap,
-            DfFlexibleMap<String, List<String>> emptyStringTableColumnMap, Pattern skipSheetPattern) {
+    public DfXlsReader(File file, Map<String, String> tableNameMap, Map<String, List<String>> notTrimTableColumnMap,
+            Map<String, List<String>> emptyStringTableColumnMap, Pattern skipSheetPattern) {
         this(create(file), tableNameMap, notTrimTableColumnMap, emptyStringTableColumnMap, skipSheetPattern);
     }
 
-    protected DfXlsReader(InputStream in, DfFlexibleMap<String, String> tableNameMap,
-            DfFlexibleMap<String, List<String>> notTrimTableColumnMap,
-            DfFlexibleMap<String, List<String>> emptyStringTableColumnMap, Pattern skipSheetPattern) {
-        this._tableNameMap = tableNameMap;
-        this._notTrimTableColumnMap = notTrimTableColumnMap;
-        this._emptyStringTableColumnMap = emptyStringTableColumnMap;
+    protected DfXlsReader(InputStream in, Map<String, String> tableNameMap,
+            Map<String, List<String>> notTrimTableColumnMap, Map<String, List<String>> emptyStringTableColumnMap,
+            Pattern skipSheetPattern) {
+        if (tableNameMap != null) {
+            this._tableNameMap = tableNameMap;
+        } else {
+            this._tableNameMap = StringKeyMap.createAsCaseInsensitive();
+        }
+        if (notTrimTableColumnMap != null) {
+            this._notTrimTableColumnMap = notTrimTableColumnMap;
+        } else {
+            this._notTrimTableColumnMap = StringKeyMap.createAsCaseInsensitive();
+        }
+        if (emptyStringTableColumnMap != null) {
+            this._emptyStringTableColumnMap = emptyStringTableColumnMap;
+        } else {
+            this._emptyStringTableColumnMap = StringKeyMap.createAsCaseInsensitive();
+        }
         this._skipSheetPattern = skipSheetPattern;
         setupWorkbook(in);
     }

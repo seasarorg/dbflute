@@ -67,7 +67,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
 import org.seasar.dbflute.friends.torque.DfTorqueColumnListToStringUtil;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
@@ -96,8 +96,8 @@ public class ForeignKey {
     private List<String> _localColumns = new ArrayList<String>(3);
     private List<String> _foreignColumns = new ArrayList<String>(3);
 
-    protected DfFlexibleMap<String, String> _localForeignMap = new DfFlexibleMap<String, String>();
-    protected DfFlexibleMap<String, String> _foreignLocalMap = new DfFlexibleMap<String, String>();
+    protected Map<String, String> _localForeignMap = StringKeyMap.createAsCaseInsensitiveOrder();
+    protected Map<String, String> _foreignLocalMap = StringKeyMap.createAsCaseInsensitiveOrder();
 
     private String _foreignPropertyNamePrefix;
     private boolean _additionalForeignKey;
@@ -149,8 +149,10 @@ public class ForeignKey {
     public void addReference(List<String> localColumnNameList, List<String> foreignColumnNameList) {
         _localColumns.addAll(localColumnNameList);
         _foreignColumns.addAll(foreignColumnNameList);
-        _localForeignMap.putAll(localColumnNameList, foreignColumnNameList);
-        _foreignLocalMap.putAll(foreignColumnNameList, localColumnNameList);
+        for (int i = 0; i < localColumnNameList.size(); i++) {
+            _localForeignMap.put(localColumnNameList.get(i), foreignColumnNameList.get(i));
+            _foreignLocalMap.put(foreignColumnNameList.get(i), localColumnNameList.get(i));
+        }
     }
 
     // ===================================================================================
@@ -439,56 +441,12 @@ public class ForeignKey {
     // ==========================================================================================
     //                                                                  Get Column Mapping Method
     //                                                                  =========================
-    public DfFlexibleMap<String, String> getLocalForeignMapping() {
+    public Map<String, String> getLocalForeignMapping() {
         return _localForeignMap;
     }
 
-    public DfFlexibleMap<String, String> getForeignLocalMapping() {
+    public Map<String, String> getForeignLocalMapping() {
         return _foreignLocalMap;
-    }
-
-    /**
-     * Utility method to get local column objects to foreign column objects
-     * mapping for this foreign key.
-     * <p>
-     * <pre>
-     * Example)
-     * - for (final Iterator ite = getLocalColumnObjectList(); ite.hasNext();) {
-     * -     final Column localCol = (Column) ite.next();
-     * -     final Column foreignCol = (Column) getLocalForeignColumnObjectMapping().get(localCol);
-     * </pre>
-     * @return table mapping foreign objects to local objects
-     */
-    public DfFlexibleMap<Column, Column> getLocalForeignColumnObjectMapping() {
-        final DfFlexibleMap<Column, Column> map = new DfFlexibleMap<Column, Column>();
-        final List<Column> localList = getLocalColumnObjectList();
-        final List<Column> foreignList = getForeignColumnObjectList();
-        for (int i = 0; i < localList.size(); i++) {
-            map.put(localList.get(i), foreignList.get(i));
-        }
-        return map;
-    }
-
-    /**
-     * Utility method to get foreign column objects to local column objects
-     * mapping for this foreign key.
-     * <p>
-     * <pre>
-     * Example)
-     * - for (final Iterator ite = getForeignColumnObjectList(); ite.hasNext();) {
-     * -     final Column foreignCol = (Column) ite.next();
-     * -     final Column localCol = (Column) getForeignLocalColumnObjectMapping().get(foreignCol);
-     * </pre>
-     * @return table mapping foreign objects to local objects
-     */
-    public DfFlexibleMap<Column, Column> getForeignLocalColumnObjectMapping() {
-        final DfFlexibleMap<Column, Column> map = new DfFlexibleMap<Column, Column>();
-        final List<Column> localList = getLocalColumnObjectList();
-        final List<Column> foreignList = getForeignColumnObjectList();
-        for (int i = 0; i < localList.size(); i++) {
-            map.put(foreignList.get(i), localList.get(i));
-        }
-        return map;
     }
 
     // ==========================================================================================
@@ -784,7 +742,7 @@ public class ForeignKey {
         String result = "";
         for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column localCol = (Column) ite.next();
-            final Column foreignCol = (Column) getLocalForeignColumnObjectMapping().get(localCol);
+            final Column foreignCol = getForeignColumnByLocalColumn(localCol);
             final String setterName = setterPrefix + foreignCol.getJavaName() + setterSuffix;
             final String getterName = "(_" + localCol.getUncapitalisedJavaName() + ")";
             if ("".equals(result)) {
@@ -812,7 +770,7 @@ public class ForeignKey {
 
         for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column localCol = (Column) ite.next();
-            final Column foreignCol = (Column) getLocalForeignColumnObjectMapping().get(localCol);
+            final Column foreignCol = getForeignColumnByLocalColumn(localCol);
             final String setterName = setterPrefix + localCol.getJavaName() + setterSuffix;
             final String getterName = "(_" + foreignCol.getUncapitalisedJavaName() + ")";
             if ("".equals(result)) {
@@ -834,7 +792,7 @@ public class ForeignKey {
         String result = "";
         for (final Iterator<Column> ite = localColumnList.iterator(); ite.hasNext();) {
             final Column localCol = (Column) ite.next();
-            final Column foreignCol = (Column) getLocalForeignColumnObjectMapping().get(localCol);
+            final Column foreignCol = getForeignColumnByLocalColumn(localCol);
             final String localName = localCol.getName();
             final String foreignName = foreignCol.getName();
             if ("".equals(result)) {
@@ -856,7 +814,7 @@ public class ForeignKey {
         String result = "";
         for (final Iterator<Column> ite = foreignColumnList.iterator(); ite.hasNext();) {
             final Column foreignCol = (Column) ite.next();
-            final Column localCol = (Column) getForeignLocalColumnObjectMapping().get(foreignCol);
+            final Column localCol = getLocalColumnByForeignColumn(foreignCol);
             final String foreignName = foreignCol.getName();
             final String localName = localCol.getName();
 
@@ -879,7 +837,7 @@ public class ForeignKey {
         String result = "";
         for (final Iterator<Column> ite = foreignColumnList.iterator(); ite.hasNext();) {
             final Column foreignCol = (Column) ite.next();
-            final Column localCol = (Column) getForeignLocalColumnObjectMapping().get(foreignCol);
+            final Column localCol = getLocalColumnByForeignColumn(foreignCol);
             final String foreignName = foreignCol.getName();
             final String localName = localCol.getName();
 

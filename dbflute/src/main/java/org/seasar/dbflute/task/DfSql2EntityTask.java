@@ -49,7 +49,7 @@ import org.seasar.dbflute.exception.DfParameterBeanDuplicateException;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.friends.torque.DfSchemaXmlReader;
 import org.seasar.dbflute.friends.velocity.DfVelocityContextFactory;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileFireMan;
@@ -274,7 +274,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         _goodSqlCount++;
                         alreadyIncrementGoodSqlCount = true;
 
-                        final DfFlexibleMap<String, String> columnJavaNativeMap = createColumnJavaNativeMap(sql);
+                        final Map<String, String> columnJavaNativeMap = createColumnJavaNativeMap(sql);
                         final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = new LinkedHashMap<String, DfColumnMetaInfo>();
                         final ResultSetMetaData md = rs.getMetaData();
                         for (int i = 1; i <= md.getColumnCount(); i++) {
@@ -392,9 +392,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 }
             }
 
-            protected DfFlexibleMap<String, String> createColumnJavaNativeMap(String sql) {
+            protected Map<String, String> createColumnJavaNativeMap(String sql) {
                 final List<String> entityPropertyTypeList = getEntityPropertyTypeList(sql);
-                final DfFlexibleMap<String, String> columnJavaNativeMap = new DfFlexibleMap<String, String>();
+                final Map<String, String> columnJavaNativeMap = StringKeyMap.createAsFlexible();
                 for (String element : entityPropertyTypeList) {
                     final String nameDelimiter = " ";
                     final int nameDelimiterLength = nameDelimiter.length();
@@ -924,7 +924,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (commonColumnMap.isEmpty()) {
             return false;
         }
-        DfFlexibleMap<String, DfColumnMetaInfo> flexibleColumnJdbcTypeMap = newFlexibleNameMap(columnJdbcTypeMap);
+        Map<String, DfColumnMetaInfo> flexibleColumnJdbcTypeMap = newFlexibleNameMap(columnJdbcTypeMap);
         Set<String> commonColumnSet = commonColumnMap.keySet();
         for (String commonColumnName : commonColumnSet) {
             if (!flexibleColumnJdbcTypeMap.containsKey(commonColumnName)) {
@@ -976,7 +976,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String getCommonColumnTorqueType(String columnName) {
-        DfFlexibleMap<String, Object> flexibleNameMap = newFlexibleNameMap(getCommonColumnMap());
+        Map<String, Object> flexibleNameMap = newFlexibleNameMap(getCommonColumnMap());
         return (String) flexibleNameMap.get(columnName);
     }
 
@@ -1086,8 +1086,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
     }
 
-    protected <KEY, VALUE> DfFlexibleMap<KEY, VALUE> newFlexibleNameMap(Map<KEY, VALUE> map) {
-        return new DfFlexibleMap<KEY, VALUE>(map);
+    protected <VALUE> Map<String, VALUE> newFlexibleNameMap(Map<String, VALUE> map) {
+        return StringKeyMap.createAsFlexible(map);
     }
 
     // ===================================================================================
