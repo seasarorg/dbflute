@@ -45,6 +45,7 @@ import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
 import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.util.DfBase64Util;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -285,7 +286,7 @@ public class DfXlsReader {
     }
 
     protected String ln() {
-        return System.getProperty("line.separator");
+        return DfSystemUtil.getLineSeparator();
     }
 
     // ===================================================================================

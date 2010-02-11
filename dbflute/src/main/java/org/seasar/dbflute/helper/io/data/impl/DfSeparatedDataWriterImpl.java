@@ -184,7 +184,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
 
                             // If the value is not null and the value has the own type except string,
                             // It registers the value to statement by the type.
-                            if (processNotNullNotString(columnName, obj, ps, bindCount)) {
+                            if (processNotNullNotString(tableName, columnName, obj, ps, bindCount)) {
                                 bindCount++;
                                 continue;
                             }
@@ -192,7 +192,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                             // - - - - - - - - - - - - - - 
                             // Against Null Headache
                             // - - - - - - - - - - - - - -
-                            if (processNull(columnName, obj, ps, bindCount, columnMetaInfoMap)) {
+                            if (processNull(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }
@@ -212,7 +212,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                             // - - - - - - - - - - - - - - 
                             // Against Timestamp Headache
                             // - - - - - - - - - - - - - -
-                            if (processTimestamp(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                            if (processTimestamp(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }
@@ -220,7 +220,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                             // - - - - - - - - - - - - - - 
                             // Against Time Headache
                             // - - - - - - - - - - - - - -
-                            if (processTime(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                            if (processTime(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }
@@ -228,7 +228,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                             // - - - - - - - - - - - - - - 
                             // Against Boolean Headache
                             // - - - - - - - - - - - - - -
-                            if (processBoolean(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                            if (processBoolean(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }
@@ -236,7 +236,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                             // - - - - - - - - - - - - - - 
                             // Against Number Headache
                             // - - - - - - - - - - - - - -
-                            if (processNumber(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                            if (processNumber(tableName, columnName, value, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }

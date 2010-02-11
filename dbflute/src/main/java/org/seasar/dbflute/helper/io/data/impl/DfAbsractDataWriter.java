@@ -27,11 +27,14 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
+import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.DfTypeUtil.ToBooleanParseException;
 import org.seasar.dbflute.util.DfTypeUtil.ToTimeParseException;
+import org.seasar.dbflute.util.DfTypeUtil.ToTimestampOutOfCalendarException;
 import org.seasar.dbflute.util.DfTypeUtil.ToTimestampParseException;
 
 /**
@@ -58,8 +61,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                     NotNull NotString
     //                                     -----------------
-    protected boolean processNotNullNotString(String columnName, Object obj, PreparedStatement statement, int bindCount)
-            throws SQLException {
+    protected boolean processNotNullNotString(String tableName, String columnName, Object obj,
+            PreparedStatement statement, int bindCount) throws SQLException {
         if (!isNotNullNotString(obj)) {
             return false;
         }
@@ -86,8 +89,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                            Null Value
     //                                            ----------
-    protected boolean processNull(String columnName, Object value, PreparedStatement statement, int bindCount,
-            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+    protected boolean processNull(String tableName, String columnName, Object value, PreparedStatement statement,
+            int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (!isNullValue(value)) {
             return false;
         }
@@ -123,8 +126,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                             Timestamp
     //                                             ---------
-    protected boolean processTimestamp(String columnName, String value, PreparedStatement ps, int bindCount,
-            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+    protected boolean processTimestamp(String tableName, String columnName, String value, PreparedStatement ps,
+            int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
@@ -139,6 +142,18 @@ public abstract class DfAbsractDataWriter {
             Timestamp timestamp = DfTypeUtil.toTimestamp(value);
             ps.setTimestamp(bindCount, timestamp);
             return true;
+        } catch (ToTimestampOutOfCalendarException e) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+            msg = msg + "Failed to set the timestamp value!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Table]" + ln() + tableName + ln();
+            msg = msg + ln();
+            msg = msg + "[Column]" + ln() + columnName + ln();
+            msg = msg + ln();
+            msg = msg + "[Value]" + ln() + value + ln();
+            msg = msg + "- - - - - - - - - -/";
+            throw new DfTableDataRegistrationFailureException(msg, e);
         } catch (ToTimestampParseException ignored) {
             return false; // couldn't parse as timestamp 
         }
@@ -147,8 +162,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                                  Time
     //                                                  ----
-    protected boolean processTime(String columnName, String value, PreparedStatement ps, int bindCount,
-            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+    protected boolean processTime(String tableName, String columnName, String value, PreparedStatement ps,
+            int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
@@ -171,8 +186,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                               Boolean
     //                                               -------
-    protected boolean processBoolean(String columnName, String value, PreparedStatement ps, int bindCount,
-            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+    protected boolean processBoolean(String tableName, String columnName, String value, PreparedStatement ps,
+            int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
@@ -195,8 +210,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                                Number
     //                                                ------
-    protected boolean processNumber(String columnName, String value, PreparedStatement ps, int bindCount,
-            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+    protected boolean processNumber(String tableName, String columnName, String value, PreparedStatement ps,
+            int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
@@ -255,8 +270,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                                  UUID
     //                                                  ----
-    protected boolean processUUID(String columnName, String value, PreparedStatement ps, int bindCount,
-            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+    protected boolean processUUID(String tableName, String columnName, String value, PreparedStatement ps,
+            int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
             if (columnMetaInfo.getJdbcDefValue() != Types.OTHER
@@ -285,8 +300,8 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                    ARRAY (PostgreSQL)
     //                                    ------------------
-    protected boolean processArray(String columnName, String value, PreparedStatement ps, int bindCount,
-            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+    protected boolean processArray(String tableName, String columnName, String value, PreparedStatement ps,
+            int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
             //rsMeta#getColumnTypeName() returns value starts with "_" if
@@ -350,5 +365,9 @@ public abstract class DfAbsractDataWriter {
             }
         }
         return clazz;
+    }
+
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 }
