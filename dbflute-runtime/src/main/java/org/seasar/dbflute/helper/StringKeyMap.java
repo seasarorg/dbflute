@@ -32,7 +32,11 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     //                                                                           Attribute
     //                                                                           =========
     protected final Map<String, VALUE> _searchMap;
+
+    // these maps always have same size of search map if it's valid
     protected final Map<String, VALUE> _plainMap; // invalid if concurrent
+    protected final Map<String, String> _searchPlainKeyMap; // same life-cycle as plainMap
+
     protected boolean _removeUnderscore;
 
     // ===================================================================================
@@ -47,6 +51,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
         if (concurrent) {
             _searchMap = newConcurrentHashMap();
             _plainMap = null; // invalid if concurrent
+            _searchPlainKeyMap = null; // same life-cycle as plainMap
         } else {
             if (order) {
                 _searchMap = newLinkedHashMap();
@@ -55,6 +60,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
                 _searchMap = newHashMap();
                 _plainMap = newHashMap();
             }
+            _searchPlainKeyMap = newHashMap();
         }
     }
 
@@ -135,14 +141,10 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     public VALUE put(String key, VALUE value) {
         final String stringKey = convertStringKey(key);
         if (stringKey != null) {
-            if (_plainMap != null) {
-                final String plainKey;
-                if (_searchMap.containsKey(stringKey)) {
-                    plainKey = searchPlainKey(stringKey);
-                } else {
-                    plainKey = key;
-                }
+            if (_plainMap != null) { // non thread safe
+                final String plainKey = generatePlainKey(key, stringKey);
                 _plainMap.put(plainKey, value);
+                _searchPlainKeyMap.put(stringKey, plainKey);
             }
             return _searchMap.put(stringKey, value);
         }
@@ -152,36 +154,19 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     public VALUE remove(Object key) {
         final String stringKey = convertStringKey(key);
         if (stringKey != null) {
-            if (_plainMap != null) {
-                final Object plainKey;
-                if (_searchMap.containsKey(stringKey)) {
-                    plainKey = searchPlainKey(stringKey);
-                } else {
-                    plainKey = key;
-                }
+            if (_plainMap != null) { // non thread safe
+                final String plainKey = generatePlainKey(key, stringKey);
                 _plainMap.remove(plainKey);
+                _searchPlainKeyMap.remove(stringKey);
             }
             return _searchMap.remove(stringKey);
         }
         return null;
     }
 
-    protected String searchPlainKey(String stringKey) {
-        final Set<String> keySet = _plainMap.keySet();
-        String plainKey = null;
-        for (String currentKey : keySet) {
-            if (stringKey.equals(convertStringKey(currentKey))) {
-                plainKey = currentKey;
-                break;
-            }
-        }
-        if (plainKey == null) {
-            String msg = "The plain map should have the key:";
-            msg = msg + " stringKey=" + stringKey;
-            msg = msg + " plainMap=" + _plainMap;
-            throw new IllegalStateException(msg);
-        }
-        return plainKey;
+    protected String generatePlainKey(Object key, String stringKey) {
+        final String plainKey = _searchPlainKeyMap.get(stringKey);
+        return (plainKey != null ? plainKey : (key != null ? key.toString() : null));
     }
 
     public final void putAll(Map<? extends String, ? extends VALUE> map) {
@@ -203,6 +188,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     public void clear() {
         if (_plainMap != null) {
             _plainMap.clear();
+            _searchPlainKeyMap.clear();
         }
         _searchMap.clear();
     }

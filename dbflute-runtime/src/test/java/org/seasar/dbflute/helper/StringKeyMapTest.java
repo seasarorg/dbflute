@@ -1,11 +1,15 @@
 package org.seasar.dbflute.helper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.DfTraceViewUtil;
 
 /**
  * @author jflute
@@ -582,5 +586,68 @@ public class StringKeyMapTest extends PlainTestCase {
         log(set);
         assertFalse(set.contains("AaA"));
         assertEquals(2, map.keySet().size());
+    }
+
+    // ===================================================================================
+    //                                                                         Performance
+    //                                                                         ===========
+    public void test_performanceCheck_put() throws Exception {
+        {
+            Map<String, String> map = new HashMap<String, String>();
+            checkPerformance(map, "new HashMap<String, String>()");
+        }
+        {
+            Map<String, String> map = new ConcurrentHashMap<String, String>();
+            checkPerformance(map, "new ConcurrentHashMap<String, String>()");
+        }
+        {
+            Map<String, String> map = new LinkedHashMap<String, String>();
+            checkPerformance(map, "new LinkedHashMap<String, String>()");
+        }
+        {
+            Map<String, String> map = StringKeyMap.createAsCaseInsensitiveConcurrent();
+            checkPerformance(map, "StringKeyMap.createAsCaseInsensitiveConcurrent()");
+        }
+        {
+            Map<String, String> map = StringKeyMap.createAsCaseInsensitiveOrdered();
+            checkPerformance(map, "StringKeyMap.createAsCaseInsensitiveOrdered()");
+        }
+        {
+            Map<String, String> map = StringKeyMap.createAsCaseInsensitive();
+            checkPerformance(map, "StringKeyMap.createAsCaseInsensitive()");
+        }
+    }
+
+    protected void checkPerformance(Map<String, String> map, String title) {
+        String value = "value";
+        log("");
+        log("[" + title + "]");
+        {
+            // new insert
+            long beforePut = System.currentTimeMillis();
+            for (int i = 0; i < 10000; i++) {
+                map.put(String.valueOf(i), value);
+            }
+            long afterPut = System.currentTimeMillis();
+            log("put():1 = " + DfTraceViewUtil.convertToPerformanceView(afterPut - beforePut));
+        }
+        {
+            // override
+            long beforePut = System.currentTimeMillis();
+            for (int i = 0; i < 10000; i++) {
+                map.put(String.valueOf(i), value);
+            }
+            long afterPut = System.currentTimeMillis();
+            log("put():2 = " + DfTraceViewUtil.convertToPerformanceView(afterPut - beforePut));
+        }
+        {
+            // get
+            long beforeGet = System.currentTimeMillis();
+            for (int i = 0; i < 10000; i++) {
+                map.get(String.valueOf(i));
+            }
+            long afterGet = System.currentTimeMillis();
+            log("get() = " + DfTraceViewUtil.convertToPerformanceView(afterGet - beforeGet));
+        }
     }
 }
