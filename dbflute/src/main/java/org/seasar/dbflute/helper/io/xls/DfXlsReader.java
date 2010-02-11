@@ -235,11 +235,11 @@ public class DfXlsReader {
                 }
             }
         } catch (RuntimeException e) {
-            throwCellValueHandlingException(table, row, column, cell, value, e);
+            throwCellValueHandlingException(table, column, row, cell, value, e);
         }
     }
 
-    protected void throwCellValueHandlingException(DataTable table, HSSFRow row, DataColumn column, HSSFCell cell,
+    protected void throwCellValueHandlingException(DataTable table, DataColumn column, HSSFRow row, HSSFCell cell,
             Object value, RuntimeException e) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
@@ -247,9 +247,9 @@ public class DfXlsReader {
         msg = msg + ln();
         msg = msg + "[Table]" + ln() + table.getTableName() + ln();
         msg = msg + ln();
-        msg = msg + "[Row Number]" + ln() + row.getRowNum() + ln();
-        msg = msg + ln();
         msg = msg + "[Column]" + ln() + (column != null ? column.getColumnName() : null) + ln();
+        msg = msg + ln();
+        msg = msg + "[Row Number]" + ln() + row.getRowNum() + ln();
         msg = msg + ln();
         msg = msg + "[Cell Object]" + ln() + cell + ln();
         msg = msg + ln();
