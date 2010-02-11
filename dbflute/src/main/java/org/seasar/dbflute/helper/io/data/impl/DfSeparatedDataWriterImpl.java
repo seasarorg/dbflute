@@ -20,7 +20,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataWriter;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuilder;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuildingResult;
@@ -71,7 +70,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     protected Map<String, String> _defaultValueMap;
 
     /** The cache map of meta info. The key is table name. */
-    protected Map<String, DfFlexibleMap<String, DfColumnMetaInfo>> _metaInfoCacheMap = new HashMap<String, DfFlexibleMap<String, DfColumnMetaInfo>>();
+    protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsCaseInsensitive();;
 
     // ===================================================================================
     //                                                                               Write
@@ -95,7 +94,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         if (tableName.indexOf("-") >= 0) {
             tableName = tableName.substring(tableName.indexOf("-") + "-".length());
         }
-        final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(_dataSource, tableName);
+        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(_dataSource, tableName);
         if (columnMetaInfoMap.isEmpty()) {
             String msg = "The tableName[" + tableName + "] was not found: filename=" + _filename;
             throw new IllegalStateException(msg);
@@ -325,11 +324,11 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                    Column Meta Info
     //                                                                    ================
-    protected DfFlexibleMap<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
+    protected Map<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
         if (_metaInfoCacheMap.containsKey(tableName)) {
             return _metaInfoCacheMap.get(tableName);
         }
-        final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleMap<String, DfColumnMetaInfo>();
+        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsCaseInsensitive();
         try {
             final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
             final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumnList(metaData, _schemaName,

@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataTable;
@@ -42,7 +43,7 @@ public class DfTemplateDataXlsHandler {
      * @param xlsFile The file of xls. (NotNull)
      * @return The result of dump. (NotNull)
      */
-    public TemplateDataResult dumpToXls(Map<String, List<String>> tableColumnMap, int limit, File xlsFile) {
+    public TemplateDataResult dumpToXls(Map<String, List<Column>> tableColumnMap, int limit, File xlsFile) {
         final DfTemplateDataExtractor extractor = new DfTemplateDataExtractor(_dataSource);
         final Map<String, List<Map<String, String>>> dumpDataMap = extractor.extractData(tableColumnMap, limit);
         return transferToXls(tableColumnMap, dumpDataMap, xlsFile);
@@ -54,10 +55,10 @@ public class DfTemplateDataXlsHandler {
      * @param xlsFile The file of xls. (NotNull)
      * @return The result of dump. (NotNull)
      */
-    protected TemplateDataResult transferToXls(Map<String, List<String>> tableColumnMap,
+    protected TemplateDataResult transferToXls(Map<String, List<Column>> tableColumnMap,
             Map<String, List<Map<String, String>>> templateDataMap, File xlsFile) {
 
-        final Map<String, List<String>> overTableColumnMap = new LinkedHashMap<String, List<String>>();
+        final Map<String, List<Column>> overTableColumnMap = new LinkedHashMap<String, List<Column>>();
         final Map<String, List<Map<String, String>>> overTemplateDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
 
         final Set<String> tableNameSet = templateDataMap.keySet();
@@ -65,7 +66,7 @@ public class DfTemplateDataXlsHandler {
         //writer.setCellEncoding(CellEncoding.ENCODING_UTF_16); // for Japanese
         final DataSet dataSet = new DataSet();
         for (String tableName : tableNameSet) {
-            final List<String> columnNameList = tableColumnMap.get(tableName);
+            final List<Column> columnList = tableColumnMap.get(tableName);
             final int dotIndex = tableName.indexOf(".");
             final DataTable dataTable;
             if (dotIndex >= 0) {
@@ -75,13 +76,13 @@ public class DfTemplateDataXlsHandler {
                 dataTable = new DataTable(tableName);
             }
             int columnIndex = 0;
-            for (String columnName : columnNameList) {
-                dataTable.addColumn(columnName, ColumnTypes.STRING);
+            for (Column column : columnList) {
+                dataTable.addColumn(column.getName(), ColumnTypes.STRING);
                 ++columnIndex;
             }
             final List<Map<String, String>> recordList = templateDataMap.get(tableName);
             if (recordList.size() > 65000) { // against Excel limit!
-                overTableColumnMap.put(tableName, columnNameList);
+                overTableColumnMap.put(tableName, columnList);
                 overTemplateDataMap.put(tableName, recordList);
                 continue;
             }
@@ -113,14 +114,14 @@ public class DfTemplateDataXlsHandler {
     }
 
     public static class TemplateDataResult {
-        protected Map<String, List<String>> overTableColumnMap;
+        protected Map<String, List<Column>> overTableColumnMap;
         protected Map<String, List<Map<String, String>>> overTemplateDataMap;
 
-        public Map<String, List<String>> getOverTableColumnMap() {
+        public Map<String, List<Column>> getOverTableColumnMap() {
             return overTableColumnMap;
         }
 
-        public void setOverTableColumnMap(Map<String, List<String>> overTableColumnMap) {
+        public void setOverTableColumnMap(Map<String, List<Column>> overTableColumnMap) {
             this.overTableColumnMap = overTableColumnMap;
         }
 

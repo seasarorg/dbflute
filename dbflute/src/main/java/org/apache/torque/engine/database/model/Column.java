@@ -1129,7 +1129,7 @@ public class Column {
         this._jdbcType = jdbcType;
     }
 
-    public Object getJdbcType() {
+    public String getJdbcType() {
         return _jdbcType;
     }
 

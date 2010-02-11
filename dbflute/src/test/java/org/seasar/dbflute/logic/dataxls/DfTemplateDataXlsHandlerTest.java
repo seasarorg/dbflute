@@ -12,20 +12,21 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.torque.engine.database.model.Column;
+import org.apache.torque.engine.database.model.TypeMap;
 import org.junit.Test;
 import org.seasar.dbflute.helper.dataset.DataColumn;
 import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
-import org.seasar.dbflute.logic.dataxls.DfTemplateDataXlsHandler;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute
  * @since 0.8.3 (2008/10/29 Wednesday)
  */
-public class DfDumpDataXlsHandlerTest extends PlainTestCase {
+public class DfTemplateDataXlsHandlerTest extends PlainTestCase {
 
     @Test
     public void test_transferToXls() throws IOException {
@@ -41,14 +42,34 @@ public class DfDumpDataXlsHandlerTest extends PlainTestCase {
         if (xlsFile.exists()) {
             xlsFile.delete();
         }
-        final Map<String, List<String>> tableColumnMap = new LinkedHashMap<String, List<String>>();
+        final Map<String, List<Column>> tableColumnMap = new LinkedHashMap<String, List<Column>>();
         {
-            final List<String> columnNameList = new ArrayList<String>();
-            columnNameList.add("AAA");
-            columnNameList.add("BBB");
-            columnNameList.add("CCC");
-            columnNameList.add("DDD");
-            tableColumnMap.put("TEST_TABLE", columnNameList);
+            final List<Column> columnList = new ArrayList<Column>();
+            {
+                Column column = new Column();
+                column.setName("AAA");
+                column.setJdbcType(TypeMap.VARCHAR);
+                columnList.add(column);
+            }
+            {
+                Column column = new Column();
+                column.setName("BBB");
+                column.setJdbcType(TypeMap.VARCHAR);
+                columnList.add(column);
+            }
+            {
+                Column column = new Column();
+                column.setName("CCC");
+                column.setJdbcType(TypeMap.TIMESTAMP);
+                columnList.add(column);
+            }
+            {
+                Column column = new Column();
+                column.setName("DDD");
+                column.setJdbcType(TypeMap.VARCHAR);
+                columnList.add(column);
+            }
+            tableColumnMap.put("TEST_TABLE", columnList);
         }
         final Map<String, List<Map<String, String>>> dumpDataMap = new LinkedHashMap<String, List<Map<String, String>>>();
         {

@@ -10,10 +10,11 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Date;
+import java.util.Map;
 import java.util.regex.PatternSyntaxException;
 
 import org.junit.Test;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.unit.PlainTestCase;
 
@@ -98,7 +99,7 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
                 return BigDecimal.class;
             }
         };
-        DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleMap<String, DfColumnMetaInfo>();
+        Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsCaseInsensitive();
         DfColumnMetaInfo info = new DfColumnMetaInfo();
         info.setColumnName("foo");
         info.setColumnSize(3);

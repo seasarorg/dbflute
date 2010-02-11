@@ -22,11 +22,11 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.TypeMap;
-import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -84,7 +84,7 @@ public abstract class DfAbsractDataWriter {
     //                                            Null Value
     //                                            ----------
     protected boolean processNull(String columnName, Object value, PreparedStatement statement, int bindCount,
-            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (!isNullValue(value)) {
             return false;
         }
@@ -121,7 +121,7 @@ public abstract class DfAbsractDataWriter {
     //                                                  Time
     //                                                  ----
     protected boolean processTime(String columnName, String value, PreparedStatement ps, int bindCount,
-            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
@@ -178,7 +178,7 @@ public abstract class DfAbsractDataWriter {
     //                                             Timestamp
     //                                             ---------
     protected boolean processTimestamp(String columnName, String value, PreparedStatement ps, int bindCount,
-            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
@@ -237,7 +237,7 @@ public abstract class DfAbsractDataWriter {
     //                                               Boolean
     //                                               -------
     protected boolean processBoolean(String columnName, String value, PreparedStatement ps, int bindCount,
-            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
@@ -291,7 +291,7 @@ public abstract class DfAbsractDataWriter {
     //                                                Number
     //                                                ------
     protected boolean processNumber(String columnName, String value, PreparedStatement ps, int bindCount,
-            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
@@ -351,7 +351,7 @@ public abstract class DfAbsractDataWriter {
     //                                                  UUID
     //                                                  ----
     protected boolean processUUID(String columnName, String value, PreparedStatement ps, int bindCount,
-            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
             if (columnMetaInfo.getJdbcDefValue() != Types.OTHER
@@ -381,12 +381,12 @@ public abstract class DfAbsractDataWriter {
     //                                    ARRAY (PostgreSQL)
     //                                    ------------------
     protected boolean processArray(String columnName, String value, PreparedStatement ps, int bindCount,
-            DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
+            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
         if (columnMetaInfo != null) {
-            // rsMeta#getColumnTypeName() returns value starts with "_" if
-            // rsMeta#getColumnType() returns Types.ARRAY in PostgreSQL.
-            //   e.g. UUID[] -> _uuid
+            //rsMeta#getColumnTypeName() returns value starts with "_" if
+            //rsMeta#getColumnType() returns Types.ARRAY in PostgreSQL.
+            //  e.g. UUID[] -> _uuid
             if (columnMetaInfo.getJdbcDefValue() != Types.ARRAY || !columnMetaInfo.getDbTypeName().startsWith("_")) {
                 return false;
             }

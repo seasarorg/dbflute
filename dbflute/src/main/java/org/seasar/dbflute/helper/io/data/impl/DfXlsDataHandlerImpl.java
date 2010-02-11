@@ -18,13 +18,13 @@ package org.seasar.dbflute.helper.io.data.impl;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.sql.BatchUpdateException;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +41,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfTableNotFoundException;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.collection.DfFlexibleMap;
 import org.seasar.dbflute.helper.dataset.DataColumn;
 import org.seasar.dbflute.helper.dataset.DataRow;
@@ -82,7 +83,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     protected boolean _suppressBatchUpdate;
 
     /** The cache map of meta info. The key is table name. */
-    protected Map<String, DfFlexibleMap<String, DfColumnMetaInfo>> _metaInfoCacheMap = new HashMap<String, DfFlexibleMap<String, DfColumnMetaInfo>>();
+    protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsCaseInsensitive();;
 
     // ===================================================================================
     //                                                                                Read
@@ -124,8 +125,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 }
 
                 // Set up columnMetaInfo.
-                final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(dataSource,
-                        tableName);
+                final Map<String, DfColumnMetaInfo> columnMetaInfoMap = getColumnMetaInfo(dataSource, tableName);
 
                 // Extension Point as Before.
                 beforeHandlingTable(dataSource, dataTable);
@@ -315,13 +315,15 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                    Column Meta Info
     //                                                                    ================
-    protected DfFlexibleMap<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
+    protected Map<String, DfColumnMetaInfo> getColumnMetaInfo(DataSource dataSource, String tableName) {
         if (_metaInfoCacheMap.containsKey(tableName)) {
             return _metaInfoCacheMap.get(tableName);
         }
-        final DfFlexibleMap<String, DfColumnMetaInfo> columnMetaInfoMap = new DfFlexibleMap<String, DfColumnMetaInfo>();
+        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsCaseInsensitive();
+        Connection conn = null;
         try {
-            final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
+            conn = dataSource.getConnection();
+            final DatabaseMetaData metaData = conn.getMetaData();
             final List<DfColumnMetaInfo> columnList = _columnHandler.getColumnList(metaData, _schemaName, tableName);
             for (DfColumnMetaInfo columnMetaInfo : columnList) {
                 columnMetaInfoMap.put(columnMetaInfo.getColumnName(), columnMetaInfo);
@@ -329,7 +331,15 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             _metaInfoCacheMap.put(tableName, columnMetaInfoMap);
             return columnMetaInfoMap;
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            String msg = "Failed to get column meta informations: table=" + tableName;
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
         }
     }
 
@@ -379,7 +389,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final DataTable table = dataSet.getTable(i);
             final String tableName = table.getTableName();
 
-            final DfFlexibleMap<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
+            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
             for (int j = 0; j < table.getColumnSize(); j++) {
                 final DataColumn dataColumn = table.getColumn(j);
                 if (!metaInfoMap.containsKey(dataColumn.getColumnName())) {
@@ -399,7 +409,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
             final String tableName = table.getTableName();
 
-            final DfFlexibleMap<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
+            final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
             for (String defaultTargetColumnName : defaultValueMapKeySet) {
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 

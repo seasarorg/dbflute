@@ -135,7 +135,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("* Data Xls Template *");
         _log.info("*                   *");
         _log.info("* * * * * * * * * * *");
-        final Map<String, List<String>> tableColumnMap = new LinkedHashMap<String, List<String>>();
+        final Map<String, List<Column>> tableColumnMap = new LinkedHashMap<String, List<Column>>();
         final DfAdditionalTableProperties tableProperties = getProperties().getAdditionalTableProperties();
         final Map<String, Object> additionalTableMap = tableProperties.getAdditionalTableMap();
         final boolean containsCommonColumn = isDataXlsTemplateContainsCommonColumn();
@@ -148,12 +148,12 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
                     continue;
                 }
                 final Column[] columns = table.getColumns();
-                final List<String> columnNameList = new ArrayList<String>();
+                final List<Column> columnNameList = new ArrayList<Column>();
                 for (Column column : columns) {
                     if (!containsCommonColumn && commonColumnMap.containsKey(column.getName())) {
                         continue;
                     }
-                    columnNameList.add(column.getName());
+                    columnNameList.add(column);
                 }
                 tableColumnMap.put(table.getTableSqlName(), columnNameList);
             }
@@ -165,7 +165,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         _log.info("");
     }
 
-    protected void dumpDataXlsTemplate(Map<String, List<String>> tableColumnMap) {
+    protected void dumpDataXlsTemplate(Map<String, List<Column>> tableColumnMap) {
         final DfTemplateDataXlsHandler xlsHandler = new DfTemplateDataXlsHandler(getDataSource());
         final Integer limit = getDataXlsTemplateRecordLimit();
         final File xlsFile = getDataXlsTemplateFile();
@@ -174,7 +174,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected void dumpDataCsvTemplate(TemplateDataResult dumpResult) {
-        final Map<String, List<String>> overTableColumnMap = dumpResult.getOverTableColumnMap();
+        final Map<String, List<Column>> overTableColumnMap = dumpResult.getOverTableColumnMap();
         if (overTableColumnMap.isEmpty()) {
             return;
         }
@@ -189,7 +189,11 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final Set<String> tableNameSet = overTableColumnMap.keySet();
         for (final String tableName : tableNameSet) {
             final String csvFilePath = csvDir.getPath() + "/" + tableName + ".csv";
-            final List<String> columnNameList = overTableColumnMap.get(tableName);
+            final List<Column> columnList = overTableColumnMap.get(tableName);
+            final List<String> columnNameList = new ArrayList<String>();
+            for (Column column : columnList) {
+                columnNameList.add(column.getName());
+            }
             final List<Map<String, String>> recordList = overDumpDataMap.get(tableName);
             _log.info("    " + tableName + "(" + recordList.size() + ")");
             try {
