@@ -58,7 +58,7 @@ public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtr
     //                                                                             Extract
     //                                                                             =======
     public Map<String, DfProcedureSynonymMetaInfo> extractProcedureSynonymMap() {
-        final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, DfProcedureSynonymMetaInfo> procedureSynonymMap = StringKeyMap.createAsFlexibleOrdered();
         final String sql = buildSynonymSelect();
         Connection conn = null;
         Statement statement = null;

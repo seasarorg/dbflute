@@ -502,8 +502,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         }
         final Map<String, Object> map = mapProp("torque." + KEY_classificationDeploymentMap, DEFAULT_EMPTY_MAP);
 
-        // It's flexible because table name should be treated as flexible/
-        _classificationDeploymentMap = StringKeyMap.createAsFlexibleOrder();
+        _classificationDeploymentMap = StringKeyMap.createAsFlexibleOrdered();
         final Set<String> deploymentMapkeySet = map.keySet();
         for (String tableName : deploymentMapkeySet) {
             final Object value = map.get(tableName);

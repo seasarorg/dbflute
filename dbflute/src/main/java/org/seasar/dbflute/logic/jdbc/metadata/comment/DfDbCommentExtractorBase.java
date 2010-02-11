@@ -53,7 +53,7 @@ public abstract class DfDbCommentExtractorBase implements DfDbCommentExtractor {
     //                                                                                Main
     //                                                                                ====
     public Map<String, UserTabComments> extractTableComment(Set<String> tableSet) {
-        Map<String, UserTabComments> resultMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, UserTabComments> resultMap = StringKeyMap.createAsFlexible();
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();
@@ -77,7 +77,7 @@ public abstract class DfDbCommentExtractorBase implements DfDbCommentExtractor {
     }
 
     public Map<String, Map<String, UserColComments>> extractColumnComment(Set<String> tableSet) {
-        Map<String, Map<String, UserColComments>> resultMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, Map<String, UserColComments>> resultMap = StringKeyMap.createAsFlexible();
         Connection conn = null;
         try {
             conn = _dataSource.getConnection();

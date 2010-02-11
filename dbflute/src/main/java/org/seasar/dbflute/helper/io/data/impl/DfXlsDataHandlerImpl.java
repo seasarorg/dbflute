@@ -82,7 +82,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     protected boolean _suppressBatchUpdate;
 
     /** The cache map of meta info. The key is table name. */
-    protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsCaseInsensitive();;
+    protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
 
     // ===================================================================================
     //                                                                                Read
@@ -318,7 +318,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         if (_metaInfoCacheMap.containsKey(tableName)) {
             return _metaInfoCacheMap.get(tableName);
         }
-        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsFlexible();
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -455,12 +455,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             path = dataDirectoryName + "/table-name.txt";
             resultMap = reader.readMapAsStringValue(path);
         }
-        final Set<Entry<String, String>> entrySet = resultMap.entrySet();
-        final StringKeyMap<String> stringKeyMap = StringKeyMap.createAsCaseInsensitive();
-        for (Entry<String, String> entry : entrySet) {
-            stringKeyMap.put(entry.getKey(), entry.getValue());
-        }
-        return stringKeyMap;
+        final StringKeyMap<String> flmap = StringKeyMap.createAsFlexible();
+        flmap.putAll(resultMap);
+        return flmap;
     }
 
     private Map<String, List<String>> getNotTrimTableColumnMap(String dataDirectoryName) {
@@ -472,7 +469,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             resultMap = reader.readMapAsStringListValue(path);
         }
         final Set<Entry<String, List<String>>> entrySet = resultMap.entrySet();
-        final StringKeyMap<List<String>> stringKeyMap = StringKeyMap.createAsCaseInsensitive();
+        final StringKeyMap<List<String>> stringKeyMap = StringKeyMap.createAsFlexible();
         for (Entry<String, List<String>> entry : entrySet) {
             stringKeyMap.put(entry.getKey(), entry.getValue());
         }
@@ -488,7 +485,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             resultMap = reader.readMapAsStringListValue(path);
         }
         final Set<Entry<String, List<String>>> entrySet = resultMap.entrySet();
-        final StringKeyMap<List<String>> stringKeyMap = StringKeyMap.createAsCaseInsensitive();
+        final StringKeyMap<List<String>> stringKeyMap = StringKeyMap.createAsFlexible();
         for (Entry<String, List<String>> entry : entrySet) {
             stringKeyMap.put(entry.getKey(), entry.getValue());
         }

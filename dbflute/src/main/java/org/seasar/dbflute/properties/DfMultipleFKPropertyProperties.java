@@ -67,10 +67,14 @@ public final class DfMultipleFKPropertyProperties extends DfAbstractHelperProper
     }
 
     protected Map<String, Map<String, Map<String, String>>> asFlexible() {
-        return StringKeyMap.createAsCaseInsensitive(getMultipleFKPropertyMap());
+        Map<String, Map<String, Map<String, String>>> map = StringKeyMap.createAsFlexible();
+        map.putAll(getMultipleFKPropertyMap());
+        return map;
     }
 
     protected Map<String, Map<String, String>> asFlexible(final Map<String, Map<String, String>> foreignKeyMap) {
-        return StringKeyMap.createAsCaseInsensitive(foreignKeyMap);
+        Map<String, Map<String, String>> map = StringKeyMap.createAsFlexible();
+        map.putAll(foreignKeyMap);
+        return map;
     }
 }

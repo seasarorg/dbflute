@@ -16,7 +16,7 @@ public class DataSet {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private Map<String, DataTable> _tableMap = StringKeyMap.createAsCaseInsensitiveOrder();
+    private Map<String, DataTable> _tableMap = StringKeyMap.createAsFlexibleOrdered();
     private List<DataTable> _tableList = new ArrayList<DataTable>();
 
     // ===================================================================================

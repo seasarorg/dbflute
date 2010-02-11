@@ -29,7 +29,7 @@ public class DataTable {
     //                                                                           Attribute
     //                                                                           =========
     private String _tableName;
-    private Map<String, DataColumn> _columnMap = StringKeyMap.createAsCaseInsensitiveOrder();
+    private Map<String, DataColumn> _columnMap = StringKeyMap.createAsFlexibleOrdered();
     private List<DataColumn> _columnList = new ArrayList<DataColumn>();
     private List<DataRow> _rows = new ArrayList<DataRow>();
     private List<DataRow> _removedRows = new ArrayList<DataRow>();

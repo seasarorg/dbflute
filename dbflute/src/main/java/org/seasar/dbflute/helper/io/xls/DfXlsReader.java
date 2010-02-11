@@ -95,17 +95,17 @@ public class DfXlsReader {
         if (tableNameMap != null) {
             this._tableNameMap = tableNameMap;
         } else {
-            this._tableNameMap = StringKeyMap.createAsCaseInsensitive();
+            this._tableNameMap = StringKeyMap.createAsFlexible();
         }
         if (notTrimTableColumnMap != null) {
             this._notTrimTableColumnMap = notTrimTableColumnMap;
         } else {
-            this._notTrimTableColumnMap = StringKeyMap.createAsCaseInsensitive();
+            this._notTrimTableColumnMap = StringKeyMap.createAsFlexible();
         }
         if (emptyStringTableColumnMap != null) {
             this._emptyStringTableColumnMap = emptyStringTableColumnMap;
         } else {
-            this._emptyStringTableColumnMap = StringKeyMap.createAsCaseInsensitive();
+            this._emptyStringTableColumnMap = StringKeyMap.createAsFlexible();
         }
         this._skipSheetPattern = skipSheetPattern;
         setupWorkbook(in);

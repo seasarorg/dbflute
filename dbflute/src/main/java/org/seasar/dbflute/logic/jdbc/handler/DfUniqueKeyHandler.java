@@ -162,7 +162,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
 
     protected Map<String, Map<Integer, String>> doGetUniqueKeyMap(DatabaseMetaData dbMeta, String schemaName,
             String tableName, List<String> pkList) throws SQLException { // non primary key only
-        final StringSet pkSet = StringSet.createAsCaseInsensitive();
+        final StringSet pkSet = StringSet.createAsFlexible();
         pkSet.addAll(pkList);
         final Map<String, Map<Integer, String>> uniqueMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;

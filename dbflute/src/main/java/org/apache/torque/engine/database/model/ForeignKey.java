@@ -96,8 +96,8 @@ public class ForeignKey {
     private List<String> _localColumns = new ArrayList<String>(3);
     private List<String> _foreignColumns = new ArrayList<String>(3);
 
-    protected Map<String, String> _localForeignMap = StringKeyMap.createAsCaseInsensitiveOrder();
-    protected Map<String, String> _foreignLocalMap = StringKeyMap.createAsCaseInsensitiveOrder();
+    protected Map<String, String> _localForeignMap = StringKeyMap.createAsFlexibleOrdered();
+    protected Map<String, String> _foreignLocalMap = StringKeyMap.createAsFlexibleOrdered();
 
     private String _foreignPropertyNamePrefix;
     private boolean _additionalForeignKey;

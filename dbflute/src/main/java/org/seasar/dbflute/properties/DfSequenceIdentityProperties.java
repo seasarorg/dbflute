@@ -46,9 +46,9 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     protected Map<String, String> getSequenceDefinitionMap() {
         if (_sequenceDefinitionMap == null) {
-            LinkedHashMap<String, String> tmpMap = new LinkedHashMap<String, String>();
-            Map<String, Object> originalMap = mapProp("torque." + KEY_sequenceDefinitionMap, DEFAULT_EMPTY_MAP);
-            Set<Entry<String, Object>> entrySet = originalMap.entrySet();
+            final Map<String, String> flexibleMap = StringKeyMap.createAsFlexibleOrdered();
+            final Map<String, Object> originalMap = mapProp("torque." + KEY_sequenceDefinitionMap, DEFAULT_EMPTY_MAP);
+            final Set<Entry<String, Object>> entrySet = originalMap.entrySet();
             for (Entry<String, Object> entry : entrySet) {
                 String tableName = entry.getKey();
                 Object sequenceValue = entry.getValue();
@@ -57,9 +57,9 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
                     msg = msg + " sequenceValue=" + sequenceValue + " map=" + originalMap;
                     throw new DfIllegalPropertyTypeException(msg);
                 }
-                tmpMap.put(tableName, (String) sequenceValue);
+                flexibleMap.put(tableName, (String) sequenceValue);
             }
-            _sequenceDefinitionMap = tmpMap;
+            _sequenceDefinitionMap = flexibleMap;
         }
         return _sequenceDefinitionMap;
     }
@@ -74,20 +74,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return resultMap;
     }
 
-    protected Map<String, String> _tableSequenceCaseInsensitiveMap;
-
-    public Map<String, String> getTableSequenceCaseInsensitiveMap() {
-        if (_tableSequenceCaseInsensitiveMap != null) {
-            return _tableSequenceCaseInsensitiveMap;
-        }
-        final StringKeyMap<String> map = StringKeyMap.createAsCaseInsensitiveOrder();
-        map.putAll(getSequenceDefinitionMap());
-        _tableSequenceCaseInsensitiveMap = map;
-        return _tableSequenceCaseInsensitiveMap;
-    }
-
     public String getSequenceProp(String tableName) {
-        final String sequenceProp = getTableSequenceCaseInsensitiveMap().get(tableName);
+        final String sequenceProp = getSequenceDefinitionMap().get(tableName);
         if (sequenceProp == null || sequenceProp.trim().length() == 0) {
             return null;
         }
@@ -95,7 +83,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public String getSequenceName(String tableName) {
-        final String sequenceProp = getTableSequenceCaseInsensitiveMap().get(tableName);
+        final String sequenceProp = getSequenceDefinitionMap().get(tableName);
         if (sequenceProp == null || sequenceProp.trim().length() == 0) {
             return null;
         }
@@ -496,7 +484,8 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     }
 
     public String getIdentityColumnName(String flexibleTableName) {
-        final Map<String, Object> flmap = StringKeyMap.createAsCaseInsensitive(getIdentityDefinitionMap());
-        return (String) flmap.get(flexibleTableName);
+        final Map<String, Object> flexibleMap = StringKeyMap.createAsFlexibleOrdered();
+        flexibleMap.putAll(getIdentityDefinitionMap());
+        return (String) flexibleMap.get(flexibleTableName);
     }
 }

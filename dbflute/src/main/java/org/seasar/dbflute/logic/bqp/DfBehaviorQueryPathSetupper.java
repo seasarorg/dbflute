@@ -112,7 +112,7 @@ public class DfBehaviorQueryPathSetupper {
      * @return The case insensitive map of table behavior query path. (NotNull)
      */
     public Map<String, Map<String, Map<String, String>>> extractTableBqpMap(List<File> sqlFileList) {
-        final Map<String, Map<String, Map<String, String>>> resultMap = StringKeyMap.createAsCaseInsensitiveOrder();
+        final Map<String, Map<String, Map<String, String>>> resultMap = StringKeyMap.createAsFlexibleOrdered();
         if (sqlFileList.isEmpty()) {
             return resultMap;
         }

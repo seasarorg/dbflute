@@ -16,6 +16,7 @@
 package org.seasar.dbflute.properties;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -44,14 +46,13 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     //                                                                       =============
     public static final String KEY_commonColumnMap = "commonColumnMap";
     protected Map<String, Object> _commonColumnTopMap;
-    protected Map<String, Object> _commonColumnMap;
+    protected Map<String, String> _commonColumnMap;
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> getCommonColumnMap() {
-        if (_commonColumnMap == null) {
-            _commonColumnMap = mapProp("torque." + KEY_commonColumnMap, DEFAULT_EMPTY_MAP);
-
-            if (_commonColumnMap.containsKey(KEY_commonColumnMap)) {
+    public Map<String, String> getCommonColumnMap() {
+        if (_commonColumnTopMap == null) {
+            _commonColumnTopMap = mapProp("torque." + KEY_commonColumnMap, DEFAULT_EMPTY_MAP);
+            if (_commonColumnTopMap.containsKey(KEY_commonColumnMap)) {
                 // For the way by dfprop-setting.
                 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                 // map:{
@@ -61,8 +62,13 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
                 //     }
                 //     ; ...
                 // - - - - - - - - - -/ 
-                _commonColumnTopMap = _commonColumnMap;
-                _commonColumnMap = (Map<String, Object>) _commonColumnTopMap.get(KEY_commonColumnMap);
+                final Map<String, String> commonColumnMap = (Map<String, String>) _commonColumnTopMap
+                        .get(KEY_commonColumnMap);
+                final Map<String, String> flmap = StringKeyMap.createAsFlexibleOrdered();
+                flmap.putAll(commonColumnMap);
+                _commonColumnMap = flmap;
+            } else {
+                _commonColumnMap = new HashMap<String, String>(); // empty
             }
         }
         return _commonColumnMap;
@@ -72,7 +78,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
 
     public List<String> getCommonColumnNameList() {
         if (_commonColumnNameList == null) {
-            final Map<String, Object> commonColumnMap = getCommonColumnMap();
+            final Map<String, String> commonColumnMap = getCommonColumnMap();
             _commonColumnNameList = new ArrayList<String>(commonColumnMap.keySet());
         }
         return _commonColumnNameList;
@@ -97,7 +103,7 @@ public final class DfCommonColumnProperties extends DfAbstractHelperProperties {
     public List<String> getCommonColumnNameConversionList() {
         if (_commonColumnNameConversionList == null) {
             _commonColumnNameConversionList = new ArrayList<String>();
-            final Map<String, Object> commonColumnMap = getCommonColumnMap();
+            final Map<String, String> commonColumnMap = getCommonColumnMap();
             final Set<String> keySet = commonColumnMap.keySet();
             for (String columnName : keySet) {
                 if (columnName.startsWith(COMMON_COLUMN_CONVERSION_PREFIX_MARK)) {

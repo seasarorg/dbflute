@@ -46,15 +46,15 @@ public class DfJdbcFacade {
     //                                                                              Select
     //                                                                              ======
     // -----------------------------------------------------
-    //                                           String List
+    //                                           Object List
     //                                           -----------
-    public List<Map<String, String>> selectStringList(String sql, List<String> columnList) {
-        return selectStringList(sql, columnList, -1);
+    public List<Map<String, Object>> selectList(String sql, Map<String, ValueType> columnValueTypeMap) {
+        return selectList(sql, columnValueTypeMap, -1);
     }
 
-    public List<Map<String, String>> selectStringList(String sql, List<String> columnList, int limit) {
+    public List<Map<String, Object>> selectList(String sql, Map<String, ValueType> columnValueTypeMap, int limit) {
         // [ATTENTION]: no use bind variables
-        final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+        final List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -67,9 +67,12 @@ public class DfJdbcFacade {
                 if (limit >= 0 && limit <= count) {
                     break;
                 }
-                final Map<String, String> recordMap = new LinkedHashMap<String, String>();
-                for (String columnName : columnList) {
-                    recordMap.put(columnName, rs.getString(columnName));
+                final Map<String, Object> recordMap = StringKeyMap.createAsFlexibleOrdered();
+                final Set<Entry<String, ValueType>> entrySet = columnValueTypeMap.entrySet();
+                for (Entry<String, ValueType> entry : entrySet) {
+                    String columnName = entry.getKey();
+                    ValueType valueType = entry.getValue();
+                    recordMap.put(columnName, valueType.getValue(rs, columnName));
                 }
                 resultList.add(recordMap);
                 ++count;
@@ -108,15 +111,15 @@ public class DfJdbcFacade {
     }
 
     // -----------------------------------------------------
-    //                                           Object List
+    //                                           String List
     //                                           -----------
-    public List<Map<String, Object>> selectList(String sql, Map<String, ValueType> columnValueTypeMap) {
-        return selectList(sql, columnValueTypeMap, -1);
+    public List<Map<String, String>> selectStringList(String sql, List<String> columnList) {
+        return selectStringList(sql, columnList, -1);
     }
 
-    public List<Map<String, Object>> selectList(String sql, Map<String, ValueType> columnValueTypeMap, int limit) {
+    public List<Map<String, String>> selectStringList(String sql, List<String> columnList, int limit) {
         // [ATTENTION]: no use bind variables
-        final List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+        final List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
         Connection conn = null;
         Statement st = null;
         ResultSet rs = null;
@@ -129,12 +132,9 @@ public class DfJdbcFacade {
                 if (limit >= 0 && limit <= count) {
                     break;
                 }
-                final Map<String, Object> recordMap = StringKeyMap.createAsCaseInsensitiveOrder();
-                final Set<Entry<String, ValueType>> entrySet = columnValueTypeMap.entrySet();
-                for (Entry<String, ValueType> entry : entrySet) {
-                    String columnName = entry.getKey();
-                    ValueType valueType = entry.getValue();
-                    recordMap.put(columnName, valueType.getValue(rs, columnName));
+                final Map<String, String> recordMap = new LinkedHashMap<String, String>();
+                for (String columnName : columnList) {
+                    recordMap.put(columnName, rs.getString(columnName));
                 }
                 resultList.add(recordMap);
                 ++count;

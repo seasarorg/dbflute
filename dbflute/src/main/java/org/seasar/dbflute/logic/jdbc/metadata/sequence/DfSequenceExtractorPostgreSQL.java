@@ -51,7 +51,7 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
     //                                                                        ============
     protected Map<String, DfSequenceMetaInfo> doGetSequenceMap() {
         _log.info("...Loading sequence informations");
-        final Map<String, DfSequenceMetaInfo> resultMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, DfSequenceMetaInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
         final String schemaCondition;
         if (!_allSchemaList.isEmpty()) {

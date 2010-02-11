@@ -98,7 +98,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
             return true;
         }
         if (isSQLServer()) {
-            final Set<String> systemSet = StringSet.createAsCaseInsensitive();
+            final Set<String> systemSet = StringSet.createAsFlexible();
             systemSet.add("sysobjects");
             systemSet.add("sysconstraints");
             systemSet.add("syssegments");

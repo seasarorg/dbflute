@@ -96,7 +96,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap = new LinkedHashMap<String, DfParameterBeanMetaData>();
     protected final Map<String, File> _entitySqlFileMap = new LinkedHashMap<String, File>();
     protected final Map<String, Map<String, String>> _behaviorQueryPathMap = new LinkedHashMap<String, Map<String, String>>();
-    protected final Map<String, String> _columnJdbcTypeMap = new LinkedHashMap<String, String>();
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
 
@@ -275,7 +274,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                         alreadyIncrementGoodSqlCount = true;
 
                         final Map<String, String> columnJavaNativeMap = createColumnJavaNativeMap(sql);
-                        final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = new LinkedHashMap<String, DfColumnMetaInfo>();
+                        final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = StringKeyMap.createAsFlexibleOrdered();
                         final ResultSetMetaData md = rs.getMetaData();
                         for (int i = 1; i <= md.getColumnCount(); i++) {
                             final DfColumnMetaInfo metaInfo = new DfColumnMetaInfo();
@@ -920,14 +919,13 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected boolean hasAllCommonColumn(Map<String, DfColumnMetaInfo> columnJdbcTypeMap) {
-        Map<String, Object> commonColumnMap = getCommonColumnMap();
+        final Map<String, String> commonColumnMap = getCommonColumnMap();
         if (commonColumnMap.isEmpty()) {
             return false;
         }
-        Map<String, DfColumnMetaInfo> flexibleColumnJdbcTypeMap = newFlexibleNameMap(columnJdbcTypeMap);
         Set<String> commonColumnSet = commonColumnMap.keySet();
         for (String commonColumnName : commonColumnSet) {
-            if (!flexibleColumnJdbcTypeMap.containsKey(commonColumnName)) {
+            if (!columnJdbcTypeMap.containsKey(commonColumnName)) {
                 return false; // Not All!
             }
         }
@@ -976,11 +974,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String getCommonColumnTorqueType(String columnName) {
-        Map<String, Object> flexibleNameMap = newFlexibleNameMap(getCommonColumnMap());
-        return (String) flexibleNameMap.get(columnName);
+        return getCommonColumnMap().get(columnName);
     }
 
-    protected Map<String, Object> getCommonColumnMap() {
+    protected Map<String, String> getCommonColumnMap() {
         DfCommonColumnProperties prop = getProperties().getCommonColumnProperties();
         return prop.getCommonColumnMap();
     }
@@ -1080,14 +1077,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     return false;
                 }
             }
-            return true;// All characters are upper case!
+            return true; // All characters are upper case!
         } else {
-            return true;// Contains connector character!
+            return true; // Contains connector character!
         }
-    }
-
-    protected <VALUE> Map<String, VALUE> newFlexibleNameMap(Map<String, VALUE> map) {
-        return StringKeyMap.createAsFlexible(map);
     }
 
     // ===================================================================================

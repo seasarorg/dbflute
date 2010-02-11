@@ -242,7 +242,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         // Initialize the set collection for reference table check.
         // This should be executed before handling foreign keys.
-        _refTableCheckSet = StringSet.createAsCaseInsensitive();
+        _refTableCheckSet = StringSet.createAsFlexible();
         for (DfTableMetaInfo tableMetaInfo : tableList) {
             _refTableCheckSet.add(tableMetaInfo.getTableName());
         }

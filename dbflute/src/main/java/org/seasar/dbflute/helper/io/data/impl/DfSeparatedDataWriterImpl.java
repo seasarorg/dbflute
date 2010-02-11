@@ -70,7 +70,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     protected Map<String, String> _defaultValueMap;
 
     /** The cache map of meta info. The key is table name. */
-    protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsCaseInsensitive();;
+    protected Map<String, Map<String, DfColumnMetaInfo>> _metaInfoCacheMap = StringKeyMap.createAsFlexible();
 
     // ===================================================================================
     //                                                                               Write
@@ -328,7 +328,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
         if (_metaInfoCacheMap.containsKey(tableName)) {
             return _metaInfoCacheMap.get(tableName);
         }
-        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, DfColumnMetaInfo> columnMetaInfoMap = StringKeyMap.createAsFlexible();
         try {
             final DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
             final List<DfColumnMetaInfo> columnMetaDataList = _columnHandler.getColumnList(metaData, _schemaName,

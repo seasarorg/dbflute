@@ -70,7 +70,7 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     }
 
     protected void handleSerialTypeSequence(Map<String, String> tableSequenceMap) throws SQLException {
-        final StringSet doneSequenceSet = StringSet.createAsCaseInsensitive();
+        final StringSet doneSequenceSet = StringSet.createAsFlexibleOrdered();
         doneSequenceSet.addAll(tableSequenceMap.values());
         final DfTableHandler tableHandler = new DfTableHandler() {
             @Override

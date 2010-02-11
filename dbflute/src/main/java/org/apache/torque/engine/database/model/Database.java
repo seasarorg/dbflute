@@ -134,7 +134,7 @@ public class Database {
     //                                                 Table
     //                                                 -----
     protected List<Table> _tableList = new ArrayList<Table>(100);
-    protected StringKeyMap<Table> _tableMap = StringKeyMap.createAsFlexibleOrder();
+    protected StringKeyMap<Table> _tableMap = StringKeyMap.createAsFlexibleOrdered();
 
     // -----------------------------------------------------
     //                                        for Sql2Entity
@@ -1050,7 +1050,7 @@ public class Database {
     // ===================================================================================
     //                                                            Common Column Properties
     //                                                            ========================
-    public Map<String, Object> getCommonColumnMap() {
+    public Map<String, String> getCommonColumnMap() {
         return getProperties().getCommonColumnProperties().getCommonColumnMap();
     }
 

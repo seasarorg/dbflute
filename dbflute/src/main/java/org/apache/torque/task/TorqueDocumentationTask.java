@@ -72,7 +72,6 @@ import org.apache.torque.engine.database.model.Database;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.velocity.anakia.Escape;
 import org.apache.velocity.context.Context;
-import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.token.file.FileMakingCallback;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
@@ -139,7 +138,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final DfAdditionalTableProperties tableProperties = getProperties().getAdditionalTableProperties();
         final Map<String, Object> additionalTableMap = tableProperties.getAdditionalTableMap();
         final boolean containsCommonColumn = isDataXlsTemplateContainsCommonColumn();
-        final Map<String, Object> commonColumnMap = getCaseInsensitiveCommonColumnMap();
+        final Map<String, String> commonColumnMap = getCommonColumnMap();
         try {
             final Database database = _schemaData.getDatabase();
             final List<Table> tableList = database.getTableList();
@@ -256,11 +255,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         return getDocumentProperties().getDataCsvTemplateDir();
     }
 
-    protected Map<String, Object> getCaseInsensitiveCommonColumnMap() {
+    protected Map<String, String> getCommonColumnMap() {
         final DfCommonColumnProperties commonColumnProperties = getProperties().getCommonColumnProperties();
-        final Map<String, Object> commonColumnMap = commonColumnProperties.getCommonColumnMap();
-        final Map<String, Object> stringKeyMap = StringKeyMap.createAsCaseInsensitive(commonColumnMap);
-        return stringKeyMap;
+        final Map<String, String> commonColumnMap = commonColumnProperties.getCommonColumnMap();
+        return commonColumnMap;
     }
 
     public boolean isGenerateProcedureParameterBean() {

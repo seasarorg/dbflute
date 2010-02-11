@@ -116,7 +116,7 @@ public class Table {
     private List<String> _foreignTableNames;
     private boolean _containsForeignPK;
     private Column _inheritanceColumn;
-    protected StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexibleOrder();
+    protected StringKeyMap<Column> _columnMap = StringKeyMap.createAsFlexibleOrdered();
     private boolean _isForReferenceOnly;
     private boolean _existSameNameTable;
 
@@ -1080,8 +1080,8 @@ public class Table {
 
     public boolean isExistForeignKey(String foreignTableName, List<String> localColumnNameList,
             List<String> foreignColumnNameList) {
-        final Set<String> localColumnNameSet = createCaseInsensitiveSet(localColumnNameList);
-        final Set<String> foreignColumnNameSet = createCaseInsensitiveSet(foreignColumnNameList);
+        final Set<String> localColumnNameSet = createFlexibleSet(localColumnNameList);
+        final Set<String> foreignColumnNameSet = createFlexibleSet(foreignColumnNameList);
         final ForeignKey[] fkArray = getForeignKeys();
         for (final ForeignKey key : fkArray) {
             if (isSameTableAsFlexible(key.getForeignTableName(), foreignTableName)) {
@@ -1138,8 +1138,10 @@ public class Table {
         return false;
     }
 
-    protected Set<String> createCaseInsensitiveSet(List<String> keyList) {
-        return StringSet.createAsCaseInsensitive(keyList);
+    protected Set<String> createFlexibleSet(List<String> keyList) {
+        final Set<String> flset = StringSet.createAsFlexibleOrdered();
+        flset.addAll(keyList);
+        return flset;
     }
 
     public boolean hasForeignKey() {
@@ -2659,7 +2661,7 @@ public class Table {
     //                                                                 ===================
     protected Map<String, Map<String, String>> getBehaviorQueryPathMap() {
         final Map<String, Map<String, Map<String, String>>> tableBqpMap = getDatabase().getTableBqpMap();
-        final Map<String, Map<String, String>> elementMap = tableBqpMap.get(getJavaName());
+        final Map<String, Map<String, String>> elementMap = tableBqpMap.get(getName());
         return elementMap != null ? elementMap : new HashMap<String, Map<String, String>>();
     }
 

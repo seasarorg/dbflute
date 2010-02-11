@@ -136,11 +136,11 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     protected void setupColumnMetaInfo(List<DfColumnMetaInfo> columns, ResultSet columnResultSet, String schemaName,
             String tableName) throws SQLException {
         // Column names for duplicate check
-        final StringSet columnNameSet = StringSet.createAsCaseInsensitive();
+        final StringSet columnNameSet = StringSet.createAsFlexible();
 
         // Duplicate objects for warning log
-        final StringSet duplicateTableNameSet = StringSet.createAsCaseInsensitive();
-        final StringSet duplicateColumnNameSet = StringSet.createAsCaseInsensitive();
+        final StringSet duplicateTableNameSet = StringSet.createAsFlexible();
+        final StringSet duplicateColumnNameSet = StringSet.createAsFlexible();
 
         while (columnResultSet.next()) {
             final String columnName = columnResultSet.getString(4);

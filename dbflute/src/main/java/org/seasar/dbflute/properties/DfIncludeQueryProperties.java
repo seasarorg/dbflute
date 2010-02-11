@@ -340,7 +340,8 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
                 throw new IllegalStateException(msg);
             }
             final Map<String, List<String>> map = _queryMap.get(javaTypeName).get(queryTypeName);
-            final Map<String, List<String>> tableNameMap = StringKeyMap.createAsCaseInsensitive(map);
+            final Map<String, List<String>> tableNameMap = StringKeyMap.createAsFlexible();
+            tableNameMap.putAll(map);
             if (!tableNameMap.containsKey(tableName) && !tableNameMap.containsKey("$$ALL$$")) {
                 return false;
             }
@@ -352,7 +353,8 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
             for (String protoColumnName : columnNameList) {
                 columnTmpMap.put(protoColumnName, new Object());
             }
-            final Map<String, Object> columnNameMap = StringKeyMap.createAsCaseInsensitive(columnTmpMap);
+            final Map<String, Object> columnNameMap = StringKeyMap.createAsFlexible();
+            columnNameMap.putAll(columnTmpMap);
             if (!columnNameMap.containsKey(columnName)) {
                 return false;
             }

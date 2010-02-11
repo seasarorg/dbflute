@@ -86,7 +86,7 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
     //                                                                             Extract
     //                                                                             =======
     public Map<String, DfSynonymMetaInfo> extractSynonymMap() {
-        final Map<String, DfSynonymMetaInfo> synonymMap = StringKeyMap.createAsCaseInsensitive();
+        final Map<String, DfSynonymMetaInfo> synonymMap = StringKeyMap.createAsFlexibleOrdered();
         final String sql = buildSynonymSelect();
         Connection conn = null;
         Statement statement = null;
