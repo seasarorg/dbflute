@@ -17,9 +17,6 @@ package org.seasar.dbflute.bhv.core.command;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
@@ -176,10 +173,8 @@ public abstract class AbstractListEntityCommand extends AbstractBehaviorCommand<
 
     private String[] createNonOrderedPropertyNames(TnBeanMetaData bmd) {
         final List<String> propertyNameList = new ArrayList<String>();
-        final Map<String, TnPropertyType> propertyTypeMap = bmd.getPropertyTypeMap();
-        final Set<Entry<String, TnPropertyType>> entrySet = propertyTypeMap.entrySet();
-        for (Entry<String, TnPropertyType> entry : entrySet) {
-            TnPropertyType pt = entry.getValue();
+        final List<TnPropertyType> ptList = bmd.getPropertyTypeList();
+        for (TnPropertyType pt : ptList) {
             if (pt.isPersistent()) {
                 propertyNameList.add(pt.getPropertyName());
             }

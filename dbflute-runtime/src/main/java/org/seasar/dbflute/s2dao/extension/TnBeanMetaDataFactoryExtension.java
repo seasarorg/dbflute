@@ -102,11 +102,11 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
     //                                                               BeanMetaData Creation
     //                                                               =====================
     @Override
-    protected TnBeanMetaDataImpl createBeanMetaDataImpl() {
+    protected TnBeanMetaDataImpl createBeanMetaDataImpl(Class<?> beanClass) {
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
         // for ConditionBean and insert() and update() and delete() and so on...
         // = = = = = = = = = =/
-        return new TnBeanMetaDataImpl() {
+        return new TnBeanMetaDataImpl(beanClass) {
             protected final List<TnIdentifierGenerator> _internalIdentifierGeneratorList = new ArrayList<TnIdentifierGenerator>();
             protected final Map<String, TnIdentifierGenerator> _internalIdentifierGeneratorsByPropertyName = newConcurrentHashMap();
 
@@ -114,7 +114,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
             // for cache
             // = = = = =/
             @Override
-            public void initialize() { // for Cache
+            public void initialize() { // non thread safe
                 final Class<?> myBeanClass = getBeanClass();
                 if (isDBFluteEntity(myBeanClass)) {
                     final TnBeanMetaData cachedMeta = getMetaFromCache(myBeanClass);
@@ -134,7 +134,7 @@ public class TnBeanMetaDataFactoryExtension extends TnBeanMetaDataFactoryImpl {
             protected void setupIdentifierGenerator(TnPropertyType propertyType) {
                 final DfPropertyDesc pd = propertyType.getPropertyDesc();
                 final String propertyName = propertyType.getPropertyName();
-                final String idType = beanAnnotationReader.getId(pd);
+                final String idType = _beanAnnotationReader.getId(pd);
                 final TnIdentifierGenerator generator = createInternalIdentifierGenerator(propertyType, idType);
                 _internalIdentifierGeneratorList.add(generator);
                 _internalIdentifierGeneratorsByPropertyName.put(propertyName, generator);

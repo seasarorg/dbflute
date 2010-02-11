@@ -35,6 +35,7 @@ import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.util.DfAssertUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -347,7 +348,7 @@ public abstract class AbstractSqlClause implements SqlClause {
 
         Integer selectIndex = 0;
         if (_useSelectIndex) {
-            _selectIndexMap = new HashMap<String, Integer>();
+            _selectIndexMap = StringKeyMap.createAsCaseInsensitiveOrdered();
         }
 
         // Columns of local table.
@@ -535,9 +536,9 @@ public abstract class AbstractSqlClause implements SqlClause {
         if (_selectIndexMap == null) {
             return null;
         }
-        final Map<String, String> selectIndexReverseMap = new HashMap<String, String>();
+        final Map<String, String> selectIndexReverseMap = StringKeyMap.createAsCaseInsensitiveOrdered();
         for (String columnName : _selectIndexMap.keySet()) {
-            Integer selectIndex = _selectIndexMap.get(columnName);
+            final Integer selectIndex = _selectIndexMap.get(columnName);
             selectIndexReverseMap.put(buildSelectIndexAliasName(selectIndex), columnName);
         }
         return selectIndexReverseMap;

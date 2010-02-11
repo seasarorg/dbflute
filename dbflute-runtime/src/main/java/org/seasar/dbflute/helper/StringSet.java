@@ -91,13 +91,13 @@ public class StringSet implements Set<String> {
     }
 
     // ===================================================================================
-    //                                                                        Map Emulator
+    //                                                                        Set Emulator
     //                                                                        ============
     // -----------------------------------------------------
     //                                           Key Related
     //                                           -----------
     public boolean add(String value) {
-        return _stringKeyMap.put(value, DUMMY_VALUE) != null;
+        return _stringKeyMap.put(value, DUMMY_VALUE) == null;
     }
 
     public boolean remove(Object value) {

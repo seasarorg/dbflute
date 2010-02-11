@@ -132,7 +132,6 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         if (modifiedPropertyNames.isEmpty()) {
             return null;
         }
-        Map<String, TnPropertyType> propertyTypeMap = beanMetaData.getPropertyTypeMap();
         String currentPropertyName = null;
         try {
             for (String propertyName : modifiedPropertyNames) {
@@ -145,7 +144,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
                     columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
 
                     // Add property type
-                    TnPropertyType propertyType = propertyTypeMap.get(propertyName);
+                    TnPropertyType propertyType = beanMetaData.getPropertyType(propertyName);
                     propertyTypeList.add(propertyType);
                 } else {
                     columnParameterMap.put(columnName, "null");
@@ -164,8 +163,8 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
                 String propertyName = columnInfo.getPropertyName();
                 columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
 
-                // Add property type
-                TnPropertyType propertyType = propertyTypeMap.get(propertyName);
+                // add property type
+                TnPropertyType propertyType = beanMetaData.getPropertyType(propertyName);
                 propertyTypeList.add(propertyType);
             }
         } catch (RuntimeException e) {

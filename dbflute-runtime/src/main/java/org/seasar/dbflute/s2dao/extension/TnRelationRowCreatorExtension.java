@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.extension;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -173,10 +174,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
         // Set up property cache about current beanMetaData.
         final TnBeanMetaData nextBmd = res.getRelationBeanMetaData();
-        final Map<String, TnPropertyType> propertyTypeMap = nextBmd.getPropertyTypeMap();
-        final Set<Entry<String, TnPropertyType>> entrySet = propertyTypeMap.entrySet();
-        for (Entry<String, TnPropertyType> entry : entrySet) {
-            final TnPropertyType pt = entry.getValue();
+        final List<TnPropertyType> ptList = nextBmd.getPropertyTypeList();
+        for (TnPropertyType pt : ptList) {
             res.setCurrentPropertyType(pt);
             if (!isTargetProperty(res)) {
                 continue;

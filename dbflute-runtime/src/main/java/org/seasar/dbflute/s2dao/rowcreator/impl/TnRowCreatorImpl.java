@@ -16,12 +16,12 @@
 package org.seasar.dbflute.s2dao.rowcreator.impl;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -66,10 +66,8 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
 
     protected void setupPropertyCache(Map<String, TnPropertyType> proprertyCache, Set<String> columnNames,
             TnBeanMetaData beanMetaData) throws SQLException {
-        final Map<String, TnPropertyType> propertyTypeMap = beanMetaData.getPropertyTypeMap();
-        final Set<Entry<String, TnPropertyType>> entrySet = propertyTypeMap.entrySet();
-        for (Entry<String, TnPropertyType> entry : entrySet) {
-            final TnPropertyType pt = entry.getValue();
+        final List<TnPropertyType> ptList = beanMetaData.getPropertyTypeList();
+        for (TnPropertyType pt : ptList) {
             if (!isTargetProperty(pt)) {
                 continue;
             }
@@ -121,10 +119,8 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
 
     protected void setupPropertyCache(Map<String, TnPropertyType> proprertyCache, Set<String> columnNames,
             TnDtoMetaData dtoMetaData) throws SQLException {
-        final Map<String, TnPropertyType> propertyTypeMap = dtoMetaData.getPropertyTypeMap();
-        final Set<Entry<String, TnPropertyType>> entrySet = propertyTypeMap.entrySet();
-        for (Entry<String, TnPropertyType> entry : entrySet) {
-            final TnPropertyType pt = entry.getValue();
+        final List<TnPropertyType> ptList = dtoMetaData.getPropertyTypeList();
+        for (TnPropertyType pt : ptList) {
             if (!isTargetProperty(pt)) {
                 continue;
             }
@@ -145,7 +141,7 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
     //                                                Common
     //                                                ------
     protected Map<String, TnPropertyType> newPropertyCache() {
-        return new HashMap<String, TnPropertyType>();
+        return StringKeyMap.createAsCaseInsensitive();
     }
 
     // ===================================================================================

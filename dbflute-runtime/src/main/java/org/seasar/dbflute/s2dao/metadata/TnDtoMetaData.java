@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -23,13 +23,17 @@ import java.util.Map;
  */
 public interface TnDtoMetaData {
 
+    /**
+     * Get the type of bean.
+     * @return The type of bean. (NotNull) 
+     */
     Class<?> getBeanClass();
 
     /**
-     * Get the map of property type. The key is property name as case insensitive.
-     * @return The map of property type. (NotNull)
+     * Get the list of property type.
+     * @return The list of property type. (NotNull)
      */
-    Map<String, TnPropertyType> getPropertyTypeMap();
+    List<TnPropertyType> getPropertyTypeList();
 
     /**
      * Get the property type by the key as case insensitive.

@@ -62,7 +62,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
 
     public TnBeanMetaData createBeanMetaData(final Class<?> beanClass, final int relationNestLevel) {
         if (beanClass == null) {
-            throw new NullPointerException("beanClass");
+            throw new IllegalArgumentException("The argument 'beanClass' should not be null.");
         }
         Connection conn = null;
         try {
@@ -90,7 +90,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
     public TnBeanMetaData createBeanMetaData(final DatabaseMetaData dbMetaData, final Class<?> beanClass,
             final int relationNestLevel) {
         if (beanClass == null) {
-            throw new NullPointerException("beanClass");
+            throw new IllegalArgumentException("The argument 'beanClass' should not be null.");
         }
         final boolean stopRelationCreation = isLimitRelationNestLevel(relationNestLevel);
         final TnBeanAnnotationReader bar = createBeanAnnotationReader(beanClass);
@@ -99,12 +99,11 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         final TnPropertyTypeFactory ptf = createPropertyTypeFactory(beanClass, bar, dbMetaData);
         final TnRelationPropertyTypeFactory rptf = createRelationPropertyTypeFactory(beanClass, bar, dbMetaData,
                 relationNestLevel, stopRelationCreation);
-        final TnBeanMetaDataImpl bmd = createBeanMetaDataImpl();
 
+        final TnBeanMetaDataImpl bmd = createBeanMetaDataImpl(beanClass);
         bmd.setBeanAnnotationReader(bar);
         bmd.setVersionNoPropertyName(versionNoPropertyName);
         bmd.setTimestampPropertyName(timestampPropertyName);
-        bmd.setBeanClass(beanClass);
         bmd.setPropertyTypeFactory(ptf);
         bmd.setRelationPropertyTypeFactory(rptf);
         bmd.initialize();
@@ -172,8 +171,8 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
         return impl;
     }
 
-    protected TnBeanMetaDataImpl createBeanMetaDataImpl() {
-        return new TnBeanMetaDataImpl();
+    protected TnBeanMetaDataImpl createBeanMetaDataImpl(Class<?> beanClass) {
+        return new TnBeanMetaDataImpl(beanClass);
     }
 
     protected boolean isLimitRelationNestLevel(final int relationNestLevel) {

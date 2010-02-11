@@ -253,25 +253,24 @@ public class ResourceContext {
         final int count = rsmd.getColumnCount();
         final Set<String> columnNames = StringSet.createAsCaseInsensitive();
         for (int i = 0; i < count; ++i) {
-            final String columnName = rsmd.getColumnLabel(i + 1);
-            final int pos = columnName.lastIndexOf('.'); // for SQLite
+            final String columnLabel = rsmd.getColumnLabel(i + 1);
+            final int pos = columnLabel.lastIndexOf('.'); // for SQLite
             if (-1 < pos) {
-                columnNames.add(columnName.substring(pos + 1));
+                columnNames.add(columnLabel.substring(pos + 1));
             } else {
-                columnNames.add(columnName);
+                columnNames.add(columnLabel);
             }
         }
-        Map<String, Integer> selectIndexMap = getSelectIndexMap();
-        if (selectIndexMap == null) {
+        final Map<String, String> selectIndexReverseMap = getSelectIndexReverseMap();
+        if (selectIndexReverseMap == null) {
             return columnNames;
         }
-        Map<String, String> selectIndexReverseMap = getSelectIndexReverseMap();
         final Set<String> realColumnNames = StringSet.createAsCaseInsensitive();
         for (String columnName : columnNames) {
-            String uniqueName = selectIndexReverseMap.get(columnName);
-            if (uniqueName != null) {
-                realColumnNames.add(uniqueName);
-            } else {
+            final String realColumnName = selectIndexReverseMap.get(columnName);
+            if (realColumnName != null) { // basically true
+                realColumnNames.add(realColumnName);
+            } else { // for derived columns and so on
                 realColumnNames.add(columnName);
             }
         }
@@ -282,7 +281,7 @@ public class ResourceContext {
         if (!ConditionBeanContext.isExistConditionBeanOnThread()) {
             return null;
         }
-        ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
+        final ConditionBean cb = ConditionBeanContext.getConditionBeanOnThread();
         if (cb == null) {
             return null;
         }

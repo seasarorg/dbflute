@@ -135,8 +135,14 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     public VALUE put(String key, VALUE value) {
         final String stringKey = convertStringKey(key);
         if (stringKey != null) {
-            if (_plainMap != null && !containsKey(stringKey)) {
-                _plainMap.put(key, value);
+            if (_plainMap != null) {
+                final String plainKey;
+                if (_searchMap.containsKey(stringKey)) {
+                    plainKey = searchPlainKey(stringKey);
+                } else {
+                    plainKey = key;
+                }
+                _plainMap.put(plainKey, value);
             }
             return _searchMap.put(stringKey, value);
         }
@@ -147,21 +153,35 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
         final String stringKey = convertStringKey(key);
         if (stringKey != null) {
             if (_plainMap != null) {
-                final Set<String> keySet = _plainMap.keySet();
-                String plainKey = null;
-                for (String currentKey : keySet) {
-                    if (stringKey.equals(convertStringKey(currentKey))) {
-                        plainKey = currentKey;
-                        break;
-                    }
+                final Object plainKey;
+                if (_searchMap.containsKey(stringKey)) {
+                    plainKey = searchPlainKey(stringKey);
+                } else {
+                    plainKey = key;
                 }
-                if (plainKey != null) {
-                    _plainMap.remove(plainKey);
-                }
+                _plainMap.remove(plainKey);
             }
             return _searchMap.remove(stringKey);
         }
         return null;
+    }
+
+    protected String searchPlainKey(String stringKey) {
+        final Set<String> keySet = _plainMap.keySet();
+        String plainKey = null;
+        for (String currentKey : keySet) {
+            if (stringKey.equals(convertStringKey(currentKey))) {
+                plainKey = currentKey;
+                break;
+            }
+        }
+        if (plainKey == null) {
+            String msg = "The plain map should have the key:";
+            msg = msg + " stringKey=" + stringKey;
+            msg = msg + " plainMap=" + _plainMap;
+            throw new IllegalStateException(msg);
+        }
+        return plainKey;
     }
 
     public final void putAll(Map<? extends String, ? extends VALUE> map) {

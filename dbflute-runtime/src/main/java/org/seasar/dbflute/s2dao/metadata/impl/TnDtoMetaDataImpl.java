@@ -15,7 +15,8 @@
  */
 package org.seasar.dbflute.s2dao.metadata.impl;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
@@ -29,61 +30,78 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactory;
  */
 public class TnDtoMetaDataImpl implements TnDtoMetaData {
 
-    protected Class<?> beanClass;
-    protected StringKeyMap<TnPropertyType> propertyTypeMap = StringKeyMap.createAsCaseInsensitiveConcurrent();
-    protected TnBeanAnnotationReader beanAnnotationReader;
-    protected TnPropertyTypeFactory propertyTypeFactory;
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected final Class<?> _beanClass;
+    protected final StringKeyMap<TnPropertyType> _propertyTypeMap = StringKeyMap.createAsCaseInsensitive();
+    protected final List<TnPropertyType> _propertyTypeList = new ArrayList<TnPropertyType>();
+    protected TnBeanAnnotationReader _beanAnnotationReader;
+    protected TnPropertyTypeFactory _propertyTypeFactory;
 
-    public TnDtoMetaDataImpl() {
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public TnDtoMetaDataImpl(Class<?> beanClass) {
+        _beanClass = beanClass;
     }
 
-    public void initialize() {
+    // ===================================================================================
+    //                                                                          Initialize
+    //                                                                          ==========
+    public void initialize() { // non thread safe
         setupPropertyType();
     }
 
+    protected void setupPropertyType() {
+        final TnPropertyType[] propertyTypes = _propertyTypeFactory.createDtoPropertyTypes();
+        for (int i = 0; i < propertyTypes.length; ++i) {
+            final TnPropertyType pt = propertyTypes[i];
+            addPropertyType(pt);
+        }
+    }
+
+    protected void addPropertyType(TnPropertyType propertyType) {
+        _propertyTypeMap.put(propertyType.getPropertyName(), propertyType);
+        _propertyTypeList.add(propertyType);
+    }
+
+    // ===================================================================================
+    //                                                                          Bean Class
+    //                                                                          ==========
     public Class<?> getBeanClass() {
-        return beanClass;
+        return _beanClass;
     }
 
-    public void setBeanClass(Class<?> beanClass) {
-        this.beanClass = beanClass;
-    }
-
-    public Map<String, TnPropertyType> getPropertyTypeMap() {
-        return propertyTypeMap;
+    // ===================================================================================
+    //                                                                       Property Type
+    //                                                                       =============
+    public List<TnPropertyType> getPropertyTypeList() {
+        return _propertyTypeList;
     }
 
     public TnPropertyType getPropertyType(String propertyName) {
-        TnPropertyType propertyType = (TnPropertyType) propertyTypeMap.get(propertyName);
+        TnPropertyType propertyType = (TnPropertyType) _propertyTypeMap.get(propertyName);
         if (propertyType == null) {
             String msg = "The propertyName was not found in the map:";
-            msg = msg + " propertyName=" + propertyName + " propertyTypeMap=" + propertyTypeMap;
+            msg = msg + " propertyName=" + propertyName + " propertyTypeMap=" + _propertyTypeMap;
             throw new IllegalStateException(msg);
         }
         return propertyType;
     }
 
     public boolean hasPropertyType(String propertyName) {
-        return propertyTypeMap.get(propertyName) != null;
+        return _propertyTypeMap.get(propertyName) != null;
     }
 
-    protected void setupPropertyType() {
-        TnPropertyType[] propertyTypes = propertyTypeFactory.createDtoPropertyTypes();
-        for (int i = 0; i < propertyTypes.length; ++i) {
-            TnPropertyType pt = propertyTypes[i];
-            addPropertyType(pt);
-        }
-    }
-
-    protected void addPropertyType(TnPropertyType propertyType) {
-        propertyTypeMap.put(propertyType.getPropertyName(), propertyType);
-    }
-
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public void setBeanAnnotationReader(TnBeanAnnotationReader beanAnnotationReader) {
-        this.beanAnnotationReader = beanAnnotationReader;
+        this._beanAnnotationReader = beanAnnotationReader;
     }
 
     public void setPropertyTypeFactory(TnPropertyTypeFactory propertyTypeFactory) {
-        this.propertyTypeFactory = propertyTypeFactory;
+        this._propertyTypeFactory = propertyTypeFactory;
     }
 }
