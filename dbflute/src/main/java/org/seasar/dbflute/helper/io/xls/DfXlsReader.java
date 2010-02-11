@@ -211,15 +211,15 @@ public class DfXlsReader {
         DataRow dataRow = table.addRow();
         HSSFCell cell = null;
         Object value = null;
+        DataColumn column = null;
         try {
             for (int i = 0; i < table.getColumnSize(); ++i) {
                 cell = row.getCell(i);
                 value = getValue(i, cell, table);
-                final DataColumn column = table.getColumn(i);
+                column = table.getColumn(i);
                 final String columnName = column.getColumnName();
                 try {
                     dataRow.addValue(columnName, value);
-                    // dataRow.setValue(i, value);
                 } catch (NumberFormatException e) {
                     if (cell.getCellType() != HSSFCell.CELL_TYPE_STRING) {
                         throw e;
@@ -229,53 +229,59 @@ public class DfXlsReader {
                     _log.info(msg);
                     column.setColumnType(ColumnTypes.STRING);
                     dataRow.addValue(columnName, value);
-                    // dataRow.setValue(i, value);
                 }
             }
         } catch (RuntimeException e) {
-            throwCellValueHandlingException(cell, value, e);
+            throwCellValueHandlingException(table, row, column, cell, value, e);
         }
     }
 
-    protected void throwCellValueHandlingException(HSSFCell cell, Object value, RuntimeException e) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "The handling of the cell value was failed!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Cell Object]" + getLineSeparator() + cell + getLineSeparator();
-        msg = msg + getLineSeparator();
+    protected void throwCellValueHandlingException(DataTable table, HSSFRow row, DataColumn column, HSSFCell cell,
+            Object value, RuntimeException e) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+        msg = msg + "Failed to handling the cell value!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Table]" + ln() + table.getTableName() + ln();
+        msg = msg + ln();
+        msg = msg + "[Row Number]" + ln() + row.getRowNum() + ln();
+        msg = msg + ln();
+        msg = msg + "[Column]" + ln() + (column != null ? column.getColumnName() : null) + ln();
+        msg = msg + ln();
+        msg = msg + "[Cell Object]" + ln() + cell + ln();
+        msg = msg + ln();
         if (cell != null) {
             switch (cell.getCellType()) {
             case HSSFCell.CELL_TYPE_NUMERIC:
-                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_NUMERIC" + getLineSeparator();
+                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_NUMERIC" + ln();
                 break;
             case HSSFCell.CELL_TYPE_STRING:
-                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_STRING" + getLineSeparator();
+                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_STRING" + ln();
                 break;
             case HSSFCell.CELL_TYPE_FORMULA:
-                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_FORMULA" + getLineSeparator();
+                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_FORMULA" + ln();
                 break;
             case HSSFCell.CELL_TYPE_BLANK:
-                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_BLANK" + getLineSeparator();
+                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_BLANK" + ln();
                 break;
             case HSSFCell.CELL_TYPE_BOOLEAN:
-                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_BOOLEAN" + getLineSeparator();
+                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_BOOLEAN" + ln();
                 break;
             case HSSFCell.CELL_TYPE_ERROR:
-                msg = msg + "[Cell Type]" + getLineSeparator() + "CELL_TYPE_ERROR" + getLineSeparator();
+                msg = msg + "[Cell Type]" + ln() + "CELL_TYPE_ERROR" + ln();
                 break;
             default:
-                msg = msg + "[Cell Type]" + getLineSeparator() + cell.getCellType() + getLineSeparator();
+                msg = msg + "[Cell Type]" + ln() + cell.getCellType() + ln();
                 break;
             }
         }
-        msg = msg + getLineSeparator();
-        msg = msg + "[Cell Value]" + getLineSeparator() + value + getLineSeparator();
-        msg = msg + "* * * * * * * * * */";
+        msg = msg + ln();
+        msg = msg + "[Cell Value]" + ln() + value + ln();
+        msg = msg + "- - - - - - - - - -/";
         throw new IllegalStateException(msg, e);
     }
 
-    protected String getLineSeparator() {
+    protected String ln() {
         return System.getProperty("line.separator");
     }
 
