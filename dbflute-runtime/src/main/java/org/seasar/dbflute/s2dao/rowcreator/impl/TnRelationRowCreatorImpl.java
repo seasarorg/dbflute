@@ -17,12 +17,12 @@ package org.seasar.dbflute.s2dao.rowcreator.impl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -304,7 +304,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     //                                                Common
     //                                                ------
     protected Map<String, Map<String, TnPropertyType>> newRelationPropertyCache() {
-        return new HashMap<String, Map<String, TnPropertyType>>();
+        return StringKeyMap.createAsCaseInsensitive();
     }
 
     // ===================================================================================

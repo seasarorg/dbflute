@@ -218,20 +218,20 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
     protected static abstract class TnAbstractMapResultSetHandler implements TnResultSetHandler {
 
         protected Map<String, Object> createRow(ResultSet rs, TnPropertyType[] propertyTypes) throws SQLException {
-            Map<String, Object> row = StringKeyMap.createAsFlexibleOrdered();
+            final Map<String, Object> row = StringKeyMap.createAsFlexibleOrdered();
             for (int i = 0; i < propertyTypes.length; ++i) {
-                Object value = propertyTypes[i].getValueType().getValue(rs, i + 1);
+                final Object value = propertyTypes[i].getValueType().getValue(rs, i + 1);
                 row.put(propertyTypes[i].getPropertyName(), value);
             }
             return row;
         }
 
         protected TnPropertyType[] createPropertyTypes(ResultSetMetaData rsmd) throws SQLException {
-            int count = rsmd.getColumnCount();
-            TnPropertyType[] propertyTypes = new TnPropertyType[count];
+            final int count = rsmd.getColumnCount();
+            final TnPropertyType[] propertyTypes = new TnPropertyType[count];
             for (int i = 0; i < count; ++i) {
-                String propertyName = rsmd.getColumnLabel(i + 1);
-                ValueType valueType = TnValueTypes.getValueType(rsmd.getColumnType(i + 1));
+                final String propertyName = rsmd.getColumnLabel(i + 1);
+                final ValueType valueType = TnValueTypes.getValueType(rsmd.getColumnType(i + 1));
                 propertyTypes[i] = new TnPropertyTypeImpl(propertyName, valueType);
             }
             return propertyTypes;
@@ -241,8 +241,8 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
     protected static class TnMapListResultSetHandler extends TnAbstractMapResultSetHandler {
 
         public Object handle(ResultSet resultSet) throws SQLException {
-            TnPropertyType[] propertyTypes = createPropertyTypes(resultSet.getMetaData());
-            List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+            final TnPropertyType[] propertyTypes = createPropertyTypes(resultSet.getMetaData());
+            final List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
             while (resultSet.next()) {
                 list.add(createRow(resultSet, propertyTypes));
             }

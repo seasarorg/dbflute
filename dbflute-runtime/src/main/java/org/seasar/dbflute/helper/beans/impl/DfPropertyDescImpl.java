@@ -57,7 +57,6 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     //                                                                         ===========
     public DfPropertyDescImpl(String propertyName, Class<?> propertyType, Method readMethod, Method writeMethod,
             DfBeanDesc beanDesc) {
-
         this(propertyName, propertyType, readMethod, writeMethod, null, beanDesc);
     }
 

@@ -90,7 +90,8 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
      * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<String, TnPropertyType>> createRelationPropertyCache(Set<String> columnNames) throws SQLException {
+    protected Map<String, Map<String, TnPropertyType>> createRelationPropertyCache(Set<String> columnNames)
+            throws SQLException {
         return relationRowCreator.createPropertyCache(columnNames, beanMetaData);
     }
 

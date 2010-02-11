@@ -131,7 +131,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             value = res.extractRelKeyValue(columnName);
         } else {
             final ValueType valueType = pt.getValueType();
-            Map<String, Integer> selectIndexMap = res.getSelectIndexMap();
+            final Map<String, Integer> selectIndexMap = res.getSelectIndexMap();
             if (selectIndexMap != null) {
                 value = ResourceContext.getValue(res.getResultSet(), columnName, valueType, selectIndexMap);
             } else {

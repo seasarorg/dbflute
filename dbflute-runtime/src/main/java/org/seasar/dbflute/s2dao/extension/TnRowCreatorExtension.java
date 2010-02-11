@@ -18,9 +18,9 @@ package org.seasar.dbflute.s2dao.extension;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -95,7 +95,6 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             String msg = "The propertyCache should not be empty: bean=" + beanClass.getName();
             throw new IllegalStateException(msg);
         }
-        final Set<String> columnNameSet = propertyCache.keySet();
         String columnName = null;
         TnPropertyType pt = null;
         String propertyName = null;
@@ -115,9 +114,10 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
         try {
             if (dbmeta != null) {
-                for (final Iterator<String> ite = columnNameSet.iterator(); ite.hasNext();) {
-                    columnName = ite.next();
-                    pt = (TnPropertyType) propertyCache.get(columnName);
+                final Set<Entry<String, TnPropertyType>> entrySet = propertyCache.entrySet();
+                for (Entry<String, TnPropertyType> entry : entrySet) {
+                    columnName = entry.getKey();
+                    pt = entry.getValue();
                     propertyName = pt.getPropertyName();
                     if (dbmeta.hasEntityPropertySetupper(propertyName)) {
                         final ValueType valueType = pt.getValueType();
@@ -128,9 +128,10 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                     }
                 }
             } else {
-                for (final Iterator<String> ite = columnNameSet.iterator(); ite.hasNext();) {
-                    columnName = ite.next();
-                    pt = (TnPropertyType) propertyCache.get(columnName);
+                final Set<Entry<String, TnPropertyType>> entrySet = propertyCache.entrySet();
+                for (Entry<String, TnPropertyType> entry : entrySet) {
+                    columnName = entry.getKey();
+                    pt = entry.getValue();
                     propertyName = pt.getPropertyName();
                     registerValueByReflection(rs, row, pt, columnName, selectIndexMap);
                 }
@@ -312,7 +313,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     public void setDBMeta(DBMeta dbmeta) {
         this._dbmeta = dbmeta;
     }
-    
+
     public void setBeanAssignable(boolean beanAssignable) {
         this._beanAssignable = beanAssignable;
     }

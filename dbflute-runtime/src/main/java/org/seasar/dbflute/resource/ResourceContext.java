@@ -20,6 +20,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -251,7 +252,7 @@ public class ResourceContext {
     public static Set<String> createSelectColumnNames(ResultSet rs) throws SQLException {
         final ResultSetMetaData rsmd = rs.getMetaData();
         final int count = rsmd.getColumnCount();
-        final Set<String> columnNames = StringSet.createAsCaseInsensitive();
+        final Set<String> columnNames = new HashSet<String>();
         for (int i = 0; i < count; ++i) {
             final String columnLabel = rsmd.getColumnLabel(i + 1);
             final int pos = columnLabel.lastIndexOf('.'); // for SQLite
@@ -300,8 +301,8 @@ public class ResourceContext {
     }
 
     public static Object getValue(ResultSet rs, String columnName, ValueType valueType,
-            Map<String, Integer> selectIndexMap) throws SQLException { // No check!
-        Integer selectIndex = selectIndexMap.get(columnName);
+            Map<String, Integer> selectIndexMap) throws SQLException { // no check
+        final Integer selectIndex = selectIndexMap.get(columnName);
         if (selectIndex != null) {
             return valueType.getValue(rs, selectIndex);
         } else {
