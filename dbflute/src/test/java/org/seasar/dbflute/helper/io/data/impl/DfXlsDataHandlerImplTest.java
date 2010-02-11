@@ -53,41 +53,6 @@ public class DfXlsDataHandlerImplTest extends PlainTestCase {
     }
 
     // -----------------------------------------------------
-    //                                                  Time
-    //                                                  ----
-    @Test
-    public void test_filterTimeValue() {
-        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl();
-        assertEquals("12:34:56", impl.filterTimeValue("12:34:56"));
-        assertEquals("02:34:56", impl.filterTimeValue("2:34:56"));
-        assertEquals("12:34:56", impl.filterTimeValue("12:34:56.123"));
-        assertEquals("02:34:56", impl.filterTimeValue("2:34:56.123"));
-    }
-
-    @Test
-    public void test_isTimeValue() {
-        final DfXlsDataHandlerImpl impl = new DfXlsDataHandlerImpl();
-        assertTrue(impl.isTimeValue("12:34:56"));
-        assertTrue(impl.isTimeValue("23:42:35"));
-        assertTrue(impl.isTimeValue("03:42:35"));
-        assertTrue(impl.isTimeValue("3:42:35"));
-        assertTrue(impl.isTimeValue("01:00:00"));
-        assertTrue(impl.isTimeValue("00:00:00"));
-        assertFalse(impl.isTimeValue("2007/12/12 12:34:56"));
-        assertFalse(impl.isTimeValue("12:34:56.123"));
-    }
-
-    // -----------------------------------------------------
-    //                                             Timestamp
-    //                                             ---------
-    @Test
-    public void test_filterTimestampValue() {
-        final DfXlsDataHandlerImpl dfXlsDataHandlerImpl = new DfXlsDataHandlerImpl();
-        final String filteredTimestampValue = dfXlsDataHandlerImpl.filterTimestampValue("2007/01/01");
-        assertEquals("2007-01-01 00:00:00", filteredTimestampValue);
-    }
-
-    // -----------------------------------------------------
     //                                               Boolean
     //                                               -------
     @Test

@@ -34,16 +34,16 @@ public class DfDataXlsTemplateHandler {
     }
 
     // ===================================================================================
-    //                                                                         Dump to Xls
-    //                                                                         ===========
+    //                                                                          Output Xls
+    //                                                                          ==========
     /**
-     * Dump data to xls. {Using dataSource}
+     * Output data xls templates. {Using dataSource}
      * @param tableColumnMap The map of table and column. (NotNull)
      * @param limit The limit of extracted record.
      * @param xlsFile The file of xls. (NotNull)
      * @return The result of dump. (NotNull)
      */
-    public TemplateDataResult dumpToXls(Map<String, List<Column>> tableColumnMap, int limit, File xlsFile) {
+    public TemplateDataResult outputData(Map<String, List<Column>> tableColumnMap, int limit, File xlsFile) {
         final DfTemplateDataExtractor extractor = new DfTemplateDataExtractor(_dataSource);
         final Map<String, List<Map<String, String>>> dumpDataMap = extractor.extractData(tableColumnMap, limit);
         return transferToXls(tableColumnMap, dumpDataMap, xlsFile);

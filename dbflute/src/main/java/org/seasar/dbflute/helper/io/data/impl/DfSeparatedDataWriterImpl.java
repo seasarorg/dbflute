@@ -210,17 +210,17 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                             }
 
                             // - - - - - - - - - - - - - - 
-                            // Against Time Headache
+                            // Against Timestamp Headache
                             // - - - - - - - - - - - - - -
-                            if (processTime(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                            if (processTimestamp(columnName, value, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }
 
                             // - - - - - - - - - - - - - - 
-                            // Against Timestamp Headache
+                            // Against Time Headache
                             // - - - - - - - - - - - - - -
-                            if (processTimestamp(columnName, value, ps, bindCount, columnMetaInfoMap)) {
+                            if (processTime(columnName, value, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }

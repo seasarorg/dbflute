@@ -300,7 +300,7 @@ public class DfXlsReader {
         switch (cell.getCellType()) {
         case HSSFCell.CELL_TYPE_NUMERIC:
             if (isCellDateFormatted(cell)) {
-                return DfTypeUtil.toTimestampFlexibly(cell.getDateCellValue());
+                return DfTypeUtil.toTimestamp(cell.getDateCellValue());
             }
             final double numericCellValue = cell.getNumericCellValue();
             if (isInt(numericCellValue)) {

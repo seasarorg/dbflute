@@ -160,26 +160,26 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         } catch (EngineException e) {
             throw new IllegalStateException(e);
         }
-        _log.info("...Creating data xls template: tables=" + tableColumnMap.size());
-        dumpDataXlsTemplate(tableColumnMap);
+        _log.info("...Outputting data xls template: tables=" + tableColumnMap.size());
+        outputDataXlsTemplate(tableColumnMap);
         _log.info("");
     }
 
-    protected void dumpDataXlsTemplate(Map<String, List<Column>> tableColumnMap) {
+    protected void outputDataXlsTemplate(Map<String, List<Column>> tableColumnMap) {
         final DfDataXlsTemplateHandler xlsHandler = new DfDataXlsTemplateHandler(getDataSource());
         final Integer limit = getDataXlsTemplateRecordLimit();
         final File xlsFile = getDataXlsTemplateFile();
-        final TemplateDataResult dumpResult = xlsHandler.dumpToXls(tableColumnMap, limit, xlsFile);
-        dumpDataCsvTemplate(dumpResult);
+        final TemplateDataResult outputResult = xlsHandler.outputData(tableColumnMap, limit, xlsFile);
+        outputDataCsvTemplate(outputResult);
     }
 
-    protected void dumpDataCsvTemplate(TemplateDataResult dumpResult) {
-        final Map<String, List<Column>> overTableColumnMap = dumpResult.getOverTableColumnMap();
+    protected void outputDataCsvTemplate(TemplateDataResult outputResult) {
+        final Map<String, List<Column>> overTableColumnMap = outputResult.getOverTableColumnMap();
         if (overTableColumnMap.isEmpty()) {
             return;
         }
-        _log.info("...Creating data csv template(over 65000): tables=" + overTableColumnMap.size());
-        final Map<String, List<Map<String, String>>> overDumpDataMap = dumpResult.getOverTemplateDataMap();
+        _log.info("...Outputting data csv template(over 65000): tables=" + overTableColumnMap.size());
+        final Map<String, List<Map<String, String>>> overDumpDataMap = outputResult.getOverTemplateDataMap();
         final FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf();
         final File csvDir = getDataCsvTemplateDir();
         if (!csvDir.exists()) {
@@ -213,10 +213,10 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
                     }
                 }, option);
             } catch (FileNotFoundException e) {
-                String msg = "Failed to dump CSV file: table=" + tableName + " csv=" + csvFilePath;
+                String msg = "Failed to output CSV file: table=" + tableName + " csv=" + csvFilePath;
                 throw new IllegalStateException(msg, e);
             } catch (IOException e) {
-                String msg = "Failed to dump CSV file: table=" + tableName + " csv=" + csvFilePath;
+                String msg = "Failed to output CSV file: table=" + tableName + " csv=" + csvFilePath;
                 throw new IllegalStateException(msg, e);
             }
         }

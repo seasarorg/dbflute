@@ -30,6 +30,9 @@ import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfTypeUtil.ToBooleanParseException;
+import org.seasar.dbflute.util.DfTypeUtil.ToTimeParseException;
+import org.seasar.dbflute.util.DfTypeUtil.ToTimestampParseException;
 
 /**
  * @author jflute
@@ -118,63 +121,6 @@ public abstract class DfAbsractDataWriter {
     }
 
     // -----------------------------------------------------
-    //                                                  Time
-    //                                                  ----
-    protected boolean processTime(String columnName, String value, PreparedStatement ps, int bindCount,
-            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
-        if (value == null) {
-            return false;
-        }
-        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
-        if (columnMetaInfo != null) {
-            final Class<?> columnType = getColumnType4Judgement(columnMetaInfo);
-            if (columnType != null && !java.sql.Time.class.isAssignableFrom(columnType)) {
-                return false;
-            }
-        }
-        value = filterTimeValue(value);
-        if (!isTimeValue(value)) {
-            return false;
-        }
-        final Time timeValue = getTimeValue(columnName, value);
-        ps.setTime(bindCount, timeValue);
-        return true;
-    }
-
-    protected String filterTimeValue(String value) {
-        value = value.trim();
-        if (value.indexOf(":") == 1 && value.lastIndexOf(":") == 4) {
-            value = "0" + value;
-        }
-        if (value.indexOf(":") == 2 && value.lastIndexOf(":") == 5 && value.indexOf(".") == 8) {
-            value = value.substring(0, 8);
-        }
-        return value;
-    }
-
-    protected boolean isTimeValue(String value) {
-        if (value == null) {
-            return false;
-        }
-        try {
-            Time.valueOf(value);
-            return true;
-        } catch (RuntimeException e) {
-        }
-        return false;
-    }
-
-    protected Time getTimeValue(String columnName, String value) {
-        try {
-            return Time.valueOf(value);
-        } catch (RuntimeException e) {
-            String msg = "The value cannot be convert to time:";
-            msg = msg + " columnName=" + columnName + " value=" + value;
-            throw new IllegalStateException(msg, e);
-        }
-    }
-
-    // -----------------------------------------------------
     //                                             Timestamp
     //                                             ---------
     protected boolean processTimestamp(String columnName, String value, PreparedStatement ps, int bindCount,
@@ -189,47 +135,36 @@ public abstract class DfAbsractDataWriter {
                 return false;
             }
         }
-        value = filterTimestampValue(value);
-        if (!isTimestampValue(value)) {
-            return false;
+        try {
+            Timestamp timestamp = DfTypeUtil.toTimestamp(value);
+            ps.setTimestamp(bindCount, timestamp);
+            return true;
+        } catch (ToTimestampParseException ignored) {
+            return false; // couldn't parse as timestamp 
         }
-        final Timestamp timestampValue = getTimestampValue(columnName, value);
-        ps.setTimestamp(bindCount, timestampValue);
-        return true;
     }
 
-    protected String filterTimestampValue(String value) {
-        value = value.trim();
-        if (value.indexOf("/") == 4 && value.lastIndexOf("/") == 7) {
-            value = value.replaceAll("/", "-");
-        }
-        if (value.indexOf("-") == 4 && value.lastIndexOf("-") == 7) {
-            if (value.length() == "2007-07-09".length()) {
-                value = value + " 00:00:00";
-            }
-        }
-        return value;
-    }
-
-    protected boolean isTimestampValue(String value) {
+    // -----------------------------------------------------
+    //                                                  Time
+    //                                                  ----
+    protected boolean processTime(String columnName, String value, PreparedStatement ps, int bindCount,
+            Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (value == null) {
             return false;
         }
-        try {
-            Timestamp.valueOf(value);
-            return true;
-        } catch (RuntimeException e) {
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo != null) {
+            final Class<?> columnType = getColumnType4Judgement(columnMetaInfo);
+            if (columnType != null && !java.sql.Time.class.isAssignableFrom(columnType)) {
+                return false;
+            }
         }
-        return false;
-    }
-
-    protected Timestamp getTimestampValue(String columnName, String value) {
         try {
-            return Timestamp.valueOf(value);
-        } catch (RuntimeException e) {
-            String msg = "The value cannot be convert to timestamp:";
-            msg = msg + " columnName=" + columnName + " value=" + value;
-            throw new IllegalStateException(msg, e);
+            Time time = DfTypeUtil.toTime(value);
+            ps.setTime(bindCount, time);
+            return true;
+        } catch (ToTimeParseException ignored) {
+            return false; // couldn't parse as time 
         }
     }
 
@@ -248,42 +183,12 @@ public abstract class DfAbsractDataWriter {
                 return false;
             }
         }
-        value = filterBooleanValue(value);
-        if (!isBooleanValue(value)) {
-            return false;
-        }
-        final Boolean booleanValue = getBooleanValue(value);
-        ps.setBoolean(bindCount, booleanValue);
-        return true;
-    }
-
-    protected String filterBooleanValue(String value) {
-        if (value == null) {
-            return null;
-        }
-        value = value.trim();
-        if ("t".equalsIgnoreCase(value) || "1".equalsIgnoreCase(value)) {
-            return "true";
-        } else if ("f".equalsIgnoreCase(value) || "0".equalsIgnoreCase(value)) {
-            return "false";
-        } else {
-            return value.toLowerCase();
-        }
-    }
-
-    protected boolean isBooleanValue(String value) {
-        if (value == null) {
-            return false;
-        }
-        return "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
-    }
-
-    protected Boolean getBooleanValue(String value) {
         try {
-            return Boolean.valueOf(value);
-        } catch (RuntimeException e) {
-            String msg = "The value should be boolean: value=" + value;
-            throw new IllegalStateException(msg, e);
+            Boolean booleanValue = DfTypeUtil.toBoolean(value);
+            ps.setBoolean(bindCount, booleanValue);
+            return true;
+        } catch (ToBooleanParseException ignored) {
+            return false; // couldn't parse as boolean
         }
     }
 
