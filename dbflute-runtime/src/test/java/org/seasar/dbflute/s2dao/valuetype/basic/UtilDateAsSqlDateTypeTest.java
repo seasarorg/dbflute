@@ -4,7 +4,6 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
-import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -16,7 +15,7 @@ public class UtilDateAsSqlDateTypeTest extends TestCase {
     public void test_toUtilDate() {
         // ## Arrange ##
         UtilDateAsSqlDateType type = new UtilDateAsSqlDateType();
-        java.sql.Date sqlDate = DfTypeUtil.toSqlDate(DfTypeUtil.toDateFlexibly("2009/12/13"));
+        java.sql.Date sqlDate = DfTypeUtil.toSqlDate(DfTypeUtil.toDate("2009/12/13"));
 
         // ## Act ##
         java.util.Date utilDate = type.toUtilDate(sqlDate);
@@ -29,7 +28,7 @@ public class UtilDateAsSqlDateTypeTest extends TestCase {
     public void test_toSqlDate() {
         // ## Arrange ##
         UtilDateAsSqlDateType type = new UtilDateAsSqlDateType();
-        Date utilDate = DfTypeUtil.toDateFlexibly("2009/12/13");
+        Date utilDate = DfTypeUtil.toDate("2009/12/13");
 
         // ## Act ##
         java.sql.Date sqlDate = type.toSqlDate(utilDate);

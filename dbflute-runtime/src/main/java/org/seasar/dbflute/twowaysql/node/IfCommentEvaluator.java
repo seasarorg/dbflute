@@ -42,7 +42,7 @@ import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.DfTypeUtil.ToTimestampFlexiblyParseException;
+import org.seasar.dbflute.util.DfTypeUtil.ToTimestampParseException;
 
 /**
  * @author jflute
@@ -289,8 +289,8 @@ public class IfCommentEvaluator {
                 if (rearValue.startsWith(quote) && rearValue.endsWith(quote)) {
                     final String literal = rearValue.substring(qlen, rearValue.length() - qlen).trim();
                     try {
-                        return DfTypeUtil.toTimestampFlexibly(literal);
-                    } catch (ToTimestampFlexiblyParseException ignored) {
+                        return DfTypeUtil.toTimestamp(literal);
+                    } catch (ToTimestampParseException ignored) {
                     }
                 }
             }

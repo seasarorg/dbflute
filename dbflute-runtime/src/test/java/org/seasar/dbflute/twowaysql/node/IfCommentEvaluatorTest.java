@@ -83,13 +83,13 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
     public void test_evaluate_date() {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
-        pmb.setBirthdate(DfTypeUtil.toDateFlexibly("2009/11/22"));
+        pmb.setBirthdate(DfTypeUtil.toDate("2009/11/22"));
         String expression = "pmb.birthdate == date '2009/11/22'";
         IfCommentEvaluator evaluator = createEvaluator(pmb, expression);
 
         // ## Act && Assert ##
         assertTrue(evaluator.evaluate());
-        pmb.setBirthdate(DfTypeUtil.toDateFlexibly("2009/10/12"));
+        pmb.setBirthdate(DfTypeUtil.toDate("2009/10/12"));
         assertFalse(evaluator.evaluate());
     }
 
@@ -344,7 +344,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
     public void test_lessThan_date() {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
-        Date birthdate = DfTypeUtil.toTimestampFlexibly("2009/12/24 12:34:56");
+        Date birthdate = DfTypeUtil.toTimestamp("2009/12/24 12:34:56");
         pmb.setBirthdate(birthdate);
 
         // ## Act && Assert ##
@@ -427,7 +427,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
     public void test_lessEqual_date() {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
-        Date birthdate = DfTypeUtil.toTimestampFlexibly("2009/12/24 12:34:56.123");
+        Date birthdate = DfTypeUtil.toTimestamp("2009/12/24 12:34:56.123");
         pmb.setBirthdate(birthdate);
 
         // ## Act && Assert ##
@@ -721,7 +721,7 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
         // ## Arrange ##
         BasePmb pmb = new BasePmb();
         pmb.setMemberId(2);
-        pmb.setBirthdate(DfTypeUtil.toDateFlexibly("2008/11/22"));
+        pmb.setBirthdate(DfTypeUtil.toDate("2008/11/22"));
 
         // ## Act && Assert ##
         assertTrue(createEvaluator(pmb, "3 > pmb.memberId").evaluate());

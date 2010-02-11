@@ -28,13 +28,13 @@ public class DfTypeUtilTest extends PlainTestCase {
     // -----------------------------------------------------
     //                                                  Date
     //                                                  ----
-    public void test_toDateFlexibly_sameClass() {
+    public void test_toDate_sameClass() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        Date pureDate = new Date(DfTypeUtil.toDateFlexibly("2009-12-13 12:34:56.123").getTime());
+        Date pureDate = new Date(DfTypeUtil.toDate("2009-12-13 12:34:56.123").getTime());
 
         // ## Act ##
-        Date date = DfTypeUtil.toDateFlexibly(pureDate);
+        Date date = DfTypeUtil.toDate(pureDate);
 
         // ## Assert ##
         assertEquals(java.util.Date.class, date.getClass());
@@ -42,13 +42,13 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2009/12/13 12:34:56", f.format(date));
     }
 
-    public void test_toDateFlexibly_subClass() {
+    public void test_toDate_subClass() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Timestamp timestamp = Timestamp.valueOf("2009-12-13 12:34:56.123");
 
         // ## Act ##
-        Date date = DfTypeUtil.toDateFlexibly(timestamp);
+        Date date = DfTypeUtil.toDate(timestamp);
 
         // ## Assert ##
         assertEquals(java.util.Date.class, date.getClass());
@@ -56,35 +56,104 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2009/12/13 12:34:56", f.format(date));
     }
 
-    public void test_toDateFlexibly() {
+    public void test_toDate_various() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
         // ## Act & Assert ##
-        assertNull(DfTypeUtil.toDateFlexibly(null));
-        assertNull(DfTypeUtil.toDateFlexibly(""));
-        assertEquals("0002/01/12 00:00:00", f.format(DfTypeUtil.toDateFlexibly("20112")));
-        assertEquals("0012/01/22 00:00:00", f.format(DfTypeUtil.toDateFlexibly("120122")));
-        assertEquals("0923/01/27 00:00:00", f.format(DfTypeUtil.toDateFlexibly("9230127")));
-        assertEquals("2008/12/30 00:00:00", f.format(DfTypeUtil.toDateFlexibly("20081230")));
-        assertEquals("2008/12/30 00:00:00", f.format(DfTypeUtil.toDateFlexibly("2008/12/30")));
-        assertEquals("2008/12/30 00:00:00", f.format(DfTypeUtil.toDateFlexibly("2008-12-30")));
-        assertEquals("2008/12/30 12:34:56", f.format(DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56")));
-        assertEquals("2008/12/30 12:34:56", f.format(DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789")));
-        assertEquals(java.util.Date.class, DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789").getClass());
-        assertNotSame(java.sql.Date.class, DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789").getClass());
-        assertNotSame(java.sql.Timestamp.class, DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789").getClass());
+        assertNull(DfTypeUtil.toDate(null));
+        assertNull(DfTypeUtil.toDate(""));
+        assertEquals("0002/01/12 00:00:00", f.format(DfTypeUtil.toDate("20112")));
+        assertEquals("0012/01/22 00:00:00", f.format(DfTypeUtil.toDate("120122")));
+        assertEquals("0923/01/27 00:00:00", f.format(DfTypeUtil.toDate("9230127")));
+        assertEquals("2008/12/30 00:00:00", f.format(DfTypeUtil.toDate("20081230")));
+        assertEquals("2008/12/30 00:00:00", f.format(DfTypeUtil.toDate("2008/12/30")));
+        assertEquals("2008/12/30 00:00:00", f.format(DfTypeUtil.toDate("2008-12-30")));
+        assertEquals("2008/12/30 12:34:56", f.format(DfTypeUtil.toDate("2008-12-30 12:34:56")));
+        assertEquals("2008/12/30 12:34:56", f.format(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
+        assertEquals("2008/09/30 12:34:56", f.format(DfTypeUtil.toDate("2008-09-30 12:34:56")));
+        assertEquals("2008/09/30 12:34:56", f.format(DfTypeUtil.toDate("2008-9-30 12:34:56")));
+        assertEquals("2008/09/01 12:34:56", f.format(DfTypeUtil.toDate("2008-9-1 12:34:56")));
+        assertEquals("0008/09/01 12:34:56", f.format(DfTypeUtil.toDate("8-9-1 12:34:56")));
+        assertEquals("2008/09/01 00:00:00", f.format(DfTypeUtil.toDate("2008-9-1")));
+        assertEquals("0008/09/01 02:04:06", f.format(DfTypeUtil.toDate("8-9-1 02:04:06")));
+        assertEquals("0008/09/01 02:04:06", f.format(DfTypeUtil.toDate("8-9-1 2:4:6")));
+        assertEquals("2008/12/30 12:34:56.000", ft.format(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
+        assertEquals(java.util.Date.class, DfTypeUtil.toDate("2008-12-30 12:34:56.789").getClass());
+        assertNotSame(java.sql.Date.class, DfTypeUtil.toDate("2008-12-30 12:34:56.789").getClass());
+        assertNotSame(java.sql.Timestamp.class, DfTypeUtil.toDate("2008-12-30 12:34:56.789").getClass());
     }
 
     public void test_clearSeconds() {
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        Date date = DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789");
+        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
         DfTypeUtil.clearSeconds(date);
 
         // ## Assert ##
         assertEquals("2008/12/30 00:00:00.000", f.format(date));
+    }
+
+    // -----------------------------------------------------
+    //                                             Timestamp
+    //                                             ---------
+    public void test_toTimestamp_various() {
+        // ## Arrange ##
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+
+        // ## Act & Assert ##
+        assertNull(DfTypeUtil.toTimestamp(null));
+        assertNull(DfTypeUtil.toTimestamp(""));
+        assertEquals("0002/01/12 00:00:00.000", f.format(DfTypeUtil.toTimestamp("20112")));
+        assertEquals("0012/01/22 00:00:00.000", f.format(DfTypeUtil.toTimestamp("120122")));
+        assertEquals("0923/01/27 00:00:00.000", f.format(DfTypeUtil.toTimestamp("9230127")));
+        assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toTimestamp("20081230")));
+        assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toTimestamp("2008/12/30")));
+        assertEquals("2008/12/30 12:34:56.000", f.format(DfTypeUtil.toTimestamp("2008/12/30 12:34:56")));
+        assertEquals("2008/12/30 12:34:56.789", f.format(DfTypeUtil.toTimestamp("2008/12/30 12:34:56.789")));
+        assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toTimestamp("2008-12-30")));
+        assertEquals("2008/12/30 12:34:56.000", f.format(DfTypeUtil.toTimestamp("2008-12-30 12:34:56")));
+        assertEquals("2008/12/30 12:34:56.789", f.format(DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789")));
+        assertEquals("2008/09/30 12:34:56.000", f.format(DfTypeUtil.toTimestamp("2008-09-30 12:34:56")));
+        assertEquals("2008/09/30 12:34:56.000", f.format(DfTypeUtil.toTimestamp("2008-9-30 12:34:56")));
+        assertEquals("2008/09/01 12:34:56.000", f.format(DfTypeUtil.toTimestamp("2008-9-1 12:34:56")));
+        assertEquals("0008/09/01 12:34:56.000", f.format(DfTypeUtil.toTimestamp("8-9-1 12:34:56")));
+        assertEquals("2008/09/01 00:00:00.000", f.format(DfTypeUtil.toTimestamp("2008-9-1")));
+        assertEquals("0008/09/01 02:04:06.000", f.format(DfTypeUtil.toTimestamp("8-9-1 02:04:06")));
+        assertEquals("0008/09/01 02:04:06.000", f.format(DfTypeUtil.toTimestamp("8-9-1 2:4:6")));
+        assertEquals("2008/12/30 12:34:56.009", f.format(DfTypeUtil.toTimestamp("2008-12-30 12:34:56.9")));
+    }
+
+    // -----------------------------------------------------
+    //                                                  Time
+    //                                                  ----
+    public void test_toTime_timestamp() {
+        // ## Arrange ##
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789");
+
+        // ## Act & Assert ##
+        assertNull(DfTypeUtil.toTime(null));
+        assertNull(DfTypeUtil.toTime(""));
+        assertEquals("1970/01/01 12:34:56.789", f.format(DfTypeUtil.toTime(date)));
+    }
+
+    public void test_toTime_various() {
+        // ## Arrange ##
+        SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat ft = new SimpleDateFormat("HH:mm:ss.SSS");
+
+        // ## Act & Assert ##
+        assertNull(DfTypeUtil.toTime(null));
+        assertNull(DfTypeUtil.toTime(""));
+        assertEquals("12:34:56", f.format(DfTypeUtil.toTime("2009/12/12 12:34:56")));
+        assertEquals("12:34:56", f.format(DfTypeUtil.toTime("12:34:56")));
+        assertEquals("02:04:06", f.format(DfTypeUtil.toTime("02:04:06")));
+        assertEquals("02:04:06", f.format(DfTypeUtil.toTime("2:4:6")));
+        assertEquals("12:34:56", f.format(DfTypeUtil.toTime("12:34:56.789")));
+        assertEquals("12:34:56.000", ft.format(DfTypeUtil.toTime("12:34:56.789")));
     }
 
     // -----------------------------------------------------
@@ -100,7 +169,7 @@ public class DfTypeUtilTest extends PlainTestCase {
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
         // ## Act ##
-        java.sql.Date date = DfTypeUtil.toSqlDate(DfTypeUtil.toDateFlexibly("2008-12-30 12:34:56.789"));
+        java.sql.Date date = DfTypeUtil.toSqlDate(DfTypeUtil.toDate("2008-12-30 12:34:56.789"));
 
         // ## Assert ##
         assertEquals("2008/12/30 00:00:00.000", f.format(date));
@@ -109,46 +178,38 @@ public class DfTypeUtilTest extends PlainTestCase {
     public void test_toSqlDate_timestamp() {
         // ## Arrange ##
         SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        Timestamp date = DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56.789");
+        Timestamp date = DfTypeUtil.toTimestamp("2008-12-30 12:34:56.789");
 
         // ## Act & Assert ##
         assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toSqlDate(date)));
     }
 
-    // -----------------------------------------------------
-    //                                                  Time
-    //                                                  ----
-    public void test_toTime() {
+    public void test_toSqlDate_various() {
         // ## Arrange ##
-        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        Date date = DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56.789");
+        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd");
+        SimpleDateFormat ft = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
         // ## Act & Assert ##
-        assertNull(DfTypeUtil.toTime(null));
-        assertNull(DfTypeUtil.toTime(""));
-        assertEquals("1970/01/01 12:34:56.789", f.format(DfTypeUtil.toTime(date)));
-    }
-
-    // -----------------------------------------------------
-    //                                             Timestamp
-    //                                             ---------
-    public void test_toTimestampFlexibly() {
-        // ## Arrange ##
-        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-
-        // ## Act & Assert ##
-        assertNull(DfTypeUtil.toTimestampFlexibly(null));
-        assertNull(DfTypeUtil.toTimestampFlexibly(""));
-        assertEquals("0002/01/12 00:00:00.000", f.format(DfTypeUtil.toTimestampFlexibly("20112")));
-        assertEquals("0012/01/22 00:00:00.000", f.format(DfTypeUtil.toTimestampFlexibly("120122")));
-        assertEquals("0923/01/27 00:00:00.000", f.format(DfTypeUtil.toTimestampFlexibly("9230127")));
-        assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toTimestampFlexibly("20081230")));
-        assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toTimestampFlexibly("2008/12/30")));
-        assertEquals("2008/12/30 12:34:56.000", f.format(DfTypeUtil.toTimestampFlexibly("2008/12/30 12:34:56")));
-        assertEquals("2008/12/30 12:34:56.789", f.format(DfTypeUtil.toTimestampFlexibly("2008/12/30 12:34:56.789")));
-        assertEquals("2008/12/30 00:00:00.000", f.format(DfTypeUtil.toTimestampFlexibly("2008-12-30")));
-        assertEquals("2008/12/30 12:34:56.000", f.format(DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56")));
-        assertEquals("2008/12/30 12:34:56.789", f.format(DfTypeUtil.toTimestampFlexibly("2008-12-30 12:34:56.789")));
+        assertNull(DfTypeUtil.toSqlDate(null));
+        assertNull(DfTypeUtil.toSqlDate(""));
+        assertEquals("0002/01/12", f.format(DfTypeUtil.toSqlDate("20112")));
+        assertEquals("0012/01/22", f.format(DfTypeUtil.toSqlDate("120122")));
+        assertEquals("0923/01/27", f.format(DfTypeUtil.toSqlDate("9230127")));
+        assertEquals("2008/12/30", f.format(DfTypeUtil.toSqlDate("20081230")));
+        assertEquals("2008/12/30", f.format(DfTypeUtil.toSqlDate("2008/12/30")));
+        assertEquals("2008/12/30", f.format(DfTypeUtil.toSqlDate("2008-12-30")));
+        assertEquals("2008/12/30", f.format(DfTypeUtil.toSqlDate("2008-12-30 12:34:56")));
+        assertEquals("2008/12/30", f.format(DfTypeUtil.toSqlDate("2008-12-30 12:34:56.789")));
+        assertEquals("2008/09/30", f.format(DfTypeUtil.toSqlDate("2008-09-30 12:34:56")));
+        assertEquals("2008/09/30", f.format(DfTypeUtil.toSqlDate("2008-9-30 12:34:56")));
+        assertEquals("2008/09/01", f.format(DfTypeUtil.toSqlDate("2008-9-1 12:34:56")));
+        assertEquals("0008/09/01", f.format(DfTypeUtil.toSqlDate("8-9-1 12:34:56")));
+        assertEquals("2008/09/01", f.format(DfTypeUtil.toSqlDate("2008-9-1")));
+        assertEquals("0008/09/01 00:00:00.000", ft.format(DfTypeUtil.toSqlDate("8-9-1 12:34:56")));
+        assertEquals("2008/12/30 00:00:00.000", ft.format(DfTypeUtil.toSqlDate("2008-12-30 12:34:56.789")));
+        assertEquals(java.sql.Date.class, DfTypeUtil.toSqlDate("2008-12-30 12:34:56.789").getClass());
+        assertNotSame(java.util.Date.class, DfTypeUtil.toSqlDate("2008-12-30 12:34:56.789").getClass());
+        assertNotSame(java.sql.Timestamp.class, DfTypeUtil.toSqlDate("2008-12-30 12:34:56.789").getClass());
     }
 
     // ===================================================================================
@@ -156,8 +217,8 @@ public class DfTypeUtilTest extends PlainTestCase {
     //                                                                              ======
     public void test_format_Date() {
         // ## Arrange ##
-        Date date = DfTypeUtil.toDateFlexibly("2008/12/30 12:34:56");
-        Timestamp timestamp = DfTypeUtil.toTimestampFlexibly("2008/12/30 12:34:56");
+        Date date = DfTypeUtil.toDate("2008/12/30 12:34:56");
+        Timestamp timestamp = DfTypeUtil.toTimestamp("2008/12/30 12:34:56");
 
         // ## Act & Assert ##
         assertNull(DfTypeUtil.format((Date) null, "yyyy/MM/dd HH:mm:ss"));
