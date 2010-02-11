@@ -117,7 +117,7 @@ public class DfTypeUtil {
             return toInteger((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Integer(getDateFormat(pattern).format(o));
+                return new Integer(createSimpleDateFormat(pattern).format(o));
             }
             return Integer.valueOf((int) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -147,7 +147,7 @@ public class DfTypeUtil {
             return toPrimitiveInt((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Integer.parseInt(getDateFormat(pattern).format(o));
+                return Integer.parseInt(createSimpleDateFormat(pattern).format(o));
             }
             return (int) ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -182,7 +182,7 @@ public class DfTypeUtil {
             return toLong((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Long(getDateFormat(pattern).format(o));
+                return new Long(createSimpleDateFormat(pattern).format(o));
             }
             return Long.valueOf(((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -212,7 +212,7 @@ public class DfTypeUtil {
             return toPrimitiveLong((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Long.parseLong(getDateFormat(pattern).format(o));
+                return Long.parseLong(createSimpleDateFormat(pattern).format(o));
             }
             return ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -247,7 +247,7 @@ public class DfTypeUtil {
             return toDouble((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Double(getDateFormat(pattern).format(o));
+                return new Double(createSimpleDateFormat(pattern).format(o));
             }
             return new Double(((java.util.Date) o).getTime());
         } else {
@@ -275,7 +275,7 @@ public class DfTypeUtil {
             return toPrimitiveDouble((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Double.parseDouble(getDateFormat(pattern).format(o));
+                return Double.parseDouble(createSimpleDateFormat(pattern).format(o));
             }
             return ((java.util.Date) o).getTime();
         } else {
@@ -308,7 +308,7 @@ public class DfTypeUtil {
             return toFloat((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Float(getDateFormat(pattern).format(o));
+                return new Float(createSimpleDateFormat(pattern).format(o));
             }
             return new Float(((java.util.Date) o).getTime());
         } else {
@@ -336,7 +336,7 @@ public class DfTypeUtil {
             return toPrimitiveFloat((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Float.parseFloat(getDateFormat(pattern).format(o));
+                return Float.parseFloat(createSimpleDateFormat(pattern).format(o));
             }
             return ((java.util.Date) o).getTime();
         } else {
@@ -369,7 +369,7 @@ public class DfTypeUtil {
             return toShort((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Short.valueOf(getDateFormat(pattern).format(o));
+                return Short.valueOf(createSimpleDateFormat(pattern).format(o));
             }
             return Short.valueOf((short) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -399,7 +399,7 @@ public class DfTypeUtil {
             return toPrimitiveShort((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Short.parseShort(getDateFormat(pattern).format(o));
+                return Short.parseShort(createSimpleDateFormat(pattern).format(o));
             }
             return (short) ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -434,7 +434,7 @@ public class DfTypeUtil {
             return toByte((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Byte(getDateFormat(pattern).format(o));
+                return new Byte(createSimpleDateFormat(pattern).format(o));
             }
             return Byte.valueOf((byte) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -464,7 +464,7 @@ public class DfTypeUtil {
             return toPrimitiveByte((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Byte.parseByte(getDateFormat(pattern).format(o));
+                return Byte.parseByte(createSimpleDateFormat(pattern).format(o));
             }
             return (byte) ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -501,7 +501,7 @@ public class DfTypeUtil {
             }
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new BigDecimal(getDateFormat(pattern).format(o));
+                return new BigDecimal(createSimpleDateFormat(pattern).format(o));
             }
             return new BigDecimal(Long.toString(((java.util.Date) o).getTime()));
         } else if (o instanceof String) {
@@ -597,17 +597,25 @@ public class DfTypeUtil {
         }
         final DateFormat df;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            df = getDateFormat(s, "yyyy-MM-dd HH:mm:ss");
+            df = createDateFormat(s, "yyyy-MM-dd HH:mm:ss");
             s = filterDateStringValueFlexibly(s);
         } else {
-            df = getDateFormat(s, pattern);
+            df = createDateFormat(s, pattern);
         }
         try {
             return df.parse(s);
         } catch (ParseException e) {
-            String msg = "Failed to parse the string to date:";
-            msg = msg + " string=" + s + " pattern=" + pattern;
-            throw new ToDateParseException(msg, e);
+            try {
+                df.setLenient(true);
+                df.parse(s); // no exception means illegal date
+                String msg = "The date expression is out of calendar:";
+                msg = msg + " string=" + s + " pattern=" + pattern;
+                throw new ToDateOutOfCalendarException(msg, e);
+            } catch (ParseException ignored) {
+                String msg = "Failed to parse the string to date:";
+                msg = msg + " string=" + s + " pattern=" + pattern;
+                throw new ToDateParseException(msg, e);
+            }
         }
     }
 
@@ -615,6 +623,14 @@ public class DfTypeUtil {
         private static final long serialVersionUID = 1L;
 
         public ToDateParseException(String msg, ParseException e) {
+            super(msg, e);
+        }
+    }
+
+    public static class ToDateOutOfCalendarException extends ToDateParseException {
+        private static final long serialVersionUID = 1L;
+
+        public ToDateOutOfCalendarException(String msg, ParseException e) {
             super(msg, e);
         }
     }
@@ -749,17 +765,25 @@ public class DfTypeUtil {
         }
         final DateFormat df;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            df = getDateFormat(s, "yyyy-MM-dd HH:mm:ss.SSS");
+            df = createDateFormat(s, "yyyy-MM-dd HH:mm:ss.SSS");
             s = filterTimestampStringValueFlexibly(s);
         } else {
-            df = getDateFormat(s, pattern);
+            df = createDateFormat(s, pattern);
         }
         try {
             return new Timestamp(df.parse(s).getTime());
         } catch (ParseException e) {
-            String msg = "Failed to parse the string to timestamp:";
-            msg = msg + " string=" + s + " pattern=" + pattern;
-            throw new ToTimestampParseException(msg, e);
+            try {
+                df.setLenient(true);
+                df.parse(s); // no exception means illegal date
+                String msg = "The timestamp expression is out of calendar:";
+                msg = msg + " string=" + s + " pattern=" + pattern;
+                throw new ToTimestampOutOfCalendarException(msg, e);
+            } catch (ParseException ignored) {
+                String msg = "Failed to parse the string to timestamp:";
+                msg = msg + " string=" + s + " pattern=" + pattern;
+                throw new ToTimestampParseException(msg, e);
+            }
         }
     }
 
@@ -767,6 +791,14 @@ public class DfTypeUtil {
         private static final long serialVersionUID = 1L;
 
         public ToTimestampParseException(String msg, Exception e) {
+            super(msg, e);
+        }
+    }
+
+    public static class ToTimestampOutOfCalendarException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToTimestampOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
         }
     }
@@ -845,17 +877,25 @@ public class DfTypeUtil {
         }
         final DateFormat df;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            df = getDateFormat(s, "HH:mm:ss");
+            df = createDateFormat(s, "HH:mm:ss");
             s = filterTimeStringValueFlexibly(s);
         } else {
-            df = getDateFormat(s, pattern);
+            df = createDateFormat(s, pattern);
         }
         try {
             return new Time(df.parse(s).getTime());
         } catch (ParseException e) {
-            String msg = "Failed to parse the string to time:";
-            msg = msg + " string=" + s + " pattern=" + pattern;
-            throw new ToTimeParseException(msg, e);
+            try {
+                df.setLenient(true);
+                df.parse(s); // no exception means illegal date
+                String msg = "The time expression is out of calendar:";
+                msg = msg + " string=" + s + " pattern=" + pattern;
+                throw new ToTimeOutOfCalendarException(msg, e);
+            } catch (ParseException ignored) {
+                String msg = "Failed to parse the string to time:";
+                msg = msg + " string=" + s + " pattern=" + pattern;
+                throw new ToTimeParseException(msg, e);
+            }
         }
     }
 
@@ -863,6 +903,14 @@ public class DfTypeUtil {
         private static final long serialVersionUID = 1L;
 
         public ToTimeParseException(String msg, Exception e) {
+            super(msg, e);
+        }
+    }
+
+    public static class ToTimeOutOfCalendarException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToTimeOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
         }
     }
@@ -923,6 +971,10 @@ public class DfTypeUtil {
         java.util.Date date;
         try {
             date = toDate(o, pattern);
+        } catch (ToDateOutOfCalendarException e) {
+            String msg = "The SQL-date expression is out of calendar:";
+            msg = msg + " obj=" + o + " pattern=" + pattern;
+            throw new ToSqlDateOutOfCalendarException(msg, e);
         } catch (ToDateParseException e) {
             String msg = "Failed to parse the object to SQL-date:";
             msg = msg + " obj=" + o + " pattern=" + pattern;
@@ -939,6 +991,14 @@ public class DfTypeUtil {
         private static final long serialVersionUID = 1L;
 
         public ToSqlDateParseException(String msg, Exception e) {
+            super(msg, e);
+        }
+    }
+
+    public static class ToSqlDateOutOfCalendarException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToSqlDateOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
         }
     }
@@ -965,7 +1025,7 @@ public class DfTypeUtil {
 
     public static Calendar localize(Calendar calendar) {
         if (calendar == null) {
-            throw new NullPointerException("calendar");
+            throw new IllegalArgumentException("The argument 'calendar' should not be null.");
         }
         Calendar localCalendar = Calendar.getInstance();
         localCalendar.setTimeInMillis(calendar.getTimeInMillis());
@@ -1121,7 +1181,7 @@ public class DfTypeUtil {
         if (date == null) {
             return null;
         }
-        DateFormat format = getDateFormat(pattern);
+        DateFormat format = createSimpleDateFormat(pattern);
         return format.format(date);
     }
 
@@ -1164,8 +1224,8 @@ public class DfTypeUtil {
             return null;
         } else if (value instanceof String) {
             return (String) value;
-        } else if (value instanceof java.util.Date) {
-            return toString((java.util.Date) value, pattern);
+        } else if (value instanceof Date) {
+            return toString((Date) value, pattern);
         } else if (value instanceof Number) {
             return toString((Number) value, pattern);
         } else if (value instanceof byte[]) {
@@ -1185,10 +1245,10 @@ public class DfTypeUtil {
         return null;
     }
 
-    public static String toString(java.util.Date value, String pattern) {
+    public static String toString(Date value, String pattern) {
         if (value != null) {
             if (pattern != null) {
-                return getDateFormat(pattern).format(value);
+                return createSimpleDateFormat(pattern).format(value);
             }
             return value.toString();
         }
@@ -1349,26 +1409,28 @@ public class DfTypeUtil {
     // -----------------------------------------------------
     //                                            DateFormat
     //                                            ----------
-    protected static DateFormat getDateFormat(String s, String pattern) {
+    protected static DateFormat createDateFormat(String s, String pattern) {
         if (pattern != null) {
-            return getDateFormat(pattern);
+            return createSimpleDateFormat(pattern);
         }
-        return getDateFormat("yyyy-MM-dd HH:mm:dd");
+        return createSimpleDateFormat("yyyy-MM-dd HH:mm:dd");
     }
 
-    protected static DateFormat getTimestampFormat(String s, String pattern) {
+    protected static DateFormat createTimestampFormat(String s, String pattern) {
         if (pattern != null) {
-            return getDateFormat(pattern);
+            return createSimpleDateFormat(pattern);
         }
-        return getDateFormat("yyyy-MM-dd HH:mm:dd.SSS");
+        return createSimpleDateFormat("yyyy-MM-dd HH:mm:dd.SSS");
     }
 
-    protected static DateFormat getDateFormat(String pattern) {
+    protected static SimpleDateFormat createSimpleDateFormat(String pattern) {
         if (pattern == null) {
             String msg = "The argument 'pattern' should not be null!";
             throw new IllegalArgumentException(msg);
         }
-        return new SimpleDateFormat(pattern);
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        simpleDateFormat.setLenient(false);
+        return simpleDateFormat;
     }
 
     //

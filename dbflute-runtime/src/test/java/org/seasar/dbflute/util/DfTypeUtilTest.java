@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.DfTypeUtil.ToDateOutOfCalendarException;
 import org.seasar.dbflute.util.DfTypeUtil.ToDateParseException;
 
 /**
@@ -66,7 +67,6 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertNull(DfTypeUtil.toDate(null));
         assertNull(DfTypeUtil.toDate(""));
         assertEquals("0002/01/12 00:00:00", f.format(DfTypeUtil.toDate("20112")));
-        assertEquals("0001/12/12 00:00:00", f.format(DfTypeUtil.toDate("20012")));
         assertEquals("0012/01/22 00:00:00", f.format(DfTypeUtil.toDate("120122")));
         assertEquals("0923/01/27 00:00:00", f.format(DfTypeUtil.toDate("9230127")));
         assertEquals("2008/12/30 00:00:00", f.format(DfTypeUtil.toDate("20081230")));
@@ -98,6 +98,30 @@ public class DfTypeUtilTest extends PlainTestCase {
         }
         try {
             DfTypeUtil.toDate("2009");
+
+            fail();
+        } catch (ToDateParseException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            DfTypeUtil.toDate("20091");
+
+            fail();
+        } catch (ToDateOutOfCalendarException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            DfTypeUtil.toDate("2009-12-09 12:34:60");
+
+            fail();
+        } catch (ToDateOutOfCalendarException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            DfTypeUtil.toDate("-20091221");
 
             fail();
         } catch (ToDateParseException e) {
