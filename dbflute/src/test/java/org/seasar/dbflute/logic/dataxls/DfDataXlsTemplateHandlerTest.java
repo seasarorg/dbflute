@@ -26,12 +26,12 @@ import org.seasar.dbflute.unit.PlainTestCase;
  * @author jflute
  * @since 0.8.3 (2008/10/29 Wednesday)
  */
-public class DfTemplateDataXlsHandlerTest extends PlainTestCase {
+public class DfDataXlsTemplateHandlerTest extends PlainTestCase {
 
     @Test
     public void test_transferToXls() throws IOException {
         // ## Arrange ##
-        final DfTemplateDataXlsHandler target = createDumpDataXlsHandler(null);
+        final DfDataXlsTemplateHandler target = createDumpDataXlsHandler(null);
         final String canonicalPath = getCanonicalPath();
 
         final File dir = new File(canonicalPath);
@@ -121,7 +121,7 @@ public class DfTemplateDataXlsHandlerTest extends PlainTestCase {
         assertTrue(existsJapaneseColumn);
     }
 
-    protected DfTemplateDataXlsHandler createDumpDataXlsHandler(DataSource dataSource) {
-        return new DfTemplateDataXlsHandler(dataSource);
+    protected DfDataXlsTemplateHandler createDumpDataXlsHandler(DataSource dataSource) {
+        return new DfDataXlsTemplateHandler(dataSource);
     }
 }

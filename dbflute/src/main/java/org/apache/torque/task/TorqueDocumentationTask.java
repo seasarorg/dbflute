@@ -78,8 +78,8 @@ import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingRowResource;
 import org.seasar.dbflute.helper.token.file.FileToken;
 import org.seasar.dbflute.helper.token.file.impl.FileTokenImpl;
-import org.seasar.dbflute.logic.dataxls.DfTemplateDataXlsHandler;
-import org.seasar.dbflute.logic.dataxls.DfTemplateDataXlsHandler.TemplateDataResult;
+import org.seasar.dbflute.logic.dataxls.DfDataXlsTemplateHandler;
+import org.seasar.dbflute.logic.dataxls.DfDataXlsTemplateHandler.TemplateDataResult;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -166,7 +166,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     }
 
     protected void dumpDataXlsTemplate(Map<String, List<Column>> tableColumnMap) {
-        final DfTemplateDataXlsHandler xlsHandler = new DfTemplateDataXlsHandler(getDataSource());
+        final DfDataXlsTemplateHandler xlsHandler = new DfDataXlsTemplateHandler(getDataSource());
         final Integer limit = getDataXlsTemplateRecordLimit();
         final File xlsFile = getDataXlsTemplateFile();
         final TemplateDataResult dumpResult = xlsHandler.dumpToXls(tableColumnMap, limit, xlsFile);

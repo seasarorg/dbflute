@@ -19,7 +19,7 @@ import org.seasar.dbflute.helper.io.xls.DfXlsWriter;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfTemplateDataXlsHandler {
+public class DfDataXlsTemplateHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -29,7 +29,7 @@ public class DfTemplateDataXlsHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfTemplateDataXlsHandler(DataSource dataSource) {
+    public DfDataXlsTemplateHandler(DataSource dataSource) {
         _dataSource = dataSource;
     }
 
