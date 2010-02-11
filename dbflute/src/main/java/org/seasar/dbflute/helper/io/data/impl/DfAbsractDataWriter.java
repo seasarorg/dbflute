@@ -146,7 +146,7 @@ public abstract class DfAbsractDataWriter {
         } catch (ToTimestampOutOfCalendarException e) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-            msg = msg + "Failed to set the timestamp because the value is out of calendar!" + ln();
+            msg = msg + "Failed to set the timestamp because the value was out of calendar!" + ln();
             msg = msg + ln();
             msg = msg + "[Table]" + ln() + tableName + ln();
             msg = msg + ln();
@@ -182,7 +182,7 @@ public abstract class DfAbsractDataWriter {
         } catch (ToTimeOutOfCalendarException e) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-            msg = msg + "Failed to set the time because the value is out of calendar!" + ln();
+            msg = msg + "Failed to set the time because the value was out of calendar!" + ln();
             msg = msg + ln();
             msg = msg + "[Table]" + ln() + tableName + ln();
             msg = msg + ln();
