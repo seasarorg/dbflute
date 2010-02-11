@@ -605,7 +605,7 @@ public class DfTypeUtil {
         try {
             return df.parse(s);
         } catch (ParseException e) {
-            String msg = "Failed to parse the string to date: ";
+            String msg = "Failed to parse the string to date:";
             msg = msg + " string=" + s + " pattern=" + pattern;
             throw new ToDateParseException(msg, e);
         }
@@ -635,6 +635,14 @@ public class DfTypeUtil {
             final String mm = value.substring(4, 6);
             final String dd = value.substring(6, 8);
             value = yyyy + "-" + mm + "-" + dd;
+        }
+
+        // check whether it can filter
+        if (!value.contains("-")) { // hyphen is not found
+            return value;
+        }
+        if (value.indexOf("-") == value.lastIndexOf("-")) { // hyphen is only one
+            return value;
         }
 
         // handling zero prefix
@@ -724,6 +732,8 @@ public class DfTypeUtil {
                 // because the time-stamp type is not final class.
                 return new Timestamp(paramTimestamp.getTime());
             }
+        } else if (o instanceof Date) {
+            return new Timestamp(((Date) o).getTime());
         } else if (o instanceof String) {
             return toTimestampFromString((String) o, pattern);
         } else if (o instanceof Calendar) {
@@ -747,7 +757,7 @@ public class DfTypeUtil {
         try {
             return new Timestamp(df.parse(s).getTime());
         } catch (ParseException e) {
-            String msg = "Failed to parse the string to timestamp: ";
+            String msg = "Failed to parse the string to timestamp:";
             msg = msg + " string=" + s + " pattern=" + pattern;
             throw new ToTimestampParseException(msg, e);
         }
@@ -843,7 +853,7 @@ public class DfTypeUtil {
         try {
             return new Time(df.parse(s).getTime());
         } catch (ParseException e) {
-            String msg = "Failed to parse the string to time: ";
+            String msg = "Failed to parse the string to time:";
             msg = msg + " string=" + s + " pattern=" + pattern;
             throw new ToTimeParseException(msg, e);
         }
@@ -914,7 +924,7 @@ public class DfTypeUtil {
         try {
             date = toDate(o, pattern);
         } catch (ToDateParseException e) {
-            String msg = "Failed to parse the object to SQL-date: ";
+            String msg = "Failed to parse the object to SQL-date:";
             msg = msg + " obj=" + o + " pattern=" + pattern;
             throw new ToSqlDateParseException(msg, e);
         }

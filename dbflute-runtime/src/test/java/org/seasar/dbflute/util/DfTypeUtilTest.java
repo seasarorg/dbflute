@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.seasar.dbflute.unit.PlainTestCase;
+import org.seasar.dbflute.util.DfTypeUtil.ToDateParseException;
 
 /**
  * @author jflute
@@ -65,6 +66,7 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertNull(DfTypeUtil.toDate(null));
         assertNull(DfTypeUtil.toDate(""));
         assertEquals("0002/01/12 00:00:00", f.format(DfTypeUtil.toDate("20112")));
+        assertEquals("0001/12/12 00:00:00", f.format(DfTypeUtil.toDate("20012")));
         assertEquals("0012/01/22 00:00:00", f.format(DfTypeUtil.toDate("120122")));
         assertEquals("0923/01/27 00:00:00", f.format(DfTypeUtil.toDate("9230127")));
         assertEquals("2008/12/30 00:00:00", f.format(DfTypeUtil.toDate("20081230")));
@@ -83,6 +85,25 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals(java.util.Date.class, DfTypeUtil.toDate("2008-12-30 12:34:56.789").getClass());
         assertNotSame(java.sql.Date.class, DfTypeUtil.toDate("2008-12-30 12:34:56.789").getClass());
         assertNotSame(java.sql.Timestamp.class, DfTypeUtil.toDate("2008-12-30 12:34:56.789").getClass());
+    }
+
+    public void test_toDate_illegal() {
+        try {
+            DfTypeUtil.toDate("2009-12");
+
+            fail();
+        } catch (ToDateParseException e) {
+            // OK
+            log(e.getMessage());
+        }
+        try {
+            DfTypeUtil.toDate("2009");
+
+            fail();
+        } catch (ToDateParseException e) {
+            // OK
+            log(e.getMessage());
+        }
     }
 
     public void test_clearSeconds() {

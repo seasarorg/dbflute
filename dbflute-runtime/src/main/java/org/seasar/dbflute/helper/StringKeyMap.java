@@ -31,8 +31,8 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final Map<String, VALUE> _internalMap;
-
+    protected final Map<String, VALUE> _searchMap;
+    protected final Map<String, VALUE> _plainMap; // invalid if concurrent
     protected boolean _removeUnderscore;
 
     // ===================================================================================
@@ -45,19 +45,22 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
         }
         _removeUnderscore = removeUnderscore;
         if (concurrent) {
-            _internalMap = newConcurrentHashMap();
+            _searchMap = newConcurrentHashMap();
+            _plainMap = null; // invalid if concurrent
         } else {
             if (order) {
-                _internalMap = newLinkedHashMap();
+                _searchMap = newLinkedHashMap();
+                _plainMap = newLinkedHashMap();
             } else {
-                _internalMap = newHashMap();
+                _searchMap = newHashMap();
+                _plainMap = newHashMap();
             }
         }
     }
 
     /**
      * Create The map of string key as case insensitive. <br />
-     * You can set null value.
+     * You can set null value. And plain keys to be set is kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as case insensitive. (NotNull)
      */
@@ -67,7 +70,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
 
     /**
      * Create The map of string key as case insensitive and concurrent. <br />
-     * You cannot set null value.
+     * You cannot set null value. And plain keys to be set is NOT kept.
      * @param <VALUE> The type of value.
      * @return The map of string key as case insensitive and concurrent. (NotNull)
      */
@@ -75,19 +78,43 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
         return new StringKeyMap<VALUE>(false, false, true);
     }
 
-    public static <VALUE> StringKeyMap<VALUE> createAsCaseInsensitiveOrder() {
+    /**
+     * Create The map of string key as case insensitive and ordered. <br />
+     * You can set null value. And plain keys to be set is kept.
+     * @param <VALUE> The type of value.
+     * @return The map of string key as case insensitive and ordered. (NotNull)
+     */
+    public static <VALUE> StringKeyMap<VALUE> createAsCaseInsensitiveOrdered() {
         return new StringKeyMap<VALUE>(false, true, false);
     }
 
+    /**
+     * Create The map of string key as flexible. <br />
+     * You can set null value. And plain keys to be set is kept.
+     * @param <VALUE> The type of value.
+     * @return The map of string key as flexible. (NotNull)
+     */
     public static <VALUE> StringKeyMap<VALUE> createAsFlexible() {
         return new StringKeyMap<VALUE>(true, false, false);
     }
 
+    /**
+     * Create The map of string key as flexible and concurrent. <br />
+     * You cannot set null value. And plain keys to be set is NOT kept.
+     * @param <VALUE> The type of value.
+     * @return The map of string key as flexible and concurrent. (NotNull)
+     */
     public static <VALUE> StringKeyMap<VALUE> createAsFlexibleConcurrent() {
         return new StringKeyMap<VALUE>(true, false, true);
     }
 
-    public static <VALUE> StringKeyMap<VALUE> createAsFlexibleOrder() {
+    /**
+     * Create The map of string key as flexible and ordered. <br />
+     * You can set null value. And plain keys to be set is kept.
+     * @param <VALUE> The type of value.
+     * @return The map of string key as flexible and ordered. (NotNull)
+     */
+    public static <VALUE> StringKeyMap<VALUE> createAsFlexibleOrdered() {
         return new StringKeyMap<VALUE>(true, true, false);
     }
 
@@ -100,7 +127,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     public VALUE get(Object key) {
         final String stringKey = convertStringKey(key);
         if (stringKey != null) {
-            return _internalMap.get(stringKey);
+            return _searchMap.get(stringKey);
         }
         return null;
     }
@@ -108,7 +135,10 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     public VALUE put(String key, VALUE value) {
         final String stringKey = convertStringKey(key);
         if (stringKey != null) {
-            return _internalMap.put(stringKey, value);
+            if (_plainMap != null && !containsKey(stringKey)) {
+                _plainMap.put(key, value);
+            }
+            return _searchMap.put(stringKey, value);
         }
         return null;
     }
@@ -116,7 +146,20 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     public VALUE remove(Object key) {
         final String stringKey = convertStringKey(key);
         if (stringKey != null) {
-            return _internalMap.remove(stringKey);
+            if (_plainMap != null) {
+                final Set<String> keySet = _plainMap.keySet();
+                String plainKey = null;
+                for (String currentKey : keySet) {
+                    if (stringKey.equals(convertStringKey(currentKey))) {
+                        plainKey = currentKey;
+                        break;
+                    }
+                }
+                if (plainKey != null) {
+                    _plainMap.remove(plainKey);
+                }
+            }
+            return _searchMap.remove(stringKey);
         }
         return null;
     }
@@ -138,31 +181,40 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     //                                              Delegate
     //                                              --------
     public void clear() {
-        _internalMap.clear();
+        if (_plainMap != null) {
+            _plainMap.clear();
+        }
+        _searchMap.clear();
     }
 
     public int size() {
-        return _internalMap.size();
+        return _searchMap.size();
     }
 
     public boolean isEmpty() {
-        return _internalMap.isEmpty();
+        return _searchMap.isEmpty();
     }
 
     public Set<String> keySet() {
-        return _internalMap.keySet();
+        if (_plainMap != null) {
+            return _plainMap.keySet();
+        }
+        return _searchMap.keySet();
     }
 
     public Collection<VALUE> values() {
-        return _internalMap.values();
+        return _searchMap.values();
     }
 
     public boolean containsValue(Object obj) {
-        return _internalMap.containsValue(obj);
+        return _searchMap.containsValue(obj);
     }
 
     public Set<Entry<String, VALUE>> entrySet() {
-        return _internalMap.entrySet();
+        if (_plainMap != null) {
+            return _plainMap.entrySet();
+        }
+        return _searchMap.entrySet();
     }
 
     // ===================================================================================
@@ -230,16 +282,25 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
     //                                                                      ==============
     @Override
     public boolean equals(Object obj) {
-        return _internalMap.equals(obj);
+        if (obj instanceof StringKeyMap<?>) {
+            return _searchMap.equals(((StringKeyMap<?>) obj)._searchMap);
+        } else if (obj instanceof Map<?, ?>) {
+            return _searchMap.equals(obj);
+        } else {
+            return false;
+        }
     }
 
     @Override
     public int hashCode() {
-        return _internalMap.hashCode();
+        return _searchMap.hashCode();
     }
 
     @Override
     public String toString() {
-        return _internalMap.toString();
+        if (_plainMap != null) {
+            return _plainMap.toString();
+        }
+        return _searchMap.toString();
     }
 }

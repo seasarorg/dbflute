@@ -218,7 +218,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
     protected static abstract class TnAbstractMapResultSetHandler implements TnResultSetHandler {
 
         protected Map<String, Object> createRow(ResultSet rs, TnPropertyType[] propertyTypes) throws SQLException {
-            Map<String, Object> row = StringKeyMap.createAsFlexible();
+            Map<String, Object> row = StringKeyMap.createAsFlexibleOrdered();
             for (int i = 0; i < propertyTypes.length; ++i) {
                 Object value = propertyTypes[i].getValueType().getValue(rs, i + 1);
                 row.put(propertyTypes[i].getPropertyName(), value);
