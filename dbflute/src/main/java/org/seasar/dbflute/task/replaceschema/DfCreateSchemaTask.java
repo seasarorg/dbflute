@@ -109,10 +109,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     //                                                                   =================
     protected void initializeSchema() {
         // additional first for dropping references to main schema
-        _log.info("");
         initializeSchemaAdditionalDrop();
-
-        _log.info("");
         initializeSchemaMainDrop();
     }
 
@@ -128,34 +125,36 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             String msg = "AdditionalDropDefinitionSchema is unsupported at MySQL and SQLServer!";
             throw new UnsupportedOperationException(msg);
         }
+        _log.info("");
         _log.info("* * * * * * * * * * * * * * * * * * * *");
         _log.info("*                                     *");
         _log.info("* Initialize Schema (Additional Drop) *");
         _log.info("*                                     *");
         _log.info("* * * * * * * * * * * * * * * * * * * *");
         for (Map<String, Object> additionalDropMap : additionalDropMapList) {
-            final String dropUrl = getMyProperties().getAdditionalDropUrl(additionalDropMap);
-            final String dropUser = getMyProperties().getAdditionalDropUser(additionalDropMap);
             final String dropSchema = getMyProperties().getAdditionalDropSchema(additionalDropMap);
-            if (dropUrl != null && dropUrl.trim().length() > 0) {
-                _log.info("url    = " + dropUrl);
-            }
+            final String dropUrl = getMyProperties().getAdditionalDropUrl(additionalDropMap);
+            final StringBuilder logSb = new StringBuilder();
             if (dropSchema != null && dropSchema.trim().length() > 0) {
-                _log.info("schema = " + dropSchema);
+                logSb.append("[").append(dropSchema).append("]");
+                if (dropUrl != null && dropUrl.trim().length() > 0) {
+                    logSb.append(": ").append(dropUrl);
+                }
+            } else {
+                if (dropUrl != null && dropUrl.trim().length() > 0) {
+                    logSb.append(dropUrl);
+                }
             }
-            if (dropUser != null && dropUser.trim().length() > 0) {
-                _log.info("user   = " + dropUser);
-            }
-            _log.info("- - - - - - - - - -");
+            _log.info(logSb.toString());
             final DfSchemaInitializer initializer = createSchemaInitializerAdditional(additionalDropMap);
             if (initializer != null) {
                 initializer.initializeSchema();
             }
-            _log.info(""); // for space line
         }
     }
 
     protected void initializeSchemaMainDrop() {
+        _log.info("");
         _log.info("* * * * * * * * * * *");
         _log.info("*                   *");
         _log.info("* Initialize Schema *");
@@ -170,7 +169,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         if (initializer != null) {
             initializer.initializeSchema();
         }
-        _log.info(""); // for space line
     }
 
     protected DfSchemaInitializer createSchemaInitializer(InitializeType initializeType) {
@@ -210,6 +208,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void createSchema(DfRunnerInformation runInfo) {
+        _log.info("");
         _log.info("* * * * * * * * *");
         _log.info("*               *");
         _log.info("* Create Schema *");
