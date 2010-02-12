@@ -47,9 +47,7 @@ public class DfJdbcFacade {
     }
 
     public DfJdbcFacade(Connection conn) {
-        _dataSource = null;
-        _conn = conn;
-        _closeConnection = false;
+        this(conn, false);
     }
 
     public DfJdbcFacade(Connection conn, boolean closeConnection) {
@@ -118,7 +116,7 @@ public class DfJdbcFacade {
         Statement st = null;
         ResultSet rs = null;
         try {
-            conn = _dataSource.getConnection();
+            conn = getConnection();
             st = conn.createStatement();
             rs = st.executeQuery(sql);
             int count = 0;
@@ -152,7 +150,7 @@ public class DfJdbcFacade {
         Connection conn = null;
         Statement st = null;
         try {
-            conn = _dataSource.getConnection();
+            conn = getConnection();
             st = conn.createStatement();
             return st.execute(sql);
         } catch (SQLException e) {
