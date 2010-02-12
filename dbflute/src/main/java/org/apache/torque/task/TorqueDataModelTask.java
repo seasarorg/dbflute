@@ -89,6 +89,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     protected void setupControlTemplate() {
         final DfLittleAdjustmentProperties littleProp = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
         if (littleProp.isAlternateGenerateControlValid()) {
+            _log.info("");
             _log.info("* * * * * * * * * * * * * * *");
             _log.info("* Process Alternate Control *");
             _log.info("* * * * * * * * * * * * * * *");
@@ -99,6 +100,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         }
         if (getBasicProperties().isTargetLanguageMain()) {
             if (getBasicProperties().isTargetLanguageJava()) {
+                _log.info("");
                 _log.info("* * * * * * * * *");
                 _log.info("* Process Java  *");
                 _log.info("* * * * * * * * *");
@@ -106,6 +108,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
                 _log.info("...Using Java control: " + control);
                 setControlTemplate(control);
             } else if (getBasicProperties().isTargetLanguageCSharp()) {
+                _log.info("");
                 _log.info("* * * * * * * * * *");
                 _log.info("* Process CSharp  *");
                 _log.info("* * * * * * * * * *");
@@ -118,6 +121,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
             }
         } else {
             final String language = getBasicProperties().getTargetLanguage();
+            _log.info("");
             _log.info("* * * * * * * * * *");
             _log.info("* Process " + language + "    *");
             _log.info("* * * * * * * * * *");

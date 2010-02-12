@@ -40,9 +40,15 @@ import org.seasar.dbflute.util.DfSystemUtil;
  */
 public final class DfAntTaskUtil {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
     /** Log-instance. */
     private static final Log _log = LogFactory.getLog(DfAntTaskUtil.class);
 
+    // ===================================================================================
+    //                                                             Build-Properties Set up
+    //                                                             =======================
     /**
      * Get the property object that saves 'build-properties'.
      * @param file File-full-path-comma-string.
@@ -67,7 +73,7 @@ public final class DfAntTaskUtil {
                         // from DBFlute module directory (old style)
                         targetFile = project.resolveFile(source);
                     }
-                    _log.info("...Using contextProperties file: " + targetFile);
+                    _log.info("...Using contextProperties: " + targetFile);
                     fis = new FileInputStream(targetFile);
                     currentProp.load(fis);
                 } catch (IOException e) {
@@ -112,8 +118,9 @@ public final class DfAntTaskUtil {
             final Set<Entry<Object, Object>> entrySet = prop.entrySet();
             _log.info("[Build-Properties]: size=" + prop.size());
             for (Entry<Object, Object> entry : entrySet) {
-                _log.info("    " + entry.getKey() + " = " + entry.getValue());
+                _log.info("  " + entry.getKey() + " = " + entry.getValue());
             }
+            _log.info("");
         } catch (RuntimeException e) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
@@ -131,6 +138,9 @@ public final class DfAntTaskUtil {
         return prop;
     }
 
+    // ===================================================================================
+    //                                                                             Logging
+    //                                                                             =======
     public static void logException(Exception e, String taskName) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
@@ -205,6 +215,9 @@ public final class DfAntTaskUtil {
         throw new DfDBFluteTaskFailureException(msg);
     }
 
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
     protected static DfBuildProperties getProperties() {
         return DfBuildProperties.getInstance();
     }
@@ -217,6 +230,9 @@ public final class DfAntTaskUtil {
         return getProperties().getDatabaseProperties();
     }
 
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
     protected static String ln() {
         return DfSystemUtil.getLineSeparator();
     }

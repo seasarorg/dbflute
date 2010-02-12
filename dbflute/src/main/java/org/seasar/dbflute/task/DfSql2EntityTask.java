@@ -164,6 +164,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected void setupControlTemplate() {
         final DfLittleAdjustmentProperties littleProp = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
         if (littleProp.isAlternateSql2EntityControlValid()) {
+            _log.info("");
             _log.info("* * * * * * * * * * * * * * *");
             _log.info("* Process Alternate Control *");
             _log.info("* * * * * * * * * * * * * * *");
@@ -174,6 +175,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         }
         if (getBasicProperties().isTargetLanguageMain()) {
             if (getBasicProperties().isTargetLanguageJava()) {
+                _log.info("");
                 _log.info("* * * * * * * * *");
                 _log.info("* Process Java  *");
                 _log.info("* * * * * * * * *");
@@ -181,6 +183,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 _log.info("...Using Java control: " + control);
                 setControlTemplate(control);
             } else if (getBasicProperties().isTargetLanguageCSharp()) {
+                _log.info("");
                 _log.info("* * * * * * * * * *");
                 _log.info("* Process CSharp  *");
                 _log.info("* * * * * * * * * *");
@@ -193,6 +196,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             }
         } else {
             final String language = getBasicProperties().getTargetLanguage();
+            _log.info("");
             _log.info("* * * * * * * * * *");
             _log.info("* Process " + language + "    *");
             _log.info("* * * * * * * * * *");

@@ -69,7 +69,10 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
     //                                                                                ====
     public void create() throws SQLException {
         if (!DfDataSourceContext.isExistDataSource()) {
-            _log.info("...create()");
+            _log.info("...Creating data source:");
+            _log.info("  driver = " + _driver);
+            _log.info("  url    = " + _url);
+            _log.info("  user   = " + _userId);
             DfDataSourceContext.setDataSource(new DfSimpleDataSource(this));
         }
     }
