@@ -146,18 +146,18 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         try {
             conn = driverInstance.connect(_url, info);
         } catch (SQLException e) {
-            String msg = "Driver#connect() threw the exception:";
+            String msg = "Failed to connect to URL:";
             msg = msg + " url=" + _url + " user=" + _userId;
             throw new DfJDBCException(msg, e);
         }
         if (conn == null) {
-            String msg = "Driver doesn't understand the URL: _url=" + _url;
+            String msg = "The driver didn't understand the URL: _url=" + _url;
             throw new DfJDBCException(msg);
         }
         try {
             conn.setAutoCommit(_autoCommit);
         } catch (SQLException e) {
-            String msg = "Connection#setAutoCommit() threw the exception:";
+            String msg = "Failed to set auto commit:";
             msg = msg + " autocommit=" + _autoCommit;
             throw new DfJDBCException(msg, e);
         }
