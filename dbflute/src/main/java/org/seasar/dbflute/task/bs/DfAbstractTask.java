@@ -221,6 +221,9 @@ public abstract class DfAbstractTask extends Task {
         return sb.toString();
     }
 
+    // -----------------------------------------------------
+    //                                           Data Source
+    //                                           -----------
     abstract protected boolean isUseDataSource();
 
     protected void setupDataSource() throws SQLException {
@@ -251,7 +254,10 @@ public abstract class DfAbstractTask extends Task {
         connector.connectSchema();
     }
 
-    public void setContextProperties(String file) {
+    // -----------------------------------------------------
+    //                                    Context Properties
+    //                                    ------------------
+    public void setContextProperties(String file) { // called by ANT
         try {
             final Properties prop = DfAntTaskUtil.getBuildProperties(file, getProject());
             DfBuildProperties.getInstance().setProperties(prop);

@@ -23,14 +23,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.collections.ExtendedProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
@@ -54,7 +55,6 @@ import org.seasar.dbflute.logic.scmconn.CurrentSchemaConnector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
-import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * The abstract class of texen task.
@@ -99,10 +99,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                               Execute
     //                                               -------
     @Override
-    /**
-     * The override.
-     */
-    final public void execute() {
+    public final void execute() {
         long before = System.currentTimeMillis();
         try {
             initializeDatabaseInfo();
@@ -236,6 +233,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return sb.toString();
     }
 
+    // -----------------------------------------------------
+    //                                        Custom Execute
+    //                                        --------------
     protected void fireSuperExecute() {
         // /----------------------------------------------
         // Set up the encoding of templates from property.
@@ -245,9 +245,6 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         doExecuteAlmostSameAsSuper();
     }
 
-    // -----------------------------------
-    //                  Copy from Velocity
-    //                  ------------------
     // Copy from super.execute() and Modify a little.
     private void doExecuteAlmostSameAsSuper() {
         if (templatePath == null && !useClasspath) {
@@ -430,36 +427,24 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     // -----------------------------------------------------
     //                                    Context Properties
     //                                    ------------------
-    public void setContextProperties(String file) {
+    @Override
+    public void setContextProperties(String file) { // called by ANT (and completely override)
         try {
-            // /------------------------------------------------------------
-            // Initialize internal context properties as ExtendedProperties.
-            //   This property is used by Velocity Framework.
-            // -------/
-            super.setContextProperties(file);
-            {
-                final Hashtable<?, ?> env = super.getProject().getProperties();
-                Set<?> entrySet = env.entrySet();
-                for (Object object : entrySet) {
-                    java.util.Map.Entry<?, ?> entry = (java.util.Map.Entry<?, ?>) object;
-                    final String key = (String) entry.getKey();
-                    final String value = (String) entry.getValue();
-                    if (key.startsWith("torque.")) {
-                        String newKey = key.substring("torque.".length());
-                        for (int j = newKey.indexOf("."); j != -1; j = newKey.indexOf(".")) {
-                            newKey = newKey.substring(0, j) + DfStringUtil.initCap(newKey.substring(j + 1));
-                        }
-                        contextProperties.setProperty(newKey, value);
-                    }
-                }
-            }
-
             // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // Initialize torque properties as Properties and set up singleton class
             // that saves 'build.properties'.
             // - - - - - - - - - -/
             final Properties prop = DfAntTaskUtil.getBuildProperties(file, getProject());
             DfBuildProperties.getInstance().setProperties(prop);
+
+            // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // Initialize context properties for Velocity.
+            // - - - - - - - - - -/
+            contextProperties = new ExtendedProperties();
+            final Set<Entry<Object, Object>> entrySet = prop.entrySet();
+            for (Entry<Object, Object> entry : entrySet) {
+                contextProperties.setProperty((String) entry.getKey(), entry.getValue());
+            }
         } catch (RuntimeException e) {
             String msg = "Failed to set context properties:";
             msg = msg + " file=" + file + " contextProperties=" + contextProperties;

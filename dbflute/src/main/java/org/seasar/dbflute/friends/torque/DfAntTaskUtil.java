@@ -19,10 +19,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.Properties;
+import java.util.Set;
+import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.BuildException;
@@ -31,6 +31,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfDBFluteTaskFailureException;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -44,36 +45,54 @@ public final class DfAntTaskUtil {
 
     /**
      * Get the property object that saves 'build-properties'.
-     * Copy from TexenTask#setContextProperties(). A little modified...
      * @param file File-full-path-comma-string.
      * @param project Project-instance of ANT.
      * @return Context-properties.
      */
-    @SuppressWarnings("unchecked")
     public static Properties getBuildProperties(String file, Project project) {
         final Properties prop = new Properties();
         try {
-            final String sources[] = StringUtils.split(file, ",");
+            final String sources[] = DfStringUtil.splitList(file, ",").toArray(new String[] {});
             for (int i = 0; i < sources.length; i++) {
-                final Properties source = new Properties();
+                final String source = sources[i];
+                final Properties currentProp = new Properties();
                 FileInputStream fis = null;
                 try {
-                    final File fullPath = project.resolveFile(sources[i]);
-                    _log.info("Using contextProperties file: " + fullPath);
-                    fis = new FileInputStream(fullPath);
-                    source.load(fis);
+                    final File currentDirFile = new File(source);
+                    final File targetFile;
+                    if (currentDirFile.exists()) { // basically true
+                        // from DBFlute client directory
+                        targetFile = currentDirFile;
+                    } else {
+                        // from DBFlute module directory (old style)
+                        targetFile = project.resolveFile(source);
+                    }
+                    _log.info("...Using contextProperties file: " + targetFile);
+                    fis = new FileInputStream(targetFile);
+                    currentProp.load(fis);
                 } catch (IOException e) {
+                    // retry getting from class-path (basically unused)
                     final ClassLoader classLoader = project.getClass().getClassLoader();
+                    InputStream ins = null;
                     try {
-                        final InputStream ins = classLoader.getResourceAsStream(sources[i]);
+                        ins = classLoader.getResourceAsStream(source);
                         if (ins == null) {
-                            String msg = "Context properties file " + sources[i];
+                            String msg = "Context properties file " + source;
                             msg = msg + " could not be found in the file system or on the classpath!";
-                            throw new BuildException(msg);
+                            throw new BuildException(msg, e);
                         }
-                        source.load(ins);
-                    } catch (IOException ioe) {
-                        throw new RuntimeException("InputStream threw the exception!", ioe);
+                        currentProp.load(ins);
+                    } catch (IOException ignored) {
+                        String msg = "Failed to load contextProperties:";
+                        msg = msg + " file=" + source + " project=" + project;
+                        throw new BuildException(msg, e);
+                    } finally {
+                        if (ins != null) {
+                            try {
+                                ins.close();
+                            } catch (IOException ignored) {
+                            }
+                        }
                     }
                 } finally {
                     if (fis != null) {
@@ -83,24 +102,30 @@ public final class DfAntTaskUtil {
                         }
                     }
                 }
-                for (final Iterator ite = source.keySet().iterator(); ite.hasNext();) {
-                    final String key = (String) ite.next();
-                    final String value = source.getProperty(key);
-
-                    prop.setProperty(key, value);
+                final Set<Entry<Object, Object>> entrySet = currentProp.entrySet();
+                for (Entry<Object, Object> entry : entrySet) {
+                    prop.setProperty((String) entry.getKey(), (String) entry.getValue());
                 }
             }
 
-            // Show properties!
-            _log.info("[Properties]: size=" + prop.size());
-            for (final Iterator ite = prop.keySet().iterator(); ite.hasNext();) {
-                final String key = (String) ite.next();
-                final String value = prop.getProperty(key);
-                _log.info("    " + key + " = " + value);
+            // show properties
+            final Set<Entry<Object, Object>> entrySet = prop.entrySet();
+            _log.info("[Build-Properties]: size=" + prop.size());
+            for (Entry<Object, Object> entry : entrySet) {
+                _log.info("    " + entry.getKey() + " = " + entry.getValue());
             }
         } catch (RuntimeException e) {
-            String msg = "Failed to get build-properties:";
-            msg = msg + " file=" + file + " project=" + project;
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+            msg = msg + "Failed to get build-properties!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "Check the existence of build.properties on DBFlute client directory." + ln();
+            msg = msg + ln();
+            msg = msg + "[File Name]" + ln() + file + ln();
+            msg = msg + ln();
+            msg = msg + "[Project]" + ln() + project + ln();
+            msg = msg + "- - - - - - - - - -/";
             throw new IllegalStateException(msg, e);
         }
         return prop;
