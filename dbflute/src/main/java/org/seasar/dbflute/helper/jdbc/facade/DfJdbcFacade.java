@@ -34,12 +34,28 @@ public class DfJdbcFacade {
     //                                                                           Attribute
     //                                                                           =========
     protected final DataSource _dataSource;
+    protected final Connection _conn;
+    protected final boolean _closeConnection;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public DfJdbcFacade(DataSource dataSource) {
         _dataSource = dataSource;
+        _conn = null;
+        _closeConnection = true;
+    }
+
+    public DfJdbcFacade(Connection conn) {
+        _dataSource = null;
+        _conn = conn;
+        _closeConnection = false;
+    }
+
+    public DfJdbcFacade(Connection conn, boolean closeConnection) {
+        _dataSource = null;
+        _conn = conn;
+        _closeConnection = closeConnection;
     }
 
     // ===================================================================================
@@ -59,7 +75,7 @@ public class DfJdbcFacade {
         Statement st = null;
         ResultSet rs = null;
         try {
-            conn = _dataSource.getConnection();
+            conn = getConnection();
             st = conn.createStatement();
             rs = st.executeQuery(sql);
             int count = 0;
@@ -81,27 +97,9 @@ public class DfJdbcFacade {
             handleSQLException(sql, e);
             return null; // unreachable
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ignored) {
-                    _log.info("ResultSet.close() threw the exception!", ignored);
-                }
-            }
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ignored) {
-                    _log.info("Statement.close() threw the exception!", ignored);
-                }
-            }
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                    _log.info("Connection.close() threw the exception!", ignored);
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(st);
+            closeConnection(conn);
         }
         return resultList;
     }
@@ -139,27 +137,9 @@ public class DfJdbcFacade {
             handleSQLException(sql, e);
             return null; // unreachable
         } finally {
-            if (rs != null) {
-                try {
-                    rs.close();
-                } catch (SQLException ignored) {
-                    _log.info("ResultSet.close() threw the exception!", ignored);
-                }
-            }
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ignored) {
-                    _log.info("Statement.close() threw the exception!", ignored);
-                }
-            }
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                    _log.info("Connection.close() threw the exception!", ignored);
-                }
-            }
+            closeResultSet(rs);
+            closeStatement(st);
+            closeConnection(conn);
         }
         return resultList;
     }
@@ -179,19 +159,51 @@ public class DfJdbcFacade {
             handleSQLException(sql, e);
             return false; // unreachable
         } finally {
-            if (st != null) {
-                try {
-                    st.close();
-                } catch (SQLException ignored) {
-                    _log.info("Statement.close() threw the exception!", ignored);
-                }
+            closeStatement(st);
+            closeConnection(conn);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                          Connection
+    //                                                                          ==========
+    protected Connection getConnection() throws SQLException {
+        if (_dataSource != null) {
+            return _dataSource.getConnection();
+        } else {
+            return _conn;
+        }
+    }
+
+    // ===================================================================================
+    //                                                                               Close
+    //                                                                               =====
+    protected void closeResultSet(ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException ignored) {
+                _log.info("ResultSet.close() threw the exception!", ignored);
             }
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ignored) {
-                    _log.info("Connection.close() threw the exception!", ignored);
-                }
+        }
+    }
+
+    protected void closeStatement(Statement st) {
+        if (st != null) {
+            try {
+                st.close();
+            } catch (SQLException ignored) {
+                _log.info("Statement.close() threw the exception!", ignored);
+            }
+        }
+    }
+
+    protected void closeConnection(Connection conn) {
+        if (conn != null && _closeConnection) {
+            try {
+                conn.close();
+            } catch (SQLException ignored) {
+                _log.info("Connection.close() threw the exception!", ignored);
             }
         }
     }
