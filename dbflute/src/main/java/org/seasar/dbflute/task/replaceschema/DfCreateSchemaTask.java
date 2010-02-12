@@ -131,6 +131,10 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         _log.info("* Initialize Schema (Additional Drop) *");
         _log.info("*                                     *");
         _log.info("* * * * * * * * * * * * * * * * * * * *");
+        if (_lazyConnection) {
+            _log.info("*Passed because it's a lazy connection");
+            return;
+        }
         for (Map<String, Object> additionalDropMap : additionalDropMapList) {
             final String dropSchema = getMyProperties().getAdditionalDropSchema(additionalDropMap);
             final String dropUrl = getMyProperties().getAdditionalDropUrl(additionalDropMap);
@@ -162,7 +166,6 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         _log.info("* * * * * * * * * * *");
         if (_lazyConnection) {
             _log.info("*Passed because it's a lazy connection");
-            _log.info("");
             return;
         }
         final DfSchemaInitializer initializer = createSchemaInitializer(InitializeType.MAIN);
