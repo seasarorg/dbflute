@@ -131,12 +131,11 @@
     <echo message=" "/>
     <echo message="+-------------------------------------------------------------------------------+"/>
     <echo message="contextProperties = ${torque.contextProperties}"/>
-    <echo message="outputFile        = ${torque.schema.dir}/project-schema-${torque.project}.xml"/>
+    <echo message="environmentType   = ${dfenv}"/>
     <echo message="+-----------------+"/>
 
     <df-jdbc
       contextProperties="${torque.contextProperties}"
-      outputFile="${torque.schema.dir}/project-schema-${torque.project}.xml"
       environmentType="${dfenv}"
     >
     </df-jdbc>
@@ -152,21 +151,12 @@
   <!-- These are in addition to the base Torque OM!                     -->
   <!-- ================================================================ -->
 
-  <target name="om-check" depends="check-run-only-on-schema-change" if="torque.internal.runOnlyOnSchemaChange">
-    <uptodate
-      property="torque.internal.om.uptodate"
-      targetfile="${torque.java.dir}/report.${torque.project}.om.generation">
-      <srcfiles dir="${torque.schema.dir}" includes="**/*-schema.xml" />
-    </uptodate>
-  </target>
-
-  <target name="om" depends="check-use-classpath, om-check" unless="torque.internal.om.uptodate"
-    description="==> generates the Peer-based object model for your project">
+  <target name="om" depends="check-use-classpath"
+    description="==> generates class files for your DB">
 
     <echo message="+------------------------------------------+"/>
     <echo message="|                                          |"/>
-    <echo message="| Generating Peer-based Object Model for   |"/>
-    <echo message="| YOUR Torque project!                     |"/>
+    <echo message="| Generating Class Files for your DB       |"/>
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
@@ -179,25 +169,15 @@
     <df-generate
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.om}"
-      schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
-      outputDirectory="${torque.java.dir}"
-      outputFile="report.${torque.project}.om.generation"
       useClasspath="${torque.useClasspath}"
       environmentType="${dfenv}">
     </df-generate>
   </target>
 
   <target name="om-template" unless="torque.internal.useClasspath">
-    <!--
-      Parameters, outputDirectory and outputFile, are actually unused (as old).
-      But the parameters may be referred to by Velocity so it remains.
-    -->
     <df-generate
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.om}"
-      schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
-      outputDirectory="${torque.java.dir}"
-      outputFile="report.${torque.project}.om.generation"
       templatePath="${torque.templatePath}"
       environmentType="${dfenv}">
     </df-generate>
@@ -221,16 +201,9 @@
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
-    <!--
-      Parameters, outputDirectory and outputFile, are actually unused (as old).
-      But the parameters may be referred to by Velocity so it remains.
-    -->
     <df-doc
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.doc}"
-      schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
-      outputDirectory="${torque.doc.dir}"
-      outputFile="report.${torque.project}.doc.generation"
       outputFormat="${torque.doc.format}"
       templatePath="${torque.templatePath}"
       useClasspath="${torque.useClasspath}"
@@ -293,12 +266,13 @@
     <echo message="|                                               |"/>
     <echo message="+-----------------------------------------------+"/>
 
+    <!--
+      Parameters, outputDirectory and outputFile, are actually unused (as old).
+      But the parameters may be referred to by Velocity so it remains.
+    -->
     <df-sql2entity
         contextProperties="${torque.contextProperties}"
         controlTemplate="${torque.template.sql2entity}"
-        schemaXml="${torque.schema.dir}/project-schema-${torque.project}.xml"
-        outputDirectory="${torque.java.dir}"
-        outputFile="report.${torque.project}.sql2entity.generation"
         templatePath="${torque.templatePath}"
         environmentType="${dfenv}"
         specifiedSqlFile="${dfsql}">

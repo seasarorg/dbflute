@@ -33,7 +33,6 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String _schemaXml;
     protected final List<FileSet> _filesets = new ArrayList<FileSet>();
     protected AppData _schemaData;
     protected Context _context;
@@ -57,7 +56,8 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     }
 
     protected DfSchemaXmlReader createSchemaFileReader() {
-        return new DfSchemaXmlReader(_schemaXml, getProject(), getTargetDatabase());
+        final String filePath = getBasicProperties().getProejctSchemaXMLFilePath();
+        return new DfSchemaXmlReader(filePath, getProject(), getTargetDatabase());
     }
 
     protected VelocityContext createVelocityContext(final AppData appData) {
@@ -70,13 +70,6 @@ public abstract class DfAbstractDbMetaTexenTask extends DfAbstractTexenTask {
     //                                                                    ================
     @Override
     protected void doExecute() {
-        fireSuperExecute();
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setSchemaXml(String schemaXml) {
-        _schemaXml = schemaXml;
+        fireVelocityProcess();
     }
 }

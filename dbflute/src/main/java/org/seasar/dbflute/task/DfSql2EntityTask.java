@@ -104,7 +104,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected DfOutsideSqlMarkAnalyzer _markAnalyzer = new DfOutsideSqlMarkAnalyzer();
 
     // for getting schema
-    protected String _schemaXml;
     protected AppData _schemaData;
 
     // ===================================================================================
@@ -137,7 +136,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         setupProcedure();
 
-        fireSuperExecute();
+        fireVelocityProcess();
         setupBehaviorQueryPath();
 
         showTargetSqlFileInformation(sqlFileList);
@@ -158,7 +157,8 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected DfSchemaXmlReader createSchemaFileReader() {
-        return new DfSchemaXmlReader(_schemaXml, getProject(), getTargetDatabase());
+        final String filePath = getBasicProperties().getProejctSchemaXMLFilePath();
+        return new DfSchemaXmlReader(filePath, getProject(), getTargetDatabase());
     }
 
     protected void setupControlTemplate() {
@@ -1112,10 +1112,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setSchemaXml(String schemaXml) { // for getting schema
-        _schemaXml = schemaXml;
-    }
-
     public void setSpecifiedSqlFile(String specifiedSqlFile) {
         DfSpecifiedSqlFile.getInstance().setSpecifiedSqlFile(specifiedSqlFile);
     }

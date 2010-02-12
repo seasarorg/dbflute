@@ -99,7 +99,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                               Execute
     //                                               -------
     @Override
-    public final void execute() {
+    public final void execute() { // completely override
         long before = System.currentTimeMillis();
         try {
             initializeDatabaseInfo();
@@ -236,116 +236,73 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     // -----------------------------------------------------
     //                                        Custom Execute
     //                                        --------------
-    protected void fireSuperExecute() {
-        // /----------------------------------------------
-        // Set up the encoding of templates from property.
-        // ----------/
+    protected void fireVelocityProcess() {
+        assertBasicAntParameter();
+
+        // set up the encoding of templates from DBFlute property
         setInputEncoding(getBasicProperties().getTemplateFileEncoding());
         setOutputEncoding(getBasicProperties().getSourceFileEncoding());
-        doExecuteAlmostSameAsSuper();
-    }
 
-    // Copy from super.execute() and Modify a little.
-    private void doExecuteAlmostSameAsSuper() {
-        if (templatePath == null && !useClasspath) {
-            throw new IllegalStateException(
-                    "The template path needs to be defined if you are not using the classpath for locating templates!");
-        }
-        if (controlTemplate == null) {
-            throw new IllegalStateException("The control template needs to be defined!");
-        }
-        if (outputDirectory == null) {
-            throw new IllegalStateException("The output directory needs to be defined!");
-        }
-        if (outputFile == null) {
-            throw new IllegalStateException("The output file needs to be defined!");
-        }
         try {
-            if (templatePath != null) {
-                log("Using templatePath: " + templatePath, 3);
-                setupVelocityTemplateProperty();
-            }
-            if (useClasspath) {
-                log("Using classpath");
-                setupVelocityClasspathProperty();
-            }
-            setupVelocityLogProperty();
-
-            Velocity.init();
-
-            final DfGenerator generator = getGeneratorHandler();
-            generator.setOutputPath(outputDirectory);
-            generator.setInputEncoding(inputEncoding);
-            generator.setOutputEncoding(outputEncoding);
-            if (templatePath != null) {
-                generator.setTemplatePath(templatePath);
-            }
-
-            // - - - - - - - - - - - - - - - - - - - -
-            // Remove writing output file of velocity.
-            // - - - - - - - - - - - - - - - - - - - -
-            // final File file = new File(outputDirectory);
-            // if (!file.exists()) {
-            //     file.mkdirs();
-            // }
-            // String path = outputDirectory + File.separator + outputFile;
-            // log("Generating to file " + path, 2);
-            // Writer writer = generator.getWriter(path, outputEncoding);
-
-            Context c = initControlContext();
-            populateInitialContext(c);
-            if (contextProperties != null) {
-                for (Iterator<?> i = contextProperties.getKeys(); i.hasNext();) {
-                    String property = (String) i.next();
-                    String value = contextProperties.getString(property);
-                    try {
-                        c.put(property, new Integer(value));
-                    } catch (NumberFormatException nfe) {
-                        String booleanString = contextProperties.testBoolean(value);
-                        if (booleanString != null) {
-                            c.put(property, Boolean.valueOf(booleanString));
-                        } else {
-                            if (property.endsWith("file.contents")) {
-                                value = fileContentsToString(getProject().resolveFile(value).getCanonicalPath());
-                                property = property.substring(0, property.indexOf("file.contents") - 1);
-                            }
-                            c.put(property, value);
-                        }
-                    }
-                }
-            }
+            initializeVelocityInstance();
+            final DfGenerator generator = setupGenerator();
+            final Context ctx = setupControlContext();
 
             _log.info("generator.parse(\"" + controlTemplate + "\", c);");
-            generator.parse(controlTemplate, c);
-
-            // - - - - - - - - - - - - - - - - - - - -
-            // Remove writing output file of velocity.
-            // - - - - - - - - - - - - - - - - - - - -
-            // final String parsedString = generator.parse(controlTemplate, c);
-            // writer.write(parsedString);
-            // writer.flush();
-            // writer.close();
-
+            generator.parse(controlTemplate, ctx);
             generator.shutdown();
             cleanup();
         } catch (BuildException e) {
             throw e;
         } catch (MethodInvocationException e) {
-            throw new IllegalStateException("Exception thrown by '" + e.getReferenceName() + "." + e.getMethodName()
-                    + "'" + ". For more information consult the velocity log, or invoke ant with the -debug flag.", e
-                    .getWrappedThrowable());
+            String msg = "Exception thrown by '" + e.getReferenceName() + "." + e.getMethodName() + "'.";
+            throw new IllegalStateException(msg, e.getWrappedThrowable());
         } catch (ParseErrorException e) {
-            throw new IllegalStateException(
-                    "Velocity syntax error. For more information consult the velocity log, or invoke ant with the -debug flag.",
-                    e);
+            throw new IllegalStateException("Velocity syntax error.", e);
         } catch (ResourceNotFoundException e) {
-            throw new IllegalStateException(
-                    "Resource not found. For more information consult the velocity log, or invoke ant with the -debug flag.",
-                    e);
+            throw new IllegalStateException("Resource not found.", e);
         } catch (Exception e) {
-            throw new IllegalStateException(
-                    "Generation failed. For more information consult the velocity log, or invoke ant with the -debug flag.",
-                    e);
+            throw new IllegalStateException("Generation failed.", e);
+        }
+    }
+
+    private void assertBasicAntParameter() {
+        if (templatePath == null && !useClasspath) {
+            String msg = "The template path needs to be defined if you are not using the classpath for locating templates!";
+            throw new IllegalStateException(msg);
+        }
+        if (controlTemplate == null) {
+            throw new IllegalStateException("The control template needs to be defined!");
+        }
+        // *because of unused
+        //if (outputDirectory == null) {
+        //    throw new IllegalStateException("The output directory needs to be defined!");
+        //}
+        // *because of unused
+        //if (outputFile == null) {
+        //    throw new IllegalStateException("The output file needs to be defined!");
+        //}
+    }
+
+    private void initializeVelocityInstance() {
+        // /---------------------------
+        // Initialize Velocity instance 
+        // ----------/
+        if (templatePath != null) {
+            log("Using templatePath: " + templatePath, 3);
+            setupVelocityTemplateProperty();
+        }
+        if (useClasspath) {
+            log("Using classpath");
+            setupVelocityClasspathProperty();
+        }
+        setupVelocityLogProperty();
+        try {
+            Velocity.init();
+        } catch (Exception e) {
+            String msg = "Failed to initialize Velocity:";
+            msg = msg + " templatePath=" + templatePath + " useClasspath=" + useClasspath;
+            throw new IllegalStateException(msg, e);
         }
     }
 
@@ -363,6 +320,70 @@ public abstract class DfAbstractTexenTask extends TexenTask {
 
     private void setupVelocityLogProperty() {
         Velocity.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM_CLASS, DfOriginalLog4JLogSystem.class.getName());
+    }
+
+    private DfGenerator setupGenerator() {
+        final DfGenerator generator = getGeneratorHandler();
+
+        // *set up later using DBFlute property (dfprop)
+        //generator.setOutputPath(outputDirectory);
+
+        // actually from DBFlute property (dfprop)
+        // because these variables could be set up before here
+        generator.setInputEncoding(inputEncoding);
+        generator.setOutputEncoding(outputEncoding);
+
+        if (templatePath != null) {
+            generator.setTemplatePath(templatePath);
+        }
+        return generator;
+    }
+
+    private Context setupControlContext() {
+        final Context ctx;
+        try {
+            ctx = initControlContext();
+        } catch (Exception e) {
+            String msg = "Failed to initialize control context:";
+            msg = msg + " templatePath=" + templatePath + " useClasspath=" + useClasspath;
+            throw new IllegalStateException(msg, e);
+        }
+        try {
+            populateInitialContext(ctx);
+        } catch (Exception e) {
+            String msg = "Failed to populate initial context:";
+            msg = msg + " templatePath=" + templatePath + " useClasspath=" + useClasspath;
+            throw new IllegalStateException(msg, e);
+        }
+        if (contextProperties != null) {
+            for (Iterator<?> i = contextProperties.getKeys(); i.hasNext();) {
+                String property = (String) i.next();
+                String value = contextProperties.getString(property);
+                try {
+                    ctx.put(property, new Integer(value));
+                } catch (NumberFormatException nfe) {
+                    String booleanString = contextProperties.testBoolean(value);
+                    if (booleanString != null) {
+                        ctx.put(property, Boolean.valueOf(booleanString));
+                    } else {
+                        if (property.endsWith("file.contents")) {
+                            final String canonicalPath;
+                            try {
+                                canonicalPath = getProject().resolveFile(value).getCanonicalPath();
+                            } catch (IOException e) {
+                                String msg = "Failed to get the canonical path:";
+                                msg = msg + " property=" + property + " value=" + value;
+                                throw new IllegalStateException(msg, e);
+                            }
+                            value = fileContentsToString(canonicalPath);
+                            property = property.substring(0, property.indexOf("file.contents") - 1);
+                        }
+                        ctx.put(property, value);
+                    }
+                }
+            }
+        }
+        return ctx;
     }
 
     // Copy from velocity.

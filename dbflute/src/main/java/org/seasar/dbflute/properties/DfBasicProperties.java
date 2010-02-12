@@ -231,14 +231,24 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                            Encoding
-    //                                                                            ========
+    //                                                                   Source & Template
+    //                                                                   =================
     public String getSourceFileEncoding() {
         return getProperty("sourceFileEncoding", DEFAULT_sourceFileEncoding);
     }
 
     public String getTemplateFileEncoding() { // It's closet!
         return getProperty("templateFileEncoding", DEFAULT_templateFileEncoding);
+    }
+
+    // ===================================================================================
+    //                                                                           SchemaXML
+    //                                                                           =========
+    public String getProejctSchemaXMLFilePath() {
+        final StringBuilder sb = new StringBuilder();
+        final String projectName = getBasicProperties().getProjectName();
+        sb.append("./schema/project-schema-").append(projectName).append(".xml"); // fixed
+        return sb.toString();
     }
 
     public String getProejctSchemaXMLEncoding() { // It's closet!

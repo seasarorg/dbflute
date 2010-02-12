@@ -124,12 +124,6 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     //                                                                           Attribute
     //                                                                           =========
     // -----------------------------------------------------
-    //                                         Database Info
-    //                                         -------------
-    /** Name of XML database schema produced. */
-    protected String _xmlSchema;
-
-    // -----------------------------------------------------
     //                                         Document Info
     //                                         -------------
     /** DOM document produced. */
@@ -186,16 +180,17 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             initializeIdentityMapIfNeeds();
             generateXML();
 
-            // Get encoding from properties
+            final String filePath = getBasicProperties().getProejctSchemaXMLFilePath();
             final String encoding = getBasicProperties().getProejctSchemaXMLEncoding();
             _log.info("$ ");
             _log.info("$ ");
             _log.info("$ /* * * * * * * * * * * * * * * * * * * * * * * *");
-            _log.info("$ ...Serializing XML: " + _xmlSchema + "(" + encoding + ")");
+            _log.info("$ ...Serializing XML: " + filePath + "(" + encoding + ")");
 
             final XMLSerializer xmlSerializer;
             {
-                final OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(_xmlSchema), encoding);
+                final FileOutputStream fis = new FileOutputStream(filePath);
+                final OutputStreamWriter writer = new OutputStreamWriter(fis, encoding);
                 final OutputFormat outputFormar = new OutputFormat(Method.XML, encoding, true);
                 xmlSerializer = new XMLSerializer(writer, outputFormar);
             }
@@ -917,12 +912,5 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         // The synonym extractor may need the set collection for reference table check.
         return new DfSynonymExtractorFactory(getDataSource(), getBasicProperties(), getDatabaseProperties(),
                 _refTableCheckSet);
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public void setOutputFile(String v) {
-        _xmlSchema = v;
     }
 }

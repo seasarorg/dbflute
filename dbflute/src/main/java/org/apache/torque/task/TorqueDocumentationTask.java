@@ -99,7 +99,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String _outputFormat;
+    private String _outputFormat; // basically 'html' (defined at default.properties)
 
     // ===================================================================================
     //                                                                             Execute
@@ -114,7 +114,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
 
         // It doesn't refresh because it's heavy.
         // After all the generate task will do it at once after doc task.
-        // refreshResources();
+        //refreshResources();
     }
 
     protected void processSchemaHtml() {
