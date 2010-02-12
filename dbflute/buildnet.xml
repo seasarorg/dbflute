@@ -144,9 +144,6 @@
 			<zipfileset prefix="output/doc" dir="output/doc">
 				<include name="readme.txt"/>
 			</zipfileset>
-			<zipfileset prefix="schema" dir="schema">
-				<include name="readme.txt"/>
-			</zipfileset>
 			<zipfileset prefix="templates/doc" dir="templates/doc">
 				<exclude name="**/*---.txt"/>
 			</zipfileset>

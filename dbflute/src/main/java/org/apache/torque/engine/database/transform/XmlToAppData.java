@@ -146,10 +146,7 @@ public class XmlToAppData extends DefaultHandler {
 
             // remember the file to avoid looping
             alreadyReadFiles.add(xmlFile);
-
             currentXmlFile = xmlFile;
-
-            SAXParser parser = saxFactory.newSAXParser();
 
             // Uses InputStreamReader for specifying an encoding for project schema XML.
             final String encoding = getProejctSchemaXMLEncoding();
@@ -157,6 +154,7 @@ public class XmlToAppData extends DefaultHandler {
             final BufferedReader br = new BufferedReader(fr);
             try {
                 final InputSource is = new InputSource(br);
+                final SAXParser parser = saxFactory.newSAXParser();
                 parser.parse(is, this);
             } finally {
                 br.close();

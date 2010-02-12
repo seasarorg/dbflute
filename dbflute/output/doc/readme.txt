@@ -1,1 +1,1 @@
-Directory for Document
+Temporary Directory for Document (SchemaHTML)

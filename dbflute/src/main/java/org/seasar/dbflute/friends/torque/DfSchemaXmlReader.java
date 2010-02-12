@@ -1,6 +1,5 @@
 package org.seasar.dbflute.friends.torque;
 
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.transform.XmlToAppData;
@@ -27,9 +26,10 @@ public class DfSchemaXmlReader {
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public void read() throws Exception {
+    public void read() {
         if (_schemaXml == null) {
-            throw new BuildException("You must specify schemaXml property!");
+            String msg = "The property 'schemaXml' should not be null!";
+            throw new IllegalStateException(msg);
         }
         _schemaData = newInstanceXmlToAppData().parseFile(_schemaXml);
         _schemaData.setName(grokName(_schemaXml));
@@ -47,7 +47,7 @@ public class DfSchemaXmlReader {
                 name = xmlFile.substring(fileSeparatorLastIndex);
             }
         } else {
-            name = "schema"; // Default-name
+            name = "schema"; // as default
         }
         return name;
     }

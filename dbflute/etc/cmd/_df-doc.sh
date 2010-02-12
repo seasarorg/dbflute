@@ -12,3 +12,4 @@ sh $DBFLUTE_HOME/etc/cmd/_df-delete-extlib.sh
 
 mkdir ./output/doc
 cp $DBFLUTE_HOME/output/doc/project-schema-${MY_PROJECT_NAME}.html ./output/doc/project-schema-${MY_PROJECT_NAME}.html
+rm -f $DBFLUTE_HOME/output/doc/project-schema-${MY_PROJECT_NAME}.html

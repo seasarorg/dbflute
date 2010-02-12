@@ -13,3 +13,4 @@ call %DBFLUTE_HOME%\etc\cmd\_df-delete-extlib.cmd
 
 mkdir .\output\doc
 copy %DBFLUTE_HOME%\output\doc\project-schema-%MY_PROJECT_NAME%.html .\output\doc\project-schema-%MY_PROJECT_NAME%.html
+del /q %DBFLUTE_HOME%\output\doc\project-schema-%MY_PROJECT_NAME%.html
