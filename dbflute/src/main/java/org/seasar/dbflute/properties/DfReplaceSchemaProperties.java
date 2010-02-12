@@ -218,6 +218,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final String schema = propertyMap.get("schema");
         final String user = propertyMap.get("user");
         final String password = propertyMap.get("password");
+        _log.info("...Creating a connection for additional user");
         return createConnection(driver, url, schema, user, password);
     }
 
@@ -347,6 +348,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         info.put("user", user);
         info.put("password", password);
         final String schema = getAdditionalDropSchema(additionalDropMap);
+        _log.info("...Creating a connection for additional drop");
         return createConnection(driver, url, schema, info);
     }
 

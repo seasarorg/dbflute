@@ -14,6 +14,7 @@ import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetter;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoJava;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * @author jflute
@@ -65,50 +66,33 @@ public class DfCurrentSchemaConnector {
     public void connectSchema(Connection conn) {
         if (_basicProperties.isDatabaseDB2() && _schema != null) {
             final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
-            Statement st = null;
-            try {
-                st = conn.createStatement();
-            } catch (SQLException e) {
-                _log.warn("Failed to create statement: " + e.getMessage());
-                return;
-            }
-            try {
-                _log.info("...Executing helper SQL:\n" + sql);
-                st.execute(sql);
-            } catch (SQLException continued) {
-                String msg = "Failed to execute the SQL: " + sql;
-                _log.warn(msg, continued);
-                return;
-            } finally {
-                if (st != null) {
-                    try {
-                        st.close();
-                    } catch (SQLException ignored) {
-                    }
-                }
-            }
+            executeCurrentSchemaSql(conn, sql);
         } else if (_basicProperties.isDatabaseOracle() && _schema != null) {
             final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + _schema.trim();
-            Statement st = null;
-            try {
-                st = conn.createStatement();
-            } catch (SQLException e) {
-                _log.warn("Failed to create statement: " + e.getMessage());
-                return;
-            }
-            try {
-                _log.info("...Executing helper SQL:\n" + sql);
-                st.execute(sql);
-            } catch (SQLException continued) {
-                String msg = "Failed to execute the SQL: " + sql;
-                _log.warn(msg, continued);
-                return;
-            } finally {
-                if (st != null) {
-                    try {
-                        st.close();
-                    } catch (SQLException ignored) {
-                    }
+            executeCurrentSchemaSql(conn, sql);
+        }
+    }
+
+    protected void executeCurrentSchemaSql(Connection conn, String sql) {
+        Statement st = null;
+        try {
+            st = conn.createStatement();
+        } catch (SQLException e) {
+            _log.warn("Failed to create statement: " + e.getMessage());
+            return;
+        }
+        try {
+            _log.info("...Connecting the schema: " + _schema + ln() + sql);
+            st.execute(sql);
+        } catch (SQLException continued) {
+            String msg = "Failed to execute the SQL: " + sql;
+            _log.warn(msg, continued);
+            return;
+        } finally {
+            if (st != null) {
+                try {
+                    st.close();
+                } catch (SQLException ignored) {
                 }
             }
         }
@@ -137,5 +121,12 @@ public class DfCurrentSchemaConnector {
 
     protected String replaceSrcMainJavaToSrcMainResources(String sqlDirectory) {
         return DfLanguageDependencyInfoJava.replaceSrcMainJavaToSrcMainResources(sqlDirectory);
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 }

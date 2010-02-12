@@ -285,10 +285,6 @@ public class DfXlsReader {
         throw new IllegalStateException(msg, e);
     }
 
-    protected String ln() {
-        return DfSystemUtil.getLineSeparator();
-    }
-
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
@@ -436,5 +432,12 @@ public class DfXlsReader {
             return false;
         }
         return _skipSheetPattern.matcher(sheetName).matches();
+    }
+
+    // ===================================================================================
+    //                                                                      General Helper
+    //                                                                      ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 }

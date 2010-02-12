@@ -10,6 +10,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -20,6 +22,10 @@ import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
  * @author jflute
  */
 public final class DfDatabaseProperties extends DfAbstractHelperProperties {
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfDatabaseProperties.class);
 
     // ===================================================================================
     //                                                                         Constructor
@@ -569,6 +575,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         final String schema = getDatabaseSchema();
         final String user = getDatabaseUser();
         final String password = getDatabasePassword();
+        _log.info("...Creating a connection for main schema");
         return createConnection(driver, url, schema, user, password);
     }
 }
