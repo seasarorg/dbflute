@@ -207,7 +207,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
     //                                     -----------------
     protected void setupAllInOneTableClassification(String sql) {
         final DfClassificationAllInOneSqlExecutor executor = new DfClassificationAllInOneSqlExecutor();
-        final Connection conn = getDatabaseProperties().getConnection();
+        final Connection conn = getDatabaseProperties().createMainSchemaConnection();
         final List<Map<String, String>> resultList = executor.executeAllInOneSql(conn, sql);
 
         for (Map<String, String> map : resultList) {
@@ -314,7 +314,7 @@ public final class DfClassificationProperties extends DfAbstractHelperProperties
         Statement stmt = null;
         ResultSet rs = null;
         try {
-            conn = getDatabaseProperties().getConnection();
+            conn = getDatabaseProperties().createMainSchemaConnection();
             stmt = conn.createStatement();
             _log.debug("/ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -");
             _log.debug("The classification sql: " + sql);

@@ -1,8 +1,6 @@
 package org.seasar.dbflute.properties;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -311,15 +309,11 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             msg = msg + " schema=" + schema;
             throw new IllegalStateException(msg);
         }
+        final String driver = getDatabaseDriver();
         final String url = getAdditionalSchemaSupplementaryConnectionUrl(schema);
         final String user = getAdditionalSchemaSupplementaryConnectionUser(schema);
         final String password = getAdditionalSchemaSupplementaryConnectionPassword(schema);
-        try {
-            return DriverManager.getConnection(url, user, password);
-        } catch (SQLException e) {
-            String msg = "Failed to connect: url=" + url + ", user=" + user;
-            throw new IllegalStateException(msg, e);
-        }
+        return createConnection(driver, url, schema, user, password);
     }
 
     public boolean hasAdditionalSchemaSupplementaryConnection(String schema) {
@@ -569,19 +563,12 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                   Connection Creation
     //                                   -------------------
-    public Connection getConnection() {
-        try {
-            Class.forName(getDatabaseDriver());
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+    public Connection createMainSchemaConnection() {
+        final String driver = getDatabaseDriver();
         final String url = getDatabaseUrl();
+        final String schema = getDatabaseSchema();
         final String user = getDatabaseUser();
-        try {
-            return DriverManager.getConnection(url, user, getDatabasePassword());
-        } catch (SQLException e) {
-            String msg = "Failed to connect: url=" + url + ", user=" + user;
-            throw new IllegalStateException(msg, e);
-        }
+        final String password = getDatabasePassword();
+        return createConnection(driver, url, schema, user, password);
     }
 }

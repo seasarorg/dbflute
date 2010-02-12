@@ -250,8 +250,8 @@ public abstract class DfAbstractTask extends Task {
     }
 
     protected void connectSchema() {
-        CurrentSchemaConnector connector = new CurrentSchemaConnector(getDataSource(), _schema, getBasicProperties());
-        connector.connectSchema();
+        final CurrentSchemaConnector connector = new CurrentSchemaConnector(_schema, getBasicProperties());
+        connector.connectSchema(getDataSource());
     }
 
     // -----------------------------------------------------

@@ -1,6 +1,7 @@
 package org.seasar.dbflute.logic.scmconn;
 
 import java.io.File;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
@@ -29,15 +30,13 @@ public class CurrentSchemaConnector {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DataSource _dataSource;
     protected String _schema;
     protected DfBasicProperties _basicProperties;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public CurrentSchemaConnector(DataSource dataSource, String schema, DfBasicProperties basicProperties) {
-        _dataSource = dataSource;
+    public CurrentSchemaConnector(String schema, DfBasicProperties basicProperties) {
         _schema = schema;
         _basicProperties = basicProperties;
     }
@@ -45,14 +44,39 @@ public class CurrentSchemaConnector {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public void connectSchema() {
+    public void connectSchema(DataSource dataSource) {
+        Connection conn = null;
+        try {
+            conn = dataSource.getConnection();
+        } catch (SQLException e) {
+            String msg = "Failed to connect the database!";
+            throw new IllegalStateException(msg, e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
+        }
+        connectSchema(conn);
+    }
+
+    public void connectSchema(Connection conn) {
         if (_basicProperties.isDatabaseDB2() && _schema != null) {
-            final Statement st;
+            Statement st = null;
             try {
-                st = _dataSource.getConnection().createStatement();
+                st = conn.createStatement();
             } catch (SQLException e) {
                 _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
                 return;
+            } finally {
+                if (st != null) {
+                    try {
+                        st.close();
+                    } catch (SQLException ignored) {
+                    }
+                }
             }
             final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
             try {
@@ -63,17 +87,24 @@ public class CurrentSchemaConnector {
                 return;
             }
         } else if (_basicProperties.isDatabaseOracle() && _schema != null) {
-            final Statement statement;
+            Statement st = null;
             try {
-                statement = _dataSource.getConnection().createStatement();
+                st = conn.createStatement();
             } catch (SQLException e) {
                 _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
                 return;
+            } finally {
+                if (st != null) {
+                    try {
+                        st.close();
+                    } catch (SQLException ignored) {
+                    }
+                }
             }
             final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + _schema.trim();
             try {
                 _log.info("...Executing helper SQL:\n" + sql);
-                statement.execute(sql);
+                st.execute(sql);
             } catch (SQLException e) {
                 _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
                 return;

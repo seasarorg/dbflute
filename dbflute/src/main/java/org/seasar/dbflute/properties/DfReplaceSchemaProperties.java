@@ -1,8 +1,6 @@
 package org.seasar.dbflute.properties;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -207,6 +205,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         if (propertyMap == null) {
             return null;
         }
+        final String driver = getDatabaseProperties().getDatabaseDriver();
         final String url;
         {
             String property = propertyMap.get("url");
@@ -216,16 +215,10 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
                 url = getDatabaseProperties().getDatabaseUrl();
             }
         }
+        final String schema = propertyMap.get("schema");
         final String user = propertyMap.get("user");
         final String password = propertyMap.get("password");
-        try {
-            final Connection conn = DriverManager.getConnection(url, user, password);
-            conn.setAutoCommit(true);
-            return conn;
-        } catch (SQLException e) {
-            String msg = "Failed to connect: url=" + url + ", user=" + user;
-            throw new IllegalStateException(msg, e);
-        }
+        return createConnection(driver, url, schema, user, password);
     }
 
     // ===================================================================================
@@ -332,6 +325,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     public Connection createAdditionalDropConnection(Map<String, Object> additionalDropMap) {
+        final String driver = getDatabaseProperties().getDatabaseDriver();
         String url = getAdditionalDropUrl(additionalDropMap);
         url = url != null && url.trim().length() > 0 ? url : getDatabaseProperties().getDatabaseUrl();
         String user = getAdditionalDropUser(additionalDropMap);
@@ -352,14 +346,8 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         info.putAll(prop);
         info.put("user", user);
         info.put("password", password);
-        try {
-            final Connection conn = DriverManager.getConnection(url, info);
-            conn.setAutoCommit(true);
-            return conn;
-        } catch (SQLException e) {
-            String msg = "Failed to connect: url=" + url + ", user=" + user;
-            throw new IllegalStateException(msg, e);
-        }
+        final String schema = getAdditionalDropSchema(additionalDropMap);
+        return createConnection(driver, url, schema, info);
     }
 
     // ===================================================================================

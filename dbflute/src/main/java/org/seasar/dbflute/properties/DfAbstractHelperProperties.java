@@ -1,5 +1,8 @@
 package org.seasar.dbflute.properties;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.logic.scmconn.CurrentSchemaConnector;
 import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfStringFileReader;
@@ -510,6 +514,46 @@ public abstract class DfAbstractHelperProperties {
 
     protected final String getEnvironmentType() {
         return DfEnvironmentType.getInstance().getEnvironmentType();
+    }
+
+    protected Connection createConnection(String driver, String url, String schema, Properties info) {
+        setupConnectionDriver(driver);
+        try {
+            final Connection conn = DriverManager.getConnection(url, info);
+            setupConnectionVariousSetting(schema, conn);
+            return conn;
+        } catch (SQLException e) {
+            String msg = "Failed to connect: url=" + url + " info=" + info;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    protected Connection createConnection(String driver, String url, String schema, String user, String password) {
+        setupConnectionDriver(driver);
+        try {
+            final Connection conn = DriverManager.getConnection(url, user, password);
+            setupConnectionVariousSetting(schema, conn);
+            return conn;
+        } catch (SQLException e) {
+            String msg = "Failed to connect: url=" + url + " user=" + user;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    private void setupConnectionDriver(String driver) {
+        try {
+            Class.forName(driver);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void setupConnectionVariousSetting(String schema, Connection conn) throws SQLException {
+        conn.setAutoCommit(true);
+        if (schema != null && schema.trim().length() > 0) {
+            final CurrentSchemaConnector connector = new CurrentSchemaConnector(schema, getBasicProperties());
+            connector.connectSchema(conn);
+        }
     }
 
     // ===============================================================================
