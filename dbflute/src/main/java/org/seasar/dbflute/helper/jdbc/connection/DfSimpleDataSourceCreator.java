@@ -127,13 +127,14 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
 
     public Connection getConnection() throws SQLException {
         if (_cachedConnection == null) {
-            _cachedConnection = new DfSimpleConnection(newConnection());
+            final Connection conn = createConnection();
+            _cachedConnection = new DfSimpleConnection(conn);
         }
         return _cachedConnection;
     }
 
-    protected Connection newConnection() throws SQLException {
-        Connection connection = null;
+    protected Connection createConnection() throws SQLException {
+        Connection conn = null;
         final Driver driverInstance = newDriver();
         final Properties info = new Properties();
         if (_connectionProperties != null && !_connectionProperties.isEmpty()) {
@@ -143,24 +144,24 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
         info.put("password", _password);
 
         try {
-            connection = driverInstance.connect(_url, info);
+            conn = driverInstance.connect(_url, info);
         } catch (SQLException e) {
             String msg = "Driver#connect() threw the exception:";
             msg = msg + " url=" + _url + " user=" + _userId;
             throw new DfJDBCException(msg, e);
         }
-        if (connection == null) {
+        if (conn == null) {
             String msg = "Driver doesn't understand the URL: _url=" + _url;
-            throw new IllegalStateException(msg);
+            throw new DfJDBCException(msg);
         }
         try {
-            connection.setAutoCommit(_autoCommit);
+            conn.setAutoCommit(_autoCommit);
         } catch (SQLException e) {
             String msg = "Connection#setAutoCommit() threw the exception:";
             msg = msg + " autocommit=" + _autoCommit;
             throw new DfJDBCException(msg, e);
         }
-        return connection;
+        return conn;
     }
 
     protected Driver newDriver() {
