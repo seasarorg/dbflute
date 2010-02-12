@@ -151,7 +151,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
             if (initializer != null) {
                 initializer.initializeSchema();
             }
-            _log.info("");
+            _log.info(""); // for space line
         }
     }
 
@@ -170,6 +170,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         if (initializer != null) {
             initializer.initializeSchema();
         }
+        _log.info(""); // for space line
     }
 
     protected DfSchemaInitializer createSchemaInitializer(InitializeType initializeType) {
@@ -209,13 +210,11 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
     }
 
     protected void createSchema(DfRunnerInformation runInfo) {
-        if (_log.isInfoEnabled()) {
-            _log.info("* * * * * * * * *");
-            _log.info("*               *");
-            _log.info("* Create Schema *");
-            _log.info("*               *");
-            _log.info("* * * * * * * * *");
-        }
+        _log.info("* * * * * * * * *");
+        _log.info("*               *");
+        _log.info("* Create Schema *");
+        _log.info("*               *");
+        _log.info("* * * * * * * * *");
         final DfSqlFileFireMan fireMan = new DfSqlFileFireMan();
         fireMan.setExecutorName("Create Schema");
         final FireResult result = fireMan.execute(getSqlFileRunner(runInfo), getReplaceSchemaSqlFileList());
@@ -224,9 +223,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         } catch (Throwable ignored) {
             _log.info("Failed to dump create-schema result: " + result, ignored);
         }
-        if (_log.isInfoEnabled()) {
-            _log.info("");
-        }
+        _log.info(""); // for space line
         destroyChangeUserConnection();
     }
 
