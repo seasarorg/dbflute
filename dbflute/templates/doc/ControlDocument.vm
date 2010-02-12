@@ -1,10 +1,13 @@
+#
+# @since DBFlute-0.9.0
+#
 #set ($database = $schemaData.database)
-#set ($basepath = $generator.OutputPath)
-    
+$database.enableDocumentOutputDirectory()
+
 #if ($outputFormat=="html")
-  #set ( $outFile = "${schemaData.name}.html" )
+  #set ($outFile = "${schemaData.name}.html")
 #else
-  #set ( $outFile = "${schemaData.name}.xml" )
+  #set ($outFile = "${schemaData.name}.xml")
 #end
 
 File to be created: $outFile
@@ -18,4 +21,4 @@ $database.initializeAdditionalUniqueKey()
 $database.initializeAdditionalForeignKey()
 $database.initializeClassificationDeployment()
 
-$generator.parse("doc/$outputFormat/datamodel.vm",$outFile,"dataModel",$dataModel)
+$generator.parse("doc/$outputFormat/datamodel.vm", $outFile, "dataModel", $dataModel)

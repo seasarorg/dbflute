@@ -41,6 +41,13 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
+    //                                                                    Output Directory
+    //                                                                    ================
+    public String getDocumentOutputDirectory() { // It's closet!
+        return getProperty("documentOutputDirectory", "./output/doc", getDocumentDefinitionMap());
+    }
+
+    // ===================================================================================
     //                                                        Alias Delimiter In DbComment
     //                                                        ============================
     public boolean isAliasDelimiterInDbCommentValid() {
@@ -210,12 +217,14 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public File getDataXlsTemplateFile() {
-        final File xlsFile = new File("./output/doc/data-xls-template.xls");
+        final String outputDirectory = getDocumentOutputDirectory();
+        final File xlsFile = new File(outputDirectory + "/data-xls-template.xls");
         return xlsFile;
     }
 
     public File getDataCsvTemplateDir() {
-        final File xlsFile = new File("./output/doc/csvdata");
+        final String outputDirectory = getDocumentOutputDirectory();
+        final File xlsFile = new File(outputDirectory + "/csvdata");
         return xlsFile;
     }
 

@@ -182,7 +182,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
         final FileMakingOption option = new FileMakingOption().delimitateByComma().encodeAsUTF8().separateLf();
         final File csvDir = getDataCsvTemplateDir();
         if (!csvDir.exists()) {
-            csvDir.mkdir();
+            csvDir.mkdirs();
         }
         final FileToken fileToken = new FileTokenImpl();
         final Set<String> tableNameSet = overTableColumnMap.keySet();

@@ -621,15 +621,32 @@ public class Database {
     //                                                                    Output Directory
     //                                                                    ================
     public void enableGenerateOutputDirectory() {
-        getGeneratorInstance().setOutputPath(getProperties().getBasicProperties().getGenerateOutputDirectory());
+        final String outputDirectory = getProperties().getBasicProperties().getGenerateOutputDirectory();
+        _log.info("...Setting up generateOutputDirectory: " + outputDirectory);
+        getGeneratorInstance().setOutputPath(outputDirectory);
     }
 
     public void enableSql2EntityOutputDirectory() {
-        getGeneratorInstance().setOutputPath(getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory());
+        final String outputDirectory = getProperties().getOutsideSqlProperties().getSql2EntityOutputDirectory();
+        _log.info("...Setting up sql2EntityOutputDirectory: " + outputDirectory);
+        getGeneratorInstance().setOutputPath(outputDirectory);
+    }
+
+    public void enableDocumentOutputDirectory() {
+        final String outputDirectory = getProperties().getDocumentProperties().getDocumentOutputDirectory();
+        _log.info("...Setting up documentOutputDirectory: " + outputDirectory);
+        final File dir = new File(outputDirectory);
+        if (!dir.exists()) {
+            _log.info("...Making directories for documentOutputDirectory: " + dir);
+            dir.mkdirs(); // because this directory is NOT user setting basically 
+        }
+        getGeneratorInstance().setOutputPath(outputDirectory);
     }
 
     public void enableFlexDtoOutputDirectory() {
-        getGeneratorInstance().setOutputPath(getProperties().getFlexDtoProperties().getOutputDirectory());
+        final String outputDirectory = getProperties().getFlexDtoProperties().getOutputDirectory();
+        _log.info("...Setting up flexDtoOutputDirectory: " + outputDirectory);
+        getGeneratorInstance().setOutputPath(outputDirectory);
     }
 
     // ===================================================================================

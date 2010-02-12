@@ -188,7 +188,7 @@
   </target>
 
   <target name="om-template" unless="torque.internal.useClasspath">
-    <!-- 
+    <!--
       Parameters, outputDirectory and outputFile, are actually unused (as old).
       But the parameters may be referred to by Velocity so it remains.
     -->
@@ -221,6 +221,10 @@
     <echo message="|                                          |"/>
     <echo message="+------------------------------------------+"/>
 
+    <!--
+      Parameters, outputDirectory and outputFile, are actually unused (as old).
+      But the parameters may be referred to by Velocity so it remains.
+    -->
     <df-doc
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.doc}"
