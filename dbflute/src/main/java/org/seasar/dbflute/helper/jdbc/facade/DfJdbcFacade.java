@@ -78,12 +78,8 @@ public class DfJdbcFacade {
                 ++count;
             }
         } catch (SQLException e) {
-            String msg = "Failed to execute the SQL:" + ln();
-            msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
-            msg = msg + " sql = " + sql + ln();
-            msg = msg + " msg = " + e.getMessage() + ln();
-            msg = msg + " - - - - - - - - - -/";
-            throw new SQLFailureException(msg, e);
+            handleSQLException(sql, e);
+            return null; // unreachable
         } finally {
             if (rs != null) {
                 try {
@@ -140,12 +136,8 @@ public class DfJdbcFacade {
                 ++count;
             }
         } catch (SQLException e) {
-            String msg = "Failed to execute the SQL:" + ln();
-            msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
-            msg = msg + " sql = " + sql + ln();
-            msg = msg + " msg = " + e.getMessage() + ln();
-            msg = msg + " - - - - - - - - - -/";
-            throw new SQLFailureException(msg, e);
+            handleSQLException(sql, e);
+            return null; // unreachable
         } finally {
             if (rs != null) {
                 try {
@@ -184,12 +176,8 @@ public class DfJdbcFacade {
             st = conn.createStatement();
             return st.execute(sql);
         } catch (SQLException e) {
-            String msg = "Failed to execute the SQL:" + ln();
-            msg = msg + " /- - - - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
-            msg = msg + " sql = " + sql + ln();
-            msg = msg + " msg = " + e.getMessage() + ln();
-            msg = msg + " - - - - - - - - - -/";
-            throw new SQLFailureException(msg, e);
+            handleSQLException(sql, e);
+            return false; // unreachable
         } finally {
             if (st != null) {
                 try {
@@ -206,6 +194,21 @@ public class DfJdbcFacade {
                 }
             }
         }
+    }
+
+    // ===================================================================================
+    //                                                                  Exception Handling
+    //                                                                  ==================
+    protected void handleSQLException(String sql, SQLException e) {
+        String msg = "Failed to execute the SQL:" + ln();
+        msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - " + ln();
+        msg = msg + "[SQL]" + ln() + sql + ln();
+        msg = msg + ln();
+        msg = msg + "[Exception]" + ln();
+        msg = msg + e.getClass() + ln();
+        msg = msg + e.getMessage() + ln();
+        msg = msg + "- - - - - - - - - -/";
+        throw new SQLFailureException(msg, e);
     }
 
     // ===================================================================================

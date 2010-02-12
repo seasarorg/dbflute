@@ -80,7 +80,7 @@ public class DfSchemaInitializerDB2 extends DfSchemaInitializerJdbc {
             sequenceNameList.add(recordMap.get(sequenceColumnName));
         }
         for (String sequenceName : sequenceNameList) {
-            final String dropSequenceSql = "drop sequence " + sequenceName;
+            final String dropSequenceSql = "drop sequence " + schema + "." + sequenceName;
             _log.info(dropSequenceSql);
             jdbcFacade.execute(dropSequenceSql);
         }

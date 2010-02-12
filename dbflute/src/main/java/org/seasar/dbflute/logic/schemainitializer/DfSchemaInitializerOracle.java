@@ -78,8 +78,9 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
         if (_schema == null || _schema.trim().length() == 0) {
             return;
         }
+        final String schema = _schema;
         final List<String> sequenceNameList = new ArrayList<String>();
-        final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + _schema + "'";
+        final String metaDataSql = "select * from ALL_SEQUENCES where SEQUENCE_OWNER = '" + schema + "'";
         Statement st = null;
         ResultSet rs = null;
         try {
@@ -115,7 +116,7 @@ public class DfSchemaInitializerOracle extends DfSchemaInitializerJdbc {
         try {
             st = conn.createStatement();
             for (String sequenceName : sequenceNameList) {
-                final String dropSequenceSql = "drop sequence " + sequenceName;
+                final String dropSequenceSql = "drop sequence " + schema + "." + sequenceName;
                 _log.info(dropSequenceSql);
                 st.execute(dropSequenceSql);
             }
