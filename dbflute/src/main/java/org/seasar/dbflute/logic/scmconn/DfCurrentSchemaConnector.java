@@ -45,13 +45,10 @@ public class DfCurrentSchemaConnector {
     // ===================================================================================
     //                                                                                Main
     //                                                                                ====
-    public void connectSchema(DataSource dataSource) {
+    public void connectSchema(DataSource dataSource) throws SQLException {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
-        } catch (SQLException e) {
-            String msg = "Failed to connect the database!";
-            throw new IllegalStateException(msg, e);
         } finally {
             if (conn != null) {
                 try {
@@ -63,7 +60,7 @@ public class DfCurrentSchemaConnector {
         connectSchema(conn);
     }
 
-    public void connectSchema(Connection conn) {
+    public void connectSchema(Connection conn) throws SQLException {
         if (_basicProperties.isDatabaseDB2() && _schema != null) {
             final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
             executeCurrentSchemaSql(conn, sql);
@@ -73,20 +70,14 @@ public class DfCurrentSchemaConnector {
         }
     }
 
-    protected void executeCurrentSchemaSql(Connection conn, String sql) {
-        Statement st = null;
-        try {
-            st = conn.createStatement();
-        } catch (SQLException e) {
-            _log.warn("Failed to create statement: " + e.getMessage());
-            return;
-        }
+    protected void executeCurrentSchemaSql(Connection conn, String sql) throws SQLException {
+        final Statement st = conn.createStatement();
         try {
             _log.info("...Connecting the schema: " + _schema + ln() + sql);
             st.execute(sql);
-        } catch (SQLException continued) {
-            String msg = "Failed to execute the SQL: " + sql;
-            _log.warn(msg, continued);
+        } catch (SQLException continued) { // continue because it's supplementary SQL
+            String msg = "Failed to execute the SQL:" + ln() + sql + ln() + continued.getMessage();
+            _log.warn(msg);
             return;
         } finally {
             if (st != null) {

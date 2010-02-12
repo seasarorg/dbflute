@@ -440,7 +440,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return DfDataSourceContext.getDataSource();
     }
 
-    protected void connectSchema() {
+    protected void connectSchema() throws SQLException {
         final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(_schema, getBasicProperties());
         connector.connectSchema(getDataSource());
     }
