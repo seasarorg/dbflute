@@ -51,7 +51,7 @@ import org.seasar.dbflute.friends.velocity.DfOriginalLog4JLogSystem;
 import org.seasar.dbflute.helper.jdbc.connection.DfSimpleDataSourceCreator;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
 import org.seasar.dbflute.logic.outsidesql.DfSqlFileCollector;
-import org.seasar.dbflute.logic.scmconn.CurrentSchemaConnector;
+import org.seasar.dbflute.logic.scmconn.DfCurrentSchemaConnector;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
@@ -441,7 +441,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     }
 
     protected void connectSchema() {
-        final CurrentSchemaConnector connector = new CurrentSchemaConnector(_schema, getBasicProperties());
+        final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(_schema, getBasicProperties());
         connector.connectSchema(getDataSource());
     }
 

@@ -13,7 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.logic.scmconn.CurrentSchemaConnector;
+import org.seasar.dbflute.logic.scmconn.DfCurrentSchemaConnector;
 import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfMapStringFileReader;
 import org.seasar.dbflute.properties.filereader.DfStringFileReader;
@@ -551,7 +551,7 @@ public abstract class DfAbstractHelperProperties {
     private void setupConnectionVariousSetting(String schema, Connection conn) throws SQLException {
         conn.setAutoCommit(true);
         if (schema != null && schema.trim().length() > 0) {
-            final CurrentSchemaConnector connector = new CurrentSchemaConnector(schema, getBasicProperties());
+            final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(schema, getBasicProperties());
             connector.connectSchema(conn);
         }
     }

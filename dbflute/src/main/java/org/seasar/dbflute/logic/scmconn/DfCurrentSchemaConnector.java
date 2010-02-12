@@ -19,13 +19,13 @@ import org.seasar.dbflute.properties.DfBasicProperties;
  * @author jflute
  * @since 0.9.4 (2009/03/03 Tuesday)
  */
-public class CurrentSchemaConnector {
+public class DfCurrentSchemaConnector {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(CurrentSchemaConnector.class);
+    private static final Log _log = LogFactory.getLog(DfCurrentSchemaConnector.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -36,7 +36,7 @@ public class CurrentSchemaConnector {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public CurrentSchemaConnector(String schema, DfBasicProperties basicProperties) {
+    public DfCurrentSchemaConnector(String schema, DfBasicProperties basicProperties) {
         _schema = schema;
         _basicProperties = basicProperties;
     }
@@ -64,11 +64,20 @@ public class CurrentSchemaConnector {
 
     public void connectSchema(Connection conn) {
         if (_basicProperties.isDatabaseDB2() && _schema != null) {
+            final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
             Statement st = null;
             try {
                 st = conn.createStatement();
             } catch (SQLException e) {
-                _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
+                _log.warn("Failed to create statement: " + e.getMessage());
+                return;
+            }
+            try {
+                _log.info("...Executing helper SQL:\n" + sql);
+                st.execute(sql);
+            } catch (SQLException continued) {
+                String msg = "Failed to execute the SQL: " + sql;
+                _log.warn(msg, continued);
                 return;
             } finally {
                 if (st != null) {
@@ -77,21 +86,22 @@ public class CurrentSchemaConnector {
                     } catch (SQLException ignored) {
                     }
                 }
-            }
-            final String sql = "SET CURRENT SCHEMA = " + _schema.trim();
-            try {
-                _log.info("...Executing helper SQL:\n" + sql);
-                st.execute(sql);
-            } catch (SQLException e) {
-                _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
-                return;
             }
         } else if (_basicProperties.isDatabaseOracle() && _schema != null) {
+            final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + _schema.trim();
             Statement st = null;
             try {
                 st = conn.createStatement();
             } catch (SQLException e) {
-                _log.warn("Connection#createStatement() threw the SQLException: " + e.getMessage());
+                _log.warn("Failed to create statement: " + e.getMessage());
+                return;
+            }
+            try {
+                _log.info("...Executing helper SQL:\n" + sql);
+                st.execute(sql);
+            } catch (SQLException continued) {
+                String msg = "Failed to execute the SQL: " + sql;
+                _log.warn(msg, continued);
                 return;
             } finally {
                 if (st != null) {
@@ -100,14 +110,6 @@ public class CurrentSchemaConnector {
                     } catch (SQLException ignored) {
                     }
                 }
-            }
-            final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + _schema.trim();
-            try {
-                _log.info("...Executing helper SQL:\n" + sql);
-                st.execute(sql);
-            } catch (SQLException e) {
-                _log.warn("'" + sql + "' threw the SQLException: " + e.getMessage());
-                return;
             }
         }
     }
