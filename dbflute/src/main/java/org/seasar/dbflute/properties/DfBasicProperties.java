@@ -68,7 +68,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     //                                                                             Project
     //                                                                             =======
     public String getProjectName() {
-        return stringProp("torque.project", ""); // at build property!
+        return stringProp("torque.project", ""); // from build-properties!
     }
 
     // ===================================================================================

@@ -454,15 +454,17 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 }
             }
 
-            // /---------------------------------------------------------------------------------------------------
-            // Initialize torque properties as Properties and set up singleton class that saves 'build.properties'.
-            //   This property is used by You.
-            // -------/
+            // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            // Initialize torque properties as Properties and set up singleton class
+            // that saves 'build.properties'.
+            // - - - - - - - - - -/
             final Properties prop = DfAntTaskUtil.getBuildProperties(file, getProject());
             DfBuildProperties.getInstance().setProperties(prop);
-
-        } catch (Exception e) {
-            _log.warn("setContextProperties() threw the exception!!!", e);
+        } catch (RuntimeException e) {
+            String msg = "Failed to set context properties:";
+            msg = msg + " file=" + file + " contextProperties=" + contextProperties;
+            _log.warn(msg, e); // logging because it throws to ANT world
+            throw e;
         }
     }
 

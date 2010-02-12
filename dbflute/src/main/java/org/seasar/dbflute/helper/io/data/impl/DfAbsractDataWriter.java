@@ -133,28 +133,39 @@ public abstract class DfAbsractDataWriter {
             return false;
         }
         final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        boolean typeChecked = false;
         if (columnMetaInfo != null) {
             final Class<?> columnType = getColumnType4Judgement(columnMetaInfo);
             if (columnType != null && !java.util.Date.class.isAssignableFrom(columnType)) {
                 return false;
             }
+            if (columnType != null && java.sql.Time.class.isAssignableFrom(columnType)) {
+                return false; // Time type is out of target here
+            }
+            // basically java.util.Date and java.sql.Timestamp are target
+
+            typeChecked = true; // for handling out of calendar
         }
         try {
             Timestamp timestamp = DfTypeUtil.toTimestamp(value);
             ps.setTimestamp(bindCount, timestamp);
             return true;
         } catch (ToTimestampOutOfCalendarException e) {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-            msg = msg + "Failed to set the timestamp because the value was out of calendar!" + ln();
-            msg = msg + ln();
-            msg = msg + "[Table]" + ln() + tableName + ln();
-            msg = msg + ln();
-            msg = msg + "[Column]" + ln() + columnName + ln();
-            msg = msg + ln();
-            msg = msg + "[Value]" + ln() + value + ln();
-            msg = msg + "- - - - - - - - - -/";
-            throw new DfTableDataRegistrationFailureException(msg, e);
+            if (typeChecked) {
+                String msg = "Look! Read the message below." + ln();
+                msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+                msg = msg + "Failed to set the timestamp because the value was out of calendar!" + ln();
+                msg = msg + ln();
+                msg = msg + "[Table]" + ln() + tableName + ln();
+                msg = msg + ln();
+                msg = msg + "[Column]" + ln() + columnName + ln();
+                msg = msg + ln();
+                msg = msg + "[Value]" + ln() + value + ln();
+                msg = msg + "- - - - - - - - - -/";
+                throw new DfTableDataRegistrationFailureException(msg, e);
+            } else {
+                return false; // couldn't parse as timestamp
+            }
         } catch (ToTimestampParseException ignored) {
             return false; // couldn't parse as timestamp 
         }

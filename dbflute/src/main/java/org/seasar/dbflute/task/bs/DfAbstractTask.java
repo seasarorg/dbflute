@@ -252,8 +252,15 @@ public abstract class DfAbstractTask extends Task {
     }
 
     public void setContextProperties(String file) {
-        final Properties prop = DfAntTaskUtil.getBuildProperties(file, getProject());
-        DfBuildProperties.getInstance().setProperties(prop);
+        try {
+            final Properties prop = DfAntTaskUtil.getBuildProperties(file, getProject());
+            DfBuildProperties.getInstance().setProperties(prop);
+        } catch (RuntimeException e) {
+            String msg = "Failed to set context properties:";
+            msg = msg + " file=" + file;
+            _log.warn(msg, e); // logging because it throws to ANT world
+            throw e;
+        }
     }
 
     protected DfBuildProperties getProperties() {

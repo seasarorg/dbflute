@@ -100,7 +100,7 @@ public final class DfBuildProperties {
     }
 
     /**
-     * Get Build-properties.
+     * Get build-properties.
      * @return Build-properties. (NotNull)
      */
     final public Properties getProperties() {

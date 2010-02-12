@@ -17,6 +17,7 @@ import org.seasar.dbflute.properties.handler.DfPropertiesHandler;
 import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
@@ -64,8 +65,22 @@ public abstract class DfAbstractHelperProperties {
     //                                                                     ===========
     /**
      * Constructor.
+     * @param prop Build-properties. (NotNull)
      */
     public DfAbstractHelperProperties(Properties prop) {
+        if (prop == null) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
+            msg = msg + "The build-properties is required!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "Check your environment of DBFlute client and module!" + ln();
+            msg = msg + "And set up from first again after confirmation of correct procedure." + ln();
+            msg = msg + ln();
+            msg = msg + "[Properties]" + ln() + null + ln();
+            msg = msg + "- - - - - - - - - -/";
+            throw new IllegalStateException(msg);
+        }
         _buildProperties = prop;
     }
 
@@ -500,6 +515,10 @@ public abstract class DfAbstractHelperProperties {
     // ===============================================================================
     //                                                                  General Helper
     //                                                                  ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
+    }
+
     protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
         return new LinkedHashMap<KEY, VALUE>();
     }

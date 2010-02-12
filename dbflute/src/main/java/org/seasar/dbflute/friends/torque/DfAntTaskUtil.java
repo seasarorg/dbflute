@@ -18,6 +18,7 @@ package org.seasar.dbflute.friends.torque;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -30,6 +31,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfDBFluteTaskFailureException;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
  * Ant task utility.
@@ -51,10 +53,6 @@ public final class DfAntTaskUtil {
     public static Properties getBuildProperties(String file, Project project) {
         final Properties prop = new Properties();
         try {
-            // /---------------------------------------------------------------------------------------------------
-            // Initialize torque properties as Properties and set up singleton class that saves 'build.properties'.
-            //   This property is used by You. 
-            // -------/
             final String sources[] = StringUtils.split(file, ",");
             for (int i = 0; i < sources.length; i++) {
                 final Properties source = new Properties();
@@ -67,13 +65,13 @@ public final class DfAntTaskUtil {
                 } catch (IOException e) {
                     final ClassLoader classLoader = project.getClass().getClassLoader();
                     try {
-                        final java.io.InputStream inputStream = classLoader.getResourceAsStream(sources[i]);
-                        if (inputStream == null) {
+                        final InputStream ins = classLoader.getResourceAsStream(sources[i]);
+                        if (ins == null) {
                             String msg = "Context properties file " + sources[i];
                             msg = msg + " could not be found in the file system or on the classpath!";
                             throw new BuildException(msg);
                         }
-                        source.load(inputStream);
+                        source.load(ins);
                     } catch (IOException ioe) {
                         throw new RuntimeException("InputStream threw the exception!", ioe);
                     }
@@ -93,9 +91,6 @@ public final class DfAntTaskUtil {
                 }
             }
 
-            // Initialize build-properties!
-            DfBuildProperties.getInstance().setProperties(prop);
-
             // Show properties!
             _log.info("[Properties]: size=" + prop.size());
             for (final Iterator ite = prop.keySet().iterator(); ite.hasNext();) {
@@ -104,8 +99,9 @@ public final class DfAntTaskUtil {
                 _log.info("    " + key + " = " + value);
             }
         } catch (RuntimeException e) {
-            _log.warn("setContextProperties() threw the exception!!!", e);
-            throw new IllegalStateException("buildContextProperties() threw the exception!", e);
+            String msg = "Failed to get build-properties:";
+            msg = msg + " file=" + file + " project=" + project;
+            throw new IllegalStateException(msg, e);
         }
         return prop;
     }
@@ -197,6 +193,6 @@ public final class DfAntTaskUtil {
     }
 
     protected static String ln() {
-        return System.getProperty("line.separator");
+        return DfSystemUtil.getLineSeparator();
     }
 }

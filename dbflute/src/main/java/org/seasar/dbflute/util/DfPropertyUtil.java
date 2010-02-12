@@ -19,7 +19,8 @@ public class DfPropertyUtil {
     //                                                               =================
     public static String stringProp(Properties prop, String key) {
         if (prop == null) {
-            String msg = "Argument[prop] must not be null: " + getLogStrKey(key);
+            String msg = "The argument 'prop' should not be null:";
+            msg = msg + " " + getLogStrKey(key);
             throw new NullPointerException(msg);
         }
         if (key == null) {
@@ -27,8 +28,9 @@ public class DfPropertyUtil {
         }
         final String value = (String) prop.get(key);
         if (value == null) {
-            String msg = "Not found property for the key: " + getLogStrKey(key);
-            throw new PropertyNotFoundException(msg + " properties=" + prop);
+            String msg = "Not found property for the key:";
+            msg = msg + " " + getLogStrKey(key) + " properties=" + prop;
+            throw new PropertyNotFoundException(msg);
         }
         if ("null".equalsIgnoreCase(value.trim())) {
             return "";
@@ -92,11 +94,11 @@ public class DfPropertyUtil {
     }
 
     public static String getLogStrKey(String key) {
-        return "key==[" + key + "]";
+        return "key=[" + key + "]";
     }
 
     public static String getLogStrKeyValue(String key, String value) {
-        return "key==[" + key + "] value==[" + value + "]";
+        return "key=[" + key + "] value=[" + value + "]";
     }
 
     // ===============================================================================
