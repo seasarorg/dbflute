@@ -162,22 +162,36 @@ public class DisplaySqlBuilder {
 
     protected static String buildTimestampText(Object bindVariable, String logTimestampFormat) {
         final String format = logTimestampFormat != null ? logTimestampFormat : DEFAULT_TIMESTAMP_FORMAT;
-        final DateFormatResource resource = analyzeDateFormat(format);
-        final DateFormat df = createDateFormat(resource);
-        return quote(df.format((java.util.Date) bindVariable), resource);
+        final java.util.Date date = (java.util.Date) bindVariable;
+        return processDateDisplay(date, format);
     }
 
     protected static String buildTimeText(Object bindVariable) {
-        final String defaultFormat = DEFAULT_TIME_FORMAT;
-        final DateFormat df = createDateFormat(defaultFormat);
-        return quote(df.format((java.util.Date) bindVariable));
+        final String format = DEFAULT_TIME_FORMAT;
+        final java.util.Date date = (java.util.Date) bindVariable;
+        final DateFormat df = createDateFormat(format);
+        return quote(df.format(date));
     }
 
     protected static String buildDateText(Object bindVariable, String logDateFormat) {
         final String format = logDateFormat != null ? logDateFormat : DEFAULT_DATE_FORMAT;
+        final java.util.Date date = (java.util.Date) bindVariable;
+        return processDateDisplay(date, format);
+    }
+
+    protected static String processDateDisplay(java.util.Date date, String format) {
         final DateFormatResource resource = analyzeDateFormat(format);
         final DateFormat df = createDateFormat(resource);
-        return quote(df.format((java.util.Date) bindVariable), resource);
+        String disp = df.format(date);
+        if (isBCPrefixTarget(date, resource)) {
+            disp = "BC" + disp; // fixed, not use 'G'
+        }
+        return quote(disp, resource);
+    }
+
+    protected static boolean isBCPrefixTarget(java.util.Date date, DateFormatResource resource) {
+        final String format = resource.getFormat();
+        return date.getTime() < 0 && format.startsWith("yyyy") && !format.contains("G");
     }
 
     protected static DateFormat createDateFormat(String format) {
