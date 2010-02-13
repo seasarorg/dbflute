@@ -86,7 +86,7 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("2008/09/01 00:00:00", df.format(DfTypeUtil.toDate("2008-9-1")));
         assertEquals("0008/09/01 02:04:06", df.format(DfTypeUtil.toDate("8-9-1 02:04:06")));
         assertEquals("0008/09/01 02:04:06", df.format(DfTypeUtil.toDate("8-9-1 2:4:6")));
-        assertEquals("2008/12/30 12:34:56.000", fullDf.format(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
+        assertEquals("2008/12/30 12:34:56.789", fullDf.format(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
         assertEquals("0008/09/01 12:34:56", df.format(DfTypeUtil.toDate("AD8-9-1 12:34:56")));
         assertEquals("2008/09/01 00:00:00", df.format(DfTypeUtil.toDate("A.D.2008-9-1")));
         assertEquals("0008/09/01 02:04:06", df.format(DfTypeUtil.toDate(" 8-9-1 2:4:6 ")));
@@ -205,14 +205,25 @@ public class DfTypeUtilTest extends PlainTestCase {
     }
 
     public void test_clearSeconds() {
-        SimpleDateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
         DfTypeUtil.clearSeconds(date);
 
         // ## Assert ##
-        assertEquals("2008/12/30 00:00:00.000", f.format(date));
+        assertEquals("2008/12/30 00:00:00.000", df.format(date));
+    }
+
+    public void test_clearMilliseconds() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.clearMilliseconds(date);
+
+        // ## Assert ##
+        assertEquals("2008/12/30 12:34:56.000", df.format(date));
     }
 
     // -----------------------------------------------------

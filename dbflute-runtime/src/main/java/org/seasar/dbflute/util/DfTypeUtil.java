@@ -548,7 +548,7 @@ public final class DfTypeUtil {
     /**
      * Convert the object to the instance that is date. <br />
      * Even if it's the sub class type, it returns a new instance. <br />
-     * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss'
+     * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
      * @param o The parsed object. (Nullable)
      * @return The instance of date. (Nullable)
@@ -565,7 +565,7 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br />
      * This method uses specified date pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default date pattern
-     * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss'.
+     * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of date. (Nullable)
@@ -601,10 +601,10 @@ public final class DfTypeUtil {
         }
         boolean strict;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            final boolean includeMilli = false;
+            final boolean includeMilli = true; // after all, includes when date too
             value = filterDateStringValueFlexibly(value, includeMilli);
             strict = !value.startsWith("-"); // not BC
-            pattern = "yyyy-MM-dd HH:mm:ss";
+            pattern = "yyyy-MM-dd HH:mm:ss.SSS";
         } else {
             strict = true;
         }
@@ -785,6 +785,13 @@ public final class DfTypeUtil {
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void clearMilliseconds(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
         cal.set(Calendar.MILLISECOND, 0);
         date.setTime(cal.getTimeInMillis());
     }
