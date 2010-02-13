@@ -601,7 +601,10 @@ public final class DfTypeUtil {
         }
         boolean strict;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            final boolean includeMilli = true; // after all, includes when date too
+            // after all, includes when date too
+            // because date type can have millisecond formally
+            final boolean includeMilli = true;
+
             value = filterDateStringValueFlexibly(value, includeMilli);
             strict = !value.startsWith("-"); // not BC
             pattern = "yyyy-MM-dd HH:mm:ss.SSS";
