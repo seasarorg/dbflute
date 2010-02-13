@@ -544,12 +544,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 #if ($table.hasUtilDateColumn())
     private String xfUD(java.util.Date date) { // formatUtilDate()
+        if (date == null) { return null; }
 #if ($database.isDatabaseOracle())
         String pattern = "yyyy-MM-dd HH:mm:ss"; // for Oracle
 #else
         String pattern = "yyyy-MM-dd";
 #end
-        return date != null ? new java.text.SimpleDateFormat(pattern).format(date) : null;
+        return (date.getTime() < 0 ? "BC" : "") + new java.text.SimpleDateFormat(pattern).format(date);
     }
 #end
 #if ($table.hasByteArrayColumn())
