@@ -22,7 +22,7 @@ public class UtilDateAsSqlDateTypeTest extends TestCase {
 
         // ## Assert ##
         assertFalse(utilDate instanceof java.sql.Date);
-        assertEquals("2009/12/13", DfTypeUtil.format(utilDate, "yyyy/MM/dd"));
+        assertEquals("2009/12/13", DfTypeUtil.toString(utilDate, "yyyy/MM/dd"));
     }
 
     public void test_toSqlDate() {
@@ -34,6 +34,6 @@ public class UtilDateAsSqlDateTypeTest extends TestCase {
         java.sql.Date sqlDate = type.toSqlDate(utilDate);
 
         // ## Assert ##
-        assertEquals("2009/12/13", DfTypeUtil.format(sqlDate, "yyyy/MM/dd"));
+        assertEquals("2009/12/13", DfTypeUtil.toString(sqlDate, "yyyy/MM/dd"));
     }
 }
