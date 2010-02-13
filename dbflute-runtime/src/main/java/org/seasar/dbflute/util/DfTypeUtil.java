@@ -44,6 +44,7 @@ public final class DfTypeUtil {
     //                                                                          Definition
     //                                                                          ==========
     protected static final String NULL = "null";
+    protected static final long AD_ORIGIN_MILLISECOND = -62135802000000L;
 
     // ===================================================================================
     //                                                                              String
@@ -102,7 +103,7 @@ public final class DfTypeUtil {
             int num = ((Number) o).intValue();
             return Boolean.valueOf(num != 0);
         } else if (o instanceof String) {
-            String s = (String) o;
+            final String s = (String) o;
             if ("true".equalsIgnoreCase(s)) {
                 return Boolean.TRUE;
             } else if ("false".equalsIgnoreCase(s)) {
@@ -594,9 +595,9 @@ public final class DfTypeUtil {
      * with flexible-parsing if the object is string type.
      * @param o The parsed object. (Nullable)
      * @return The instance of date. (Nullable)
-     * @throws ToDateParseException When it failed to parse the string to date.
-     * @throws ToDateNumberFormatException When it failed to format the elements as number.
-     * @throws ToDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
      */
     public static Date toDate(Object o) {
         return toDate(o, null);
@@ -611,9 +612,9 @@ public final class DfTypeUtil {
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of date. (Nullable)
-     * @throws ToDateParseException When it failed to parse the string to date.
-     * @throws ToDateNumberFormatException When it failed to format the elements as number.
-     * @throws ToDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
+     * @throws ParseDateException When it failed to parse the string to date.
+     * @throws ParseDateNumberFormatException When it failed to format the elements as number.
+     * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
      */
     public static Date toDate(Object o, String pattern) {
         if (o == null) {
@@ -662,17 +663,17 @@ public final class DfTypeUtil {
                 df.parse(value); // no exception means illegal date
                 String msg = "The date expression is out of calendar:";
                 msg = msg + " string=" + value + " pattern=" + pattern;
-                throw new ToDateOutOfCalendarException(msg, e);
+                throw new ParseDateOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to date:";
                 msg = msg + " string=" + value + " pattern=" + pattern;
-                throw new ToDateParseException(msg, e);
+                throw new ParseDateException(msg, e);
             }
         }
     }
 
     protected static String filterDateStringValueFlexibly(final String pureValue, boolean includeMilli) {
-        final String bcPrefix = "-";
+        final String bcSymbolPrefix = "-";
         final String adLatinPrefix = "AD";
         final String adLatinDotPrefix = "A.D.";
         final String bcLatinPrefix = "BC";
@@ -687,20 +688,20 @@ public final class DfTypeUtil {
         // handling AD/BC prefix
         final boolean bc;
         {
-            if (value.startsWith(bcLatinPrefix)) {
-                value = value.substring(bcLatinPrefix.length());
-                bc = true;
-            } else if (value.startsWith(bcLatinDotPrefix)) {
-                value = value.substring(bcLatinDotPrefix.length());
-                bc = true;
-            } else if (value.startsWith(adLatinPrefix)) {
+            if (value.startsWith(adLatinPrefix)) {
                 value = value.substring(adLatinPrefix.length());
                 bc = false;
             } else if (value.startsWith(adLatinDotPrefix)) {
                 value = value.substring(adLatinDotPrefix.length());
                 bc = false;
-            } else if (value.startsWith(bcPrefix)) {
-                value = value.substring(bcPrefix.length());
+            } else if (value.startsWith(bcLatinPrefix)) {
+                value = value.substring(bcLatinPrefix.length());
+                bc = true;
+            } else if (value.startsWith(bcLatinDotPrefix)) {
+                value = value.substring(bcLatinDotPrefix.length());
+                bc = true;
+            } else if (value.startsWith(bcSymbolPrefix)) {
+                value = value.substring(bcSymbolPrefix.length());
                 bc = true;
             } else {
                 bc = false;
@@ -708,7 +709,7 @@ public final class DfTypeUtil {
         }
 
         // handling slash delimiter for yyyyMMdd
-        value = value.replaceAll("/", "-");
+        value = value.replaceAll("/", dateDlm);
 
         // handling '20090119' and '8631230' and so on
         if (value.length() <= 8 && !value.contains(dateDlm)) {
@@ -768,7 +769,7 @@ public final class DfTypeUtil {
                 value = value + timeMilliDlm + "000";
             }
         }
-        return (bc ? bcPrefix : "") + value;
+        return (bc ? bcSymbolPrefix : "") + value;
     }
 
     protected static String handleTimeZeroPrefix(String time, String pureValue, boolean includeMilli) {
@@ -812,7 +813,7 @@ public final class DfTypeUtil {
         } catch (NumberFormatException e) {
             String msg = "Failed to format " + title + " as number:";
             msg = msg + " " + title + "=" + value + " value=" + pureValue;
-            throw new ToDateNumberFormatException(msg, e);
+            throw new ParseDateNumberFormatException(msg, e);
         }
     }
 
@@ -824,28 +825,39 @@ public final class DfTypeUtil {
         return sb.toString() + value;
     }
 
-    public static class ToDateParseException extends RuntimeException {
+    public static class ParseDateException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public ToDateParseException(String msg, Exception e) {
+        public ParseDateException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ToDateNumberFormatException extends ToDateParseException {
+    public static class ParseDateNumberFormatException extends ParseDateException {
         private static final long serialVersionUID = 1L;
 
-        public ToDateNumberFormatException(String msg, Exception e) {
+        public ParseDateNumberFormatException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ToDateOutOfCalendarException extends ToDateParseException {
+    public static class ParseDateOutOfCalendarException extends ParseDateException {
         private static final long serialVersionUID = 1L;
 
-        public ToDateOutOfCalendarException(String msg, Exception e) {
+        public ParseDateOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
         }
+    }
+
+    // -----------------------------------------------------
+    //                                         Determination
+    //                                         -------------
+    public static boolean isDateAD(Date date) {
+        return date.getTime() >= AD_ORIGIN_MILLISECOND;
+    }
+
+    public static boolean isDateBC(Date date) {
+        return date.getTime() < AD_ORIGIN_MILLISECOND;
     }
 
     // -----------------------------------------------------
@@ -892,9 +904,9 @@ public final class DfTypeUtil {
      * with flexible-parsing if the object is string type.
      * @param o The parsed object. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
-     * @throws ToTimestampParseException When it failed to parse the string to time-stamp.
-     * @throws ToTimestampNumberFormatException When it failed to format the elements as number.
-     * @throws ToTimestampOutOfCalendarException When the timestamp was out of calendar. (if BC, not thrown)
+     * @throws ParseTimestampException When it failed to parse the string to time-stamp.
+     * @throws ParseTimestampNumberFormatException When it failed to format the elements as number.
+     * @throws ParseTimestampOutOfCalendarException When the timestamp was out of calendar. (if BC, not thrown)
      */
     public static Timestamp toTimestamp(Object o) {
         return toTimestamp(o, null);
@@ -909,9 +921,9 @@ public final class DfTypeUtil {
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
-     * @throws ToTimestampParseException When it failed to parse the string to time-stamp.
-     * @throws ToTimestampNumberFormatException When it failed to format the elements as number.
-     * @throws ToTimestampOutOfCalendarException When the timestamp was out of calendar. (if BC, not thrown)
+     * @throws ParseTimestampException When it failed to parse the string to time-stamp.
+     * @throws ParseTimestampNumberFormatException When it failed to format the elements as number.
+     * @throws ParseTimestampOutOfCalendarException When the timestamp was out of calendar. (if BC, not thrown)
      */
     public static Timestamp toTimestamp(Object o, String pattern) {
         if (o == null) {
@@ -956,11 +968,11 @@ public final class DfTypeUtil {
                 df.parse(value); // no exception means illegal date
                 String msg = "The timestamp expression is out of calendar:";
                 msg = msg + " string=" + value + " pattern=" + pattern;
-                throw new ToTimestampOutOfCalendarException(msg, e);
+                throw new ParseTimestampOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to timestamp:";
                 msg = msg + " string=" + value + " pattern=" + pattern;
-                throw new ToTimestampParseException(msg, e);
+                throw new ParseTimestampException(msg, e);
             }
         }
     }
@@ -970,34 +982,34 @@ public final class DfTypeUtil {
         try {
             final boolean includeMilli = true;
             value = filterDateStringValueFlexibly(value, includeMilli); // based on date way
-        } catch (ToDateNumberFormatException e) {
+        } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the timestamp as number:";
             msg = msg + " value=" + pureValue;
-            throw new ToTimestampNumberFormatException(msg, e);
+            throw new ParseTimestampNumberFormatException(msg, e);
         }
         return value;
     }
 
-    public static class ToTimestampParseException extends RuntimeException {
+    public static class ParseTimestampException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public ToTimestampParseException(String msg, Exception e) {
+        public ParseTimestampException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ToTimestampOutOfCalendarException extends ToTimestampParseException {
+    public static class ParseTimestampOutOfCalendarException extends ParseTimestampException {
         private static final long serialVersionUID = 1L;
 
-        public ToTimestampOutOfCalendarException(String msg, Exception e) {
+        public ParseTimestampOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ToTimestampNumberFormatException extends ToTimestampParseException {
+    public static class ParseTimestampNumberFormatException extends ParseTimestampException {
         private static final long serialVersionUID = 1L;
 
-        public ToTimestampNumberFormatException(String msg, Exception e) {
+        public ParseTimestampNumberFormatException(String msg, Exception e) {
             super(msg, e);
         }
     }
@@ -1012,9 +1024,9 @@ public final class DfTypeUtil {
      * with flexible-parsing if the object is string type.
      * @param o The parsed object. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
-     * @throws ToTimeParseException When it failed to parse the string to time.
-     * @throws ToTimeNumberFormatException When it failed to format the elements as number.
-     * @throws ToTimeOutOfCalendarException When the time is out of calendar.
+     * @throws ParseTimeException When it failed to parse the string to time.
+     * @throws ParseTimeNumberFormatException When it failed to format the elements as number.
+     * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
      */
     public static Time toTime(Object o) {
         return toTime(o, null);
@@ -1029,9 +1041,9 @@ public final class DfTypeUtil {
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
-     * @throws ToTimeParseException When it failed to parse the string to time.
-     * @throws ToTimeNumberFormatException When it failed to format the elements as number.
-     * @throws ToTimeOutOfCalendarException When the time is out of calendar.
+     * @throws ParseTimeException When it failed to parse the string to time.
+     * @throws ParseTimeNumberFormatException When it failed to format the elements as number.
+     * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
      */
     public static Time toTime(Object o, String pattern) {
         if (o == null) {
@@ -1082,11 +1094,11 @@ public final class DfTypeUtil {
                 df.parse(value); // no exception means illegal date
                 String msg = "The time expression is out of calendar:";
                 msg = msg + " string=" + value + " pattern=" + pattern;
-                throw new ToTimeOutOfCalendarException(msg, e);
+                throw new ParseTimeOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to time:";
                 msg = msg + " string=" + value + " pattern=" + pattern;
-                throw new ToTimeParseException(msg, e);
+                throw new ParseTimeException(msg, e);
             }
         }
     }
@@ -1101,35 +1113,35 @@ public final class DfTypeUtil {
             final boolean includeMilli = false;
             try {
                 value = handleTimeZeroPrefix(time, pureValue, includeMilli);
-            } catch (ToDateNumberFormatException e) {
+            } catch (ParseDateNumberFormatException e) {
                 String msg = "Failed to format the time as number:";
                 msg = msg + " value=" + pureValue;
-                throw new ToTimeNumberFormatException(msg, e);
+                throw new ParseTimeNumberFormatException(msg, e);
             }
         }
         return value;
     }
 
-    public static class ToTimeParseException extends RuntimeException {
+    public static class ParseTimeException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public ToTimeParseException(String msg, Exception e) {
+        public ParseTimeException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ToTimeNumberFormatException extends ToTimeParseException {
+    public static class ParseTimeNumberFormatException extends ParseTimeException {
         private static final long serialVersionUID = 1L;
 
-        public ToTimeNumberFormatException(String msg, Exception e) {
+        public ParseTimeNumberFormatException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ToTimeOutOfCalendarException extends ToTimeParseException {
+    public static class ParseTimeOutOfCalendarException extends ParseTimeException {
         private static final long serialVersionUID = 1L;
 
-        public ToTimeOutOfCalendarException(String msg, Exception e) {
+        public ParseTimeOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
         }
     }
@@ -1144,9 +1156,9 @@ public final class DfTypeUtil {
      * with flexible-parsing if the object is string type.
      * @param o The parsed object. (Nullable)
      * @return The instance of SQL date. (Nullable)
-     * @throws ToSqlDateParseException When it failed to parse the string to SQL date.
-     * @throws ToSqlDateNumberFormatException When it failed to format the elements as number.
-     * @throws ToSqlDateOutOfCalendarException When the time is out of calendar.
+     * @throws ParseSqlDateException When it failed to parse the string to SQL date.
+     * @throws ParseSqlDateNumberFormatException When it failed to format the elements as number.
+     * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.
      */
     public static java.sql.Date toSqlDate(Object o) {
         return toSqlDate(o, null);
@@ -1161,9 +1173,9 @@ public final class DfTypeUtil {
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of SQL date. (Nullable)
-     * @throws ToSqlDateParseException When it failed to parse the string to SQL date.
-     * @throws ToSqlDateNumberFormatException When it failed to format the elements as number.
-     * @throws ToSqlDateOutOfCalendarException When the time is out of calendar.
+     * @throws ParseSqlDateException When it failed to parse the string to SQL date.
+     * @throws ParseSqlDateNumberFormatException When it failed to format the elements as number.
+     * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.
      */
     public static java.sql.Date toSqlDate(Object o, String pattern) {
         if (o == null) {
@@ -1184,18 +1196,18 @@ public final class DfTypeUtil {
         final Date date;
         try {
             date = toDate(o, pattern);
-        } catch (ToDateNumberFormatException e) {
+        } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the time as number:";
             msg = msg + " obj=" + o + " pattern=" + pattern;
-            throw new ToSqlDateNumberFormatException(msg, e);
-        } catch (ToDateOutOfCalendarException e) {
+            throw new ParseSqlDateNumberFormatException(msg, e);
+        } catch (ParseDateOutOfCalendarException e) {
             String msg = "The SQL-date expression is out of calendar:";
             msg = msg + " obj=" + o + " pattern=" + pattern;
-            throw new ToSqlDateOutOfCalendarException(msg, e);
-        } catch (ToDateParseException e) {
+            throw new ParseSqlDateOutOfCalendarException(msg, e);
+        } catch (ParseDateException e) {
             String msg = "Failed to parse the object to SQL-date:";
             msg = msg + " obj=" + o + " pattern=" + pattern;
-            throw new ToSqlDateParseException(msg, e);
+            throw new ParseSqlDateException(msg, e);
         }
         if (date != null) {
             clearTime(date);
@@ -1204,26 +1216,26 @@ public final class DfTypeUtil {
         return null;
     }
 
-    public static class ToSqlDateParseException extends RuntimeException {
+    public static class ParseSqlDateException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public ToSqlDateParseException(String msg, Exception e) {
+        public ParseSqlDateException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ToSqlDateNumberFormatException extends ToSqlDateParseException {
+    public static class ParseSqlDateNumberFormatException extends ParseSqlDateException {
         private static final long serialVersionUID = 1L;
 
-        public ToSqlDateNumberFormatException(String msg, Exception e) {
+        public ParseSqlDateNumberFormatException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ToSqlDateOutOfCalendarException extends ToSqlDateParseException {
+    public static class ParseSqlDateOutOfCalendarException extends ParseSqlDateException {
         private static final long serialVersionUID = 1L;
 
-        public ToSqlDateOutOfCalendarException(String msg, Exception e) {
+        public ParseSqlDateOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
         }
     }
@@ -1246,18 +1258,18 @@ public final class DfTypeUtil {
         final Date date;
         try {
             date = toDate(o, pattern);
-        } catch (ToDateNumberFormatException e) {
+        } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the calendar as number:";
             msg = msg + " obj=" + o + " pattern=" + pattern;
-            throw new ToCalendarNumberFormatException(msg, e);
-        } catch (ToDateOutOfCalendarException e) {
+            throw new ParseCalendarNumberFormatException(msg, e);
+        } catch (ParseDateOutOfCalendarException e) {
             String msg = "The calendar expression is out of calendar:";
             msg = msg + " obj=" + o + " pattern=" + pattern;
-            throw new ToCalendarOutOfCalendarException(msg, e);
-        } catch (ToDateParseException e) {
+            throw new ParseCalendarOutOfCalendarException(msg, e);
+        } catch (ParseDateException e) {
             String msg = "Failed to parse the object to calendar:";
             msg = msg + " obj=" + o + " pattern=" + pattern;
-            throw new ToCalendarParseException(msg, e);
+            throw new ParseCalendarParseException(msg, e);
         }
         if (date != null) {
             final Calendar cal = Calendar.getInstance();
@@ -1267,26 +1279,26 @@ public final class DfTypeUtil {
         return null;
     }
 
-    public static class ToCalendarParseException extends RuntimeException {
+    public static class ParseCalendarParseException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public ToCalendarParseException(String msg, Exception e) {
+        public ParseCalendarParseException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ToCalendarNumberFormatException extends ToCalendarParseException {
+    public static class ParseCalendarNumberFormatException extends ParseCalendarParseException {
         private static final long serialVersionUID = 1L;
 
-        public ToCalendarNumberFormatException(String msg, Exception e) {
+        public ParseCalendarNumberFormatException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ToCalendarOutOfCalendarException extends ToCalendarParseException {
+    public static class ParseCalendarOutOfCalendarException extends ParseCalendarParseException {
         private static final long serialVersionUID = 1L;
 
-        public ToCalendarOutOfCalendarException(String msg, Exception e) {
+        public ParseCalendarOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
         }
     }

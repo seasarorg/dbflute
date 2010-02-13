@@ -23,6 +23,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -191,7 +192,7 @@ public class DisplaySqlBuilder {
 
     protected static boolean isBCPrefixTarget(java.util.Date date, DateFormatResource resource) {
         final String format = resource.getFormat();
-        return date.getTime() < 0 && format.startsWith("yyyy") && !format.contains("G");
+        return DfTypeUtil.isDateBC(date) && format.startsWith("yyyy") && !format.contains("G");
     }
 
     protected static DateFormat createDateFormat(String format) {

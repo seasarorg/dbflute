@@ -42,7 +42,7 @@ import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
-import org.seasar.dbflute.util.DfTypeUtil.ToTimestampParseException;
+import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
 
 /**
  * @author jflute
@@ -290,7 +290,7 @@ public class IfCommentEvaluator {
                     final String literal = rearValue.substring(qlen, rearValue.length() - qlen).trim();
                     try {
                         return DfTypeUtil.toTimestamp(literal);
-                    } catch (ToTimestampParseException ignored) {
+                    } catch (ParseTimestampException ignored) {
                     }
                 }
             }

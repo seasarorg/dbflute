@@ -15,10 +15,12 @@
  */
 package org.seasar.dbflute;
 
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The interface of entity.
@@ -139,4 +141,56 @@ public interface Entity {
      * @return The display string for this entity. (NotNull)
      */
     public String buildDisplayString(String name, boolean column, boolean relation);
+
+    // ===================================================================================
+    //                                                                      Display String
+    //                                                                      ==============
+    public static final class InternalUtil {
+        public static boolean isSameValue(Object value1, Object value2) {
+            if (value1 == null && value2 == null) {
+                return true;
+            }
+            if (value1 == null || value2 == null) {
+                return false;
+            }
+            if (value1 instanceof byte[] && value2 instanceof byte[]) {
+                return isSameValueBytes((byte[]) value1, (byte[]) value2);
+            }
+            return value1.equals(value2);
+        }
+
+        public static boolean isSameValueBytes(byte[] bytes1, byte[] bytes2) {
+            if (bytes1 == null && bytes2 == null) {
+                return true;
+            }
+            if (bytes1 == null || bytes2 == null) {
+                return false;
+            }
+            if (bytes1.length != bytes2.length) {
+                return false;
+            }
+            for (int i = 0; i < bytes1.length; i++) {
+                if (bytes1[i] != bytes2[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static int calculateHashcode(int result, Object value) { // calculateHashcode()
+            if (value == null) {
+                return result;
+            }
+            return (31 * result) + (value instanceof byte[] ? ((byte[]) value).length : value.hashCode());
+        }
+
+        public static String toString(Date date, String pattern) {
+            final String str = DfTypeUtil.toString(date, pattern);
+            return (DfTypeUtil.isDateBC(date) ? "BC" : "") + str;
+        }
+
+        public static String toString(byte[] bytes) {
+            return "byte[" + (bytes != null ? String.valueOf(bytes.length) : "null") + "]";
+        }
+    }
 }
