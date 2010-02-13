@@ -46,11 +46,8 @@ public final class DfTypeUtil {
     protected static final String NULL = "null";
 
     // ===================================================================================
-    //                                                                          Convert To
-    //                                                                          ==========
-    // -----------------------------------------------------
-    //                                               Boolean
-    //                                               -------
+    //                                                                             Boolean
+    //                                                                             =======
     public static Boolean toBoolean(Object o) {
         if (o == null) {
             return (Boolean) o;
@@ -99,9 +96,9 @@ public final class DfTypeUtil {
         }
     }
 
-    // -----------------------------------------------------
-    //                                               Integer
-    //                                               -------
+    // ===================================================================================
+    //                                                                             Integer
+    //                                                                             =======
     public static Integer toInteger(Object o) {
         return toInteger(o, null);
     }
@@ -117,7 +114,7 @@ public final class DfTypeUtil {
             return toInteger((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Integer(createSimpleDateFormat(pattern).format(o));
+                return new Integer(createDateFormat(pattern).format(o));
             }
             return Integer.valueOf((int) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -147,7 +144,7 @@ public final class DfTypeUtil {
             return toPrimitiveInt((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Integer.parseInt(createSimpleDateFormat(pattern).format(o));
+                return Integer.parseInt(createDateFormat(pattern).format(o));
             }
             return (int) ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -164,9 +161,9 @@ public final class DfTypeUtil {
         return Integer.parseInt(normalize(s));
     }
 
-    // -----------------------------------------------------
-    //                                                  Long
-    //                                                  ----
+    // ===================================================================================
+    //                                                                                Long
+    //                                                                                ====
     public static Long toLong(Object o) {
         return toLong(o, null);
     }
@@ -182,7 +179,7 @@ public final class DfTypeUtil {
             return toLong((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Long(createSimpleDateFormat(pattern).format(o));
+                return new Long(createDateFormat(pattern).format(o));
             }
             return Long.valueOf(((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -212,7 +209,7 @@ public final class DfTypeUtil {
             return toPrimitiveLong((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Long.parseLong(createSimpleDateFormat(pattern).format(o));
+                return Long.parseLong(createDateFormat(pattern).format(o));
             }
             return ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -229,9 +226,9 @@ public final class DfTypeUtil {
         return Long.parseLong(normalize(s));
     }
 
-    // -----------------------------------------------------
-    //                                                Double
-    //                                                ------
+    // ===================================================================================
+    //                                                                              Double
+    //                                                                              ======
     public static Double toDouble(Object o) {
         return toDouble(o, null);
     }
@@ -247,7 +244,7 @@ public final class DfTypeUtil {
             return toDouble((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Double(createSimpleDateFormat(pattern).format(o));
+                return new Double(createDateFormat(pattern).format(o));
             }
             return new Double(((java.util.Date) o).getTime());
         } else {
@@ -275,7 +272,7 @@ public final class DfTypeUtil {
             return toPrimitiveDouble((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Double.parseDouble(createSimpleDateFormat(pattern).format(o));
+                return Double.parseDouble(createDateFormat(pattern).format(o));
             }
             return ((java.util.Date) o).getTime();
         } else {
@@ -290,9 +287,9 @@ public final class DfTypeUtil {
         return Double.parseDouble(normalize(s));
     }
 
-    // -----------------------------------------------------
-    //                                                 Float
-    //                                                 -----
+    // ===================================================================================
+    //                                                                               Float
+    //                                                                               =====
     public static Float toFloat(Object o) {
         return toFloat(o, null);
     }
@@ -308,7 +305,7 @@ public final class DfTypeUtil {
             return toFloat((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Float(createSimpleDateFormat(pattern).format(o));
+                return new Float(createDateFormat(pattern).format(o));
             }
             return new Float(((java.util.Date) o).getTime());
         } else {
@@ -336,7 +333,7 @@ public final class DfTypeUtil {
             return toPrimitiveFloat((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Float.parseFloat(createSimpleDateFormat(pattern).format(o));
+                return Float.parseFloat(createDateFormat(pattern).format(o));
             }
             return ((java.util.Date) o).getTime();
         } else {
@@ -351,9 +348,9 @@ public final class DfTypeUtil {
         return Float.parseFloat(normalize(s));
     }
 
-    // -----------------------------------------------------
-    //                                                 Short
-    //                                                 -----
+    // ===================================================================================
+    //                                                                               Short
+    //                                                                               =====
     public static Short toShort(Object o) {
         return toShort(o, null);
     }
@@ -369,7 +366,7 @@ public final class DfTypeUtil {
             return toShort((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Short.valueOf(createSimpleDateFormat(pattern).format(o));
+                return Short.valueOf(createDateFormat(pattern).format(o));
             }
             return Short.valueOf((short) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -399,7 +396,7 @@ public final class DfTypeUtil {
             return toPrimitiveShort((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Short.parseShort(createSimpleDateFormat(pattern).format(o));
+                return Short.parseShort(createDateFormat(pattern).format(o));
             }
             return (short) ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -416,9 +413,9 @@ public final class DfTypeUtil {
         return Short.parseShort(normalize(s));
     }
 
-    // -----------------------------------------------------
-    //                                                  Byte
-    //                                                  ----
+    // ===================================================================================
+    //                                                                                Byte
+    //                                                                                ====
     public static Byte toByte(Object o) {
         return toByte(o, null);
     }
@@ -434,7 +431,7 @@ public final class DfTypeUtil {
             return toByte((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new Byte(createSimpleDateFormat(pattern).format(o));
+                return new Byte(createDateFormat(pattern).format(o));
             }
             return Byte.valueOf((byte) ((java.util.Date) o).getTime());
         } else if (o instanceof Boolean) {
@@ -464,7 +461,7 @@ public final class DfTypeUtil {
             return toPrimitiveByte((String) o);
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return Byte.parseByte(createSimpleDateFormat(pattern).format(o));
+                return Byte.parseByte(createDateFormat(pattern).format(o));
             }
             return (byte) ((java.util.Date) o).getTime();
         } else if (o instanceof Boolean) {
@@ -481,9 +478,9 @@ public final class DfTypeUtil {
         return Byte.parseByte(normalize(s));
     }
 
-    // -----------------------------------------------------
-    //                                            BigDecimal
-    //                                            ----------
+    // ===================================================================================
+    //                                                                          BigDecimal
+    //                                                                          ==========
     public static BigDecimal toBigDecimal(Object o) {
         return toBigDecimal(o, null);
     }
@@ -501,7 +498,7 @@ public final class DfTypeUtil {
             }
         } else if (o instanceof java.util.Date) {
             if (pattern != null) {
-                return new BigDecimal(createSimpleDateFormat(pattern).format(o));
+                return new BigDecimal(createDateFormat(pattern).format(o));
             }
             return new BigDecimal(Long.toString(((java.util.Date) o).getTime()));
         } else if (o instanceof String) {
@@ -515,9 +512,9 @@ public final class DfTypeUtil {
         }
     }
 
-    // -----------------------------------------------------
-    //                                            BigInteger
-    //                                            ----------
+    // ===================================================================================
+    //                                                                          BigInteger
+    //                                                                          ==========
     public static BigInteger toBigInteger(Object o) {
         return toBigInteger(o, null);
     }
@@ -542,9 +539,9 @@ public final class DfTypeUtil {
         }
     }
 
-    // -----------------------------------------------------
-    //                                                  Date
-    //                                                  ----
+    // ===================================================================================
+    //                                                                          (util)Date
+    //                                                                          ==========
     /**
      * Convert the object to the instance that is date. <br />
      * Even if it's the sub class type, it returns a new instance. <br />
@@ -611,7 +608,7 @@ public final class DfTypeUtil {
         } else {
             strict = true;
         }
-        final DateFormat df = createSimpleDateFormat(pattern, strict);
+        final DateFormat df = createDateFormat(pattern, strict);
         try {
             return df.parse(value);
         } catch (ParseException e) {
@@ -782,23 +779,6 @@ public final class DfTypeUtil {
         return sb.toString() + value;
     }
 
-    public static void clearSeconds(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        date.setTime(cal.getTimeInMillis());
-    }
-
-    public static void clearMilliseconds(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.set(Calendar.MILLISECOND, 0);
-        date.setTime(cal.getTimeInMillis());
-    }
-
     public static class ToDateParseException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
@@ -823,9 +803,26 @@ public final class DfTypeUtil {
         }
     }
 
-    // -----------------------------------------------------
-    //                                             Timestamp
-    //                                             ---------
+    public static void clearSeconds(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void clearMilliseconds(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.MILLISECOND, 0);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    // ===================================================================================
+    //                                                                           Timestamp
+    //                                                                           =========
     /**
      * Convert the object to the instance that is time-stamp. <br />
      * Even if it's the sub class type, it returns a new instance. <br />
@@ -888,7 +885,7 @@ public final class DfTypeUtil {
         } else {
             strict = true;
         }
-        DateFormat df = createSimpleDateFormat(pattern, strict);
+        DateFormat df = createDateFormat(pattern, strict);
         try {
             return new Timestamp(df.parse(value).getTime());
         } catch (ParseException e) {
@@ -943,9 +940,9 @@ public final class DfTypeUtil {
         }
     }
 
-    // -----------------------------------------------------
-    //                                                  Time
-    //                                                  ----
+    // ===================================================================================
+    //                                                                                Time
+    //                                                                                ====
     /**
      * Convert the object to the instance that is time. <br />
      * Even if it's the sub class type, it returns a new instance. <br />
@@ -1014,7 +1011,7 @@ public final class DfTypeUtil {
             value = filterTimeStringValueFlexibly(value);
             pattern = "HH:mm:ss";
         }
-        final DateFormat df = createSimpleDateFormat(pattern, true);
+        final DateFormat df = createDateFormat(pattern, true);
         try {
             return new Time(df.parse(value).getTime());
         } catch (ParseException e) {
@@ -1075,9 +1072,9 @@ public final class DfTypeUtil {
         }
     }
 
-    // -----------------------------------------------------
-    //                                              SQL Date
-    //                                              --------
+    // ===================================================================================
+    //                                                                           (sql)Date
+    //                                                                           =========
     /**
      * Convert the object to the instance that is SQL-date. <br />
      * Even if it's the sub class type, it returns a new instance. <br />
@@ -1169,16 +1166,20 @@ public final class DfTypeUtil {
         }
     }
 
-    // -----------------------------------------------------
-    //                                              Calendar
-    //                                              --------
+    // ===================================================================================
+    //                                                                            Calendar
+    //                                                                            ========
     public static Calendar toCalendar(Object o) {
         return toCalendar(o, null);
     }
 
     public static Calendar toCalendar(Object o, String pattern) {
         if (o instanceof Calendar) {
-            return (Calendar) o;
+            final Calendar original = ((Calendar) o);
+            final Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(original.getTimeInMillis());
+            cal.setTimeZone(original.getTimeZone());
+            return cal;// new instance
         }
         final Date date;
         try {
@@ -1196,9 +1197,8 @@ public final class DfTypeUtil {
             msg = msg + " obj=" + o + " pattern=" + pattern;
             throw new ToCalendarParseException(msg, e);
         }
-
         if (date != null) {
-            Calendar cal = Calendar.getInstance();
+            final Calendar cal = Calendar.getInstance();
             cal.setTime(date);
             return cal;
         }
@@ -1238,9 +1238,9 @@ public final class DfTypeUtil {
         return localCalendar;
     }
 
-    // -----------------------------------------------------
-    //                                                Number
-    //                                                ------
+    // ===================================================================================
+    //                                                                              Number
+    //                                                                              ======
     public static Object toNumber(Class<?> type, Object o) {
         if (type == Integer.class) {
             return toInteger(o);
@@ -1262,9 +1262,9 @@ public final class DfTypeUtil {
         return o;
     }
 
-    // -----------------------------------------------------
-    //                                               Wrapper
-    //                                               -------
+    // ===================================================================================
+    //                                                                             Wrapper
+    //                                                                             =======
     public static Object toWrapper(Class<?> type, Object o) {
         if (type == int.class) {
             Integer i = toInteger(o);
@@ -1359,9 +1359,9 @@ public final class DfTypeUtil {
         return o;
     }
 
-    // -----------------------------------------------------
-    //                                                Binary
-    //                                                ------
+    // ===================================================================================
+    //                                                                              Binary
+    //                                                                              ======
     public static byte[] toBinary(String o, String encoding) {
         if (o == null) {
             return null;
@@ -1387,27 +1387,51 @@ public final class DfTypeUtil {
         if (date == null) {
             return null;
         }
-        DateFormat format = createSimpleDateFormat(pattern);
+        DateFormat format = createDateFormat(pattern);
         return format.format(date);
+    }
+
+    public static String format(Calendar cal, String pattern) {
+        if (cal == null) {
+            return null;
+        }
+        return format(cal.getTime(), pattern);
+    }
+
+    // -----------------------------------------------------
+    //                                            DateFormat
+    //                                            ----------
+    public static DateFormat createDateFormat(String pattern) { // as lenient
+        return createDateFormat(pattern, false);
+    }
+
+    public static DateFormat createDateFormat(String pattern, boolean strict) {
+        if (pattern == null) {
+            String msg = "The argument 'pattern' should not be null!";
+            throw new IllegalArgumentException(msg);
+        }
+        final SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        sdf.setLenient(!strict);
+        return sdf;
     }
 
     // ===================================================================================
     //                                                                           Normalize
     //                                                                           =========
-    protected static String normalize(String s) {
-        return normalize(s, Locale.getDefault());
+    protected static String normalize(String value) {
+        return normalize(value, Locale.getDefault());
     }
 
-    protected static String normalize(String s, Locale locale) {
-        if (s == null) {
+    protected static String normalize(String value, Locale locale) {
+        if (value == null) {
             return null;
         }
-        DecimalFormatSymbols symbols = getDecimalFormatSymbols(locale);
-        char decimalSep = symbols.getDecimalSeparator();
-        char groupingSep = symbols.getGroupingSeparator();
-        StringBuilder sb = new StringBuilder(20);
-        for (int i = 0; i < s.length(); ++i) {
-            char c = s.charAt(i);
+        final DecimalFormatSymbols symbols = getDecimalFormatSymbols(locale);
+        final char groupingSep = symbols.getGroupingSeparator();
+        final char decimalSep = symbols.getDecimalSeparator();
+        final StringBuilder sb = new StringBuilder(20);
+        for (int i = 0; i < value.length(); ++i) {
+            char c = value.charAt(i);
             if (c == groupingSep) {
                 continue;
             } else if (c == decimalSep) {
@@ -1454,7 +1478,7 @@ public final class DfTypeUtil {
     public static String toString(Date value, String pattern) {
         if (value != null) {
             if (pattern != null) {
-                return createSimpleDateFormat(pattern).format(value);
+                return createDateFormat(pattern).format(value);
             }
             return value.toString();
         }
@@ -1468,7 +1492,6 @@ public final class DfTypeUtil {
     // The text cannot be null.
     // If the value is null, it returns 'null' text.
     // - - - - - - - - - -/
-
     /**
      * @return The 'null' text as string. (NotNull)
      */
@@ -1612,23 +1635,6 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    // -----------------------------------------------------
-    //                                            DateFormat
-    //                                            ----------
-    protected static SimpleDateFormat createSimpleDateFormat(String pattern) {
-        return createSimpleDateFormat(pattern, false);
-    }
-
-    protected static SimpleDateFormat createSimpleDateFormat(String pattern, boolean strict) {
-        if (pattern == null) {
-            String msg = "The argument 'pattern' should not be null!";
-            throw new IllegalArgumentException(msg);
-        }
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        simpleDateFormat.setLenient(!strict);
-        return simpleDateFormat;
-    }
-
     // -----------------------------------------------------
     //                                  DecimalFormatSymbols
     //                                  --------------------

@@ -33,11 +33,24 @@ public class DfTypeUtilTest extends PlainTestCase {
     }
 
     // -----------------------------------------------------
+    //                                               Integer
+    //                                               -------
+    public void test_toInteger() {
+        // ## Arrange & Act & Assert ##
+        assertNull(DfTypeUtil.toInteger(null));
+        assertNull(DfTypeUtil.toInteger(""));
+        assertEquals(Integer.valueOf(3), DfTypeUtil.toInteger("3"));
+        assertEquals(Integer.valueOf(33333), DfTypeUtil.toInteger("33333"));
+        assertEquals(Integer.valueOf(-33333), DfTypeUtil.toInteger("-33333"));
+        assertEquals(Integer.valueOf(33333), DfTypeUtil.toInteger("33,333"));
+    }
+
+    // -----------------------------------------------------
     //                                                  Date
     //                                                  ----
     public void test_toDate_sameClass() {
         // ## Arrange ##
-        DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
         Date pureDate = new Date(DfTypeUtil.toDate("2009-12-13 12:34:56.123").getTime());
 
         // ## Act ##
@@ -51,7 +64,7 @@ public class DfTypeUtilTest extends PlainTestCase {
 
     public void test_toDate_subClass() {
         // ## Arrange ##
-        DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
         Timestamp timestamp = Timestamp.valueOf("2009-12-13 12:34:56.123");
 
         // ## Act ##
@@ -65,7 +78,7 @@ public class DfTypeUtilTest extends PlainTestCase {
 
     public void test_toDate_various() {
         // ## Arrange ##
-        DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        DateFormat df = DfTypeUtil.createDateFormat("yyyy/MM/dd HH:mm:ss");
         DateFormat fullDf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
         // ## Act & Assert ##
