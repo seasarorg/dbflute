@@ -98,7 +98,7 @@ public class DfTypeUtilTest extends PlainTestCase {
     public void test_toDate_various_BC() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        SimpleDateFormat fullDf = new SimpleDateFormat("GGGyyyy/MM/dd HH:mm:ss.SSS");
+        SimpleDateFormat fullDf = new SimpleDateFormat("Gyyyy/MM/dd HH:mm:ss.SSS");
 
         // ## Act & Assert ##
         log(fullDf.format(DfTypeUtil.toDate("-2008-09-01 02:04:06")));
@@ -254,7 +254,7 @@ public class DfTypeUtilTest extends PlainTestCase {
     public void test_toTimestamp_various_BC() {
         // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
-        SimpleDateFormat fullDf = new SimpleDateFormat("GGGyyyy/MM/dd HH:mm:ss.SSS");
+        SimpleDateFormat fullDf = new SimpleDateFormat("Gyyyy/MM/dd HH:mm:ss.SSS");
 
         // ## Act & Assert ##
         log(fullDf.format(DfTypeUtil.toTimestamp("-2008-09-01 02:04:06.123")));
