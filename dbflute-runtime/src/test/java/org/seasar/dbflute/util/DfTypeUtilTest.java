@@ -103,6 +103,7 @@ public class DfTypeUtilTest extends PlainTestCase {
         // ## Act & Assert ##
         log(fullDf.format(DfTypeUtil.toDate("-2008-09-01 02:04:06")));
         assertTrue(DfTypeUtil.toDate("-8-9-1").getTime() < 0);
+        assertTrue(DfTypeUtil.toDate("-1-9-1").getTime() < 0);
         assertTrue(DfTypeUtil.toDate("-8-9-1 2:4:6").getTime() < 0);
         assertTrue(DfTypeUtil.toDate("-80901").getTime() < 0);
         assertTrue(DfTypeUtil.toDate("-2008-09-01 02:04:06").getTime() < 0);
@@ -193,6 +194,14 @@ public class DfTypeUtilTest extends PlainTestCase {
             // OK
             log(e.getMessage());
         }
+        try {
+            DfTypeUtil.toDate("0000-12-09 12:34:26");
+
+            fail();
+        } catch (ToDateOutOfCalendarException e) {
+            // OK
+            log(e.getMessage());
+        }
     }
 
     public void test_clearSeconds() {
@@ -250,6 +259,7 @@ public class DfTypeUtilTest extends PlainTestCase {
         // ## Act & Assert ##
         log(fullDf.format(DfTypeUtil.toTimestamp("-2008-09-01 02:04:06.123")));
         assertTrue(DfTypeUtil.toTimestamp("-8-9-1").getTime() < 0);
+        assertTrue(DfTypeUtil.toTimestamp("-1-9-1").getTime() < 0);
         assertTrue(DfTypeUtil.toTimestamp("-8-9-1 2:4:6").getTime() < 0);
         assertTrue(DfTypeUtil.toTimestamp("-80901").getTime() < 0);
         assertTrue(DfTypeUtil.toTimestamp("-2008-09-01 02:04:06.123").getTime() < 0);
@@ -356,6 +366,15 @@ public class DfTypeUtilTest extends PlainTestCase {
             // OK
             log(e.getMessage());
         }
+        try {
+            DfTypeUtil.toTimestamp("0000-12-09 12:34:26.541");
+
+            fail();
+        } catch (ToTimestampOutOfCalendarException e) {
+            // OK
+            log(e.getMessage());
+        }
+
     }
 
     // -----------------------------------------------------
