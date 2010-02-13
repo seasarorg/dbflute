@@ -38,12 +38,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class DfTypeUtil {
+public final class DfTypeUtil {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final String NULL = "null";
+    protected static final String NULL = "null";
 
     // ===================================================================================
     //                                                                          Convert To
@@ -553,6 +553,8 @@ public class DfTypeUtil {
      * @param o The parsed object. (Nullable)
      * @return The instance of date. (Nullable)
      * @throws ToDateParseException When it failed to parse the string to date.
+     * @throws ToDateNumberFormatException When it failed to format the elements as number.
+     * @throws ToDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
      */
     public static Date toDate(Object o) {
         return toDate(o, null);
@@ -568,6 +570,8 @@ public class DfTypeUtil {
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of date. (Nullable)
      * @throws ToDateParseException When it failed to parse the string to date.
+     * @throws ToDateNumberFormatException When it failed to format the elements as number.
+     * @throws ToDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
      */
     public static Date toDate(Object o, String pattern) {
         if (o == null) {
@@ -591,108 +595,183 @@ public class DfTypeUtil {
         }
     }
 
-    protected static Date toDateFromString(String s, String pattern) {
-        if (s == null || s.trim().length() == 0) {
+    protected static Date toDateFromString(String value, String pattern) {
+        if (value == null || value.trim().length() == 0) {
             return null;
         }
-        final DateFormat df;
+        boolean strict;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            df = createDateFormat(s, "yyyy-MM-dd HH:mm:ss");
-            s = filterDateStringValueFlexibly(s);
+            final boolean includeMilli = false;
+            value = filterDateStringValueFlexibly(value, includeMilli);
+            strict = !value.startsWith("-"); // not BC
+            pattern = "yyyy-MM-dd HH:mm:ss";
         } else {
-            df = createDateFormat(s, pattern);
+            strict = true;
         }
+        final DateFormat df = createSimpleDateFormat(pattern, strict);
         try {
-            return df.parse(s);
+            return df.parse(value);
         } catch (ParseException e) {
             try {
                 df.setLenient(true);
-                df.parse(s); // no exception means illegal date
+                df.parse(value); // no exception means illegal date
                 String msg = "The date expression is out of calendar:";
-                msg = msg + " string=" + s + " pattern=" + pattern;
+                msg = msg + " string=" + value + " pattern=" + pattern;
                 throw new ToDateOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to date:";
-                msg = msg + " string=" + s + " pattern=" + pattern;
+                msg = msg + " string=" + value + " pattern=" + pattern;
                 throw new ToDateParseException(msg, e);
             }
         }
     }
 
-    public static class ToDateParseException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public ToDateParseException(String msg, ParseException e) {
-            super(msg, e);
-        }
-    }
-
-    public static class ToDateOutOfCalendarException extends ToDateParseException {
-        private static final long serialVersionUID = 1L;
-
-        public ToDateOutOfCalendarException(String msg, ParseException e) {
-            super(msg, e);
-        }
-    }
-
-    protected static String filterDateStringValueFlexibly(String value) {
-        // basic filter
+    protected static String filterDateStringValueFlexibly(final String pureValue, boolean includeMilli) {
+        final String bcPrefix = "-";
+        final String adLatinPrefix = "AD";
+        final String adLatinDotPrefix = "A.D.";
+        final String bcLatinPrefix = "BC";
+        final String bcLatinDotPrefix = "B.C.";
+        final String dateDlm = "-";
+        final String dateTimeDlm = " ";
+        final String timeDlm = ":";
+        final String timeMilliDlm = ".";
+        String value = pureValue;
         value = value.trim();
+
+        // handling AD/BC prefix
+        final boolean bc;
+        {
+            if (value.startsWith(bcLatinPrefix)) {
+                value = value.substring(bcLatinPrefix.length());
+                bc = true;
+            } else if (value.startsWith(bcLatinDotPrefix)) {
+                value = value.substring(bcLatinDotPrefix.length());
+                bc = true;
+            } else if (value.startsWith(adLatinPrefix)) {
+                value = value.substring(adLatinPrefix.length());
+                bc = false;
+            } else if (value.startsWith(adLatinDotPrefix)) {
+                value = value.substring(adLatinDotPrefix.length());
+                bc = false;
+            } else if (value.startsWith(bcPrefix)) {
+                value = value.substring(bcPrefix.length());
+                bc = true;
+            } else {
+                bc = false;
+            }
+        }
+
+        // handling slash delimiter for yyyyMMdd
         value = value.replaceAll("/", "-");
 
-        // handling '20090119'
-        if (value.length() <= 8 && !value.contains("-")) {
-            if (value.length() > 4) {
-                value = resolveZeroPrefix(value, 8 - value.length());
+        // handling '20090119' and '8631230' and so on
+        if (value.length() <= 8 && !value.contains(dateDlm)) {
+            if (value.length() >= 5) {
+                value = resolveDateElementZeroPrefix(value, 8 - value.length());
+                final String yyyy = value.substring(0, 4);
+                final String mm = value.substring(4, 6);
+                final String dd = value.substring(6, 8);
+                value = yyyy + dateDlm + mm + dateDlm + dd;
             } else {
-                return value; // if the value is '2009'
+                return pureValue; // couldn't filter for example '1234'
             }
-            final String yyyy = value.substring(0, 4);
-            final String mm = value.substring(4, 6);
-            final String dd = value.substring(6, 8);
-            value = yyyy + "-" + mm + "-" + dd;
         }
 
         // check whether it can filter
-        if (!value.contains("-")) { // hyphen is not found
-            return value;
-        }
-        if (value.indexOf("-") == value.lastIndexOf("-")) { // hyphen is only one
-            return value;
+        if (!value.contains("-") || (value.indexOf("-") == value.lastIndexOf("-"))) {
+            return pureValue; // couldn't filter for example '123456789' and '1234-123'
         }
 
         // handling zero prefix
-        final int yearEndIndex = value.indexOf("-");
+        final int yearEndIndex = value.indexOf(dateDlm);
         String yyyy = value.substring(0, yearEndIndex);
-        yyyy = resolveZeroPrefix(yyyy, 4 - yyyy.length());
-
-        final String startsMm = value.substring(yearEndIndex + "-".length());
-        final int monthEndIndex = startsMm.indexOf("-");
-        String mm = startsMm.substring(0, monthEndIndex);
-        mm = resolveZeroPrefix(mm, 2 - mm.length());
-
-        final String startsDd = startsMm.substring(monthEndIndex + "-".length());
-        final int dayEndIndex = startsDd.indexOf(" ");
-        String dd = dayEndIndex >= 0 ? startsDd.substring(0, dayEndIndex) : startsDd;
-        dd = resolveZeroPrefix(dd, 2 - dd.length());
-
-        String time = null;
-        if (dayEndIndex >= 0) {
-            time = startsDd.substring(dayEndIndex + " ".length());
+        yyyy = resolveDateElementZeroPrefix(yyyy, 4 - yyyy.length());
+        if (bc) {
+            final Integer yyyyInt = formatDateElementAsNumber(yyyy, "yyyy", pureValue);
+            yyyy = String.valueOf(yyyyInt - 1); // because DateFormat treats '-2007' as 'BC2008'
+            yyyy = resolveDateElementZeroPrefix(yyyy, 4 - yyyy.length());
+        } else {
+            formatDateElementAsNumber(yyyy, "yyyy", pureValue); // check only
         }
 
-        value = yyyy + "-" + mm + "-" + dd + (time != null ? " " + time : "");
+        final String startsMon = value.substring(yearEndIndex + dateDlm.length());
+        final int monthEndIndex = startsMon.indexOf(dateDlm);
+        String mm = startsMon.substring(0, monthEndIndex);
+        mm = resolveDateElementZeroPrefix(mm, 2 - mm.length());
+        formatDateElementAsNumber(mm, "MM", pureValue); // check only
 
-        // add HH:mm:dd if not exists
-        if (value.indexOf("-") == 4 && value.lastIndexOf("-") == 7) {
-            if (value.length() == "2007-07-09".length()) {
-                value = value + " 00:00:00"; // for ' HH:mm:ss'
+        final String startsDay = startsMon.substring(monthEndIndex + dateDlm.length());
+        final int dayEndIndex = startsDay.indexOf(dateTimeDlm);
+        String dd = dayEndIndex >= 0 ? startsDay.substring(0, dayEndIndex) : startsDay;
+        dd = resolveDateElementZeroPrefix(dd, 2 - dd.length());
+        formatDateElementAsNumber(dd, "dd", pureValue); // check only
+        final String yyyy_MM_dd = yyyy + dateDlm + mm + dateDlm + dd;
+
+        if (dayEndIndex >= 0) { // has time parts
+            final String time = startsDay.substring(dayEndIndex + dateTimeDlm.length());
+
+            // check whether it can filter
+            if (!time.contains(timeDlm) || (time.indexOf(timeDlm) == time.lastIndexOf(timeDlm))) {
+                return pureValue; // couldn't filter for example '2009-12-12 123451' and '2009-12-12 123:451'
+            }
+
+            value = yyyy_MM_dd + dateTimeDlm + handleTimeZeroPrefix(time, pureValue, includeMilli);
+        } else {
+            value = yyyy_MM_dd + dateTimeDlm + "00:00:00";
+            if (includeMilli) {
+                value = value + timeMilliDlm + "000";
+            }
+        }
+        return (bc ? bcPrefix : "") + value;
+    }
+
+    protected static String handleTimeZeroPrefix(String time, String pureValue, boolean includeMilli) {
+        final String timeDlm = ":";
+        final String timeMilliDlm = ".";
+
+        final int hourEndIndex = time.indexOf(timeDlm);
+        String hour = time.substring(0, hourEndIndex);
+        hour = resolveDateElementZeroPrefix(hour, 2 - hour.length());
+        formatDateElementAsNumber(hour, "HH", pureValue); // check only
+
+        final String startsMin = time.substring(hourEndIndex + timeDlm.length());
+        final int minEndIndex = startsMin.indexOf(timeDlm);
+        String min = startsMin.substring(0, minEndIndex);
+        min = resolveDateElementZeroPrefix(min, 2 - min.length());
+        formatDateElementAsNumber(min, "mm", pureValue); // check only
+
+        final String startsSec = startsMin.substring(minEndIndex + timeDlm.length());
+        final int secEndIndex = startsSec.indexOf(timeMilliDlm);
+        String sec = secEndIndex >= 0 ? startsSec.substring(0, secEndIndex) : startsSec;
+        sec = resolveDateElementZeroPrefix(sec, 2 - sec.length());
+        formatDateElementAsNumber(sec, "ss", pureValue); // check only
+
+        String value = hour + timeDlm + min + timeDlm + sec;
+        if (includeMilli) {
+            if (secEndIndex >= 0) {
+                final String milli = startsSec.substring(secEndIndex + timeMilliDlm.length());
+                resolveDateElementZeroPrefix(milli, 3 - milli.length());
+                formatDateElementAsNumber(milli, "SSS", pureValue); // check only
+                value = value + timeMilliDlm + milli; // append millisecond
+            } else {
+                value = value + timeMilliDlm + "000";
             }
         }
         return value;
     }
 
-    protected static String resolveZeroPrefix(String value, int count) {
+    protected static Integer formatDateElementAsNumber(String value, String title, String pureValue) {
+        try {
+            return Integer.valueOf(value);
+        } catch (NumberFormatException e) {
+            String msg = "Failed to format " + title + " as number:";
+            msg = msg + " " + title + "=" + value + " value=" + pureValue;
+            throw new ToDateNumberFormatException(msg, e);
+        }
+    }
+
+    protected static String resolveDateElementZeroPrefix(String value, int count) {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             sb.append("0");
@@ -710,6 +789,30 @@ public class DfTypeUtil {
         date.setTime(cal.getTimeInMillis());
     }
 
+    public static class ToDateParseException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToDateParseException(String msg, Exception e) {
+            super(msg, e);
+        }
+    }
+
+    public static class ToDateNumberFormatException extends ToDateParseException {
+        private static final long serialVersionUID = 1L;
+
+        public ToDateNumberFormatException(String msg, Exception e) {
+            super(msg, e);
+        }
+    }
+
+    public static class ToDateOutOfCalendarException extends ToDateParseException {
+        private static final long serialVersionUID = 1L;
+
+        public ToDateOutOfCalendarException(String msg, Exception e) {
+            super(msg, e);
+        }
+    }
+
     // -----------------------------------------------------
     //                                             Timestamp
     //                                             ---------
@@ -721,6 +824,8 @@ public class DfTypeUtil {
      * @param o The parsed object. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
      * @throws ToTimestampParseException When it failed to parse the string to time-stamp.
+     * @throws ToTimestampNumberFormatException When it failed to format the elements as number.
+     * @throws ToTimestampOutOfCalendarException When the timestamp was out of calendar. (if BC, not thrown)
      */
     public static Timestamp toTimestamp(Object o) {
         return toTimestamp(o, null);
@@ -736,6 +841,8 @@ public class DfTypeUtil {
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
      * @throws ToTimestampParseException When it failed to parse the string to time-stamp.
+     * @throws ToTimestampNumberFormatException When it failed to format the elements as number.
+     * @throws ToTimestampOutOfCalendarException When the timestamp was out of calendar. (if BC, not thrown)
      */
     public static Timestamp toTimestamp(Object o, String pattern) {
         if (o == null) {
@@ -759,32 +866,47 @@ public class DfTypeUtil {
         }
     }
 
-    protected static Timestamp toTimestampFromString(String s, String pattern) {
-        if (s == null || s.trim().length() == 0) {
+    protected static Timestamp toTimestampFromString(String value, String pattern) {
+        if (value == null || value.trim().length() == 0) {
             return null;
         }
-        final DateFormat df;
+        boolean strict;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            df = createDateFormat(s, "yyyy-MM-dd HH:mm:ss.SSS");
-            s = filterTimestampStringValueFlexibly(s);
+            value = filterTimestampStringValueFlexibly(value);
+            strict = !value.startsWith("-"); // not BC
+            pattern = "yyyy-MM-dd HH:mm:ss.SSS";
         } else {
-            df = createDateFormat(s, pattern);
+            strict = true;
         }
+        DateFormat df = createSimpleDateFormat(pattern, strict);
         try {
-            return new Timestamp(df.parse(s).getTime());
+            return new Timestamp(df.parse(value).getTime());
         } catch (ParseException e) {
             try {
                 df.setLenient(true);
-                df.parse(s); // no exception means illegal date
+                df.parse(value); // no exception means illegal date
                 String msg = "The timestamp expression is out of calendar:";
-                msg = msg + " string=" + s + " pattern=" + pattern;
+                msg = msg + " string=" + value + " pattern=" + pattern;
                 throw new ToTimestampOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to timestamp:";
-                msg = msg + " string=" + s + " pattern=" + pattern;
+                msg = msg + " string=" + value + " pattern=" + pattern;
                 throw new ToTimestampParseException(msg, e);
             }
         }
+    }
+
+    protected static String filterTimestampStringValueFlexibly(final String pureValue) {
+        String value = pureValue;
+        try {
+            final boolean includeMilli = true;
+            value = filterDateStringValueFlexibly(value, includeMilli); // based on date way
+        } catch (ToDateNumberFormatException e) {
+            String msg = "Failed to format the timestamp as number:";
+            msg = msg + " value=" + pureValue;
+            throw new ToTimestampNumberFormatException(msg, e);
+        }
+        return value;
     }
 
     public static class ToTimestampParseException extends RuntimeException {
@@ -795,7 +917,7 @@ public class DfTypeUtil {
         }
     }
 
-    public static class ToTimestampOutOfCalendarException extends RuntimeException {
+    public static class ToTimestampOutOfCalendarException extends ToTimestampParseException {
         private static final long serialVersionUID = 1L;
 
         public ToTimestampOutOfCalendarException(String msg, Exception e) {
@@ -803,13 +925,12 @@ public class DfTypeUtil {
         }
     }
 
-    protected static String filterTimestampStringValueFlexibly(String value) {
-        value = filterDateStringValueFlexibly(value); // based on date way
-        final int timeEndIndex = value.indexOf(".");
-        if (timeEndIndex < 0) {
-            value = value + ".000"; // for '.SSS'
+    public static class ToTimestampNumberFormatException extends ToTimestampParseException {
+        private static final long serialVersionUID = 1L;
+
+        public ToTimestampNumberFormatException(String msg, Exception e) {
+            super(msg, e);
         }
-        return value;
     }
 
     // -----------------------------------------------------
@@ -823,6 +944,8 @@ public class DfTypeUtil {
      * @param o The parsed object. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
      * @throws ToTimeParseException When it failed to parse the string to time.
+     * @throws ToTimeNumberFormatException When it failed to format the elements as number.
+     * @throws ToTimeOutOfCalendarException When the time is out of calendar.
      */
     public static Time toTime(Object o) {
         return toTime(o, null);
@@ -838,6 +961,8 @@ public class DfTypeUtil {
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
      * @throws ToTimeParseException When it failed to parse the string to time.
+     * @throws ToTimeNumberFormatException When it failed to format the elements as number.
+     * @throws ToTimeOutOfCalendarException When the time is out of calendar.
      */
     public static Time toTime(Object o, String pattern) {
         if (o == null) {
@@ -871,32 +996,49 @@ public class DfTypeUtil {
         }
     }
 
-    protected static Time toTimeFromString(String s, String pattern) {
-        if (s == null || s.trim().length() == 0) {
+    protected static Time toTimeFromString(String value, String pattern) {
+        if (value == null || value.trim().length() == 0) {
             return null;
         }
-        final DateFormat df;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            df = createDateFormat(s, "HH:mm:ss");
-            s = filterTimeStringValueFlexibly(s);
-        } else {
-            df = createDateFormat(s, pattern);
+            value = filterTimeStringValueFlexibly(value);
+            pattern = "HH:mm:ss";
         }
+        final DateFormat df = createSimpleDateFormat(pattern, true);
         try {
-            return new Time(df.parse(s).getTime());
+            return new Time(df.parse(value).getTime());
         } catch (ParseException e) {
             try {
                 df.setLenient(true);
-                df.parse(s); // no exception means illegal date
+                df.parse(value); // no exception means illegal date
                 String msg = "The time expression is out of calendar:";
-                msg = msg + " string=" + s + " pattern=" + pattern;
+                msg = msg + " string=" + value + " pattern=" + pattern;
                 throw new ToTimeOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to time:";
-                msg = msg + " string=" + s + " pattern=" + pattern;
+                msg = msg + " string=" + value + " pattern=" + pattern;
                 throw new ToTimeParseException(msg, e);
             }
         }
+    }
+
+    protected static String filterTimeStringValueFlexibly(String pureValue) {
+        String value = pureValue;
+        value = value.trim();
+        final int dateEndIndex = value.indexOf(" ");
+        if (dateEndIndex >= 0) {
+            // '2008-12-12 12:34:56' to '12:34:56'
+            final String time = value.substring(dateEndIndex + " ".length());
+            final boolean includeMilli = false;
+            try {
+                value = handleTimeZeroPrefix(time, pureValue, includeMilli);
+            } catch (ToDateNumberFormatException e) {
+                String msg = "Failed to format the time as number:";
+                msg = msg + " value=" + pureValue;
+                throw new ToTimeNumberFormatException(msg, e);
+            }
+        }
+        return value;
     }
 
     public static class ToTimeParseException extends RuntimeException {
@@ -907,22 +1049,20 @@ public class DfTypeUtil {
         }
     }
 
-    public static class ToTimeOutOfCalendarException extends RuntimeException {
+    public static class ToTimeNumberFormatException extends ToTimeParseException {
+        private static final long serialVersionUID = 1L;
+
+        public ToTimeNumberFormatException(String msg, Exception e) {
+            super(msg, e);
+        }
+    }
+
+    public static class ToTimeOutOfCalendarException extends ToTimeParseException {
         private static final long serialVersionUID = 1L;
 
         public ToTimeOutOfCalendarException(String msg, Exception e) {
             super(msg, e);
         }
-    }
-
-    protected static String filterTimeStringValueFlexibly(String value) {
-        value = value.trim();
-        final int dateEndIndex = value.indexOf(" ");
-        if (dateEndIndex >= 0) {
-            // '2008-12-12 12:34:56' to '12:34:56' 
-            value = value.substring(dateEndIndex + " ".length());
-        }
-        return value;
     }
 
     // -----------------------------------------------------
@@ -935,7 +1075,9 @@ public class DfTypeUtil {
      * with flexible-parsing if the object is string type.
      * @param o The parsed object. (Nullable)
      * @return The instance of SQL date. (Nullable)
-     * @throws ToDateParseException When it failed to parse the string to SQL date.
+     * @throws ToSqlDateParseException When it failed to parse the string to SQL date.
+     * @throws ToSqlDateNumberFormatException When it failed to format the elements as number.
+     * @throws ToSqlDateOutOfCalendarException When the time is out of calendar.
      */
     public static java.sql.Date toSqlDate(Object o) {
         return toSqlDate(o, null);
@@ -950,7 +1092,9 @@ public class DfTypeUtil {
      * @param o The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of SQL date. (Nullable)
-     * @throws ToDateParseException When it failed to parse the string to SQL date.
+     * @throws ToSqlDateParseException When it failed to parse the string to SQL date.
+     * @throws ToSqlDateNumberFormatException When it failed to format the elements as number.
+     * @throws ToSqlDateOutOfCalendarException When the time is out of calendar.
      */
     public static java.sql.Date toSqlDate(Object o, String pattern) {
         if (o == null) {
@@ -971,6 +1115,10 @@ public class DfTypeUtil {
         java.util.Date date;
         try {
             date = toDate(o, pattern);
+        } catch (ToDateNumberFormatException e) {
+            String msg = "Failed to format the time as number:";
+            msg = msg + " obj=" + o + " pattern=" + pattern;
+            throw new ToSqlDateNumberFormatException(msg, e);
         } catch (ToDateOutOfCalendarException e) {
             String msg = "The SQL-date expression is out of calendar:";
             msg = msg + " obj=" + o + " pattern=" + pattern;
@@ -995,7 +1143,15 @@ public class DfTypeUtil {
         }
     }
 
-    public static class ToSqlDateOutOfCalendarException extends RuntimeException {
+    public static class ToSqlDateNumberFormatException extends ToSqlDateParseException {
+        private static final long serialVersionUID = 1L;
+
+        public ToSqlDateNumberFormatException(String msg, Exception e) {
+            super(msg, e);
+        }
+    }
+
+    public static class ToSqlDateOutOfCalendarException extends ToSqlDateParseException {
         private static final long serialVersionUID = 1L;
 
         public ToSqlDateOutOfCalendarException(String msg, Exception e) {
@@ -1301,9 +1457,9 @@ public class DfTypeUtil {
         }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(value);
-        StringBuilder buf = new StringBuilder();
-        addDate(buf, calendar);
-        return quote(buf.toString());
+        StringBuilder sb = new StringBuilder();
+        addDate(sb, calendar);
+        return quote(sb.toString());
     }
 
     public static String toText(Time value) {
@@ -1312,10 +1468,10 @@ public class DfTypeUtil {
         }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(value);
-        StringBuilder buf = new StringBuilder();
-        addTime(buf, calendar);
-        addTimeDecimalPart(buf, calendar.get(Calendar.MILLISECOND));
-        return quote(buf.toString());
+        StringBuilder sb = new StringBuilder();
+        addTime(sb, calendar);
+        addTimeDecimalPart(sb, calendar.get(Calendar.MILLISECOND));
+        return quote(sb.toString());
     }
 
     public static String toText(Timestamp value) {
@@ -1345,57 +1501,57 @@ public class DfTypeUtil {
         return quote(value.toString());
     }
 
-    // yyyy-mm-dd
-    protected static void addDate(StringBuilder buf, Calendar calendar) {
+    // yyyy-MM-dd
+    protected static void addDate(StringBuilder sb, Calendar calendar) {
         int year = calendar.get(Calendar.YEAR);
-        buf.append(year);
-        buf.append('-');
+        sb.append(year);
+        sb.append('-');
         int month = calendar.get(Calendar.MONTH) + 1;
         if (month < 10) {
-            buf.append('0');
+            sb.append('0');
         }
-        buf.append(month);
-        buf.append('-');
+        sb.append(month);
+        sb.append('-');
         int date = calendar.get(Calendar.DATE);
         if (date < 10) {
-            buf.append('0');
+            sb.append('0');
         }
-        buf.append(date);
+        sb.append(date);
     }
 
     // hh:mm:ss
-    protected static void addTime(StringBuilder buf, Calendar calendar) {
-        if (buf.length() > 0) {
-            buf.append(' ');
+    protected static void addTime(StringBuilder sb, Calendar calendar) {
+        if (sb.length() > 0) {
+            sb.append(' ');
         }
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         if (hour < 10) {
-            buf.append('0');
+            sb.append('0');
         }
-        buf.append(hour);
-        buf.append(':');
+        sb.append(hour);
+        sb.append(':');
         int minute = calendar.get(Calendar.MINUTE);
         if (minute < 10) {
-            buf.append('0');
+            sb.append('0');
         }
-        buf.append(minute);
-        buf.append(':');
+        sb.append(minute);
+        sb.append(':');
         int second = calendar.get(Calendar.SECOND);
         if (second < 10) {
-            buf.append('0');
+            sb.append('0');
         }
-        buf.append(second);
+        sb.append(second);
     }
 
     // .000
-    protected static void addTimeDecimalPart(StringBuilder buf, int decimalPart) {
+    protected static void addTimeDecimalPart(StringBuilder sb, int decimalPart) {
         if (decimalPart == 0) {
             return;
         }
-        if (buf.length() > 0) {
-            buf.append('.');
+        if (sb.length() > 0) {
+            sb.append('.');
         }
-        buf.append(decimalPart);
+        sb.append(decimalPart);
     }
 
     // 'text'
@@ -1409,101 +1565,24 @@ public class DfTypeUtil {
     // -----------------------------------------------------
     //                                            DateFormat
     //                                            ----------
-    protected static DateFormat createDateFormat(String s, String pattern) {
-        if (pattern != null) {
-            return createSimpleDateFormat(pattern);
-        }
-        return createSimpleDateFormat("yyyy-MM-dd HH:mm:dd");
-    }
-
-    protected static DateFormat createTimestampFormat(String s, String pattern) {
-        if (pattern != null) {
-            return createSimpleDateFormat(pattern);
-        }
-        return createSimpleDateFormat("yyyy-MM-dd HH:mm:dd.SSS");
-    }
-
     protected static SimpleDateFormat createSimpleDateFormat(String pattern) {
+        return createSimpleDateFormat(pattern, false);
+    }
+
+    protected static SimpleDateFormat createSimpleDateFormat(String pattern, boolean strict) {
         if (pattern == null) {
             String msg = "The argument 'pattern' should not be null!";
             throw new IllegalArgumentException(msg);
         }
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        simpleDateFormat.setLenient(false);
+        simpleDateFormat.setLenient(!strict);
         return simpleDateFormat;
-    }
-
-    //
-    //    protected static DateFormat getDateFormat(String s, Locale locale) {
-    //        String pattern = getDateFormatPattern(locale);
-    //        final String shortPattern = removeDateDelimiter(pattern);
-    //        final String delimitor = findDateDelimiter(s);
-    //        if (delimitor == null) {
-    //            if (s.length() == shortPattern.length()) {
-    //                return getDateFormat(shortPattern);
-    //            }
-    //            if (s.length() == shortPattern.length() + 2) {
-    //                return getDateFormat(replace(shortPattern, "yy", "yyyy"));
-    //            }
-    //        } else {
-    //            String[] array = split(s, delimitor);
-    //            for (int i = 0; i < array.length; ++i) {
-    //                if (array[i].length() == 4) {
-    //                    pattern = replace(pattern, "yy", "yyyy");
-    //                    break;
-    //                }
-    //            }
-    //            return getDateFormat(pattern);
-    //        }
-    //        return new SimpleDateFormat();
-    //    }
-    //
-    //    protected static String getDateFormatPattern(Locale locale) {
-    //        final SimpleDateFormat df = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT, locale);
-    //        String pattern = df.toPattern();
-    //        final int index = pattern.indexOf(' ');
-    //        if (index > 0) {
-    //            pattern = pattern.substring(0, index);
-    //        }
-    //        if (pattern.indexOf("MM") < 0) {
-    //            pattern = replace(pattern, "M", "MM");
-    //        }
-    //        if (pattern.indexOf("dd") < 0) {
-    //            pattern = replace(pattern, "d", "dd");
-    //        }
-    //        return pattern;
-    //    }
-
-    protected static String removeDateDelimiter(String pattern) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < pattern.length(); ++i) {
-            char c = pattern.charAt(i);
-            if (c == 'y' || c == 'M' || c == 'd') {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
-    }
-
-    protected static String findDateDelimiter(String value) {
-        for (int i = 0; i < value.length(); ++i) {
-            char c = value.charAt(i);
-            if (Character.isDigit(c)) {
-                continue;
-            }
-            return Character.toString(c);
-        }
-        return null;
     }
 
     // -----------------------------------------------------
     //                                  DecimalFormatSymbols
     //                                  --------------------
     protected static Map<Locale, DecimalFormatSymbols> symbolsCache = new ConcurrentHashMap<Locale, DecimalFormatSymbols>();
-
-    protected static DecimalFormatSymbols getDecimalFormatSymbols() {
-        return getDecimalFormatSymbols(Locale.getDefault());
-    }
 
     protected static DecimalFormatSymbols getDecimalFormatSymbols(Locale locale) {
         DecimalFormatSymbols symbols = (DecimalFormatSymbols) symbolsCache.get(locale);
