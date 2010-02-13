@@ -1122,7 +1122,7 @@ public final class DfTypeUtil {
             clearSeconds(resultDate);
             return resultDate;
         }
-        java.util.Date date;
+        final Date date;
         try {
             date = toDate(o, pattern);
         } catch (ToDateNumberFormatException e) {
@@ -1180,13 +1180,53 @@ public final class DfTypeUtil {
         if (o instanceof Calendar) {
             return (Calendar) o;
         }
-        Date date = toDate(o, pattern);
+        final Date date;
+        try {
+            date = toDate(o, pattern);
+        } catch (ToDateNumberFormatException e) {
+            String msg = "Failed to format the calendar as number:";
+            msg = msg + " obj=" + o + " pattern=" + pattern;
+            throw new ToCalendarNumberFormatException(msg, e);
+        } catch (ToDateOutOfCalendarException e) {
+            String msg = "The calendar expression is out of calendar:";
+            msg = msg + " obj=" + o + " pattern=" + pattern;
+            throw new ToCalendarOutOfCalendarException(msg, e);
+        } catch (ToDateParseException e) {
+            String msg = "Failed to parse the object to calendar:";
+            msg = msg + " obj=" + o + " pattern=" + pattern;
+            throw new ToCalendarParseException(msg, e);
+        }
+
         if (date != null) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(date);
             return cal;
         }
         return null;
+    }
+
+    public static class ToCalendarParseException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToCalendarParseException(String msg, Exception e) {
+            super(msg, e);
+        }
+    }
+
+    public static class ToCalendarNumberFormatException extends ToCalendarParseException {
+        private static final long serialVersionUID = 1L;
+
+        public ToCalendarNumberFormatException(String msg, Exception e) {
+            super(msg, e);
+        }
+    }
+
+    public static class ToCalendarOutOfCalendarException extends ToCalendarParseException {
+        private static final long serialVersionUID = 1L;
+
+        public ToCalendarOutOfCalendarException(String msg, Exception e) {
+            super(msg, e);
+        }
     }
 
     public static Calendar localize(Calendar calendar) {
