@@ -185,6 +185,9 @@ public interface Entity {
         }
 
         public static String toString(Date date, String pattern) {
+            if (date == null) {
+                return null;
+            }
             final String str = DfTypeUtil.toString(date, pattern);
             return (DfTypeUtil.isDateBC(date) ? "BC" : "") + str;
         }
