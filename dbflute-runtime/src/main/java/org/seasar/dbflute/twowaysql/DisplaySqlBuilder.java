@@ -163,21 +163,21 @@ public class DisplaySqlBuilder {
     protected static String buildTimestampText(Object bindVariable, String logTimestampFormat) {
         final String format = logTimestampFormat != null ? logTimestampFormat : DEFAULT_TIMESTAMP_FORMAT;
         final DateFormatResource resource = analyzeDateFormat(format);
-        final DateFormat sdf = createDateFormat(resource);
-        return quote(sdf.format((java.util.Date) bindVariable), resource);
+        final DateFormat df = createDateFormat(resource);
+        return quote(df.format((java.util.Date) bindVariable), resource);
     }
 
     protected static String buildTimeText(Object bindVariable) {
         final String defaultFormat = DEFAULT_TIME_FORMAT;
-        final DateFormat sdf = createDateFormat(defaultFormat);
-        return quote(sdf.format((java.util.Date) bindVariable));
+        final DateFormat df = createDateFormat(defaultFormat);
+        return quote(df.format((java.util.Date) bindVariable));
     }
 
     protected static String buildDateText(Object bindVariable, String logDateFormat) {
         final String format = logDateFormat != null ? logDateFormat : DEFAULT_DATE_FORMAT;
         final DateFormatResource resource = analyzeDateFormat(format);
-        final DateFormat sdf = createDateFormat(resource);
-        return quote(sdf.format((java.util.Date) bindVariable), resource);
+        final DateFormat df = createDateFormat(resource);
+        return quote(df.format((java.util.Date) bindVariable), resource);
     }
 
     protected static DateFormat createDateFormat(String format) {
