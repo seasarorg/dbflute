@@ -32,11 +32,11 @@ import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfTypeUtil.ParseTimeException;
+import org.seasar.dbflute.util.DfTypeUtil.ParseTimeOutOfCalendarException;
+import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
+import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampOutOfCalendarException;
 import org.seasar.dbflute.util.DfTypeUtil.ToBooleanParseException;
-import org.seasar.dbflute.util.DfTypeUtil.ToTimeOutOfCalendarException;
-import org.seasar.dbflute.util.DfTypeUtil.ToTimeParseException;
-import org.seasar.dbflute.util.DfTypeUtil.ToTimestampOutOfCalendarException;
-import org.seasar.dbflute.util.DfTypeUtil.ToTimestampParseException;
 
 /**
  * @author jflute
@@ -150,7 +150,7 @@ public abstract class DfAbsractDataWriter {
             Timestamp timestamp = DfTypeUtil.toTimestamp(value);
             ps.setTimestamp(bindCount, timestamp);
             return true;
-        } catch (ToTimestampOutOfCalendarException e) {
+        } catch (ParseTimestampOutOfCalendarException e) {
             if (typeChecked) {
                 String msg = "Look! Read the message below." + ln();
                 msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
@@ -166,7 +166,7 @@ public abstract class DfAbsractDataWriter {
             } else {
                 return false; // couldn't parse as timestamp
             }
-        } catch (ToTimestampParseException ignored) {
+        } catch (ParseTimestampException ignored) {
             return false; // couldn't parse as timestamp 
         }
     }
@@ -190,7 +190,7 @@ public abstract class DfAbsractDataWriter {
             Time time = DfTypeUtil.toTime(value);
             ps.setTime(bindCount, time);
             return true;
-        } catch (ToTimeOutOfCalendarException e) {
+        } catch (ParseTimeOutOfCalendarException e) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
             msg = msg + "Failed to set the time because the value was out of calendar!" + ln();
@@ -202,7 +202,7 @@ public abstract class DfAbsractDataWriter {
             msg = msg + "[Value]" + ln() + value + ln();
             msg = msg + "- - - - - - - - - -/";
             throw new DfTableDataRegistrationFailureException(msg, e);
-        } catch (ToTimeParseException ignored) {
+        } catch (ParseTimeException ignored) {
             return false; // couldn't parse as time 
         }
     }

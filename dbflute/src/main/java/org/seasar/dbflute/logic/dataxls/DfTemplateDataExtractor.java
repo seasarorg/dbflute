@@ -124,14 +124,12 @@ public class DfTemplateDataExtractor {
                     strValue = (String) objValue;
                 } else if (objValue instanceof Timestamp) {
                     final Timestamp timestamp = (Timestamp) objValue;
-                    final String prefix = timestamp.getTime() < 0 ? "BC" : "";
-                    strValue = prefix + DfTypeUtil.toString(timestamp, "yyyy-MM-dd HH:mm:ss.SSS");
+                    strValue = formatDate(timestamp, "yyyy-MM-dd HH:mm:ss.SSS");
                 } else if (objValue instanceof Time) {
                     strValue = DfTypeUtil.toString((Time) objValue, "HH:mm:ss");
                 } else if (objValue instanceof Date) {
                     final Date date = (Date) objValue;
-                    final String prefix = date.getTime() < 0 ? "BC" : "";
-                    strValue = prefix + DfTypeUtil.toString(date, "yyyy-MM-dd HH:mm:ss");
+                    strValue = formatDate(date, "yyyy-MM-dd HH:mm:ss");
                 } else {
                     strValue = objValue != null ? objValue.toString() : null;
                 }
@@ -140,5 +138,10 @@ public class DfTemplateDataExtractor {
             resultList.add(stringMap);
         }
         return resultList;
+    }
+
+    protected String formatDate(Date date, String pattern) {
+        final String prefix = (DfTypeUtil.isDateBC(date) ? "BC" : "");
+        return prefix + DfTypeUtil.toString(date, pattern);
     }
 }

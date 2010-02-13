@@ -429,29 +429,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         if (other == null || !(other instanceof $myClassName)) { return false; }
         $myClassName otherEntity = ($myClassName)other;
 #foreach ($col in $table.equalsHashcodeColumnList)
-        if (!xSV(get${col.JavaName}(), otherEntity.get${col.JavaName}())) { return false; }
+        if (!xSV(get${col.javaName}(), otherEntity.get${col.javaName}())) { return false; }
 #end
         return true;
     }
     private boolean xSV(Object value1, Object value2) { // isSameValue()
-        if (value1 == null && value2 == null) { return true; }
-        if (value1 == null || value2 == null) { return false; }
-#if ($table.hasByteArrayColumnInEqualsHashcode())
-        if (value1 instanceof byte[] && value2 instanceof byte[]) { return xSVBA((byte[])value1, (byte[])value2); }
-#end
-        return value1.equals(value2);
+        return InternalUtil.isSameValue(value1, value2);
     }
-#if ($table.hasByteArrayColumnInEqualsHashcode())
-    private boolean xSVBA(byte[] byte1, byte[] byte2) { // isSameValueByteArray()
-        if (byte1 == null && byte2 == null) { return true; }
-        if (byte1 == null || byte2 == null) { return false; }
-        if (byte1.length != byte2.length) { return false; }
-        for (int i=0; i < byte1.length; i++) {
-            if (byte1[i] != byte2[i]) { return false; }
-        }
-        return true;
-    }
-#end
 
     /**
      * Calculates the hash-code from primary-keys or columns.
@@ -465,8 +449,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return result;
     }
     private int xCH(int result, Object value) { // calculateHashcode()
-        if (value == null) { return result; }
-        return (31*result) + (value instanceof byte[] ? ((byte[])value).length : value.hashCode());
+        return InternalUtil.calculateHashcode(result, value);
     }
 
     /**
@@ -543,19 +526,18 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return sb.toString();
     }
 #if ($table.hasUtilDateColumn())
-    private String xfUD(java.util.Date date) { // formatUtilDate()
-        if (date == null) { return null; }
+    private String xfUD(Date date) { // formatUtilDate()
 #if ($database.isDatabaseOracle())
-        String pattern = "yyyy-MM-dd HH:mm:ss"; // for Oracle
+        String pattern = "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
 #else
         String pattern = "yyyy-MM-dd";
 #end
-        return (date.getTime() < 0 ? "BC" : "") + new java.text.SimpleDateFormat(pattern).format(date);
+        return InternalUtil.toString(date, pattern);
     }
 #end
 #if ($table.hasByteArrayColumn())
-    private String xfBA(byte[] byteArray) { // formatByteArray()
-        return "byte[" + (byteArray != null ? String.valueOf(byteArray.length) : "null") + "]";
+    private String xfBA(byte[] bytes) { // formatByteArray()
+        return InternalUtil.toString(bytes);
     }
 #end
     private String xbuildRelationString() {
