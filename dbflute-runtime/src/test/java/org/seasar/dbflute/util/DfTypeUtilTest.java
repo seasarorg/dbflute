@@ -252,38 +252,77 @@ public class DfTypeUtilTest extends PlainTestCase {
     public void test_toDate_isDateAD() {
         // ## Arrange & Act & Assert ##
         assertTrue(DfTypeUtil.isDateAD(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
-        assertTrue(DfTypeUtil.isDateAD(DfTypeUtil.toDate("0001-01-01 00:00:00.000")));
-        assertFalse(DfTypeUtil.isDateAD(DfTypeUtil.toDate("BC0001-12-31 23:59:59.999")));
+        Date before = DfTypeUtil.toDate("BC0001-12-31 23:59:59.999");
+        Date after = DfTypeUtil.toDate("0001-01-01 00:00:00.000");
+        log("before time = " + before.getTime());
+        log("after  time = " + after.getTime());
+        assertFalse(DfTypeUtil.isDateAD(before));
+        assertTrue(DfTypeUtil.isDateAD(after));
+        assertEquals(GregorianCalendar.BC, DfTypeUtil.toCalendar(before).get(Calendar.ERA));
+        assertEquals(GregorianCalendar.AD, DfTypeUtil.toCalendar(after).get(Calendar.ERA));
+
+        // extra
+        DfTypeUtil.addDateDate(before, 1);
+        DfTypeUtil.clearDateTimeParts(before);
+        assertEquals(after, before);
     }
 
     public void test_toDate_isDateBC() {
         // ## Arrange & Act & Assert ##
         assertFalse(DfTypeUtil.isDateBC(DfTypeUtil.toDate("2008-12-30 12:34:56.789")));
-        assertFalse(DfTypeUtil.isDateBC(DfTypeUtil.toDate("0001-01-01 00:00:00.000")));
-        assertTrue(DfTypeUtil.isDateBC(DfTypeUtil.toDate("BC0001-12-31 23:59:59.999")));
         Date before = DfTypeUtil.toDate("BC0001-12-31 23:59:59.999");
-        assertEquals(GregorianCalendar.BC, DfTypeUtil.toCalendar(before).get(Calendar.ERA));
         Date after = DfTypeUtil.toDate("0001-01-01 00:00:00.000");
+        log("before time = " + before.getTime());
+        log("after  time = " + after.getTime());
+        assertTrue(DfTypeUtil.isDateBC(before));
+        assertFalse(DfTypeUtil.isDateBC(after));
+        assertEquals(GregorianCalendar.BC, DfTypeUtil.toCalendar(before).get(Calendar.ERA));
         assertEquals(GregorianCalendar.AD, DfTypeUtil.toCalendar(after).get(Calendar.ERA));
     }
 
-    public void test_clearSeconds() {
+    public void test_setDateFirstDateOfMonth() {
+        // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
-        DfTypeUtil.clearTime(date);
+        DfTypeUtil.setDateFirstDateOfMonth(date);
+
+        // ## Assert ##
+        assertEquals("2008/12/01 12:34:56.789", df.format(date));
+    }
+
+    public void test_setDateLastDateOfMonth() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-02-06 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.setDateLastDateOfMonth(date);
+
+        // ## Assert ##
+        assertEquals("2008/02/29 12:34:56.789", df.format(date));
+    }
+
+    public void test_clearDateTimeParts() {
+        // ## Arrange ##
+        SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
+        Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
+
+        // ## Act ##
+        DfTypeUtil.clearDateTimeParts(date);
 
         // ## Assert ##
         assertEquals("2008/12/30 00:00:00.000", df.format(date));
     }
 
-    public void test_clearMilliseconds() {
+    public void test_clearDateMillisecond() {
+        // ## Arrange ##
         SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
         Date date = DfTypeUtil.toDate("2008-12-30 12:34:56.789");
 
         // ## Act ##
-        DfTypeUtil.clearMillisecond(date);
+        DfTypeUtil.clearDateMillisecond(date);
 
         // ## Assert ##
         assertEquals("2008/12/30 12:34:56.000", df.format(date));

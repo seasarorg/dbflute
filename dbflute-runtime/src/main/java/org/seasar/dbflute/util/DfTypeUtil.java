@@ -44,7 +44,17 @@ public final class DfTypeUtil {
     //                                                                          Definition
     //                                                                          ==========
     protected static final String NULL = "null";
-    protected static final long AD_ORIGIN_MILLISECOND = -62135802000000L;
+    protected static final long AD_ORIGIN_MILLISECOND;
+    static {
+        final Calendar cal = Calendar.getInstance();
+        cal.clear();
+        cal.set(1, 0, 1, 0, 0, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        // AD0001/01/01 00:00:00.000
+        AD_ORIGIN_MILLISECOND = cal.getTimeInMillis();
+
+        // *the value of millisecond may depend on JDK implementation
+    }
 
     // ===================================================================================
     //                                                                              String
@@ -861,19 +871,71 @@ public final class DfTypeUtil {
     }
 
     // -----------------------------------------------------
-    //                                           Clear Parts
-    //                                           -----------
-    public static void clearTime(Date date) {
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        clearTime(cal);
+    //                                          Manipulation
+    //                                          ------------
+    public static void addDateYear(Date date, int year) {
+        final Calendar cal = toCalendar(date);
+        addCalendarYear(cal, year);
         date.setTime(cal.getTimeInMillis());
     }
 
-    public static void clearMillisecond(Date date) {
-        final Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        clearMillisecond(cal);
+    public static void addDateMonth(Date date, int month) {
+        final Calendar cal = toCalendar(date);
+        addCalendarMonth(cal, month);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void addDateDate(Date date, int dayOfMonth) {
+        final Calendar cal = toCalendar(date);
+        addCalendarDate(cal, dayOfMonth);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void addDateHourOfDay(Date date, int hourOfDay) {
+        final Calendar cal = toCalendar(date);
+        addCalendarHourOfDay(cal, hourOfDay);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void addDateMinute(Date date, int minute) {
+        final Calendar cal = toCalendar(date);
+        addCalendarMinute(cal, minute);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void addDateSecond(Date date, int second) {
+        final Calendar cal = toCalendar(date);
+        addCalendarSecond(cal, second);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void addDateMillisecond(Date date, int millisecond) {
+        final Calendar cal = toCalendar(date);
+        addCalendarMillisecond(cal, millisecond);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void setDateFirstDateOfMonth(Date date) {
+        final Calendar cal = toCalendar(date);
+        setCalendarFirstDateOfMonth(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void setDateLastDateOfMonth(Date date) {
+        final Calendar cal = toCalendar(date);
+        setCalendarLastDateOfMonth(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void clearDateTimeParts(Date date) {
+        final Calendar cal = toCalendar(date);
+        clearCalendarTimeParts(cal);
+        date.setTime(cal.getTimeInMillis());
+    }
+
+    public static void clearDateMillisecond(Date date) {
+        final Calendar cal = toCalendar(date);
+        clearCalendarMillisecond(cal);
         date.setTime(cal.getTimeInMillis());
     }
 
@@ -1190,7 +1252,7 @@ public final class DfTypeUtil {
                 // because the SQL-date type is not final class.
                 resultDate = new java.sql.Date(paramSqlDate.getTime());
             }
-            clearTime(resultDate);
+            clearDateTimeParts(resultDate);
             return resultDate;
         }
         final Date date;
@@ -1210,7 +1272,7 @@ public final class DfTypeUtil {
             throw new ParseSqlDateException(msg, e);
         }
         if (date != null) {
-            clearTime(date);
+            clearDateTimeParts(date);
             return new java.sql.Date(date.getTime());
         }
         return null;
@@ -1304,17 +1366,55 @@ public final class DfTypeUtil {
     }
 
     // -----------------------------------------------------
+    //                                          Manipulation
+    //                                          ------------
+    public static void addCalendarYear(Calendar cal, int year) {
+        cal.add(Calendar.YEAR, year);
+    }
+
+    public static void addCalendarMonth(Calendar cal, int month) {
+        cal.add(Calendar.MONTH, month);
+    }
+
+    public static void addCalendarDate(Calendar cal, int date) {
+        cal.add(Calendar.DATE, date);
+    }
+
+    public static void addCalendarHourOfDay(Calendar cal, int hourOfDay) {
+        cal.add(Calendar.HOUR_OF_DAY, hourOfDay);
+    }
+
+    public static void addCalendarMinute(Calendar cal, int minute) {
+        cal.add(Calendar.MINUTE, minute);
+    }
+
+    public static void addCalendarSecond(Calendar cal, int second) {
+        cal.add(Calendar.SECOND, second);
+    }
+
+    public static void addCalendarMillisecond(Calendar cal, int millisecond) {
+        cal.add(Calendar.MILLISECOND, millisecond);
+    }
+
+    public static void setCalendarFirstDateOfMonth(Calendar cal) {
+        cal.set(Calendar.DATE, cal.getActualMinimum(Calendar.DATE));
+    }
+
+    public static void setCalendarLastDateOfMonth(Calendar cal) {
+        cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DATE));
+    }
+
+    // -----------------------------------------------------
     //                                           Clear Parts
     //                                           -----------
-    public static void clearTime(Calendar cal) {
+    public static void clearCalendarTimeParts(Calendar cal) {
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        clearMillisecond(cal);
+        clearCalendarMillisecond(cal);
     }
 
-    public static void clearMillisecond(Calendar cal) {
+    public static void clearCalendarMillisecond(Calendar cal) {
         cal.set(Calendar.MILLISECOND, 0);
     }
 
@@ -1547,7 +1647,7 @@ public final class DfTypeUtil {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(value);
         StringBuilder sb = new StringBuilder();
-        addDate(sb, calendar);
+        appendCalendarDate(sb, calendar);
         return quote(sb.toString());
     }
 
@@ -1558,8 +1658,8 @@ public final class DfTypeUtil {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(value);
         StringBuilder sb = new StringBuilder();
-        addTime(sb, calendar);
-        addTimeDecimalPart(sb, calendar.get(Calendar.MILLISECOND));
+        appendCalendarTime(sb, calendar);
+        appendTimeDecimalPart(sb, calendar.get(Calendar.MILLISECOND));
         return quote(sb.toString());
     }
 
@@ -1569,11 +1669,11 @@ public final class DfTypeUtil {
         }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(value);
-        StringBuilder buf = new StringBuilder(30);
-        addDate(buf, calendar);
-        addTime(buf, calendar);
-        addTimeDecimalPart(buf, value.getNanos());
-        return quote(buf.toString());
+        StringBuilder sb = new StringBuilder(30);
+        appendCalendarDate(sb, calendar);
+        appendCalendarTime(sb, calendar);
+        appendTimeDecimalPart(sb, value.getNanos());
+        return quote(sb.toString());
     }
 
     public static String toText(byte[] value) {
@@ -1591,7 +1691,7 @@ public final class DfTypeUtil {
     }
 
     // yyyy-MM-dd
-    protected static void addDate(StringBuilder sb, Calendar calendar) {
+    protected static void appendCalendarDate(StringBuilder sb, Calendar calendar) {
         int year = calendar.get(Calendar.YEAR);
         sb.append(year);
         sb.append('-');
@@ -1609,7 +1709,7 @@ public final class DfTypeUtil {
     }
 
     // HH:mm:ss
-    protected static void addTime(StringBuilder sb, Calendar calendar) {
+    protected static void appendCalendarTime(StringBuilder sb, Calendar calendar) {
         if (sb.length() > 0) {
             sb.append(' ');
         }
@@ -1633,7 +1733,7 @@ public final class DfTypeUtil {
     }
 
     // .SSS
-    protected static void addTimeDecimalPart(StringBuilder sb, int decimalPart) {
+    protected static void appendTimeDecimalPart(StringBuilder sb, int decimalPart) {
         if (decimalPart == 0) {
             return;
         }
