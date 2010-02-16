@@ -5,6 +5,7 @@ using System.Reflection;
 using ${glPackageBaseCommonCBeanOutsidesql};
 using ${glPackageBaseCommonJdbc};
 using Seasar.Extension.ADO;
+using Seasar.Extension.ADO.Types;
 
 namespace ${glPackageBaseCommon} {
 
@@ -34,6 +35,7 @@ public class ${myClassName} {
 #else
     protected String _outsideSqlPackage;
 #end
+    protected IDbParameterParser _dbParameterParser;
 #if ($database.isOmitDirectoryPackageValid())
     protected String _omitDirectoryPackage = "${database.omitDirectoryPackage}";
 #else
@@ -61,7 +63,6 @@ public class ${myClassName} {
 #end
     protected AdditionalAssembly _additionalAssemblyProvider;
     protected FileSystemPath _fileSystemPathResolver;
-    protected IDbParameterParser _dbParameterParser;
 	protected bool _internalDebug;
 	protected bool _locked = false; // at first unlocked
 
@@ -161,7 +162,34 @@ public class ${myClassName} {
 	        _outsideSqlPackage = value;
 		}
 	}
-	
+
+    // ===================================================================================
+    //                                                                          Value Type
+    //                                                                          ==========
+	public IValueType RegisterBasicValueType(Type keyType, IValueType valueType) {
+	    AssertNotLocked();
+		if (_log.isInfoEnabled()) {
+		    _log.info("...Registering basic valueType: keyType=" + keyType + " valueType=" + valueType);
+		}
+	    ValueTypes.RegisterValueType(keyType, valueType);
+	}
+
+    // ===================================================================================
+    //                                                                 DB Parameter Parser
+    //                                                                 ===================
+	public IDbParameterParser DbParameterParser { // CSharp only
+	    get {
+	        return _dbParameterParser;
+		}
+		set {
+	        AssertNotLocked();
+		    if (_log.IsInfoEnabled) {
+		        _log.Info("...Setting dbParameterParser: " + value);
+		    }
+	        _dbParameterParser = value;
+		}
+	}
+
     // ===================================================================================
     //                                                              Omit Directory Package
     //                                                              ======================
@@ -275,22 +303,6 @@ public class ${myClassName} {
 	}
 
     // ===================================================================================
-    //                                                                 DB Parameter Parser
-    //                                                                 ===================
-	public IDbParameterParser DbParameterParser { // CSharp only
-	    get {
-	        return _dbParameterParser;
-		}
-		set {
-	        AssertNotLocked();
-		    if (_log.IsInfoEnabled) {
-		        _log.Info("...Setting dbParameterParser: " + value);
-		    }
-	        _dbParameterParser = value;
-		}
-	}
-
-    // ===================================================================================
     //                                                                      Internal Debug
     //                                                                      ==============
 	public bool IsInternalDebug {
@@ -305,7 +317,7 @@ public class ${myClassName} {
 	        _internalDebug = value;
 		}
 	}
-	
+
     // ===================================================================================
     //                                                                         Config Lock
     //                                                                         ===========
