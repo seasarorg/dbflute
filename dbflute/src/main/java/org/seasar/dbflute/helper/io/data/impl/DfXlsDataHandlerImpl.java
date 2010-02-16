@@ -46,8 +46,8 @@ import org.seasar.dbflute.helper.dataset.DataColumn;
 import org.seasar.dbflute.helper.dataset.DataRow;
 import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataTable;
-import org.seasar.dbflute.helper.dataset.states.CreatedState;
-import org.seasar.dbflute.helper.dataset.states.SqlContext;
+import org.seasar.dbflute.helper.dataset.states.DtsCreatedState;
+import org.seasar.dbflute.helper.dataset.states.DtsSqlContext;
 import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
 import org.seasar.dbflute.helper.io.data.DfXlsDataHandler;
@@ -540,9 +540,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
 
     protected static class MyCreatedState {
         public String buildPreparedSql(final DataRow row) {
-            final CreatedState createdState = new CreatedState() {
+            final DtsCreatedState createdState = new DtsCreatedState() {
                 public String toString() {
-                    final SqlContext sqlContext = getSqlContext(row);
+                    final DtsSqlContext sqlContext = getSqlContext(row);
                     return sqlContext.getSql();
                 }
             };

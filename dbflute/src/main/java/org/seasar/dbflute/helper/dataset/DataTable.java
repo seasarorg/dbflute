@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.dataset.states.RowStates;
+import org.seasar.dbflute.helper.dataset.states.DtsRowStates;
 import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
@@ -56,7 +56,7 @@ public class DataTable {
     public DataRow addRow() {
         DataRow row = new DataRow(this);
         _rows.add(row);
-        row.setState(RowStates.CREATED);
+        row.setState(DtsRowStates.CREATED);
         return row;
     }
 
@@ -71,7 +71,7 @@ public class DataTable {
     public DataRow[] removeRows() {
         for (int i = 0; i < _rows.size();) {
             DataRow row = getRow(i);
-            if (row.getState().equals(RowStates.REMOVED)) {
+            if (row.getState().equals(DtsRowStates.REMOVED)) {
                 _removedRows.add(row);
                 _rows.remove(i);
             } else {

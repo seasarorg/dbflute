@@ -3,8 +3,8 @@ package org.seasar.dbflute.helper.dataset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.helper.dataset.states.RowState;
-import org.seasar.dbflute.helper.dataset.states.RowStates;
+import org.seasar.dbflute.helper.dataset.states.DtsRowState;
+import org.seasar.dbflute.helper.dataset.states.DtsRowStates;
 import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
 
@@ -22,7 +22,7 @@ public class DataRow {
 
     private List<Object> _values = new ArrayList<Object>();
 
-    private RowState _state = RowStates.UNCHANGED;
+    private DtsRowState _state = DtsRowStates.UNCHANGED;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -67,24 +67,24 @@ public class DataRow {
     // }
 
     private void modify() {
-        if (_state.equals(RowStates.UNCHANGED)) {
-            _state = RowStates.MODIFIED;
+        if (_state.equals(DtsRowStates.UNCHANGED)) {
+            _state = DtsRowStates.MODIFIED;
         }
     }
 
     public void remove() {
-        _state = RowStates.REMOVED;
+        _state = DtsRowStates.REMOVED;
     }
 
     public DataTable getTable() {
         return _table;
     }
 
-    public RowState getState() {
+    public DtsRowState getState() {
         return _state;
     }
 
-    public void setState(RowState state) {
+    public void setState(DtsRowState state) {
         _state = state;
     }
 

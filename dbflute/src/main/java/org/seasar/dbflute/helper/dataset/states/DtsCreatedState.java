@@ -12,30 +12,38 @@ import org.seasar.dbflute.helper.dataset.DataTable;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class RemovedState extends AbstractRowState {
+public class DtsCreatedState extends DtsAbstractRowState {
 
     public String toString() {
-        return "REMOVED";
+        return "CREATED";
     }
 
-    protected SqlContext getSqlContext(DataRow row) {
+    protected DtsSqlContext getSqlContext(DataRow row) {
         DataTable table = row.getTable();
         StringBuffer buf = new StringBuffer(100);
         List<Object> argList = new ArrayList<Object>();
         List<Class<?>> argTypeList = new ArrayList<Class<?>>();
-        buf.append("delete from ");
+        buf.append("insert into ");
         buf.append(table.getTableName());
-        buf.append(" where ");
+        buf.append(" (");
+        int writableColumnSize = 0;
         for (int i = 0; i < table.getColumnSize(); ++i) {
             DataColumn column = table.getColumn(i);
-            if (column.isPrimaryKey()) {
+            if (column.isWritable()) {
+                ++writableColumnSize;
                 buf.append(column.getColumnName());
-                buf.append(" = ? and ");
+                buf.append(", ");
                 argList.add(row.getValue(i));
                 argTypeList.add(column.getColumnType().getType());
             }
         }
-        buf.setLength(buf.length() - 5);
-        return new SqlContext(buf.toString(), argList.toArray(), argTypeList.toArray(new Class[argTypeList.size()]));
+        buf.setLength(buf.length() - 2);
+        buf.append(") values (");
+        for (int i = 0; i < writableColumnSize; ++i) {
+            buf.append("?, ");
+        }
+        buf.setLength(buf.length() - 2);
+        buf.append(")");
+        return new DtsSqlContext(buf.toString(), argList.toArray(), argTypeList.toArray(new Class[argTypeList.size()]));
     }
 }

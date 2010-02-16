@@ -16,18 +16,18 @@ import org.seasar.dbflute.helper.dataset.DataTable;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class SqlServerSqlTableWriter extends SqlTableWriter {
+public class DtsSqlServerSqlTableWriter extends DtsSqlTableWriter {
 
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(SqlServerSqlTableWriter.class);
+    private static final Log _log = LogFactory.getLog(DtsSqlServerSqlTableWriter.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public SqlServerSqlTableWriter(final DataSource dataSource, String schemaName) {
+    public DtsSqlServerSqlTableWriter(final DataSource dataSource, String schemaName) {
         super(dataSource, schemaName);
     }
 

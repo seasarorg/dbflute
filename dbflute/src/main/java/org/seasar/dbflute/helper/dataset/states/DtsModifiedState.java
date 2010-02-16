@@ -12,13 +12,13 @@ import org.seasar.dbflute.helper.dataset.DataTable;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class ModifiedState extends AbstractRowState {
+public class DtsModifiedState extends DtsAbstractRowState {
 
     public String toString() {
         return "MODIFIED";
     }
 
-    protected SqlContext getSqlContext(DataRow row) {
+    protected DtsSqlContext getSqlContext(DataRow row) {
         DataTable table = row.getTable();
         StringBuffer buf = new StringBuffer(100);
         List<Object> argList = new ArrayList<Object>();
@@ -47,6 +47,6 @@ public class ModifiedState extends AbstractRowState {
             }
         }
         buf.setLength(buf.length() - 5);
-        return new SqlContext(buf.toString(), argList.toArray(), argTypeList.toArray(new Class[argTypeList.size()]));
+        return new DtsSqlContext(buf.toString(), argList.toArray(), argTypeList.toArray(new Class[argTypeList.size()]));
     }
 }

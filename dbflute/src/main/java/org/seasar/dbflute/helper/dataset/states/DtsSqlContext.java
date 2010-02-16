@@ -5,7 +5,7 @@ package org.seasar.dbflute.helper.dataset.states;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class SqlContext {
+public class DtsSqlContext {
 
     private String sql;
 
@@ -13,10 +13,10 @@ public class SqlContext {
 
     private Class<?>[] argTypes;
 
-    public SqlContext() {
+    public DtsSqlContext() {
     }
 
-    public SqlContext(String sql, Object[] args, Class<?>[] argTypes) {
+    public DtsSqlContext(String sql, Object[] args, Class<?>[] argTypes) {
         setSql(sql);
         setArgs(args);
         setArgTypes(argTypes);
