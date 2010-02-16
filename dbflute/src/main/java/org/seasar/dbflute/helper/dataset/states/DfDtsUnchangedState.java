@@ -9,7 +9,7 @@ import org.seasar.dbflute.helper.dataset.DfDataRow;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DtsUnchangedState implements DtsRowState {
+public class DfDtsUnchangedState implements DfDtsRowState {
 
     public void update(DataSource dataSource, DfDataRow row) {
     }

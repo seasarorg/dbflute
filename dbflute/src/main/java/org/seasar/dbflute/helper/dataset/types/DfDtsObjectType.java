@@ -5,9 +5,9 @@ package org.seasar.dbflute.helper.dataset.types;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DtsObjectType implements DtsColumnType {
+public class DfDtsObjectType implements DfDtsColumnType {
 
-    public DtsObjectType() {
+    public DfDtsObjectType() {
     }
 
     public Object convert(Object value, String formatPattern) {

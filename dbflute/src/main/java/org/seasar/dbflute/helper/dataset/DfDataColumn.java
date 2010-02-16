@@ -1,6 +1,6 @@
 package org.seasar.dbflute.helper.dataset;
 
-import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
+import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -13,7 +13,7 @@ public class DfDataColumn {
     //                                                                           Attribute
     //                                                                           =========
     private String columnName;
-    private DtsColumnType columnType;
+    private DfDtsColumnType columnType;
     private int columnIndex;
     private boolean primaryKey = false;
     private boolean writable = true;
@@ -22,7 +22,7 @@ public class DfDataColumn {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfDataColumn(String columnName, DtsColumnType columnType, int columnIndex) {
+    public DfDataColumn(String columnName, DfDtsColumnType columnType, int columnIndex) {
         setColumnName(columnName);
         setColumnType(columnType);
         setColumnIndex(columnIndex);
@@ -39,11 +39,11 @@ public class DfDataColumn {
         this.columnName = columnName;
     }
 
-    public DtsColumnType getColumnType() {
+    public DfDtsColumnType getColumnType() {
         return columnType;
     }
 
-    public void setColumnType(DtsColumnType columnType) {
+    public void setColumnType(DfDtsColumnType columnType) {
         this.columnType = columnType;
     }
 

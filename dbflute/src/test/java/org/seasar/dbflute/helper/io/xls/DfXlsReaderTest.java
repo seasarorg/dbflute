@@ -16,10 +16,10 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.dataset.DataColumn;
-import org.seasar.dbflute.helper.dataset.DataRow;
-import org.seasar.dbflute.helper.dataset.DataSet;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataColumn;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
+import org.seasar.dbflute.helper.dataset.DfDataSet;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.jdbc.sqlfile.DfSqlFileGetterTest;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfResourceUtil;
@@ -42,7 +42,7 @@ public class DfXlsReaderTest extends PlainTestCase {
         final DfXlsReader reader = createXlsReader(xlsFile, null);
 
         // ## Act ##
-        final DataSet dataSet = reader.read();
+        final DfDataSet dataSet = reader.read();
 
         // ## Assert ##
         log("[DataSet]:" + getLineSeparator() + dataSet);
@@ -51,15 +51,15 @@ public class DfXlsReaderTest extends PlainTestCase {
         boolean existsNull = false;
         boolean existsTrimmed = false;
         for (int i = 0; i < tableSize; i++) {
-            final DataTable dataTable = dataSet.getTable(i);
+            final DfDataTable dataTable = dataSet.getTable(i);
             final int columnSize = dataTable.getColumnSize();
             assertTrue(columnSize > 0);
             final int rowSize = dataTable.getRowSize();
             assertTrue(rowSize > 0);
             for (int j = 0; j < rowSize; j++) {
-                final DataRow dataRow = dataTable.getRow(j);
+                final DfDataRow dataRow = dataTable.getRow(j);
                 for (int k = 0; k < columnSize; k++) {
-                    final DataColumn dataColumn = dataTable.getColumn(k);
+                    final DfDataColumn dataColumn = dataTable.getColumn(k);
                     final Object value = dataRow.getValue(dataColumn.getColumnName());
                     if (dataColumn.getColumnName().equals("AAA")) {
                         assertNotNull(value);

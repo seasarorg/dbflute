@@ -20,16 +20,16 @@ import org.seasar.dbflute.helper.dataset.DfDataRow;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public abstract class DtsAbstractRowState implements DtsRowState {
+public abstract class DfDtsAbstractRowState implements DfDtsRowState {
 
     /** Log instance. */
-    private static final Log _log = LogFactory.getLog(DtsAbstractRowState.class);
+    private static final Log _log = LogFactory.getLog(DfDtsAbstractRowState.class);
 
-    DtsAbstractRowState() {
+    DfDtsAbstractRowState() {
     }
 
     public void update(DataSource dataSource, DfDataRow row) {
-        final DtsSqlContext ctx = getSqlContext(row);
+        final DfDtsSqlContext ctx = getSqlContext(row);
         execute(dataSource, ctx.getSql(), ctx.getArgs(), ctx.getArgTypes(), row);
     }
 
@@ -151,7 +151,7 @@ public abstract class DtsAbstractRowState implements DtsRowState {
         return value;
     }
 
-    protected abstract DtsSqlContext getSqlContext(DfDataRow row);
+    protected abstract DfDtsSqlContext getSqlContext(DfDataRow row);
 
     private static Connection getConnection(DataSource dataSource) {
         try {

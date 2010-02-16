@@ -7,15 +7,15 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DtsStringType extends DtsObjectType {
+public class DfDtsStringType extends DfDtsObjectType {
 
     protected boolean trim;
 
-    public DtsStringType() {
+    public DfDtsStringType() {
         this(true);
     }
 
-    public DtsStringType(final boolean trim) {
+    public DfDtsStringType(final boolean trim) {
         this.trim = trim;
     }
 

@@ -8,19 +8,19 @@ import javax.sql.DataSource;
 
 import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
-import org.seasar.dbflute.helper.dataset.states.DtsRowState;
+import org.seasar.dbflute.helper.dataset.states.DfDtsRowState;
 
 /**
  * {Refers to S2Container and Extends it}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DtsSqlTableWriter implements DtsTableWriter {
+public class DfDtsSqlTableWriter implements DfDtsTableWriter {
 
     private DataSource dataSource;
     protected String _schemaName;
 
-    public DtsSqlTableWriter(DataSource dataSource, String schemaName) {
+    public DfDtsSqlTableWriter(DataSource dataSource, String schemaName) {
         this.dataSource = dataSource;
         _schemaName = schemaName;
     }
@@ -39,7 +39,7 @@ public class DtsSqlTableWriter implements DtsTableWriter {
     protected void doWrite(DfDataTable table) {
         for (int i = 0; i < table.getRowSize(); ++i) {
             DfDataRow row = table.getRow(i);
-            DtsRowState state = row.getState();
+            DfDtsRowState state = row.getState();
             state.update(dataSource, row);
         }
     }

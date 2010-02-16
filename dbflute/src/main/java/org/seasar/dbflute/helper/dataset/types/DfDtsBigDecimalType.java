@@ -1,6 +1,6 @@
 package org.seasar.dbflute.helper.dataset.types;
 
-import java.sql.Timestamp;
+import java.math.BigDecimal;
 
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -9,16 +9,16 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DtsTimestampType extends DtsObjectType {
+public class DfDtsBigDecimalType extends DfDtsObjectType {
 
-    public DtsTimestampType() {
+    public DfDtsBigDecimalType() {
     }
 
     public Object convert(Object value, String formatPattern) {
-        return DfTypeUtil.toTimestamp(value, formatPattern);
+        return DfTypeUtil.toBigDecimal(value, formatPattern);
     }
 
     public Class<?> getType() {
-        return Timestamp.class;
+        return BigDecimal.class;
     }
 }

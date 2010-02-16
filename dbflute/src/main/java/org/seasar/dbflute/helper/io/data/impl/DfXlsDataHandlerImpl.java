@@ -46,10 +46,10 @@ import org.seasar.dbflute.helper.dataset.DfDataColumn;
 import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
-import org.seasar.dbflute.helper.dataset.states.DtsCreatedState;
-import org.seasar.dbflute.helper.dataset.states.DtsSqlContext;
-import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
-import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
+import org.seasar.dbflute.helper.dataset.states.DfDtsCreatedState;
+import org.seasar.dbflute.helper.dataset.states.DfDtsSqlContext;
+import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
+import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.data.DfXlsDataHandler;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
@@ -413,13 +413,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 
                 if (metaInfoMap.containsKey(defaultTargetColumnName) && !table.hasColumn(defaultTargetColumnName)) {
-                    final DtsColumnType columnType;
+                    final DfDtsColumnType columnType;
                     final Object value;
                     if (defaultValue.equalsIgnoreCase("sysdate")) {
-                        columnType = DtsColumnTypes.TIMESTAMP;
+                        columnType = DfDtsColumnTypes.TIMESTAMP;
                         value = new Timestamp(System.currentTimeMillis());
                     } else {
-                        columnType = DtsColumnTypes.STRING;
+                        columnType = DfDtsColumnTypes.STRING;
                         value = defaultValue;
                     }
                     table.addColumn(defaultTargetColumnName, columnType);
@@ -540,9 +540,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
 
     protected static class MyCreatedState {
         public String buildPreparedSql(final DfDataRow row) {
-            final DtsCreatedState createdState = new DtsCreatedState() {
+            final DfDtsCreatedState createdState = new DfDtsCreatedState() {
                 public String toString() {
-                    final DtsSqlContext sqlContext = getSqlContext(row);
+                    final DfDtsSqlContext sqlContext = getSqlContext(row);
                     return sqlContext.getSql();
                 }
             };

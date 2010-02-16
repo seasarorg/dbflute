@@ -40,8 +40,8 @@ import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataSetConstants;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
-import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
-import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
+import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
+import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
 import org.seasar.dbflute.util.DfBase64Util;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -231,7 +231,7 @@ public class DfXlsReader {
                     String msg = "...Changing the column type to STRING type:";
                     msg = msg + " name=" + columnName + " value=" + value;
                     _log.info(msg);
-                    column.setColumnType(DtsColumnTypes.STRING);
+                    column.setColumnType(DfDtsColumnTypes.STRING);
                     dataRow.addValue(columnName, value);
                 }
             }
@@ -378,22 +378,22 @@ public class DfXlsReader {
         return false;
     }
 
-    protected DtsColumnType getColumnType(HSSFCell cell) {
+    protected DfDtsColumnType getColumnType(HSSFCell cell) {
         switch (cell.getCellType()) {
         case HSSFCell.CELL_TYPE_NUMERIC:
             if (isCellDateFormatted(cell)) {
-                return DtsColumnTypes.TIMESTAMP;
+                return DfDtsColumnTypes.TIMESTAMP;
             }
-            return DtsColumnTypes.BIGDECIMAL;
+            return DfDtsColumnTypes.BIGDECIMAL;
         case HSSFCell.CELL_TYPE_BOOLEAN:
-            return DtsColumnTypes.BOOLEAN;
+            return DfDtsColumnTypes.BOOLEAN;
         case HSSFCell.CELL_TYPE_STRING:
             if (isCellBase64Formatted(cell)) {
-                return DtsColumnTypes.BINARY;
+                return DfDtsColumnTypes.BINARY;
             }
-            return DtsColumnTypes.STRING;
+            return DfDtsColumnTypes.STRING;
         default:
-            return DtsColumnTypes.STRING;
+            return DfDtsColumnTypes.STRING;
         }
     }
 

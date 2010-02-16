@@ -9,7 +9,7 @@ import org.seasar.dbflute.helper.dataset.DfDataSet;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DtsSqlWriter {
+public class DfDtsSqlWriter {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -20,7 +20,7 @@ public class DtsSqlWriter {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DtsSqlWriter(DataSource dataSource, String schemaName) {
+    public DfDtsSqlWriter(DataSource dataSource, String schemaName) {
         this.dataSource = dataSource;
         _schemaName = schemaName;
     }
@@ -30,7 +30,7 @@ public class DtsSqlWriter {
     }
 
     public void write(DfDataSet dataSet) {
-        DtsTableWriter writer = new DtsSqlTableWriter(getDataSource(), _schemaName);
+        DfDtsTableWriter writer = new DfDtsSqlTableWriter(getDataSource(), _schemaName);
         for (int i = 0; i < dataSet.getTableSize(); ++i) {
             writer.write(dataSet.getTable(i));
         }

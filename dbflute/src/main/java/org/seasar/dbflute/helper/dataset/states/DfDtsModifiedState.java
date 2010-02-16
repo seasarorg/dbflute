@@ -12,13 +12,13 @@ import org.seasar.dbflute.helper.dataset.DfDataTable;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DtsModifiedState extends DtsAbstractRowState {
+public class DfDtsModifiedState extends DfDtsAbstractRowState {
 
     public String toString() {
         return "MODIFIED";
     }
 
-    protected DtsSqlContext getSqlContext(DfDataRow row) {
+    protected DfDtsSqlContext getSqlContext(DfDataRow row) {
         DfDataTable table = row.getTable();
         StringBuffer buf = new StringBuffer(100);
         List<Object> argList = new ArrayList<Object>();
@@ -47,6 +47,6 @@ public class DtsModifiedState extends DtsAbstractRowState {
             }
         }
         buf.setLength(buf.length() - 5);
-        return new DtsSqlContext(buf.toString(), argList.toArray(), argTypeList.toArray(new Class[argTypeList.size()]));
+        return new DfDtsSqlContext(buf.toString(), argList.toArray(), argTypeList.toArray(new Class[argTypeList.size()]));
     }
 }

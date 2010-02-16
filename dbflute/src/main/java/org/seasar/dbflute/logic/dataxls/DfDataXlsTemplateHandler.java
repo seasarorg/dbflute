@@ -12,7 +12,7 @@ import org.apache.torque.engine.database.model.Column;
 import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
-import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
+import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.xls.DfXlsWriter;
 
 /**
@@ -77,7 +77,7 @@ public class DfDataXlsTemplateHandler {
             }
             int columnIndex = 0;
             for (Column column : columnList) {
-                dataTable.addColumn(column.getName(), DtsColumnTypes.STRING);
+                dataTable.addColumn(column.getName(), DfDtsColumnTypes.STRING);
                 ++columnIndex;
             }
             final List<Map<String, String>> recordList = templateDataMap.get(tableName);

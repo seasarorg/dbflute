@@ -1,7 +1,5 @@
 package org.seasar.dbflute.helper.dataset.types;
 
-import java.math.BigDecimal;
-
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -9,16 +7,16 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DtsBigDecimalType extends DtsObjectType {
+public class DfDtsBooleanType extends DfDtsObjectType {
 
-    public DtsBigDecimalType() {
+    public DfDtsBooleanType() {
     }
 
     public Object convert(Object value, String formatPattern) {
-        return DfTypeUtil.toBigDecimal(value, formatPattern);
+        return DfTypeUtil.toBoolean(value);
     }
 
     public Class<?> getType() {
-        return BigDecimal.class;
+        return Boolean.class;
     }
 }

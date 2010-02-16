@@ -7,7 +7,7 @@ import org.seasar.dbflute.helper.dataset.DfDataTable;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public interface DtsTableWriter {
+public interface DfDtsTableWriter {
 
     public void write(DfDataTable table);
 }

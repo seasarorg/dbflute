@@ -15,10 +15,10 @@ import javax.sql.DataSource;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.junit.Test;
-import org.seasar.dbflute.helper.dataset.DataColumn;
-import org.seasar.dbflute.helper.dataset.DataRow;
-import org.seasar.dbflute.helper.dataset.DataSet;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataColumn;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
+import org.seasar.dbflute.helper.dataset.DfDataSet;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 import org.seasar.dbflute.unit.PlainTestCase;
 
@@ -91,21 +91,21 @@ public class DfDataXlsTemplateHandlerTest extends PlainTestCase {
         // ## Assert ##
         assertTrue(xlsFile.exists());
         final DfXlsReader xlsReader = new DfXlsReader(xlsFile);
-        final DataSet dataSet = xlsReader.read();
+        final DfDataSet dataSet = xlsReader.read();
         log("[DataSet]:" + getLineSeparator() + dataSet);
         final int tableSize = dataSet.getTableSize();
         assertTrue(tableSize > 0);
         boolean existsJapaneseColumn = false;
         for (int i = 0; i < tableSize; i++) {
-            final DataTable dataTable = dataSet.getTable(i);
+            final DfDataTable dataTable = dataSet.getTable(i);
             final int columnSize = dataTable.getColumnSize();
             assertTrue(columnSize > 0);
             final int rowSize = dataTable.getRowSize();
             assertTrue(rowSize > 0);
             for (int j = 0; j < rowSize; j++) {
-                final DataRow dataRow = dataTable.getRow(j);
+                final DfDataRow dataRow = dataTable.getRow(j);
                 for (int k = 0; k < columnSize; k++) {
-                    final DataColumn dataColumn = dataTable.getColumn(k);
+                    final DfDataColumn dataColumn = dataTable.getColumn(k);
                     final String columnName = dataColumn.getColumnName();
                     final Object value = dataRow.getValue(columnName);
                     assertNotNull(value);

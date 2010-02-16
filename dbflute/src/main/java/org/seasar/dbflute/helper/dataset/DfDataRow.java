@@ -3,10 +3,10 @@ package org.seasar.dbflute.helper.dataset;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.helper.dataset.states.DtsRowState;
-import org.seasar.dbflute.helper.dataset.states.DtsRowStates;
-import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
-import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
+import org.seasar.dbflute.helper.dataset.states.DfDtsRowState;
+import org.seasar.dbflute.helper.dataset.states.DfDtsRowStates;
+import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
+import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -22,7 +22,7 @@ public class DfDataRow {
 
     private List<Object> _values = new ArrayList<Object>();
 
-    private DtsRowState _state = DtsRowStates.UNCHANGED;
+    private DfDtsRowState _state = DfDtsRowStates.UNCHANGED;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -67,24 +67,24 @@ public class DfDataRow {
     // }
 
     private void modify() {
-        if (_state.equals(DtsRowStates.UNCHANGED)) {
-            _state = DtsRowStates.MODIFIED;
+        if (_state.equals(DfDtsRowStates.UNCHANGED)) {
+            _state = DfDtsRowStates.MODIFIED;
         }
     }
 
     public void remove() {
-        _state = DtsRowStates.REMOVED;
+        _state = DfDtsRowStates.REMOVED;
     }
 
     public DfDataTable getTable() {
         return _table;
     }
 
-    public DtsRowState getState() {
+    public DfDtsRowState getState() {
         return _state;
     }
 
-    public void setState(DtsRowState state) {
+    public void setState(DfDtsRowState state) {
         _state = state;
     }
 
@@ -115,7 +115,7 @@ public class DfDataRow {
             String columnName = _table.getColumnName(i);
             Object value = _values.get(i);
             Object otherValue = other.getValue(columnName);
-            DtsColumnType ct = DtsColumnTypes.getColumnType(value);
+            DfDtsColumnType ct = DfDtsColumnTypes.getColumnType(value);
             if (ct.equals(value, otherValue)) {
                 continue;
             }

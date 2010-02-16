@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.dataset.states.DtsRowStates;
-import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
-import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
+import org.seasar.dbflute.helper.dataset.states.DfDtsRowStates;
+import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
+import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
@@ -56,7 +56,7 @@ public class DfDataTable {
     public DfDataRow addRow() {
         DfDataRow row = new DfDataRow(this);
         _rows.add(row);
-        row.setState(DtsRowStates.CREATED);
+        row.setState(DfDtsRowStates.CREATED);
         return row;
     }
 
@@ -71,7 +71,7 @@ public class DfDataTable {
     public DfDataRow[] removeRows() {
         for (int i = 0; i < _rows.size();) {
             DfDataRow row = getRow(i);
-            if (row.getState().equals(DtsRowStates.REMOVED)) {
+            if (row.getState().equals(DfDtsRowStates.REMOVED)) {
                 _removedRows.add(row);
                 _rows.remove(i);
             } else {
@@ -111,19 +111,19 @@ public class DfDataTable {
         return getColumn(index).getColumnName();
     }
 
-    public DtsColumnType getColumnType(int index) {
+    public DfDtsColumnType getColumnType(int index) {
         return getColumn(index).getColumnType();
     }
 
-    public DtsColumnType getColumnType(String columnName) {
+    public DfDtsColumnType getColumnType(String columnName) {
         return getColumn(columnName).getColumnType();
     }
 
     public DfDataColumn addColumn(String columnName) {
-        return addColumn(columnName, DtsColumnTypes.OBJECT);
+        return addColumn(columnName, DfDtsColumnTypes.OBJECT);
     }
 
-    public DfDataColumn addColumn(String columnName, DtsColumnType columnType) {
+    public DfDataColumn addColumn(String columnName, DfDtsColumnType columnType) {
         DfDataColumn column = new DfDataColumn(columnName, columnType, _columnMap.size());
         _columnMap.put(columnName, column);
         _columnList.add(column);
@@ -148,7 +148,7 @@ public class DfDataTable {
             if (metaInfo != null) {
                 column.setWritable(true);
                 final int jdbcDefValue = metaInfo.getJdbcDefValue();
-                column.setColumnType(DtsColumnTypes.getColumnType(jdbcDefValue));
+                column.setColumnType(DfDtsColumnTypes.getColumnType(jdbcDefValue));
             } else {
                 column.setWritable(false);
             }
