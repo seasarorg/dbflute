@@ -166,7 +166,7 @@ public class ${myClassName} {
     // ===================================================================================
     //                                                                          Value Type
     //                                                                          ==========
-	public IValueType RegisterBasicValueType(Type keyType, IValueType valueType) {
+	public void RegisterBasicValueType(Type keyType, IValueType valueType) {
 	    AssertNotLocked();
 		if (_log.IsInfoEnabled) {
 		    _log.Info("...Registering basic valueType: keyType=" + keyType + " valueType=" + valueType);
