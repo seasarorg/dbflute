@@ -9,11 +9,11 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class BinaryType extends ObjectType {
+public class DtsBinaryType extends DtsObjectType {
 
     private static final Class<?> TYPE = new byte[0].getClass();
 
-    public BinaryType() {
+    public DtsBinaryType() {
     }
 
     public Object convert(Object value, String formatPattern) {

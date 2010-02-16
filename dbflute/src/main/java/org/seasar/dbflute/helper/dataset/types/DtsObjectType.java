@@ -1,13 +1,13 @@
 package org.seasar.dbflute.helper.dataset.types;
 
 /**
- * Data Table. {Refer to S2Container}
+ * The object type for data set. {Refers to S2Container}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class ObjectType implements ColumnType {
+public class DtsObjectType implements DtsColumnType {
 
-    public ObjectType() {
+    public DtsObjectType() {
     }
 
     public Object convert(Object value, String formatPattern) {

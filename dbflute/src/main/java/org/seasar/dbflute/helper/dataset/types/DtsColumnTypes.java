@@ -12,25 +12,25 @@ import java.util.Map;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class ColumnTypes {
+public class DtsColumnTypes {
 
-    public static final ColumnType STRING = new StringType();
+    public static final DtsColumnType STRING = new DtsStringType();
 
-    public static final ColumnType NOT_TRIM_STRING = new StringType(false);
+    public static final DtsColumnType NOT_TRIM_STRING = new DtsStringType(false);
 
-    public static final ColumnType BIGDECIMAL = new BigDecimalType();
+    public static final DtsColumnType BIGDECIMAL = new DtsBigDecimalType();
 
-    public static final ColumnType TIMESTAMP = new TimestampType();
+    public static final DtsColumnType TIMESTAMP = new DtsTimestampType();
 
-    public static final ColumnType BINARY = new BinaryType();
+    public static final DtsColumnType BINARY = new DtsBinaryType();
 
-    public static final ColumnType OBJECT = new ObjectType();
+    public static final DtsColumnType OBJECT = new DtsObjectType();
 
-    public static final ColumnType BOOLEAN = new BooleanType();
+    public static final DtsColumnType BOOLEAN = new DtsBooleanType();
 
-    private static Map<Class<?>, ColumnType> typesByClass = new HashMap<Class<?>, ColumnType>();
+    private static Map<Class<?>, DtsColumnType> typesByClass = new HashMap<Class<?>, DtsColumnType>();
 
-    private static Map<Integer, ColumnType> typesBySqlType = new HashMap<Integer, ColumnType>();
+    private static Map<Integer, DtsColumnType> typesBySqlType = new HashMap<Integer, DtsColumnType>();
 
     static {
         registerColumnType(String.class, STRING);
@@ -74,7 +74,7 @@ public class ColumnTypes {
         registerColumnType(Types.VARCHAR, STRING);
     }
 
-    protected ColumnTypes() {
+    protected DtsColumnTypes() {
     }
 
     // [Unused on DBFlute]
@@ -109,34 +109,34 @@ public class ColumnTypes {
     //        }
     //    }
 
-    public static ColumnType getColumnType(int type) {
-        ColumnType columnType = (ColumnType) typesBySqlType.get(new Integer(type));
+    public static DtsColumnType getColumnType(int type) {
+        DtsColumnType columnType = (DtsColumnType) typesBySqlType.get(new Integer(type));
         if (columnType != null) {
             return columnType;
         }
         return OBJECT;
     }
 
-    public static ColumnType getColumnType(Object value) {
+    public static DtsColumnType getColumnType(Object value) {
         if (value == null) {
             return OBJECT;
         }
         return getColumnType(value.getClass());
     }
 
-    public static ColumnType getColumnType(Class<?> clazz) {
-        ColumnType columnType = (ColumnType) typesByClass.get(clazz);
+    public static DtsColumnType getColumnType(Class<?> clazz) {
+        DtsColumnType columnType = (DtsColumnType) typesByClass.get(clazz);
         if (columnType != null) {
             return columnType;
         }
         return OBJECT;
     }
 
-    public static ColumnType registerColumnType(int sqlType, ColumnType columnType) {
-        return (ColumnType) typesBySqlType.put(new Integer(sqlType), columnType);
+    public static DtsColumnType registerColumnType(int sqlType, DtsColumnType columnType) {
+        return (DtsColumnType) typesBySqlType.put(new Integer(sqlType), columnType);
     }
 
-    public static ColumnType registerColumnType(Class<?> clazz, ColumnType columnType) {
-        return (ColumnType) typesByClass.put(clazz, columnType);
+    public static DtsColumnType registerColumnType(Class<?> clazz, DtsColumnType columnType) {
+        return (DtsColumnType) typesByClass.put(clazz, columnType);
     }
 }

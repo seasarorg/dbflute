@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.dataset.states.RowStates;
-import org.seasar.dbflute.helper.dataset.types.ColumnType;
-import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
+import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
+import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
@@ -111,19 +111,19 @@ public class DataTable {
         return getColumn(index).getColumnName();
     }
 
-    public ColumnType getColumnType(int index) {
+    public DtsColumnType getColumnType(int index) {
         return getColumn(index).getColumnType();
     }
 
-    public ColumnType getColumnType(String columnName) {
+    public DtsColumnType getColumnType(String columnName) {
         return getColumn(columnName).getColumnType();
     }
 
     public DataColumn addColumn(String columnName) {
-        return addColumn(columnName, ColumnTypes.OBJECT);
+        return addColumn(columnName, DtsColumnTypes.OBJECT);
     }
 
-    public DataColumn addColumn(String columnName, ColumnType columnType) {
+    public DataColumn addColumn(String columnName, DtsColumnType columnType) {
         DataColumn column = new DataColumn(columnName, columnType, _columnMap.size());
         _columnMap.put(columnName, column);
         _columnList.add(column);
@@ -148,7 +148,7 @@ public class DataTable {
             if (metaInfo != null) {
                 column.setWritable(true);
                 final int jdbcDefValue = metaInfo.getJdbcDefValue();
-                column.setColumnType(ColumnTypes.getColumnType(jdbcDefValue));
+                column.setColumnType(DtsColumnTypes.getColumnType(jdbcDefValue));
             } else {
                 column.setWritable(false);
             }

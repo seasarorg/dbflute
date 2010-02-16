@@ -9,9 +9,9 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class BigDecimalType extends ObjectType {
+public class DtsBigDecimalType extends DtsObjectType {
 
-    public BigDecimalType() {
+    public DtsBigDecimalType() {
     }
 
     public Object convert(Object value, String formatPattern) {

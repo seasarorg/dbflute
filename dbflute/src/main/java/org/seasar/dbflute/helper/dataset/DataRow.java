@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.seasar.dbflute.helper.dataset.states.RowState;
 import org.seasar.dbflute.helper.dataset.states.RowStates;
-import org.seasar.dbflute.helper.dataset.types.ColumnType;
-import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
+import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
+import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -115,7 +115,7 @@ public class DataRow {
             String columnName = _table.getColumnName(i);
             Object value = _values.get(i);
             Object otherValue = other.getValue(columnName);
-            ColumnType ct = ColumnTypes.getColumnType(value);
+            DtsColumnType ct = DtsColumnTypes.getColumnType(value);
             if (ct.equals(value, otherValue)) {
                 continue;
             }

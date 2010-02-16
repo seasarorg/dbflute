@@ -3,19 +3,19 @@ package org.seasar.dbflute.helper.dataset.types;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
- * Data Table. {Refer to S2Container}
+ * The string type for data set. {Refers to S2Container}
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class StringType extends ObjectType {
+public class DtsStringType extends DtsObjectType {
 
     protected boolean trim;
 
-    public StringType() {
+    public DtsStringType() {
         this(true);
     }
 
-    public StringType(final boolean trim) {
+    public DtsStringType(final boolean trim) {
         this.trim = trim;
     }
 

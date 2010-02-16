@@ -48,8 +48,8 @@ import org.seasar.dbflute.helper.dataset.DataSet;
 import org.seasar.dbflute.helper.dataset.DataTable;
 import org.seasar.dbflute.helper.dataset.states.CreatedState;
 import org.seasar.dbflute.helper.dataset.states.SqlContext;
-import org.seasar.dbflute.helper.dataset.types.ColumnType;
-import org.seasar.dbflute.helper.dataset.types.ColumnTypes;
+import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
+import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
 import org.seasar.dbflute.helper.io.data.DfXlsDataHandler;
 import org.seasar.dbflute.helper.io.xls.DfXlsReader;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
@@ -413,13 +413,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 final String defaultValue = defaultValueMap.get(defaultTargetColumnName);
 
                 if (metaInfoMap.containsKey(defaultTargetColumnName) && !table.hasColumn(defaultTargetColumnName)) {
-                    final ColumnType columnType;
+                    final DtsColumnType columnType;
                     final Object value;
                     if (defaultValue.equalsIgnoreCase("sysdate")) {
-                        columnType = ColumnTypes.TIMESTAMP;
+                        columnType = DtsColumnTypes.TIMESTAMP;
                         value = new Timestamp(System.currentTimeMillis());
                     } else {
-                        columnType = ColumnTypes.STRING;
+                        columnType = DtsColumnTypes.STRING;
                         value = defaultValue;
                     }
                     table.addColumn(defaultTargetColumnName, columnType);
