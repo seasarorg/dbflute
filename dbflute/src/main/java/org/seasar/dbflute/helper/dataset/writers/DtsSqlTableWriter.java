@@ -6,8 +6,8 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.dataset.DataRow;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.states.DtsRowState;
 
 /**
@@ -29,22 +29,22 @@ public class DtsSqlTableWriter implements DtsTableWriter {
         return dataSource;
     }
 
-    public void write(DataTable table) {
+    public void write(DfDataTable table) {
         if (!table.hasMetaData()) {
             setupMetaData(table);
         }
         doWrite(table);
     }
 
-    protected void doWrite(DataTable table) {
+    protected void doWrite(DfDataTable table) {
         for (int i = 0; i < table.getRowSize(); ++i) {
-            DataRow row = table.getRow(i);
+            DfDataRow row = table.getRow(i);
             DtsRowState state = row.getState();
             state.update(dataSource, row);
         }
     }
 
-    private void setupMetaData(DataTable table) {
+    private void setupMetaData(DfDataTable table) {
         Connection con = getConnection(dataSource);
         try {
             table.setupMetaData(getMetaData(con), _schemaName);

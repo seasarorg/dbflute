@@ -23,22 +23,22 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DataTable {
+public class DfDataTable {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     private String _tableName;
-    private Map<String, DataColumn> _columnMap = StringKeyMap.createAsFlexibleOrdered();
-    private List<DataColumn> _columnList = new ArrayList<DataColumn>();
-    private List<DataRow> _rows = new ArrayList<DataRow>();
-    private List<DataRow> _removedRows = new ArrayList<DataRow>();
+    private Map<String, DfDataColumn> _columnMap = StringKeyMap.createAsFlexibleOrdered();
+    private List<DfDataColumn> _columnList = new ArrayList<DfDataColumn>();
+    private List<DfDataRow> _rows = new ArrayList<DfDataRow>();
+    private List<DfDataRow> _removedRows = new ArrayList<DfDataRow>();
     private boolean _hasMetaData = false;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DataTable(String tableName) {
+    public DfDataTable(String tableName) {
         setTableName(tableName);
     }
 
@@ -49,12 +49,12 @@ public class DataTable {
         return _rows.size();
     }
 
-    public DataRow getRow(int index) {
-        return (DataRow) _rows.get(index);
+    public DfDataRow getRow(int index) {
+        return (DfDataRow) _rows.get(index);
     }
 
-    public DataRow addRow() {
-        DataRow row = new DataRow(this);
+    public DfDataRow addRow() {
+        DfDataRow row = new DfDataRow(this);
         _rows.add(row);
         row.setState(DtsRowStates.CREATED);
         return row;
@@ -64,13 +64,13 @@ public class DataTable {
         return _removedRows.size();
     }
 
-    public DataRow getRemovedRow(int index) {
-        return (DataRow) _removedRows.get(index);
+    public DfDataRow getRemovedRow(int index) {
+        return (DfDataRow) _removedRows.get(index);
     }
 
-    public DataRow[] removeRows() {
+    public DfDataRow[] removeRows() {
         for (int i = 0; i < _rows.size();) {
-            DataRow row = getRow(i);
+            DfDataRow row = getRow(i);
             if (row.getState().equals(DtsRowStates.REMOVED)) {
                 _removedRows.add(row);
                 _rows.remove(i);
@@ -78,19 +78,19 @@ public class DataTable {
                 ++i;
             }
         }
-        return (DataRow[]) _removedRows.toArray(new DataRow[_removedRows.size()]);
+        return (DfDataRow[]) _removedRows.toArray(new DfDataRow[_removedRows.size()]);
     }
 
     public int getColumnSize() {
         return _columnMap.size();
     }
 
-    public DataColumn getColumn(int index) {
+    public DfDataColumn getColumn(int index) {
         return _columnList.get(index);
     }
 
-    public DataColumn getColumn(String columnName) {
-        DataColumn column = getColumn0(columnName);
+    public DfDataColumn getColumn(String columnName) {
+        DfDataColumn column = getColumn0(columnName);
         if (column == null) {
             String msg = "The column was not found in the table: ";
             msg = msg + " tableName=" + _tableName + " columnName=" + columnName;
@@ -99,7 +99,7 @@ public class DataTable {
         return column;
     }
 
-    private DataColumn getColumn0(String columnName) {
+    private DfDataColumn getColumn0(String columnName) {
         return _columnMap.get(columnName);
     }
 
@@ -119,12 +119,12 @@ public class DataTable {
         return getColumn(columnName).getColumnType();
     }
 
-    public DataColumn addColumn(String columnName) {
+    public DfDataColumn addColumn(String columnName) {
         return addColumn(columnName, DtsColumnTypes.OBJECT);
     }
 
-    public DataColumn addColumn(String columnName, DtsColumnType columnType) {
-        DataColumn column = new DataColumn(columnName, columnType, _columnMap.size());
+    public DfDataColumn addColumn(String columnName, DtsColumnType columnType) {
+        DfDataColumn column = new DfDataColumn(columnName, columnType, _columnMap.size());
         _columnMap.put(columnName, column);
         _columnList.add(column);
         return column;
@@ -138,7 +138,7 @@ public class DataTable {
         final Map<String, DfColumnMetaInfo> metaMap = extractColumnMetaMap(metaData, schemaName);
         final Set<String> primaryKeySet = getPrimaryKeySet(metaData, schemaName);
         for (int i = 0; i < getColumnSize(); ++i) {
-            final DataColumn column = getColumn(i);
+            final DfDataColumn column = getColumn(i);
             if (primaryKeySet.contains(column.getColumnName())) {
                 column.setPrimaryKey(true);
             } else {
@@ -204,10 +204,10 @@ public class DataTable {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof DataTable)) {
+        if (!(o instanceof DfDataTable)) {
             return false;
         }
-        DataTable other = (DataTable) o;
+        DfDataTable other = (DfDataTable) o;
         if (getRowSize() != other.getRowSize()) {
             return false;
         }

@@ -5,7 +5,7 @@ package org.seasar.dbflute.helper.dataset;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public interface DataSetConstants {
+public interface DfDataSetConstants {
 
     String DATE_FORMAT = "yyyy/MM/dd";
 

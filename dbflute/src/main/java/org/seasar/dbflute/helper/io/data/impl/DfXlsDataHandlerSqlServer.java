@@ -26,7 +26,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
  * @author jflute
@@ -47,14 +47,14 @@ public class DfXlsDataHandlerSqlServer extends DfXlsDataHandlerImpl {
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-    protected void beforeHandlingTable(DataSource dataSource, DataTable dataTable) {
+    protected void beforeHandlingTable(DataSource dataSource, DfDataTable dataTable) {
         if (hasIdentityColumn(dataSource, dataTable)) {
             turnOnIdentityInsert(dataSource, dataTable);
             _identityTableSet.add(dataTable.getTableName());
         }
     }
 
-    protected void finallyHandlingTable(DataSource dataSource, DataTable dataTable) {
+    protected void finallyHandlingTable(DataSource dataSource, DfDataTable dataTable) {
         if (_identityTableSet.contains(dataTable.getTableName())) {
             turnOffIdentityInsert(dataSource, dataTable);
         }
@@ -63,7 +63,7 @@ public class DfXlsDataHandlerSqlServer extends DfXlsDataHandlerImpl {
     // ===================================================================================
     //                                                                            Identity
     //                                                                            ========
-    private boolean hasIdentityColumn(DataSource dataSource, final DataTable dataTable) {
+    private boolean hasIdentityColumn(DataSource dataSource, final DfDataTable dataTable) {
         final String sql = "SELECT IDENT_CURRENT ('" + dataTable.getTableName() + "') AS IDENT_CURRENT";
         final Connection conn = getConnection(dataSource);
         Statement stmt = null;
@@ -100,15 +100,15 @@ public class DfXlsDataHandlerSqlServer extends DfXlsDataHandlerImpl {
         }
     }
 
-    private void turnOnIdentityInsert(DataSource dataSource, final DataTable dataTable) {
+    private void turnOnIdentityInsert(DataSource dataSource, final DfDataTable dataTable) {
         setIdentityInsert(dataSource, dataTable, "ON");
     }
 
-    private void turnOffIdentityInsert(DataSource dataSource, final DataTable dataTable) {
+    private void turnOffIdentityInsert(DataSource dataSource, final DfDataTable dataTable) {
         setIdentityInsert(dataSource, dataTable, "OFF");
     }
 
-    private void setIdentityInsert(DataSource dataSource, final DataTable dataTable, final String command) {
+    private void setIdentityInsert(DataSource dataSource, final DfDataTable dataTable, final String command) {
         final String sql = "SET IDENTITY_INSERT " + dataTable.getTableName() + " " + command;
         if (_loggingInsertSql) {
             _log.info(sql);

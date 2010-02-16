@@ -13,7 +13,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.dataset.DataRow;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -28,12 +28,12 @@ public abstract class DtsAbstractRowState implements DtsRowState {
     DtsAbstractRowState() {
     }
 
-    public void update(DataSource dataSource, DataRow row) {
+    public void update(DataSource dataSource, DfDataRow row) {
         final DtsSqlContext ctx = getSqlContext(row);
         execute(dataSource, ctx.getSql(), ctx.getArgs(), ctx.getArgTypes(), row);
     }
 
-    protected void execute(DataSource dataSource, String sql, Object[] args, Class<?>[] argTypes, DataRow row) {
+    protected void execute(DataSource dataSource, String sql, Object[] args, Class<?>[] argTypes, DfDataRow row) {
         final String tableName = row.getTable().getTableName();
         final Connection conn = getConnection(dataSource);
         try {
@@ -151,7 +151,7 @@ public abstract class DtsAbstractRowState implements DtsRowState {
         return value;
     }
 
-    protected abstract DtsSqlContext getSqlContext(DataRow row);
+    protected abstract DtsSqlContext getSqlContext(DfDataRow row);
 
     private static Connection getConnection(DataSource dataSource) {
         try {

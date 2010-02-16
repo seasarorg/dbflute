@@ -2,7 +2,7 @@ package org.seasar.dbflute.helper.dataset.writers;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.dataset.DataSet;
+import org.seasar.dbflute.helper.dataset.DfDataSet;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -15,7 +15,7 @@ public class DtsSqlServerSqlWriter extends DtsSqlWriter {
         super(dataSource, schemaName);
     }
 
-    public void write(final DataSet dataSet) {
+    public void write(final DfDataSet dataSet) {
         final DtsTableWriter writer = new DtsSqlServerSqlTableWriter(getDataSource(), _schemaName);
         for (int i = 0; i < dataSet.getTableSize(); ++i) {
             writer.write(dataSet.getTable(i));

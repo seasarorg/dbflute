@@ -29,10 +29,10 @@ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.seasar.dbflute.helper.dataset.DataRow;
-import org.seasar.dbflute.helper.dataset.DataSet;
-import org.seasar.dbflute.helper.dataset.DataSetConstants;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
+import org.seasar.dbflute.helper.dataset.DfDataSet;
+import org.seasar.dbflute.helper.dataset.DfDataSetConstants;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.util.DfBase64Util;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -41,7 +41,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute 
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DfXlsWriter implements DataSetConstants {
+public class DfXlsWriter implements DfDataSetConstants {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -103,9 +103,9 @@ public class DfXlsWriter implements DataSetConstants {
     // ===================================================================================
     //                                                                               Write
     //                                                                               =====
-    public void write(DataSet dataSet) {
+    public void write(DfDataSet dataSet) {
         for (int i = 0; i < dataSet.getTableSize(); ++i) {
-            final DataTable table = dataSet.getTable(i);
+            final DfDataTable table = dataSet.getTable(i);
             final HSSFSheet sheet = workbook.createSheet();
             final String tableName = table.getTableName();
             try {
@@ -122,7 +122,7 @@ public class DfXlsWriter implements DataSetConstants {
             for (int j = 0; j < table.getRowSize(); ++j) {
                 final HSSFRow row = sheet.createRow(j + 1);
                 for (int k = 0; k < table.getColumnSize(); ++k) {
-                    final DataRow dataRow = table.getRow(j);
+                    final DfDataRow dataRow = table.getRow(j);
                     final Object value = dataRow.getValue(k);
                     if (value != null) {
                         final HSSFCell cell = row.createCell(k);

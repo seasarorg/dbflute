@@ -3,9 +3,9 @@ package org.seasar.dbflute.helper.dataset.states;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.helper.dataset.DataColumn;
-import org.seasar.dbflute.helper.dataset.DataRow;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataColumn;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -18,8 +18,8 @@ public class DtsCreatedState extends DtsAbstractRowState {
         return "CREATED";
     }
 
-    protected DtsSqlContext getSqlContext(DataRow row) {
-        DataTable table = row.getTable();
+    protected DtsSqlContext getSqlContext(DfDataRow row) {
+        DfDataTable table = row.getTable();
         StringBuffer buf = new StringBuffer(100);
         List<Object> argList = new ArrayList<Object>();
         List<Class<?>> argTypeList = new ArrayList<Class<?>>();
@@ -28,7 +28,7 @@ public class DtsCreatedState extends DtsAbstractRowState {
         buf.append(" (");
         int writableColumnSize = 0;
         for (int i = 0; i < table.getColumnSize(); ++i) {
-            DataColumn column = table.getColumn(i);
+            DfDataColumn column = table.getColumn(i);
             if (column.isWritable()) {
                 ++writableColumnSize;
                 buf.append(column.getColumnName());

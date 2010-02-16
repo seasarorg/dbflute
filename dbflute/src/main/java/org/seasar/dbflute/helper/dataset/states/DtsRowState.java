@@ -2,7 +2,7 @@ package org.seasar.dbflute.helper.dataset.states;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.dataset.DataRow;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -11,5 +11,5 @@ import org.seasar.dbflute.helper.dataset.DataRow;
  */
 public interface DtsRowState {
 
-    void update(DataSource dataSource, DataRow row);
+    void update(DataSource dataSource, DfDataRow row);
 }

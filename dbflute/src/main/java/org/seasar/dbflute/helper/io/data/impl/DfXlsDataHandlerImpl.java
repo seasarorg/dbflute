@@ -42,10 +42,10 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfTableDataRegistrationFailureException;
 import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.dataset.DataColumn;
-import org.seasar.dbflute.helper.dataset.DataRow;
-import org.seasar.dbflute.helper.dataset.DataSet;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataColumn;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
+import org.seasar.dbflute.helper.dataset.DfDataSet;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.states.DtsCreatedState;
 import org.seasar.dbflute.helper.dataset.states.DtsSqlContext;
 import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
@@ -87,9 +87,9 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public List<DataSet> readSeveralData(String dataDirectoryName) {
+    public List<DfDataSet> readSeveralData(String dataDirectoryName) {
         final List<File> xlsList = getXlsList(dataDirectoryName);
-        final List<DataSet> ls = new ArrayList<DataSet>();
+        final List<DfDataSet> ls = new ArrayList<DfDataSet>();
         for (File file : xlsList) {
             final DfXlsReader xlsReader = createXlsReader(dataDirectoryName, file);
             ls.add(xlsReader.read());
@@ -110,13 +110,13 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             _log.info("writeData(" + file + ")");
             _log.info("= = = = = = =/");
             final DfXlsReader xlsReader = createXlsReader(dataDirectoryName, file);
-            final DataSet dataSet = xlsReader.read();
+            final DfDataSet dataSet = xlsReader.read();
 
             filterValidColumn(dataSet, dataSource);
             setupDefaultValue(dataDirectoryName, dataSet, dataSource);
 
             for (int i = 0; i < dataSet.getTableSize(); i++) {
-                final DataTable dataTable = dataSet.getTable(i);
+                final DfDataTable dataTable = dataSet.getTable(i);
                 final String tableName = dataTable.getTableName();
                 if (dataTable.getRowSize() == 0) {
                     _log.info("*Not found row at the table: " + tableName);
@@ -132,7 +132,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 // Set up columnNameList.
                 final List<String> columnNameList = new ArrayList<String>();
                 for (int j = 0; j < dataTable.getColumnSize(); j++) {
-                    final DataColumn dataColumn = dataTable.getColumn(j);
+                    final DfDataColumn dataColumn = dataTable.getColumn(j);
                     final String columnName = dataColumn.getColumnName();
                     columnNameList.add(columnName);
                 }
@@ -140,7 +140,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
                 PreparedStatement ps = null;
                 try {
                     for (int j = 0; j < dataTable.getRowSize(); j++) {
-                        final DataRow dataRow = dataTable.getRow(j);
+                        final DfDataRow dataRow = dataTable.getRow(j);
                         if (ps == null) {
                             final MyCreatedState myCreatedState = new MyCreatedState();
                             final String preparedSql = myCreatedState.buildPreparedSql(dataRow);
@@ -299,10 +299,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         }
     }
 
-    protected void beforeHandlingTable(DataSource dataSource, DataTable dataTable) {
+    protected void beforeHandlingTable(DataSource dataSource, DfDataTable dataTable) {
     }
 
-    protected void finallyHandlingTable(DataSource dataSource, DataTable dataTable) {
+    protected void finallyHandlingTable(DataSource dataSource, DfDataTable dataTable) {
     }
 
     protected String removeDoubleQuotation(String value) {
@@ -383,14 +383,14 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return new ArrayList<File>(sortedFileSet);
     }
 
-    protected void filterValidColumn(final DataSet dataSet, final DataSource dataSource) {
+    protected void filterValidColumn(final DfDataSet dataSet, final DataSource dataSource) {
         for (int i = 0; i < dataSet.getTableSize(); i++) {
-            final DataTable table = dataSet.getTable(i);
+            final DfDataTable table = dataSet.getTable(i);
             final String tableName = table.getTableName();
 
             final Map<String, DfColumnMetaInfo> metaInfoMap = getColumnMetaInfo(dataSource, tableName);
             for (int j = 0; j < table.getColumnSize(); j++) {
-                final DataColumn dataColumn = table.getColumn(j);
+                final DfDataColumn dataColumn = table.getColumn(j);
                 if (!metaInfoMap.containsKey(dataColumn.getColumnName())) {
                     dataColumn.setWritable(false);
                 }
@@ -401,10 +401,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======
-    protected void setupDefaultValue(String dataDirectoryName, final DataSet dataSet, final DataSource dataSource) {
+    protected void setupDefaultValue(String dataDirectoryName, final DfDataSet dataSet, final DataSource dataSource) {
         final Map<String, String> defaultValueMap = getDefaultValueMap(dataDirectoryName);
         for (int i = 0; i < dataSet.getTableSize(); i++) {
-            final DataTable table = dataSet.getTable(i);
+            final DfDataTable table = dataSet.getTable(i);
             final Set<String> defaultValueMapKeySet = defaultValueMap.keySet();
             final String tableName = table.getTableName();
 
@@ -426,7 +426,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
 
                     int rowSize = table.getRowSize();
                     for (int j = 0; j < table.getRowSize(); j++) {
-                        final DataRow row = table.getRow(j);
+                        final DfDataRow row = table.getRow(j);
                         row.addValue(defaultTargetColumnName, value);
                         ++rowSize;
                     }
@@ -499,10 +499,10 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
         return tableName + ":{" + bindParameterString + "}";
     }
 
-    protected ColumnContainer createColumnContainer(final DataTable dataTable, final DataRow dataRow) {
+    protected ColumnContainer createColumnContainer(final DfDataTable dataTable, final DfDataRow dataRow) {
         final ColumnContainer container = new ColumnContainer();
         for (int i = 0; i < dataTable.getColumnSize(); i++) {
-            final DataColumn dataColumn = dataTable.getColumn(i);
+            final DfDataColumn dataColumn = dataTable.getColumn(i);
             if (!dataColumn.isWritable()) {
                 continue;
             }
@@ -519,7 +519,7 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
     //                                                                        ============
     protected static class ColumnContainer {
         protected Map<String, Object> columnValueMap = new LinkedHashMap<String, Object>();
-        protected Map<String, DataColumn> columnObjectMap = new LinkedHashMap<String, DataColumn>();
+        protected Map<String, DfDataColumn> columnObjectMap = new LinkedHashMap<String, DfDataColumn>();
 
         public Map<String, Object> getColumnValueMap() {
             return columnValueMap;
@@ -529,17 +529,17 @@ public class DfXlsDataHandlerImpl extends DfAbsractDataWriter implements DfXlsDa
             this.columnValueMap.put(columnName, columnValue);
         }
 
-        public Map<String, DataColumn> getColumnObjectMap() {
+        public Map<String, DfDataColumn> getColumnObjectMap() {
             return columnObjectMap;
         }
 
-        public void addColumnObject(String columnName, DataColumn columnObject) {
+        public void addColumnObject(String columnName, DfDataColumn columnObject) {
             this.columnObjectMap.put(columnName, columnObject);
         }
     }
 
     protected static class MyCreatedState {
-        public String buildPreparedSql(final DataRow row) {
+        public String buildPreparedSql(final DfDataRow row) {
             final DtsCreatedState createdState = new DtsCreatedState() {
                 public String toString() {
                     final DtsSqlContext sqlContext = getSqlContext(row);

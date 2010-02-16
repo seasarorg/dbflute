@@ -11,18 +11,18 @@ import org.seasar.dbflute.helper.StringKeyMap;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DataSet {
+public class DfDataSet {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private Map<String, DataTable> _tableMap = StringKeyMap.createAsFlexibleOrdered();
-    private List<DataTable> _tableList = new ArrayList<DataTable>();
+    private Map<String, DfDataTable> _tableMap = StringKeyMap.createAsFlexibleOrdered();
+    private List<DfDataTable> _tableList = new ArrayList<DfDataTable>();
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DataSet() {
+    public DfDataSet() {
     }
 
     // ===================================================================================
@@ -36,16 +36,16 @@ public class DataSet {
         return getTable(index).getTableName();
     }
 
-    public DataTable getTable(int index) {
-        return (DataTable) _tableList.get(index);
+    public DfDataTable getTable(int index) {
+        return (DfDataTable) _tableList.get(index);
     }
 
     public boolean hasTable(String tableName) {
         return _tableMap.containsKey(tableName);
     }
 
-    public DataTable getTable(String tableName) {
-        DataTable table = (DataTable) _tableMap.get(tableName);
+    public DfDataTable getTable(String tableName) {
+        DfDataTable table = (DfDataTable) _tableMap.get(tableName);
         if (table == null) {
             String msg = "The table was Not Found: " + tableName;
             throw new IllegalStateException(msg);
@@ -53,11 +53,11 @@ public class DataSet {
         return table;
     }
 
-    public DataTable addTable(String tableName) {
-        return addTable(new DataTable(tableName));
+    public DfDataTable addTable(String tableName) {
+        return addTable(new DfDataTable(tableName));
     }
 
-    public DataTable addTable(DataTable table) {
+    public DfDataTable addTable(DfDataTable table) {
         _tableMap.put(table.getTableName(), table);
         _tableList.add(table);
         return table;
@@ -79,10 +79,10 @@ public class DataSet {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof DataSet)) {
+        if (!(o instanceof DfDataSet)) {
             return false;
         }
-        DataSet other = (DataSet) o;
+        DfDataSet other = (DfDataSet) o;
         if (getTableSize() != other.getTableSize()) {
             return false;
         }

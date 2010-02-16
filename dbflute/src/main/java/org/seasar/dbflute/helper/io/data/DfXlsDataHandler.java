@@ -20,14 +20,14 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.seasar.dbflute.helper.dataset.DataSet;
+import org.seasar.dbflute.helper.dataset.DfDataSet;
 
 /**
  * @author jflute
  */
 public interface DfXlsDataHandler {
 
-    public List<DataSet> readSeveralData(String dataDirectoryName);
+    public List<DfDataSet> readSeveralData(String dataDirectoryName);
 
     public void writeSeveralData(String dataDirectoryName, DataSource dataSource);
 

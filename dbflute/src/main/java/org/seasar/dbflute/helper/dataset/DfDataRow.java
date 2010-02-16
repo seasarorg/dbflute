@@ -13,12 +13,12 @@ import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DataRow {
+public class DfDataRow {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private DataTable _table;
+    private DfDataTable _table;
 
     private List<Object> _values = new ArrayList<Object>();
 
@@ -27,7 +27,7 @@ public class DataRow {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DataRow(DataTable table) {
+    public DfDataRow(DfDataTable table) {
         _table = table;
 
         // [Unused on DBFlute]
@@ -49,12 +49,12 @@ public class DataRow {
     }
 
     public Object getValue(String columnName) {
-        final DataColumn column = _table.getColumn(columnName);
+        final DfDataColumn column = _table.getColumn(columnName);
         return _values.get(column.getColumnIndex());
     }
 
     public void addValue(String columnName, Object value) {
-        final DataColumn column = _table.getColumn(columnName);
+        final DfDataColumn column = _table.getColumn(columnName);
         _values.add(column.convert(value));
         modify();
     }
@@ -76,7 +76,7 @@ public class DataRow {
         _state = DtsRowStates.REMOVED;
     }
 
-    public DataTable getTable() {
+    public DfDataTable getTable() {
         return _table;
     }
 
@@ -107,10 +107,10 @@ public class DataRow {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof DataRow)) {
+        if (!(o instanceof DfDataRow)) {
             return false;
         }
-        DataRow other = (DataRow) o;
+        DfDataRow other = (DfDataRow) o;
         for (int i = 0; i < _table.getColumnSize(); ++i) {
             String columnName = _table.getColumnName(i);
             Object value = _values.get(i);

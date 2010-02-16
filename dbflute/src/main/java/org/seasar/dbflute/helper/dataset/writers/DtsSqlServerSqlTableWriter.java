@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -34,7 +34,7 @@ public class DtsSqlServerSqlTableWriter extends DtsSqlTableWriter {
     // ===================================================================================
     //                                                                       Main Override
     //                                                                       =============
-    protected void doWrite(final DataTable dataTable) {
+    protected void doWrite(final DfDataTable dataTable) {
         boolean hasIdentity = hasIdentityColumn(dataTable);
         if (hasIdentity) {
             turnOnIdentityInsert(dataTable);
@@ -45,15 +45,15 @@ public class DtsSqlServerSqlTableWriter extends DtsSqlTableWriter {
         }
     }
 
-    private void turnOnIdentityInsert(final DataTable dataTable) {
+    private void turnOnIdentityInsert(final DfDataTable dataTable) {
         setIdentityInsert(dataTable, "ON");
     }
 
-    private void turnOffIdentityInsert(final DataTable dataTable) {
+    private void turnOffIdentityInsert(final DfDataTable dataTable) {
         setIdentityInsert(dataTable, "OFF");
     }
 
-    private void setIdentityInsert(final DataTable dataTable, final String command) {
+    private void setIdentityInsert(final DfDataTable dataTable, final String command) {
         final String sql = "SET IDENTITY_INSERT " + dataTable.getTableName() + " " + command;
         if (_log.isDebugEnabled()) {
             _log.debug(sql);
@@ -78,7 +78,7 @@ public class DtsSqlServerSqlTableWriter extends DtsSqlTableWriter {
         }
     }
 
-    private boolean hasIdentityColumn(final DataTable dataTable) {
+    private boolean hasIdentityColumn(final DfDataTable dataTable) {
         final String sql = "SELECT IDENT_CURRENT ('" + dataTable.getTableName() + "') AS IDENT_CURRENT";
         final Connection conn = getConnection(getDataSource());
         Statement stmt = null;

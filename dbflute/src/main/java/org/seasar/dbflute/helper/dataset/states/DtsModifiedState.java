@@ -3,9 +3,9 @@ package org.seasar.dbflute.helper.dataset.states;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.seasar.dbflute.helper.dataset.DataColumn;
-import org.seasar.dbflute.helper.dataset.DataRow;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataColumn;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -18,8 +18,8 @@ public class DtsModifiedState extends DtsAbstractRowState {
         return "MODIFIED";
     }
 
-    protected DtsSqlContext getSqlContext(DataRow row) {
-        DataTable table = row.getTable();
+    protected DtsSqlContext getSqlContext(DfDataRow row) {
+        DfDataTable table = row.getTable();
         StringBuffer buf = new StringBuffer(100);
         List<Object> argList = new ArrayList<Object>();
         List<Class<?>> argTypeList = new ArrayList<Class<?>>();
@@ -27,7 +27,7 @@ public class DtsModifiedState extends DtsAbstractRowState {
         buf.append(table.getTableName());
         buf.append(" set ");
         for (int i = 0; i < table.getColumnSize(); ++i) {
-            DataColumn column = table.getColumn(i);
+            DfDataColumn column = table.getColumn(i);
             if (column.isWritable() && !column.isPrimaryKey()) {
                 buf.append(column.getColumnName());
                 buf.append(" = ?, ");
@@ -38,7 +38,7 @@ public class DtsModifiedState extends DtsAbstractRowState {
         buf.setLength(buf.length() - 2);
         buf.append(" where ");
         for (int i = 0; i < table.getColumnSize(); ++i) {
-            DataColumn column = table.getColumn(i);
+            DfDataColumn column = table.getColumn(i);
             if (column.isPrimaryKey()) {
                 buf.append(column.getColumnName());
                 buf.append(" = ? and ");

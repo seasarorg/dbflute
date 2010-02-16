@@ -9,9 +9,9 @@ import java.util.Set;
 import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.Column;
-import org.seasar.dbflute.helper.dataset.DataRow;
-import org.seasar.dbflute.helper.dataset.DataSet;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
+import org.seasar.dbflute.helper.dataset.DfDataSet;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
 import org.seasar.dbflute.helper.io.xls.DfXlsWriter;
 
@@ -64,16 +64,16 @@ public class DfDataXlsTemplateHandler {
         final Set<String> tableNameSet = templateDataMap.keySet();
         // If the Apache POI version is 2.5, this is necessary to handle Japanese. 
         //writer.setCellEncoding(CellEncoding.ENCODING_UTF_16); // for Japanese
-        final DataSet dataSet = new DataSet();
+        final DfDataSet dataSet = new DfDataSet();
         for (String tableName : tableNameSet) {
             final List<Column> columnList = tableColumnMap.get(tableName);
             final int dotIndex = tableName.indexOf(".");
-            final DataTable dataTable;
+            final DfDataTable dataTable;
             if (dotIndex >= 0) {
                 // for the table of additional schema
-                dataTable = new DataTable(tableName.substring(dotIndex + ".".length()));
+                dataTable = new DfDataTable(tableName.substring(dotIndex + ".".length()));
             } else {
-                dataTable = new DataTable(tableName);
+                dataTable = new DfDataTable(tableName);
             }
             int columnIndex = 0;
             for (Column column : columnList) {
@@ -88,7 +88,7 @@ public class DfDataXlsTemplateHandler {
             }
             for (Map<String, String> recordMap : recordList) {
                 final Set<String> columnNameSet = recordMap.keySet();
-                final DataRow dataRow = dataTable.addRow();
+                final DfDataRow dataRow = dataTable.addRow();
                 for (String columnName : columnNameSet) {
                     final String value = recordMap.get(columnName);
                     dataRow.addValue(columnName, value);

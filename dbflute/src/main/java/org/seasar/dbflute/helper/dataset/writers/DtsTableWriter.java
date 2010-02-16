@@ -1,6 +1,6 @@
 package org.seasar.dbflute.helper.dataset.writers;
 
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -9,5 +9,5 @@ import org.seasar.dbflute.helper.dataset.DataTable;
  */
 public interface DtsTableWriter {
 
-    public void write(DataTable table);
+    public void write(DfDataTable table);
 }

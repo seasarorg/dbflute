@@ -35,11 +35,11 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.seasar.dbflute.helper.StringKeyMap;
-import org.seasar.dbflute.helper.dataset.DataColumn;
-import org.seasar.dbflute.helper.dataset.DataRow;
-import org.seasar.dbflute.helper.dataset.DataSet;
-import org.seasar.dbflute.helper.dataset.DataSetConstants;
-import org.seasar.dbflute.helper.dataset.DataTable;
+import org.seasar.dbflute.helper.dataset.DfDataColumn;
+import org.seasar.dbflute.helper.dataset.DfDataRow;
+import org.seasar.dbflute.helper.dataset.DfDataSet;
+import org.seasar.dbflute.helper.dataset.DfDataSetConstants;
+import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DtsColumnTypes;
 import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
@@ -66,7 +66,7 @@ public class DfXlsReader {
     // -----------------------------------------------------
     //                                          Xls Resource
     //                                          ------------
-    protected DataSet _dataSet;
+    protected DfDataSet _dataSet;
     protected HSSFWorkbook _workbook;
     protected HSSFDataFormat _dataFormat;
 
@@ -130,7 +130,7 @@ public class DfXlsReader {
             throw new IllegalStateException(e);
         }
         _dataFormat = _workbook.createDataFormat();
-        _dataSet = new DataSet();
+        _dataSet = new DfDataSet();
         for (int i = 0; i < _workbook.getNumberOfSheets(); ++i) {
             final String sheetName = _workbook.getSheetName(i);
             if (isCommentOutSheet(sheetName)) {// since 0.7.9
@@ -145,7 +145,7 @@ public class DfXlsReader {
         }
     }
 
-    protected DataTable createTable(String sheetName, HSSFSheet sheet) {
+    protected DfDataTable createTable(String sheetName, HSSFSheet sheet) {
         String tableName = sheetName;
         if (_tableNameMap != null && !_tableNameMap.isEmpty() && sheetName.startsWith("$")) {
             String realTableName = _tableNameMap.get(sheetName);
@@ -158,7 +158,7 @@ public class DfXlsReader {
             }
             tableName = realTableName;
         }
-        final DataTable table = _dataSet.addTable(tableName);
+        final DfDataTable table = _dataSet.addTable(tableName);
         final int rowCount = sheet.getLastRowNum();
         final HSSFRow nameRow = sheet.getRow(0);
         if (nameRow == null) {
@@ -175,7 +175,7 @@ public class DfXlsReader {
         return table;
     }
 
-    protected void setupColumns(DataTable table, HSSFRow nameRow, HSSFRow valueRow) {
+    protected void setupColumns(DfDataTable table, HSSFRow nameRow, HSSFRow valueRow) {
         for (int i = 0;; ++i) {
             final HSSFCell nameCell = nameRow.getCell(i);
             if (nameCell == null) {
@@ -201,7 +201,7 @@ public class DfXlsReader {
         }
     }
 
-    protected void setupRows(DataTable table, HSSFSheet sheet) {
+    protected void setupRows(DfDataTable table, HSSFSheet sheet) {
         for (int i = 1;; ++i) {
             HSSFRow row = sheet.getRow((short) i);
             if (row == null) {
@@ -211,11 +211,11 @@ public class DfXlsReader {
         }
     }
 
-    protected void setupRow(DataTable table, HSSFRow row) {
-        DataRow dataRow = table.addRow();
+    protected void setupRow(DfDataTable table, HSSFRow row) {
+        DfDataRow dataRow = table.addRow();
         HSSFCell cell = null;
         Object value = null;
-        DataColumn column = null;
+        DfDataColumn column = null;
         try {
             for (int i = 0; i < table.getColumnSize(); ++i) {
                 cell = row.getCell(i);
@@ -240,7 +240,7 @@ public class DfXlsReader {
         }
     }
 
-    protected void throwCellValueHandlingException(DataTable table, DataColumn column, HSSFRow row, HSSFCell cell,
+    protected void throwCellValueHandlingException(DfDataTable table, DfDataColumn column, HSSFRow row, HSSFCell cell,
             Object value, RuntimeException e) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
@@ -288,14 +288,14 @@ public class DfXlsReader {
     // ===================================================================================
     //                                                                                Read
     //                                                                                ====
-    public DataSet read() {
+    public DfDataSet read() {
         return _dataSet;
     }
 
     // ===================================================================================
     //                                                                      Value Handling
     //                                                                      ==============
-    public Object getValue(int columnIndex, HSSFCell cell, DataTable table) {
+    public Object getValue(int columnIndex, HSSFCell cell, DfDataTable table) {
         if (cell == null) {
             if (isEmptyStringTarget(columnIndex, table)) {
                 return "\"\""; // for preventing trimming later
@@ -346,13 +346,13 @@ public class DfXlsReader {
         }
     }
 
-    public boolean isNotTrimTarget(HSSFCell cell, DataTable table) {
+    public boolean isNotTrimTarget(HSSFCell cell, DfDataTable table) {
         final String tableName = table.getTableName();
         if (!_notTrimTableColumnMap.containsKey(tableName)) {
             return false;
         }
         final List<String> notTrimTargetColumnList = _notTrimTableColumnMap.get(tableName);
-        final DataColumn column = table.getColumn(cell.getColumnIndex());
+        final DfDataColumn column = table.getColumn(cell.getColumnIndex());
         final String targetColumnName = column.getColumnName();
         for (String currentColumnName : notTrimTargetColumnList) {
             if (targetColumnName.equalsIgnoreCase(currentColumnName)) {
@@ -362,13 +362,13 @@ public class DfXlsReader {
         return false;
     }
 
-    public boolean isEmptyStringTarget(int columnIndex, DataTable table) {
+    public boolean isEmptyStringTarget(int columnIndex, DfDataTable table) {
         final String tableName = table.getTableName();
         if (!_emptyStringTableColumnMap.containsKey(tableName)) {
             return false;
         }
         final List<String> emptyStringTargetColumnList = _emptyStringTableColumnMap.get(tableName);
-        final DataColumn column = table.getColumn(columnIndex);
+        final DfDataColumn column = table.getColumn(columnIndex);
         final String targetColumnName = column.getColumnName();
         for (String currentColumnName : emptyStringTargetColumnList) {
             if (targetColumnName.equalsIgnoreCase(currentColumnName)) {
@@ -403,7 +403,7 @@ public class DfXlsReader {
     protected boolean isCellBase64Formatted(HSSFCell cell) {
         HSSFCellStyle cs = cell.getCellStyle();
         short dfNum = cs.getDataFormat();
-        return DataSetConstants.BASE64_FORMAT.equals(_dataFormat.getFormat(dfNum));
+        return DfDataSetConstants.BASE64_FORMAT.equals(_dataFormat.getFormat(dfNum));
     }
 
     protected boolean isCellDateFormatted(HSSFCell cell) {

@@ -7,7 +7,7 @@ import org.seasar.dbflute.helper.dataset.types.DtsColumnType;
  * @author jflute
  * @since 0.8.3 (2008/10/28 Tuesday)
  */
-public class DataColumn {
+public class DfDataColumn {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -22,7 +22,7 @@ public class DataColumn {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DataColumn(String columnName, DtsColumnType columnType, int columnIndex) {
+    public DfDataColumn(String columnName, DtsColumnType columnType, int columnIndex) {
         setColumnName(columnName);
         setColumnType(columnType);
         setColumnIndex(columnIndex);
