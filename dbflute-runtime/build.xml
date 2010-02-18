@@ -1,7 +1,7 @@
 <project name="DBFluteRuntime" default="dist" basedir=".">
 
 	<property name="version" value="0.9.6.5"/>
-	<property name="build.version" value="0.9.6.5-RC3"/>
+	<property name="build.version" value="0.9.6.5"/>
 	<property name="pre.version" value="0.9.6.4"/>
 
 	<target name="dist">
