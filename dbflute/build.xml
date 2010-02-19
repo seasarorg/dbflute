@@ -240,6 +240,10 @@
 	<target name="reflect-mac-mysql" depends="deploy-dist" description="==> reflect to mysql example">
 	  	<copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
+
+	<target name="reflect-mac-postgresql" depends="deploy-dist" description="==> reflect to postgresql example">
+	  	<copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	</target>
 	
 	<target name="reflect-mac-multipledb" depends="deploy-dist" description="==> reflect to multipledb example">
 	  	<copy todir="${dbflute.multipledb.seasar.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
@@ -279,6 +283,7 @@
 	  	<copy todir="${dbflute.guice.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.lucy.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.mysql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
+	  	<copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.multipledb.seasar.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.multipledb.spring.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.ymir.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
@@ -296,10 +301,6 @@
 
 	<target name="reflect-win-oracle" depends="deploy-dist" description="==> reflect to oracle example">
 	  	<copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
-	</target>
-
-	<target name="reflect-win-postgresql" depends="deploy-dist" description="==> reflect to postgresql example">
-	  	<copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
 	<target name="reflect-win-db2" depends="deploy-dist" description="==> reflect to db2 example">
@@ -324,7 +325,6 @@
 
 	<target name="reflect-win-others" depends="deploy-dist" description="==> reflect to other examples">
 	  	<copy todir="${dbflute.oracle.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
-	  	<copy todir="${dbflute.postgresql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.db2.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.sqlserver.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	  	<copy todir="${dbflute.msaccess.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
