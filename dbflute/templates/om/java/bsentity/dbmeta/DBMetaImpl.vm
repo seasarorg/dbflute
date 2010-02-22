@@ -36,6 +36,9 @@ public class ${myClassName} extends AbstractDBMeta {
     public String getTableDbName() { return "$table.name"; }
     public String getTablePropertyName() { return "$table.javaBeansRulePropertyName"; }
     public String getTableSqlName() { return "$table.tableSqlName"; }
+#if ($table.hasAlias())
+    public String getTableAlias() { return "$table.alias"; }
+#end
 
     // ===================================================================================
     //                                                                         Column Info

@@ -39,6 +39,9 @@ namespace ${myDBMetaPackageName} {
         public override String TableDbName { get { return "$table.name"; } }
         public override String TablePropertyName { get { return "$table.javaName"; } }
         public override String TableSqlName { get { return "$table.tableSqlName"; } }
+#if ($table.hasAlias())
+        public override String TableAlias { get { return "$table.alias"; } }
+#end
 
         // ===============================================================================
         //                                                                     Column Info

@@ -25,6 +25,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         public abstract String TableDbName { get; }
         public abstract String TablePropertyName { get; }
         public abstract String TableSqlName { get; }
+        public virtual String TableAlias { get { return null; } } // as default
 
         // ===============================================================================
         //                                                                     Column Info
