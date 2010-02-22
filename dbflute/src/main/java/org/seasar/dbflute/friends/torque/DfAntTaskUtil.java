@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -29,6 +31,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfDBFluteTaskFailureException;
+import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -213,6 +216,28 @@ public final class DfAntTaskUtil {
         msg = msg + ln() + "Look at the log: console or dbflute.log";
         msg = msg + ln() + "* * * * * * * * * */";
         throw new DfDBFluteTaskFailureException(msg);
+    }
+
+    // ===================================================================================
+    //                                                                          Connection
+    //                                                                          ==========
+    public static void shutdownIfDerbyEmbedded(String driver) throws SQLException {
+        if (!driver.startsWith("org.apache.derby.") || !driver.endsWith(".EmbeddedDriver")) {
+            return;
+        }
+        final String shutdownUrl = "jdbc:derby:;shutdown=true";
+        try {
+            _log.info("...Shutting down the connection to Derby");
+            DriverManager.getConnection(shutdownUrl);
+        } catch (SQLException e) {
+            if ("XJ015".equals(e.getSQLState())) {
+                _log.info(" --> success: " + e.getMessage());
+            } else {
+                String msg = "Failed to shut down the connection to Derby:";
+                msg = msg + " shutdownUrl=" + shutdownUrl;
+                throw new DfJDBCException(msg, e);
+            }
+        }
     }
 
     // ===================================================================================

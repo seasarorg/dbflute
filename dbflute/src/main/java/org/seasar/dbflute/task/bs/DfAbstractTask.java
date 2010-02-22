@@ -106,6 +106,7 @@ public abstract class DfAbstractTask extends Task {
                     try {
                         destroyDataSource();
                     } catch (SQLException ignored) {
+                        _log.warn("Failed to destroy data source! (Ignored)", ignored);
                     }
                 }
             }
@@ -243,6 +244,11 @@ public abstract class DfAbstractTask extends Task {
 
     protected void destroyDataSource() throws SQLException {
         _dataSourceCreator.destroy();
+
+        if (getBasicProperties().isDatabaseDerby()) {
+            // Derby(Embedded) needs an original shutdown for destroying a connection
+            DfAntTaskUtil.shutdownIfDerbyEmbedded(_driver);
+        }
     }
 
     protected DataSource getDataSource() {
