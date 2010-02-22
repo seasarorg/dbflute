@@ -16,6 +16,10 @@ import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
 
 public class MockDBMeta implements DBMeta {
 
+    public String getTableAlias() {
+        return null;
+    }
+
     public DBDef getCurrentDBDef() {
         return null;
     }

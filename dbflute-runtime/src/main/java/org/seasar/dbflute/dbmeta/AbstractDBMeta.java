@@ -105,6 +105,10 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                          Table Info
     //                                                                          ==========
+    public String getTableAlias() {
+        return null; // as default
+    }
+
     /**
      * Get the flexible map of table DB name.
      * @return The flexible map of table DB name. (NotNull, NotEmpty)

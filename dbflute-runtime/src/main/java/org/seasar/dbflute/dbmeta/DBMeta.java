@@ -68,22 +68,28 @@ public interface DBMeta {
     //                                                                          Table Info
     //                                                                          ==========
     /**
-     * Get table DB name.
-     * @return Table DB name. (NotNull)
+     * Get the DB name of the table.
+     * @return The DB name of the table. (NotNull)
      */
     public String getTableDbName();
 
     /**
-     * Get table property name(JavaBeansRule).
-     * @return Table property name(JavaBeansRule). (NotNull)
+     * Get the property name(JavaBeansRule) of table.
+     * @return The property name(JavaBeansRule) of table. (NotNull)
      */
     public String getTablePropertyName();
 
     /**
-     * Get table SQL name.
-     * @return Table SQL name. (NotNull)
+     * Get the SQL name of table.
+     * @return The SQL name of table. (NotNull)
      */
     public String getTableSqlName();
+
+    /**
+     * Get the alias of the table.
+     * @return The alias of the table. (Nullable: when it cannot get an alias from meta)
+     */
+    public String getTableAlias();
 
     // ===================================================================================
     //                                                                         Column Info
