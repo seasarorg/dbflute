@@ -39,7 +39,7 @@ map:{
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isEntityDBMetaDbCommentValid (NotRequired - Default 'false')
-    #  Does it allow DB comment to be on DB-meta?
+    #  Does it allow DB comment to be on DB meta of entity?
     # 
     #; isEntityDBMetaDbCommentValid = false
     # - - - - - - - - - -/
