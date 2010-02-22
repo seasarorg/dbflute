@@ -7,7 +7,7 @@ import org.seasar.dbflute.task.bs.DfAbstractTask;
  * @since 0.7.9 (2008/08/22 Friday)
  */
 public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
-    
+
     // ===================================================================================
     //                                                                 DataSource Override
     //                                                                 ===================
@@ -15,11 +15,27 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
     protected boolean isUseDataSource() {
         return true;
     }
-    
+
     // ===================================================================================
     //                                                                      Various Common
     //                                                                      ==============
     protected String resolveTerminater4Tool() {
         return getBasicProperties().isDatabaseOracle() ? "/" : null;
+    }
+
+    protected boolean isDbCommentLineForIrregularPattern(String line) {
+        // for irregular pattern
+        line = line.trim().toLowerCase();
+        if (getBasicProperties().isDatabaseMySQL()) {
+            if (line.contains("comment='") || line.contains("comment = '") || line.contains(" comment '")) {
+                return true;
+            }
+        }
+        if (getBasicProperties().isDatabaseSqlServer()) {
+            if (line.startsWith("exec sys.sp_addextendedproperty @name=n'ms_description'")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

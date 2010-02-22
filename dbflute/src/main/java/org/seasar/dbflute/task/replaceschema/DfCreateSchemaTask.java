@@ -371,6 +371,16 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         }
 
         @Override
+        protected boolean isDbCommentLine(String line) {
+            final boolean commentLine = super.isDbCommentLine(line);
+            if (commentLine) {
+                return commentLine;
+            }
+            // for irregular pattern
+            return isDbCommentLineForIrregularPattern(line);
+        }
+
+        @Override
         protected String getTerminater4Tool() {
             return resolveTerminater4Tool();
         }

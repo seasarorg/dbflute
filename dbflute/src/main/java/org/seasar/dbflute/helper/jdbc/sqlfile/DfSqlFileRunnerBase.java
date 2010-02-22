@@ -246,7 +246,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             String sql = "";
             String line = "";
             boolean inGroup = false;
-            boolean existsCommentOn = false;
+            boolean alwaysNeedsLineSeparator = false;
             boolean isAlreadyProcessUTF8Bom = false;
             while ((line = in.readLine()) != null) {
                 if (!isAlreadyProcessUTF8Bom) {
@@ -256,10 +256,10 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 if (!inGroup && isSqlTrimAndRemoveLineSeparator()) {
                     line = line.trim();
                 }
-                if (!existsCommentOn && isSqlTrimAndRemoveLineSeparator() && isHandlingCommentOnLineSeparator()) {
-                    final String lowerLine = line.trim().toLowerCase();
-                    if (lowerLine.startsWith("comment on ") && lowerLine.contains("is") && lowerLine.contains("'")) {
-                        existsCommentOn = true;
+                if (!alwaysNeedsLineSeparator && isSqlTrimAndRemoveLineSeparator()
+                        && isHandlingCommentOnLineSeparator()) {
+                    if (isDbCommentLine(line)) {
+                        alwaysNeedsLineSeparator = true;
                     }
                 }
 
@@ -283,7 +283,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         addSqlToList(sqlList, sql);
 
                         // End Point of SQL!
-                        existsCommentOn = false;
+                        alwaysNeedsLineSeparator = false;
                         sql = "";
                         continue;
                     }
@@ -309,7 +309,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
 
                     final String lineConnect;
                     if (isSqlTrimAndRemoveLineSeparator()) {
-                        if (existsCommentOn) {
+                        if (alwaysNeedsLineSeparator) {
                             lineConnect = ln();
                         } else {
                             lineConnect = " ";
@@ -342,13 +342,13 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         addSqlToList(sqlList, sql);
 
                         // End Point of SQL!
-                        existsCommentOn = false;
+                        alwaysNeedsLineSeparator = false;
                         sql = "";
                     } else {
                         _runInfo.setDelimiter(delimiterChanger.getNewDelimiter(sql, _runInfo.getDelimiter()));
 
                         // End Point of SQL!
-                        existsCommentOn = false;
+                        alwaysNeedsLineSeparator = false;
                         sql = "";
                     }
                 }
@@ -393,6 +393,15 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
         _log.info("The SQL is line comment only so skip it:" + ln() + sql);
         return true;
+    }
+
+    protected boolean isDbCommentLine(String line) {
+        line = line.trim().toLowerCase();
+        // basic pattern
+        if (line.startsWith("comment on ") && line.contains("is") && line.contains("'")) {
+            return true;
+        }
+        return false;
     }
 
     protected String removeTerminater4ToolIfNeeds(String sql) {
