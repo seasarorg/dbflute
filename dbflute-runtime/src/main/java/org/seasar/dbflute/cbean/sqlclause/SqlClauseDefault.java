@@ -36,10 +36,10 @@ public class SqlClauseDefault extends AbstractSqlClause {
     // ===================================================================================
     //                                                                    OrderBy Override
     //                                                                    ================
-	@Override
+    @Override
     protected OrderByClause.OrderByNullsSetupper createOrderByNullsSetupper() {
-	    return createOrderByNullsSetupperByCaseWhen();
-	}
+        return createOrderByNullsSetupperByCaseWhen();
+    }
 
     /**
      * {@inheritDoc}
@@ -60,27 +60,21 @@ public class SqlClauseDefault extends AbstractSqlClause {
     }
 
     /**
-     * The override.
-     * 
-     * @return Determination.
+     * {@inheritDoc}
      */
     public boolean isFetchStartIndexSupported() {
-        return false; // Default
-    }
-
-    /**
-     * The override.
-     * 
-     * @return Determination.
-     */
-    public boolean isFetchSizeSupported() {
-        return false; // Default
+        return false;
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @return this. (NotNull)
+     */
+    public boolean isFetchSizeSupported() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public SqlClause lockForUpdate() {
         String msg = "LockForUpdate-SQL is unavailable in the database. Sorry...: " + toString();
@@ -89,8 +83,6 @@ public class SqlClauseDefault extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
         return "";
@@ -98,8 +90,6 @@ public class SqlClauseDefault extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
         return "";
@@ -107,8 +97,6 @@ public class SqlClauseDefault extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
         return "";
@@ -116,8 +104,6 @@ public class SqlClauseDefault extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
         return "";

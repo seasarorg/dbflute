@@ -49,10 +49,10 @@ public class SqlClauseMySql extends AbstractSqlClause {
     // ===================================================================================
     //                                                                    OrderBy Override
     //                                                                    ================
-	@Override
+    @Override
     protected OrderByClause.OrderByNullsSetupper createOrderByNullsSetupper() {
-	    return createOrderByNullsSetupperByCaseWhen();
-	}
+        return createOrderByNullsSetupperByCaseWhen();
+    }
 
     // ===================================================================================
     //                                                                 FetchScope Override
@@ -80,7 +80,6 @@ public class SqlClauseMySql extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
         _lockSqlSuffix = " for update";
@@ -89,7 +88,6 @@ public class SqlClauseMySql extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
         return "";
@@ -97,7 +95,6 @@ public class SqlClauseMySql extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
         return "";
@@ -105,7 +102,6 @@ public class SqlClauseMySql extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
         return "";
@@ -113,25 +109,24 @@ public class SqlClauseMySql extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
-    
+
     // [DBFlute-0.7.5]
     // ===================================================================================
     //                                                               Query Update Override
     //                                                               =====================
-	@Override
+    @Override
     protected boolean isUpdateSubQueryUseLocalTableSupported() {
         return false;
     }
-	
-	// [DBFlute-0.9.5]
-	// ===================================================================================
-	//                                                                    Full-Text Search
-	//                                                                    ================
+
+    // [DBFlute-0.9.5]
+    // ===================================================================================
+    //                                                                    Full-Text Search
+    //                                                                    ================
     /**
      * Build a condition string of match statement for full-text search. <br />
      * Bind variable is unused because the condition value should be literal in MySQL.
@@ -142,9 +137,8 @@ public class SqlClauseMySql extends AbstractSqlClause {
      * @param aliasName The alias name of the target table. (NotNull)
      * @return The condition string of match statement. (NotNull)
      */
-    public String buildMatchCondition(List<ColumnInfo> textColumnList
-                                    , String conditionValue, FullTextSearchModifier modifier
-                                    , String tableDbName, String aliasName) {
+    public String buildMatchCondition(List<ColumnInfo> textColumnList, String conditionValue,
+            FullTextSearchModifier modifier, String tableDbName, String aliasName) {
         if (textColumnList == null) {
             throw new IllegalArgumentException("The argument 'textColumnList' should not be null!");
         }
@@ -152,13 +146,16 @@ public class SqlClauseMySql extends AbstractSqlClause {
             throw new IllegalArgumentException("The argument 'textColumnList' should not be empty list!");
         }
         if (conditionValue == null || conditionValue.length() == 0) {
-            throw new IllegalArgumentException("The argument 'conditionValue' should not be null or empty: " + conditionValue);
+            throw new IllegalArgumentException("The argument 'conditionValue' should not be null or empty: "
+                    + conditionValue);
         }
         if (tableDbName == null || tableDbName.trim().length() == 0) {
-            throw new IllegalArgumentException("The argument 'tableDbName' should not be null or trimmed-empty: " + tableDbName);
+            throw new IllegalArgumentException("The argument 'tableDbName' should not be null or trimmed-empty: "
+                    + tableDbName);
         }
         if (aliasName == null || aliasName.trim().length() == 0) {
-            throw new IllegalArgumentException("The argument 'aliasName' should not be null or trimmed-empty: " + aliasName);
+            throw new IllegalArgumentException("The argument 'aliasName' should not be null or trimmed-empty: "
+                    + aliasName);
         }
         StringBuilder sb = new StringBuilder();
         int index = 0;

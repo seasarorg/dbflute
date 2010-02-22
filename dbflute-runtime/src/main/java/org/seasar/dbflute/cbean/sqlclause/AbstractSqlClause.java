@@ -1733,11 +1733,11 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     public boolean isFetchStartIndexSupported() {
-        return true; // Default
+        return true; // as default
     }
 
     public boolean isFetchSizeSupported() {
-        return true; // Default
+        return true; // as default
     }
 
     abstract protected String createSelectHint();

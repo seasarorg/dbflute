@@ -24,6 +24,9 @@ public class SqlClauseDerby extends AbstractSqlClause {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    /** String of fetch-scope as sql-suffix. */
+    protected String _fetchScopeSqlSuffix = "";
+
     /** String of lock as sql-suffix. */
     protected String _lockSqlSuffix = "";
 
@@ -41,10 +44,10 @@ public class SqlClauseDerby extends AbstractSqlClause {
     // ===================================================================================
     //                                                                    OrderBy Override
     //                                                                    ================
-	@Override
+    @Override
     protected OrderByClause.OrderByNullsSetupper createOrderByNullsSetupper() {
-	    return createOrderByNullsSetupperByCaseWhen();
-	}
+        return createOrderByNullsSetupperByCaseWhen();
+    }
 
     // ===================================================================================
     //                                                                 FetchScope Override
@@ -53,42 +56,27 @@ public class SqlClauseDerby extends AbstractSqlClause {
      * {@inheritDoc}
      */
     protected void doFetchFirst() {
+        doFetchPage();
     }
 
     /**
      * {@inheritDoc}
      */
     protected void doFetchPage() {
+        final int offset = getPageStartIndex();
+        final int fetchSize = getFetchSize();
+        _fetchScopeSqlSuffix = " offset " + offset + " rows fetch next " + fetchSize + " rows only";
     }
 
     /**
      * {@inheritDoc}
      */
     protected void doClearFetchPageClause() {
-    }
-
-    /**
-     * The override.
-     * 
-     * @return Determination.
-     */
-    public boolean isFetchStartIndexSupported() {
-        return false; // Default
-    }
-
-    /**
-     * The override.
-     * 
-     * @return Determination.
-     */
-    public boolean isFetchSizeSupported() {
-        return false; // Default
+        _fetchScopeSqlSuffix = "";
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
         _lockSqlSuffix = " for update";
@@ -97,8 +85,6 @@ public class SqlClauseDerby extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
         return "";
@@ -106,8 +92,6 @@ public class SqlClauseDerby extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
         return "";
@@ -115,8 +99,6 @@ public class SqlClauseDerby extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
         return "";
@@ -124,10 +106,8 @@ public class SqlClauseDerby extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
-        return _lockSqlSuffix;
+        return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
 }
