@@ -418,6 +418,17 @@ public class Table {
         return comment != null ? comment : "";
     }
 
+    public boolean isCommentForDBMetaValid() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        return hasComment() && prop.isEntityDBMetaDbCommentValid();
+    }
+
+    public String getCommentForDBMeta() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.resolveTextForDBMeta(getComment());
+        return comment != null ? comment : "";
+    }
+
     // -----------------------------------------------------
     //                                        Display String
     //                                        --------------

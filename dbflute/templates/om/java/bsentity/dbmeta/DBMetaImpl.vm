@@ -39,12 +39,15 @@ public class ${myClassName} extends AbstractDBMeta {
 #if ($table.hasAlias())
     public String getTableAlias() { return "$table.alias"; }
 #end
+#if ($table.isCommentForDBMetaValid())
+    public String getTableComment() { return "$table.commentForDBMeta"; }
+#end
 
     // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========
 #foreach ($col in $table.columns)
-    protected ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression});
+    protected ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression});
 #end
 
 #foreach ($col in $table.columns)

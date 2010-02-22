@@ -26,6 +26,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         public abstract String TablePropertyName { get; }
         public abstract String TableSqlName { get; }
         public virtual String TableAlias { get { return null; } } // as default
+        public virtual String TableComment { get { return null; } } // as default
 
         // ===============================================================================
         //                                                                     Column Info
@@ -51,13 +52,8 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         // createColumnInfo()
-        protected ${glColumnInfo} cci(String columnDbName, String columnAlias, String propertyName, Type propertyType, bool primary, String columnDbType, int? columnSize, int? columnDecimalDigits, bool commonColumn) {
-            return new ${glColumnInfo}(this, columnDbName, columnAlias, propertyName, propertyType, primary, columnDbType, columnSize, columnDecimalDigits, commonColumn);
-        }
-
-        // createColumnInfo()
-        protected ${glColumnInfo} cci(String columnDbName, String columnAlias, String propertyName, Type propertyType, bool primary, String columnDbType, int? columnSize, int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType) {
-            return new ${glColumnInfo}(this, columnDbName, columnAlias, propertyName, propertyType, primary, columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType);
+        protected ${glColumnInfo} cci(String columnDbName, String columnAlias, String propertyName, Type propertyType, bool primary, String columnDbType, int? columnSize, int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType, String columnComment) {
+            return new ${glColumnInfo}(this, columnDbName, columnAlias, propertyName, propertyType, primary, columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType, columnComment);
         }
 
         public List<${glColumnInfo}> ColumnInfoList { get { return _columnInfoList; } }

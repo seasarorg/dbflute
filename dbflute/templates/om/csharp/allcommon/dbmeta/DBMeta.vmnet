@@ -18,6 +18,7 @@ namespace ${glPackageBaseCommonDBMeta} {
         String TablePropertyName { get; }
         String TableSqlName { get; }
         String TableAlias { get; }
+        String TableComment { get; }
 
         // ===============================================================================
         //                                                                     Column Info

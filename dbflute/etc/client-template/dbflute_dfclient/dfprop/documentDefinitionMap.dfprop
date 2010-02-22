@@ -2,14 +2,16 @@
 # documentDefinitionMap: (NotRequired - Default 'map:{}')
 #
 # o aliasDelimiterInDbComment (NotRequired - Default '')
-# o isEntityJavaDocDbCommentValid (NotRequired - Default 'false')
+# o isEntityJavaDocDbCommentValid (NotRequired - Default false)
+# o isEntityDBMetaDbCommentValid (NotRequired - Default false)
 # o dataXlsTemplateRecordLimit (NotRequired - Default '')
-# o dataXlsTemplateContainsCommonColumn (NotRequired - Default 'false')
+# o dataXlsTemplateContainsCommonColumn (NotRequired - Default false)
 # 
 # Example:
 # map:{
 #     ; aliasDelimiterInDbComment = :
 #     ; isEntityJavaDocDbCommentValid = true
+#     ; isEntityDBMetaDbCommentValid = true
 #     ; dataXlsTemplateRecordLimit = 10
 #     ; dataXlsTemplateContainsCommonColumn = false
 # }
@@ -33,6 +35,13 @@ map:{
     #  Does it allow DB comment to be on java-doc?
     # 
     #; isEntityJavaDocDbCommentValid = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isEntityDBMetaDbCommentValid (NotRequired - Default 'false')
+    #  Does it allow DB comment to be on DB-meta?
+    # 
+    #; isEntityDBMetaDbCommentValid = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

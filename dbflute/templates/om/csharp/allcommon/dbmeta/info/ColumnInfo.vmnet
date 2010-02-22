@@ -23,6 +23,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected int? columnDecimalDigits;
         protected bool commonColumn;
         protected OptimisticLockType optimisticLockType;
+        protected String columnComment;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -36,7 +37,8 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
 
         public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
                             , Type propertyType, bool primary, String columnDbType, int? columnSize
-                            , int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType) {
+                            , int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType
+                            , String columnComment) {
             AssertObjectNotNull("dbmeta", dbmeta);
             AssertObjectNotNull("columnDbName", columnDbName);
             AssertObjectNotNull("propertyName", propertyName);
@@ -53,6 +55,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             this.columnDecimalDigits = columnDecimalDigits;
             this.commonColumn = commonColumn;
             this.optimisticLockType = optimisticLockType;
+            this.columnComment = columnComment;
         }
 
         // ===============================================================================

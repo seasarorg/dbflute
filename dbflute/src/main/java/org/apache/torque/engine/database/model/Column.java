@@ -900,6 +900,20 @@ public class Column {
         return comment != null ? comment : "";
     }
 
+    public boolean isCommentForDBMetaValid() {
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        return hasComment() && prop.isEntityDBMetaDbCommentValid();
+    }
+
+    public String getCommentForDBMetaSettingExpression() {
+        if (!isCommentForDBMetaValid()) {
+            return "null";
+        }
+        final DfDocumentProperties prop = getProperties().getDocumentProperties();
+        final String comment = prop.resolveTextForDBMeta(getComment());
+        return comment != null ? "\"" + comment + "\"" : "null";
+    }
+
     // -----------------------------------------------------
     //                                         Default Value
     //                                         -------------
@@ -1890,6 +1904,16 @@ public class Column {
             return "OptimisticLockType.UPDATE_DATE";
         } else {
             return "null";
+        }
+    }
+
+    public String getOptimistickLockExpressionNotNull() { // basically for C#
+        if (isVersionNo()) {
+            return "OptimisticLockType.VERSION_NO";
+        } else if (isUpdateDate()) {
+            return "OptimisticLockType.UPDATE_DATE";
+        } else {
+            return "OptimisticLockType.NONE";
         }
     }
 

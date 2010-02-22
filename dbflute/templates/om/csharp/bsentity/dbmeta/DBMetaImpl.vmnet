@@ -42,6 +42,9 @@ namespace ${myDBMetaPackageName} {
 #if ($table.hasAlias())
         public override String TableAlias { get { return "$table.alias"; } }
 #end
+#if ($table.isCommentForDBMetaValid())
+        public override String TableComment { get { return "$table.commentForDBMeta"; } }
+#end
 
         // ===============================================================================
         //                                                                     Column Info
@@ -56,7 +59,7 @@ namespace ${myDBMetaPackageName} {
 
         protected void InitializeColumnInfo() {
 #foreach ($col in $table.columns)
-            _column${col.javaName} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}#if ($col.isOptimisticLock()), ${col.optimistickLockExpression}#end);
+            _column${col.javaName} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpressionNotNull}, ${col.commentForDBMetaSettingExpression});
 #end
         }
 

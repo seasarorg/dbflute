@@ -97,11 +97,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     //                                                            Entity JavaDoc DbComment
     //                                                            ========================
     public boolean isEntityJavaDocDbCommentValid() {
-        String value = (String) getDocumentDefinitionMap().get("entityJavaDocDbCommentValid");
-        if (value == null) {
-            value = (String) getDocumentDefinitionMap().get("isEntityJavaDocDbCommentValid");
-        }
-        return value != null && value.trim().equalsIgnoreCase("true");
+        return isProperty("isEntityJavaDocDbCommentValid", false, getDocumentDefinitionMap());
     }
 
     public String resolveTextForSchemaHtml(String text) {
@@ -184,6 +180,30 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             comment = comment.replaceAll(SPECIAL_LINE_SEPARATOR, javaDocLineSeparator);
         }
         return comment;
+    }
+
+    // ===================================================================================
+    //                                                             Entity DBMeta DbComment
+    //                                                             =======================
+    public boolean isEntityDBMetaDbCommentValid() {
+        return isProperty("isEntityDBMetaDbCommentValid", false, getDocumentDefinitionMap());
+    }
+
+    public String resolveTextForDBMeta(String text) { // C# same as Java
+        if (text == null || text.trim().length() == 0) {
+            return null;
+        }
+        text = removeCR(text);
+        text = DfStringUtil.replace(text, "\"", "\\\""); // escape double quotation
+
+        final String literalLineSeparator = "\\\\n";
+        if (text.contains(NORMAL_LINE_SEPARATOR)) {
+            text = text.replaceAll(NORMAL_LINE_SEPARATOR, literalLineSeparator);
+        }
+        if (text.contains(SPECIAL_LINE_SEPARATOR)) {
+            text = text.replaceAll(SPECIAL_LINE_SEPARATOR, literalLineSeparator);
+        }
+        return text;
     }
 
     // ===================================================================================
