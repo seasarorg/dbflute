@@ -91,6 +91,14 @@ public interface DBMeta {
      */
     public String getTableAlias();
 
+    /**
+     * Get the comment of the table. <br />
+     * If the real comment contains the alias,
+     * this result does NOT contain it and its delimiter.  
+     * @return The comment of the table. (Nullable: when it cannot get a comment from meta)
+     */
+    public String getTableComment();
+
     // ===================================================================================
     //                                                                         Column Info
     //                                                                         ===========

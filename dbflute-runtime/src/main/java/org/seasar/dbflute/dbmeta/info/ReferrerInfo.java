@@ -33,12 +33,12 @@ public class ReferrerInfo implements RelationInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final String referrerPropertyName;
-    protected final DBMeta localDBMeta;
-    protected final DBMeta referrerDBMeta;
-    protected final Map<ColumnInfo, ColumnInfo> localReferrerColumnInfoMap;
-    protected final Map<ColumnInfo, ColumnInfo> referrerLocalColumnInfoMap;
-    protected final boolean oneToOne;
+    protected final String _referrerPropertyName;
+    protected final DBMeta _localDBMeta;
+    protected final DBMeta _referrerDBMeta;
+    protected final Map<ColumnInfo, ColumnInfo> _localReferrerColumnInfoMap;
+    protected final Map<ColumnInfo, ColumnInfo> _referrerLocalColumnInfoMap;
+    protected final boolean _oneToOne;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -50,40 +50,40 @@ public class ReferrerInfo implements RelationInfo {
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("referrerDBMeta", referrerDBMeta);
         assertObjectNotNull("localReferrerColumnInfoMap", localReferrerColumnInfoMap);
-        this.referrerPropertyName = referrerPropertyName;
-        this.localDBMeta = localDBMeta;
-        this.referrerDBMeta = referrerDBMeta;
-        this.localReferrerColumnInfoMap = localReferrerColumnInfoMap;
+        this._referrerPropertyName = referrerPropertyName;
+        this._localDBMeta = localDBMeta;
+        this._referrerDBMeta = referrerDBMeta;
+        this._localReferrerColumnInfoMap = localReferrerColumnInfoMap;
         final Set<ColumnInfo> keySet = localReferrerColumnInfoMap.keySet();
-        referrerLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
+        _referrerLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
         for (final Iterator<ColumnInfo> ite = keySet.iterator(); ite.hasNext(); ) {
             final ColumnInfo key = ite.next();
             final ColumnInfo value = localReferrerColumnInfoMap.get(key);
-            referrerLocalColumnInfoMap.put(value, key);
+            _referrerLocalColumnInfoMap.put(value, key);
         }
-        this.oneToOne = oneToOne;
+        this._oneToOne = oneToOne;
     }
     
     // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
     public ColumnInfo findLocalByReferrer(String referrerColumnDbName) {
-        final ColumnInfo keyColumnInfo = referrerDBMeta.findColumnInfo(referrerColumnDbName);
-        final ColumnInfo resultColumnInfo = (ColumnInfo)referrerLocalColumnInfoMap.get(keyColumnInfo);
+        final ColumnInfo keyColumnInfo = _referrerDBMeta.findColumnInfo(referrerColumnDbName);
+        final ColumnInfo resultColumnInfo = (ColumnInfo)_referrerLocalColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by referrerColumnDbName in referrerLocalColumnInfoMap:";
-            msg = msg + " referrerColumnDbName=" + referrerColumnDbName + " referrerLocalColumnInfoMap=" + referrerLocalColumnInfoMap;
+            msg = msg + " referrerColumnDbName=" + referrerColumnDbName + " referrerLocalColumnInfoMap=" + _referrerLocalColumnInfoMap;
             throw new IllegalArgumentException(msg);
         }
         return resultColumnInfo;
     }
 
     public ColumnInfo findReferrerByLocal(String localColumnDbName) {
-        final ColumnInfo keyColumnInfo = localDBMeta.findColumnInfo(localColumnDbName);
-        final ColumnInfo resultColumnInfo = (ColumnInfo)localReferrerColumnInfoMap.get(keyColumnInfo);
+        final ColumnInfo keyColumnInfo = _localDBMeta.findColumnInfo(localColumnDbName);
+        final ColumnInfo resultColumnInfo = (ColumnInfo)_localReferrerColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by localColumnDbName in localReferrerColumnInfoMap:";
-            msg = msg + " localColumnDbName=" + localColumnDbName + " localReferrerColumnInfoMap=" + localReferrerColumnInfoMap;
+            msg = msg + " localColumnDbName=" + localColumnDbName + " localReferrerColumnInfoMap=" + _localReferrerColumnInfoMap;
             throw new IllegalArgumentException(msg);
         }
         return resultColumnInfo;
@@ -93,15 +93,15 @@ public class ReferrerInfo implements RelationInfo {
     //                                                                              Finder
     //                                                                              ======
     public java.lang.reflect.Method findSetter() {
-        return findMethod(localDBMeta.getEntityType(), "set" + buildInitCapPropertyName(), new Class[] { java.util.List.class });
+        return findMethod(_localDBMeta.getEntityType(), "set" + buildInitCapPropertyName(), new Class[] { java.util.List.class });
     }
 
     public java.lang.reflect.Method findGetter() {
-        return findMethod(localDBMeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class[] {});
+        return findMethod(_localDBMeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class[] {});
     }
 
     protected String buildInitCapPropertyName() {
-        return initCap(this.referrerPropertyName);
+        return initCap(this._referrerPropertyName);
     }
 
     // ===================================================================================
@@ -160,7 +160,7 @@ public class ReferrerInfo implements RelationInfo {
     //                                                                      Basic Override
     //                                                                      ==============
     public int hashCode() {
-        return referrerPropertyName.hashCode() + localDBMeta.hashCode() + referrerDBMeta.hashCode();
+        return _referrerPropertyName.hashCode() + _localDBMeta.hashCode() + _referrerDBMeta.hashCode();
     }
 
     public boolean equals(Object obj) {
@@ -168,46 +168,46 @@ public class ReferrerInfo implements RelationInfo {
             return false;
         }
         final ReferrerInfo target = (ReferrerInfo)obj;
-        if (!this.referrerPropertyName.equals(target.getReferrerPropertyName())) {
+        if (!this._referrerPropertyName.equals(target.getReferrerPropertyName())) {
             return false;
         }
-        if (!this.localDBMeta.equals(target.getLocalDBMeta())) {
+        if (!this._localDBMeta.equals(target.getLocalDBMeta())) {
             return false;
         }
-        if (!this.referrerDBMeta.equals(target.getReferrerDBMeta())) {
+        if (!this._referrerDBMeta.equals(target.getReferrerDBMeta())) {
             return false;
         }
         return true;
     }
 
     public String toString() {
-        return localDBMeta.getTableDbName() + "." + referrerPropertyName + "<-" + referrerDBMeta.getTableDbName();
+        return _localDBMeta.getTableDbName() + "." + _referrerPropertyName + "<-" + _referrerDBMeta.getTableDbName();
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getReferrerPropertyName() {
-        return referrerPropertyName;
+        return _referrerPropertyName;
     }
 
     public DBMeta getLocalDBMeta() {
-        return localDBMeta;
+        return _localDBMeta;
     }
 
     public DBMeta getReferrerDBMeta() {
-        return referrerDBMeta;
+        return _referrerDBMeta;
     }
 
     public Map<ColumnInfo, ColumnInfo> getLocalReferrerColumnInfoMap() {
-        return new LinkedHashMap<ColumnInfo, ColumnInfo>(localReferrerColumnInfoMap); // as snapshot
+        return new LinkedHashMap<ColumnInfo, ColumnInfo>(_localReferrerColumnInfoMap); // as snapshot
     }
 
     public Map<ColumnInfo, ColumnInfo> getReferrerLocalColumnInfoMap() {
-        return new LinkedHashMap<ColumnInfo, ColumnInfo>(referrerLocalColumnInfoMap); // as snapshot
+        return new LinkedHashMap<ColumnInfo, ColumnInfo>(_referrerLocalColumnInfoMap); // as snapshot
     }
 
     public boolean isOneToOne() {
-        return oneToOne;
+        return _oneToOne;
     }
 }

@@ -27,57 +27,60 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected final DBMeta dbmeta;
-    protected final String columnDbName;
-    protected final String columnAlias;
-    protected final String propertyName;
-    protected final Class<?> propertyType;
-    protected final boolean primary;
-    protected final boolean autoIncrement;
-    protected final String columnDbType;
-    protected final Integer columnSize;
-    protected final Integer columnDecimalDigits;
-    protected final boolean commonColumn;
-    protected final OptimisticLockType optimisticLockType;
+    protected final DBMeta _dbmeta;
+    protected final String _columnDbName;
+    protected final String _columnAlias;
+    protected final String _propertyName;
+    protected final Class<?> _propertyType;
+    protected final boolean _primary;
+    protected final boolean _autoIncrement;
+    protected final String _columnDbType;
+    protected final Integer _columnSize;
+    protected final Integer _columnDecimalDigits;
+    protected final boolean _commonColumn;
+    protected final OptimisticLockType _optimisticLockType;
+    protected final String _columnComment;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, String propertyName,
             Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
-            Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType) {
+            Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
+            String columnComment) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
         assertObjectNotNull("propertyName", propertyName);
         assertObjectNotNull("propertyType", propertyType);
-        this.dbmeta = dbmeta;
-        this.columnDbName = columnDbName;
-        this.columnAlias = columnAlias;
-        this.propertyName = propertyName;
-        this.propertyType = propertyType;
-        this.primary = primary;
-        this.autoIncrement = autoIncrement;
-        this.columnSize = columnSize;
-        this.columnDbType = columnDbType;
-        this.columnDecimalDigits = columnDecimalDigits;
-        this.commonColumn = commonColumn;
-        this.optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
+        this._dbmeta = dbmeta;
+        this._columnDbName = columnDbName;
+        this._columnAlias = columnAlias;
+        this._propertyName = propertyName;
+        this._propertyType = propertyType;
+        this._primary = primary;
+        this._autoIncrement = autoIncrement;
+        this._columnSize = columnSize;
+        this._columnDbType = columnDbType;
+        this._columnDecimalDigits = columnDecimalDigits;
+        this._commonColumn = commonColumn;
+        this._optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
+        this._columnComment = columnComment;
     }
 
     // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
     public java.lang.reflect.Method findSetter() {
-        return findMethod(dbmeta.getEntityType(), "set" + buildInitCapPropertyName(),
-                new Class<?>[] { this.propertyType });
+        return findMethod(_dbmeta.getEntityType(), "set" + buildInitCapPropertyName(),
+                new Class<?>[] { this._propertyType });
     }
 
     public java.lang.reflect.Method findGetter() {
-        return findMethod(dbmeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class<?>[] {});
+        return findMethod(_dbmeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class<?>[] {});
     }
 
     protected String buildInitCapPropertyName() {
-        return initCap(this.propertyName);
+        return initCap(this._propertyName);
     }
 
     // ===================================================================================
@@ -117,7 +120,7 @@ public class ColumnInfo {
     //                                                                      Basic Override
     //                                                                      ==============
     public int hashCode() {
-        return dbmeta.hashCode() + columnDbName.hashCode();
+        return _dbmeta.hashCode() + _columnDbName.hashCode();
     }
 
     public boolean equals(Object obj) {
@@ -125,24 +128,24 @@ public class ColumnInfo {
             return false;
         }
         final ColumnInfo target = (ColumnInfo) obj;
-        if (!this.dbmeta.equals(target.getDBMeta())) {
+        if (!this._dbmeta.equals(target.getDBMeta())) {
             return false;
         }
-        if (!this.columnDbName.equals(target.getColumnDbName())) {
+        if (!this._columnDbName.equals(target.getColumnDbName())) {
             return false;
         }
         return true;
     }
 
     public String toString() {
-        return dbmeta.getTableDbName() + "." + columnDbName;
+        return _dbmeta.getTableDbName() + "." + _columnDbName;
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public DBMeta getDBMeta() {
-        return dbmeta;
+        return _dbmeta;
     }
 
     /**
@@ -150,15 +153,15 @@ public class ColumnInfo {
      * @return The DB name of the column. (NotNull)
      */
     public String getColumnDbName() {
-        return this.columnDbName;
+        return this._columnDbName;
     }
 
     /**
      * Get the alias of the column.
-     * @return The alias of the column. (Nullable: If the definition about aliases, it returns null.)
+     * @return The alias of the column. (Nullable: when it cannot get an alias from meta)
      */
     public String getColumnAlias() {
-        return this.columnAlias;
+        return this._columnAlias;
     }
 
     /**
@@ -166,7 +169,7 @@ public class ColumnInfo {
      * @return The name of property for the column. (NotNull)
      */
     public String getPropertyName() {
-        return this.propertyName;
+        return this._propertyName;
     }
 
     /**
@@ -174,7 +177,7 @@ public class ColumnInfo {
      * @return The type of property for the column. (NotNull)
      */
     public Class<?> getPropertyType() {
-        return this.propertyType;
+        return this._propertyType;
     }
 
     /**
@@ -182,7 +185,7 @@ public class ColumnInfo {
      * @return Determination.
      */
     public boolean isPrimary() {
-        return this.primary;
+        return this._primary;
     }
 
     /**
@@ -190,7 +193,7 @@ public class ColumnInfo {
      * @return Determination.
      */
     public boolean isAutoIncrement() {
-        return this.autoIncrement;
+        return this._autoIncrement;
     }
 
     /**
@@ -198,7 +201,7 @@ public class ColumnInfo {
      * @return The DB type of the column. (NotNull: If the type is unknown, it returns 'UnknownType'.)
      */
     public String getColumnDbType() {
-        return this.columnDbType;
+        return this._columnDbType;
     }
 
     /**
@@ -206,7 +209,7 @@ public class ColumnInfo {
      * @return The size of the column. (Nullable: If the type does not have size, it returns null.)
      */
     public Integer getColumnSize() {
-        return this.columnSize;
+        return this._columnSize;
     }
 
     /**
@@ -214,7 +217,7 @@ public class ColumnInfo {
      * @return The decimal digits of the column. (Nullable: If the type does not have disits, it returns null.)
      */
     public Integer getColumnDecimalDigits() {
-        return this.columnDecimalDigits;
+        return this._columnDecimalDigits;
     }
 
     /**
@@ -222,7 +225,7 @@ public class ColumnInfo {
      * @return Determination.
      */
     public boolean isCommonColumn() {
-        return this.commonColumn;
+        return this._commonColumn;
     }
 
     /**
@@ -238,7 +241,7 @@ public class ColumnInfo {
      * @return Determination.
      */
     public boolean isVersionNo() {
-        return OptimisticLockType.VERSION_NO == optimisticLockType;
+        return OptimisticLockType.VERSION_NO == _optimisticLockType;
     }
 
     /**
@@ -246,6 +249,16 @@ public class ColumnInfo {
      * @return Determination.
      */
     public boolean isUpdateDate() {
-        return OptimisticLockType.UPDATE_DATE == optimisticLockType;
+        return OptimisticLockType.UPDATE_DATE == _optimisticLockType;
+    }
+
+    /**
+     * Get the comment of the column. <br />
+     * If the real comment contains the alias,
+     * this result does NOT contain it and its delimiter.  
+     * @return The comment of the column. (Nullable: when it cannot get an alias from meta)
+     */
+    public String getColumnComment() {
+        return this._columnComment;
     }
 }

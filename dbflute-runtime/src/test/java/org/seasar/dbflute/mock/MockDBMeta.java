@@ -20,6 +20,10 @@ public class MockDBMeta implements DBMeta {
         return null;
     }
 
+    public String getTableComment() {
+        return null;
+    }
+
     public DBDef getCurrentDBDef() {
         return null;
     }

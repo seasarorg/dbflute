@@ -105,10 +105,18 @@ public abstract class AbstractDBMeta implements DBMeta {
     // ===================================================================================
     //                                                                          Table Info
     //                                                                          ==========
+    // These methods is expected to override if it needs.
     public String getTableAlias() {
-        return null; // as default
+        return null;
     }
 
+    public String getTableComment() {
+        return null;
+    }
+
+    // -----------------------------------------------------
+    //                                          Flexible Map
+    //                                          ------------
     /**
      * Get the flexible map of table DB name.
      * @return The flexible map of table DB name. (NotNull, NotEmpty)
@@ -172,9 +180,10 @@ public abstract class AbstractDBMeta implements DBMeta {
 
     protected ColumnInfo cci(String columnDbName, String columnAlias, String propertyName, Class<?> propertyType,
             boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
-            Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType) { // createColumnInfo()
+            Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
+            String columnComment) { // createColumnInfo()
         return new ColumnInfo(this, columnDbName, columnAlias, propertyName, propertyType, primary, autoIncrement,
-                columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType);
+                columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType, columnComment);
     }
 
     /**
@@ -1191,7 +1200,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         return DfStringUtil.initUncap(str);
     }
 
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 
