@@ -1,5 +1,5 @@
 cd ..
-ant -f build.xml reflect-to-others
+ant -f build.xml reflect-to-others-for-mac
 
 cd ../dbflute-spring-example/dbflute_exampledb
 rm ./log/*.log
