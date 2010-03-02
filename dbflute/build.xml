@@ -9,12 +9,14 @@
 	<property name="build.version" value="${version}-RC2"/>
 	<property name="pre.version" value="0.9.6.5"/>
 	<property name="runtime.version" value="0.9.6.6"/>
+	<property name="runtime.build.version" value="0.9.6.6"/>
 	<property name="runtime.pre.version" value="0.9.6.5"/>
 
 	<!-- Resource Directories -->
 	<property name="workspace.base" value=".."/>
 	<property name="dist" value="dist"/>
 	<property name="embedded" value="embedded"/>
+	<property name="runtime.dir" value="${workspace.base}/dbflute-runtime"/>
 	<property name="extraction.dir" value="${dist}/extraction"/>
 	<property name="stage.dir" value="${workspace.base}/dbflute-www/download"/>
 
@@ -22,11 +24,14 @@
 	<property name="engine.jar" value="dbflute.jar"/>
 	<property name="runtime.jar" value="dbflute-runtime-${runtime.version}.jar"/>
 	<property name="runtime.sources.jar" value="dbflute-runtime-${runtime.version}-sources.jar"/>
+	<property name="runtime.build.jar" value="dbflute-runtime-${runtime.build.version}.jar"/>
+	<property name="runtime.sources.build.jar" value="dbflute-runtime-${runtime.build.version}-sources.jar"/>
 	<property name="runtime.pre.jar" value="dbflute-runtime-${runtime.pre.version}.jar"/>
 	<property name="runtime.sources.pre.jar" value="dbflute-runtime-${runtime.pre.version}-sources.jar"/>
 	<property name="runtime.nonversion.jar" value="dbflute-runtime.jar"/>
 	<property name="runtime.sources.nonversion.jar" value="dbflute-runtime-sources.jar"/>
 	<property name="module.zip" value="dbflute-${version}.zip"/>
+	<property name="module.build.zip" value="dbflute-${build.version}.zip"/>
 
 	<!-- Basic Examples -->
 	<property name="basic.example.dir" value="${workspace.base}/dbflute-basic-example"/>
@@ -189,6 +194,14 @@
 	  	</zip>
 	</target>
 
+	<target name="runtime-dist">
+		<copy file="${runtime.dir}/target/${runtime.build.jar}" tofile="${dist}/${runtime.jar}" overwrite="true"/>
+		<copy file="${runtime.dir}/target/${runtime.sources.build.jar}" tofile="${dist}/${runtime.sources.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.jar}" tofile="lib/${runtime.nonversion.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.sources.jar}" tofile="lib/sources/${runtime.sources.nonversion.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.jar}" tofile="${embedded}/lib/${runtime.nonversion.jar}" overwrite="true"/>
+	</target>
+
 	<target name="adjust">
 		<fixcrlf srcdir="${embedded}/templates" eol="crlf" encoding="UTF-8">
 			<exclude name="**/*.vmnet"/>
@@ -201,7 +214,7 @@
 	<!--                                                            ================== -->
 
 	<target name="stage">
-	  	<copy file="${dist}/${module.zip}" tofile="${stage.dir}/dbflute/dbflute-${build.version}.zip" overwrite="true"></copy>
+	  	<copy file="${dist}/${module.zip}" tofile="${stage.dir}/dbflute/${module.build.zip}" overwrite="true"></copy>
 	</target>
 
 	<!-- ============================================================================= -->
@@ -221,54 +234,93 @@
 		<delete file="${basic.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${basic.example.dir}/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${basic.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<replace file="${basic.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${basic.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${basic.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
-	<target name="reflect-to-spring" depends="prepare-reflection" description="==> reflect to spring application">
+	<target name="reflect-to-spring" depends="prepare-reflection" description="==> reflect to spring example">
 	  	<copy todir="${spring.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${spring.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${spring.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${spring.example.dir}/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${spring.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<replace file="${spring.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${spring.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${spring.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
-	<target name="reflect-to-guice" depends="prepare-reflection" description="==> reflect to guice application">
+	<target name="reflect-to-guice" depends="prepare-reflection" description="==> reflect to guice example">
 	  	<copy todir="${guice.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${guice.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${guice.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${guice.example.dir}/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${guice.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<replace file="${guice.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${guice.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${guice.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
-	<target name="reflect-to-lucy" depends="prepare-reflection" description="==> reflect to lucy application">
+	<target name="reflect-to-lucy" depends="prepare-reflection" description="==> reflect to lucy example">
 	  	<copy todir="${lucy.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
 		<delete file="${lucy.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${lucy.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${lucy.example.dir}/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${lucy.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<replace file="${lucy.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${lucy.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${lucy.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-mysql" depends="prepare-reflection" description="==> reflect to mysql example">
 	  	<copy todir="${mysql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${mysql.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${mysql.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${mysql.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-postgresql" depends="prepare-reflection" description="==> reflect to postgresql example">
 	  	<copy todir="${postgresql.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${postgresql.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${postgresql.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${postgresql.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-oracle" depends="prepare-reflection" description="==> reflect to oracle example">
 	  	<copy todir="${oracle.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${oracle.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${oracle.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${oracle.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-db2" depends="prepare-reflection" description="==> reflect to db2 example">
 	  	<copy todir="${db2.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${db2.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${db2.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${db2.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-sqlserver" depends="prepare-reflection" description="==> reflect to sqlserver example">
 	  	<copy todir="${sqlserver.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${sqlserver.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${sqlserver.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-msaccess" depends="prepare-reflection" description="==> reflect to msaccess example">
 	  	<copy todir="${msaccess.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${msaccess.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${msaccess.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${msaccess.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-ymir" depends="prepare-reflection" description="==> reflect to ymir example">
@@ -277,6 +329,10 @@
 		<delete file="${ymir.example.dir}/src/main/webapp/WEB-INF/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${ymir.example.dir}/src/main/webapp/WEB-INF/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${ymir.example.dir}/src/main/webapp/WEB-INF/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<replace file="${ymir.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${ymir.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${ymir.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-sastruts" depends="prepare-reflection" description="==> reflect to sastruts example">
@@ -285,35 +341,74 @@
 		<delete file="${sastruts.example.dir}/src/main/webapp/WEB-INF/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${sastruts.example.dir}/src/main/webapp/WEB-INF/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${sastruts.example.dir}/src/main/webapp/WEB-INF/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<replace file="${sastruts.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${sastruts.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${sastruts.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-teeda" depends="prepare-reflection" description="==> reflect to teeda example">
 	  	<copy todir="${teeda.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${teeda.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${teeda.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${teeda.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-buri" depends="prepare-reflection" description="==> reflect to buri example">
 	  	<copy todir="${buri.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${buri.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${buri.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${buri.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-hibernate" depends="prepare-reflection" description="==> reflect to hibernate example">
 	  	<copy todir="${hibernate.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${hibernate.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${hibernate.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${hibernate.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-s2jdbc" depends="prepare-reflection" description="==> reflect to s2jdbc example">
 	  	<copy todir="${s2jdbc.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${s2jdbc.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${s2jdbc.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${s2jdbc.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-flex" depends="prepare-reflection" description="==> reflect to flex example">
 	  	<copy todir="${flex.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${flex.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${flex.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${flex.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-doma" depends="prepare-reflection" description="==> reflect to flex example">
 	  	<copy todir="${doma.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${doma.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${doma.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${doma.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-multipledb" depends="prepare-reflection" description="==> reflect to multipledb example">
 	  	<copy todir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
 	  	<copy todir="${multipledb.spring.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${multipledb.seasar.example.dir}/dbflute_librarydb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.seasar.example.dir}/dbflute_librarydb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.seasar.example.dir}/dbflute_memberdb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.seasar.example.dir}/dbflute_memberdb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.spring.example.dir}/dbflute_librarydb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.spring.example.dir}/dbflute_librarydb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.spring.example.dir}/dbflute_memberdb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.spring.example.dir}/dbflute_memberdb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${multipledb.seasar.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${multipledb.spring.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-clientsql" depends="prepare-reflection" description="==> reflect to tricky example">
@@ -321,6 +416,7 @@
 		<delete file="${clientsql.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${clientsql.example.dir}/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientsql.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-tricky" depends="prepare-reflection" description="==> reflect to tricky example">
@@ -329,6 +425,10 @@
 		<delete file="${tricky.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${tricky.example.dir}/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${tricky.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<replace file="${tricky.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${tricky.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${tricky.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-javatest" depends="prepare-reflection" description="==> reflect to java test">

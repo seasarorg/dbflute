@@ -7,6 +7,7 @@
 	<!-- Version -->
 	<property name="version" value="0.8.9.12"/>
 	<property name="build.version" value="${version}-RC2"/>
+	<property name="pre.version" value="0.8.9.11"/>
 
 	<!-- Resource Directories -->
 	<property name="workspace.base" value=".."/>
@@ -17,7 +18,8 @@
 
 	<!-- Jar Files -->
 	<property name="engine.jar" value="dbflute.jar"/>
-	<property name="module.zip" value="dbflute.net-${version}.zip"/>
+	<property name="module.zip" value="dbflute-${version}.zip"/>
+	<property name="module.build.zip" value="dbflute-${build.version}.zip"/>
 
 	<!-- Examples -->
 	<property name="basic.example.dir" value="${workspace.base}/dfnet-basic-example"/>
@@ -163,7 +165,7 @@
 	<!--                                                            ================== -->
 
 	<target name="stage">
-		<copy file="${dist}/${module.zip}" tofile="${stage.dir}/dbflute/dbflute-${build.version}.zip" overwrite="true"></copy>
+		<copy file="${dist}/${module.zip}" tofile="${stage.dir}/dbflute/${module.build.zip}" overwrite="true"></copy>
 	</target>
 
 	<!-- ============================================================================= -->
@@ -178,21 +180,24 @@
 	</target>
 
 	<target name="reflect-to-basic" depends="deploy-dist" description="==> reflect to basic example">
-		<copy todir="${basic.example.dir}/mydbflute/dbflute-${version}">
-			<fileset dir="${extraction.dir}"/>
-		</copy>
+		<copy todir="${basic.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${basic.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${basic.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-asp.net" depends="deploy-dist" description="==> reflect to asp.net example">
-		<copy todir="${asp.net.example.dir}/mydbflute/dbflute-${version}">
-			<fileset dir="${extraction.dir}"/>
-		</copy>
+		<copy todir="${asp.net.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${asp.net.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${asp.net.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 	<target name="reflect-to-multipledb-quill" depends="deploy-dist" description="==> reflect to multipledb quill example">
-		<copy todir="${multipledb.quill.example.dir}/mydbflute/dbflute-${version}">
-			<fileset dir="${extraction.dir}"/>
-		</copy>
+		<copy todir="${multipledb.quill.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
+		<replace file="${multipledb.quill.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<delete dir="${multipledb.quill.example.dir}/mydbflute/dbflute-${pre.version}"/>
+		<delete dir="${extraction.dir}"/>
 	</target>
 
 </project>
