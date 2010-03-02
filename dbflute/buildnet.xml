@@ -10,6 +10,7 @@
 
 	<!-- Directories and Module Files -->
 	<property name="dbflute.dist" value="dist/net"/>
+	<property name="dbflute.embedded" value="embedded"/>
 	<property name="dbflute.jar.file" value="dbflute.jar"/>
 	<property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
 	<property name="dbflute.zip.file" value="dbflute.net-${version}.zip"/>
@@ -87,18 +88,18 @@
 		<delete file="${dbflute.zip.dirfile}"/>
 		
 		<copy overwrite="true"
-			  file="etc/client-template/_project.bat"
-			  tofile="etc/client-template/dbflute_dfclient/_project.bat">
+			  file="${dbflute.embedded}/etc/client-template/_project.bat"
+			  tofile="${dbflute.embedded}/etc/client-template/dbflute_dfclient/_project.bat">
 			<filterset><filter token="dbflute.version" value="${internal.version}" /></filterset>
 		</copy>
 		<copy overwrite="true"
-		      file="etc/client-template/_project.sh"
-			  tofile="etc/client-template/dbflute_dfclient/_project.sh">
+		      file="${dbflute.embedded}/etc/client-template/_project.sh"
+			  tofile="${dbflute.embedded}/etc/client-template/dbflute_dfclient/_project.sh">
 			<filterset><filter token="dbflute.version" value="${internal.version}" /></filterset>
 		</copy>
-		<delete file="etc/client-template/dbflute_dfclient.zip"/>
-		<zip zipfile="etc/client-template/dbflute_dfclient.zip">
-			<zipfileset prefix="dbflute_dfclient" dir="etc/client-template/dbflute_dfclient"/>
+		<delete file="${dbflute.embedded}/etc/client-template/dbflute_dfclient.zip"/>
+		<zip zipfile="${dbflute.embedded}/etc/client-template/dbflute_dfclient.zip">
+			<zipfileset prefix="dbflute_dfclient" dir="${dbflute.embedded}/etc/client-template/dbflute_dfclient"/>
 		</zip>
 		
 		<tstamp>
@@ -116,46 +117,46 @@
 		</copy>
 		
 		<zip zipfile="${dbflute.zip.dirfile}">
-			<zipfileset prefix="etc/cmd" dir="etc/cmd">
+			<zipfileset prefix="etc/cmd" dir="${dbflute.embedded}/etc/cmd">
 				<include name="*.cmd"/>
 				<include name="*.sh"/>
 			</zipfileset>
-			<zipfileset prefix="etc/client-template" dir="etc/client-template">
+			<zipfileset prefix="etc/client-template" dir="${dbflute.embedded}/etc/client-template">
 				<include name="dbflute_dfclient.zip"/>
 			</zipfileset>
-	      	<zipfileset prefix="etc/license" dir="etc/license">
+	      	<zipfileset prefix="etc/license" dir="${dbflute.embedded}/etc/license">
 	          	<include name="*.txt"/>
 		        <include name="*.html"/>
 				<exclude name="Derby_License.txt"/>
 				<exclude name="H2_License.html"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="etc/logprop" dir="etc/logprop">
+	      	<zipfileset prefix="etc/logprop" dir="${dbflute.embedded}/etc/logprop">
 	            <include name="log4j.properties"/>
 	      	</zipfileset>
 			<zipfileset prefix="lib" dir="${dbflute.dist}">
 				<include name="${dbflute.jar.file}"/>
 			</zipfileset>
-			<zipfileset prefix="lib" dir="lib/forExecute">
+			<zipfileset prefix="lib" dir="${dbflute.embedded}/lib">
 				<include name="*.jar"/>
 				<include name="*.zip"/>
 				<exclude name="derby-*.jar"/>
 				<exclude name="h2-*.jar"/>
 			</zipfileset>
-			<zipfileset prefix="templates/doc" dir="templates/doc">
+			<zipfileset prefix="templates/doc" dir="${dbflute.embedded}/templates/doc">
 				<exclude name="**/*---.txt"/>
 			</zipfileset>
-			<zipfileset prefix="templates/om" dir="templates/om">
+			<zipfileset prefix="templates/om" dir="${dbflute.embedded}/templates/om">
 				<include name="ControlGenerateCSharp.vm"/>
 				<include name="ControlSql2EntityCSharp.vm"/>
 			</zipfileset>
-			<zipfileset prefix="templates/om/csharp" dir="templates/om/csharp">
+			<zipfileset prefix="templates/om/csharp" dir="${dbflute.embedded}/templates/om/csharp">
 				<exclude name="**/*---.txt"/>
 			</zipfileset>
-			<zipfileset prefix="ant" dir="ant"/>
-			<zipfileset prefix="" dir="">
+			<zipfileset prefix="ant" dir="${dbflute.embedded}/ant"/>
+			<zipfileset prefix="" dir="${dbflute.embedded}">
 				<include name="build-torque.xml"/>
 			</zipfileset>
-			<zipfileset prefix="" dir="etc/mark">
+			<zipfileset prefix="" dir="${dbflute.embedded}/mark">
 				<include name="product-is-dbflute.net-${version}"/>
 			</zipfileset>
 		</zip>

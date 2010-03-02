@@ -10,7 +10,7 @@
 
 	<!-- Directories and Module Files -->
 	<property name="dbflute.dist" value="dist"/>
-	<property name="dbflute.templates" value="templates"/>
+	<property name="dbflute.embedded" value="embedded"/>
 	<property name="dbflute.jar.file" value="dbflute.jar"/>
 	<property name="dbflute.jar.dirfile" value="${dbflute.dist}/${dbflute.jar.file}"/>
 	<property name="dbflute.zip.file" value="dbflute-${version}.zip"/>
@@ -114,28 +114,28 @@
 	  	<delete file="${dbflute.zip.dirfile}"/>
 	  	
 	  	<copy overwrite="true"
-	  		  file="etc/client-template/_project.bat"
-	  		  tofile="etc/client-template/dbflute_dfclient/_project.bat">
+	  		  file="${dbflute.embedded}/etc/client-template/_project.bat"
+	  		  tofile="${dbflute.embedded}/etc/client-template/dbflute_dfclient/_project.bat">
 			<filterset><filter token="dbflute.version" value="${internal.version}" /></filterset>
 	  	</copy>
 	  	<copy overwrite="true"
-		      file="etc/client-template/_project.sh"
-	  		  tofile="etc/client-template/dbflute_dfclient/_project.sh">
+		      file="${dbflute.embedded}/etc/client-template/_project.sh"
+	  		  tofile="${dbflute.embedded}/etc/client-template/dbflute_dfclient/_project.sh">
 			<filterset><filter token="dbflute.version" value="${internal.version}" /></filterset>
 	  	</copy>
-	  	<delete file="etc/client-template/dbflute_dfclient.zip"/>
-	  	<zip zipfile="etc/client-template/dbflute_dfclient.zip">
-	      	<zipfileset prefix="dbflute_dfclient" dir="etc/client-template/dbflute_dfclient"/>
+	  	<delete file="${dbflute.embedded}/etc/client-template/dbflute_dfclient.zip"/>
+	  	<zip zipfile="${dbflute.embedded}/etc/client-template/dbflute_dfclient.zip">
+	      	<zipfileset prefix="dbflute_dfclient" dir="${dbflute.embedded}/etc/client-template/dbflute_dfclient"/>
 	  	</zip>
 	
 	  	<tstamp>
 	    	<format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
 	  	</tstamp>
 	
-	  	<delete file="etc/mark/product-is-dbflute-${version}"/>
+	  	<delete file="${dbflute.embedded}/mark/product-is-dbflute-${version}"/>
 	  	<copy overwrite="true" 
-	  		  file="etc/mark/product-is-dbflute"
-	  		  tofile="etc/mark/product-is-dbflute-${version}">
+	  		  file="${dbflute.embedded}/mark/product-is-dbflute"
+	  		  tofile="${dbflute.embedded}/mark/product-is-dbflute-${version}">
 			<filterset>
 				<filter token="version" value="${internal.version}" />
 		 		<filter token="datetime" value="${now.date}" />
@@ -143,52 +143,52 @@
 	  	</copy>
 
 	  	<zip zipfile="${dbflute.zip.dirfile}">
-	      	<zipfileset prefix="etc/cmd" dir="etc/cmd">
+	      	<zipfileset prefix="etc/cmd" dir="${dbflute.embedded}/etc/cmd">
 	          	<include name="*.cmd"/>
 	          	<include name="*.sh"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="etc/client-template" dir="etc/client-template">
+	      	<zipfileset prefix="etc/client-template" dir="${dbflute.embedded}/etc/client-template">
 	          	<include name="dbflute_dfclient.zip"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="etc/license" dir="etc/license">
+	      	<zipfileset prefix="etc/license" dir="${dbflute.embedded}/etc/license">
 	          	<include name="*.txt"/>
 	          	<include name="*.html"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="etc/logprop" dir="etc/logprop">
+	      	<zipfileset prefix="etc/logprop" dir="${dbflute.embedded}/etc/logprop">
 	          	<include name="log4j.properties"/>
 	      	</zipfileset>
 	      	<zipfileset prefix="lib" dir="dist">
 	          	<include name="${dbflute.jar.file}"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="lib" dir="lib/forExecute">
+	      	<zipfileset prefix="lib" dir="${dbflute.embedded}/lib">
 	          	<include name="*.jar"/>
 	          	<include name="*.zip"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="templates/doc" dir="templates/doc">
+	      	<zipfileset prefix="templates/doc" dir="${dbflute.embedded}/templates/doc">
 	          	<exclude name="**/*---.txt"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="templates/om" dir="templates/om">
+	      	<zipfileset prefix="templates/om" dir="${dbflute.embedded}/templates/om">
 	          	<include name="ControlGenerateJava.vm"/>
 	          	<include name="ControlSql2EntityJava.vm"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="templates/om/java" dir="templates/om/java">
+	      	<zipfileset prefix="templates/om/java" dir="${dbflute.embedded}/templates/om/java">
 	          	<exclude name="**/*---.txt"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="ant" dir="ant"/>
-	      	<zipfileset prefix="" dir="">
+	      	<zipfileset prefix="ant" dir="${dbflute.embedded}/ant"/>
+	      	<zipfileset prefix="" dir="${dbflute.embedded}">
 	          	<include name="build-torque.xml"/>
 	      	</zipfileset>
-	      	<zipfileset prefix="" dir="etc/mark">
+	      	<zipfileset prefix="" dir="${dbflute.embedded}/mark">
 	          	<include name="product-is-dbflute-${version}"/>
 	      	</zipfileset>
 	  	</zip>
 	</target>
 
 	<target name="adjust">
-		<fixcrlf srcdir="${dbflute.templates}" eol="crlf" encoding="UTF-8">
-			<exclude name="**/*.vmnet"/>	
+		<fixcrlf srcdir="${dbflute.embedded}/templates" eol="crlf" encoding="UTF-8">
+			<exclude name="**/*.vmnet"/>
 		</fixcrlf>
-		<fixcrlf srcdir="${dbflute.templates}/om/csharp" eol="crlf" encoding="UTF-8" />
+		<fixcrlf srcdir="${dbflute.embedded}/templates/om/csharp" eol="crlf" encoding="UTF-8" />
 	</target>
 
 	<!-- ============================================================================= -->
@@ -217,7 +217,7 @@
     <!-- Reflection for Mac  -->
 	<!-- = = = = = = = = = = -->
 
-	<target name="reflect-mac-basic" depends="deploy-dist" description="==> reflect to basic application">
+	<target name="reflect-basic" depends="deploy-dist" description="==> reflect to basic application">
 	  	<copy todir="${dbflute.basic.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${dbflute.deploy.dir}"/></copy>
 	</target>
 
