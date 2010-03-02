@@ -1,0 +1,282 @@
+<project name="Torque" default="jdbc" basedir=".">
+  <!--
+    Note - You should not have to edit this file.
+
+    Instead, if calling build-torque.xml directly, edit the build.properties
+    that is in the same directory. If calling build-torque.xml via another
+    build file, you can also use the build.properties in the same directory,
+    or set the property torque.contextProperties to the file
+    to use in place of build.properties (e.g. project.properties).
+  -->
+
+  <!--
+    For us to load the default.properties from the classpath, we need to bootstrap.
+    To know the right lib.dir for the torque-classpath, we need to manually
+    figure out torque.lib.dir, but to do that, we need to manually figure
+    out torque.contextProperties and load that so that any old configurations
+    still work propertly. Then we can go on and do the rest of the mappings via
+    old.properties.
+   -->
+  <property name="build.properties" value="build.properties"/>
+  <property name="torque.contextProperties" value="${build.properties}"/>
+  <property file="${torque.contextProperties}"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="torque.lib.dir" value="${lib.dir}"/>
+  <property name="logprop.dir" value="etc/logprop"/>
+  <property name="class.root" value="target/classes"/>
+
+  <!--
+    Build the classpath. Specifically point to each file we're including to avoid
+    version conflicts in the case of the torque.lib.dir being something like lib.repo.
+    However, we still need to pull in the user's database driver and since we don't
+    know which jar that will be, after we've got all of our specific, version-safe jars,
+    do a general inclusion of the torque.lib.dir to catch any drivers.
+  -->
+  <path id="torque-classpath">
+    <!-- The log4j.properties (should be valid at first) -->
+    <dirset dir=".">
+      <include name="${logprop.dir}"/>
+    </dirset>
+
+  	<!-- Embedded Libraries -->
+    <fileset dir="${torque.lib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+
+    <!-- [Unused on DBFlute] -->
+    <dirset dir=".">
+      <include name="${class.root}"/>
+    </dirset>
+  </path>
+
+  <!--
+    The default.properties file will map old properties to the new ones along
+    with setting the correct defaults.
+  -->
+  <property resource="org/apache/torque/default.properties">
+    <classpath>
+      <path refid="torque-classpath"/>
+    </classpath>
+  </property>
+
+  <!--
+    Do forward declarations of all of our tasks to
+    centralize them and clean up the targets.
+  -->
+  <taskdef name="df-jdbc" classpathref="torque-classpath"
+    classname="org.apache.torque.task.TorqueJDBCTransformTask"/>
+  <taskdef name="df-doc" classpathref="torque-classpath"
+    classname="org.apache.torque.task.TorqueDocumentationTask"/>
+  <taskdef name="df-generate" classpathref="torque-classpath"
+    classname="org.apache.torque.task.TorqueDataModelTask"/>
+  <taskdef name="df-sql2entity" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.DfSql2EntityTask"/>
+  <taskdef name="df-outside-sql-test" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.DfOutsideSqlTestTask"/>
+
+  <!-- ReplaceSchema -->
+  <taskdef name="df-create-schema" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.replaceschema.DfCreateSchemaTask"/>
+  <taskdef name="df-load-data" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.replaceschema.DfLoadDataTask"/>
+  <taskdef name="df-take-finally" classpathref="torque-classpath"
+    classname="org.seasar.dbflute.task.replaceschema.DfTakeFinallyTask"/>
+
+  <!--
+    for Ant-Contrib
+  -->
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+
+  <!-- ================================================================ -->
+  <!-- C H E C K  U S E C L A S S P A T H                               -->
+  <!-- ================================================================ -->
+  <!-- Temporary hack around the propertiesUtil bug. Should             -->
+  <!-- be fixed soon.                                                   -->
+  <!-- ================================================================ -->
+
+  <target name="check-use-classpath">
+    <condition property="torque.internal.useClasspath">
+      <equals arg1="${torque.useClasspath}" arg2="true"/>
+    </condition>
+  </target>
+
+  <!-- ================================================================ -->
+  <!-- C H E C K  R U N  O N L Y  O N  S C H E M A  C H A N G E         -->
+  <!-- ================================================================ -->
+  <!-- Maps the torque.runOnlyOnSchemaChange to                         -->
+  <!-- torque.internal.runOnlyOnSchemaChange                            -->
+  <!-- ================================================================ -->
+
+  <target name="check-run-only-on-schema-change">
+    <condition property="torque.internal.runOnlyOnSchemaChange">
+      <equals arg1="${torque.runOnlyOnSchemaChange}" arg2="true"/>
+    </condition>
+  </target>
+
+  <!-- ******************************************************************************* -->
+  <!--                                                                            JDBC -->
+  <!--                                                                            **** -->
+  <!-- ================================================================ -->
+  <!-- J D B C  TO  X M L                                               -->
+  <!-- ================================================================ -->
+
+  <target name="jdbc" description="==> jdbc to xml">
+
+    <echo message="+-----------------------------------------------+"/>
+    <echo message="|                                               |"/>
+    <echo message="| Generating XML from JDBC connection !         |"/>
+    <echo message="|                                               |"/>
+    <echo message="+-----------------------------------------------+"/>
+
+    <echo message=" "/>
+    <echo message="+-------------------------------------------------------------------------------+"/>
+    <echo message="contextProperties = ${torque.contextProperties}"/>
+    <echo message="environmentType   = ${dfenv}"/>
+    <echo message="+-----------------+"/>
+
+    <df-jdbc
+      contextProperties="${torque.contextProperties}"
+      environmentType="${dfenv}"
+    >
+    </df-jdbc>
+  </target>
+
+  <!-- ******************************************************************************* -->
+  <!--                                                                              OM -->
+  <!--                                                                              ** -->
+  <!-- ================================================================ -->
+  <!-- G E N E R A T E  P R O J E C T  P E E R  B A S E D  O M          -->
+  <!-- ================================================================ -->
+  <!-- Generate the Peer-based object model for your project.           -->
+  <!-- These are in addition to the base Torque OM!                     -->
+  <!-- ================================================================ -->
+
+  <target name="om" depends="check-use-classpath"
+    description="==> generates class files for your DB">
+
+    <echo message="+------------------------------------------+"/>
+    <echo message="|                                          |"/>
+    <echo message="| Generating Class Files for your DB       |"/>
+    <echo message="|                                          |"/>
+    <echo message="+------------------------------------------+"/>
+
+    <antcall target="om-classpath"/>
+    <antcall target="om-template"/>
+    <!-- antcall target="zip-base-om"/ -->
+  </target>
+
+  <target name="om-classpath" if="torque.internal.useClasspath">
+    <df-generate
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="${torque.template.om}"
+      useClasspath="${torque.useClasspath}"
+      environmentType="${dfenv}">
+    </df-generate>
+  </target>
+
+  <target name="om-template" unless="torque.internal.useClasspath">
+    <df-generate
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="${torque.template.om}"
+      templatePath="${torque.templatePath}"
+      environmentType="${dfenv}">
+    </df-generate>
+  </target>
+
+  <!-- ******************************************************************************* -->
+  <!--                                                                             Doc -->
+  <!--                                                                             *** -->
+  <!-- ================================================================ -->
+  <!-- G E N E R A T E   D O C S                                        -->
+  <!-- ================================================================ -->
+  <!-- Generates documentation to                                       -->
+  <!-- ${torque.doc.dir}/project-schema.html                            -->
+  <!-- ================================================================ -->
+
+  <target name="doc" description="==> generates documentation for your datamodel">
+
+    <echo message="+------------------------------------------+"/>
+    <echo message="|                                          |"/>
+    <echo message="| Generating docs for YOUR datamodel!      |"/>
+    <echo message="|                                          |"/>
+    <echo message="+------------------------------------------+"/>
+
+    <df-doc
+      contextProperties="${torque.contextProperties}"
+      controlTemplate="${torque.template.doc}"
+      outputFormat="${torque.doc.format}"
+      templatePath="${torque.templatePath}"
+      useClasspath="${torque.useClasspath}"
+      environmentType="${dfenv}">
+    </df-doc>
+  </target>
+
+  <!-- ******************************************************************************* -->
+  <!--                                                                         PlaySQL -->
+  <!--                                                                         ******* -->
+  <target name="replace-schema" description="==> replace-schema">
+
+    <echo message="+-----------------------------------------------+"/>
+    <echo message="|                                               |"/>
+    <echo message="| Replace-Schema !                              |"/>
+    <echo message="|                                               |"/>
+    <echo message="+-----------------------------------------------+"/>
+
+    <tstamp>
+      <format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
+    </tstamp>
+
+    <df-create-schema
+        contextProperties="${torque.contextProperties}"
+  	    validTaskEndInformation="false"
+        environmentType="${dfenv}">
+    </df-create-schema>
+    <df-load-data
+        contextProperties="${torque.contextProperties}"
+        validTaskEndInformation="false"
+        environmentType="${dfenv}">
+    </df-load-data>
+    <df-take-finally
+        contextProperties="${torque.contextProperties}"
+        beforeTimestamp="${now.date}"
+        environmentType="${dfenv}">
+    </df-take-finally>
+  </target>
+
+  <target name="outside-sql-test" description="==> outside-sql-test">
+
+    <echo message="+-----------------------------------------------+"/>
+    <echo message="|                                               |"/>
+    <echo message="| Outside-Sql Test !                            |"/>
+    <echo message="|                                               |"/>
+    <echo message="+-----------------------------------------------+"/>
+  	
+    <df-outside-sql-test
+        contextProperties="${torque.contextProperties}"
+        environmentType="${dfenv}"
+        specifiedSqlFile="${dfsql}">
+    </df-outside-sql-test>
+  </target>
+
+  <target name="sql2entity" description="==> sql2entity">
+
+    <echo message="+-----------------------------------------------+"/>
+    <echo message="|                                               |"/>
+    <echo message="| Sql 2 Entity !                                |"/>
+    <echo message="|                                               |"/>
+    <echo message="+-----------------------------------------------+"/>
+
+    <!--
+      Parameters, outputDirectory and outputFile, are actually unused (as old).
+      But the parameters may be referred to by Velocity so it remains.
+    -->
+    <df-sql2entity
+        contextProperties="${torque.contextProperties}"
+        controlTemplate="${torque.template.sql2entity}"
+        templatePath="${torque.templatePath}"
+        environmentType="${dfenv}"
+        specifiedSqlFile="${dfsql}">
+    </df-sql2entity>
+  </target>
+
+</project>
