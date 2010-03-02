@@ -6,7 +6,7 @@
 
 	<!-- Version -->
 	<property name="version" value="0.8.9.12"/>
-	<property name="internal.version" value="${version}-RC1"/>
+	<property name="internal.version" value="${version}-RC2"/>
 
 	<!-- Directories and Module Files -->
 	<property name="dbflute.dist" value="dist/net"/>
@@ -59,7 +59,7 @@
 			<src path="src/main/java" />
 			<src path="src/main/resources" />
 			<classpath>
-			<fileset dir="lib/forCompile">
+			<fileset dir="lib">
 				<include name="**/*.jar" />
 			</fileset>
 			</classpath>
@@ -177,27 +177,27 @@
 	<!--                                                        E X A M P L E  T A S K -->
 	<!--                                                        ====================== -->
 
-    <!-- basically for example projects -->
+    <!-- for example projects -->
 	<target name="deploy-dist">
 		<delete dir="${dbflute.deploy.dir}"/>
 		<unzip src="${dbflute.zip.dirfile}" dest="${dbflute.deploy.dir}"/>
 		<chmod dir="${dbflute.deploy.dir}/ant/bin" perm="ugo+rx" includes="**/*"/>
 	</target>
 
-	<target name="reflect-win-basic" depends="deploy-dist" description="==> reflect to basic example">
+	<target name="reflect-to-basic" depends="deploy-dist" description="==> reflect to basic example">
 		<copy todir="${dfnet.basic.example.dir}/mydbflute/dbflute-${version}">
 			<fileset dir="${dbflute.deploy.dir}"/>
 		</copy>
 	</target>
 
-	<target name="reflect-win-asp.net" depends="deploy-dist" description="==> reflect to asp.net example">
-		<copy todir="${dfnet.asp.net.example.dir}/mydbflute/dbflute-${version}">
+	<target name="reflect-to-multipledb-quill" depends="deploy-dist" description="==> reflect to multipledb quill example">
+		<copy todir="${dfnet.multipledb.quill.example.dir}/mydbflute/dbflute-${version}">
 			<fileset dir="${dbflute.deploy.dir}"/>
 		</copy>
 	</target>
 
-	<target name="reflect-win-multipledb-quill" depends="deploy-dist" description="==> reflect to multipledb quill example">
-		<copy todir="${dfnet.multipledb.quill.example.dir}/mydbflute/dbflute-${version}">
+	<target name="reflect-to-asp.net" depends="deploy-dist" description="==> reflect to asp.net example">
+		<copy todir="${dfnet.asp.net.example.dir}/mydbflute/dbflute-${version}">
 			<fileset dir="${dbflute.deploy.dir}"/>
 		</copy>
 	</target>
