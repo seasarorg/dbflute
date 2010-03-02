@@ -1,8 +1,0 @@
-
-using System;
-
-namespace ${glPackageBaseCommonCBeanOutsidesql} {
-    public interface ${glProcedurePmb} {
-        String ProcedureName { get; }
-    }
-}

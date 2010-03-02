@@ -1,7 +1,0 @@
-
-using System;
-
-namespace ${glPackageBaseCommonCBeanGrouping} {
-
-    public delegate ROW ${glGroupingRowSetupper}<ROW, ENTITY>(${glGroupingRowResource}<ENTITY> groupingRowResource);
-}
