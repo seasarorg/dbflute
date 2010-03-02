@@ -180,7 +180,7 @@
 	          	<exclude name="**/*---.txt"/>
 	      	</zipfileset>
 	      	<zipfileset prefix="ant" dir="${embedded}/ant"/>
-	      	<zipfileset prefix="" dir="">
+	      	<zipfileset prefix="" dir="${embedded}">
 	          	<include name="build-torque.xml"/>
 	      	</zipfileset>
 	      	<zipfileset prefix="" dir="${embedded}/mark">
