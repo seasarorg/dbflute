@@ -2,7 +2,6 @@
 
 	<property name="version" value="0.9.6.6"/>
 	<property name="build.version" value="0.9.6.6"/>
-	<property name="pre.version" value="0.9.6.5"/>
 
 	<target name="dist">
 		<copy file="target/dbflute-runtime-${build.version}.jar"
@@ -11,9 +10,6 @@
 		<copy file="target/dbflute-runtime-${build.version}-sources.jar"
 			  tofile="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
 			  overwrite="true"/>
-	</target>
-
-	<target name="reflect-module" depends="dist">
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute/lib/dbflute-runtime.jar"
 			  overwrite="true"/>
@@ -23,124 +19,5 @@
 		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
 			  tofile="../dbflute/embedded/lib/dbflute-runtime.jar"
 			  overwrite="true"/>
-	</target>
-
-	<!-- ============================================================================= -->
-	<!--                                                        E X A M P L E  T A S K -->
-	<!--                                                        ====================== -->
-	<target name="reflect-to-basic" depends="reflect-module">
-		<delete file="../dbflute-basic-example/lib/dbflute-runtime-${pre.version}.jar"/>
-		<delete file="../dbflute-basic-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-			  tofile="../dbflute-basic-example/lib/dbflute-runtime-${version}.jar"
-			  overwrite="true"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-			  tofile="../dbflute-basic-example/lib/sources/dbflute-runtime-${version}-sources.jar"
-			  overwrite="true"/>
-	</target>
-
-	<target name="reflect-to-spring" depends="dist">
-		<delete file="../dbflute-spring-example/lib/dbflute-runtime-${pre.version}.jar"/>
-		<delete file="../dbflute-spring-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-			  tofile="../dbflute-spring-example/lib/dbflute-runtime-${version}.jar"
-			  overwrite="true"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-			  tofile="../dbflute-spring-example/lib/sources/dbflute-runtime-${version}-sources.jar"
-			  overwrite="true"/>
-	</target>
-
-	<target name="reflect-to-guice" depends="dist">
-		<delete file="../dbflute-guice-example/lib/dbflute-runtime-${pre.version}.jar"/>
-		<delete file="../dbflute-guice-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-			  tofile="../dbflute-guice-example/lib/dbflute-runtime-${version}.jar"
-			  overwrite="true"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-			  tofile="../dbflute-guice-example/lib/sources/dbflute-runtime-${version}-sources.jar"
-			  overwrite="true"/>
-	</target>
-
-	<target name="reflect-to-lucy" depends="dist">
-		<delete file="../dbflute-lucy-example/lib/dbflute-runtime-${pre.version}.jar"/>
-		<delete file="../dbflute-lucy-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-			  tofile="../dbflute-lucy-example/lib/dbflute-runtime-${version}.jar"
-			  overwrite="true"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-			  tofile="../dbflute-lucy-example/lib/sources/dbflute-runtime-${version}-sources.jar"
-			  overwrite="true"/>
-	</target>
-
-	<target name="reflect-to-ymir" depends="dist">
-		<delete file="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${pre.version}.jar"/>
-		<delete file="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-			  tofile="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${version}.jar"
-			  overwrite="true"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-			  tofile="../dbflute-ymir-example/src/main/webapp/WEB-INF/lib/sources/dbflute-runtime-${version}-sources.jar"
-			  overwrite="true"/>
-	</target>
-
-	<target name="reflect-to-sastruts" depends="dist">
-		<delete file="../dbflute-sastruts-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${pre.version}.jar"/>
-		<delete file="../dbflute-sastruts-example/src/main/webapp/WEB-INF/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-			  tofile="../dbflute-sastruts-example/src/main/webapp/WEB-INF/lib/dbflute-runtime-${version}.jar"
-			  overwrite="true"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-			  tofile="../dbflute-sastruts-example/src/main/webapp/WEB-INF/lib/sources/dbflute-runtime-${version}-sources.jar"
-			  overwrite="true"/>
-	</target>
-
-	<target name="reflect-to-clientsql" depends="dist">
-		<delete file="../dbflute-clientsql-example/lib/dbflute-runtime-${pre.version}.jar"/>
-		<delete file="../dbflute-clientsql-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-			  tofile="../dbflute-clientsql-example/lib/dbflute-runtime-${version}.jar"
-			  overwrite="true"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-			  tofile="../dbflute-clientsql-example/lib/sources/dbflute-runtime-${version}-sources.jar"
-			  overwrite="true"/>
-	</target>
-
-	<target name="reflect-to-tricky" depends="dist">
-		<delete file="../dbflute-tricky-example/lib/dbflute-runtime-${pre.version}.jar"/>
-		<delete file="../dbflute-tricky-example/lib/sources/dbflute-runtime-${pre.version}-sources.jar"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-			  tofile="../dbflute-tricky-example/lib/dbflute-runtime-${version}.jar"
-			  overwrite="true"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-			  tofile="../dbflute-tricky-example/lib/sources/dbflute-runtime-${version}-sources.jar"
-			  overwrite="true"/>
-	</target>
-
-	<target name="reflect-to-javatest" depends="dist">
-		<copy file="../dbflute/dist/dbflute-runtime-${version}.jar"
-			  tofile="../javatest/lib/dbflute-runtime.jar"
-			  overwrite="true"/>
-		<copy file="../dbflute/dist/dbflute-runtime-${version}-sources.jar"
-			  tofile="../javatest/lib/sources/dbflute-runtime-sources.jar"
-		   	  overwrite="true"/>
-	</target>
-
-	<target name="reflect-mac-all">
-
-		<echo message="+------------------------------------------+"/>
-		<echo message="|                                          |"/>
-		<echo message="| Reflecting library to all projects!      |"/>
-		<echo message="|                                          |"/>
-		<echo message="+------------------------------------------+"/>
-
-	  	<antcall target="reflect-to-basic" />
-	  	<antcall target="reflect-to-spring" />
-	  	<antcall target="reflect-to-guice" />
-	  	<antcall target="reflect-to-lucy" />
-	  	<antcall target="reflect-to-ymir" />
-	  	<antcall target="reflect-to-sastruts" />
-	  	<antcall target="reflect-to-clientsql" />
-	  	<antcall target="reflect-to-tricky" />
-	  	<antcall target="reflect-to-javatest" />
 	</target>
 </project>
