@@ -1,0 +1,69 @@
+
+using System;
+using System.Collections;
+using ${glPackageBaseCommonSqlClause};
+using ${glPackageBaseCommonJdbc};
+
+namespace ${glPackageBaseCommonCBean} {
+
+    public interface ${glConditionBean} : ${glPagingBean} {
+
+        // ===============================================================================
+        //                                                                      Table Name
+        //                                                                      ==========
+        String TableDbName { get; }
+        String TableSqlName { get; }
+
+        // ===============================================================================
+        //                                                                       SqlClause
+        //                                                                       =========
+        ${glSqlClause} SqlClause { get; }
+        String GetClause();
+
+        // ===============================================================================
+        //                                                                 OrderBy Setting
+        //                                                                 ===============
+        ${glConditionBean} AddOrderBy_PK_Asc();
+        ${glConditionBean} AddOrderBy_PK_Desc();
+		
+        // ===============================================================================
+        //                                                                           Query
+        //                                                                           =====
+        ${glConditionQuery} LocalCQ { get; }
+
+        // ===============================================================================
+        //                                                                    Lock Setting
+        //                                                                    ============
+        $glConditionBean LockForUpdate();
+
+        // ===============================================================================
+        //                                                                    Select Count
+        //                                                                    ============
+        ${glConditionBean} xsetupSelectCountIgnoreFetchScope();
+        ${glConditionBean} xafterCareSelectCountIgnoreFetchScope();
+        bool IsSelectCountIgnoreFetchScope();
+		
+        // ===============================================================================
+        //                                                                Statement Config
+        //                                                                ================
+        void Configure(${glStatementConfig} statementConfig);
+        ${glStatementConfig} StatementConfig { get; }
+
+        // ===============================================================================
+        //                                                                     Display SQL
+        //                                                                     ===========
+    	String ToDisplaySql();
+
+        // ===============================================================================
+        //                                                      Basic Status Determination
+        //                                                      ==========================
+    	bool HasWhereClause();
+    	bool HasOrderByClause();
+        bool HasUnionQueryOrUnionAllQuery();
+        
+        // ===============================================================================
+        //                                                              Query Synchronizer
+        //                                                              ==================
+        void xregisterUnionQuerySynchronizer(${glUnionQuery}<${glConditionBean}> unionQuerySynchronizer);
+    }
+}

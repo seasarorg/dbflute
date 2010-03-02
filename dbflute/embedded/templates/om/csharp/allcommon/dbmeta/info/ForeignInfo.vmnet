@@ -1,0 +1,145 @@
+
+using System;
+using System.Reflection;
+
+using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonUtil};
+
+namespace ${glPackageBaseCommonDBMetaInfo} {
+
+    public class ${glForeignInfo} : ${glRelationInfo} {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        protected String foreignPropertyName;
+        protected ${glDBMeta} localDBMeta;
+        protected ${glDBMeta} foreignDBMeta;
+        protected Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap;
+        protected Map<${glColumnInfo}, ${glColumnInfo}> foreignLocalColumnInfoMap;
+        protected int relationNo;
+        protected bool oneToOne;
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glForeignInfo}(String foreignPropertyName, ${glDBMeta} localDBMeta, ${glDBMeta} foreignDBMeta
+                         , Map<${glColumnInfo}, ${glColumnInfo}> localForeignColumnInfoMap
+                         , int relationNo, bool oneToOne) {
+            AssertObjectNotNull("foreignPropertyName", foreignPropertyName);
+            AssertObjectNotNull("localDBMeta", localDBMeta);
+            AssertObjectNotNull("foreignDBMeta", foreignDBMeta);
+            AssertObjectNotNull("localForeignColumnInfoMap", localForeignColumnInfoMap);
+            this.foreignPropertyName = foreignPropertyName;
+            this.localDBMeta = localDBMeta;
+            this.foreignDBMeta = foreignDBMeta;
+            this.localForeignColumnInfoMap = localForeignColumnInfoMap;
+            Set<${glColumnInfo}> keySet = localForeignColumnInfoMap.keySet();
+            foreignLocalColumnInfoMap = new LinkedHashMap<${glColumnInfo}, ${glColumnInfo}>();
+            foreach (${glColumnInfo} key in localForeignColumnInfoMap.keySet()) {
+                ${glColumnInfo} value = localForeignColumnInfoMap.get(key);
+                foreignLocalColumnInfoMap.put(value, key);
+            }
+            this.relationNo = relationNo;
+            this.oneToOne = oneToOne;
+        }
+        
+        // ===============================================================================
+        //                                                                          Finder
+        //                                                                          ======
+        public ${glColumnInfo} FindLocalByForeign(String foreignColumnDbName) {
+            ${glColumnInfo} keyColumnInfo = foreignDBMeta.FindColumnInfo(foreignColumnDbName);
+            ${glColumnInfo} resultColumnInfo = foreignLocalColumnInfoMap.get(keyColumnInfo);
+            if (resultColumnInfo == null) {
+                String msg = "Not found by foreignColumnDbName in foreignLocalColumnInfoMap:";
+                msg = msg + " foreignColumnDbName=" + foreignColumnDbName + " foreignLocalColumnInfoMap=" + foreignLocalColumnInfoMap;
+                throw new ArgumentException(msg);
+            }
+            return resultColumnInfo;
+        }
+
+        public PropertyInfo FindAccessor() {
+            return FindProperty(localDBMeta.EntityType, BuildInitCapPropertyName(), new Type[] { typeof(System.Collections.Generic.IList<>) });
+        }
+
+        // ===============================================================================
+        //                                                                         Builder
+        //                                                                         =======
+        public String BuildInitCapPropertyName() {
+            return InitCap(this.foreignPropertyName);
+        }
+
+        // ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        protected static String InitCap(String str) {
+            return ${glSimpleStringUtil}.InitCap(str);
+        }
+
+        protected static PropertyInfo FindProperty(Type clazz, String propertyName, Type[] argTypes) {
+            return clazz.GetProperty(propertyName, argTypes);
+        }
+        
+        protected void AssertObjectNotNull(String variableName, Object value) {
+            if (variableName == null) {
+                String msg = "The value should not be null: variableName=" + variableName + " value=" + value;
+                throw new ArgumentException(msg);
+            }
+            if (value == null) {
+                String msg = "The value should not be null: variableName=" + variableName;
+                throw new ArgumentException(msg);
+            }
+        }
+
+        // ===============================================================================
+        //                                                                       Implement
+        //                                                                       =========
+        public String RelationPropertyName {
+            get { return ForeignPropertyName; }
+        }
+
+        public ${glDBMeta} TargetDBMeta {
+            get { return ForeignDBMeta; }
+        }
+
+        public Map<${glColumnInfo}, ${glColumnInfo}> LocalTargetColumnInfoMap {
+            get { return LocalForeignColumnInfoMap; }
+        }
+
+        public bool IsReferrer {
+            get { return false; }
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public String ForeignPropertyName {
+            get { return foreignPropertyName; }
+        }
+
+        public ${glDBMeta} LocalDBMeta {
+            get { return localDBMeta; }
+        }
+
+        public ${glDBMeta} ForeignDBMeta {
+            get { return foreignDBMeta; }
+        }
+
+        public Map<${glColumnInfo}, ${glColumnInfo}> LocalForeignColumnInfoMap {
+            get { return localForeignColumnInfoMap; }
+        }
+
+        public Map<${glColumnInfo}, ${glColumnInfo}> ForeignLocalColumnInfoMap {
+            get { return foreignLocalColumnInfoMap; }
+        }
+
+        public int RelationNo {
+            get { return relationNo; }
+        }
+
+        public bool IsOneToOne {
+            get { return oneToOne; }
+        }
+    }
+}

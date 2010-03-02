@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>${database.projectName} schema</title>
+  <style type="text/css">
+	* {
+		margin: 0;
+		padding: 0;
+	}
+	body {
+		font-family: Verdana, "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", Meiryo, "メイリオ", "MS P Gothic", "MS Pゴシック", sans-serif;
+		font-size: 90%;
+		margin: 10px 5px 5px 15px;
+		background-color: #ffffe0;
+	}
+
+	/* heading */
+	h1 {
+		font-size: 1.5em;
+		border-bottom: 2px solid #af0000;
+		border-top: 2px solid #af0000;
+	}
+	h2 {
+		margin: 30px 0 5px 0;
+		font-size: 1.8em;
+		border-bottom: 2px solid #af0000;
+		border-left: 10px solid #af0000;
+		text-indent: 10px;
+	}
+	h3 {
+		padding: 0 0 0 10px;
+		margin: 1em 10% 0 0;
+		border-top: double 3px #af0000;
+		border-bottom: solid 1px #333333;
+		font-size: 1.5em;
+		color: #333333;
+	}
+	h4 {
+ 		padding: 0 0 0 10px;
+		margin: 1em 10% 0 1em;
+		border-top: solid 1px #af0000;
+		border-bottom: solid 1px #af0000;
+		font-size: 1.4em;
+		color: #333333;
+	}
+
+	/* total info */
+	.updatedate {
+		text-align: right;
+	}
+	.mainschema {
+		text-align: right;
+	}
+	.sublink {
+		text-align: right;
+	}
+
+	/* table */
+	table {
+		border-collapse:collapse;
+	}
+	table, th {
+		border: 1px solid #555;
+	}
+	th {
+		background-color: #cc9;
+		font-size: 0.8em;
+	}
+	td {
+		border-bottom: 1px dotted #aaa;
+		border-left: 1px solid #555;
+		padding:2px;
+	}
+	.schemacell {
+		font-size: 0.8em;
+		white-space: nowrap;
+	}
+	.aliascell {
+		white-space: nowrap;
+	}
+	.flgcell {
+		text-align: center;
+	}
+	.flgplus {
+		font-size: 0.7em;
+	}
+	.numcell {
+		text-align: center;
+	}
+	.linkcell {
+		font-size: 0.8em;
+	}
+	.commentcell {
+		font-size: 0.7em;
+	}
+	.subcell {
+		font-size: 0.8em;
+	}
+	.comcolcell {
+		color: #666;
+	}
+	.optcell {
+		font-style: italic;
+	}
+	.additionalpk {
+		font-size: 0.7em;
+		font-style: italic;
+	}
+	.additionalfk {
+		font-size: 0.7em;
+		font-style: italic;
+	}
+
+	/* inner table */
+	table.child {
+		margin: 3px;
+	}
+	table.child th {
+		font-size: 0.7em;
+	}
+	table.child, table.child td, table.child th {
+		border-top: none;
+		border-left: none;
+		border-bottom: 1px solid #aaa;
+		border-right: 1px solid #aaa;
+	}
+
+	/* table supplementary info */
+	span.tableschema {
+		font-size: 0.6em;
+	}
+	span.bqpcount {
+		font-size: 0.5em;
+	}
+	dl.bqplist {
+		padding-left: 2em;
+	}
+	dl.bqplist dt {
+		display: list-item;
+		font-size: 1.2em;
+		margin-top: 0.3em;
+	}
+	dl.bqplist dd {
+		font-size: 0.9em;
+		padding-left: 1em;
+	}
+	dl.bqplist dd.subinfo {
+		padding-left: 2em;
+	}
+	dl.bqplist dd.subinfo span.file {
+		font-style: italic;
+	}
+	dl.bqplist dd.subinfo span.ctet {
+		color: green;
+	}
+	dl.bqplist dd.subinfo span.pmb {
+		color: green;
+	}
+	dl.procedurelist {
+		padding-left: 2em;
+	}
+	dl.procedurelist dt {
+		display: list-item;
+		font-size: 1.2em;
+		margin-top: 0.3em;
+	}
+	dl.procedurelist dt span.type {
+		font-size: 0.7em;
+		color: green;
+	}
+	dl.procedurelist dd {
+		font-size: 0.9em;
+		padding-left: 1em;
+	}
+	dl.procedurelist dd.column {
+		font-style: italic;
+		padding-left: 2em;
+	}
+	dl.procedurelist dd.column span.type {
+		font-size: 0.9em;
+		color: green;
+	}
+	dl.procedurelist dd.column pre {
+		padding-left: 1em;
+	}
+  </style>
+</head>
+
+<body>
+<h1>Project Schema for ${database.projectName} (${database.databaseName})</h1>
+#if ($database.hasDatabaseSchema())
+<p class="mainschema">generated from <strong>${database.databaseSchema}</strong></p>
+#end
+<p class="updatedate">${database.timestampExpression}</p>
+#if ($database.hasClassificationDefinitionMap())
+<p class="sublink"><a href="#cdef">Classification Definition</a></p>
+#end
+#if ($database.hasTableBqpMap() || $database.isGenerateProcedureParameterBean())
+<p class="sublink"><a href="#outsidesql">OutsideSql List</a></p>
+#end
+
+<h2>Table List</h2>
+<table summary="Tables in the Schema">
+	<thead>
+	<tr>
+#if ($database.hasAdditionalSchema())
+		<th>Schema</th>
+#end
+#if ($database.isAliasDelimiterInDbCommentValid())
+		<th>Alias</th>
+#end
+		<th>Name</th>
+		<th>Type</th>
+		<th>ForeignTable</th>
+		<th>ReferrerTable</th>
+		<th>Comment</th>
+		<th>EntityName</th>
+	</tr>
+	</thead>
+	<tbody>
+#foreach ($table in $database.tableDisplaySortedList)
+	<tr>
+#if ($database.hasAdditionalSchema())
+		<td class="schemacell">#if ($table.hasSchema()) ${table.schema}#else &nbsp;#end</td>
+#end
+#if ($database.isAliasDelimiterInDbCommentValid())
+		<td class="aliascell">${table.alias}</td>
+#end
+		<td><a href="#${table.name}"${table.titleForSchemaHtml}>${table.name}</a></td>
+		<td class="subcell">${table.type}</td>
+		<td class="subcell">${table.foreignTableNameCommaStringWithHtmlHref}</td>
+		<td class="subcell">${table.referrerTableNameCommaStringWithHtmlHref}</td>
+		<td class="commentcell">#if ($table.hasComment()) ${table.commentForSchemaHtml}#else &nbsp;#end</td>
+		<td class="subcell">${table.javaName}</td>
+	</tr>
+#end
+	</tbody>
+</table>
+
+#foreach ($table in $database.tableDisplaySortedList)
+$generator.parse("doc/html/table.vm", null, "table", $table)
+#end
+
+#if ($database.hasClassificationDefinitionMap())
+<h2 id="cdef">Classification Definition</h2>
+<table summary="Classifications in the Schema">
+	<thead>
+	<tr>
+		<th>Classification</th>
+		<th>Top Comment</th>
+		<th>Definition</th>
+	</tr>
+	</thead>
+	<tbody>
+#foreach ($classificationName in $database.classificationNameList)
+#set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
+  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+  #set ($existTop = true)
+#else
+  #set ($existTop = false)
+#end
+	<tr>
+		<td>${classificationName}</td>
+		<td>#if ($existTop && $classificationTopMap.containsKey('topComment'))$classificationTopMap.get('topComment')#else &nbsp;#end</td>
+		<td>
+			<table class="child">
+			<tr>
+				<th><a name="${classificationName}Cls"/>Code</th>
+				<th>Name</th>
+				<th>Alias</th>
+				<th>Comment</th>
+			</tr>
+#foreach ($classificationMap in $classificationMapList)
+			<tr>
+				<td>$classificationMap.get('code')</td>
+				<td>${classificationMap.get('name')}</td>
+				<td>#if ($classificationMap.containsKey('alias'))${classificationMap.get('alias')}#else &nbsp;#end</td>
+				<td>#if ($classificationMap.containsKey('comment'))${classificationMap.get('comment')}#else &nbsp;#end</td>
+			</tr>
+#end
+			</table>
+		</td>
+	</tr>
+#end
+	</tbody>
+</table>
+#end
+
+#if ($database.hasTableBqpMap() || $database.isGenerateProcedureParameterBean())
+<h2 id="outsidesql">OutsideSql List</h2>
+#foreach ($table in $database.tableDisplaySortedList)
+#if ($table.hasBehaviorQueryPath())
+<h3 id="${table.javaName}Sql"><a href="#${table.name}">${table.name}</a></h3>
+<dl class="bqplist">
+#foreach ($behaviorQueryPath in $table.behaviorQueryPathList)
+	<dt>$table.getBehaviorQueryPathTitleForSchemaHtml($behaviorQueryPath)$table.getBehaviorQueryPathDisplayName($behaviorQueryPath)</dt>
+#if ($table.hasBehaviorQueryPathDescription($behaviorQueryPath))
+	<dd>
+		<pre>$table.getBehaviorQueryPathDescriptionForSchemaHtml($behaviorQueryPath)</pre>
+	</dd>
+#end
+	<dd class="subinfo">
+		<span class="file">$table.getBehaviorQueryPathFileName($behaviorQueryPath)</span>
+#if ($table.hasBehaviorQueryPathCustomizeEntity($behaviorQueryPath))
+		<span class="ctet">(${table.getBehaviorQueryPathCustomizeEntity($behaviorQueryPath)}${table.getBehaviorQueryPathCursorForSchemaHtml($behaviorQueryPath)})</span>
+#end
+#if ($table.hasBehaviorQueryPathParameterBean($behaviorQueryPath))
+		<span class="pmb">(${table.getBehaviorQueryPathParameterBean($behaviorQueryPath)})</span>
+#end
+	</dd>
+#end
+</dl>
+#end
+#end
+#if ($database.isGenerateProcedureParameterBean())
+<h3 id="procedure">Procedure</h3>
+<dl class="procedurelist">
+#foreach ($procedure in $database.availableProcedureList)
+	<dt>${procedure.procedureDisplayNameForSchemaHtml}</dt>
+#if ($procedure.hasProcedureComment())
+	<dd>
+		<pre>${procedure.procedureCommentForSchemaHtml}</pre>
+	</dd>
+#end
+#if ($procedure.procedureColumnMetaInfoList.isEmpty())
+	<dd class="column">*no arguments</dd>
+#else
+#foreach ($column in $procedure.procedureColumnMetaInfoList)
+	<dd class="column">
+		${column.columnDisplayNameForSchemaHtml}
+#if ($column.hasColumnComment())
+		<pre>${column.columnCommentForSchemaHtml}</pre>
+#end
+	</dd>
+#end
+#end
+#end
+</dl>
+#end
+#end
+</body>
+</html>

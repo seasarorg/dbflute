@@ -1,0 +1,55 @@
+<h2 id="${table.name}"${table.titleForSchemaHtml}>
+${table.aliasExpression}${table.name}
+#if ($database.hasAdditionalSchema() && $table.hasSchema())
+&nbsp;<span class="tableschema">on ${table.schema}</span>
+#end
+#if ($table.hasBehaviorQueryPath())
+&nbsp;<span class="bqpcount"><a href="${database.sharp}${table.javaName}Sql">(outsideSql=${table.behaviorQueryPathList.size()})</a></span>
+#end
+</h2>
+<table summary="Columns in ${table.name}">
+	<thead>
+	<tr>
+		<th>PK</th>
+		<th>ID</th>
+		<th>UQ</th>
+		<th>IX</th>
+		<th>Not<br />Null</th>
+#if ($database.isAliasDelimiterInDbCommentValid())
+		<th>Alias</th>
+#end
+		<th>Name</th>
+		<th>Type</th>
+		<th>Size</th>
+		<th>Def</th>
+		<th>ForeignTable</th>
+		<th>ReferrerTable</th>
+		<th>Classification</th>
+		<th>Comment</th>
+		<th>PropertyName</th>
+		<th>${table.database.targetLanguageInitCap}Type</th>
+	</tr>
+	</thead>
+#foreach ($col in $table.columns)
+	<tr>
+		<td class="flgcell#if ($col.isAdditionalPrimaryKey()) additionalpk#end"${col.primaryKeyTitleForSchemaHtml}>${col.primaryKeyMarkForSchemaHtml}</td>
+		<td class="flgcell">#if ($col.isIdentityOrSequence())o#else &nbsp;#end</td>
+		<td class="flgcell#if ($col.isUniqueAllAdditional()) additionalpk#end"${col.uniqueKeyTitleForSchemaHtml}>${col.uniqueKeyMarkForSchemaHtml}</td>
+		<td class="flgcell"${col.indexTitleForSchemaHtml}>${col.indexMarkForSchemaHtml}</td>
+		<td class="flgcell">#if ($col.isNotNull())*#else &nbsp;#end</td>
+#if ($database.isAliasDelimiterInDbCommentValid())
+		<td class="${col.schemaHtmlColumnAliasCssClass}">${col.alias}</td>
+#end
+		<td#if ($col.hasSchemaHtmlColumnNameCssClass()) class="${col.schemaHtmlColumnNameCssClass}"#end id="${table.name}${col.name}">${col.name}</td>
+		<td>${col.dbTypeExpression}</td>
+		<td class="numcell">#if ($col.hasColumnSize()) ${col.columnSize} #else &nbsp;#end</td>
+		<td class="subcell">#if ($col.hasDefaultValue() && !$col.isIdentityOrSequence()) ${col.defaultValue}#else &nbsp;#end</td>
+		<td class="linkcell">${col.foreignTableNameCommaStringWithHtmlHref}&nbsp;</td>
+		<td class="linkcell">${col.referrerTableCommaStringWithHtmlHref}&nbsp;</td>
+		<td class="linkcell">#if ($col.hasClassification())<a href="${table.database.sharp}${col.classificationName}Cls">${col.classificationName}</a>#else &nbsp;#end</td>
+		<td class="commentcell">#if ($col.hasComment()) ${col.commentForSchemaHtml}#else &nbsp;#end</td>
+		<td class="subcell">${col.javaBeansRulePropertyName}</td>
+		<td class="subcell">${col.javaNativeRemovedPackage}</td>
+	</tr>
+#end
+</table>

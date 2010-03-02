@@ -1,0 +1,1088 @@
+${database.allClassCopyright}package ${glPackageBaseBhv};
+#set ($myClassName = "${myBaseBhvClassName}")
+
+import java.util.List;
+
+import org.seasar.dbflute.*;
+import org.seasar.dbflute.bhv.*;
+#if ($table.isAvailableNonPrimaryKeyWritable())
+import org.seasar.dbflute.bhv.core.command.InsertEntityCommand;
+#end
+import org.seasar.dbflute.cbean.ConditionBean;
+import org.seasar.dbflute.cbean.EntityRowHandler;
+import org.seasar.dbflute.cbean.ListResultBean;
+import org.seasar.dbflute.cbean.PagingBean;
+import org.seasar.dbflute.cbean.PagingHandler;
+import org.seasar.dbflute.cbean.PagingInvoker;
+import org.seasar.dbflute.cbean.PagingResultBean;
+import org.seasar.dbflute.cbean.ResultBeanBuilder;
+import org.seasar.dbflute.dbmeta.DBMeta;
+#if ($database.isMakeFlatExpansion())
+import org.seasar.dbflute.dbmeta.hierarchy.HierarchyArranger;
+import org.seasar.dbflute.dbmeta.hierarchy.HierarchyBasicRequest;
+import org.seasar.dbflute.dbmeta.hierarchy.HierarchyRequest;
+#end
+#if ($table.isBuriTarget())
+import ${glPackagePluginBuri}.${glBuriDef};
+#end
+#if (${table.hasPrimaryKey()} && $table.hasReferrerAsMany())
+import ${glPackageExtendedBhv}.*;
+#end
+import ${glPackageExtendedEntity}.*;
+import ${myDBMetaPackageName}.*;
+import ${glPackageCB}.*;
+
+#set ($myExtendClassName = "")
+#if ($table.isWritable())
+  #set ($myExtendClassName = "AbstractBehaviorWritable")
+#else
+  #set ($myExtendClassName = "AbstractBehaviorReadable")
+#end
+/**
+ * The behavior of ${table.basicInfoDispString}. <br />
+#if ($table.isBuriInternal())
+ * {Buri Internal}
+#end
+ * <pre>
+ * [primary-key]
+ *     ${table.primaryKeyNameCommaString}
+ * 
+ * [column]
+ *     ${table.columnNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.definedSequenceName}
+ * 
+ * [identity]
+ *     ${table.identityColumnName}
+ * 
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ * 
+ * [foreign-table]
+ *     ${table.foreignTableNameCommaString}
+ * 
+ * [referrer-table]
+ *     ${table.referrerTableNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
+ * </pre>
+ * @author ${database.classAuthor}
+ */
+public abstract class ${myClassName} extends ${myExtendClassName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    ${database.behaviorQueryPathBeginMark}
+    ${database.behaviorQueryPathEndMark}
+
+    // ===================================================================================
+    //                                                                          Table name
+    //                                                                          ==========
+    /** @return The name on database of table. (NotNull) */
+    public String getTableDbName() { return "${table.name}"; }
+
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    /** @return The instance of DBMeta. (NotNull) */
+    public DBMeta getDBMeta() { return ${myDBMetaClassName}.getInstance(); }
+
+    /** @return The instance of DBMeta as my table type. (NotNull) */
+    public ${myDBMetaClassName} getMyDBMeta() { return ${myDBMetaClassName}.getInstance(); }
+
+    // ===================================================================================
+    //                                                                        New Instance
+    //                                                                        ============
+    /** {@inheritDoc} */
+    public Entity newEntity() { return newMyEntity(); }
+
+    /** {@inheritDoc} */
+    public ConditionBean newConditionBean() { return newMyConditionBean(); }
+
+    /** @return The instance of new entity as my table type. (NotNull) */
+    public ${myExtendedObjectClassName} newMyEntity() { return new ${myExtendedObjectClassName}(); }
+
+    /** @return The instance of new condition-bean as my table type. (NotNull) */
+    public ${myConditionBeanClassName} newMyConditionBean() { return new ${myConditionBeanClassName}(); }
+
+    // ===================================================================================
+    //                                                                        Count Select
+    //                                                                        ============
+    /**
+     * Select the count by the condition-bean. {IgnorePagingCondition}
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The selected count.
+     */
+    public int selectCount(${myConditionBeanClassName} cb) {
+        assertCBNotNull(cb);
+        return delegateSelectCount(cb);
+    }
+
+    @Override
+    protected int doReadCount(ConditionBean cb) {
+        return selectCount(downcast(cb));
+    }
+
+    // ===================================================================================
+    //                                                                       Cursor Select
+    //                                                                       =============
+    /**
+     * Select the cursor by the condition-bean. <br />
+     * Attention: It has a mapping cost from result set to entity.
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @param entityRowHandler The handler of entity row of ${myExtendedObjectClassName}. (NotNull)
+     */
+    public void selectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler) {
+        assertCBNotNull(cb); assertObjectNotNull("entityRowHandler<${myExtendedObjectClassName}>", entityRowHandler);
+        delegateSelectCursor(cb, entityRowHandler);
+    }
+
+    // ===================================================================================
+    //                                                                       Entity Select
+    //                                                                       =============
+    /**
+     * Select the entity by the condition-bean.
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The selected entity. (Nullable: If the condition has no data, it returns null)
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     */
+    public ${myExtendedObjectClassName} selectEntity(final ${myConditionBeanClassName} cb) {
+        return helpSelectEntityInternally(cb, new InternalSelectEntityCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
+            public List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
+    }
+
+    @Override
+    protected Entity doReadEntity(ConditionBean cb) {
+        return selectEntity(downcast(cb));
+    }
+
+    /**
+     * Select the entity by the condition-bean with deleted check.
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The selected entity. (NotNull)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     */
+    public ${myExtendedObjectClassName} selectEntityWithDeletedCheck(final ${myConditionBeanClassName} cb) {
+        return helpSelectEntityWithDeletedCheckInternally(cb, new InternalSelectEntityWithDeletedCheckCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
+            public List<${myExtendedObjectClassName}> callbackSelectList(${myConditionBeanClassName} cb) { return selectList(cb); } });
+    }
+
+    @Override
+    protected Entity doReadEntityWithDeletedCheck(ConditionBean cb) {
+        return selectEntityWithDeletedCheck(downcast(cb));
+    }
+#if ($table.hasPrimaryKey())
+
+    /**
+     * Select the entity by the primary-key value.
+     * ${table.primaryKeyArgsJavaDocString}
+     * @return The selected entity. (Nullable: If the primary-key value has no data, it returns null)
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     */
+    public ${myExtendedObjectClassName} selectByPKValue(${table.primaryKeyArgsString}) {
+        return selectEntity(buildPKCB(${table.primaryKeyArgsCallingString}));
+    }
+
+    /**
+     * Select the entity by the primary-key value with deleted check.
+     * ${table.primaryKeyArgsJavaDocString}
+     * @return The selected entity. (NotNull)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     */
+    public ${myExtendedObjectClassName} selectByPKValueWithDeletedCheck(${table.primaryKeyArgsString}) {
+        return selectEntityWithDeletedCheck(buildPKCB(${table.primaryKeyArgsCallingString}));
+    }
+
+    private ${myConditionBeanClassName} buildPKCB(${table.primaryKeyArgsString}) {
+        ${table.primaryKeyArgsAssertString}
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        ${table.primaryKeyArgsConditionSetupString}
+        return cb;
+    }
+#end
+
+    // ===================================================================================
+    //                                                                         List Select
+    //                                                                         ===========
+    /**
+     * Select the list as result bean.
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The result bean of selected list. (NotNull)
+     */
+    public ListResultBean<${myExtendedObjectClassName}> selectList(${myConditionBeanClassName} cb) {
+        assertCBNotNull(cb);
+        return new ResultBeanBuilder<${myExtendedObjectClassName}>(getTableDbName()).buildListResultBean(cb, delegateSelectList(cb));
+    }
+
+    @Override
+    protected ListResultBean<? extends Entity> doReadList(ConditionBean cb) {
+        return selectList(downcast(cb));
+    }
+
+    // ===================================================================================
+    //                                                                         Page Select
+    //                                                                         ===========
+    /**
+     * Select the page as result bean.
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The result bean of selected page. (NotNull)
+     */
+    public PagingResultBean<${myExtendedObjectClassName}> selectPage(final ${myConditionBeanClassName} cb) {
+        assertCBNotNull(cb);
+        final PagingInvoker<${myExtendedObjectClassName}> invoker = new PagingInvoker<${myExtendedObjectClassName}>(getTableDbName());
+        final PagingHandler<${myExtendedObjectClassName}> handler = new PagingHandler<${myExtendedObjectClassName}>() {
+            public PagingBean getPagingBean() { return cb; }
+            public int count() { return selectCount(cb); }
+            public List<${myExtendedObjectClassName}> paging() { return selectList(cb); }
+        };
+        return invoker.invokePaging(handler);
+    }
+
+    @Override
+    protected PagingResultBean<? extends Entity> doReadPage(ConditionBean cb) {
+        return selectPage(downcast(cb));
+    }
+
+    // ===================================================================================
+    //                                                                       Scalar Select
+    //                                                                       =============
+    /**
+     * Select the scalar value derived by a function. <br />
+     * Call a function method after this method called like as follows:
+     * <pre>
+     * ${table.uncapitalisedJavaName}Bhv.scalarSelect(Date.class).max(new ScalarQuery(${myConditionBeanClassName} cb) {
+     *     cb.specify().columnXxxDatetime(); // the required specification of target column
+     *     cb.query().setXxxName_PrefixSearch("S"); // query as you like it
+     * });
+     * </pre>
+     * @param <RESULT> The type of result.
+     * @param resultType The type of result. (NotNull)
+     * @return The scalar value derived by a function. (Nullable)
+     */
+    public <RESULT> SLFunction<${myConditionBeanClassName}, RESULT> scalarSelect(Class<RESULT> resultType) {
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.xsetupForScalarSelect();
+        cb.getSqlClause().disableSelectIndex(); // for when you use union
+        return new SLFunction<${myConditionBeanClassName}, RESULT>(cb, resultType);
+    }
+#if ($table.isUseSequence())
+
+    // ===================================================================================
+    //                                                                            Sequence
+    //                                                                            ========
+    /**
+     * Select the next value as sequence.
+     * @return The next value. (NotNull)
+     */
+    public ${table.sequenceReturnType} selectNextVal() {
+        return delegateSelectNextVal();
+    }
+#end
+#if (${table.hasPrimaryKey()} && $table.hasReferrerAsMany())
+
+    // ===================================================================================
+    //                                                                       Load Referrer
+    //                                                                       =============
+#foreach ($referrer in $table.referrerList)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerBhvClassName = "${referrer.referrerTableExtendedBehaviorClassName}")
+#set ($referrerCBClassName = "${referrer.referrerTableExtendedConditionBeanClassName}")
+#set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+#set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
+#set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
+#if (!$referrer.isOneToOne())
+    /**
+     * {Refer to overload method that has an argument of the list of entity.}
+     * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
+     */
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
+        xassLRArg(${myEntityVariableName}, conditionBeanSetupper);
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
+    }
+    /**
+     * Load referrer of ${referrer.referrerJavaBeansRulePropertyName} with the setupper for condition-bean of referrer. <br />
+     * About internal policy, the value of primary key(and others too) is treated as case-insensitive. <br />
+     * The condition-bean that the setupper provides have settings before you touch it. It is as follows:
+     * <pre>
+#if ($referrer.isSimpleKeyFK())
+     * cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(pkList);
+     * cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc();
+#else
+     * cb.query().set[ForeignKey]_InScope(pkList);
+     * cb.query().addOrderBy_[ForeignKey]_Asc();
+#end
+     * </pre>
+     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param conditionBeanSetupper The instance of referrer condition-bean setupper for registering referrer condition. (NotNull)
+     */
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
+        xassLRArg(${myEntityListVariableName}, conditionBeanSetupper);
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myEntityListVariableName}, new LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+    }
+    /**
+     * {Refer to overload method that has an argument of the list of entity.}
+     * @param ${myEntityVariableName} The entity of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param loadReferrerOption The option of load-referrer. (NotNull)
+     */
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(${myExtendedObjectClassName} ${myEntityVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+        xassLRArg(${myEntityVariableName}, loadReferrerOption);
+        load${referrer.referrerJavaBeansRulePropertyNameInitCap}(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
+    }
+#if ($referrer.isSimpleKeyFK())
+#set ($primaryKeyJavaNative = "${table.getPrimaryKeyJavaNativeAsOne()}")
+    /**
+     * {Refer to overload method that has an argument of condition-bean setupper.}
+     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param loadReferrerOption The option of load-referrer. (NotNull)
+     */
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+        xassLRArg(${myEntityListVariableName}, loadReferrerOption);
+        if (${myEntityListVariableName}.isEmpty()) { return; }
+        final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
+        helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${primaryKeyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
+            public ${primaryKeyJavaNative} getPKVal(${myExtendedObjectClassName} e) { return e.get${table.getPrimaryKeyJavaNameAsOne()}(); }
+            public void setRfLs(${myExtendedObjectClassName} e, List<${referrerEntityClassName}> ls) { e.set${referrer.referrerPropertyNameInitCap}(ls); }
+            public ${referrerCBClassName} newMyCB() { return referrerBhv.newMyConditionBean(); }
+            public void qyFKIn(${referrerCBClassName} cb, List<${primaryKeyJavaNative}> ls) { cb.query().set${referrer.getLocalColumnJavaNameAsOne()}_InScope(ls); }
+            public void qyOdFKAsc(${referrerCBClassName} cb) { cb.query().addOrderBy_${referrer.getLocalColumnJavaNameAsOne()}_Asc(); }
+            public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
+            public ${primaryKeyJavaNative} getFKVal(${referrerEntityClassName} e) { return e.get${referrer.getLocalColumnJavaNameAsOne()}(); }
+            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le) { re.set${referrer.foreignPropertyNameInitCap}(le); }
+        });
+    }
+
+#else
+#set ($primaryKeyJavaNative = "java.util.Map<String, Object>")
+    /**
+     * {Refer to overload method that has an argument of condition-bean setupper.}
+     * @param ${myEntityListVariableName} The entity list of ${table.javaBeansRulePropertyName}. (NotNull)
+     * @param loadReferrerOption The option of load-referrer. (NotNull)
+     */
+    public void load${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+        xassLRArg(${myEntityListVariableName}, loadReferrerOption);
+        if (${myEntityListVariableName}.isEmpty()) { return; }
+        final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
+        helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${primaryKeyJavaNative}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
+            public ${primaryKeyJavaNative} getPKVal(${myExtendedObjectClassName} e) {
+                ${primaryKeyJavaNative} primaryKeyMap = new java.util.LinkedHashMap<String, Object>();
+#foreach ($col in $referrer.foreignColumnList)
+                primaryKeyMap.put("${col.javaName}", e.get${col.javaName}());
+#end
+                return primaryKeyMap;
+            }
+            public void setRfLs(${myExtendedObjectClassName} e, List<${referrerEntityClassName}> ls) { e.set${referrer.referrerPropertyNameInitCap}(ls); }
+            public ${referrerCBClassName} newMyCB() { return referrerBhv.newMyConditionBean(); }
+            public void qyFKIn(${referrerCBClassName} cb, List<${primaryKeyJavaNative}> ls) {
+                final String aliasName = cb.getSqlClause().getLocalTableAliasName();
+                String identity = null;
+                StringBuilder sb = new StringBuilder();
+                int index = 0;
+                for (${primaryKeyJavaNative} primaryKeyMap : ls) {
+                    if (sb.length() > 0) { sb.append(")").append(ln()).append("     or ("); }
+#set ($foreignColumnIndex = 0)
+#foreach ($col in $referrer.foreignColumnList)
+#set ($localColumn = $referrer.getLocalColumnByForeignColumn($col))
+#if ($foreignColumnIndex > 0)
+                    sb.append(" and ");
+#end
+                    sb.append(aliasName).append(".${localColumn.name} = ");
+                    identity = "${referrer.referrerJavaBeansRulePropertyName}${col.javaName}" + index;
+                    sb.append("/*pmb.freeParameterMap.").append(identity).append("*/null");
+                    cb.xregisterFreeParameter(identity, primaryKeyMap.get("${col.javaName}"));
+#set ($foreignColumnIndex = $foreignColumnIndex + 1)
+#end
+                    ++index;
+                }
+                sb.insert(0, "((").append("))");
+                cb.getSqlClause().registerWhereClause(sb.toString());
+            }
+            public void qyOdFKAsc(${referrerCBClassName} cb) {
+#foreach ($col in $referrer.localColumnList)
+                cb.query().addOrderBy_${col.javaName}_Asc();
+#end
+            }
+            public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb) { return referrerBhv.selectList(cb); }
+            public ${primaryKeyJavaNative} getFKVal(${referrerEntityClassName} e) {
+                ${primaryKeyJavaNative} foreignKeyMap = new java.util.LinkedHashMap<String, Object>();
+#foreach ($col in $referrer.localColumnList)
+#set ($foreignColumn = $referrer.getForeignColumnByLocalColumn($col))
+                foreignKeyMap.put("${foreignColumn.javaName}", e.get${col.javaName}());
+#end
+                return foreignKeyMap;
+            }
+            public void setlcEt(${referrerEntityClassName} re, ${myExtendedObjectClassName} le) { re.set${referrer.foreignPropertyNameInitCap}(le); }
+        });
+    }
+
+#end
+#end
+#end
+#end
+#if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
+#foreach ($processName in $table.tableProcessForMethodNameList)
+#set ($referrerEntityClassName = "${glProjectPrefix}BuriAllRoundStateHistory")
+#set ($referrerBhvClassName = "${glPackageExtendedBhv}.${glProjectPrefix}BuriAllRoundStateHistoryBhv")
+#set ($referrerCBClassName = "${glProjectPrefix}BuriAllRoundStateHistoryCB")
+#set ($referrerEntityLongClassName = "${glPackageExtendedEntity}.${referrerEntityClassName}")
+#set ($genericPKMyEntityMap = "${table.getPrimaryKeyJavaNativeAsOne()}, ${myExtendedObjectClassName}")
+#set ($genericPKChildListMap = "${table.getPrimaryKeyJavaNativeAsOne()}, List<${referrerEntityClassName}>")
+    public void loadBuriAllRoundStateHistory_${processName}List(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
+        xassLRArg(${myEntityVariableName}, conditionBeanSetupper);
+        loadBuriAllRoundStateHistory_${processName}List(xnewLRLs(${myEntityVariableName}), conditionBeanSetupper);
+    }
+    public void loadBuriAllRoundStateHistory_${processName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.ConditionBeanSetupper<${referrerCBClassName}> conditionBeanSetupper) {
+        xassLRArg(${myEntityListVariableName}, conditionBeanSetupper);
+        loadBuriAllRoundStateHistory_${processName}List(${myEntityListVariableName}, new org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}>(conditionBeanSetupper));
+    }
+    public void loadBuriAllRoundStateHistory_${processName}List(${myExtendedObjectClassName} ${myEntityVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+        xassLRArg(${myEntityVariableName}, loadReferrerOption);
+        loadBuriAllRoundStateHistory_${processName}List(xnewLRLs(${myEntityVariableName}), loadReferrerOption);
+    }
+    public void loadBuriAllRoundStateHistory_${processName}List(List<${myExtendedObjectClassName}> ${myEntityListVariableName}, org.seasar.dbflute.bhv.LoadReferrerOption<${referrerCBClassName}, ${referrerEntityClassName}> loadReferrerOption) {
+        xassLRArg(${myEntityListVariableName}, loadReferrerOption);
+        if (${myEntityListVariableName}.isEmpty()) { return; }
+        final ${referrerBhvClassName} referrerBhv = xgetBSFLR().select(${referrerBhvClassName}.class);
+        helpLoadReferrerInternally(${myEntityListVariableName}, loadReferrerOption, new InternalLoadReferrerCallback<${myExtendedObjectClassName}, ${table.getPrimaryKeyJavaNativeAsOne()}, ${referrerCBClassName}, ${referrerEntityClassName}>() {
+            public ${table.getPrimaryKeyJavaNativeAsOne()} getPKVal(${myExtendedObjectClassName} entity)
+            { return entity.get${table.getPrimaryKeyJavaNameAsOne()}(); }
+            public void setRfLs(${myExtendedObjectClassName} entity, List<${referrerEntityClassName}> referrerList)
+            { entity.setBuriAllRoundStateHistory_${processName}List(referrerList); }
+            public ${referrerCBClassName} newMyCB() { return referrerBhv.newMyConditionBean(); }
+            public void qyFKIn(${referrerCBClassName} cb, List<${table.getPrimaryKeyJavaNativeAsOne()}> pkList) {
+                java.util.List<Long> internalPkValueList = new java.util.ArrayList<Long>();
+                for (${table.getPrimaryKeyJavaNativeAsOne()} pk : pkList) {
+                    internalPkValueList.add(Long.valueOf(pk.toString()));
+                }
+                cb.query().setInternalPkValue_InScope(internalPkValueList);
+                cb.query().setInternalDataType_Equal("${glPackageExtendedEntity}.${myExtendedObjectClassName}"); // is a fixed condition!
+            }
+            public void qyOdFKAsc(${referrerCBClassName} cb)
+            { cb.query().addOrderBy_InternalPkValue_Asc(); }
+            public List<${referrerEntityClassName}> selRfLs(${referrerCBClassName} cb)
+            { return referrerBhv.selectList(cb); }
+            public ${table.getPrimaryKeyJavaNativeAsOne()} getFKVal(${referrerEntityClassName} entity)
+            { return ${table.getPrimaryKeyJavaNativeAsOne()}.valueOf(entity.getInternalPkValue().toString()); }
+            public void setlcEt(${referrerEntityClassName} referrerEntity, ${myExtendedObjectClassName} localEntity)
+            { referrerEntity.set${table.javaName}_${processName}(localEntity); }
+        });
+    }
+
+#end
+#end
+    // ===================================================================================
+    //                                                                    Pull out Foreign
+    //                                                                    ================
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
+    /**
+     * Pull out the list of foreign table '${foreignEntityClassName}'.
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
+     * @return The list of foreign table. (NotNull)
+     */
+    public List<${foreignEntityClassName}> pullout${foreignKey.foreignPropertyNameInitCap}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${foreignEntityClassName}>() {
+            public ${foreignEntityClassName} getFr(${myExtendedObjectClassName} e) { return e.get${foreignKey.foreignPropertyNameInitCap}(); }
+            public boolean hasRf() { return ${foreignKey.canBeReferrer()}; }
+#if ($foreignKey.canBeReferrer())
+#if ($foreignKey.isOneToOne())
+            public void setRfLs(${foreignEntityClassName} e, List<${myExtendedObjectClassName}> ls)
+            { if (!ls.isEmpty()) { e.set${foreignKey.referrerPropertyNameInitCapAsOne}(ls.get(0)); } }
+#else
+            public void setRfLs(${foreignEntityClassName} e, List<${myExtendedObjectClassName}> ls)
+            { e.set${foreignKey.referrerPropertyNameInitCap}(ls); }
+#end
+#else
+            public void setRfLs(${foreignEntityClassName} e, List<${myExtendedObjectClassName}> ls)
+            { throw new UnsupportedOperationException(); }
+#end
+        });
+    }
+#end
+#foreach ($referrer in $table.referrers)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${glProjectPrefix}${referrerTable.javaName}")
+#if (${referrer.isOneToOne()})
+    /**
+     * Pull out the list of referrer-as-one table '${referrerEntityClassName}'.
+     * @param ${myEntityListVariableName} The list of ${table.uncapitalisedJavaName}. (NotNull)
+     * @return The list of referrer-as-one table. (NotNull)
+     */
+    public List<${referrerEntityClassName}> pullout${referrer.referrerPropertyNameInitCapAsOne}(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        return helpPulloutInternally(${myEntityListVariableName}, new InternalPulloutCallback<${myExtendedObjectClassName}, ${referrerEntityClassName}>() {
+            public ${referrerEntityClassName} getFr(${myExtendedObjectClassName} e) { return e.get${referrer.referrerPropertyNameInitCapAsOne}(); }
+            public boolean hasRf() { return ${referrer.canBeReferrer()}; }
+            public void setRfLs(${referrerEntityClassName} e, List<${myExtendedObjectClassName}> ls)
+            { if (!ls.isEmpty()) { e.set${referrer.foreignPropertyNameInitCap}(ls.get(0)); } }
+        });
+    }
+#end
+#end
+#if ($table.isWritable())
+
+    // ===================================================================================
+    //                                                                       Entity Update
+    //                                                                       =============
+    /**
+     * Insert the entity.
+     * @param ${myEntityVariableName} The entity of insert target. (NotNull)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     */
+    public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        assertEntityNotNull(${myEntityVariableName});
+        delegateInsert(${myEntityVariableName});
+    }
+
+    @Override
+    protected void doCreate(Entity entity) {
+        insert(downcast(entity));
+    }
+
+    /**
+     * Update the entity modified-only. {UpdateCountZeroException, ConcurrencyControl}
+     * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
+#if ($table.hasOptimisticLock())
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+#else
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+#end
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     */
+    public void update(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpUpdateInternally(${myEntityVariableName}, new InternalUpdateCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateUpdate(${myExtendedObjectClassName} entity) { return delegateUpdate(entity); } });
+    }
+
+    @Override
+    protected void doModify(Entity entity) {
+        update(downcast(entity));
+    }
+#if ($table.hasOptimisticLock())
+    
+    /**
+     * Update the entity non-strictly modified-only. {UpdateCountZeroException, NonConcurrencyControl}
+     * @param ${myEntityVariableName} The entity of update target. (NotNull) {PrimaryKeyRequired}
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     */
+    public void updateNonstrict(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpUpdateNonstrictInternally(${myEntityVariableName}, new InternalUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateUpdateNonstrict(${myExtendedObjectClassName} entity) { return delegateUpdateNonstrict(entity); } });
+    }
+#end
+
+    @Override
+    protected void doModifyNonstrict(Entity entity) {
+#if ($table.hasOptimisticLock())
+        updateNonstrict(downcast(entity));
+#else
+        update(downcast(entity));
+#end
+    }
+
+    /**
+     * Insert or update the entity modified-only. {ConcurrencyControl(when update)}
+     * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
+#if ($table.hasOptimisticLock())
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+#else
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+#end
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     */
+    public void insertOrUpdate(final ${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateCallback<${myExtendedObjectClassName}, ${myConditionBeanClassName}>() {
+            public void callbackInsert(${myExtendedObjectClassName} entity) { insert(entity); }
+            public void callbackUpdate(${myExtendedObjectClassName} entity) { update(entity); }
+            public ${myConditionBeanClassName} callbackNewMyConditionBean() { return newMyConditionBean(); }
+            public int callbackSelectCount(${myConditionBeanClassName} cb) { return selectCount(cb); }
+        });
+    }
+
+    @Override
+    protected void doCreateOrUpdate(Entity entity) {
+        insertOrUpdate(downcast(entity));
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Insert or update the entity non-strictly modified-only. {NonConcurrencyControl(when update)}
+     * @param ${myEntityVariableName} The entity of insert or update target. (NotNull)
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyExistsException When the entity already exists. (Unique Constraint Violation)
+     */
+    public void insertOrUpdateNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpInsertOrUpdateInternally(${myEntityVariableName}, new InternalInsertOrUpdateNonstrictCallback<${myExtendedObjectClassName}>() {
+            public void callbackInsert(${myExtendedObjectClassName} entity) { insert(entity); }
+            public void callbackUpdateNonstrict(${myExtendedObjectClassName} entity) { updateNonstrict(entity); }
+        });
+    }
+#end
+
+    @Override
+    protected void doCreateOrUpdateNonstrict(Entity entity) {
+#if ($table.isUseUpdateDate() || $table.isUseVersionNo())
+        insertOrUpdateNonstrict(downcast(entity));
+#else
+        insertOrUpdate(downcast(entity));
+#end
+    }
+
+    /**
+     * Delete the entity. {UpdateCountZeroException, ConcurrencyControl}
+     * @param ${myEntityVariableName} The entity of delete target. (NotNull) {PrimaryKeyRequired, ConcurrencyColumnRequired}
+#if ($table.hasOptimisticLock())
+     * @exception org.seasar.dbflute.exception.EntityAlreadyUpdatedException When the entity has already been updated.
+#else
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+#end
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     */
+    public void delete(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpDeleteInternally(${myEntityVariableName}, new InternalDeleteCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateDelete(${myExtendedObjectClassName} entity) { return delegateDelete(entity); } });
+    }
+
+    @Override
+    protected void doRemove(Entity entity) {
+        delete(downcast(entity));
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Delete the entity non-strictly. {UpdateCountZeroException, NonConcurrencyControl}
+     * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     */
+    public void deleteNonstrict(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpDeleteNonstrictInternally(${myEntityVariableName}, new InternalDeleteNonstrictCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return delegateDeleteNonstrict(entity); } });
+    }
+
+    /**
+     * Delete the entity non-strictly ignoring deleted. {UpdateCountZeroException, NonConcurrencyControl}
+     * @param ${myEntityVariableName} Entity. (NotNull) {PrimaryKeyRequired}
+     * @exception org.seasar.dbflute.exception.EntityDuplicatedException When the entity has been duplicated.
+     */
+    public void deleteNonstrictIgnoreDeleted(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        helpDeleteNonstrictIgnoreDeletedInternally(${myEntityVariableName}, new InternalDeleteNonstrictIgnoreDeletedCallback<${myExtendedObjectClassName}>() {
+            public int callbackDelegateDeleteNonstrict(${myExtendedObjectClassName} entity) { return delegateDeleteNonstrict(entity); } });
+    }
+#end
+
+    // ===================================================================================
+    //                                                                        Batch Update
+    //                                                                        ============
+    /**
+     * Batch insert the list. This method use 'Batch Update' of java.sql.PreparedStatement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @return The array of inserted count.
+     */
+    public int[] batchInsert(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
+        return delegateInsertList(${myEntityListVariableName});
+    }
+
+    /**
+     * Batch update the list. All columns are update target. {NOT modified only} <br />
+     * This method use 'Batch Update' of java.sql.PreparedStatement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @return The array of updated count.
+#if ($table.hasOptimisticLock())
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
+#else
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+#end
+     */
+    public int[] batchUpdate(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
+        return delegateUpdateList(${myEntityListVariableName});
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Batch update the list non-strictly. All columns are update target. {NOT modified only} <br />
+     * This method use 'Batch Update' of java.sql.PreparedStatement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @return The array of updated count.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     */
+    public int[] batchUpdateNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
+        return delegateUpdateListNonstrict(${myEntityListVariableName});
+    }
+#end
+
+    /**
+     * Batch delete the list. <br />
+     * This method use 'Batch Update' of java.sql.PreparedStatement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @return The array of deleted count.
+#if ($table.hasOptimisticLock())
+     * @exception org.seasar.dbflute.exception.BatchEntityAlreadyUpdatedException When the entity has already been updated. This exception extends EntityAlreadyUpdatedException.
+#else
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+#end
+     */
+    public int[] batchDelete(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
+        return delegateDeleteList(${myEntityListVariableName});
+    }
+#if ($table.hasOptimisticLock())
+
+    /**
+     * Batch delete the list non-strictly. <br />
+     * This method use 'Batch Update' of java.sql.PreparedStatement.
+     * @param ${myEntityListVariableName} The list of the entity. (NotNull)
+     * @return The array of deleted count.
+     * @exception org.seasar.dbflute.exception.EntityAlreadyDeletedException When the entity has already been deleted.
+     */
+    public int[] batchDeleteNonstrict(List<${myExtendedObjectClassName}> ${myEntityListVariableName}) {
+        assertObjectNotNull("${myEntityListVariableName}", ${myEntityListVariableName});
+        return delegateDeleteListNonstrict(${myEntityListVariableName});
+    }
+#end
+
+    // ===================================================================================
+    //                                                                        Query Update
+    //                                                                        ============
+    /**
+     * Query update the several entities. {NoConcurrencyControl}
+     * @param ${myEntityVariableName} The entity that contains update values. (NotNull) {PrimaryKeyNotRequired}
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The updated count.
+     */
+    public int queryUpdate(${myExtendedObjectClassName} ${myEntityVariableName}, ${myConditionBeanClassName} cb) {
+        assertObjectNotNull("${myEntityVariableName}", ${myEntityVariableName}); assertCBNotNull(cb);
+        setupCommonColumnOfUpdateIfNeeds(${myEntityVariableName});
+        filterEntityOfUpdate(${myEntityVariableName}); assertEntityOfUpdate(${myEntityVariableName});
+        return invoke(createQueryUpdateEntityCBCommand(${myEntityVariableName}, cb));
+    }
+
+    /**
+     * Query delete the several entities. {NoConcurrencyControl}
+     * @param cb The condition-bean of ${myExtendedObjectClassName}. (NotNull)
+     * @return The deleted count.
+     */
+    public int queryDelete(${myConditionBeanClassName} cb) {
+        assertCBNotNull(cb);
+        return invoke(createQueryDeleteCBCommand(cb));
+    }
+#else
+#if ($table.isAvailableNonPrimaryKeyWritable())
+
+    // ===================================================================================
+    //                                                                       Entity Update
+    //                                                                       =============
+    /**
+     * Insert.
+     * @param ${myEntityVariableName} The entity for insert. (NotNull)
+     */
+    public void insert(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        assertEntityNotNull(${myEntityVariableName});
+        delegateInsert(${myEntityVariableName});
+    }
+#end
+#end
+#if ($table.isBuriTarget())
+
+    // ===================================================================================
+    //                                                                      Buri Interface
+    //                                                                      ==============
+    public ${myExtendedObjectClassName} xgetEntityForBuri(${table.primaryKeyArgsString}) { // For Buri
+        ${myExtendedObjectClassName} entity = new ${myExtendedObjectClassName}();
+        ${table.getPrimaryKeyArgsSetupString('entity')}
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.acceptPrimaryKeyMapString(getDBMeta().extractPrimaryKeyMapString(entity));
+        return selectEntity(cb);
+    }
+
+    public List<${myExtendedObjectClassName}> xgetEntitiesForBuri(List<${table.primaryKeyJavaNativeAsOne}> ids) { // For Buri
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.query().set${table.primaryKeyAsOne.javaName}_InScope(ids);
+        return selectList(cb);
+    }
+
+    protected org.escafe.buri.engine.processor.BuriAutoSelectProcessor _buriAutoSelectProcessor;
+    public void setBuriAutoSelectProcessor(org.escafe.buri.engine.processor.BuriAutoSelectProcessor buriAutoSelectProcessor) {
+        _buriAutoSelectProcessor = buriAutoSelectProcessor;
+    }
+
+    protected void toNextStatusAction(String processPath, Object entity, Object userData, String action) {
+        try {
+            _buriAutoSelectProcessor.toNextStatusAction(processPath, entity, userData, action);
+        } catch (org.seasar.coffee.script.exception.ScriptExecuteException e) {
+            if (e.getCause() instanceof ognl.MethodFailedException) {
+                ognl.MethodFailedException fail = (ognl.MethodFailedException) e.getCause();
+                Throwable reason = fail.getReason();
+                if (reason instanceof org.seasar.dbflute.exception.EntityAlreadyExistsException) {
+                    throw (org.seasar.dbflute.exception.EntityAlreadyExistsException)reason;
+                } else if (reason instanceof org.seasar.dbflute.exception.EntityAlreadyDeletedException) {
+                    throw (org.seasar.dbflute.exception.EntityAlreadyDeletedException)reason;
+                } else if (reason instanceof org.seasar.dbflute.exception.EntityAlreadyUpdatedException) {
+                    throw (org.seasar.dbflute.exception.EntityAlreadyUpdatedException)reason;
+                }
+            }
+            throw e;
+        }
+    }
+
+    protected ${glBuriDef}.BuriUserDataProvider _buriUserDataProvider;
+    public void setBuriUserDataProvider(${glBuriDef}.BuriUserDataProvider buriUserDataProvider) {
+        _buriUserDataProvider = buriUserDataProvider;
+    }
+#foreach ($processName in $table.tableProcessForMethodNameList)
+
+    public void toNextStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
+        assertEntityNotNull(${myEntityVariableName});
+        String processPath = ${glBuriDef}.BuriProcess.${processName}.path();
+        Object userData = getUserData_${processName}(${myEntityVariableName}, action);
+        toNextStatusAction(processPath, ${myEntityVariableName}, userData, action.code());
+    }
+
+    protected Object getUserData_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.${processName}_Action action) {
+        if (_buriUserDataProvider == null) { return null; }
+        return _buriUserDataProvider.provide(${glBuriDef}.BuriProcess.${processName}, ${myEntityVariableName}, action);
+    }
+
+    public ${glBuriDef}.${processName}_Status getStatus_${processName}(${myExtendedObjectClassName} ${myEntityVariableName}) {
+        assertEntityNotNullAndHasPrimaryKeyValue(${myEntityVariableName});
+        java.util.List<BuriAllRoundState> buriAllRoundStateList = xgetCurrentStateList(${myEntityVariableName}, ${glBuriDef}.BuriProcess.${processName});
+        java.util.List<${glBuriDef}.${processName}_Status> statusList = new java.util.ArrayList<${glBuriDef}.${processName}_Status>();
+        if (buriAllRoundStateList.isEmpty()) { return null; }
+        for (BuriAllRoundState buriAllRoundState : buriAllRoundStateList) {
+            ${glBuriDef}.${processName}_Status status = ${glBuriDef}.${processName}_Status.codeOf(buriAllRoundState.getStatusPathName());
+            if (status != null) { statusList.add(status); }
+        }
+        if (statusList.size() > 1) {
+            String msg = "This method does not support duplicate status: " + statusList;
+            throw new IllegalStateException(msg);
+        }
+        return !statusList.isEmpty() ? statusList.get(0) : null;
+    }
+
+    public java.util.List<${myExtendedObjectClassName}> getEntities(org.seasar.dbflute.bhv.ConditionBeanSetupper<${myConditionBeanClassName}> conditionBeanSetupper
+            , ${glBuriDef}.${processName}_Status... statuses) {
+        assertObjectNotNull("statuses", statuses);
+        ${myConditionBeanClassName} cb = newMyConditionBean();
+        cb.setupSelect_BuriAllRoundState_${processName}();
+        conditionBeanSetupper.setup(cb);
+        java.util.List<String> pathNameList = new java.util.ArrayList<String>();
+        for (${glBuriDef}.${processName}_Status status : statuses) {
+            pathNameList.add(status.path());
+        }
+        cb.query().queryBuriAllRoundState_${processName}().setStatusPathName_InScope(pathNameList);
+        return selectList(cb);
+    }
+#end
+
+    private List<BuriAllRoundState> xgetCurrentStateList(${myExtendedObjectClassName} ${myEntityVariableName}, ${glBuriDef}.BuriProcess process) {
+        ${glPackageExtendedBhv}.BuriAllRoundStateBhv bhv = xgetBuriAllRoundStateBhv();
+        BuriAllRoundStateCB cb = bhv.newMyConditionBean();
+        cb.specify().columnStatusPathName();
+        cb.query().setStatusPathName_LikeSearch(process.path() + ".", new org.seasar.dbflute.cbean.coption.LikeSearchOption().likePrefix());
+        cb.query().setInternalPkValue_Equal(new Long(${myEntityVariableName}.${table.primaryKeyGetterCommaString}));
+        cb.query().setInternalDataType_Equal(${myExtendedObjectClassName}.class.getName());
+        return bhv.selectList(cb);
+    }
+
+    private ${glPackageExtendedBhv}.BuriAllRoundStateBhv xgetBuriAllRoundStateBhv() {
+        return getBehaviorSelector().select(${glPackageExtendedBhv}.BuriAllRoundStateBhv.class);
+    }
+#end
+    
+    // ===================================================================================
+    //                                                                     Delegate Method
+    //                                                                     ===============
+    // [Behavior Command]
+    // -----------------------------------------------------
+    //                                                Select
+    //                                                ------
+    protected int delegateSelectCount(${myConditionBeanClassName} cb) { return invoke(createSelectCountCBCommand(cb)); }
+    protected void delegateSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<${myExtendedObjectClassName}> entityRowHandler)
+    { invoke(createSelectCursorCBCommand(cb, entityRowHandler, ${myExtendedObjectClassName}.class)); }
+    protected List<${myExtendedObjectClassName}> delegateSelectList(${myConditionBeanClassName} cb)
+    { return invoke(createSelectListCBCommand(cb, ${myExtendedObjectClassName}.class)); }
+#if ($table.isUseSequence())
+    protected ${table.sequenceReturnType} delegateSelectNextVal() { return invoke(createSelectNextValCommand(${table.sequenceReturnType}.class)); }
+#end
+#if ($table.isWritable())
+
+    // -----------------------------------------------------
+    //                                                Update
+    //                                                ------
+    protected int delegateInsert(${myExtendedObjectClassName} e)
+    { if (!processBeforeInsert(e)) { return 1; } return invoke(createInsertEntityCommand(e)); }
+    protected int delegateUpdate(${myExtendedObjectClassName} e)
+#if ($table.hasOptimisticLock())
+    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateEntityCommand(e)); }
+#else
+    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
+#end
+#if ($table.hasOptimisticLock())
+    protected int delegateUpdateNonstrict(${myExtendedObjectClassName} e)
+    { if (!processBeforeUpdate(e)) { return 1; } return invoke(createUpdateNonstrictEntityCommand(e)); }
+#end
+    protected int delegateDelete(${myExtendedObjectClassName} e)
+#if ($table.hasOptimisticLock())
+    { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteEntityCommand(e)); }
+#else
+    { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e)); }
+#end
+#if ($table.hasOptimisticLock())
+    protected int delegateDeleteNonstrict(${myExtendedObjectClassName} e)
+    { if (!processBeforeDelete(e)) { return 1; } return invoke(createDeleteNonstrictEntityCommand(e)); }
+#end
+
+    protected int[] delegateInsertList(List<${myExtendedObjectClassName}> ls)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchInsertEntityCommand(helpFilterBeforeInsertInternally(ls))); }
+    @SuppressWarnings("unchecked")
+    protected int[] doCreateList(List<Entity> ls) { return delegateInsertList((List)ls); }
+    protected int[] delegateUpdateList(List<${myExtendedObjectClassName}> ls)
+#if ($table.hasOptimisticLock())
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
+#else
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
+#end
+    @SuppressWarnings("unchecked")
+    protected int[] doModifyList(List<Entity> ls) { return delegateUpdateList((List)ls); }
+#if ($table.hasOptimisticLock())
+    protected int[] delegateUpdateListNonstrict(List<${myExtendedObjectClassName}> ls)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchUpdateNonstrictEntityCommand(helpFilterBeforeUpdateInternally(ls))); }
+#end
+    protected int[] delegateDeleteList(List<${myExtendedObjectClassName}> ls)
+#if ($table.hasOptimisticLock())
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
+#else
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
+#end
+    @SuppressWarnings("unchecked")
+    protected int[] doRemoveList(List<Entity> ls) { return delegateDeleteList((List)ls); }
+#if ($table.hasOptimisticLock())
+    protected int[] delegateDeleteListNonstrict(List<${myExtendedObjectClassName}> ls)
+    { if (ls.isEmpty()) { return new int[]{}; } return invoke(createBatchDeleteNonstrictEntityCommand(helpFilterBeforeDeleteInternally(ls))); }
+#end
+#else
+#if ($table.isAvailableNonPrimaryKeyWritable())
+    protected int delegateInsert(${myExtendedObjectClassName} e) {
+        assertEntityNotNull(e); // If this table use identity, the entity does not have primary-key.
+        filterEntityOfInsert(e);
+        return invoke(createInsertEntityCommand(e));
+    }
+    protected InsertEntityCommand createInsertEntityCommand(Entity entity) {
+        assertBehaviorCommandInvoker("createInsertEntityCommand");
+        final InsertEntityCommand cmd = new InsertEntityCommand();
+        cmd.setTableDbName(getTableDbName());
+        _behaviorCommandInvoker.injectComponentProperty(cmd);
+        cmd.setEntityType(entity.getClass());
+        cmd.setEntity(entity);
+        return cmd;
+    }
+#end
+#end
+#if ($table.hasBehaviorFilterBeforeColumn())
+
+    // ===================================================================================
+    //                                                                     Filter Override
+    //                                                                     ===============
+#if ($table.hasBehaviorFilterBeforeInsertColumn())
+    @Override
+    protected void filterEntityOfInsert(Entity targetEntity) {
+        super.filterEntityOfInsert(targetEntity);
+        ${myExtendedObjectClassName} entity = downcast(targetEntity);
+#foreach ($column in $table.behaviorFilterBeforeInsertColumnList)
+        entity.set${column.javaName}(${column.behaviorFilterBeforeInsertColumnExpression});
+#end
+    }
+#end
+#if ($table.isWritable())
+#if ($table.hasBehaviorFilterBeforeUpdateColumn())
+    @Override
+    protected void filterEntityOfUpdate(Entity targetEntity) {
+        super.filterEntityOfUpdate(targetEntity);
+        ${myExtendedObjectClassName} entity = downcast(targetEntity);
+#foreach ($column in $table.behaviorFilterBeforeUpdateColumnList)
+        entity.set${column.javaName}(${column.behaviorFilterBeforeUpdateColumnExpression});
+#end
+    }
+#end
+#end
+#end
+#if ($database.isMakeFlatExpansion())
+
+    // ===================================================================================
+    //                                                                           Hierarchy
+    //                                                                           =========
+    /**
+     * Create the basic request of hierarchy of ${myExtendedObjectClassName}..
+     * @param sourceList The list of source. (NotNull)
+     * @param <SOURCE> The type of source.
+     * @return Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
+     */
+    public <SOURCE> ${glHierarchyBasicRequest}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> createHierarchyBasicRequest(List<SOURCE> sourceList) {
+        final ${glHierarchyBasicRequest}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace> request = new ${glHierarchyBasicRequest}<${myExtendedObjectClassName}, ${myDBMetaClassName}.${table.relationTraceClassName}RelationTrace>(${myExtendedObjectClassName}.class);
+        request.registerSourceList(sourceList);
+        return request;
+    }
+
+    /**
+     * Arrange hierarchy.
+     * @param request Hierarchy request of ${myExtendedObjectClassName}. (NotNull)
+     * @return The list of ${myExtendedObjectClassName}. (NotNull)
+     */
+    public List<${myExtendedObjectClassName}> arrangeHierarchy(${glHierarchyRequest}<${myExtendedObjectClassName}> request) {
+        return new ${glHierarchyArranger}<${myExtendedObjectClassName}>().arrangeHierarchy(request);
+    }
+#end
+
+    // ===================================================================================
+    //                                                                Optimistic Lock Info
+    //                                                                ====================
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasVersionNoValue(Entity entity) {
+#if ($table.isUseVersionNo())
+        return !(downcast(entity).get${table.versionNoJavaName}() + "").equals("null");// For primitive type
+#else
+        return false;
+#end
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasUpdateDateValue(Entity entity) {
+#if ($table.isUseUpdateDate())
+        return downcast(entity).get${table.updateDateJavaName}() != null;
+#else
+        return false;
+#end
+    }
+
+    // ===================================================================================
+    //                                                                     Downcast Helper
+    //                                                                     ===============
+    protected ${myExtendedObjectClassName} downcast(Entity entity) {
+        return helpEntityDowncastInternally(entity, ${myExtendedObjectClassName}.class);
+    }
+
+    protected ${myConditionBeanClassName} downcast(ConditionBean cb) {
+        return helpConditionBeanDowncastInternally(cb, ${myConditionBeanClassName}.class);
+    }
+}

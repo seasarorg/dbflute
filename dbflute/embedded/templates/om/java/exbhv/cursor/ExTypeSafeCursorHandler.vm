@@ -1,0 +1,15 @@
+${database.allClassCopyright}package ${myExtendedDaoCursorPackageName};
+#set ($myClassName = "${myExtendedTypeSafeCursorHandlerClassName}")
+
+import ${myBaseDaoCursorPackageName}.${myBaseTypeSafeCursorHandlerClassName};
+
+/**
+ * The cursor handler of ${table.name}.
+ * <p>
+ * You can implement your original methods here.
+ * This class remains when re-generating.
+ * </p>
+ * @author ${database.classAuthor}
+ */
+public abstract class ${myClassName} extends ${myBaseTypeSafeCursorHandlerClassName} {
+}

@@ -1,0 +1,174 @@
+${database.allClassCopyright}package ${myBaseEntityPackageName};
+#set ($myClassName = "${myBaseObjectClassName}")
+
+import java.io.Serializable;
+import javax.persistence.*;
+
+#foreach ($foreignKeys in $table.ForeignKeys)
+#set ($foreignEntityClassName = "${foreignKeys.foreignTable.javaName}")
+import ${myExtendedEntityPackageName}.${foreignEntityClassName};
+#end
+#foreach ($referrer in $table.referrers)
+#set ($referrerEntityClassName = "${referrer.table.javaName}")
+import ${myExtendedEntityPackageName}.${referrerEntityClassName};
+#end
+
+/**
+ * The entity of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
+ * <pre>
+ * [primary-key]
+ *     ${table.primaryKeyNameCommaString}
+ * 
+ * [column]
+ *     ${table.columnNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.definedSequenceName}
+ * 
+ * [identity]
+ *     ${table.identityColumnName}
+ * 
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ * 
+ * [foreign-table]
+ *     ${table.foreignTableNameCommaString}
+ * 
+ * [referrer-table]
+ *     ${table.referrerTableNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
+ * </pre>
+ * @author ${database.classAuthor}
+ */
+@MappedSuperclass
+public abstract class ${myClassName} implements Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+#foreach ($col in $table.columns)
+    /** Property for ${col.javaBeansRulePropertyName} column. {${col.columnDefinitionLineDisp}} */
+#if ($col.isPrimaryKey())
+    @Id
+#end
+#if ($col.isIdentity())
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+#end
+#if ($col.isJdbcTypeDate())
+    @Temporal(javax.persistence.TemporalType.DATE)
+#end
+#if ($col.isJdbcTypeTime())
+    @Temporal(javax.persistence.TemporalType.TIME)
+#end
+#if ($col.isJdbcTypeTimestamp())
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+#end
+#if ($col.isJdbcTypeBlob() && $col.isJdbcTypeClob())
+    @Lob
+#end
+#if ($table.isUseVersionNo() && $col.isVersionNo())
+    @Version
+#end
+    public ${col.javaNative} ${col.uncapitalisedJavaName};
+    
+#end
+    // ===================================================================================
+    //                                                                       Foreign Table
+    //                                                                       =============
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignEntityClassName = "${foreignKey.foreignTable.javaName}")
+    /** Foreign property for ${foreignKey.foreignTable.name} table. */
+    @ManyToOne
+#if ($foreignKey.isSimpleKeyFK())
+    @JoinColumn(name="${foreignKey.localColumnNameAsOne}")
+#end
+    public ${foreignEntityClassName} ${foreignKey.foreignPropertyName};
+
+#end
+#foreach ($referrer in $table.referrers)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.table.javaName}")
+#if (${referrer.isOneToOne()})
+    /** Foreign property(referrer-as-one) for ${referrerTable.name} table. */
+    @OneToOne(mappedBy = "${referrer.foreignPropertyName}")
+    public ${referrerEntityClassName} ${referrer.referrerPropertyNameAsOneS2Jdbc};
+
+#end
+#end
+    // ===================================================================================
+    //                                                                      Referrer Table
+    //                                                                      ==============
+#foreach ($referrer in $table.referrers)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.table.javaName}")
+#if (!${referrer.isOneToOne()})
+    /** Referrer property for ${referrerTable.name} table. */
+    @OneToMany(mappedBy = "${referrer.foreignPropertyName}")
+    public java.util.List<${referrerEntityClassName}> ${referrer.referrerPropertyName};
+
+#end
+#end
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+#if ($table.hasPrimaryKey())
+    /**
+     * If the primary-key of the other is same as this one, returns true.
+     * @param other Other entity.
+     * @return Comparing result.
+     */
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof $myClassName)) { return false; }
+        $myClassName otherEntity = ($myClassName)other;
+#foreach ($col in $table.primaryKey)
+        if (!helpComparingValue(${col.uncapitalisedJavaName}, otherEntity.${col.uncapitalisedJavaName})) { return false; }
+#end
+        return true;
+    }
+
+    protected boolean helpComparingValue(Object value1, Object value2) {
+        if (value1 == null && value2 == null) { return true; }
+        return value1 != null && value2 != null && value1.equals(value2);
+    }
+
+    /**
+     * Calculates hash-code from primary-key.
+     * @return Hash-code from primary-key.
+     */
+    public int hashCode() {
+        int result = 17;
+#foreach ($col in $table.primaryKey)
+        if (${col.uncapitalisedJavaName} != null) { result = (31*result) + ${col.uncapitalisedJavaName}.hashCode(); }
+#end
+        return result;
+    }
+#end
+
+    /**
+     * @return The view string of all columns. (NotNull)
+     */
+    public String toString() {
+        String delimiter = ",";
+        StringBuilder sb = new StringBuilder();
+#foreach ($col in $table.columns)
+        sb.append(delimiter).append(${col.uncapitalisedJavaName});
+#end
+        if (sb.length() > 0) { sb.delete(0, delimiter.length()); }
+        sb.insert(0, "{").append("}");
+        return sb.toString();
+    }
+}

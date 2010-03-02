@@ -1,0 +1,160 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
+
+/**
+ * The basic implementation of the auto set-upper of common column.
+ * @author ${database.classAuthor}
+ */
+public class ${glImplementedCommonColumnAutoSetupper} implements CommonColumnAutoSetupper {
+
+    // =====================================================================================
+    //                                                                            Definition
+    //                                                                            ==========
+    /** Log instance. */
+    private static final Log _log = LogFactory.getLog(${glImplementedCommonColumnAutoSetupper}.class);
+#if ($database.isExistCommonColumnSetupElement())
+
+    // =====================================================================================
+    //                                                                             Attribute
+    //                                                                             =========
+#foreach ($resource in $database.commonColumnSetupResourceList)
+    /** The property of ${resource.propertyName}. */
+    protected ${resource.className} ${resource.propertyVariableName};
+
+    /**
+     * @return The value of ${resource.propertyName}.
+     */
+    public ${resource.className} get${resource.propertyNameInitCap}() {
+        return ${resource.propertyVariableName};
+    }
+
+    /**
+     * @param ${resource.propertyName} The value of ${resource.propertyName}.
+     */
+    public void set${resource.propertyNameInitCap}(${resource.className} ${resource.propertyName}) {
+        this.${resource.propertyVariableName} = ${resource.propertyName};
+    }
+
+#end
+    // =====================================================================================
+    //                                                                                Set up
+    //                                                                                ======
+    /**
+     * {@inheritDoc}
+     */
+    public void handleCommonColumnOfInsertIfNeeds(Entity targetEntity) {
+        final ${glEntityDefinedCommonColumn} entity = askIfEntitySetup(targetEntity);
+        if (entity == null) {
+            return;
+        }
+        log(entity, "INSERT");
+#foreach ($columnName in ${database.commonColumnNameList})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($entityCommonColumnMap = ${database.commonColumnMap})
+#set ($columnType = ${entityCommonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeInsertInterceptorLogicMap(${columnName})})
+#set ($logic = ${database.getCommonColumnSetupBeforeInsertInterceptorLogicByColumnName(${columnName})})
+#if ($database.isCommonColumnSetupInvokingLogic($logic))
+#set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+
+        ${filteredLogic}
+#else
+
+        final ${javaNative} ${uncapitalisedJavaName} = ${logic};
+        entity.set${javaName}(${uncapitalisedJavaName});
+#end
+#end
+#end
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void handleCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
+        final ${glEntityDefinedCommonColumn} entity = askIfEntitySetup(targetEntity);
+        if (entity == null) {
+            return;
+        }
+        log(entity, "UPDATE");
+#foreach ($columnName in ${database.commonColumnNameList})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($entityCommonColumnMap = ${database.CommonColumnMap})
+#set ($columnType = ${entityCommonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#if (${database.containsValidColumnNameKeyCommonColumnSetupBeforeUpdateInterceptorLogicMap(${columnName})})
+#set ($logic = ${database.getCommonColumnSetupBeforeUpdateInterceptorLogicByColumnName(${columnName})})
+#if ($database.isCommonColumnSetupInvokingLogic($logic))
+#set ($filteredLogic = $database.removeCommonColumnSetupInvokingMark($logic))
+
+        ${filteredLogic}
+#else
+
+        final ${javaNative} ${uncapitalisedJavaName} = ${logic};
+        entity.set${javaName}(${uncapitalisedJavaName});
+#end
+#end
+#end
+    }
+
+    // =====================================================================================
+    //                                                                         Assist Helper
+    //                                                                         =============
+    protected ${glEntityDefinedCommonColumn} askIfEntitySetup(Entity targetEntity) {
+        if (!hasCommonColumn(targetEntity)) {
+            return null;
+        }
+        final ${glEntityDefinedCommonColumn} entity = downcastEntity(targetEntity);
+        if (!canCommonColumnAutoSetup(entity)) {
+            return null;
+        }
+        return entity;
+    }
+
+    protected boolean hasCommonColumn(Entity targetEntity) {
+        return targetEntity instanceof ${glEntityDefinedCommonColumn};
+    }
+
+    protected boolean canCommonColumnAutoSetup(${glEntityDefinedCommonColumn} entity) {
+        return entity.canCommonColumnAutoSetup();
+    }
+
+    protected ${glEntityDefinedCommonColumn} downcastEntity(Entity targetEntity) {
+        return (${glEntityDefinedCommonColumn})targetEntity;
+    }
+#else
+
+    // =====================================================================================
+    //                                                                                Set up
+    //                                                                                ======
+    /**
+     * {@inheritDoc}
+     */
+    public void handleCommonColumnOfInsertIfNeeds(Entity targetEntity) {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void handleCommonColumnOfUpdateIfNeeds(Entity targetEntity) {
+    }
+#end
+
+    // =====================================================================================
+    //                                                                               Logging
+    //                                                                               =======
+    protected void log(${glEntityDefinedCommonColumn} entity, String keyword) {
+        if (_log.isDebugEnabled()) {
+            _log.debug("...Setting up column columns of " + entity.getTableDbName() + " before " + keyword + "!");
+        }
+    }
+}

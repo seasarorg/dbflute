@@ -1,0 +1,19 @@
+${database.allClassCopyright}package ${myExtendedEntityPackageName};
+#set ($myClassName = "${myExtendedObjectClassName}")
+
+import ${myBaseEntityPackageName}.${myBaseObjectClassName};
+
+/**
+ * The entity of ${table.name}.
+ * <p>
+ * You can implement your original methods here.
+ * This class remains when re-generating.
+ * </p>
+ * @author ${database.classAuthor}
+ */
+@javax.persistence.Entity
+public class ${myClassName} extends ${myBaseObjectClassName} {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+}

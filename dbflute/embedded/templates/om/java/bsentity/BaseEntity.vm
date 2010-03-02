@@ -1,0 +1,641 @@
+${database.allClassCopyright}package ${myBaseEntityPackageName};
+#set ($myClassName = "${myBaseObjectClassName}")
+
+import java.io.Serializable;
+import java.util.*;
+
+import org.seasar.dbflute.dbmeta.DBMeta;
+#if (!$table.hasAllCommonColumn() || $table.hasRelation())
+import org.seasar.dbflute.Entity;
+#end
+#if ($table.hasAllCommonColumn())
+import ${glPackageBaseCommon}.${glEntityDefinedCommonColumn};
+#end
+#if (!$isSql2Entity)
+import ${glPackageBaseCommon}.${glDBMetaInstanceHandler};
+#end
+#if ($table.hasClassification())
+import ${glPackageBaseCommon}.${glCDef};
+#end
+#if ($table.isBuriTarget())
+import ${glPackagePluginBuri}.${glBuriDef};
+#end
+#if ($table.hasRelation())
+import ${myExtendedEntityPackageName}.*;
+#end
+#set ($myEntityInterfaceName = "")
+#if (${table.hasAllCommonColumn()})
+  #set ($myEntityInterfaceName = ${glEntityDefinedCommonColumn})
+#else
+  #set ($myEntityInterfaceName = "Entity")
+#end
+
+/**
+ * The entity of ${table.basicInfoDispString}. <br />
+#if ($table.isCommentForJavaDocValid())
+ * ${table.commentForJavaDoc}
+#end
+ * <pre>
+ * [primary-key]
+ *     ${table.primaryKeyNameCommaString}
+ * 
+ * [column]
+ *     ${table.columnNameCommaString}
+ * 
+ * [sequence]
+ *     ${table.definedSequenceName}
+ * 
+ * [identity]
+ *     ${table.identityColumnName}
+ * 
+ * [version-no]
+ *     ${table.versionNoColumnName}
+ * 
+ * [foreign-table]
+ *     ${table.foreignTableNameCommaString}
+ * 
+ * [referrer-table]
+ *     ${table.referrerTableNameCommaString}
+ * 
+ * [foreign-property]
+ *     ${table.foreignPropertyNameCommaString}
+ * 
+ * [referrer-property]
+ *     ${table.referrerPropertyNameCommaString}
+ * </pre>
+ * @author ${database.classAuthor}
+ */
+public abstract class $myClassName implements ${myEntityInterfaceName}, Serializable {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    // -----------------------------------------------------
+    //                                                Column
+    //                                                ------
+#foreach ($col in $table.columns)
+    /** ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} */
+    protected ${col.javaNative} _${col.uncapitalisedJavaName};
+
+#end
+    // -----------------------------------------------------
+    //                                              Internal
+    //                                              --------
+    /** The modified properties for this entity. */
+    protected EntityModifiedProperties _modifiedProperties = newEntityModifiedProperties();
+#if ($table.hasAllCommonColumn())
+
+    /** Is common column auto set up effective? */
+    protected boolean _canCommonColumnAutoSetup = true;
+#end
+
+    // ===================================================================================
+    //                                                                          Table Name
+    //                                                                          ==========
+    public String getTableDbName() {
+        return "${table.name}";
+    }
+
+    public String getTablePropertyName() { // as JavaBeansRule
+        return "${table.javaBeansRulePropertyName}";
+    }
+
+#if ($isSql2Entity)
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    public DBMeta getDBMeta() {
+        return ${myDBMetaPackageName}.${myDBMetaClassName}.getInstance();
+    }
+
+#else
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    public DBMeta getDBMeta() {
+        return ${glDBMetaInstanceHandler}.findDBMeta(getTableDbName());
+    }
+
+#end
+#if ($table.hasClassification())
+    // ===================================================================================
+    //                                                          Classification Classifying
+    //                                                          ==========================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
+  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+  #set ($existTop = true)
+#end
+    /**
+     * Classify the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+     * $classificationTopMap.get('topComment')
+#end
+     * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
+     */
+    public void classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
+#if ($col.isJavaNativeStringObject())
+        set${col.javaName}(cls != null ? cls.code() : null);
+#elseif ($col.isJavaNativeValueOfAbleObject())
+        set${col.javaName}(cls != null ? ${col.javaNative}.valueOf(cls.code()) : null);
+#else
+        set${col.javaName}(cls != null ? new ${col.javaNative}(cls.code()) : null);
+#end
+    }
+
+#foreach ($classificationMap in $col.classificationMapList)
+    /**
+     * Classify the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    public void classify${col.javaName}${classificationMap.get('name')}() {
+        classify${col.javaName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
+    }
+
+#end
+#end
+#end
+    // ===================================================================================
+    //                                                        Classification Determination
+    //                                                        ============================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
+  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+  #set ($existTop = true)
+#end
+    /**
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+     * $classificationTopMap.get('topComment')
+#end
+     * @return The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
+     */
+    public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
+        return ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
+    }
+
+#foreach ($classificationMap in $col.classificationMapList)
+    /**
+     * Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     * <p>
+     * The difference of capital letters and small letters is NOT distinguished.
+     * If the value is null, this method returns false!
+     * </p>
+     * @return Determination.
+     */
+    public boolean is${col.JavaName}${classificationMap.get('name')}() {
+        ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
+        return cls != null ? cls.equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
+    }
+
+#end
+#end
+#end
+    // ===================================================================================
+    //                                                           Classification Name/Alias
+    //                                                           =========================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
+#if (!$col.isTableClassification())
+#if ($col.hasClassificationName())
+    /**
+     * Get the value of the column '${col.uncapitalisedJavaName}' as classification name.
+     * @return The value of the column '${col.uncapitalisedJavaName}' as classification name. (Nullable)
+     */
+    public String get${col.JavaName}Name() {
+        ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
+        return cls != null ? cls.name() : null;
+    }
+
+#end
+#if (${col.hasClassificationAlias()})
+    /**
+     * Get the value of the column '${col.uncapitalisedJavaName}' as classification alias.
+     * @return The value of the column '${col.uncapitalisedJavaName}' as classification alias. (Nullable)
+     */
+    public String get${col.JavaName}Alias() {
+        ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
+        return cls != null ? cls.alias() : null;
+    }
+
+#end
+#end
+#end
+#end
+#end
+    // ===================================================================================
+    //                                                                    Foreign Property
+    //                                                                    ================
+#set ($foreignKeyIndex = 0)
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignTable = $foreignKey.foreignTable)
+#set ($foreignEntityClassName = "${foreignKey.foreignTableExtendedEntityClassName}")
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+    /** ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'. */
+    protected ${foreignEntityClassName} ${foreignVariableName};
+
+    /**
+     * ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'. {without lazy-load}
+     * @return The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
+     */
+    public ${foreignEntityClassName} get${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() {
+        return ${foreignVariableName};
+    }
+
+    /**
+     * ${foreignTable.aliasExpression}${foreignTable.name} as '${foreignKey.foreignJavaBeansRulePropertyName}'.
+     * @param ${foreignKey.foreignPropertyName} The entity of foreign property '${foreignKey.foreignJavaBeansRulePropertyName}'. (Nullable)
+     */
+    public void set${foreignKey.foreignJavaBeansRulePropertyNameInitCap}(${foreignEntityClassName} ${foreignKey.foreignPropertyName}) {
+        ${foreignVariableName} = ${foreignKey.foreignPropertyName};
+    }
+#if ($database.isMakeEntityChaseRelation())
+
+    public ${foreignEntityClassName} chase${foreignKey.foreignJavaBeansRulePropertyNameInitCap}() {
+        return ${foreignVariableName} != null ? ${foreignVariableName} : new ${foreignEntityClassName}();
+    }
+#end
+
+#set ($foreignKeyIndex = $foreignKeyIndex + 1)
+#end
+#foreach ($referrer in $table.referrers)
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+#if (${referrer.isOneToOne()})
+    /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. */
+    protected ${referrerEntityClassName} ${referrerVariableName};
+
+    /**
+     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. {without lazy-load} <br />
+     * @return the entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable: If the foreign key does not have 'NotNull' constraint, please check null.)
+     */
+    public ${referrerEntityClassName} get${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+        return ${referrerVariableName};
+    }
+
+    /**
+     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyNameAsOne}'.
+     * @param ${referrer.referrerJavaBeansRulePropertyNameAsOne} The entity of foreign property(referrer-as-one) '${referrer.referrerJavaBeansRulePropertyNameAsOne}'. (Nullable)
+     */
+    public void set${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}(${referrerEntityClassName} ${referrer.referrerJavaBeansRulePropertyNameAsOne}) {
+        ${referrerVariableName} = ${referrer.referrerJavaBeansRulePropertyNameAsOne};
+    }
+#if ($database.isMakeEntityChaseRelation())
+
+    public ${referrerEntityClassName} chase${referrer.referrerJavaBeansRulePropertyNameAsOneInitCap}() {
+        return ${referrerVariableName} != null ? ${referrerVariableName} : new ${referrerEntityClassName}();
+    }
+#end
+
+#set ($foreignKeyIndex = $foreignKeyIndex + 1)
+#end
+#end
+    // ===================================================================================
+    //                                                                   Referrer Property
+    //                                                                   =================
+#foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
+#set ($referrerTable = $referrer.table)
+#set ($referrerEntityClassName = "${referrer.referrerTableExtendedEntityClassName}")
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+    /** ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. */
+    protected List<${referrerEntityClassName}> $referrerVariableName;
+
+    /**
+     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'. {without lazy-load} <br />
+     * @return The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (NotNull: If it's not loaded yet, initializes the list instance of referrer as empty and returns it.)
+     */
+    public List<${referrerEntityClassName}> get${referrer.referrerJavaBeansRulePropertyNameInitCap}() {
+        if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
+        return ${referrerVariableName};
+    }
+
+    /**
+     * ${referrerTable.aliasExpression}${referrerTable.name} as '${referrer.referrerJavaBeansRulePropertyName}'.
+     * @param ${referrer.referrerPropertyName} The entity list of referrer property '${referrer.referrerJavaBeansRulePropertyName}'. (Nullable)
+     */
+    public void set${referrer.referrerJavaBeansRulePropertyNameInitCap}(List<${referrerEntityClassName}> ${referrer.referrerPropertyName}) {
+        ${referrerVariableName} = ${referrer.referrerPropertyName};
+    }
+
+#end
+#end
+#if ($table.isBuriTarget() && $database.hasBuriAllRoundStateHistory())
+#foreach ($processName in $table.tableProcessForMethodNameList)
+#set ($referrerEntityClassName = "${glProjectPrefix}BuriAllRoundStateHistory")
+#set ($referrerVariableName = "_buriAllRoundStateHistory_${processName}")
+    protected List<${referrerEntityClassName}> $referrerVariableName;
+
+    public List<${referrerEntityClassName}> getBuriAllRoundStateHistory_${processName}List() {
+        if (${referrerVariableName} == null) { ${referrerVariableName} = new ArrayList<${referrerEntityClassName}>(); }
+        return ${referrerVariableName};
+    }
+
+    public void setBuriAllRoundStateHistory_${processName}List(List<${referrerEntityClassName}> buriAllRoundStateHistory_${processName}) {
+        ${referrerVariableName} = buriAllRoundStateHistory_${processName};
+    }
+
+#end
+#end
+    // ===================================================================================
+    //                                                                       Determination
+    //                                                                       =============
+    public boolean hasPrimaryKeyValue() {
+#foreach ($col in $table.primaryKey)
+        if (_${col.uncapitalisedJavaName} == null) { return false; }
+#end
+        return ${table.hasPrimaryKey()};
+    }
+
+    // ===================================================================================
+    //                                                                 Modified Properties
+    //                                                                 ===================
+    public Set<String> getModifiedPropertyNames() {
+        return _modifiedProperties.getPropertyNames();
+    }
+
+    protected EntityModifiedProperties newEntityModifiedProperties() {
+        return new EntityModifiedProperties();
+    }
+
+    public void clearModifiedPropertyNames() {
+        _modifiedProperties.clear();
+    }
+
+    public boolean hasModification() {
+        return !_modifiedProperties.isEmpty();
+    }
+#if (${table.hasAllCommonColumn()})
+    
+    // ===================================================================================
+    //                                                              Common Column Handling
+    //                                                              ======================
+    /**
+     * Enable common column auto set up. {for after disable because the default is enabled}
+     */
+    public void enableCommonColumnAutoSetup() {
+        _canCommonColumnAutoSetup = true;
+    }
+
+    /**
+     * Disables auto set-up of common columns.
+     */
+    public void disableCommonColumnAutoSetup() {
+        _canCommonColumnAutoSetup = false;
+    }
+    
+    /**
+     * Can the entity set up common column by auto?
+     * @return Determination.
+     */
+    public boolean canCommonColumnAutoSetup() { // for Framework
+        return _canCommonColumnAutoSetup;
+    }
+#end
+#if ($table.isBuriTarget())
+    
+    // ===================================================================================
+    //                                                                      Buri Interface
+    //                                                                      ==============
+#foreach ($processName in $table.tableProcessForMethodNameList)
+    public ${glBuriDef}.${processName}_Status getStatus_${processName}() {
+        if (getBuriAllRoundState_${processName}() == null) { return null; }
+        return ${glBuriDef}.${processName}_Status.codeOf(getBuriAllRoundState_${processName}().getStatusPathName());
+    }
+#end
+#end
+
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    /**
+     * If primary-keys or columns of the other are same as this one, returns true.
+     * @param other The other entity. (Nullable)
+     * @return Comparing result.
+     */
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof $myClassName)) { return false; }
+        $myClassName otherEntity = ($myClassName)other;
+#foreach ($col in $table.equalsHashcodeColumnList)
+        if (!xSV(get${col.javaName}(), otherEntity.get${col.javaName}())) { return false; }
+#end
+        return true;
+    }
+    private boolean xSV(Object value1, Object value2) { // isSameValue()
+        return InternalUtil.isSameValue(value1, value2);
+    }
+
+    /**
+     * Calculates the hash-code from primary-keys or columns.
+     * @return The hash-code from primary-key or columns.
+     */
+    public int hashCode() {
+        int result = 17;
+#foreach ($col in $table.equalsHashcodeColumnList)
+        result = xCH(result, get${col.JavaName}());
+#end
+        return result;
+    }
+    private int xCH(int result, Object value) { // calculateHashcode()
+        return InternalUtil.calculateHashcode(result, value);
+    }
+
+    /**
+     * @return The display string of all columns and relation existences. (NotNull)
+     */
+    public String toString() {
+        return buildDisplayString(getClass().getSimpleName(), true, true);
+    }
+
+    /**
+     * @return The display string of basic informations with one-nested relation values. (NotNull)
+     */
+    public String toStringWithRelation() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(toString());
+#if ($table.hasRelation())
+        String l = "\n  ";
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+        if (${foreignVariableName} != null)
+        { sb.append(l).append(xbRDS(${foreignVariableName}, "${foreignKey.foreignPropertyName}")); }
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+        if (${referrerVariableName} != null)
+        { sb.append(l).append(xbRDS(${referrerVariableName}, "${referrer.referrerPropertyNameAsOne}")); }
+#end
+#end
+#foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+        if (${referrerVariableName} != null) { for (Entity e : ${referrerVariableName})
+        { if (e != null) { sb.append(l).append(xbRDS(e, "${referrer.referrerPropertyName}")); } } }
+#end
+#end
+#end
+        return sb.toString();
+    }
+#if ($table.hasRelation())
+    private String xbRDS(Entity e, String name) { // buildRelationDisplayString()
+        return e.buildDisplayString(name, true, true);
+    }
+#end
+
+    /**
+     * @param name The name for display. (Nullable: If it's null, it does not have a name)
+     * @param column Does it contains column values or not?
+     * @param relation Does it contains relation existences or not?
+     * @return The display string for this entity. (NotNull)
+     */
+    public String buildDisplayString(String name, boolean column, boolean relation) {
+        StringBuilder sb = new StringBuilder();
+        if (name != null) { sb.append(name).append(column || relation ? ":" : ""); }
+        if (column) { sb.append(xbuildColumnString()); }
+        if (relation) { sb.append(xbuildRelationString()); }
+        sb.append("@").append(Integer.toHexString(hashCode()));
+        return sb.toString();
+    }
+    private String xbuildColumnString() {
+        String c = ", ";
+        StringBuilder sb = new StringBuilder();
+#foreach ($col in $table.columns)
+#if ($col.isJavaNativeUtilDate())
+        sb.append(c).append(xfUD(get${col.javaName}()));
+#elseif ($col.isJavaNativeByteArray())
+        sb.append(c).append(xfBA(get${col.javaName}()));
+#else
+        sb.append(c).append(get${col.javaName}());
+#end
+#end
+        if (sb.length() > 0) { sb.delete(0, c.length()); }
+        sb.insert(0, "{").append("}");
+        return sb.toString();
+    }
+#if ($table.hasUtilDateColumn())
+    private String xfUD(Date date) { // formatUtilDate()
+#if ($database.isDatabaseOracle())
+        String pattern = "yyyy-MM-dd HH:mm:ss"; // time parts for Oracle only
+#else
+        String pattern = "yyyy-MM-dd";
+#end
+        return InternalUtil.toString(date, pattern);
+    }
+#end
+#if ($table.hasByteArrayColumn())
+    private String xfBA(byte[] bytes) { // formatByteArray()
+        return InternalUtil.toString(bytes);
+    }
+#end
+    private String xbuildRelationString() {
+#if ($table.hasRelation())
+        StringBuilder sb = new StringBuilder();
+        String c = ",";
+#foreach ($foreignKey in $table.foreignKeys)
+#set ($foreignVariableName = "_${foreignKey.foreignPropertyName}")
+        if (${foreignVariableName} != null) { sb.append(c).append("${foreignKey.foreignPropertyName}"); }
+#end
+#foreach ($referrer in $table.referrers)
+#if (${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyNameAsOne}")
+        if (${referrerVariableName} != null) { sb.append(c).append("${referrer.referrerPropertyNameAsOne}"); }
+#end
+#end
+#foreach ($referrer in $table.referrers)
+#if (!${referrer.isOneToOne()})
+#set ($referrerVariableName = "_${referrer.referrerPropertyName}")
+        if (${referrerVariableName} != null && !${referrerVariableName}.isEmpty())
+        { sb.append(c).append("${referrer.referrerPropertyName}"); }
+#end
+#end
+        if (sb.length() > 0) { sb.delete(0, c.length()).insert(0, "(").append(")"); }
+        return sb.toString();
+#else
+        return "";
+#end
+    }
+
+#set ($propertyLoopIndex = 0)
+#foreach ($col in $table.columns)
+#if ($propertyLoopIndex == 0)
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+#else
+
+#end
+#if ($col.isJavaNativeStringClob())
+    /** The value type annotation. {${col.columnDefinitionLineDisp}} */
+    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "stringClobType";
+
+#end
+#if ($col.isJavaNativeBytesOid())
+    /** The value type annotation. {${col.columnDefinitionLineDisp}} */
+    public static String ${col.javaBeansRulePropertyName}_VALUE_TYPE = "bytesOidType";
+
+#end
+    /**
+     * [get] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+     * @return The value of the column '${col.name}'. (Nullable)
+     */
+    public ${col.JavaNative} get${col.javaName}() {
+        return _${col.uncapitalisedJavaName};
+    }
+
+    /**
+     * [set] ${col.aliasExpression}${col.name}: {${col.columnDefinitionLineDisp}} <br />
+#if ($col.isCommentForJavaDocValid())
+     * ${col.commentForJavaDoc}
+#end
+     * @param ${col.UncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
+     */
+    public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
+        _modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
+        this._${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
+    }
+#set ($propertyLoopIndex = $propertyLoopIndex + 1)
+#end
+#if ($table.hasAllCommonColumn())
+#foreach ($columnName in ${database.commonColumnNameConversionList})
+#set ($filteredColumnName = ${database.filterCommonColumn(${columnName})})
+#set ($commonColumnMap = ${database.commonColumnMap})
+#set ($columnType = ${commonColumnMap.get(${columnName})})
+#set ($javaNative = ${database.convertJavaNativeByJdbcType(${columnType})})
+#set ($javaName = ${database.convertJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($uncapitalisedJavaName = ${database.convertUncapitalisedJavaNameByJdbcNameAsColumn(${filteredColumnName})})
+#set ($targetJavaName = ${table.findTargetColumnJavaNameByCommonColumnName(${columnName})})
+
+    /**
+     * Get the value of the column '${uncapitalisedJavaName}'. <br />
+     * @return The value of the column '${uncapitalisedJavaName}'. (Nullable)
+     */
+    public ${javaNative} get${javaName}() {
+        return get${targetJavaName}();
+    }
+
+    /**
+     * Set the value of the column '${uncapitalisedJavaName}'. <br />
+     * @param ${uncapitalisedJavaName} The value of the column '${uncapitalisedJavaName}'. (Nullable)
+     */
+    public void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
+        set${targetJavaName}(${uncapitalisedJavaName});
+    }
+#end
+#end
+}

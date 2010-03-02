@@ -1,0 +1,188 @@
+
+using System;
+using System.Data;
+using System.Text;
+using System.Collections;
+
+namespace ${glPackageBaseCommonUtil} {
+
+    public class ${glTraceViewUtil} {
+
+        /// <summary>
+        /// Convert to performance view.
+        /// </summary>
+        /// <param name="before">The value of before millisecond. (NotNull)</param>
+        /// <param name="after">The value of after millisecound. (NotNull)</param>
+        /// <returns>Performance view. (ex. 1m23s456ms) (NotNull)</returns>
+        public static String ConvertToPerformanceView(DateTime before, DateTime after) {
+            long beforeMil = 0;
+            {
+                String hour = (before.Hour < 10 ? "0" + before.Hour : "" + before.Hour);
+                String minute = (before.Minute < 10 ? "0" + before.Minute : "" + before.Minute);
+                String secound = (before.Second < 10 ? "0" + before.Second : "" + before.Second);
+                String millisecond = (before.Millisecond < 10 ? "00" + before.Millisecond : (before.Millisecond < 100 ? "0" + before.Millisecond : "" + before.Millisecond));
+                beforeMil = long.Parse(hour + minute + secound + millisecond);
+            }
+            long afterMil = 0;
+            {
+                String hour = (after.Hour < 10 ? "0" + after.Hour : "" + after.Hour);
+                String minute = (after.Minute < 10 ? "0" + after.Minute : "" + after.Minute);
+                String secound = (after.Second < 10 ? "0" + after.Second : "" + after.Second);
+                String millisecond = (after.Millisecond < 10 ? "00" + after.Millisecond : (after.Millisecond < 100 ? "0" + after.Millisecond : "" + after.Millisecond));
+                afterMil = long.Parse(hour + minute + secound + millisecond);
+            }
+            long mil = afterMil - beforeMil;
+            if (mil < 0) {
+                return "minus mil: " + after + "-" + before;
+            }
+
+            long sec = mil / 1000;
+            long min = sec / 60;
+            sec = sec % 60;
+            mil = mil % 1000;
+
+            StringBuilder sb = new StringBuilder();
+            if (min >= 10) { // Minute
+                sb.Append(min).Append("m");
+            } else if (min < 10 && min >= 0) {
+                sb.Append("0").Append(min).Append("m");
+            }
+            if (sec >= 10) { // Secound
+                sb.Append(sec).Append("s");
+            } else if (sec < 10 && sec >= 0) {
+                sb.Append("0").Append(sec).Append("s");
+            }
+            if (mil >= 100) { // Millisecond
+                sb.Append(mil).Append("ms");
+            } else if (mil < 100 && mil >= 10) {
+                sb.Append("0").Append(mil).Append("ms");
+            } else if (mil < 10 && mil >= 0) {
+                sb.Append("00").Append(mil).Append("ms");
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Change object array to string view.
+        /// </summary>
+        /// <param name="objArray">The array of object. (NotNull)</param>
+        /// <returns>The string divided with comma. (NotNull: If the argument is null, returns empty string.)</returns>
+        public static String ConvertObjectArrayToStringView(Object[] objArray) {
+            if (objArray == null) {
+                return "";
+            }
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < objArray.Length; i++) {
+                if (i == 0) {
+                    sb.Append(objArray[i]);
+                } else {
+                    sb.Append(", ").Append(objArray[i]);
+                }
+            }
+            return sb.ToString();
+        }
+        
+        public static string ToStringView(object target) {
+            if (target == null) {
+                return "null";
+            }
+            string ret;
+            if (target is IDictionary) {
+                ret = ToStringView(target as IDictionary);
+            } else if (target is IList) {
+                ret = ToStringView(target as IList);
+            } else if (target is DataSet) {
+                ret = ToStringView(target as DataSet);
+            } else if (target is DataTable) {
+                ret = ToStringView(target as DataTable);
+            } else {
+                ret = target.ToString();
+            }
+            return ret;
+        }
+
+        public static string ToStringView(IDictionary target) {
+            if (target == null) {
+                return "null";
+            }
+
+            StringBuilder buf = new StringBuilder();
+
+            buf.Append("{");
+            foreach (object key in target.Keys) {
+                buf.AppendFormat("{0}={1}, ", ToStringView(key), ToStringView(target[key]));
+            }
+            if (target.Keys.Count > 0) {
+                buf.Length -= 2;
+            }
+            buf.Append("}");
+
+            return buf.ToString();
+        }
+
+        public static string ToStringView(IList target) {
+            if (target == null) {
+                return "null";
+            }
+
+            StringBuilder buf = new StringBuilder();
+            buf.Append("{");
+            foreach (object o in target) {
+                buf.Append(ToStringView(o));
+                buf.Append(", ");
+            }
+            if (target.Count > 0) {
+                buf.Length -= 2;
+            }
+            buf.Append("}");
+
+            return buf.ToString();
+        }
+
+        public static string ToStringView(DataSet target) {
+            if (target == null) {
+                return "null";
+            }
+
+            StringBuilder buf = new StringBuilder();
+
+            foreach (DataTable table in target.Tables) {
+                buf.Append(ToStringView(table));
+                buf.Append(Environment.NewLine);
+            }
+
+            return buf.ToString();
+        }
+
+        public static string ToStringView(DataTable target) {
+            if (target == null) {
+                return "null";
+            }
+
+            StringBuilder buf = new StringBuilder();
+
+            buf.AppendFormat(target.TableName);
+            buf.Append(Environment.NewLine);
+
+            DataRowCollection tableRows = target.Rows;
+            DataColumnCollection tableColumns = target.Columns;
+            for (int ctrRow = 0; ctrRow < tableRows.Count; ctrRow++) {
+                DataRow row = tableRows[ctrRow];
+                buf.AppendFormat("Row #{0}-", ctrRow + 1);
+                buf.Append(Environment.NewLine);
+                object[] rowItems = row.ItemArray;
+
+                for (int ctrColumn = 0; ctrColumn < tableColumns.Count; ctrColumn++) {
+                    DataColumn column = tableColumns[ctrColumn];
+                    buf.AppendFormat("\t{0}: {1}", column.ColumnName, rowItems[ctrColumn]);
+                    buf.Append(Environment.NewLine);
+                }
+            }
+            buf.Append(Environment.NewLine);
+
+            return buf.ToString();
+        }
+        
+    }
+}

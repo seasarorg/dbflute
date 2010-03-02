@@ -1,0 +1,95 @@
+${database.allClassCopyright}package ${myBaseDaoCursorPackageName};
+#set ($myClassName = "${myBaseTypeSafeCursorClassName}")
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.seasar.dbflute.jdbc.ValueType;
+import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
+
+/**
+ * The cursor of ${table.name}.
+ * @author ${database.classAuthor}
+ */
+public class ${myClassName} {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    // -----------------------------------------------------
+    //                                        Column DB Name
+    //                                        --------------
+#foreach ($col in $table.columns)
+    /** DB name of ${col.name}. */
+    public static final String DB_NAME_${col.name} = "$col.name";
+
+#end
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    /** Wrapped result set. */
+    protected ResultSet _rs;
+
+#foreach ($col in $table.columns)
+    protected ValueType _vt${col.javaName} = vt(${col.javaNative}.class);
+#end
+
+    protected ValueType vt(Class<?> type) {
+        return TnValueTypes.getValueType(type);
+    }
+
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
+    public ${myClassName}() {
+    }
+
+    // ===================================================================================
+    //                                                                             Prepare
+    //                                                                             =======
+    /**
+     * Accept result set.
+     * @param rs Result set. (NotNull)
+     */
+    public void accept(ResultSet rs) {
+        this._rs = rs;
+    }
+
+    // ===================================================================================
+    //                                                                              Direct
+    //                                                                              ======
+    /**
+     * Get wrapped result set.
+     * @return Wrapped result set. (NotNull)
+     */
+    public java.sql.ResultSet cursor() {
+        return _rs;
+    }
+
+    // ===================================================================================
+    //                                                                            Delegate
+    //                                                                            ========
+    /**
+     * Move to next result.
+     * @return Is exist next result.
+     * @throws java.sql.SQLException
+     */
+    public boolean next() throws SQLException {
+        return _rs.next();
+    }
+
+    // ===================================================================================
+    //                                                                  Type Safe Accessor
+    //                                                                  ==================
+#foreach ($col in $table.columns)
+    /**
+     * Get the value of ${col.uncapitalisedJavaName}.
+     * @return The value of ${col.uncapitalisedJavaName}. (Nullable)
+     * @throws java.sql.SQLException
+     */
+    public ${col.javaNative} get${col.javaName}() throws SQLException {
+        return (${col.javaNative})_vt${col.javaName}.getValue(_rs, DB_NAME_${col.name});
+    }
+
+#end
+}

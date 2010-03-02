@@ -1,0 +1,197 @@
+#set ($myClassName = "${glDBMetaInstanceHandler}")
+#set ($instanceMapGenericDefinition = "String, ${glDBMeta}")
+
+using System;
+using System.Reflection;
+
+using ${glPackageBaseCommonJavaLike};
+using ${glPackageBaseCommonUtil};
+
+namespace ${glPackageBaseCommonDBMeta} {
+
+    public class ${myClassName} {
+
+        // ===============================================================================
+        //                                                                    Resource Map
+        //                                                                    ============
+        protected static readonly Map<String, ${glDBMeta}> _tableDbNameInstanceMap = new HashMap<String, ${glDBMeta}>();
+        protected static readonly Map<String, String> _tableDbNameClassNameMap;
+        protected static readonly Map<String, String> _tableDbNamePropertyNameKeyToLowerMap;
+        protected static readonly Map<String, String> _tablePropertyNameDbNameKeyToLowerMap;
+
+        static ${myClassName}() {
+            {
+                Map<String, String> tmpMap = new HashMap<String, String>();
+#foreach ($table in $database.tables)
+                tmpMap.put("${table.name}", "${glPackageBaseDBMeta}.${glProjectPrefix}${table.JavaName}Dbm");
+#end
+                _tableDbNameClassNameMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
+            }
+
+            {
+                Map<String, String> tmpMap = new HashMap<String, String>();
+#foreach ($table in $database.tables)
+                tmpMap.put("${table.name}".ToLower(), "${table.javaBeansRulePropertyName}");
+#end
+                _tableDbNamePropertyNameKeyToLowerMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
+            }
+
+            {
+                Map<String, String> tmpMap = new HashMap<String, String>();
+#foreach ($table in $database.tables)
+                tmpMap.put("${table.javaName}".ToLower(), "${table.name}");
+#end
+                _tablePropertyNameDbNameKeyToLowerMap = tmpMap;//java.util.Collections.unmodifiableMap(tmpMap);
+            }
+        }
+
+        protected static ${glDBMeta} GetDBMeta(String className) {
+			Type clazz = ForName(className, AppDomain.CurrentDomain.GetAssemblies());
+            if (clazz == null) {
+                String msg = "The className was not found: " + className + " assemblys=";
+                msg = msg + Seasar.Framework.Util.ToStringUtil.ToString(AppDomain.CurrentDomain.GetAssemblies());
+                throw new SystemException(msg);
+            }
+            System.Reflection.MethodInfo method = clazz.GetMethod("GetInstance");
+            return (${glDBMeta})method.Invoke(null, null);
+        }
+
+        protected static Type ForName(string className, Assembly[] assemblys) {
+            Type type = Type.GetType(className);
+            if(type != null) return type;
+            foreach(Assembly assembly in assemblys) {
+                type = assembly.GetType(className);
+                if(type != null) return type;
+            }
+            return type;
+        }
+
+        // Returns the unmodifiable map that contains all instances of DB meta. (NotNull & NotEmpty)
+        public static Map<String, ${glDBMeta}> GetUnmodifiableDBMetaMap() {
+            InitializeDBMetaMap();
+            lock (_tableDbNameInstanceMap) {
+                Map<String, ${glDBMeta}> copiedMap = new HashMap<String, ${glDBMeta}>();
+                foreach (String tableDbName in _tableDbNameInstanceMap.keySet()) {
+                    copiedMap.put(tableDbName, _tableDbNameInstanceMap.get(tableDbName));
+                }
+                return copiedMap;
+            }
+        }
+
+        protected static void InitializeDBMetaMap() {
+            if (IsInitialized) {
+                return;
+            }
+            lock (_tableDbNameInstanceMap) {
+                Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
+                foreach (String tableDbName in tableDbNameSet) {
+                    FindDBMeta(tableDbName); // Initialize!
+                }
+                if (!IsInitialized) {
+                    String msg = "Failed to initialize tableDbNameInstanceMap:";
+                    msg = msg + " tableDbNameInstanceMap=" + _tableDbNameInstanceMap;
+                    throw new IllegalStateException(msg);
+                }
+            }
+        }
+
+        protected static bool IsInitialized { get {
+            return _tableDbNameInstanceMap.size() == _tableDbNameClassNameMap.size();
+        }}
+
+        // ===============================================================================
+        //                                                                     Find DBMeta
+        //                                                                     ===========
+        /// <summary>
+        /// Find dbmeta by table flexible-name.
+        /// <![CDATA[
+        /// If the table name is 'ORDER_DETAIL', you can find the dbmeta by ...(as follows)
+        ///     'ORDER_DETAIL', 'ORDer_DeTAiL', 'order_detail'
+        ///   , 'OrderDetail', 'orderdetail', 'oRderDetaIl'
+        /// ]]>
+        /// </summary>
+        /// <param name="tableFlexibleName">Table flexible-name. (NotNull and NotEmpty)</param>
+        /// <returns>DBMeta. (NotNull)</returns>
+        public static ${glDBMeta} FindDBMeta(String tableFlexibleName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
+            if (_tableDbNameInstanceMap.containsKey(tableFlexibleName)) {
+                return ByTableDbName(tableFlexibleName);
+            }
+            String toLowerKey = tableFlexibleName.ToLower();
+            if (_tableDbNamePropertyNameKeyToLowerMap.containsKey(toLowerKey)) {
+                String propertyName = (String)_tableDbNamePropertyNameKeyToLowerMap.get(toLowerKey);
+                String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(propertyName.ToLower());
+                return ByTableDbName(dbName);
+            }
+            if (_tablePropertyNameDbNameKeyToLowerMap.containsKey(toLowerKey)) {
+                String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(toLowerKey);
+                return ByTableDbName(dbName);
+            }
+            int dotLastIndex = tableFlexibleName.LastIndexOf(".");
+            if (dotLastIndex >= 0) {
+                try {
+                    return FindDBMeta(tableFlexibleName.Substring(dotLastIndex + 1));
+                } catch (DBMetaNotFoundException) {
+                    // Nothing
+                }
+            }
+            String msg = "The instance map returned null by the key: key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
+            throw new DBMetaNotFoundException(msg);
+        }
+
+        // ===============================================================================
+        //                                                                   By Table Name
+        //                                                                   =============
+        protected static ${glDBMeta} ByTableDbName(String tableDbName) {
+            AssertObjectNotNull("tableDbName", tableDbName);
+            try {
+                return GetCachedDBMeta(tableDbName);
+            } catch (System.Collections.Generic.KeyNotFoundException e) {
+                String msg = "The tableDbNameInstanceMap didn't contain the key of '" + tableDbName + "': ";
+                throw new ArgumentOutOfRangeException(msg + _tableDbNameInstanceMap, e);
+            }
+        }
+
+        // ===============================================================================
+        //                                                                   Cached DBMeta
+        //                                                                   =============
+        protected static ${glDBMeta} GetCachedDBMeta(String tableName) { // For lazy-load! Thank you koyak!
+            ${glDBMeta} dbmeta = _tableDbNameInstanceMap.get(tableName);
+            if (dbmeta != null) {
+                return dbmeta;
+            }
+            lock (_tableDbNameInstanceMap) {
+                dbmeta = _tableDbNameInstanceMap.get(tableName);
+                if (dbmeta != null) {
+                    return dbmeta;
+                }
+                String entityName = _tableDbNameClassNameMap.get(tableName);
+                _tableDbNameInstanceMap.put(tableName, GetDBMeta(entityName));
+                return _tableDbNameInstanceMap.get(tableName);
+            }
+        }
+
+        // ===============================================================================
+        //                                                                  General Helper
+        //                                                                  ==============
+        // -------------------------------------------------
+        //                                     Assert Object
+        //                                     -------------
+        protected static void AssertObjectNotNull(String variableName, Object value) {
+		    ${glSimpleAssertUtil}.AssertObjectNotNull(variableName, value);
+        }
+
+        // -------------------------------------------------
+        //                                     Assert String
+        //                                     -------------
+        protected static void AssertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+            ${glSimpleAssertUtil}.AssertStringNotNullAndNotTrimmedEmpty(variableName, value);
+        }
+    }
+
+    public class DBMetaNotFoundException : SystemException {
+
+        public DBMetaNotFoundException(String msg)
+        : base(msg) {}
+    }
+}

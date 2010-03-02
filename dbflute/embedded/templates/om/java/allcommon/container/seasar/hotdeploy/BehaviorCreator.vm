@@ -1,0 +1,25 @@
+${database.allClassCopyright}package ${glPackageBaseCommonS2Container};
+
+import org.seasar.framework.container.ComponentCustomizer;
+import org.seasar.framework.container.creator.ComponentCreatorImpl;
+import org.seasar.framework.container.deployer.InstanceDefFactory;
+import org.seasar.framework.convention.NamingConvention;
+
+public class ${glBehaviorCreator} extends ComponentCreatorImpl {
+
+    public ${glBehaviorCreator}(NamingConvention namingConvention) {
+        super(namingConvention);
+        setNameSuffix("Bhv");
+        setInstanceDef(InstanceDefFactory.SINGLETON);
+        setEnableInterface(false);
+        setEnableAbstract(false);
+    }
+
+    public ComponentCustomizer getBehaviorCustomizer() {
+        return getCustomizer();
+    }
+
+    public void setBehaviorCustomizer(ComponentCustomizer customizer) {
+        setCustomizer(customizer);
+    }
+}

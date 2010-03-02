@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans
+    PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd"
+>
+<beans>
+    <!-- The components of DBFlute Runtime. -->
+    <bean class="${glPackageBaseCommon}.${glDBFluteInitializer}">
+        <constructor-arg index="0"><ref bean="${database.DBFluteBeansDataSourceName}"/></constructor-arg>
+    </bean>
+#if ($database.hasExtendedImplementedInvokerAssistantClass())
+    <bean id="${database.invokerAssistantComponentName}" class="${database.extendedImplementedInvokerAssistantClass}" autowire="byType">
+#else
+    <bean id="${database.invokerAssistantComponentName}" class="${glPackageBaseCommon}.${glImplementedInvokerAssistant}" autowire="byType">
+#end
+        <property name="dataSource"><ref bean="${database.DBFluteBeansDataSourceName}"/></property>
+        <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
+    </bean>
+#if ($database.hasExtendedImplementedCommonColumnAutoSetupperClass())
+    <bean id="${database.commonColumnAutoSetupperComponentName}" class="${database.extendedImplementedCommonColumnAutoSetupperClass}" autowire="byType"/>
+#else
+    <bean id="${database.commonColumnAutoSetupperComponentName}" class="${glPackageBaseCommon}.${glImplementedCommonColumnAutoSetupper}" autowire="byType"/>
+#end
+    <bean id="${database.behaviorSelectorComponentName}" class="${glPackageBaseCommon}.${glImplementedBehaviorSelector}" autowire="byType"/>
+    <bean id="${database.behaviorCommandInvokerComponentName}" class="org.seasar.dbflute.bhv.core.BehaviorCommandInvoker" autowire="byType">
+        <property name="invokerAssistant"><ref bean="${database.invokerAssistantComponentName}"/></property>
+    </bean>
+
+    <!-- The components of Behavior. -->
+#foreach ($table in $database.tables)
+	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorFullClassName}" autowire="byType">
+        <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
+        <property name="behaviorSelector"><ref bean="${database.behaviorSelectorComponentName}"/></property>
+#if ($table.isWritable())
+        <property name="commonColumnAutoSetupper"><ref bean="${database.commonColumnAutoSetupperComponentName}"/></property>
+#end
+    </bean>
+#end
+</beans>

@@ -1,0 +1,91 @@
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+
+using Seasar.Framework.Util;
+using Seasar.Extension.ADO;
+using Seasar.Dao;
+
+namespace ${glPackageBaseCommonS2DaoInternalRsHandler} {
+
+    public abstract class ${glInternalAbstractBeanMetaDataResultSetHandler} : IDataReaderHandler {
+
+        // ===============================================================================
+        //                                                                       Attribute
+        //                                                                       =========
+        private readonly IBeanMetaData _beanMetaData;
+        private string[] _clearModifiedOnlyPropertyNamePrefixes = new string[] { "Clear" }; // [DAONET-57] 2007/10/02
+        protected IRowCreator _rowCreator; // [DAONET-56] (2007/08/29)
+        protected IRelationRowCreator _relationRowCreator; // [DAONET-56] (2007/08/29)
+
+        // ===============================================================================
+        //                                                                     Constructor
+        //                                                                     ===========
+        public ${glInternalAbstractBeanMetaDataResultSetHandler}(IBeanMetaData beanMetaData, IRowCreator rowCreator, IRelationRowCreator relationRowCreator) {
+            _beanMetaData = beanMetaData;
+            _rowCreator = rowCreator;
+            _relationRowCreator = relationRowCreator;
+        }
+
+        // ===============================================================================
+        //                                                                          Handle
+        //                                                                          ======
+        public virtual Object Handle(IDataReader dataReader) {
+            return null;
+        }
+
+        // ===============================================================================
+        //                                                                   Assist Helper
+        //                                                                   =============
+        protected virtual IColumnMetaData[] CreateColumnMetaData(System.Collections.IList columnNames) {
+            return _rowCreator.CreateColumnMetaData(columnNames, _beanMetaData);
+        }
+
+        protected virtual Object CreateRow(IDataReader reader, IColumnMetaData[] columns) {
+            return _rowCreator.CreateRow(reader, columns, _beanMetaData.BeanType);
+        }
+
+        protected virtual IDictionary<string, IDictionary<string, IPropertyType>> CreateRelationPropertyCache(System.Collections.IList columnNames) {
+            return _relationRowCreator.CreateRelationPropertyCache(columnNames, _beanMetaData);
+        }
+
+        protected virtual Object CreateRelationRow(IDataReader reader, IRelationPropertyType rpt,
+            System.Collections.IList columnNames, System.Collections.Hashtable relKeyValues,
+            IDictionary<String, IDictionary<String, IPropertyType>> relationColumnMetaDataCache) {
+            return _relationRowCreator.CreateRelationRow(reader, rpt, columnNames, relKeyValues, relationColumnMetaDataCache);
+        }
+
+        protected virtual bool IsTargetProperty(IPropertyType pt) { // [DAONET-56] (2007/08/29)
+            return pt.PropertyInfo.CanWrite;
+        }
+
+        protected virtual Object CreateRelationRow(IRelationPropertyType rpt) {
+            return ClassUtil.NewInstance(rpt.PropertyInfo.PropertyType);
+        }
+
+        protected virtual System.Collections.IList CreateColumnNames(DataTable dt) {
+            System.Collections.IList columnNames = new CaseInsentiveSet();
+            foreach (DataRow row in dt.Rows) {
+                string columnName = (string) row["ColumnName"];
+                columnNames.Add(columnName);
+            }
+            return columnNames;
+        }
+
+        protected virtual void PostCreateRow(Object row, IBeanMetaData bmd) {
+            if (row is ${glEntity}) { // DBFlute Target
+                ((${glEntity})row).ClearModifiedPropertyNames();
+            } else { // Basically Unreachable
+                bmd.ClearModifiedPropertyNames(row);
+            }
+        }
+
+        // ===============================================================================
+        //                                                                        Accessor
+        //                                                                        ========
+        public IBeanMetaData BeanMetaData {
+            get { return _beanMetaData; }
+        }
+    }
+}
