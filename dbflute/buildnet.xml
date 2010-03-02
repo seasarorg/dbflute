@@ -106,10 +106,10 @@
 			<format property="now.date" pattern="yyyy-MM-dd HH:mm:ss.SSS" />
 		</tstamp>
 		
-		<delete file="etc/mark/product-is-dbflute.net-${version}"/>
+		<delete file="${dbflute.embedded}/mark/product-is-dbflute.net-${version}"/>
 		<copy overwrite="true"
-			  file="etc/mark/product-is-dbflute.net"
-			  tofile="etc/mark/product-is-dbflute.net-${version}">
+			  file="${dbflute.embedded}/mark/product-is-dbflute.net"
+			  tofile="${dbflute.embedded}/mark/product-is-dbflute.net-${version}">
 			<filterset>
 				<filter token="version" value="${internal.version}" />
 				<filter token="datetime" value="${now.date}" />

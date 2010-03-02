@@ -1,8 +1,7 @@
 cd ..
-ant -f build.xml reflect-mac-others
-cd dist
+ant -f build.xml reflect-to-others
 
-cd ../../dbflute-spring-example/dbflute_exampledb
+cd ../dbflute-spring-example/dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
