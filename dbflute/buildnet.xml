@@ -13,7 +13,7 @@
 	<property name="workspace.base" value=".."/>
 	<property name="dist" value="dist/net"/>
 	<property name="embedded" value="embedded"/>
-	<property name="extraction.dir" value="${dist}/net/extraction"/>
+	<property name="extraction.dir" value="${dist}/extraction"/>
 	<property name="stage.dir" value="${workspace.base}/dfnet-www/download"/>
 
 	<!-- Jar Files -->
