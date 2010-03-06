@@ -683,6 +683,7 @@ public final class DfTypeUtil {
     }
 
     protected static String filterDateStringValueFlexibly(final String pureValue, boolean includeMilli) {
+        final String dateLiteralPrefix = "date ";
         final String bcSymbolPrefix = "-";
         final String adLatinPrefix = "AD";
         final String adLatinDotPrefix = "A.D.";
@@ -694,6 +695,12 @@ public final class DfTypeUtil {
         final String timeMilliDlm = ".";
         String value = pureValue;
         value = value.trim();
+
+        final boolean dateLiteral = value.startsWith(dateLiteralPrefix);
+        if (dateLiteral) {
+            value = value.substring(dateLiteralPrefix.length());
+            value = value.trim();
+        }
 
         // handling AD/BC prefix
         final boolean bc;
@@ -716,13 +723,14 @@ public final class DfTypeUtil {
             } else {
                 bc = false;
             }
+            value = value.trim();
         }
 
         // handling slash delimiter for yyyyMMdd
         value = value.replaceAll("/", dateDlm);
 
-        // handling '20090119' and '8631230' and so on
-        if (value.length() <= 8 && !value.contains(dateDlm)) {
+        // handling 'date 20090119' and 'date 8631230' and so on
+        if (dateLiteral && value.length() <= 8 && !value.contains(dateDlm)) {
             if (value.length() >= 5) {
                 value = resolveDateElementZeroPrefix(value, 8 - value.length());
                 final String yyyy = value.substring(0, 4);
