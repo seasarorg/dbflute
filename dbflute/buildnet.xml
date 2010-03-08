@@ -188,7 +188,7 @@
 
 	<target name="reflect-to-asp.net" depends="deploy-dist" description="==> reflect to asp.net example">
 		<copy todir="${asp.net.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
-		<replace file="${asp.net.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${asp.net.example.dir}/dbflute_dfnetexdb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${asp.net.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
