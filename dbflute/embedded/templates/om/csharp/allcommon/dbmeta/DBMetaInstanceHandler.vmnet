@@ -173,7 +173,7 @@ namespace ${glPackageBaseCommonDBMeta} {
                     return dbmeta;
                 }
                 String entityName = _tableDbNameClassNameMap.get(tableDbName);
-                _tableDbNameInstanceMap.put(tableName, GetDBMeta(entityName));
+                _tableDbNameInstanceMap.put(tableDbName, GetDBMeta(entityName));
                 return _tableDbNameInstanceMap.get(tableDbName);
             }
         }
