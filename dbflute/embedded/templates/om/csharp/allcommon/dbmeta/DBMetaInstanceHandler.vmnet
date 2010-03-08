@@ -102,18 +102,23 @@ namespace ${glPackageBaseCommonDBMeta} {
         // ===============================================================================
         //                                                                     Find DBMeta
         //                                                                     ===========
-        /// <summary>
-        /// Find dbmeta by table flexible-name.
-        /// <![CDATA[
-        /// If the table name is 'ORDER_DETAIL', you can find the dbmeta by ...(as follows)
-        ///     'ORDER_DETAIL', 'ORDer_DeTAiL', 'order_detail'
-        ///   , 'OrderDetail', 'orderdetail', 'oRderDetaIl'
-        /// ]]>
-        /// </summary>
-        /// <param name="tableFlexibleName">Table flexible-name. (NotNull and NotEmpty)</param>
-        /// <returns>DBMeta. (NotNull)</returns>
-        public static ${glDBMeta} FindDBMeta(String tableFlexibleName) {
+        public static ${glDBMeta} FindDBMeta(String tableFlexibleName) { // accept quoted name and schema prefix
+            ${glDBMeta} dbmeta = ByTableFlexibleName(tableFlexibleName);
+            if (dbmeta == null) {
+                String msg = "The DB meta was not found by the table flexible name: " + tableFlexibleName;
+                msg = msg + " key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
+                throw new DBMetaNotFoundException(msg);
+            }
+            return dbmeta;
+        }
+
+        // ===============================================================================
+        //                                                                   By Table Name
+        //                                                                   =============
+        protected static ${glDBMeta} ByTableFlexibleName(String tableFlexibleName) {
             AssertStringNotNullAndNotTrimmedEmpty("tableFlexibleName", tableFlexibleName);
+            tableFlexibleName = RemoveSchemaIfExists(tableFlexibleName);
+            tableFlexibleName = RemoveQuoteIfExists(tableFlexibleName);
             if (_tableDbNameInstanceMap.containsKey(tableFlexibleName)) {
                 return ByTableDbName(tableFlexibleName);
             }
@@ -127,47 +132,49 @@ namespace ${glPackageBaseCommonDBMeta} {
                 String dbName = (String)_tablePropertyNameDbNameKeyToLowerMap.get(toLowerKey);
                 return ByTableDbName(dbName);
             }
-            int dotLastIndex = tableFlexibleName.LastIndexOf(".");
-            if (dotLastIndex >= 0) {
-                try {
-                    return FindDBMeta(tableFlexibleName.Substring(dotLastIndex + 1));
-                } catch (DBMetaNotFoundException) {
-                    // Nothing
-                }
-            }
-            String msg = "The instance map returned null by the key: key=" + tableFlexibleName + " instanceMap=" + _tableDbNameInstanceMap;
-            throw new DBMetaNotFoundException(msg);
+            return null;
         }
 
-        // ===============================================================================
-        //                                                                   By Table Name
-        //                                                                   =============
-        protected static ${glDBMeta} ByTableDbName(String tableDbName) {
-            AssertObjectNotNull("tableDbName", tableDbName);
-            try {
-                return GetCachedDBMeta(tableDbName);
-            } catch (System.Collections.Generic.KeyNotFoundException e) {
-                String msg = "The tableDbNameInstanceMap didn't contain the key of '" + tableDbName + "': ";
-                throw new ArgumentOutOfRangeException(msg + _tableDbNameInstanceMap, e);
+        protected static String RemoveSchemaIfExists(String name) {
+            int dotLastIndex = name.LastIndexOf(".");
+            if (dotLastIndex >= 0) {
+                name = name.Substring(dotLastIndex + 1);
             }
+            return name;
+        }
+
+        protected static String RemoveQuoteIfExists(String name) {
+            if (name.StartsWith("\"") && name.EndsWith("\"")) {
+                name = name.Substring(1);
+                name = name.Substring(0, name.Length - 1);
+            } else if (name.StartsWith("[") && name.EndsWith("]")) {
+                name = name.Substring(1);
+                name = name.Substring(0, name.Length - 1);
+            }
+            return name;
+        }
+
+        protected static ${glDBMeta} ByTableDbName(String tableDbName) {
+            AssertStringNotNullAndNotTrimmedEmpty("tableDbName", tableDbName);
+            return GetCachedDBMeta(tableDbName);
         }
 
         // ===============================================================================
         //                                                                   Cached DBMeta
         //                                                                   =============
-        protected static ${glDBMeta} GetCachedDBMeta(String tableName) { // For lazy-load! Thank you koyak!
-            ${glDBMeta} dbmeta = _tableDbNameInstanceMap.get(tableName);
+        protected static ${glDBMeta} GetCachedDBMeta(String tableDbName) { // lazy-load (thank you koyak!)
+            ${glDBMeta} dbmeta = _tableDbNameInstanceMap.get(tableDbName);
             if (dbmeta != null) {
                 return dbmeta;
             }
             lock (_tableDbNameInstanceMap) {
-                dbmeta = _tableDbNameInstanceMap.get(tableName);
+                dbmeta = _tableDbNameInstanceMap.get(tableDbName);
                 if (dbmeta != null) {
                     return dbmeta;
                 }
-                String entityName = _tableDbNameClassNameMap.get(tableName);
+                String entityName = _tableDbNameClassNameMap.get(tableDbName);
                 _tableDbNameInstanceMap.put(tableName, GetDBMeta(entityName));
-                return _tableDbNameInstanceMap.get(tableName);
+                return _tableDbNameInstanceMap.get(tableDbName);
             }
         }
 
