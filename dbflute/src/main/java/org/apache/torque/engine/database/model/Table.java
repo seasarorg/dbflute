@@ -490,7 +490,7 @@ public class Table {
             beginQuote = "[";
             endQuote = "]";
         } else {
-            beginQuote = "\"";
+            beginQuote = "\\\"";
             endQuote = beginQuote;
         }
         return beginQuote + tableName + endQuote;
