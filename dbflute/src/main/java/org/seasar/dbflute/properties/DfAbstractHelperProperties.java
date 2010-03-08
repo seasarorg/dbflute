@@ -12,6 +12,7 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.config.DfEnvironmentType;
+import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.scmconn.DfCurrentSchemaConnector;
 import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
@@ -554,6 +555,25 @@ public abstract class DfAbstractHelperProperties {
             final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(schema, getBasicProperties());
             connector.connectSchema(conn);
         }
+    }
+
+    protected String castToString(Object obj, String property) {
+        if (!(obj instanceof String)) {
+            String msg = "The type of the property '" + property + "' should be String:";
+            msg = msg + " obj=" + obj + " type=" + (obj != null ? obj.getClass() : null);
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        return (String) obj;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <ELEMENT> List<ELEMENT> castToList(Object obj, String property) {
+        if (!(obj instanceof List<?>)) {
+            String msg = "The type of the property '" + property + "' should be List:";
+            msg = msg + " obj=" + obj + " type=" + (obj != null ? obj.getClass() : null);
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        return (List<ELEMENT>) obj;
     }
 
     // ===============================================================================

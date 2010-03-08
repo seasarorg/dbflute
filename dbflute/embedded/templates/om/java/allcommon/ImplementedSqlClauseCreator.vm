@@ -17,8 +17,8 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 	 * @return SQL clause. (NotNull)
 	 */
     public SqlClause createSqlClause(ConditionBean cb) {
-        final String tableSqlName = cb.getTableSqlName();
-		final SqlClause sqlClause = createSqlClause(tableSqlName);
+        String tableDbName = cb.getTableDbName();
+		SqlClause sqlClause = createSqlClause(tableDbName);
         return sqlClause;
     }
 

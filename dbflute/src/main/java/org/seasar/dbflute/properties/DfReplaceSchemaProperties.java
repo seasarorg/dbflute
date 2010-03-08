@@ -394,28 +394,6 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
-    protected String castToString(Object obj, String property) {
-        if (!(obj instanceof String)) {
-            String msg = "The type of the property '" + property + "' should be String:";
-            msg = msg + " obj=" + obj + " type=" + (obj != null ? obj.getClass() : null);
-            throw new DfIllegalPropertyTypeException(msg);
-        }
-        return (String) obj;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <ELEMENT> List<ELEMENT> castToList(Object obj, String property) {
-        if (!(obj instanceof List<?>)) {
-            String msg = "The type of the property '" + property + "' should be List:";
-            msg = msg + " obj=" + obj + " type=" + (obj != null ? obj.getClass() : null);
-            throw new DfIllegalPropertyTypeException(msg);
-        }
-        return (List<ELEMENT>) obj;
-    }
-
-    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String replaceString(String text, String fromText, String toText) {

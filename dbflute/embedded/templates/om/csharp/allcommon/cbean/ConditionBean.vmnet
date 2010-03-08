@@ -12,7 +12,6 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                      Table Name
         //                                                                      ==========
         String TableDbName { get; }
-        String TableSqlName { get; }
 
         // ===============================================================================
         //                                                                       SqlClause

@@ -35,7 +35,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     }
 
     /** The flexible map of table DB name. This is for conversion at finding. */
-    protected static final Map<String, String> _tableDbNameFlexibleMap = StringKeyMap.createAsFlexibleConcurrent();
+    protected static final Map<String, String> _tableDbNameFlexibleMap = StringKeyMap.createAsFlexible();
     static {
         final Set<String> tableDbNameSet = _tableDbNameClassNameMap.keySet();
         for (String tableDbName : tableDbNameSet) {
@@ -134,7 +134,7 @@ public class ${glDBMetaInstanceHandler} implements DBMetaProvider {
     // ===================================================================================
     //                                                                       Cached DBMeta
     //                                                                       =============
-    protected static DBMeta getCachedDBMeta(String tableName) { // For lazy-load! Thank you koyak!
+    protected static DBMeta getCachedDBMeta(String tableName) { // lazy-load (thank you koyak!)
         DBMeta dbmeta = _tableDbNameInstanceMap.get(tableName);
         if (dbmeta != null) {
             return dbmeta;

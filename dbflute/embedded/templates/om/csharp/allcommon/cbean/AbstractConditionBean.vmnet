@@ -36,14 +36,14 @@ namespace ${glPackageBaseCommonCBean} {
         //                                                                     Constructor
         //                                                                     ===========
         public ${myClassName}() {
-            _sqlClause = new ${glSqlClause}${database.generateDbName}(TableSqlName);
+            ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(TableDbName);
+            _sqlClause = new ${glSqlClause}${database.generateDbName}(dbmeta.TableSqlName);
         }
 
         // ===============================================================================
         //                                                                      Table Name
         //                                                                      ==========
         public abstract String TableDbName { get; }
-        public abstract String TableSqlName { get; }
 
         // ===============================================================================
         //                                                                       SqlClause

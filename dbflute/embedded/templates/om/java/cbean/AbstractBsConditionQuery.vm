@@ -44,11 +44,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     //                                                                          Table Name
     //                                                                          ==========
     public String getTableDbName() {
-        return "${table.Name}";
-    }
-    
-    public String getTableSqlName() {
-        return "${table.tableSqlName}";
+        return "${table.name}";
     }
 
     // ===================================================================================

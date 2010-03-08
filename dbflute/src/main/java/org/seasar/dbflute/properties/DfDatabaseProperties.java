@@ -22,6 +22,7 @@ import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
  * @author jflute
  */
 public final class DfDatabaseProperties extends DfAbstractHelperProperties {
+
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========

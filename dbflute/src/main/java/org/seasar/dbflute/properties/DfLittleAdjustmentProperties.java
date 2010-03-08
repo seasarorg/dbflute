@@ -1,7 +1,12 @@
 package org.seasar.dbflute.properties;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+
+import org.seasar.dbflute.helper.StringSet;
 
 /**
  * @author jflute
@@ -126,6 +131,30 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public String getShortCharHandlingModeCode() { // It's closet!
         return getShortCharHandlingMode().substring(0, 1);
+    }
+
+    // ===================================================================================
+    //                                                                               Quote
+    //                                                                               =====
+    protected Set<String> _quoteTableNameSet;
+
+    protected Set<String> getQuoteTableNameSet() {
+        if (_quoteTableNameSet != null) {
+            return _quoteTableNameSet;
+        }
+        final Map<String, Object> littleAdjustmentMap = getLittleAdjustmentMap();
+        final Object obj = littleAdjustmentMap.get("quoteTableNameList");
+        if (obj == null) {
+            return new HashSet<String>();
+        }
+        final List<String> list = castToList(obj, "littleAdjustmentMap.quoteTableNameList");
+        _quoteTableNameSet = StringSet.createAsFlexible();
+        _quoteTableNameSet.addAll(list);
+        return _quoteTableNameSet;
+    }
+
+    public boolean isQuoteTable(String tableName) {
+        return getQuoteTableNameSet().contains(tableName);
     }
 
     // ===================================================================================

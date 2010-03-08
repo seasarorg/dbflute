@@ -81,6 +81,7 @@ import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -462,19 +463,37 @@ public class Table {
     }
 
     /**
-     * Get table SQL-name.
-     * @return Table SQL-name. (NotNull)
+     * Get table SQL name.
+     * @return Table SQL name. (NotNull)
      */
     public String getTableSqlName() {
+        final String tableName = quoteTableNameIfNeeds(_name);
         if (isAvailableAddingSchemaToTableSqlName()) {
             if (_schema != null && _schema.trim().length() > 0) {
-                return _schema + "." + _name;
+                return _schema + "." + tableName;
             }
         }
         if (isAdditionalSchema()) { // for resolving additional schema
-            return _schema + "." + _name;
+            return _schema + "." + tableName;
         }
-        return _name;
+        return tableName;
+    }
+
+    protected String quoteTableNameIfNeeds(String tableName) {
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        if (!prop.isQuoteTable(tableName)) {
+            return tableName;
+        }
+        final String beginQuote;
+        final String endQuote;
+        if (getBasicProperties().isDatabaseSqlServer()) {
+            beginQuote = "[";
+            endQuote = "]";
+        } else {
+            beginQuote = "\"";
+            endQuote = beginQuote;
+        }
+        return beginQuote + tableName + endQuote;
     }
 
     // -----------------------------------------------------

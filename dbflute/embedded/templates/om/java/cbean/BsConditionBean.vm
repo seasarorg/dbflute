@@ -59,10 +59,6 @@ public class ${myClassName} extends AbstractConditionBean {
         return "${table.name}";
     }
 
-    public String getTableSqlName() {
-        return "${table.tableSqlName}";
-    }
-
     // ===================================================================================
     //                                                                      PrimaryKey Map
     //                                                                      ==============

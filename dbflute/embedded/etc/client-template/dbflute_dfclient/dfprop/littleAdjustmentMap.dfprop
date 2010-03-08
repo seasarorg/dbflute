@@ -14,6 +14,7 @@
 # o extendedImplementedCommonColumnAutoSetupperClass: (NotRequired - Default '')
 # o extendedS2DaoSettingClass: (NotRequired - Default '')
 # o shortCharHandlingMode: (NotRequired - Default NONE)
+# o quoteTableNameList: (NotRequired - Default list:{})
 # 
 # *The line that starts with '#' means comment-out.
 #
@@ -143,6 +144,14 @@ map:{
     #   LFILL - It fills the parameter by left spaces.
     #
     #; shortCharHandlingMode = NONE
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o quoteTableNameList: (NotRequired - Default list:{})
+    #  The list of table DB names that need to be quoted.
+    #  Specified tables is quoted on auto-generated SQL.
+    #
+    #; quoteTableNameList = list:{}
     # - - - - - - - - - -/
 }
 # ----------------/

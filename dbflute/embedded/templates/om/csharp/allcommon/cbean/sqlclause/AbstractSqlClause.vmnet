@@ -28,8 +28,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
-    /** The name of table. */
+    /** The DB name of table. */
     protected readonly String _tableName;
+
+    /** The DB meta of table. */
+    protected readonly ${glDBMeta} _dbmeta;
 
     // -----------------------------------------------------
     //                                       Clause Resource
@@ -121,6 +124,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             throw new IllegalArgumentException(msg);
         }
         _tableName = tableName;
+        _dbmeta = findDBMeta(_tableName);
     }
 
     // ===================================================================================
@@ -282,7 +286,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
         // The type of select clause is COLUMNS since here.
         // - - - - - - - - - -/
         StringBuilder sb = new StringBuilder();
-        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(_tableName);
+        ${glDBMeta} dbmeta = getDBMeta();
         List<${glColumnInfo}> columnInfoList = dbmeta.ColumnInfoList;
 
         // [DBFlute-0.7.4]
@@ -472,10 +476,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
     public void buildFromClause(StringBuilder sb) {
         sb.append(ln()).append("  ");
         sb.append("from ");
+        String tableSqlName = getDBMeta().TableSqlName;
         if (_baseTableInlineWhereList.isEmpty()) {
-            sb.append(_tableName).append(" dflocal");
+            sb.append(tableSqlName).append(" dflocal");
         } else {
-            sb.append(getInlineViewClause(_tableName, _baseTableInlineWhereList)).append(" dflocal");
+            sb.append(getInlineViewClause(tableSqlName, _baseTableInlineWhereList)).append(" dflocal");
         }
         sb.append(getFromBaseTableHint());
         sb.append(getLeftOuterJoinClause());
@@ -499,10 +504,11 @@ public abstract class ${myClassName} : ${glSqlClause} {
             } else {
                 sb.append(" left outer join "); // is main!
             }
+            String tableSqlName = findDBMeta(joinTableName).TableSqlName;
             if (inlineWhereClauseList.isEmpty()) {
-                sb.append(joinTableName);
+                sb.append(tableSqlName);
             } else {
-                sb.append(getInlineViewClause(joinTableName, inlineWhereClauseList));
+                sb.append(getInlineViewClause(tableSqlName, inlineWhereClauseList));
             }
             sb.append(" ").append(aliasName).append(" on ");
             int count = 0;
@@ -635,7 +641,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
                                                                                  , String localTableName
                                                                                  , String foreignPropertyName
                                                                                  , String localRelationPath) {
-        ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(localTableName);
+        ${glDBMeta} dbmeta = findDBMeta(localTableName);
         ${glForeignInfo} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
         int relationNo = foreignInfo.RelationNo;
         String nextRelationPath = "_" + relationNo;
@@ -1609,7 +1615,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     }
 
     public int resolveRelationNo(String localTableName, String foreignPropertyName) {
-         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(localTableName);
+         ${glDBMeta} dbmeta = findDBMeta(localTableName);
          ${glForeignInfo} foreignInfo = dbmeta.FindForeignInfo(foreignPropertyName);
         return foreignInfo.RelationNo;
     }
@@ -1870,12 +1876,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
             return null;
         }
         String aliasName = getLocalTableAliasName();
-        ${glDBMeta} dbmeta = findDBMeta();
+        ${glDBMeta} dbmeta = getDBMeta();
         if (dbmeta.HasTwoOrMorePrimaryKeys) {
             String msg = "The target table of queryUpdate() should have only one primary key:";
             msg = msg + " primaryKeys=" + toStringView(dbmeta.PrimaryUniqueInfo.UniqueColumnList);
             throw new IllegalStateException(msg);
         }
+        String tableSqlName = dbmeta.TableSqlName;
         String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
         String selectClause = "select " + aliasName + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
@@ -1887,7 +1894,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
         StringBuilder sb = new StringBuilder();
         String ln = this.ln();
-        sb.append("update ").append(_tableName).append(ln);
+        sb.append("update ").append(tableSqlName).append(ln);
         int index = 0;
         // It is guaranteed that the map has one or more elements.
         foreach (String columnName in columnParameterMap.keySet()) {
@@ -1920,12 +1927,13 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     public String getClauseQueryDelete() {
         String aliasName = getLocalTableAliasName();
-        ${glDBMeta} dbmeta = findDBMeta();
+        ${glDBMeta} dbmeta = getDBMeta();
         if (dbmeta.HasTwoOrMorePrimaryKeys) {
             String msg = "The target table of queryDelete() should have only one primary key:";
             msg = msg + " primaryKeys=" + toStringView(dbmeta.PrimaryUniqueInfo.UniqueColumnList);
             throw new IllegalStateException(msg);
         }
+        String tableSqlName = dbmeta.TableSqlName;
         String primaryKeyName = dbmeta.PrimaryUniqueInfo.FirstColumn.ColumnDbName;
         String selectClause = "select " + aliasName + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
@@ -1939,7 +1947,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
             String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             StringBuilder sb = new StringBuilder();
             String ln = this.ln();
-            sb.append("delete from ").append(_tableName).append(ln);
+            sb.append("delete from ").append(tableSqlName).append(ln);
             sb.append(" where ").append(primaryKeyName);
             sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
             return sb.toString();
@@ -1987,10 +1995,14 @@ public abstract class ${myClassName} : ${glSqlClause} {
 
     // [DBFlute-0.7.9]
     // ===================================================================================
-    //                                                                       Assist Helper
+    //                                                                       DBMeta Helper
     //                                                                       =============
-    protected ${glDBMeta} findDBMeta() {
-        return ${glDBMetaInstanceHandler}.FindDBMeta(_tableName); 
+    protected ${glDBMeta} getDBMeta() {
+        return _dbmeta;
+    }
+
+    protected ${glDBMeta} findDBMeta(String tableDbName) {
+        return ${glDBMetaInstanceHandler}.FindDBMeta(tableDbName); 
     }
 
     // ===================================================================================
