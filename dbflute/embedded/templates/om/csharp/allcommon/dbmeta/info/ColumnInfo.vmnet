@@ -15,6 +15,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected ${glDBMeta} dbmeta;
         protected String columnDbName;
         protected String columnAlias;
+        protected bool notNull;
         protected String propertyName;
         protected Type propertyType;
         protected bool primary;
@@ -28,7 +29,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         // ===============================================================================
         //                                                                     Constructor
         //                                                                     ===========
-        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, String propertyName
+        public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, bool notNull, String propertyName
                             , Type propertyType, bool primary, String columnDbType, int? columnSize
                             , int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType
                             , String columnComment) {
@@ -40,6 +41,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             this.dbmeta = dbmeta;
             this.columnDbName = columnDbName;
             this.columnAlias = columnAlias;
+            this.notNull = notNull;
             this.propertyName = propertyName;
             this.propertyType = propertyType;
             this.primary = primary;
@@ -117,6 +119,10 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
 
         public String ColumnAlias {
             get { return columnAlias; }
+        }
+
+        public bool IsNotNull {
+            get { return notNull; }
         }
 
         public String PropertyName {

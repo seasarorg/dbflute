@@ -52,8 +52,8 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         // createColumnInfo()
-        protected ${glColumnInfo} cci(String columnDbName, String columnAlias, String propertyName, Type propertyType, bool primary, String columnDbType, int? columnSize, int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType, String columnComment) {
-            return new ${glColumnInfo}(this, columnDbName, columnAlias, propertyName, propertyType, primary, columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType, columnComment);
+        protected ${glColumnInfo} cci(String columnDbName, String columnAlias, bool notNull, String propertyName, Type propertyType, bool primary, String columnDbType, int? columnSize, int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType, String columnComment) {
+            return new ${glColumnInfo}(this, columnDbName, columnAlias, notNull, propertyName, propertyType, primary, columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType, columnComment);
         }
 
         public List<${glColumnInfo}> ColumnInfoList { get { return _columnInfoList; } }

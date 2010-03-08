@@ -59,7 +59,7 @@ namespace ${myDBMetaPackageName} {
 
         protected void InitializeColumnInfo() {
 #foreach ($col in $table.columns)
-            _column${col.javaName} = cci("${col.name}", ${col.aliasSettingExpression}, "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpressionNotNull}, ${col.commentForDBMetaSettingExpression});
+            _column${col.javaName} = cci("${col.name}", ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaName}", typeof(${col.javaNative}), ${col.isPrimaryKey()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpressionNotNull}, ${col.commentForDBMetaSettingExpression});
 #end
         }
 
