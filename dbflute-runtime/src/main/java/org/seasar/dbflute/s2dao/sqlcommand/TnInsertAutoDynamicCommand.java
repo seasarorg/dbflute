@@ -66,27 +66,27 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
     }
 
     protected String createInsertSql(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {
-        StringBuffer buf = new StringBuffer(100);
-        buf.append("insert into ");
-        buf.append(targetDBMeta.getTableSqlName());
-        buf.append(" (");
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("insert into ");
+        sb.append(targetDBMeta.getTableSqlName());
+        sb.append(" (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             TnPropertyType pt = propertyTypes[i];
             final String columnName = pt.getColumnName();
             if (i > 0) {
-                buf.append(", ");
+                sb.append(", ");
             }
-            buf.append(columnName);
+            sb.append(columnName);
         }
-        buf.append(")").append(getLineSeparator()).append(" values (");
+        sb.append(")").append(getLineSeparator()).append(" values (");
         for (int i = 0; i < propertyTypes.length; ++i) {
             if (i > 0) {
-                buf.append(", ");
+                sb.append(", ");
             }
-            buf.append("?");
+            sb.append("?");
         }
-        buf.append(")");
-        return buf.toString();
+        sb.append(")");
+        return sb.toString();
     }
 
     protected TnInsertAutoHandler createInsertAutoHandler(TnBeanMetaData bmd, TnPropertyType[] propertyTypes) {

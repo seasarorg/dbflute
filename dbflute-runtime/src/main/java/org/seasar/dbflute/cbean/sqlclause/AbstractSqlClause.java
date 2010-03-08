@@ -61,8 +61,14 @@ public abstract class AbstractSqlClause implements SqlClause {
     /** The DB name of table. */
     protected final String _tableDbName;
 
-    /** The DB meta of target table. */
+    /** The DB meta of table. (basically NotNull) */
+    protected DBMeta _dbmeta;
+
+    /** The DB meta of target table. (basically NotNull) */
     protected DBMetaProvider _dbmetaProvider;
+
+    /** The cache map of DB meta for basically related tables. */
+    protected final Map<String, DBMeta> _cachedDBMetaMap = StringKeyMap.createAsFlexible();
 
     // -----------------------------------------------------
     //                                       Clause Resource
@@ -179,6 +185,7 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     public SqlClause provider(DBMetaProvider dbmetaProvider) {
         _dbmetaProvider = dbmetaProvider;
+        _dbmeta = findDBMeta(_tableDbName);
         return this;
     }
 
@@ -341,7 +348,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         // The type of select clause is COLUMNS since here.
         // - - - - - - - - - -/
         final StringBuilder sb = new StringBuilder();
-        final DBMeta dbmeta = findDBMeta();
+        final DBMeta dbmeta = getDBMeta();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
 
         Map<String, String> localSpecifiedMap = null;
@@ -579,7 +586,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     protected void buildFromClause(StringBuilder sb) {
         sb.append(ln()).append("  ");
         sb.append("from ");
-        final String tableSqlName = findDBMeta().getTableSqlName();
+        final String tableSqlName = getDBMeta().getTableSqlName();
         if (_baseTableInlineWhereList.isEmpty()) {
             sb.append(tableSqlName).append(" dflocal");
         } else {
@@ -2101,7 +2108,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             return null;
         }
         final String aliasName = getLocalTableAliasName();
-        final DBMeta dbmeta = findDBMeta();
+        final DBMeta dbmeta = getDBMeta();
         final String tableSqlName = dbmeta.getTableSqlName();
         final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
         final String selectClause = "select " + aliasName + "." + primaryKeyName;
@@ -2137,13 +2144,13 @@ public abstract class AbstractSqlClause implements SqlClause {
             if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
                 String msg = "The queryUpdate() with outer join is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
-                msg = msg + " tableDbName=" + findDBMeta().getTableDbName();
+                msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
             if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
                 String msg = "The queryUpdate() with union is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
-                msg = msg + " tableDbName=" + findDBMeta().getTableDbName();
+                msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
             String subQuery = filterSubQueryIndent(fromWhereClause);
@@ -2161,7 +2168,7 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     public String getClauseQueryDelete() {
         final String aliasName = getLocalTableAliasName();
-        final DBMeta dbmeta = findDBMeta();
+        final DBMeta dbmeta = getDBMeta();
         final String tableSqlName = dbmeta.getTableSqlName();
         final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
         final String selectClause = "select " + aliasName + "." + primaryKeyName;
@@ -2184,13 +2191,13 @@ public abstract class AbstractSqlClause implements SqlClause {
             if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
                 String msg = "The queryDelete() with outer join is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
-                msg = msg + " tableDbName=" + findDBMeta().getTableDbName();
+                msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
             if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
                 String msg = "The queryDelete() with union is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
-                msg = msg + " tableDbName=" + findDBMeta().getTableDbName();
+                msg = msg + " tableDbName=" + getDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
             String subQuery = filterSubQueryIndent(fromWhereClause);
@@ -2237,17 +2244,23 @@ public abstract class AbstractSqlClause implements SqlClause {
     // ===================================================================================
     //                                                                       DBMeta Helper
     //                                                                       =============
-    protected DBMeta findDBMeta() {
-        return findDBMeta(_tableDbName);
+    protected DBMeta getDBMeta() {
+        return _dbmeta;
     }
 
     protected DBMeta findDBMeta(String tableDbName) {
+        DBMeta dbmeta = _cachedDBMetaMap.get(tableDbName);
+        if (dbmeta != null) {
+            return dbmeta;
+        }
         if (_dbmetaProvider == null) {
             String msg = "The DB meta provider should not be null when using findDBMeta(): ";
             msg = msg + " tableDbName=" + tableDbName;
             throw new IllegalStateException(msg);
         }
-        return _dbmetaProvider.provideDBMetaChecked(tableDbName);
+        dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
+        _cachedDBMetaMap.put(tableDbName, dbmeta);
+        return dbmeta;
     }
 
     // ===================================================================================
