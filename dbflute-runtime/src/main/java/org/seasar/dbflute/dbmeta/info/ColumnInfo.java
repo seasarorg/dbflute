@@ -30,6 +30,7 @@ public class ColumnInfo {
     protected final DBMeta _dbmeta;
     protected final String _columnDbName;
     protected final String _columnAlias;
+    protected final boolean _notNull;
     protected final String _propertyName;
     protected final Class<?> _propertyType;
     protected final boolean _primary;
@@ -44,7 +45,7 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, String propertyName,
+    public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, boolean notNull, String propertyName,
             Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
             Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
             String columnComment) {
@@ -55,6 +56,7 @@ public class ColumnInfo {
         this._dbmeta = dbmeta;
         this._columnDbName = columnDbName;
         this._columnAlias = columnAlias;
+        this._notNull = notNull;
         this._propertyName = propertyName;
         this._propertyType = propertyType;
         this._primary = primary;
@@ -162,6 +164,14 @@ public class ColumnInfo {
      */
     public String getColumnAlias() {
         return this._columnAlias;
+    }
+
+    /**
+     * Is the column not null?
+     * @return Determination.
+     */
+    public boolean isNotNull() {
+        return this._notNull;
     }
 
     /**
