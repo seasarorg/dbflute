@@ -27,10 +27,11 @@ public class SqlClauseDefault extends AbstractSqlClause {
     //                                                                         Constructor
     //                                                                         ===========
     /**
-     * @param tableName Table name. (NotNull)
+     * Constructor.
+     * @param tableDbName The DB name of table. (NotNull)
      **/
-    public SqlClauseDefault(String tableName) {
-        super(tableName);
+    public SqlClauseDefault(String tableDbName) {
+        super(tableDbName);
     }
 
     // ===================================================================================

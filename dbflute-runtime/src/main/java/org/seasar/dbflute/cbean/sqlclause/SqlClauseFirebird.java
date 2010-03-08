@@ -29,11 +29,10 @@ public class SqlClauseFirebird extends AbstractSqlClause {
 
     /**
      * Constructor.
-     * 
-     * @param tableName Table name. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
      **/
-    public SqlClauseFirebird(String tableName) {
-        super(tableName);
+    public SqlClauseFirebird(String tableDbName) {
+        super(tableDbName);
     }
 
     /**

@@ -35,19 +35,19 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param tableName Table name. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
      **/
-    public SqlClauseDb2(String tableName) {
-        super(tableName);
+    public SqlClauseDb2(String tableDbName) {
+        super(tableDbName);
     }
 
     // ===================================================================================
     //                                                                    OrderBy Override
     //                                                                    ================
-	@Override
+    @Override
     protected OrderByClause.OrderByNullsSetupper createOrderByNullsSetupper() {
-	    return createOrderByNullsSetupperByCaseWhen();
-	}
+        return createOrderByNullsSetupperByCaseWhen();
+    }
 
     // ===================================================================================
     //                                                                 FetchScope Override

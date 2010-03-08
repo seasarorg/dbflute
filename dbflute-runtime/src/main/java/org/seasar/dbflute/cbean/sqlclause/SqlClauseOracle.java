@@ -41,10 +41,10 @@ public class SqlClauseOracle extends AbstractSqlClause {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param tableName Table name. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
      **/
-    public SqlClauseOracle(String tableName) {
-        super(tableName);
+    public SqlClauseOracle(String tableDbName) {
+        super(tableDbName);
     }
 
     // ===================================================================================
@@ -107,7 +107,7 @@ public class SqlClauseOracle extends AbstractSqlClause {
      * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
-        final DBMeta dbmeta = findDBMeta(_tableName);
+        final DBMeta dbmeta = findDBMeta(_tableDbName);
         if (dbmeta.hasPrimaryKey()) {
             final String primaryKeyColumnName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
             _lockSqlSuffix = " for update of " + getLocalTableAliasName() + "." + primaryKeyColumnName;

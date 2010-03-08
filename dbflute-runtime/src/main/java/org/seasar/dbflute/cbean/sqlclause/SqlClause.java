@@ -159,11 +159,11 @@ public interface SqlClause {
     //                                                                           =========
     /**
      * Register outer-join.
-     * @param joinTableName The name of join table. {left outer join [joinTableName]} (NotNull)
+     * @param joinTableDbName The DB name of join table. {left outer join [joinTableName]} (NotNull)
      * @param aliasName The alias name of join table. {left outer join joinTableName [aliasName]} (NotNull and Unique per invoking method)
      * @param joinOnMap Map that has conditions of on-clause. (NotNull)
      */
-    void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap);
+    void registerOuterJoin(String joinTableDbName, String aliasName, Map<String, String> joinOnMap);
 
     /**
      * Change the join type for the relation to inner join.

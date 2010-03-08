@@ -35,10 +35,10 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param tableName Table name. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
      **/
-    public SqlClauseSqlServer(String tableName) {
-        super(tableName);
+    public SqlClauseSqlServer(String tableDbName) {
+        super(tableDbName);
     }
 
     // ===================================================================================

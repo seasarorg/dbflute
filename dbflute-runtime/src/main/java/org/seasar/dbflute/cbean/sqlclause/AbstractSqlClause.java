@@ -58,8 +58,8 @@ public abstract class AbstractSqlClause implements SqlClause {
     // -----------------------------------------------------
     //                                                 Basic
     //                                                 -----
-    /** The name of table for SQL. */
-    protected final String _tableName;
+    /** The DB name of table. */
+    protected final String _tableDbName;
 
     /** The DB meta of target table. */
     protected DBMetaProvider _dbmetaProvider;
@@ -165,12 +165,16 @@ public abstract class AbstractSqlClause implements SqlClause {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public AbstractSqlClause(String tableName) {
-        if (tableName == null) {
-            String msg = "Argument[tableName] should not be null.";
+    /**
+     * Constructor.
+     * @param tableDbName The DB name of table. (NotNull)
+     **/
+    public AbstractSqlClause(String tableDbName) {
+        if (tableDbName == null) {
+            String msg = "Argument[tableDbName] should not be null.";
             throw new IllegalArgumentException(msg);
         }
-        _tableName = tableName;
+        _tableDbName = tableDbName;
     }
 
     public SqlClause provider(DBMetaProvider dbmetaProvider) {
@@ -337,7 +341,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         // The type of select clause is COLUMNS since here.
         // - - - - - - - - - -/
         final StringBuilder sb = new StringBuilder();
-        final DBMeta dbmeta = findDBMeta(_tableName);
+        final DBMeta dbmeta = findDBMeta();
         final List<ColumnInfo> columnInfoList = dbmeta.getColumnInfoList();
 
         Map<String, String> localSpecifiedMap = null;
@@ -575,10 +579,11 @@ public abstract class AbstractSqlClause implements SqlClause {
     protected void buildFromClause(StringBuilder sb) {
         sb.append(ln()).append("  ");
         sb.append("from ");
+        final String tableSqlName = findDBMeta().getTableSqlName();
         if (_baseTableInlineWhereList.isEmpty()) {
-            sb.append(_tableName).append(" dflocal");
+            sb.append(tableSqlName).append(" dflocal");
         } else {
-            sb.append(getInlineViewClause(_tableName, _baseTableInlineWhereList)).append(" dflocal");
+            sb.append(getInlineViewClause(tableSqlName, _baseTableInlineWhereList)).append(" dflocal");
         }
         sb.append(getFromBaseTableHint());
         sb.append(getLeftOuterJoinClause());
@@ -590,7 +595,7 @@ public abstract class AbstractSqlClause implements SqlClause {
         for (Iterator<String> ite = _outerJoinMap.keySet().iterator(); ite.hasNext();) {
             String aliasName = ite.next();
             LeftOuterJoinInfo joinInfo = (LeftOuterJoinInfo) _outerJoinMap.get(aliasName);
-            String joinTableName = joinInfo.getJoinTableName();
+            String joinTableDbName = joinInfo.getJoinTableDbName();
             List<String> inlineWhereClauseList = joinInfo.getInlineWhereClauseList();
             List<String> additionalOnClauseList = joinInfo.getAdditionalOnClauseList();
             Map<String, String> joinOnMap = joinInfo.getJoinOnMap();
@@ -602,10 +607,11 @@ public abstract class AbstractSqlClause implements SqlClause {
             } else {
                 sb.append(" left outer join "); // is main!
             }
+            final String joinTableSqlName = findDBMeta(joinTableDbName).getTableSqlName();
             if (inlineWhereClauseList.isEmpty()) {
-                sb.append(joinTableName);
+                sb.append(joinTableSqlName);
             } else {
-                sb.append(getInlineViewClause(joinTableName, inlineWhereClauseList));
+                sb.append(getInlineViewClause(joinTableSqlName, inlineWhereClauseList));
             }
             sb.append(" ").append(aliasName).append(" on ");
             int count = 0;
@@ -810,12 +816,12 @@ public abstract class AbstractSqlClause implements SqlClause {
     /**
      * {@inheritDoc}
      */
-    public void registerOuterJoin(String joinTableName, String aliasName, Map<String, String> joinOnMap) {
+    public void registerOuterJoin(String joinTableDbName, String aliasName, Map<String, String> joinOnMap) {
         assertAlreadyOuterJoin(aliasName);
         assertJoinOnMapNotEmpty(joinOnMap, aliasName);
         final LeftOuterJoinInfo joinInfo = new LeftOuterJoinInfo();
         joinInfo.setAliasName(aliasName);
-        joinInfo.setJoinTableName(joinTableName);
+        joinInfo.setJoinTableDbName(joinTableDbName);
         joinInfo.setJoinOnMap(joinOnMap);
         if (_innerJoinEffective) { // basically false
             joinInfo.setInnerJoin(true);
@@ -852,7 +858,7 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     protected static class LeftOuterJoinInfo {
         protected String _aliasName;
-        protected String _joinTableName;
+        protected String _joinTableDbName;
         protected List<String> _inlineWhereClauseList = new ArrayList<String>();
         protected List<String> _additionalOnClauseList = new ArrayList<String>();
         protected Map<String, String> _joinOnMap;
@@ -866,12 +872,12 @@ public abstract class AbstractSqlClause implements SqlClause {
             _aliasName = value;
         }
 
-        public String getJoinTableName() {
-            return _joinTableName;
+        public String getJoinTableDbName() {
+            return _joinTableDbName;
         }
 
-        public void setJoinTableName(String value) {
-            _joinTableName = value;
+        public void setJoinTableDbName(String value) {
+            _joinTableDbName = value;
         }
 
         public List<String> getInlineWhereClauseList() {
@@ -2095,7 +2101,8 @@ public abstract class AbstractSqlClause implements SqlClause {
             return null;
         }
         final String aliasName = getLocalTableAliasName();
-        final DBMeta dbmeta = findDBMeta(_tableName);
+        final DBMeta dbmeta = findDBMeta();
+        final String tableSqlName = dbmeta.getTableSqlName();
         final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
         final String selectClause = "select " + aliasName + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
@@ -2107,7 +2114,7 @@ public abstract class AbstractSqlClause implements SqlClause {
 
         final StringBuilder sb = new StringBuilder();
         String ln = ln();
-        sb.append("update ").append(_tableName).append(ln);
+        sb.append("update ").append(tableSqlName).append(ln);
         int index = 0;
         // It is guaranteed that the map has one or more elements.
         final Set<Entry<String, String>> entrySet = columnParameterMap.entrySet();
@@ -2130,13 +2137,13 @@ public abstract class AbstractSqlClause implements SqlClause {
             if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
                 String msg = "The queryUpdate() with outer join is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
-                msg = msg + " tableName=" + _tableName;
+                msg = msg + " tableDbName=" + findDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
             if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
                 String msg = "The queryUpdate() with union is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
-                msg = msg + " tableName=" + _tableName;
+                msg = msg + " tableDbName=" + findDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
             String subQuery = filterSubQueryIndent(fromWhereClause);
@@ -2154,7 +2161,8 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     public String getClauseQueryDelete() {
         final String aliasName = getLocalTableAliasName();
-        final DBMeta dbmeta = findDBMeta(_tableName);
+        final DBMeta dbmeta = findDBMeta();
+        final String tableSqlName = dbmeta.getTableSqlName();
         final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
         final String selectClause = "select " + aliasName + "." + primaryKeyName;
         String fromWhereClause = getClauseFromWhereWithUnionTemplate();
@@ -2168,7 +2176,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             final String subQuery = filterSubQueryIndent(selectClause + " " + fromWhereClause);
             final StringBuilder sb = new StringBuilder();
             String ln = ln();
-            sb.append("delete from ").append(_tableName).append(ln);
+            sb.append("delete from ").append(tableSqlName).append(ln);
             sb.append(" where ").append(primaryKeyName);
             sb.append(" in (").append(ln).append(subQuery).append(ln).append(")");
             return sb.toString();
@@ -2176,13 +2184,13 @@ public abstract class AbstractSqlClause implements SqlClause {
             if (_outerJoinMap != null && !_outerJoinMap.isEmpty()) {
                 String msg = "The queryDelete() with outer join is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
-                msg = msg + " tableName=" + _tableName;
+                msg = msg + " tableDbName=" + findDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
             if (_unionQueryInfoList != null && !_unionQueryInfoList.isEmpty()) {
                 String msg = "The queryDelete() with union is unavailable";
                 msg = msg + " because your DB does not support it or the table has two-or-more primary keys:";
-                msg = msg + " tableName=" + _tableName;
+                msg = msg + " tableDbName=" + findDBMeta().getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
             String subQuery = filterSubQueryIndent(fromWhereClause);
@@ -2227,15 +2235,19 @@ public abstract class AbstractSqlClause implements SqlClause {
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
+    //                                                                       DBMeta Helper
     //                                                                       =============
-    protected DBMeta findDBMeta(String tableName) {
+    protected DBMeta findDBMeta() {
+        return findDBMeta(_tableDbName);
+    }
+
+    protected DBMeta findDBMeta(String tableDbName) {
         if (_dbmetaProvider == null) {
             String msg = "The DB meta provider should not be null when using findDBMeta(): ";
-            msg = msg + " tableName=" + tableName;
+            msg = msg + " tableDbName=" + tableDbName;
             throw new IllegalStateException(msg);
         }
-        return _dbmetaProvider.provideDBMetaChecked(tableName);
+        return _dbmetaProvider.provideDBMetaChecked(tableDbName);
     }
 
     // ===================================================================================

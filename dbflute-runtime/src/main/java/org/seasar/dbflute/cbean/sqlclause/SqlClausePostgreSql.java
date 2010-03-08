@@ -35,10 +35,10 @@ public class SqlClausePostgreSql extends AbstractSqlClause {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param tableName Table name. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
      **/
-    public SqlClausePostgreSql(String tableName) {
-        super(tableName);
+    public SqlClausePostgreSql(String tableDbName) {
+        super(tableDbName);
     }
 
     // ===================================================================================

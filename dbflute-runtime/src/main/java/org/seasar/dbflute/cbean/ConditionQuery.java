@@ -28,84 +28,78 @@ public interface ConditionQuery {
     //                                                                  Important Accessor
     //                                                                  ==================
     /**
-     * Get table DB-name.
-     * @return Table DB-name. (NotNull)
+     * Get table DB name.
+     * @return Table DB name. (NotNull)
      */
-    public String getTableDbName();
-	
-    /**
-     * Get table SQL-name.
-     * @return Table SQL-name. (NotNull)
-     */
-    public String getTableSqlName();
+    String getTableDbName();
 
     /**
-     * Get real alias name(that has nest level mark).
+     * Get real alias name (that has nest level mark).
      * @return Real alias name. (NotNull)
      */
-    public String getRealAliasName();
+    String getRealAliasName();
 
     /**
-     * Get real column name(with real alias name).
+     * Get real column name (with real alias name).
      * @param columnName Column name without alias name. (NotNull)
      * @return Real column name. (NotNull)
      */
-    public String getRealColumnName(String columnName);
+    String getRealColumnName(String columnName);
 
     /**
      * Get the referrer query.
      * @return The referrer query. (Nullable: If null, this is base query)
      */
-    public ConditionQuery getReferrerQuery();
+    ConditionQuery getReferrerQuery();
 
     /**
-     * Get sql clause.
-     * @return Sql clause. (NotNull)
+     * Get the SqlClause.
+     * @return The SqlClause. (NotNull)
      */
-    public SqlClause getSqlClause();
+    SqlClause getSqlClause();
 
     /**
      * Get alias name.
      * @return Alias name. (NotNull)
      */
-    public String getAliasName();
+    String getAliasName();
 
     /**
      * Get nest level.
      * @return Nest level.
      */
-    public int getNestLevel();
+    int getNestLevel();
 
     /**
      * Get next nest level.
      * @return Next nest level.
      */
-    public int getNextNestLevel();
+    int getNextNestLevel();
 
     /**
      * Is base query?
      * @param query Condition query. (NotNull)
      * @return Determination.
      */
-    public boolean isBaseQuery(ConditionQuery query);
+    boolean isBaseQuery(ConditionQuery query);
 
-	/**
-	 * Get the level of subQuery.
-	 * @return The level of subQuery.
-	 */
-	public int getSubQueryLevel();
-	
+    /**
+     * Get the level of subQuery.
+     * @return The level of subQuery.
+     */
+    int getSubQueryLevel();
+
     /**
      * Get the property name of foreign relation.
      * @return The property name of foreign relation. (NotNull)
      */
-    public String getForeignPropertyName();
+    String getForeignPropertyName();
 
     /**
      * Get the path of foreign relation.
      * @return The path of foreign relation. (NotNull)
      */
-    public String getRelationPath();
+    String getRelationPath();
 
     // ===================================================================================
     //                                                                 Reflection Invoking
@@ -115,7 +109,7 @@ public interface ConditionQuery {
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
      * @return The conditionValue. (NotNull)
      */
-    public ConditionValue invokeValue(String columnFlexibleName);
+    ConditionValue invokeValue(String columnFlexibleName);
 
     /**
      * Invoke setting query. {ResolveRelation}
@@ -123,19 +117,19 @@ public interface ConditionQuery {
      * @param conditionKeyName The name of the conditionKey. (NotNull)
      * @param value The value of the condition. (NotNull)
      */
-    public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
+    void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
 
     /**
      * Invoke adding orderBy. {ResolveRelation}
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
      * @param isAsc Is it ascend?
      */
-    public void invokeOrderBy(String columnFlexibleName, boolean isAsc);
+    void invokeOrderBy(String columnFlexibleName, boolean isAsc);
 
     /**
      * Invoke getting foreign conditionQuery.
      * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)
      */
-    public ConditionQuery invokeForeignCQ(String foreignPropertyName);
+    ConditionQuery invokeForeignCQ(String foreignPropertyName);
 }

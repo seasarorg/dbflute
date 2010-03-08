@@ -3,6 +3,8 @@ package org.seasar.dbflute.cbean.sqlclause;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.mock.MockDBMeta;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
@@ -13,7 +15,17 @@ public class SqlClauseH2Test extends PlainTestCase {
 
     public void test_getLeftOuterJoinClause_outerJoin() {
         // ## Arrange ##
-        SqlClauseH2 target = new SqlClauseH2("test");
+        SqlClauseH2 target = new SqlClauseH2("test") {
+            @Override
+            protected DBMeta findDBMeta(String tableDbName) {
+                return new MockDBMeta() {
+                    @Override
+                    public String getTableSqlName() {
+                        return "BAR";
+                    }
+                };
+            }
+        };
 
         Map<String, String> joinOnMap = new HashMap<String, String>();
         joinOnMap.put("LOCAL_BAR_ID", "FOREIGN_BAR_ID");
@@ -30,7 +42,17 @@ public class SqlClauseH2Test extends PlainTestCase {
 
     public void test_getLeftOuterJoinClause_innerJoin() {
         // ## Arrange ##
-        SqlClauseH2 target = new SqlClauseH2("test");
+        SqlClauseH2 target = new SqlClauseH2("test") {
+            @Override
+            protected DBMeta findDBMeta(final String tableDbName) {
+                return new MockDBMeta() {
+                    @Override
+                    public String getTableSqlName() {
+                        return tableDbName.equals("FOO") ? "FOO" : "BAR";
+                    }
+                };
+            }
+        };
 
         Map<String, String> joinOnMap = new HashMap<String, String>();
         joinOnMap.put("LOCAL_FOO_ID", "FOREIGN_FOO_ID");

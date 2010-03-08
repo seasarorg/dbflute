@@ -1578,7 +1578,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void registerOuterJoin(ConditionQuery cq, Map<String, String> joinOnMap) {
-        getSqlClause().registerOuterJoin(cq.getTableSqlName(), cq.getRealAliasName(), joinOnMap);
+        getSqlClause().registerOuterJoin(cq.getTableDbName(), cq.getRealAliasName(), joinOnMap);
     }
 
     protected String fxcKey() { // getFixedConditionKey()

@@ -40,10 +40,10 @@ public class SqlClauseMySql extends AbstractSqlClause {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param tableName Table name. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
      **/
-    public SqlClauseMySql(String tableName) {
-        super(tableName);
+    public SqlClauseMySql(String tableDbName) {
+        super(tableDbName);
     }
 
     // ===================================================================================

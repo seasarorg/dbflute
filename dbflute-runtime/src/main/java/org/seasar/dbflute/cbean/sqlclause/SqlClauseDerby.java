@@ -35,10 +35,10 @@ public class SqlClauseDerby extends AbstractSqlClause {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param tableName Table name. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
      **/
-    public SqlClauseDerby(String tableName) {
-        super(tableName);
+    public SqlClauseDerby(String tableDbName) {
+        super(tableDbName);
     }
 
     // ===================================================================================

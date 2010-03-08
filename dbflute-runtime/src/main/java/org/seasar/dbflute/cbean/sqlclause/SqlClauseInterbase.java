@@ -35,10 +35,10 @@ public class SqlClauseInterbase extends AbstractSqlClause {
     //                                                                         ===========
     /**
      * Constructor.
-     * @param tableName Table name. (NotNull)
+     * @param tableDbName The DB name of table. (NotNull)
      **/
-    public SqlClauseInterbase(String tableName) {
-        super(tableName);
+    public SqlClauseInterbase(String tableDbName) {
+        super(tableDbName);
     }
 
     /**
