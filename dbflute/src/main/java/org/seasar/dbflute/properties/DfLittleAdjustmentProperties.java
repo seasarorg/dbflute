@@ -124,12 +124,12 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return !getShortCharHandlingMode().equalsIgnoreCase("NONE");
     }
 
-    public String getShortCharHandlingMode() { // It's closet!
+    public String getShortCharHandlingMode() {
         String property = getProperty("shortCharHandlingMode", "NONE");
         return property.toUpperCase();
     }
 
-    public String getShortCharHandlingModeCode() { // It's closet!
+    public String getShortCharHandlingModeCode() {
         return getShortCharHandlingMode().substring(0, 1);
     }
 
@@ -138,7 +138,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     //                                                                               =====
     protected Set<String> _quoteTableNameSet;
 
-    protected Set<String> getQuoteTableNameSet() {
+    protected Set<String> getQuoteTableNameSet() { // It's closet!
         if (_quoteTableNameSet != null) {
             return _quoteTableNameSet;
         }
