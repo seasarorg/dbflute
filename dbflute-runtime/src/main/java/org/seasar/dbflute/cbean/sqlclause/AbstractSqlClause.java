@@ -61,10 +61,10 @@ public abstract class AbstractSqlClause implements SqlClause {
     /** The DB name of table. */
     protected final String _tableDbName;
 
-    /** The DB meta of table. (basically NotNull) */
+    /** The DB meta of table. (basically NotNull: null only when treated as dummy) */
     protected DBMeta _dbmeta;
 
-    /** The DB meta of target table. (basically NotNull) */
+    /** The DB meta of target table. (basically NotNull: null only when treated as dummy) */
     protected DBMetaProvider _dbmetaProvider;
 
     /** The cache map of DB meta for basically related tables. */
@@ -177,13 +177,24 @@ public abstract class AbstractSqlClause implements SqlClause {
      **/
     public AbstractSqlClause(String tableDbName) {
         if (tableDbName == null) {
-            String msg = "Argument[tableDbName] should not be null.";
+            String msg = "The argument 'tableDbName' should not be null.";
             throw new IllegalArgumentException(msg);
         }
         _tableDbName = tableDbName;
     }
 
+    /**
+     * Set the provider of DB meta. <br />
+     * If you want to use all functions, this method is required.
+     * @param dbmetaProvider The provider of DB meta. (NotNull)
+     * @return this. (NotNull)
+     */
     public SqlClause provider(DBMetaProvider dbmetaProvider) {
+        if (dbmetaProvider == null) {
+            String msg = "The argument 'dbmetaProvider' should not be null:";
+            msg = msg + " tableDbName=" + _tableDbName;
+            throw new IllegalArgumentException(msg);
+        }
         _dbmetaProvider = dbmetaProvider;
         _dbmeta = findDBMeta(_tableDbName);
         return this;
@@ -2245,6 +2256,11 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                                                       DBMeta Helper
     //                                                                       =============
     protected DBMeta getDBMeta() {
+        if (_dbmeta == null) {
+            String msg = "The DB meta of local table should not be null when using getDBMeta():";
+            msg = msg + " tableDbName=" + _tableDbName;
+            throw new IllegalStateException(msg);
+        }
         return _dbmeta;
     }
 
@@ -2254,7 +2270,7 @@ public abstract class AbstractSqlClause implements SqlClause {
             return dbmeta;
         }
         if (_dbmetaProvider == null) {
-            String msg = "The DB meta provider should not be null when using findDBMeta(): ";
+            String msg = "The DB meta provider should not be null when using findDBMeta():";
             msg = msg + " tableDbName=" + tableDbName;
             throw new IllegalStateException(msg);
         }

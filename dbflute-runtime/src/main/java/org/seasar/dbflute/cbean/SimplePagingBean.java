@@ -37,7 +37,7 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     /** SQL clause instance. */
     protected final SqlClause _sqlClause;
     {
-        _sqlClause = new SqlClauseDefault("Dummy");
+        _sqlClause = new SqlClauseDefault("dummy");
     }
 
     /** The map of parameter. (Nullable) */
