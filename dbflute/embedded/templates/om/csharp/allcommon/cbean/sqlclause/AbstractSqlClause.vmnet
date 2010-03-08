@@ -32,7 +32,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected readonly String _tableName;
 
     /** The DB meta of table. */
-    protected readonly ${glDBMeta} _dbmeta;
+    protected ${glDBMeta} _dbmeta;
 
     // -----------------------------------------------------
     //                                       Clause Resource
@@ -124,7 +124,6 @@ public abstract class ${myClassName} : ${glSqlClause} {
             throw new IllegalArgumentException(msg);
         }
         _tableName = tableName;
-        _dbmeta = findDBMeta(_tableName);
     }
 
     // ===================================================================================
@@ -1998,6 +1997,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
     //                                                                       DBMeta Helper
     //                                                                       =============
     protected ${glDBMeta} getDBMeta() {
+        if (_dbmeta != null) {
+            return _dbmeta;
+        }
+        _dbmeta = findDBMeta(_tableName);
         return _dbmeta;
     }
 
