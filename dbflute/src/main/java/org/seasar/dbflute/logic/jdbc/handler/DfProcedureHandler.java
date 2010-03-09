@@ -455,6 +455,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             procedureColumnMetaInfo.setColumnComment(columnComment);
             procedureMetaInfo.addProcedureColumnMetaInfo(procedureColumnMetaInfo);
         }
+        adjustProcedureColumnList(procedureMetaInfo);
     }
 
     protected String buildProcedureFullName(DfProcedureMetaInfo metaInfo) {
@@ -496,6 +497,46 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         }
         final String procedureName = metaInfo.getProcedureName();
         return sb.append(procedureName).toString();
+    }
+
+    protected void adjustProcedureColumnList(DfProcedureMetaInfo procedureMetaInfo) {
+        adjustPostgreSQLResultSetParameter(procedureMetaInfo);
+    }
+
+    protected void adjustPostgreSQLResultSetParameter(DfProcedureMetaInfo procedureMetaInfo) {
+        if (!isPostgreSQL()) {
+            return;
+        }
+        final List<DfProcedureColumnMetaInfo> columnMetaInfoList = procedureMetaInfo.getProcedureColumnMetaInfoList();
+        boolean existsResultSetParameter = false;
+        boolean existsResultSetReturn = false;
+        int resultSetReturnIndex = 0;
+        String resultSetReturnName = null;
+        int index = 0;
+        for (DfProcedureColumnMetaInfo columnMetaInfo : columnMetaInfoList) {
+            final DfProcedureColumnType procedureColumnType = columnMetaInfo.getProcedureColumnType();
+            final String dbTypeName = columnMetaInfo.getDbTypeName();
+            if (procedureColumnType.equals(DfProcedureColumnType.procedureColumnOut)) {
+                if ("refcursor".equalsIgnoreCase(dbTypeName)) {
+                    existsResultSetParameter = true;
+                }
+            }
+            if (procedureColumnType.equals(DfProcedureColumnType.procedureColumnReturn)) {
+                if ("refcursor".equalsIgnoreCase(dbTypeName)) {
+                    existsResultSetReturn = true;
+                    resultSetReturnIndex = index;
+                    resultSetReturnName = columnMetaInfo.getColumnName();
+                }
+            }
+            ++index;
+        }
+        if (existsResultSetParameter && existsResultSetReturn) {
+            // It is a precondition that PostgreSQL does not allow functions to have a result set return
+            // when it also has result set parameters (as an out parameter).
+            String name = procedureMetaInfo.getProcedureFullName() + "." + resultSetReturnName;
+            _log.info("...Removing the result set return which is unnecessary: " + name);
+            columnMetaInfoList.remove(resultSetReturnIndex);
+        }
     }
 
     // ===================================================================================
