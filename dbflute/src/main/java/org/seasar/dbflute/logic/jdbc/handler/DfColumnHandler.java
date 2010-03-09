@@ -248,11 +248,11 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     //                                    Type Determination
     //                                    ------------------
     public boolean isOracleStringClob(final String dbTypeName) {
-        return getJdbcTypeMapper().isOracleStringClob(dbTypeName);
+        return getJdbcTypeMapper().isOracle_Clob(dbTypeName);
     }
 
     public boolean isPostgreSQLBytesOid(final String dbTypeName) {
-        return getJdbcTypeMapper().isPostgreSQLBytesOid(dbTypeName);
+        return getJdbcTypeMapper().isPostgreSQL_Oid(dbTypeName);
     }
 
     public boolean isUUID(final String dbTypeName) {
