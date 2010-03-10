@@ -195,7 +195,8 @@
 
 	<target name="reflect-to-multipledb-quill" depends="deploy-dist" description="==> reflect to multipledb quill example">
 		<copy todir="${multipledb.quill.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
-		<replace file="${multipledb.quill.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.quill.example.dir}/dbflute_librarydb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${multipledb.quill.example.dir}/dbflute_memberdb/_project.bat" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${multipledb.quill.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
