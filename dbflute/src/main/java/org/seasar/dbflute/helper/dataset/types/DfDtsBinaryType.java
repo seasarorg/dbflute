@@ -18,7 +18,7 @@ public class DfDtsBinaryType extends DfDtsObjectType {
 
     public Object convert(Object value, String formatPattern) {
         if (value != null && value instanceof String) {
-            return DfTypeUtil.toBinary((String) value, "UTF-8");
+            return DfTypeUtil.toStringBytes((String) value, "UTF-8");
         }
         return value;
     }
