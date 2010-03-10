@@ -152,7 +152,8 @@ public class TnFetchAssistResultSet extends PlainResultSetWrapper {
      */
     @Override
     public boolean next() throws SQLException {
-        if (_db2 && _skipToCursorEnd) { // [DBFLUTE-243]
+        if (_db2 && _skipToCursorEnd) {
+            // because DB2 closes cursor when cursor end automatically [DBFLUTE-243]
             return false;
         }
         final boolean hasNext = super.next();

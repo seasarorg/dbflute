@@ -2,6 +2,8 @@ package org.seasar.dbflute.util;
 
 import static org.seasar.dbflute.util.DfTypeUtil.AD_ORIGIN_MILLISECOND;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -27,13 +29,16 @@ public class DfTypeUtilTest extends PlainTestCase {
     //                                                                          Convert To
     //                                                                          ==========
     // -----------------------------------------------------
-    //                                               Boolean
-    //                                               -------
-    public void test_toBoolean() {
+    //                                                String
+    //                                                ------
+    public void test_toString() throws UnsupportedEncodingException {
         // ## Arrange & Act & Assert ##
-        assertNull(DfTypeUtil.toBoolean(null));
-        assertTrue(DfTypeUtil.toBoolean("true"));
-        assertFalse(DfTypeUtil.toBoolean("false"));
+        assertNull(DfTypeUtil.toString(null));
+        assertEquals("", DfTypeUtil.toString(""));
+        assertEquals("foo", DfTypeUtil.toString("foo"));
+        assertEquals("3", DfTypeUtil.toString(3));
+        assertEquals("3", DfTypeUtil.toString(3L));
+        assertEquals("3.7", DfTypeUtil.toString(new BigDecimal("3.7")));
     }
 
     // -----------------------------------------------------
@@ -578,6 +583,39 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals(java.sql.Date.class, DfTypeUtil.toSqlDate("2008-12-30 12:34:56.789").getClass());
         assertNotSame(java.util.Date.class, DfTypeUtil.toSqlDate("2008-12-30 12:34:56.789").getClass());
         assertNotSame(java.sql.Timestamp.class, DfTypeUtil.toSqlDate("2008-12-30 12:34:56.789").getClass());
+    }
+
+    // -----------------------------------------------------
+    //                                               Boolean
+    //                                               -------
+    public void test_toBoolean_basic() {
+        // ## Arrange & Act & Assert ##
+        assertNull(DfTypeUtil.toBoolean(null));
+        assertTrue(DfTypeUtil.toBoolean("true"));
+        assertFalse(DfTypeUtil.toBoolean("false"));
+    }
+
+    // -----------------------------------------------------
+    //                                                Binary
+    //                                                ------
+    public void test_toBinary_basic() {
+        // ## Arrange & Act & Assert ##
+        assertNull(DfTypeUtil.toBinary(null));
+        assertNotNull(DfTypeUtil.toBinary(""));
+    }
+
+    public void test_toBinary_serializable() {
+        // ## Arrange ##
+        Date expected = DfTypeUtil.toDate("2010-03-11");
+        String pt = "yyyy-MM-dd";
+
+        // ## Act ##
+        byte[] binary = DfTypeUtil.toBinary(expected);
+
+        // ## Assert ##
+        Date actual = DfTypeUtil.toDate(binary);
+        log(DfTypeUtil.toString(actual, "yyyy-MM-dd"));
+        assertEquals(DfTypeUtil.toString(expected, pt), DfTypeUtil.toString(actual, pt));
     }
 
     // ===================================================================================

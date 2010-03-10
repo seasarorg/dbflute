@@ -75,13 +75,14 @@ public class BinaryType extends TnAbstractValueType {
         }
         long l = blob.length();
         if (Integer.MAX_VALUE < l) {
-            throw new ArrayIndexOutOfBoundsException();
+            String msg = "The length of the BLOB value should be less (equal) than integer:";
+            msg = msg + " length=" + l + " value=" + blob;
+            throw new ArrayIndexOutOfBoundsException(msg);
         }
         return blob.getBytes(1, (int) l);
     }
 
     public void bindValue(PreparedStatement ps, int index, Object value) throws SQLException {
-
         if (value == null) {
             setNull(ps, index);
         } else if (value instanceof byte[]) {
@@ -94,7 +95,6 @@ public class BinaryType extends TnAbstractValueType {
     }
 
     public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
-
         if (value == null) {
             setNull(cs, parameterName);
         } else if (value instanceof byte[]) {

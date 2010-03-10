@@ -15,6 +15,11 @@
  */
 package org.seasar.dbflute.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -59,25 +64,38 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                              String
     //                                                                              ======
-    public static String toString(Object value) {
-        return toString(value, null);
+    /**
+     * Convert the object to the instance that is string. <br />
+     * If the object is a byte array, encode as base64.
+     * @param obj The parsed object. (Nullable)
+     * @return The instance of string. (Nullable)
+     */
+    public static String toString(Object obj) {
+        return toString(obj, null);
     }
 
-    public static String toString(Object value, String pattern) {
-        if (value == null) {
+    /**
+     * Convert the object to the instance that is string. <br />
+     * If the object is a byte array, encode as base64.
+     * @param obj The parsed object. (Nullable)
+     * @param pattern The pattern format to parse. (Nullable)
+     * @return The instance of string. (Nullable)
+     */
+    public static String toString(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (value instanceof String) {
-            return (String) value;
-        } else if (value instanceof Date) {
-            return toStringFromDate((Date) value, pattern);
-        } else if (value instanceof Number) {
-            return toStringFromNumber((Number) value, pattern);
-        } else if (value instanceof Calendar) {
-            return toStringFromDate(((Calendar) value).getTime(), pattern);
-        } else if (value instanceof byte[]) {
-            return DfBase64Util.encode((byte[]) value);
+        } else if (obj instanceof String) {
+            return (String) obj;
+        } else if (obj instanceof Date) {
+            return toStringFromDate((Date) obj, pattern);
+        } else if (obj instanceof Number) {
+            return toStringFromNumber((Number) obj, pattern);
+        } else if (obj instanceof Calendar) {
+            return toStringFromDate(((Calendar) obj).getTime(), pattern);
+        } else if (obj instanceof byte[]) {
+            return DfBase64Util.encode((byte[]) obj);
         } else {
-            return value.toString();
+            return obj.toString();
         }
     }
 
@@ -101,485 +119,396 @@ public final class DfTypeUtil {
         return null;
     }
 
+    public static byte[] toStringBytes(String str, String encoding) {
+        if (str == null) {
+            return null;
+        }
+        try {
+            return str.getBytes(encoding);
+        } catch (UnsupportedEncodingException e) {
+            String msg = "The encoding is invalid: encoding=" + encoding + " str=" + str;
+            throw new IllegalStateException(msg);
+        }
+    }
+
     // ===================================================================================
-    //                                                                             Boolean
-    //                                                                             =======
-    public static Boolean toBoolean(Object o) {
-        if (o == null) {
-            return (Boolean) o;
-        } else if (o instanceof Boolean) {
-            return (Boolean) o;
-        } else if (o instanceof Number) {
-            int num = ((Number) o).intValue();
-            return Boolean.valueOf(num != 0);
-        } else if (o instanceof String) {
-            final String s = (String) o;
-            if ("true".equalsIgnoreCase(s)) {
-                return Boolean.TRUE;
-            } else if ("false".equalsIgnoreCase(s)) {
-                return Boolean.FALSE;
-            } else if (s.equalsIgnoreCase("1")) {
-                return Boolean.TRUE;
-            } else if (s.equalsIgnoreCase("0")) {
-                return Boolean.FALSE;
-            } else if (s.equalsIgnoreCase("t")) {
-                return Boolean.TRUE;
-            } else if (s.equalsIgnoreCase("f")) {
-                return Boolean.FALSE;
-            } else {
-                String msg = "Failed to parse the boolean string:";
-                msg = msg + " value=" + s;
-                throw new ToBooleanParseException(msg);
+    //                                                                              Number
+    //                                                                              ======
+    public static Object toNumber(Class<?> type, Object obj) {
+        if (type == Integer.class) {
+            return toInteger(obj);
+        } else if (type == Double.class) {
+            return toDouble(obj);
+        } else if (type == Long.class) {
+            return toLong(obj);
+        } else if (type == Float.class) {
+            return toFloat(obj);
+        } else if (type == Short.class) {
+            return toShort(obj);
+        } else if (type == Byte.class) {
+            return toByte(obj);
+        } else if (type == BigDecimal.class) {
+            return toBigDecimal(obj);
+        } else if (type == BigInteger.class) {
+            return toBigInteger(obj);
+        }
+        return obj;
+    }
+
+    // -----------------------------------------------------
+    //                                             Normalize
+    //                                             ---------
+    protected static String normalize(String value) {
+        return normalize(value, Locale.getDefault());
+    }
+
+    protected static String normalize(String value, Locale locale) {
+        if (value == null) {
+            return null;
+        }
+        final DecimalFormatSymbols symbols = getDecimalFormatSymbols(locale);
+        final char groupingSep = symbols.getGroupingSeparator();
+        final char decimalSep = symbols.getDecimalSeparator();
+        final StringBuilder sb = new StringBuilder(20);
+        for (int i = 0; i < value.length(); ++i) {
+            char c = value.charAt(i);
+            if (c == groupingSep) {
+                continue;
+            } else if (c == decimalSep) {
+                c = '.';
             }
-        } else {
-            return Boolean.TRUE;
+            sb.append(c);
         }
+        return sb.toString();
     }
 
-    public static boolean toPrimitiveBoolean(Object o) {
-        Boolean b = toBoolean(o);
-        if (b != null) {
-            return b.booleanValue();
-        }
-        return false;
-    }
-
-    public static class ToBooleanParseException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public ToBooleanParseException(String msg) {
-            super(msg);
-        }
+    // -----------------------------------------------------
+    //                                          NumberFormat
+    //                                          ------------
+    public static DecimalFormat createDecimalFormat(String pattern) {
+        return new DecimalFormat(pattern);
     }
 
     // ===================================================================================
     //                                                                             Integer
     //                                                                             =======
-    public static Integer toInteger(Object o) {
-        return toInteger(o, null);
+    public static Integer toInteger(Object obj) {
+        return toInteger(obj, null);
     }
 
-    public static Integer toInteger(Object o, String pattern) {
-        if (o == null) {
+    public static Integer toInteger(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof Integer) {
-            return (Integer) o;
-        } else if (o instanceof Number) {
-            return Integer.valueOf(((Number) o).intValue());
-        } else if (o instanceof String) {
-            return toInteger((String) o);
-        } else if (o instanceof java.util.Date) {
+        } else if (obj instanceof Integer) {
+            return (Integer) obj;
+        } else if (obj instanceof Number) {
+            return Integer.valueOf(((Number) obj).intValue());
+        } else if (obj instanceof String) {
+            return toInteger((String) obj);
+        } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new Integer(createDateFormat(pattern).format(o));
+                return new Integer(createDateFormat(pattern).format(obj));
             }
-            return Integer.valueOf((int) ((java.util.Date) o).getTime());
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? Integer.valueOf(1) : Integer.valueOf(0);
+            return Integer.valueOf((int) ((java.util.Date) obj).getTime());
+        } else if (obj instanceof Boolean) {
+            return ((Boolean) obj).booleanValue() ? Integer.valueOf(1) : Integer.valueOf(0);
+        } else if (obj instanceof byte[]) {
+            return toInteger(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toInteger(o.toString());
+            return toInteger(obj.toString());
         }
     }
 
-    protected static Integer toInteger(String s) {
-        if (s == null || s.trim().length() == 0) {
+    protected static Integer toInteger(String str) {
+        if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Integer(normalize(s));
+        return new Integer(normalize(str));
     }
 
-    public static int toPrimitiveInt(Object o) {
-        return toPrimitiveInt(o, null);
+    public static int toPrimitiveInt(Object obj) {
+        return toPrimitiveInt(obj, null);
     }
 
-    public static int toPrimitiveInt(Object o, String pattern) {
-        if (o == null) {
-            return 0;
-        } else if (o instanceof Number) {
-            return ((Number) o).intValue();
-        } else if (o instanceof String) {
-            return toPrimitiveInt((String) o);
-        } else if (o instanceof java.util.Date) {
-            if (pattern != null) {
-                return Integer.parseInt(createDateFormat(pattern).format(o));
-            }
-            return (int) ((java.util.Date) o).getTime();
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? 1 : 0;
-        } else {
-            return toPrimitiveInt(o.toString());
-        }
-    }
-
-    protected static int toPrimitiveInt(String s) {
-        if (s == null || s.trim().length() == 0) {
-            return 0;
-        }
-        return Integer.parseInt(normalize(s));
+    public static int toPrimitiveInt(Object obj, String pattern) {
+        Integer wrapper = toInteger(obj, pattern);
+        return wrapper != null ? wrapper.intValue() : 0;
     }
 
     // ===================================================================================
     //                                                                                Long
     //                                                                                ====
-    public static Long toLong(Object o) {
-        return toLong(o, null);
+    public static Long toLong(Object obj) {
+        return toLong(obj, null);
     }
 
-    public static Long toLong(Object o, String pattern) {
-        if (o == null) {
+    public static Long toLong(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof Long) {
-            return (Long) o;
-        } else if (o instanceof Number) {
-            return Long.valueOf(((Number) o).longValue());
-        } else if (o instanceof String) {
-            return toLong((String) o);
-        } else if (o instanceof java.util.Date) {
+        } else if (obj instanceof Long) {
+            return (Long) obj;
+        } else if (obj instanceof Number) {
+            return Long.valueOf(((Number) obj).longValue());
+        } else if (obj instanceof String) {
+            return toLong((String) obj);
+        } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new Long(createDateFormat(pattern).format(o));
+                return new Long(createDateFormat(pattern).format(obj));
             }
-            return Long.valueOf(((java.util.Date) o).getTime());
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? Long.valueOf(1) : Long.valueOf(0);
+            return Long.valueOf(((java.util.Date) obj).getTime());
+        } else if (obj instanceof Boolean) {
+            return ((Boolean) obj).booleanValue() ? Long.valueOf(1) : Long.valueOf(0);
+        } else if (obj instanceof byte[]) {
+            return toLong(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toLong(o.toString());
+            return toLong(obj.toString());
         }
     }
 
-    protected static Long toLong(String s) {
-        if (s == null || s.trim().length() == 0) {
+    protected static Long toLong(String str) {
+        if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Long(normalize(s));
+        return new Long(normalize(str));
     }
 
-    public static long toPrimitiveLong(Object o) {
-        return toPrimitiveLong(o, null);
+    public static long toPrimitiveLong(Object obj) {
+        return toPrimitiveLong(obj, null);
     }
 
-    public static long toPrimitiveLong(Object o, String pattern) {
-        if (o == null) {
-            return 0;
-        } else if (o instanceof Number) {
-            return ((Number) o).longValue();
-        } else if (o instanceof String) {
-            return toPrimitiveLong((String) o);
-        } else if (o instanceof java.util.Date) {
-            if (pattern != null) {
-                return Long.parseLong(createDateFormat(pattern).format(o));
-            }
-            return ((java.util.Date) o).getTime();
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? 1 : 0;
-        } else {
-            return toPrimitiveLong(o.toString());
-        }
-    }
-
-    protected static long toPrimitiveLong(String s) {
-        if (s == null || s.trim().length() == 0) {
-            return 0;
-        }
-        return Long.parseLong(normalize(s));
+    public static long toPrimitiveLong(Object obj, String pattern) {
+        Long wrapper = toLong(obj, pattern);
+        return wrapper != null ? wrapper.longValue() : 0L;
     }
 
     // ===================================================================================
     //                                                                              Double
     //                                                                              ======
-    public static Double toDouble(Object o) {
-        return toDouble(o, null);
+    public static Double toDouble(Object obj) {
+        return toDouble(obj, null);
     }
 
-    public static Double toDouble(Object o, String pattern) {
-        if (o == null) {
+    public static Double toDouble(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof Double) {
-            return (Double) o;
-        } else if (o instanceof Number) {
-            return new Double(((Number) o).doubleValue());
-        } else if (o instanceof String) {
-            return toDouble((String) o);
-        } else if (o instanceof java.util.Date) {
+        } else if (obj instanceof Double) {
+            return (Double) obj;
+        } else if (obj instanceof Number) {
+            return new Double(((Number) obj).doubleValue());
+        } else if (obj instanceof String) {
+            return toDouble((String) obj);
+        } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new Double(createDateFormat(pattern).format(o));
+                return new Double(createDateFormat(pattern).format(obj));
             }
-            return new Double(((java.util.Date) o).getTime());
+            return new Double(((java.util.Date) obj).getTime());
+        } else if (obj instanceof byte[]) {
+            return toDouble(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toDouble(o.toString());
+            return toDouble(obj.toString());
         }
     }
 
-    protected static Double toDouble(String s) {
-        if (s == null || s.trim().length() == 0) {
+    protected static Double toDouble(String str) {
+        if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Double(normalize(s));
+        return new Double(normalize(str));
     }
 
-    public static double toPrimitiveDouble(Object o) {
-        return toPrimitiveDouble(o, null);
+    public static double toPrimitiveDouble(Object obj) {
+        return toPrimitiveDouble(obj, null);
     }
 
-    public static double toPrimitiveDouble(Object o, String pattern) {
-        if (o == null) {
-            return 0;
-        } else if (o instanceof Number) {
-            return ((Number) o).doubleValue();
-        } else if (o instanceof String) {
-            return toPrimitiveDouble((String) o);
-        } else if (o instanceof java.util.Date) {
-            if (pattern != null) {
-                return Double.parseDouble(createDateFormat(pattern).format(o));
-            }
-            return ((java.util.Date) o).getTime();
-        } else {
-            return toPrimitiveDouble(o.toString());
-        }
-    }
-
-    private static double toPrimitiveDouble(String s) {
-        if (DfStringUtil.isNullOrEmpty(s)) {
-            return 0;
-        }
-        return Double.parseDouble(normalize(s));
+    public static double toPrimitiveDouble(Object obj, String pattern) {
+        Double wrapper = toDouble(obj, pattern);
+        return wrapper != null ? wrapper.doubleValue() : 0;
     }
 
     // ===================================================================================
     //                                                                               Float
     //                                                                               =====
-    public static Float toFloat(Object o) {
-        return toFloat(o, null);
+    public static Float toFloat(Object obj) {
+        return toFloat(obj, null);
     }
 
-    public static Float toFloat(Object o, String pattern) {
-        if (o == null) {
+    public static Float toFloat(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof Float) {
-            return (Float) o;
-        } else if (o instanceof Number) {
-            return new Float(((Number) o).floatValue());
-        } else if (o instanceof String) {
-            return toFloat((String) o);
-        } else if (o instanceof java.util.Date) {
+        } else if (obj instanceof Float) {
+            return (Float) obj;
+        } else if (obj instanceof Number) {
+            return new Float(((Number) obj).floatValue());
+        } else if (obj instanceof String) {
+            return toFloat((String) obj);
+        } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new Float(createDateFormat(pattern).format(o));
+                return new Float(createDateFormat(pattern).format(obj));
             }
-            return new Float(((java.util.Date) o).getTime());
+            return new Float(((java.util.Date) obj).getTime());
+        } else if (obj instanceof byte[]) {
+            return toFloat(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toFloat(o.toString());
+            return toFloat(obj.toString());
         }
     }
 
-    protected static Float toFloat(String s) {
-        if (s == null || s.trim().length() == 0) {
+    protected static Float toFloat(String str) {
+        if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Float(normalize(s));
+        return new Float(normalize(str));
     }
 
-    public static float toPrimitiveFloat(Object o) {
-        return toPrimitiveFloat(o, null);
+    public static float toPrimitiveFloat(Object obj) {
+        return toPrimitiveFloat(obj, null);
     }
 
-    public static float toPrimitiveFloat(Object o, String pattern) {
-        if (o == null) {
-            return 0;
-        } else if (o instanceof Number) {
-            return ((Number) o).floatValue();
-        } else if (o instanceof String) {
-            return toPrimitiveFloat((String) o);
-        } else if (o instanceof java.util.Date) {
-            if (pattern != null) {
-                return Float.parseFloat(createDateFormat(pattern).format(o));
-            }
-            return ((java.util.Date) o).getTime();
-        } else {
-            return toPrimitiveFloat(o.toString());
-        }
-    }
-
-    private static float toPrimitiveFloat(String s) {
-        if (DfStringUtil.isNullOrEmpty(s)) {
-            return 0;
-        }
-        return Float.parseFloat(normalize(s));
+    public static float toPrimitiveFloat(Object obj, String pattern) {
+        Float wrapper = toFloat(obj, pattern);
+        return wrapper != null ? wrapper.floatValue() : 0;
     }
 
     // ===================================================================================
     //                                                                               Short
     //                                                                               =====
-    public static Short toShort(Object o) {
-        return toShort(o, null);
+    public static Short toShort(Object obj) {
+        return toShort(obj, null);
     }
 
-    public static Short toShort(Object o, String pattern) {
-        if (o == null) {
+    public static Short toShort(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof Short) {
-            return (Short) o;
-        } else if (o instanceof Number) {
-            return Short.valueOf(((Number) o).shortValue());
-        } else if (o instanceof String) {
-            return toShort((String) o);
-        } else if (o instanceof java.util.Date) {
+        } else if (obj instanceof Short) {
+            return (Short) obj;
+        } else if (obj instanceof Number) {
+            return Short.valueOf(((Number) obj).shortValue());
+        } else if (obj instanceof String) {
+            return toShort((String) obj);
+        } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return Short.valueOf(createDateFormat(pattern).format(o));
+                return Short.valueOf(createDateFormat(pattern).format(obj));
             }
-            return Short.valueOf((short) ((java.util.Date) o).getTime());
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? Short.valueOf((short) 1) : Short.valueOf((short) 0);
+            return Short.valueOf((short) ((java.util.Date) obj).getTime());
+        } else if (obj instanceof Boolean) {
+            return ((Boolean) obj).booleanValue() ? Short.valueOf((short) 1) : Short.valueOf((short) 0);
+        } else if (obj instanceof byte[]) {
+            return toShort(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toShort(o.toString());
+            return toShort(obj.toString());
         }
     }
 
-    protected static Short toShort(String s) {
-        if (s == null || s.trim().length() == 0) {
+    protected static Short toShort(String str) {
+        if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Short(normalize(s));
+        return new Short(normalize(str));
     }
 
-    public static short toPrimitiveShort(Object o) {
-        return toPrimitiveShort(o, null);
+    public static short toPrimitiveShort(Object obj) {
+        return toPrimitiveShort(obj, null);
     }
 
-    public static short toPrimitiveShort(Object o, String pattern) {
-        if (o == null) {
-            return 0;
-        } else if (o instanceof Number) {
-            return ((Number) o).shortValue();
-        } else if (o instanceof String) {
-            return toPrimitiveShort((String) o);
-        } else if (o instanceof java.util.Date) {
-            if (pattern != null) {
-                return Short.parseShort(createDateFormat(pattern).format(o));
-            }
-            return (short) ((java.util.Date) o).getTime();
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? (short) 1 : (short) 0;
-        } else {
-            return toPrimitiveShort(o.toString());
-        }
-    }
-
-    private static short toPrimitiveShort(String s) {
-        if (DfStringUtil.isNullOrEmpty(s)) {
-            return 0;
-        }
-        return Short.parseShort(normalize(s));
+    public static short toPrimitiveShort(Object obj, String pattern) {
+        Short wrapper = toShort(obj, pattern);
+        return wrapper != null ? wrapper.shortValue() : 0;
     }
 
     // ===================================================================================
     //                                                                                Byte
     //                                                                                ====
-    public static Byte toByte(Object o) {
-        return toByte(o, null);
+    public static Byte toByte(Object obj) {
+        return toByte(obj, null);
     }
 
-    public static Byte toByte(Object o, String pattern) {
-        if (o == null) {
+    public static Byte toByte(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof Byte) {
-            return (Byte) o;
-        } else if (o instanceof Number) {
-            return Byte.valueOf(((Number) o).byteValue());
-        } else if (o instanceof String) {
-            return toByte((String) o);
-        } else if (o instanceof java.util.Date) {
+        } else if (obj instanceof Byte) {
+            return (Byte) obj;
+        } else if (obj instanceof Number) {
+            return Byte.valueOf(((Number) obj).byteValue());
+        } else if (obj instanceof String) {
+            return toByte((String) obj);
+        } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new Byte(createDateFormat(pattern).format(o));
+                return new Byte(createDateFormat(pattern).format(obj));
             }
-            return Byte.valueOf((byte) ((java.util.Date) o).getTime());
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? Byte.valueOf((byte) 1) : Byte.valueOf((byte) 0);
+            return Byte.valueOf((byte) ((java.util.Date) obj).getTime());
+        } else if (obj instanceof Boolean) {
+            return ((Boolean) obj).booleanValue() ? Byte.valueOf((byte) 1) : Byte.valueOf((byte) 0);
+        } else if (obj instanceof byte[]) {
+            return toByte(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toByte(o.toString());
+            return toByte(obj.toString());
         }
     }
 
-    protected static Byte toByte(String s) {
-        if (s == null || s.trim().length() == 0) {
+    protected static Byte toByte(String str) {
+        if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Byte(normalize(s));
+        return new Byte(normalize(str));
     }
 
-    public static byte toPrimitiveByte(Object o) {
-        return toPrimitiveByte(o, null);
+    public static byte toPrimitiveByte(Object obj) {
+        return toPrimitiveByte(obj, null);
     }
 
-    public static byte toPrimitiveByte(Object o, String pattern) {
-        if (o == null) {
-            return 0;
-        } else if (o instanceof Number) {
-            return ((Number) o).byteValue();
-        } else if (o instanceof String) {
-            return toPrimitiveByte((String) o);
-        } else if (o instanceof java.util.Date) {
-            if (pattern != null) {
-                return Byte.parseByte(createDateFormat(pattern).format(o));
-            }
-            return (byte) ((java.util.Date) o).getTime();
-        } else if (o instanceof Boolean) {
-            return ((Boolean) o).booleanValue() ? (byte) 1 : (byte) 0;
-        } else {
-            return toPrimitiveByte(o.toString());
-        }
-    }
-
-    private static byte toPrimitiveByte(String s) {
-        if (DfStringUtil.isNullOrEmpty(s)) {
-            return 0;
-        }
-        return Byte.parseByte(normalize(s));
+    public static byte toPrimitiveByte(Object obj, String pattern) {
+        Byte wrapper = toByte(obj, pattern);
+        return wrapper != null ? wrapper.byteValue() : 0;
     }
 
     // ===================================================================================
     //                                                                          BigDecimal
     //                                                                          ==========
-    public static BigDecimal toBigDecimal(Object o) {
-        return toBigDecimal(o, null);
+    public static BigDecimal toBigDecimal(Object obj) {
+        return toBigDecimal(obj, null);
     }
 
-    public static BigDecimal toBigDecimal(Object o, String pattern) {
-        if (o == null) {
+    public static BigDecimal toBigDecimal(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof BigDecimal) {
-            final BigDecimal paramBigDecimal = (BigDecimal) o;
+        } else if (obj instanceof BigDecimal) {
+            final BigDecimal paramBigDecimal = (BigDecimal) obj;
             if (BigDecimal.class.equals(paramBigDecimal.getClass())) { // pure big-decimal
                 return paramBigDecimal;
             } else { // sub class
                 // because the big-decimal type is not final class.
                 return new BigDecimal(paramBigDecimal.toPlainString());
             }
-        } else if (o instanceof java.util.Date) {
+        } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new BigDecimal(createDateFormat(pattern).format(o));
+                return new BigDecimal(createDateFormat(pattern).format(obj));
             }
-            return new BigDecimal(Long.toString(((java.util.Date) o).getTime()));
-        } else if (o instanceof String) {
-            String s = (String) o;
+            return new BigDecimal(Long.toString(((java.util.Date) obj).getTime()));
+        } else if (obj instanceof String) {
+            String s = (String) obj;
             if (s == null || s.trim().length() == 0) {
                 return null;
             }
             return new BigDecimal(new BigDecimal(s).toPlainString());
+        } else if (obj instanceof byte[]) {
+            return toBigDecimal(toSerializable((byte[]) obj)); // recursive
         } else {
-            return new BigDecimal(new BigDecimal(o.toString()).toPlainString());
+            return new BigDecimal(new BigDecimal(obj.toString()).toPlainString());
         }
     }
 
     // ===================================================================================
     //                                                                          BigInteger
     //                                                                          ==========
-    public static BigInteger toBigInteger(Object o) {
-        return toBigInteger(o, null);
+    public static BigInteger toBigInteger(Object obj) {
+        return toBigInteger(obj, null);
     }
 
-    public static BigInteger toBigInteger(Object o, String pattern) {
-        if (o == null) {
+    public static BigInteger toBigInteger(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof BigInteger) {
-            final BigInteger paramBigInteger = (BigInteger) o;
+        } else if (obj instanceof BigInteger) {
+            final BigInteger paramBigInteger = (BigInteger) obj;
             if (BigInteger.class.equals(paramBigInteger.getClass())) { // pure big-integer
                 return paramBigInteger;
             } else { // sub class
@@ -587,7 +516,7 @@ public final class DfTypeUtil {
                 return BigInteger.valueOf(paramBigInteger.longValue());
             }
         } else {
-            Long l = toLong(o, pattern);
+            Long l = toLong(obj, pattern);
             if (l == null) {
                 return null;
             }
@@ -603,14 +532,14 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br />
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
-     * @param o The parsed object. (Nullable)
+     * @param obj The parsed object. (Nullable)
      * @return The instance of date. (Nullable)
      * @throws ParseDateException When it failed to parse the string to date.
      * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
      */
-    public static Date toDate(Object o) {
-        return toDate(o, null);
+    public static Date toDate(Object obj) {
+        return toDate(obj, null);
     }
 
     /**
@@ -619,20 +548,20 @@ public final class DfTypeUtil {
      * This method uses specified date pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default date pattern
      * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
-     * @param o The parsed object. (Nullable)
+     * @param obj The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of date. (Nullable)
      * @throws ParseDateException When it failed to parse the string to date.
      * @throws ParseDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseDateOutOfCalendarException When the date was out of calendar. (if BC, not thrown)
      */
-    public static Date toDate(Object o, String pattern) {
-        if (o == null) {
+    public static Date toDate(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof String) {
-            return toDateFromString((String) o, pattern);
-        } else if (o instanceof Date) {
-            final Date paramDate = (Date) o;
+        } else if (obj instanceof String) {
+            return toDateFromString((String) obj, pattern);
+        } else if (obj instanceof Date) {
+            final Date paramDate = (Date) obj;
             if (Date.class.equals(paramDate.getClass())) { // pure date
                 return paramDate;
             } else { // sub class
@@ -641,15 +570,17 @@ public final class DfTypeUtil {
                 date.setTime(paramDate.getTime());
                 return date;
             }
-        } else if (o instanceof Calendar) {
-            return ((Calendar) o).getTime();
+        } else if (obj instanceof Calendar) {
+            return ((Calendar) obj).getTime();
+        } else if (obj instanceof byte[]) {
+            return toDate(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toDateFromString(o.toString(), pattern);
+            return toDateFromString(obj.toString(), pattern);
         }
     }
 
-    protected static Date toDateFromString(String value, String pattern) {
-        if (value == null || value.trim().length() == 0) {
+    protected static Date toDateFromString(String str, String pattern) {
+        if (str == null || str.trim().length() == 0) {
             return null;
         }
         boolean strict;
@@ -658,31 +589,31 @@ public final class DfTypeUtil {
             // because date type can have millisecond formally
             final boolean includeMilli = true;
 
-            value = filterDateStringValueFlexibly(value, includeMilli);
-            strict = !value.startsWith("-"); // not BC
+            str = filterDateStringValueFlexibly(str, includeMilli);
+            strict = !str.startsWith("-"); // not BC
             pattern = "yyyy-MM-dd HH:mm:ss.SSS";
         } else {
             strict = true;
         }
         final DateFormat df = createDateFormat(pattern, strict);
         try {
-            return df.parse(value);
+            return df.parse(str);
         } catch (ParseException e) {
             try {
                 df.setLenient(true);
-                df.parse(value); // no exception means illegal date
+                df.parse(str); // no exception means illegal date
                 String msg = "The date expression is out of calendar:";
-                msg = msg + " string=" + value + " pattern=" + pattern;
+                msg = msg + " string=" + str + " pattern=" + pattern;
                 throw new ParseDateOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to date:";
-                msg = msg + " string=" + value + " pattern=" + pattern;
+                msg = msg + " string=" + str + " pattern=" + pattern;
                 throw new ParseDateException(msg, e);
             }
         }
     }
 
-    protected static String filterDateStringValueFlexibly(final String pureValue, boolean includeMilli) {
+    protected static String filterDateStringValueFlexibly(final String pureStr, boolean includeMilli) {
         final String dateLiteralPrefix = "date ";
         final String bcSymbolPrefix = "-";
         final String adLatinPrefix = "AD";
@@ -693,7 +624,7 @@ public final class DfTypeUtil {
         final String dateTimeDlm = " ";
         final String timeDlm = ":";
         final String timeMilliDlm = ".";
-        String value = pureValue;
+        String value = pureStr;
         value = value.trim();
 
         final boolean dateLiteral = value.startsWith(dateLiteralPrefix);
@@ -738,13 +669,13 @@ public final class DfTypeUtil {
                 final String dd = value.substring(6, 8);
                 value = yyyy + dateDlm + mm + dateDlm + dd;
             } else {
-                return pureValue; // couldn't filter for example '1234'
+                return pureStr; // couldn't filter for example '1234'
             }
         }
 
         // check whether it can filter
         if (!value.contains("-") || (value.indexOf("-") == value.lastIndexOf("-"))) {
-            return pureValue; // couldn't filter for example '123456789' and '1234-123'
+            return pureStr; // couldn't filter for example '123456789' and '1234-123'
         }
 
         // handling zero prefix
@@ -752,24 +683,24 @@ public final class DfTypeUtil {
         String yyyy = value.substring(0, yearEndIndex);
         yyyy = resolveDateElementZeroPrefix(yyyy, 4 - yyyy.length());
         if (bc) {
-            final Integer yyyyInt = formatDateElementAsNumber(yyyy, "yyyy", pureValue);
+            final Integer yyyyInt = formatDateElementAsNumber(yyyy, "yyyy", pureStr);
             yyyy = String.valueOf(yyyyInt - 1); // because DateFormat treats '-2007' as 'BC2008'
             yyyy = resolveDateElementZeroPrefix(yyyy, 4 - yyyy.length());
         } else {
-            formatDateElementAsNumber(yyyy, "yyyy", pureValue); // check only
+            formatDateElementAsNumber(yyyy, "yyyy", pureStr); // check only
         }
 
         final String startsMon = value.substring(yearEndIndex + dateDlm.length());
         final int monthEndIndex = startsMon.indexOf(dateDlm);
         String mm = startsMon.substring(0, monthEndIndex);
         mm = resolveDateElementZeroPrefix(mm, 2 - mm.length());
-        formatDateElementAsNumber(mm, "MM", pureValue); // check only
+        formatDateElementAsNumber(mm, "MM", pureStr); // check only
 
         final String startsDay = startsMon.substring(monthEndIndex + dateDlm.length());
         final int dayEndIndex = startsDay.indexOf(dateTimeDlm);
         String dd = dayEndIndex >= 0 ? startsDay.substring(0, dayEndIndex) : startsDay;
         dd = resolveDateElementZeroPrefix(dd, 2 - dd.length());
-        formatDateElementAsNumber(dd, "dd", pureValue); // check only
+        formatDateElementAsNumber(dd, "dd", pureStr); // check only
         final String yyyy_MM_dd = yyyy + dateDlm + mm + dateDlm + dd;
 
         if (dayEndIndex >= 0) { // has time parts
@@ -777,10 +708,10 @@ public final class DfTypeUtil {
 
             // check whether it can filter
             if (!time.contains(timeDlm) || (time.indexOf(timeDlm) == time.lastIndexOf(timeDlm))) {
-                return pureValue; // couldn't filter for example '2009-12-12 123451' and '2009-12-12 123:451'
+                return pureStr; // couldn't filter for example '2009-12-12 123451' and '2009-12-12 123:451'
             }
 
-            value = yyyy_MM_dd + dateTimeDlm + handleTimeZeroPrefix(time, pureValue, includeMilli);
+            value = yyyy_MM_dd + dateTimeDlm + handleTimeZeroPrefix(time, pureStr, includeMilli);
         } else {
             value = yyyy_MM_dd + dateTimeDlm + "00:00:00";
             if (includeMilli) {
@@ -790,33 +721,33 @@ public final class DfTypeUtil {
         return (bc ? bcSymbolPrefix : "") + value;
     }
 
-    protected static String handleTimeZeroPrefix(String time, String pureValue, boolean includeMilli) {
+    protected static String handleTimeZeroPrefix(String time, String pureStr, boolean includeMilli) {
         final String timeDlm = ":";
         final String timeMilliDlm = ".";
 
         final int hourEndIndex = time.indexOf(timeDlm);
         String hour = time.substring(0, hourEndIndex);
         hour = resolveDateElementZeroPrefix(hour, 2 - hour.length());
-        formatDateElementAsNumber(hour, "HH", pureValue); // check only
+        formatDateElementAsNumber(hour, "HH", pureStr); // check only
 
         final String startsMin = time.substring(hourEndIndex + timeDlm.length());
         final int minEndIndex = startsMin.indexOf(timeDlm);
         String min = startsMin.substring(0, minEndIndex);
         min = resolveDateElementZeroPrefix(min, 2 - min.length());
-        formatDateElementAsNumber(min, "mm", pureValue); // check only
+        formatDateElementAsNumber(min, "mm", pureStr); // check only
 
         final String startsSec = startsMin.substring(minEndIndex + timeDlm.length());
         final int secEndIndex = startsSec.indexOf(timeMilliDlm);
         String sec = secEndIndex >= 0 ? startsSec.substring(0, secEndIndex) : startsSec;
         sec = resolveDateElementZeroPrefix(sec, 2 - sec.length());
-        formatDateElementAsNumber(sec, "ss", pureValue); // check only
+        formatDateElementAsNumber(sec, "ss", pureStr); // check only
 
         String value = hour + timeDlm + min + timeDlm + sec;
         if (includeMilli) {
             if (secEndIndex >= 0) {
                 final String milli = startsSec.substring(secEndIndex + timeMilliDlm.length());
                 resolveDateElementZeroPrefix(milli, 3 - milli.length());
-                formatDateElementAsNumber(milli, "SSS", pureValue); // check only
+                formatDateElementAsNumber(milli, "SSS", pureStr); // check only
                 value = value + timeMilliDlm + milli; // append millisecond
             } else {
                 value = value + timeMilliDlm + "000";
@@ -825,22 +756,22 @@ public final class DfTypeUtil {
         return value;
     }
 
-    protected static Integer formatDateElementAsNumber(String value, String title, String pureValue) {
+    protected static Integer formatDateElementAsNumber(String str, String title, String pureValue) {
         try {
-            return Integer.valueOf(value);
+            return Integer.valueOf(str);
         } catch (NumberFormatException e) {
             String msg = "Failed to format " + title + " as number:";
-            msg = msg + " " + title + "=" + value + " value=" + pureValue;
+            msg = msg + " " + title + "=" + str + " value=" + pureValue;
             throw new ParseDateNumberFormatException(msg, e);
         }
     }
 
-    protected static String resolveDateElementZeroPrefix(String value, int count) {
+    protected static String resolveDateElementZeroPrefix(String str, int count) {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             sb.append("0");
         }
-        return sb.toString() + value;
+        return sb.toString() + str;
     }
 
     public static class ParseDateException extends RuntimeException {
@@ -972,14 +903,14 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br />
      * This method uses default date pattern based on 'yyyy-MM-dd HH:mm:ss.SSS'
      * with flexible-parsing if the object is string type.
-     * @param o The parsed object. (Nullable)
+     * @param obj The parsed object. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
      * @throws ParseTimestampException When it failed to parse the string to time-stamp.
      * @throws ParseTimestampNumberFormatException When it failed to format the elements as number.
      * @throws ParseTimestampOutOfCalendarException When the timestamp was out of calendar. (if BC, not thrown)
      */
-    public static Timestamp toTimestamp(Object o) {
-        return toTimestamp(o, null);
+    public static Timestamp toTimestamp(Object obj) {
+        return toTimestamp(obj, null);
     }
 
     /**
@@ -988,76 +919,78 @@ public final class DfTypeUtil {
      * This method uses specified timestamp pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default timestamp pattern
      * with flexible-parsing based on 'yyyy-MM-dd HH:mm:ss.SSS'.
-     * @param o The parsed object. (Nullable)
+     * @param obj The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time-stamp. (Nullable: If the value is null or empty, it returns null.)
      * @throws ParseTimestampException When it failed to parse the string to time-stamp.
      * @throws ParseTimestampNumberFormatException When it failed to format the elements as number.
      * @throws ParseTimestampOutOfCalendarException When the timestamp was out of calendar. (if BC, not thrown)
      */
-    public static Timestamp toTimestamp(Object o, String pattern) {
-        if (o == null) {
+    public static Timestamp toTimestamp(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof Timestamp) {
-            final Timestamp paramTimestamp = (Timestamp) o;
+        } else if (obj instanceof Timestamp) {
+            final Timestamp paramTimestamp = (Timestamp) obj;
             if (Timestamp.class.equals(paramTimestamp.getClass())) { // pure time-stamp
                 return paramTimestamp;
             } else { // sub class
                 // because the time-stamp type is not final class.
                 return new Timestamp(paramTimestamp.getTime());
             }
-        } else if (o instanceof Date) {
-            return new Timestamp(((Date) o).getTime());
-        } else if (o instanceof String) {
-            return toTimestampFromString((String) o, pattern);
-        } else if (o instanceof Calendar) {
-            return new Timestamp(((Calendar) o).getTime().getTime());
+        } else if (obj instanceof Date) {
+            return new Timestamp(((Date) obj).getTime());
+        } else if (obj instanceof String) {
+            return toTimestampFromString((String) obj, pattern);
+        } else if (obj instanceof Calendar) {
+            return new Timestamp(((Calendar) obj).getTime().getTime());
+        } else if (obj instanceof byte[]) {
+            return toTimestamp(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toTimestampFromString(o.toString(), pattern);
+            return toTimestampFromString(obj.toString(), pattern);
         }
     }
 
-    protected static Timestamp toTimestampFromString(String value, String pattern) {
-        if (value == null || value.trim().length() == 0) {
+    protected static Timestamp toTimestampFromString(String str, String pattern) {
+        if (str == null || str.trim().length() == 0) {
             return null;
         }
         boolean strict;
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            value = filterTimestampStringValueFlexibly(value);
-            strict = !value.startsWith("-"); // not BC
+            str = filterTimestampStringValueFlexibly(str);
+            strict = !str.startsWith("-"); // not BC
             pattern = "yyyy-MM-dd HH:mm:ss.SSS";
         } else {
             strict = true;
         }
         DateFormat df = createDateFormat(pattern, strict);
         try {
-            return new Timestamp(df.parse(value).getTime());
+            return new Timestamp(df.parse(str).getTime());
         } catch (ParseException e) {
             try {
                 df.setLenient(true);
-                df.parse(value); // no exception means illegal date
+                df.parse(str); // no exception means illegal date
                 String msg = "The timestamp expression is out of calendar:";
-                msg = msg + " string=" + value + " pattern=" + pattern;
+                msg = msg + " string=" + str + " pattern=" + pattern;
                 throw new ParseTimestampOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to timestamp:";
-                msg = msg + " string=" + value + " pattern=" + pattern;
+                msg = msg + " string=" + str + " pattern=" + pattern;
                 throw new ParseTimestampException(msg, e);
             }
         }
     }
 
-    protected static String filterTimestampStringValueFlexibly(final String pureValue) {
-        String value = pureValue;
+    protected static String filterTimestampStringValueFlexibly(final String pureStr) {
+        String str = pureStr;
         try {
             final boolean includeMilli = true;
-            value = filterDateStringValueFlexibly(value, includeMilli); // based on date way
+            str = filterDateStringValueFlexibly(str, includeMilli); // based on date way
         } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the timestamp as number:";
-            msg = msg + " value=" + pureValue;
+            msg = msg + " value=" + pureStr;
             throw new ParseTimestampNumberFormatException(msg, e);
         }
-        return value;
+        return str;
     }
 
     public static class ParseTimestampException extends RuntimeException {
@@ -1092,14 +1025,14 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br />
      * This method uses default time pattern based on 'HH:mm:ss'
      * with flexible-parsing if the object is string type.
-     * @param o The parsed object. (Nullable)
+     * @param obj The parsed object. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
      * @throws ParseTimeException When it failed to parse the string to time.
      * @throws ParseTimeNumberFormatException When it failed to format the elements as number.
      * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
      */
-    public static Time toTime(Object o) {
-        return toTime(o, null);
+    public static Time toTime(Object obj) {
+        return toTime(obj, null);
     }
 
     /**
@@ -1108,88 +1041,90 @@ public final class DfTypeUtil {
      * This method uses specified time pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default time pattern
      * with flexible-parsing based on 'HH:mm:ss'.
-     * @param o The parsed object. (Nullable)
+     * @param obj The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of time. (Nullable: If the value is null or empty, it returns null.)
      * @throws ParseTimeException When it failed to parse the string to time.
      * @throws ParseTimeNumberFormatException When it failed to format the elements as number.
      * @throws ParseTimeOutOfCalendarException When the time is out of calendar.
      */
-    public static Time toTime(Object o, String pattern) {
-        if (o == null) {
+    public static Time toTime(Object obj, String pattern) {
+        if (obj == null) {
             return null;
-        } else if (o instanceof String) {
-            return toTimeFromString((String) o, pattern);
-        } else if (o instanceof Time) {
-            final Time paramTime = (Time) o;
+        } else if (obj instanceof String) {
+            return toTimeFromString((String) obj, pattern);
+        } else if (obj instanceof Time) {
+            final Time paramTime = (Time) obj;
             if (Time.class.equals(paramTime.getClass())) { // pure time
                 return paramTime;
             } else { // sub class
                 // because the time type is not final class.
                 return new Time(paramTime.getTime());
             }
-        } else if (o instanceof Date) {
-            Date date = (Date) o;
+        } else if (obj instanceof Date) {
+            Date date = (Date) obj;
             Calendar cal = Calendar.getInstance();
             cal.setTime(date);
             cal.set(Calendar.YEAR, 1970);
             cal.set(Calendar.MONTH, Calendar.JANUARY);
             cal.set(Calendar.DATE, 1);
             return new Time(cal.getTimeInMillis());
-        } else if (o instanceof Calendar) {
-            Calendar cal = (Calendar) o;
+        } else if (obj instanceof Calendar) {
+            Calendar cal = (Calendar) obj;
             cal.set(Calendar.YEAR, 1970);
             cal.set(Calendar.MONTH, Calendar.JANUARY);
             cal.set(Calendar.DATE, 1);
             return new Time(cal.getTimeInMillis());
+        } else if (obj instanceof byte[]) {
+            return toTime(toSerializable((byte[]) obj)); // recursive
         } else {
-            return toTimeFromString(o.toString(), pattern);
+            return toTimeFromString(obj.toString(), pattern);
         }
     }
 
-    protected static Time toTimeFromString(String value, String pattern) {
-        if (value == null || value.trim().length() == 0) {
+    protected static Time toTimeFromString(String str, String pattern) {
+        if (str == null || str.trim().length() == 0) {
             return null;
         }
         if (pattern == null || pattern.trim().length() == 0) { // flexibly
-            value = filterTimeStringValueFlexibly(value);
+            str = filterTimeStringValueFlexibly(str);
             pattern = "HH:mm:ss";
         }
         final DateFormat df = createDateFormat(pattern, true);
         try {
-            return new Time(df.parse(value).getTime());
+            return new Time(df.parse(str).getTime());
         } catch (ParseException e) {
             try {
                 df.setLenient(true);
-                df.parse(value); // no exception means illegal date
+                df.parse(str); // no exception means illegal date
                 String msg = "The time expression is out of calendar:";
-                msg = msg + " string=" + value + " pattern=" + pattern;
+                msg = msg + " string=" + str + " pattern=" + pattern;
                 throw new ParseTimeOutOfCalendarException(msg, e);
             } catch (ParseException ignored) {
                 String msg = "Failed to parse the string to time:";
-                msg = msg + " string=" + value + " pattern=" + pattern;
+                msg = msg + " string=" + str + " pattern=" + pattern;
                 throw new ParseTimeException(msg, e);
             }
         }
     }
 
-    protected static String filterTimeStringValueFlexibly(String pureValue) {
-        String value = pureValue;
-        value = value.trim();
-        final int dateEndIndex = value.indexOf(" ");
+    protected static String filterTimeStringValueFlexibly(String pureStr) {
+        String str = pureStr;
+        str = str.trim();
+        final int dateEndIndex = str.indexOf(" ");
         if (dateEndIndex >= 0) {
             // '2008-12-12 12:34:56' to '12:34:56'
-            final String time = value.substring(dateEndIndex + " ".length());
+            final String time = str.substring(dateEndIndex + " ".length());
             final boolean includeMilli = false;
             try {
-                value = handleTimeZeroPrefix(time, pureValue, includeMilli);
+                str = handleTimeZeroPrefix(time, pureStr, includeMilli);
             } catch (ParseDateNumberFormatException e) {
                 String msg = "Failed to format the time as number:";
-                msg = msg + " value=" + pureValue;
+                msg = msg + " value=" + pureStr;
                 throw new ParseTimeNumberFormatException(msg, e);
             }
         }
-        return value;
+        return str;
     }
 
     public static class ParseTimeException extends RuntimeException {
@@ -1224,14 +1159,14 @@ public final class DfTypeUtil {
      * Even if it's the sub class type, it returns a new instance. <br />
      * This method uses default date pattern based on 'yyyy-MM-dd'
      * with flexible-parsing if the object is string type.
-     * @param o The parsed object. (Nullable)
+     * @param obj The parsed object. (Nullable)
      * @return The instance of SQL date. (Nullable)
      * @throws ParseSqlDateException When it failed to parse the string to SQL date.
      * @throws ParseSqlDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.
      */
-    public static java.sql.Date toSqlDate(Object o) {
-        return toSqlDate(o, null);
+    public static java.sql.Date toSqlDate(Object obj) {
+        return toSqlDate(obj, null);
     }
 
     /**
@@ -1240,20 +1175,20 @@ public final class DfTypeUtil {
      * This method uses specified SQL-date pattern when the pattern is not null
      * if the object is string type. If it's null, it uses default SQL-date pattern
      * with flexible-parsing based on 'yyyy-MM-dd'.
-     * @param o The parsed object. (Nullable)
+     * @param obj The parsed object. (Nullable)
      * @param pattern The pattern format to parse. (Nullable)
      * @return The instance of SQL date. (Nullable)
      * @throws ParseSqlDateException When it failed to parse the string to SQL date.
      * @throws ParseSqlDateNumberFormatException When it failed to format the elements as number.
      * @throws ParseSqlDateOutOfCalendarException When the time is out of calendar.
      */
-    public static java.sql.Date toSqlDate(Object o, String pattern) {
-        if (o == null) {
+    public static java.sql.Date toSqlDate(Object obj, String pattern) {
+        if (obj == null) {
             return null;
         }
-        if (o instanceof java.sql.Date) {
+        if (obj instanceof java.sql.Date) {
             final java.sql.Date resultDate;
-            final java.sql.Date paramSqlDate = (java.sql.Date) o;
+            final java.sql.Date paramSqlDate = (java.sql.Date) obj;
             if (java.sql.Date.class.equals(paramSqlDate.getClass())) { // pure SQL-date
                 resultDate = paramSqlDate;
             } else { // sub class
@@ -1265,18 +1200,18 @@ public final class DfTypeUtil {
         }
         final Date date;
         try {
-            date = toDate(o, pattern);
+            date = toDate(obj, pattern);
         } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the time as number:";
-            msg = msg + " obj=" + o + " pattern=" + pattern;
+            msg = msg + " obj=" + obj + " pattern=" + pattern;
             throw new ParseSqlDateNumberFormatException(msg, e);
         } catch (ParseDateOutOfCalendarException e) {
             String msg = "The SQL-date expression is out of calendar:";
-            msg = msg + " obj=" + o + " pattern=" + pattern;
+            msg = msg + " obj=" + obj + " pattern=" + pattern;
             throw new ParseSqlDateOutOfCalendarException(msg, e);
         } catch (ParseDateException e) {
             String msg = "Failed to parse the object to SQL-date:";
-            msg = msg + " obj=" + o + " pattern=" + pattern;
+            msg = msg + " obj=" + obj + " pattern=" + pattern;
             throw new ParseSqlDateException(msg, e);
         }
         if (date != null) {
@@ -1313,13 +1248,13 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                            Calendar
     //                                                                            ========
-    public static Calendar toCalendar(Object o) {
-        return toCalendar(o, null);
+    public static Calendar toCalendar(Object obj) {
+        return toCalendar(obj, null);
     }
 
-    public static Calendar toCalendar(Object o, String pattern) {
-        if (o instanceof Calendar) {
-            final Calendar original = ((Calendar) o);
+    public static Calendar toCalendar(Object obj, String pattern) {
+        if (obj instanceof Calendar) {
+            final Calendar original = ((Calendar) obj);
             final Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(original.getTimeInMillis());
             cal.setTimeZone(original.getTimeZone());
@@ -1327,18 +1262,18 @@ public final class DfTypeUtil {
         }
         final Date date;
         try {
-            date = toDate(o, pattern);
+            date = toDate(obj, pattern);
         } catch (ParseDateNumberFormatException e) {
             String msg = "Failed to format the calendar as number:";
-            msg = msg + " obj=" + o + " pattern=" + pattern;
+            msg = msg + " obj=" + obj + " pattern=" + pattern;
             throw new ParseCalendarNumberFormatException(msg, e);
         } catch (ParseDateOutOfCalendarException e) {
             String msg = "The calendar expression is out of calendar:";
-            msg = msg + " obj=" + o + " pattern=" + pattern;
+            msg = msg + " obj=" + obj + " pattern=" + pattern;
             throw new ParseCalendarOutOfCalendarException(msg, e);
         } catch (ParseDateException e) {
             String msg = "Failed to parse the object to calendar:";
-            msg = msg + " obj=" + o + " pattern=" + pattern;
+            msg = msg + " obj=" + obj + " pattern=" + pattern;
             throw new ParseCalendarParseException(msg, e);
         }
         if (date != null) {
@@ -1440,173 +1375,143 @@ public final class DfTypeUtil {
     }
 
     // ===================================================================================
-    //                                                                              Number
-    //                                                                              ======
-    public static Object toNumber(Class<?> type, Object o) {
-        if (type == Integer.class) {
-            return toInteger(o);
-        } else if (type == BigDecimal.class) {
-            return toBigDecimal(o);
-        } else if (type == Double.class) {
-            return toDouble(o);
-        } else if (type == Long.class) {
-            return toLong(o);
-        } else if (type == Float.class) {
-            return toFloat(o);
-        } else if (type == Short.class) {
-            return toShort(o);
-        } else if (type == BigInteger.class) {
-            return toBigInteger(o);
-        } else if (type == Byte.class) {
-            return toByte(o);
-        }
-        return o;
-    }
-
-    // -----------------------------------------------------
-    //                                             Normalize
-    //                                             ---------
-    protected static String normalize(String value) {
-        return normalize(value, Locale.getDefault());
-    }
-
-    protected static String normalize(String value, Locale locale) {
-        if (value == null) {
-            return null;
-        }
-        final DecimalFormatSymbols symbols = getDecimalFormatSymbols(locale);
-        final char groupingSep = symbols.getGroupingSeparator();
-        final char decimalSep = symbols.getDecimalSeparator();
-        final StringBuilder sb = new StringBuilder(20);
-        for (int i = 0; i < value.length(); ++i) {
-            char c = value.charAt(i);
-            if (c == groupingSep) {
-                continue;
-            } else if (c == decimalSep) {
-                c = '.';
-            }
-            sb.append(c);
-        }
-        return sb.toString();
-    }
-
-    // -----------------------------------------------------
-    //                                          NumberFormat
-    //                                          ------------
-    public static DecimalFormat createDecimalFormat(String pattern) {
-        return new DecimalFormat(pattern);
-    }
-
-    // ===================================================================================
-    //                                                                             Wrapper
+    //                                                                             Boolean
     //                                                                             =======
-    public static Object toWrapper(Class<?> type, Object o) {
-        if (type == int.class) {
-            Integer i = toInteger(o);
-            if (i != null) {
-                return i;
+    public static Boolean toBoolean(Object obj) {
+        if (obj == null) {
+            return (Boolean) obj;
+        } else if (obj instanceof Boolean) {
+            return (Boolean) obj;
+        } else if (obj instanceof Number) {
+            int num = ((Number) obj).intValue();
+            return Boolean.valueOf(num != 0);
+        } else if (obj instanceof String) {
+            final String str = (String) obj;
+            if ("true".equalsIgnoreCase(str)) {
+                return Boolean.TRUE;
+            } else if ("false".equalsIgnoreCase(str)) {
+                return Boolean.FALSE;
+            } else if (str.equalsIgnoreCase("1")) {
+                return Boolean.TRUE;
+            } else if (str.equalsIgnoreCase("0")) {
+                return Boolean.FALSE;
+            } else if (str.equalsIgnoreCase("t")) {
+                return Boolean.TRUE;
+            } else if (str.equalsIgnoreCase("f")) {
+                return Boolean.FALSE;
+            } else {
+                String msg = "Failed to parse the boolean string:";
+                msg = msg + " value=" + str;
+                throw new ToBooleanParseException(msg);
             }
-            return Integer.valueOf(0);
-        } else if (type == double.class) {
-            Double d = toDouble(o);
-            if (d != null) {
-                return d;
-            }
-            return new Double(0);
-        } else if (type == long.class) {
-            Long l = toLong(o);
-            if (l != null) {
-                return l;
-            }
-            return Long.valueOf(0);
-        } else if (type == float.class) {
-            Float f = toFloat(o);
-            if (f != null) {
-                return f;
-            }
-            return new Float(0);
-        } else if (type == short.class) {
-            Short s = toShort(o);
-            if (s != null) {
-                return s;
-            }
-            return Short.valueOf((short) 0);
-        } else if (type == boolean.class) {
-            Boolean b = toBoolean(o);
-            if (b != null) {
-                return b;
-            }
-            return Boolean.FALSE;
-        } else if (type == byte.class) {
-            Byte b = toByte(o);
-            if (b != null) {
-                return b;
-            }
-            return Byte.valueOf((byte) 0);
+        } else if (obj instanceof byte[]) {
+            return toBoolean(toSerializable((byte[]) obj)); // recursive
+        } else {
+            return Boolean.FALSE; // couldn't parse
         }
-        return o;
     }
 
-    public static Object convertPrimitiveWrapper(Class<?> type, Object o) {
-        if (type == int.class) {
-            Integer i = toInteger(o);
-            if (i != null) {
-                return i;
-            }
-            return Integer.valueOf(0);
-        } else if (type == double.class) {
-            Double d = toDouble(o);
-            if (d != null) {
-                return d;
-            }
-            return new Double(0);
-        } else if (type == long.class) {
-            Long l = toLong(o);
-            if (l != null) {
-                return l;
-            }
-            return Long.valueOf(0);
-        } else if (type == float.class) {
-            Float f = toFloat(o);
-            if (f != null) {
-                return f;
-            }
-            return new Float(0);
-        } else if (type == short.class) {
-            Short s = toShort(o);
-            if (s != null) {
-                return s;
-            }
-            return Short.valueOf((short) 0);
-        } else if (type == boolean.class) {
-            Boolean b = toBoolean(o);
-            if (b != null) {
-                return b;
-            }
-            return Boolean.FALSE;
-        } else if (type == byte.class) {
-            Byte b = toByte(o);
-            if (b != null) {
-                return b;
-            }
-            return Byte.valueOf((byte) 0);
+    public static boolean toPrimitiveBoolean(Object obj) {
+        Boolean wrapper = toBoolean(obj);
+        return wrapper != null ? wrapper.booleanValue() : false;
+    }
+
+    public static class ToBooleanParseException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ToBooleanParseException(String msg) {
+            super(msg);
         }
-        return o;
     }
 
     // ===================================================================================
     //                                                                              Binary
     //                                                                              ======
-    public static byte[] toBinary(String o, String encoding) {
-        if (o == null) {
+    public static byte[] toBinary(Serializable obj) {
+        if (obj == null) {
             return null;
         }
         try {
-            return o.getBytes(encoding);
-        } catch (UnsupportedEncodingException e) {
-            String msg = "The encoding is invalid: encoding=" + encoding + " o=" + o;
-            throw new IllegalStateException(msg);
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(obj);
+            try {
+                return baos.toByteArray();
+            } finally {
+                oos.close();
+            }
+        } catch (Exception e) {
+            String msg = "Failed to convert the object to binary: obj=" + obj;
+            throw new IllegalStateException(msg, e);
         }
+    }
+
+    public static Serializable toSerializable(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
+        try {
+            final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            final ObjectInputStream ois = new ObjectInputStream(bais);
+            try {
+                return (Serializable) ois.readObject();
+            } finally {
+                ois.close();
+            }
+        } catch (Exception e) {
+            String msg = "Failed to convert the object to binary: bytes.length=" + bytes.length;
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                             Wrapper
+    //                                                                             =======
+    public static Object toWrapper(Class<?> type, Object obj) {
+        if (type == int.class) {
+            Integer i = toInteger(obj);
+            if (i != null) {
+                return i;
+            }
+            return Integer.valueOf(0);
+        } else if (type == double.class) {
+            Double d = toDouble(obj);
+            if (d != null) {
+                return d;
+            }
+            return new Double(0);
+        } else if (type == long.class) {
+            Long l = toLong(obj);
+            if (l != null) {
+                return l;
+            }
+            return Long.valueOf(0);
+        } else if (type == float.class) {
+            Float f = toFloat(obj);
+            if (f != null) {
+                return f;
+            }
+            return new Float(0);
+        } else if (type == short.class) {
+            Short s = toShort(obj);
+            if (s != null) {
+                return s;
+            }
+            return Short.valueOf((short) 0);
+        } else if (type == boolean.class) {
+            Boolean b = toBoolean(obj);
+            if (b != null) {
+                return b;
+            }
+            return Boolean.FALSE;
+        } else if (type == byte.class) {
+            Byte b = toByte(obj);
+            if (b != null) {
+                return b;
+            }
+            return Byte.valueOf((byte) 0);
+        }
+        return obj;
     }
 
     // ===================================================================================
@@ -1776,22 +1681,22 @@ public final class DfTypeUtil {
     // -----------------------------------------------------
     //                                                String
     //                                                ------
-    protected static String replace(String text, String fromText, String toText) {
-        if (text == null || fromText == null || toText == null) {
+    protected static String replace(String text, String from, String to) {
+        if (text == null || from == null || to == null) {
             return null;
         }
         StringBuilder sb = new StringBuilder();
         int pos = 0;
         int pos2 = 0;
         do {
-            pos = text.indexOf(fromText, pos2);
+            pos = text.indexOf(from, pos2);
             if (pos == 0) {
-                sb.append(toText);
-                pos2 = fromText.length();
+                sb.append(to);
+                pos2 = from.length();
             } else if (pos > 0) {
                 sb.append(text.substring(pos2, pos));
-                sb.append(toText);
-                pos2 = pos + fromText.length();
+                sb.append(to);
+                pos2 = pos + from.length();
             } else {
                 sb.append(text.substring(pos2));
                 return sb.toString();

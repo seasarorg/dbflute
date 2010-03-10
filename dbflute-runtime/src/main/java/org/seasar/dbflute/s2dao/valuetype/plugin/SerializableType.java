@@ -15,10 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.valuetype.plugin;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -61,41 +58,12 @@ public class SerializableType extends BytesType {
         super.bindValue(cs, parameterName, serialize(value));
     }
 
-    protected byte[] serialize(final Object o) throws SQLException {
-        if (o == null) {
-            return null;
-        }
-        try {
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            final ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(o);
-            try {
-                return baos.toByteArray();
-            } finally {
-                oos.close();
-            }
-        } catch (final Exception e) {
-            String msg = "The Exception occurred: object=" + o;
-            throw new IllegalStateException(msg, e);
-        }
+    protected byte[] serialize(final Object obj) throws SQLException {
+        return DfTypeUtil.toBinary((Serializable) obj);
     }
 
-    protected Object deserialize(final Object bytes) throws SQLException {
-        if (bytes == null) {
-            return null;
-        }
-        try {
-            final ByteArrayInputStream bais = new ByteArrayInputStream((byte[]) bytes);
-            final ObjectInputStream ois = new ObjectInputStream(bais);
-            try {
-                return ois.readObject();
-            } finally {
-                ois.close();
-            }
-        } catch (final Exception e) {
-            String msg = "The Exception occurred: object=" + bytes;
-            throw new IllegalStateException(msg, e);
-        }
+    protected Serializable deserialize(final Object bytes) throws SQLException {
+        return DfTypeUtil.toSerializable((byte[]) bytes);
     }
 
     public String toText(Object value) {

@@ -248,7 +248,7 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     }
 
     private Object convertPrimitiveWrapper(Object arg) {
-        return DfTypeUtil.convertPrimitiveWrapper(propertyType, arg);
+        return DfTypeUtil.toWrapper(propertyType, arg);
     }
 
     private Object convertNumber(Object arg) {
