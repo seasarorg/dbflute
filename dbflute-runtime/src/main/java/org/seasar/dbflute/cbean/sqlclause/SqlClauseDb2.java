@@ -24,10 +24,13 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    /** String of fetch-first as sql-suffix. */
-    protected String _fetchFirstSqlSuffix = "";
+    /** String of fetch-scope as select-hint. */
+    protected String _fetchScopeSelectHint = "";
 
-    /** String of lock as from-hint. */
+    /** String of fetch-scope as sql-suffix. */
+    protected String _fetchScopeSqlSuffix = "";
+
+    /** String of lock as sql-suffix. */
     protected String _lockSqlSuffix = "";
 
     // ===================================================================================
@@ -39,6 +42,19 @@ public class SqlClauseDb2 extends AbstractSqlClause {
      **/
     public SqlClauseDb2(String tableDbName) {
         super(tableDbName);
+    }
+
+    // ===================================================================================
+    //                                                                Main Clause Override
+    //                                                                ====================
+    @Override
+    protected String prepareUnionClause(String selectClause) {
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        // Remove select-hint comment from select clause of union
+        // for fetch-scope with union().
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        selectClause = replaceString(selectClause, SELECT_HINT, "");
+        return super.prepareUnionClause(selectClause);
     }
 
     // ===================================================================================
@@ -56,42 +72,43 @@ public class SqlClauseDb2 extends AbstractSqlClause {
      * {@inheritDoc}
      */
     protected void doFetchFirst() {
-        if (isFetchSizeSupported()) {
-            _fetchFirstSqlSuffix = " fetch first " + getFetchSize() + " rows only";
-        }
+        doFetchPage();
     }
 
     /**
-     * {@inheritDoc} {Unsupported!}
+     * {@inheritDoc}
      */
     protected void doFetchPage() {
+        if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
+            return;
+        }
+        _fetchScopeSelectHint = " * from (select base.*, row_number() over() as rn from (" + ln() + "select";
+        _fetchScopeSqlSuffix = "";
+        if (isFetchStartIndexSupported()) {
+            _fetchScopeSqlSuffix = ") base )" + ln() + " where rn > " + getPageStartIndex();
+        }
         if (isFetchSizeSupported()) {
             if (isFetchStartIndexSupported()) {
-                _fetchFirstSqlSuffix = " fetch first " + getFetchSize() + " rows only";
+                _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rn <= " + getPageEndIndex();
             } else {
-                _fetchFirstSqlSuffix = " fetch first " + getPageEndIndex() + " rows only";
+                _fetchScopeSqlSuffix = ") base )" + ln() + " where rn <= " + getPageEndIndex();
             }
         }
     }
 
     /**
-     * {@inheritDoc} {Unsupported!}
+     * {@inheritDoc}
      */
     protected void doClearFetchPageClause() {
-        _fetchFirstSqlSuffix = "";
+        _fetchScopeSelectHint = "";
+        _fetchScopeSqlSuffix = "";
     }
 
-    /**
-     * The override.
-     * @return Determination.
-     */
-    public boolean isFetchStartIndexSupported() {
-        return false;
-    }
-
+    // ===================================================================================
+    //                                                                       Lock Override
+    //                                                                       =============
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
         _lockSqlSuffix = " for update with RS";
@@ -103,15 +120,13 @@ public class SqlClauseDb2 extends AbstractSqlClause {
     //                                                                       =============
     /**
      * {@inheritDoc}
-     * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
-        return "";
+        return _fetchScopeSelectHint;
     }
 
     /**
      * {@inheritDoc}
-     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
         return "";
@@ -119,7 +134,6 @@ public class SqlClauseDb2 extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
         return "";
@@ -127,10 +141,9 @@ public class SqlClauseDb2 extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
-        return _fetchFirstSqlSuffix + _lockSqlSuffix;
+        return _fetchScopeSqlSuffix + _lockSqlSuffix;
     }
 
     // [DBFlute-0.7.9]

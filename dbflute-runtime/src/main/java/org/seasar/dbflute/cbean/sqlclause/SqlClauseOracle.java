@@ -104,7 +104,6 @@ public class SqlClauseOracle extends AbstractSqlClause {
     //                                                                       =============
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
         final DBMeta dbmeta = findDBMeta(_tableDbName);
@@ -123,7 +122,6 @@ public class SqlClauseOracle extends AbstractSqlClause {
     //                                                                       =============
     /**
      * {@inheritDoc}
-     * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
         return _fetchScopeSelectHint;
@@ -131,7 +129,6 @@ public class SqlClauseOracle extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
         return "";
@@ -139,7 +136,6 @@ public class SqlClauseOracle extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
         return "";
@@ -147,7 +143,6 @@ public class SqlClauseOracle extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;
