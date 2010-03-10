@@ -357,8 +357,8 @@
 
 	<target name="reflect-to-buri" depends="prepare-reflection" description="==> reflect to buri example">
 	  	<copy todir="${buri.example.dir}/mydbflute/dbflute-${version}"><fileset dir="${extraction.dir}"/></copy>
-		<replace file="${buri.example.dir}/dbflute_exampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
-		<replace file="${buri.example.dir}/dbflute_exampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
+		<replace file="${buri.example.dir}/dbflute_buriexampledb/_project.bat" token="-${pre.version}" value="-${version}"/>
+		<replace file="${buri.example.dir}/dbflute_buriexampledb/_project.sh" token="-${pre.version}" value="-${version}"/>
 		<delete dir="${buri.example.dir}/mydbflute/dbflute-${pre.version}"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
