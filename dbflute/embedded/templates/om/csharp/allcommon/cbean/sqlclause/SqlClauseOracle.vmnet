@@ -33,7 +33,7 @@ public class ${myClassName} : ${glAbstractSqlClause} {
         selectClause = replaceString(selectClause, SELECT_HINT, "");
         return base.prepareUnionClause(selectClause);
     }
-	
+
     // ===================================================================================
     //                                                                 FetchScope Override
     //                                                                 ===================
@@ -42,21 +42,14 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     }
 
     protected override void doFetchPage() {
-        if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
-            return;
-        }
-        _fetchScopeSelectHint = " * from (select base.*, rownum as rn from (" + ln() + "select";
-        _fetchScopeSqlSuffix = "";
-        if (isFetchStartIndexSupported()) {
-            _fetchScopeSqlSuffix = ") base )" + ln() + " where rn > " + getPageStartIndex();
-        }
-        if (isFetchSizeSupported()) {
-            if (isFetchStartIndexSupported()) {
-                _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rn <= " + getPageEndIndex();
-            } else {
-                _fetchScopeSqlSuffix = ") base )" + ln() + " where rn <= " + getPageEndIndex();
-            }
-        }
+        RownumPagingProcessor processor = new RownumPagingProcessor(getRownumExpression());
+        processor.processRowNumberPaging();
+        _fetchScopeSelectHint = processor.getSelectHint();
+        _fetchScopeSqlSuffix = processor.getSqlSuffix();
+    }
+
+    protected virtual String getRownumExpression() {
+        return "rownum";
     }
 
     protected override void doClearFetchPageClause() {

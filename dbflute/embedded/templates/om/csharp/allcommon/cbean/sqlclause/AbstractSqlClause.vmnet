@@ -1555,6 +1555,10 @@ public abstract class ${myClassName} : ${glSqlClause} {
             _sqlSuffix = suffixSb.toString();
         }
 
+        protected String ln() {
+            return ${glSimpleSystemUtil}.GetLineSeparator();
+        }
+
         public String getSelectHint() {
             return _selectHint;
         }
@@ -2065,7 +2069,7 @@ public abstract class ${myClassName} : ${glSqlClause} {
     protected String replaceString(String text, String fromText, String toText) {
         return ${glSimpleStringUtil}.Replace(text, fromText, toText);
     }
-    
+
     protected String ln() {
         return ${glSimpleSystemUtil}.GetLineSeparator();
     }
