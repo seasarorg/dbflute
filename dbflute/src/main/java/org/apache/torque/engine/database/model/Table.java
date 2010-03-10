@@ -468,6 +468,15 @@ public class Table {
      */
     public String getTableSqlName() {
         final String tableName = quoteTableNameIfNeeds(_name);
+        return processSchemaPrefix(tableName);
+    }
+
+    public String getTableSqlNameDirectUse() {
+        final String tableName = quoteTableNameIfNeedsDirectUse(_name);
+        return processSchemaPrefix(tableName);
+    }
+
+    protected String processSchemaPrefix(String tableName) {
         if (isAvailableAddingSchemaToTableSqlName()) {
             if (_schema != null && _schema.trim().length() > 0) {
                 return _schema + "." + tableName;
@@ -481,19 +490,12 @@ public class Table {
 
     protected String quoteTableNameIfNeeds(String tableName) {
         final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        if (!prop.isQuoteTable(tableName)) {
-            return tableName;
-        }
-        final String beginQuote;
-        final String endQuote;
-        if (getBasicProperties().isDatabaseSqlServer()) {
-            beginQuote = "[";
-            endQuote = "]";
-        } else {
-            beginQuote = "\\\"";
-            endQuote = beginQuote;
-        }
-        return beginQuote + tableName + endQuote;
+        return prop.quoteTableNameIfNeeds(tableName);
+    }
+
+    protected String quoteTableNameIfNeedsDirectUse(String tableName) {
+        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
+        return prop.quoteTableNameIfNeeds(tableName, true);
     }
 
     // -----------------------------------------------------

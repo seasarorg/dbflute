@@ -157,6 +157,26 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return getQuoteTableNameSet().contains(tableName);
     }
 
+    public String quoteTableNameIfNeeds(String tableName) {
+        return quoteTableNameIfNeeds(tableName, false);
+    }
+
+    public String quoteTableNameIfNeeds(String tableName, boolean directUse) {
+        if (!isQuoteTable(tableName)) {
+            return tableName;
+        }
+        final String beginQuote;
+        final String endQuote;
+        if (getBasicProperties().isDatabaseSqlServer()) {
+            beginQuote = "[";
+            endQuote = "]";
+        } else {
+            beginQuote = directUse ? "\"" : "\\\"";
+            endQuote = beginQuote;
+        }
+        return beginQuote + tableName + endQuote;
+    }
+
     // ===================================================================================
     //                                                                                CDef
     //                                                                                ====

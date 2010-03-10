@@ -154,7 +154,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
                     }
                     columnNameList.add(column);
                 }
-                tableColumnMap.put(table.getTableSqlName(), columnNameList);
+                tableColumnMap.put(table.getTableSqlNameDirectUse(), columnNameList);
             }
         } catch (EngineException e) {
             throw new IllegalStateException(e);
