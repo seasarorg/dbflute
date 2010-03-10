@@ -1478,24 +1478,14 @@ public abstract class ${myClassName} : ${glSqlClause} {
             fetchPageNumber = 1;
         }
         if (_fetchSize <= 0) {
-            String msg = "Fetch size should not be minus or zero!" + ln();
+            String msg = "Look! Read the message below." + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-            msg = msg + "Look! Read the message below." + ln();
+            msg = msg + "Fetch size should not be minus or zero." + ln();
             msg = msg + ln();
-            msg = msg + "[Advice]" + ln();
-            msg = msg + "When you invoke this method, it is necessary to invoke 'FetchFirst()' or 'FetchScope()' ahead of that. " + ln();
-            msg = msg + "Please confirm your program. Does it really invoke 'FetchPage()' with 'FetchFirst()' or 'FetchScope()'?" + ln();
-            msg = msg + "  For example:" + ln();
-            msg = msg + "    before (x):" + ln();
-            msg = msg + "      XxxCB cb = new XxxCB();" + ln();
-            msg = msg + "      cb.FetchPage(3);" + ln();
-            msg = msg + "    after  (o):" + ln();
-            msg = msg + "      XxxCB cb = new XxxCB();" + ln();
-            msg = msg + "      cb.FetchFirst(20); // The size of page" + ln();
-            msg = msg + "      cb.FetchPage(3);   // The number of target page" + ln();
-            msg = msg + ln();
-            msg = msg + "[Actual Parameter Value]" + ln();
+            msg = msg + "[Fetch Size]" + ln();
             msg = msg + "fetchSize=" + _fetchSize + ln();
+            msg = msg + ln();
+            msg = msg + "[Fetch Page Number]" + ln();
             msg = msg + "fetchPageNumber=" + fetchPageNumber + ln();
             msg = msg + "* * * * * * * * * */" + ln();
             throw new IllegalStateException(msg);
@@ -1512,6 +1502,67 @@ public abstract class ${myClassName} : ${glSqlClause} {
     abstract protected void doFetchFirst();
     abstract protected void doFetchPage();
     abstract protected void doClearFetchPageClause();
+
+    protected class RownumPagingProcessor {
+        protected String _rownumExpression;
+        protected bool _offset;
+        protected bool _limit;
+        protected int _pageStartIndex;
+        protected int _pageEndIndex;
+        protected String _selectHint = "";
+        protected String _sqlSuffix = "";
+
+        public RownumPagingProcessor(String rownumExpression
+                , bool offset, bool limit, int pageStartIndex, int pageEndIndex) {
+            _rownumExpression = rownumExpression;
+            _offset = offset;
+            _limit = limit;
+            _pageStartIndex = pageStartIndex;
+            _pageEndIndex = pageEndIndex;
+        }
+
+        public void processRowNumberPaging() {
+            bool offset = _offset;
+            bool limit = _limit;
+            if (!offset && !limit) {
+                return;
+            }
+
+            StringBuilder hintSb = new StringBuilder();
+            String rownum = _rownumExpression;
+            hintSb.append(" *").append(ln());
+            hintSb.append("  from (").append(ln());
+            hintSb.append("select plain.*, ").append(rownum).append(" as rn").append(ln());
+            hintSb.append("  from (").append(ln());
+            hintSb.append("select"); // main select
+
+            StringBuilder suffixSb = new StringBuilder();
+            String fromEnd = "       ) plain" + ln() + "       ) ext" + ln();
+            if (offset) {
+                int pageStartIndex = _pageStartIndex;
+                suffixSb.append(fromEnd).append(" where ext.rn > ").append(pageStartIndex);
+            }
+            if (limit) {
+                int pageEndIndex = _pageEndIndex;
+                if (offset) {
+                    suffixSb.append(ln()).append("   and ext.rn <= ").append(pageEndIndex);
+                } else {
+                    suffixSb.append(fromEnd).append(" where ext.rn <= ").append(pageEndIndex);
+                }
+            }
+
+            _selectHint = hintSb.toString();
+            _sqlSuffix = suffixSb.toString();
+        }
+
+        public String getSelectHint() {
+            return _selectHint;
+        }
+
+        public String getSqlSuffix() {
+            return _sqlSuffix;
+        }
+    }
 
     public virtual int getFetchStartIndex() {
         return _fetchStartIndex;
