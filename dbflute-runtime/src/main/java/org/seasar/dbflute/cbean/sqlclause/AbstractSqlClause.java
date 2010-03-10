@@ -1705,6 +1705,58 @@ public abstract class AbstractSqlClause implements SqlClause {
 
     abstract protected void doClearFetchPageClause();
 
+    protected class RownumPagingProcessor {
+        protected String _rownumExpression;
+        protected String _selectHint = "";
+        protected String _sqlSuffix = "";
+
+        public RownumPagingProcessor(String rownumExpression) {
+            _rownumExpression = rownumExpression;
+        }
+
+        public void processRowNumberPaging() {
+            final boolean offset = isFetchStartIndexSupported();
+            final boolean limit = isFetchSizeSupported();
+            if (!offset && !limit) {
+                return;
+            }
+
+            final StringBuilder hintSb = new StringBuilder();
+            final String rownum = _rownumExpression;
+            hintSb.append(" *").append(ln());
+            hintSb.append("  from (").append(ln());
+            hintSb.append("select plain.*, ").append(rownum).append(" as rn").append(ln());
+            hintSb.append("  from (").append(ln());
+            hintSb.append("select"); // main select
+
+            final StringBuilder suffixSb = new StringBuilder();
+            final String fromEnd = "       ) plain" + ln() + "       ) ext" + ln();
+            if (offset) {
+                final int pageStartIndex = getPageStartIndex();
+                suffixSb.append(fromEnd).append(" where ext.rn > ").append(pageStartIndex);
+            }
+            if (limit) {
+                final int pageEndIndex = getPageEndIndex();
+                if (offset) {
+                    suffixSb.append(ln()).append("   and ext.rn <= ").append(pageEndIndex);
+                } else {
+                    suffixSb.append(fromEnd).append(" where ext.rn <= ").append(pageEndIndex);
+                }
+            }
+
+            _selectHint = hintSb.toString();
+            _sqlSuffix = suffixSb.toString();
+        }
+
+        public String getSelectHint() {
+            return _selectHint;
+        }
+
+        public String getSqlSuffix() {
+            return _sqlSuffix;
+        }
+    }
+
     public int getFetchStartIndex() {
         return _fetchStartIndex;
     }

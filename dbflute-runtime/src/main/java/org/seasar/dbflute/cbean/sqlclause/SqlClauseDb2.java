@@ -79,21 +79,14 @@ public class SqlClauseDb2 extends AbstractSqlClause {
      * {@inheritDoc}
      */
     protected void doFetchPage() {
-        if (!isFetchStartIndexSupported() && !isFetchSizeSupported()) {
-            return;
-        }
-        _fetchScopeSelectHint = " * from (select base.*, row_number() over() as rn from (" + ln() + "select";
-        _fetchScopeSqlSuffix = "";
-        if (isFetchStartIndexSupported()) {
-            _fetchScopeSqlSuffix = ") base )" + ln() + " where rn > " + getPageStartIndex();
-        }
-        if (isFetchSizeSupported()) {
-            if (isFetchStartIndexSupported()) {
-                _fetchScopeSqlSuffix = _fetchScopeSqlSuffix + " and rn <= " + getPageEndIndex();
-            } else {
-                _fetchScopeSqlSuffix = ") base )" + ln() + " where rn <= " + getPageEndIndex();
-            }
-        }
+        final RownumPagingProcessor processor = new RownumPagingProcessor(getRownumExpression());
+        processor.processRowNumberPaging();
+        _fetchScopeSelectHint = processor.getSelectHint();
+        _fetchScopeSqlSuffix = processor.getSqlSuffix();
+    }
+
+    protected String getRownumExpression() {
+        return "row_number() over()";
     }
 
     /**
