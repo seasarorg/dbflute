@@ -42,7 +42,9 @@ public class ${myClassName} : ${glAbstractSqlClause} {
     }
 
     protected override void doFetchPage() {
-        RownumPagingProcessor processor = new RownumPagingProcessor(getRownumExpression());
+        RownumPagingProcessor processor = new RownumPagingProcessor(getRownumExpression()
+            , isFetchStartIndexSupported(), isFetchSizeSupported()
+            , getPageStartIndex(), getPageEndIndex());
         processor.processRowNumberPaging();
         _fetchScopeSelectHint = processor.getSelectHint();
         _fetchScopeSqlSuffix = processor.getSqlSuffix();
