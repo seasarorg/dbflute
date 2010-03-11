@@ -111,8 +111,7 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     //                                                                       Lock Override
     //                                                                       =============
     /**
-     * {@inheritDoc} {Implement}
-     * @return this. (NotNull)
+     * {@inheritDoc}
      */
     public SqlClause lockForUpdate() {
         _lockFromHint = " with (updlock)";
@@ -124,7 +123,6 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
     //                                                                       =============
     /**
      * {@inheritDoc}
-     * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
         return _fetchFirstSelectHint;
@@ -132,7 +130,6 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
         return _lockFromHint;
@@ -140,7 +137,6 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
         return "";
@@ -148,7 +144,6 @@ public class SqlClauseSqlServer extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
         return "";

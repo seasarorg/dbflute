@@ -58,7 +58,6 @@ public class SqlClauseH2 extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
         _lockSqlSuffix = " for update";
@@ -67,7 +66,6 @@ public class SqlClauseH2 extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
         return "";
@@ -75,7 +73,6 @@ public class SqlClauseH2 extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
         return "";
@@ -83,7 +80,6 @@ public class SqlClauseH2 extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
         return "";
@@ -91,7 +87,6 @@ public class SqlClauseH2 extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
         return _fetchScopeSqlSuffix + _lockSqlSuffix;

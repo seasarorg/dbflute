@@ -68,8 +68,6 @@ public class SqlClauseFirebird extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return this. (NotNull)
      */
     public SqlClause lockForUpdate() {
         _lockSqlSuffix = " for update with lock";
@@ -78,8 +76,6 @@ public class SqlClauseFirebird extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return Select-hint. (NotNull)
      */
     protected String createSelectHint() {
         return _fetchScopeSelectHint;
@@ -87,8 +83,6 @@ public class SqlClauseFirebird extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return From-base-table-hint. {select * from table [from-base-table-hint] where ...} (NotNull)
      */
     protected String createFromBaseTableHint() {
         return "";
@@ -96,8 +90,6 @@ public class SqlClauseFirebird extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return From-hint. (NotNull)
      */
     protected String createFromHint() {
         return "";
@@ -105,8 +97,6 @@ public class SqlClauseFirebird extends AbstractSqlClause {
 
     /**
      * {@inheritDoc}
-     * 
-     * @return Sql-suffix. (NotNull)
      */
     protected String createSqlSuffix() {
         return _lockSqlSuffix;
