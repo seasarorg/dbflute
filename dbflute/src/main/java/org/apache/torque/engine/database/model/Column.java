@@ -1535,6 +1535,16 @@ public class Column {
         return getIncludeQueryProperties().isAvailableStringNotInScope(getTableName(), getName());
     }
 
+    public boolean isAvailableStringEmptyString() {
+        if (hasQueryRestrictionByFlgClassification()) {
+            return false;
+        }
+        if (!getDatabaseChecked().isMakeConditionQueryEqualEmptyString()) {
+            return false;
+        }
+        return getIncludeQueryProperties().isAvailableStringEmptyString(getTableName(), getName());
+    }
+
     // -----------------------------------------------------
     //                                                Number
     //                                                ------

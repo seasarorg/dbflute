@@ -115,6 +115,10 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
         return isAvailable("String", "NotInScope", tableName, columnName);
     }
 
+    public boolean isAvailableStringEmptyString(String tableName, String columnName) {
+        return isAvailable("String", "EmptyString", tableName, columnName);
+    }
+
     // ---------------------------------------
     //                                  Number
     //                                  ------

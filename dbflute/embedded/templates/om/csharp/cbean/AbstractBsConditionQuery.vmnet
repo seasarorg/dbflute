@@ -26,7 +26,7 @@ namespace ${glPackageBaseCQ} {
 #if (${col.isJavaNativeStringObject()})
 
         public void Set${tmpJavaName}_Equal(${col.javaNative} v) { DoSet${tmpJavaName}_Equal(fRES(v)); }
-#if ($database.isMakeConditionQueryEqualEmptyString())
+#if (${col.isAvailableStringEmptyString()})
         public void Set${tmpJavaName}_Equal_EmptyString() { DoSet${tmpJavaName}_Equal(""); }
 #end
 #if (${col.hasClassification()})
@@ -43,7 +43,7 @@ namespace ${glPackageBaseCQ} {
         protected void DoSet${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, v); }
 #if (${col.isAvailableStringNotEqual()})
         public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { DoSet${tmpJavaName}_NotEqual(fRES(v)); }
-#if ($database.isMakeConditionQueryEqualEmptyString())
+#if (${col.isAvailableStringEmptyString()})
         public void Set${tmpJavaName}_NotEqual_EmptyString() { DoSet${tmpJavaName}_NotEqual(""); }
 #end
 #if (${col.hasClassification()})

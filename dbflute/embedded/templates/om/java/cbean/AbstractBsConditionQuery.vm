@@ -62,7 +62,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void set${tmpJavaName}_Equal(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         doSet${tmpJavaName}_Equal(fRES(${tmpUncapitalisedJavaName}));
     }
-#if ($database.isMakeConditionQueryEqualEmptyString())
+#if (${col.isAvailableStringEmptyString()})
 
     /**
      * Equal(=). As the empty-string. And OnlyOnceRegistered.
@@ -100,7 +100,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
     public void set${tmpJavaName}_NotEqual(${col.javaNative} ${tmpUncapitalisedJavaName}) {
         doSet${tmpJavaName}_NotEqual(fRES(${tmpUncapitalisedJavaName}));
     }
-#if ($database.isMakeConditionQueryEqualEmptyString())
+#if (${col.isAvailableStringEmptyString()})
 
     /**
      * Equal(!=). As the empty-string. And OnlyOnceRegistered.
