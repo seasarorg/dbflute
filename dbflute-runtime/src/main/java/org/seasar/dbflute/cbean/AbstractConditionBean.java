@@ -776,7 +776,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
             String msg = "The argument[primaryKeyMap] must not be empty.";
             throw new IllegalArgumentException(msg);
         }
-        DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        DBMeta dbmeta = getDBMeta();
         List<ColumnInfo> columnInfoList = dbmeta.getPrimaryUniqueInfo().getUniqueColumnList();
         for (ColumnInfo columnInfo : columnInfoList) {
             String columnDbName = columnInfo.getColumnDbName();
