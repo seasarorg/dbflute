@@ -9,9 +9,14 @@ import org.seasar.dbflute.cbean.PagingBean;
 import org.seasar.dbflute.cbean.UnionQuery;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementConfig;
 
 public class MockConditionBean implements ConditionBean {
+
+    public DBMeta getDBMeta() {
+        return null;
+    }
 
     public void acceptPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
     }

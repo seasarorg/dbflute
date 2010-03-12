@@ -97,6 +97,16 @@ public abstract class AbstractConditionBean implements ConditionBean {
     protected boolean _forInScopeSubQuery;
 
     // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    /**
+     * {@inheritDoc}
+     */
+    public DBMeta getDBMeta() {
+        return getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+    }
+
+    // ===================================================================================
     //                                                                           SqlClause
     //                                                                           =========
     /**

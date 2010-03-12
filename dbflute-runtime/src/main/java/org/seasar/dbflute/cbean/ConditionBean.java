@@ -18,6 +18,7 @@ package org.seasar.dbflute.cbean;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.jdbc.StatementConfig;
 
 /**
@@ -34,6 +35,15 @@ public interface ConditionBean extends PagingBean {
      * @return Table DB-name. (NotNull)
      */
     String getTableDbName();
+
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    /**
+     * Get the instance of DBMeta.
+     * @return The instance of DBMeta. (NotNull)
+     */
+    DBMeta getDBMeta();
 
     // ===================================================================================
     //                                                                           SqlClause
