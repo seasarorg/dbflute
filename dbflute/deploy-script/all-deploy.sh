@@ -1,7 +1,14 @@
 cd ..
-ant -f build.xml reflect-to-others-for-mac
+ant -f build.xml reflect-to-all-for-mac
 
-cd ../dbflute-spring-example/dbflute_exampledb
+cd ../dbflute-basic-example/dbflute_exampledb
+rm ./log/*.log
+. jdbc.sh
+. doc.sh
+. generate.sh
+. sql2entity.sh
+
+cd ../../dbflute-spring-example/dbflute_exampledb
 rm ./log/*.log
 . jdbc.sh
 . doc.sh
