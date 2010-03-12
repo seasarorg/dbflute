@@ -225,8 +225,7 @@ public class DfBehaviorQueryPathSetupper {
         final StringBuilder sb = new StringBuilder();
         try {
             while (true) {
-                String line;
-                line = reader.readLine();
+                final String line = reader.readLine();
                 if (line == null) {
                     break;
                 }
@@ -427,7 +426,13 @@ public class DfBehaviorQueryPathSetupper {
                         final String title = behaviorQueryElementMap.get("title");
                         if (title != null && title.trim().length() > 0) {
                             final String resolvedTitle = docprop.resolveTextForJavaDoc(title, indent);
-                            definitionLineSb.append(indent + "/** " + resolvedTitle + " */\n");
+                            final String commentExp;
+                            if (getBasicProperties().isTargetLanguageCSharp()) {
+                                commentExp = indent + "/// <summary>" + resolvedTitle + " </summary>\n";
+                            } else {
+                                commentExp = indent + "/** " + resolvedTitle + " */\n"; // basically here
+                            }
+                            definitionLineSb.append(commentExp);
                         }
 
                         definitionLineSb.append(indent);
