@@ -229,11 +229,7 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isDataXlsTemplateContainsCommonColumn() {
-        String value = (String) getDocumentDefinitionMap().get("dataXlsTemplateContainsCommonColumn");
-        if (value == null) {
-            value = (String) getDocumentDefinitionMap().get("isDataXlsTemplateContainsCommonColumn");
-        }
-        return value != null && value.trim().equalsIgnoreCase("true");
+        return isProperty("isDataXlsTemplateContainsCommonColumn", false, getDocumentDefinitionMap());
     }
 
     public File getDataXlsTemplateFile() {

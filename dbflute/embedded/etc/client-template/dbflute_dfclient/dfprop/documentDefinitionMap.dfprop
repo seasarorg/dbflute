@@ -5,7 +5,7 @@
 # o isEntityJavaDocDbCommentValid (NotRequired - Default false)
 # o isEntityDBMetaDbCommentValid (NotRequired - Default false)
 # o dataXlsTemplateRecordLimit (NotRequired - Default '')
-# o dataXlsTemplateContainsCommonColumn (NotRequired - Default false)
+# o isDataXlsTemplateContainsCommonColumn (NotRequired - Default false)
 # 
 # Example:
 # map:{
@@ -13,7 +13,7 @@
 #     ; isEntityJavaDocDbCommentValid = true
 #     ; isEntityDBMetaDbCommentValid = true
 #     ; dataXlsTemplateRecordLimit = 10
-#     ; dataXlsTemplateContainsCommonColumn = false
+#     ; isDataXlsTemplateContainsCommonColumn = false
 # }
 #
 # *The line that starts with '#' means comment-out.
@@ -54,12 +54,12 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o dataXlsTemplateContainsCommonColumn (NotRequired - Default 'false')
-    #  Does Data Excel Template contain common columns?
+    # o isDataXlsTemplateContainsCommonColumn (NotRequired - Default 'false')
+    #  Does data excel template contain common columns?
     #  Basically you don't need this
-    #  because common column is resolved on replace-schema.
+    #  because common columns are resolved on replace-schema.
     # 
-    #; dataXlsTemplateContainsCommonColumn = false
+    #; isDataXlsTemplateContainsCommonColumn = false
     # - - - - - - - - - -/
 }
 # ----------------/
