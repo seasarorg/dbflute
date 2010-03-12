@@ -14,6 +14,11 @@ namespace ${glPackageBaseCommonCBean} {
         String TableDbName { get; }
 
         // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
+        ${glDBMeta} DBMeta { get; }
+
+        // ===============================================================================
         //                                                                       SqlClause
         //                                                                       =========
         ${glSqlClause} SqlClause { get; }

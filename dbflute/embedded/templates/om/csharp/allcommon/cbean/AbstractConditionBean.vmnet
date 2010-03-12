@@ -46,6 +46,11 @@ namespace ${glPackageBaseCommonCBean} {
         public abstract String TableDbName { get; }
 
         // ===============================================================================
+        //                                                                          DBMeta
+        //                                                                          ======
+        public ${glDBMeta} DBMeta { get { return ${glDBMetaInstanceHandler}.FindDBMeta(TableDbName); } }
+
+        // ===============================================================================
         //                                                                       SqlClause
         //                                                                       =========
         public ${glSqlClause} SqlClause { get { return _sqlClause; } }
