@@ -45,6 +45,7 @@ import org.seasar.dbflute.helper.language.grammar.DfGrammarInfo;
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -87,7 +88,8 @@ public class DfBehaviorQueryPathSetupper {
         if (sqlFileList.isEmpty()) {
             return;
         }
-        reflectBehaviorQueryPath(createBehaviorQueryPathMap(sqlFileList));
+        final Map<String, Map<String, String>> behaviorQueryPathMap = createBehaviorQueryPathMap(sqlFileList);
+        reflectBehaviorQueryPath(behaviorQueryPathMap);
     }
 
     // ===================================================================================
@@ -139,39 +141,6 @@ public class DfBehaviorQueryPathSetupper {
                 className = className.substring(basePrefix.length(), className.length());
             }
             resultMap.put(className, entry.getValue());
-
-            // additional element
-            final Map<String, Map<String, String>> behaviorQueryPathMap = entry.getValue();
-            final Set<Entry<String, Map<String, String>>> bqpSet = behaviorQueryPathMap.entrySet();
-            for (Entry<String, Map<String, String>> elementEntry : bqpSet) {
-                final Map<String, String> elementMap = elementEntry.getValue();
-                final String path = elementMap.get("path");
-                final File sqlFile = new File(path);
-                final DfOutsideSqlMarkAnalyzer analyzer = new DfOutsideSqlMarkAnalyzer();
-                final BufferedReader reader = new BufferedReader(newInputStreamReader(sqlFile));
-                final StringBuilder sb = new StringBuilder();
-                try {
-                    while (true) {
-                        String line;
-                        line = reader.readLine();
-                        if (line == null) {
-                            break;
-                        }
-                        sb.append(line).append(ln());
-                    }
-                } catch (IOException e) {
-                    String msg = "Failed to read the SQL: " + sqlFile;
-                    throw new IllegalStateException(msg, e);
-                }
-                final String sql = sb.toString();
-                final String customizeEntity = analyzer.getCustomizeEntityName(sql);
-                final String parameterBean = analyzer.getParameterBeanName(sql);
-                elementMap.put("customizeEntity", customizeEntity);
-                elementMap.put("parameterBean", parameterBean);
-                elementMap.put("cursor", analyzer.isCursor(sql) ? "cursor" : null);
-                elementMap.put("title", analyzer.getTitle(sql));
-                elementMap.put("description", analyzer.getDescription(sql));
-            }
         }
         return resultMap;
     }
@@ -244,7 +213,37 @@ public class DfBehaviorQueryPathSetupper {
             behaviorQueryElement.put("behaviorName", behaviorName);
             behaviorQueryElement.put("behaviorQueryPath", behaviorQueryPath);
             behaviorQueryPathMap.put(path, behaviorQueryElement);
+
+            // setup informations in the SQL file
+            setupInfoInSqlFile(sqlFile, behaviorQueryElement);
         }
+    }
+
+    protected void setupInfoInSqlFile(File sqlFile, Map<String, String> elementMap) {
+        final DfOutsideSqlMarkAnalyzer analyzer = new DfOutsideSqlMarkAnalyzer();
+        final BufferedReader reader = new BufferedReader(newInputStreamReader(sqlFile));
+        final StringBuilder sb = new StringBuilder();
+        try {
+            while (true) {
+                String line;
+                line = reader.readLine();
+                if (line == null) {
+                    break;
+                }
+                sb.append(line).append(ln());
+            }
+        } catch (IOException e) {
+            String msg = "Failed to read the SQL: " + sqlFile;
+            throw new IllegalStateException(msg, e);
+        }
+        final String sql = sb.toString();
+        final String customizeEntity = analyzer.getCustomizeEntityName(sql);
+        final String parameterBean = analyzer.getParameterBeanName(sql);
+        elementMap.put("customizeEntity", customizeEntity);
+        elementMap.put("parameterBean", parameterBean);
+        elementMap.put("cursor", analyzer.isCursor(sql) ? "cursor" : null);
+        elementMap.put("title", analyzer.getTitle(sql));
+        elementMap.put("description", analyzer.getDescription(sql));
     }
 
     /**
@@ -310,9 +309,9 @@ public class DfBehaviorQueryPathSetupper {
         }
 
         final Map<File, Map<String, Map<String, String>>> reflectResourceMap = new HashMap<File, Map<String, Map<String, String>>>();
-        final Set<String> keySet = behaviorQueryPathMap.keySet();
-        for (String key : keySet) {
-            final Map<String, String> behaviorQueryElementMap = behaviorQueryPathMap.get(key);
+        final Set<Entry<String, Map<String, String>>> entrySet = behaviorQueryPathMap.entrySet();
+        for (Entry<String, Map<String, String>> entry : entrySet) {
+            final Map<String, String> behaviorQueryElementMap = entry.getValue();
             final String behaviorName = behaviorQueryElementMap.get("behaviorName");
             final String behaviorQueryPath = behaviorQueryElementMap.get("behaviorQueryPath");
             final File bsbhvFile = bsbhvFileMap.get(behaviorName);
@@ -394,6 +393,7 @@ public class DfBehaviorQueryPathSetupper {
         final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
         final String behaviorQueryPathBeginMark = getBasicProperties().getBehaviorQueryPathBeginMark();
         final String behaviorQueryPathEndMark = getBasicProperties().getBehaviorQueryPathEndMark();
+        final DfDocumentProperties docprop = getDocumentProperties();
         String lineString = null;
         final StringBuilder sb = new StringBuilder();
         try {
@@ -422,8 +422,15 @@ public class DfBehaviorQueryPathSetupper {
                     for (String behaviorQueryPath : behaviorQueryPathSet) {
                         final Map<String, String> behaviorQueryElementMap = resourceElementMap.get(behaviorQueryPath);
                         final StringBuilder definitionLineSb = new StringBuilder();
-                        definitionLineSb
-                                .append(lineString.substring(0, lineString.indexOf(behaviorQueryPathBeginMark)));
+                        final String indent = lineString.substring(0, lineString.indexOf(behaviorQueryPathBeginMark));
+
+                        final String title = behaviorQueryElementMap.get("title");
+                        if (title != null && title.trim().length() > 0) {
+                            final String resolvedTitle = docprop.resolveTextForJavaDoc(title, indent);
+                            definitionLineSb.append(indent + "/** " + resolvedTitle + " */\n");
+                        }
+
+                        definitionLineSb.append(indent);
                         definitionLineSb.append(grammarInfo.getPublicStaticDefinition());
                         final String subDirectoryPath = behaviorQueryElementMap.get("subDirectoryPath");
                         if (DfStringUtil.isNotNullAndNotTrimmedEmpty(subDirectoryPath)) {
@@ -535,6 +542,10 @@ public class DfBehaviorQueryPathSetupper {
 
     protected DfOutsideSqlProperties getOutsideSqlProperties() {
         return _buildProperties.getOutsideSqlProperties();
+    }
+
+    protected DfDocumentProperties getDocumentProperties() {
+        return _buildProperties.getDocumentProperties();
     }
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {

@@ -95,7 +95,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected final Map<String, Object> _cursorInfoMap = new LinkedHashMap<String, Object>();
     protected final Map<String, DfParameterBeanMetaData> _pmbMetaDataMap = new LinkedHashMap<String, DfParameterBeanMetaData>();
     protected final Map<String, File> _entitySqlFileMap = new LinkedHashMap<String, File>();
-    protected final Map<String, Map<String, String>> _behaviorQueryPathMap = new LinkedHashMap<String, Map<String, String>>();
     protected final Map<String, String> _exceptionInfoMap = new LinkedHashMap<String, String>();
     protected final Map<String, List<String>> _primaryKeyMap = new LinkedHashMap<String, List<String>>();
 

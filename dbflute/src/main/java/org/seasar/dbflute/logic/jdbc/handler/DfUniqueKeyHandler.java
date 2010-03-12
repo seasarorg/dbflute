@@ -75,27 +75,35 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             return info;
         }
         ResultSet parts = null;
+        ResultSet lowerSpare = null;
+        ResultSet upperSpare = null;
         try {
             parts = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName);
-            while (parts.next()) {
-                final String columnName = getPrimaryKeyColumnNameFromDBMeta(parts);
-                final String pkName = getPrimaryKeyNameFromDBMeta(parts);
-                info.addPrimaryKeyList(columnName, pkName);
-            }
-            if (!info.hasPrimaryKey()) { // for lower case
-                parts = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName.toLowerCase());
+            if (parts != null) {
                 while (parts.next()) {
                     final String columnName = getPrimaryKeyColumnNameFromDBMeta(parts);
                     final String pkName = getPrimaryKeyNameFromDBMeta(parts);
                     info.addPrimaryKeyList(columnName, pkName);
                 }
             }
+            if (!info.hasPrimaryKey()) { // for lower case
+                lowerSpare = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName.toLowerCase());
+                if (lowerSpare != null) {
+                    while (lowerSpare.next()) {
+                        final String columnName = getPrimaryKeyColumnNameFromDBMeta(lowerSpare);
+                        final String pkName = getPrimaryKeyNameFromDBMeta(lowerSpare);
+                        info.addPrimaryKeyList(columnName, pkName);
+                    }
+                }
+            }
             if (!info.hasPrimaryKey()) { // for upper case
-                parts = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName.toUpperCase());
-                while (parts.next()) {
-                    final String columnName = getPrimaryKeyColumnNameFromDBMeta(parts);
-                    final String pkName = getPrimaryKeyNameFromDBMeta(parts);
-                    info.addPrimaryKeyList(columnName, pkName);
+                upperSpare = getPrimaryKeyResultSetFromDBMeta(metaData, schemaName, tableName.toUpperCase());
+                if (upperSpare != null) {
+                    while (upperSpare.next()) {
+                        final String columnName = getPrimaryKeyColumnNameFromDBMeta(upperSpare);
+                        final String pkName = getPrimaryKeyNameFromDBMeta(upperSpare);
+                        info.addPrimaryKeyList(columnName, pkName);
+                    }
                 }
             }
             // check except columns
@@ -104,13 +112,23 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
             if (parts != null) {
                 parts.close();
             }
+            if (lowerSpare != null) {
+                lowerSpare.close();
+            }
+            if (upperSpare != null) {
+                upperSpare.close();
+            }
         }
         return info;
     }
 
-    protected ResultSet getPrimaryKeyResultSetFromDBMeta(DatabaseMetaData dbMeta, String schemaName, String tableName)
-            throws SQLException {
-        return dbMeta.getPrimaryKeys(null, schemaName, tableName);
+    protected ResultSet getPrimaryKeyResultSetFromDBMeta(DatabaseMetaData dbMeta, String schemaName, String tableName) {
+        try {
+            return dbMeta.getPrimaryKeys(null, schemaName, tableName);
+        } catch (SQLException ignored) {
+            // patch: MySQL throws SQLException when the table was not found
+            return null;
+        }
     }
 
     protected String getPrimaryKeyColumnNameFromDBMeta(ResultSet resultSet) throws SQLException {
