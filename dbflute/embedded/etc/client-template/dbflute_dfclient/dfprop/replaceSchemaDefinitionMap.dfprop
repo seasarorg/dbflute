@@ -120,10 +120,10 @@ map:{
     #  You can drop additional other schemas.
     #  Elements of this map are as below:
     #   o url: (NotRequired - Default same as main schema)
+    #   o schema: (Required: if empty schema means valid schema, not required)
     #   o user: (NotRequired - Default same as main schema)
     #   o password: (NotRequired - Default same as main schema)
     #   o propertiesMap: (NotRequired - Default map:{})
-    #   o schema: (Required: if empty schema means valid schema, not required)
     #   o objectTypeTargetList: (NotRequired - Default list{TABLE;VIEW})
     #   o tableExceptList: (NotRequired - Default list{})
     #   o tableTargetList: (NotRequired - Default list{})
@@ -132,10 +132,10 @@ map:{
     #; additionalDropMapList = list:{
     #    ; map:{
     #        ; url = jdbc:oracle:thin:...
+    #        ; schema = NEXTEXAMPLEDB
     #        ; user = NEXTEXAMPLEDB
     #        ; password = NEXTEXAMPLEDB
     #        ; propertiesMap = map:{}
-    #        ; schema = NEXTEXAMPLEDB
     #        ; objectTypeTargetList = list:{TABLE;VIEW}
     #        ; tableExceptList = list:{FULL_NAME ; prefix:PREFIX_ ; ...}
     #        ; tableTargetList = list:{FULL_NAME ; prefix:PREFIX_ ; ...}
