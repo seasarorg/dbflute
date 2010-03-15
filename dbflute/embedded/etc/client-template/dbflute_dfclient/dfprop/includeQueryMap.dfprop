@@ -8,8 +8,8 @@
 # }
 #
 # PropertyType: String, Number, Date
-# Operand: Equal, NotEqual, GreaterThan, LessThan, GreaterEqual, LessEqual
-#          , PrefixSearch, InScope, NotInScope, LikeSearch, NotLikeSearch
+# Operand: NotEqual, GreaterThan, LessThan, GreaterEqual, LessEqual, PrefixSearch
+#          , InScope, NotInScope, LikeSearch, NotLikeSearch, EmptyString
 # 
 # Example:
 # map:{
