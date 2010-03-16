@@ -18,6 +18,22 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("ccc", splitList.get(2));
     }
 
+    public void test_splitList_notTrim() {
+        String ln = DfSystemUtil.getLineSeparator();
+        List<String> splitList = DfStringUtil.splitList("aaa " + ln + "bbb" + ln + " ccc", ln);
+        assertEquals("aaa ", splitList.get(0));
+        assertEquals("bbb", splitList.get(1));
+        assertEquals(" ccc", splitList.get(2));
+    }
+
+    public void test_splitListTrimmed_trim() {
+        String ln = DfSystemUtil.getLineSeparator();
+        List<String> splitList = DfStringUtil.splitListTrimmed("aaa " + ln + "bbb" + ln + " ccc", ln);
+        assertEquals("aaa", splitList.get(0));
+        assertEquals("bbb", splitList.get(1));
+        assertEquals("ccc", splitList.get(2));
+    }
+
     public void test_rtrim_default() {
         assertNull(DfStringUtil.rtrim(null));
         assertEquals(" foo", DfStringUtil.rtrim(" foo "));

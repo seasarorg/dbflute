@@ -182,13 +182,14 @@ public abstract class AbstractDBMeta implements DBMeta {
             Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
             Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
             String columnComment, String foreignListExp, String refererrListExp) { // createColumnInfo()
+        final String delimiter = ",";
         List<String> foreignPropList = null;
         if (foreignListExp != null && foreignListExp.trim().length() > 0) {
-            foreignPropList = DfStringUtil.splitListTrimmed(foreignListExp, ",");
+            foreignPropList = DfStringUtil.splitList(foreignListExp, delimiter);
         }
         List<String> refererrPropList = null;
         if (refererrListExp != null && refererrListExp.trim().length() > 0) {
-            refererrPropList = DfStringUtil.splitListTrimmed(refererrListExp, ",");
+            refererrPropList = DfStringUtil.splitList(refererrListExp, delimiter);
         }
         return new ColumnInfo(this, columnDbName, columnAlias, notNull, propertyName, propertyType, primary,
                 autoIncrement, columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType,
