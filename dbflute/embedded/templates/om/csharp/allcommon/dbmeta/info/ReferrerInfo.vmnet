@@ -121,6 +121,13 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         }
 
         // ===============================================================================
+        //                                                                  Basic Override
+        //                                                                  ==============
+        public override String ToString() {
+            return localDBMeta.TableDbName + "." + referrerPropertyName + "->" + referrerDBMeta.TableDbName;
+        }
+
+        // ===============================================================================
         //                                                                        Accessor
         //                                                                        ========
         public String ReferrerPropertyName {
