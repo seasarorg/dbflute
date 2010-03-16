@@ -51,7 +51,7 @@ public class ColumnInfo {
     protected final OptimisticLockType _optimisticLockType;
     protected final String _columnComment;
     protected final List<String> _foreignPropList;
-    protected final List<String> _refererrPropList;
+    protected final List<String> _referrerPropList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -59,7 +59,7 @@ public class ColumnInfo {
     public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, boolean notNull, String propertyName,
             Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
             Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
-            String columnComment, List<String> foreignPropList, List<String> refererrPropList) {
+            String columnComment, List<String> foreignPropList, List<String> referrerPropList) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
         assertObjectNotNull("propertyName", propertyName);
@@ -79,7 +79,7 @@ public class ColumnInfo {
         this._optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
         this._columnComment = columnComment;
         this._foreignPropList = foreignPropList != null ? foreignPropList : EMPTY_LIST;
-        this._refererrPropList = refererrPropList != null ? refererrPropList : EMPTY_LIST;
+        this._referrerPropList = referrerPropList != null ? referrerPropList : EMPTY_LIST;
 
     }
 
@@ -311,7 +311,7 @@ public class ColumnInfo {
     public List<ReferrerInfo> getReferrerInfoList() {
         // find at this timing because initialization timing of column info is before FK's one.
         final List<ReferrerInfo> referrerInfoList = new ArrayList<ReferrerInfo>();
-        for (String fkProp : _refererrPropList) {
+        for (String fkProp : _referrerPropList) {
             referrerInfoList.add(getDBMeta().findReferrerInfo(fkProp));
         }
         return Collections.unmodifiableList(referrerInfoList); // as read-only

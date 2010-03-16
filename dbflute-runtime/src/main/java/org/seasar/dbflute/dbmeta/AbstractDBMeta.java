@@ -181,19 +181,19 @@ public abstract class AbstractDBMeta implements DBMeta {
     protected ColumnInfo cci(String columnDbName, String columnAlias, boolean notNull, String propertyName,
             Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
             Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
-            String columnComment, String foreignListExp, String refererrListExp) { // createColumnInfo()
+            String columnComment, String foreignListExp, String referrerListExp) { // createColumnInfo()
         final String delimiter = ",";
         List<String> foreignPropList = null;
         if (foreignListExp != null && foreignListExp.trim().length() > 0) {
-            foreignPropList = DfStringUtil.splitList(foreignListExp, delimiter);
+            foreignPropList = splitListTrimmed(foreignListExp, delimiter);
         }
-        List<String> refererrPropList = null;
-        if (refererrListExp != null && refererrListExp.trim().length() > 0) {
-            refererrPropList = DfStringUtil.splitList(refererrListExp, delimiter);
+        List<String> referrerPropList = null;
+        if (referrerListExp != null && referrerListExp.trim().length() > 0) {
+            referrerPropList = splitListTrimmed(referrerListExp, delimiter);
         }
         return new ColumnInfo(this, columnDbName, columnAlias, notNull, propertyName, propertyType, primary,
                 autoIncrement, columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType,
-                columnComment, foreignPropList, refererrPropList);
+                columnComment, foreignPropList, referrerPropList);
     }
 
     /**
@@ -1202,15 +1202,19 @@ public abstract class AbstractDBMeta implements DBMeta {
         return DfStringUtil.replace(text, fromText, toText);
     }
 
-    protected String initCap(String str) {
+    protected final List<String> splitListTrimmed(String str, String delimiter) {
+        return DfStringUtil.splitListTrimmed(str, delimiter);
+    }
+
+    protected final String initCap(String str) {
         return DfStringUtil.initCap(str);
     }
 
-    protected String initUncap(String str) {
+    protected final String initUncap(String str) {
         return DfStringUtil.initUncap(str);
     }
 
-    protected String ln() {
+    protected final String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 
