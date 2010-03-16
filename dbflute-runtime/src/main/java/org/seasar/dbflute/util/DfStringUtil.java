@@ -82,15 +82,30 @@ public class DfStringUtil {
      * @return The split list. (NotNull)
      */
     public static List<String> splitList(final String str, final String delimiter) {
+        return doSplitList(str, delimiter, false);
+    }
+
+    /**
+     * @param str The split target string. (NotNull)
+     * @param delimiter The delimiter for split. (NotNull)
+     * @return The split list that their elements is trimmed. (NotNull)
+     */
+    public static List<String> splitListTrimmed(final String str, final String delimiter) {
+        return doSplitList(str, delimiter, true);
+    }
+
+    protected static List<String> doSplitList(final String str, final String delimiter, boolean trim) {
         final List<String> list = new ArrayList<String>();
         int i = 0;
         int j = str.indexOf(delimiter);
         for (int h = 0; j >= 0; h++) {
-            list.add(str.substring(i, j));
+            final String element = str.substring(i, j);
+            list.add(trim ? element.trim() : element);
             i = j + delimiter.length();
             j = str.indexOf(delimiter, i);
         }
-        list.add(str.substring(i));
+        final String element = str.substring(i);
+        list.add(trim ? element.trim() : element);
         return list;
     }
 

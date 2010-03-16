@@ -16,13 +16,13 @@
 package org.seasar.dbflute.dbmeta.info;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
-
 
 /**
  * The information of foreign relation.
@@ -44,9 +44,8 @@ public class ForeignInfo implements RelationInfo {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public ForeignInfo(String foreignPropertyName, DBMeta localDBMeta, DBMeta foreignDBMeta
-                     , Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap
-                     , int relationNo, boolean oneToOne) {
+    public ForeignInfo(String foreignPropertyName, DBMeta localDBMeta, DBMeta foreignDBMeta,
+            Map<ColumnInfo, ColumnInfo> localForeignColumnInfoMap, int relationNo, boolean oneToOne) {
         assertObjectNotNull("foreignPropertyName", foreignPropertyName);
         assertObjectNotNull("localDBMeta", localDBMeta);
         assertObjectNotNull("foreignDBMeta", foreignDBMeta);
@@ -57,7 +56,7 @@ public class ForeignInfo implements RelationInfo {
         this._localForeignColumnInfoMap = localForeignColumnInfoMap;
         final Set<ColumnInfo> keySet = localForeignColumnInfoMap.keySet();
         _foreignLocalColumnInfoMap = new LinkedHashMap<ColumnInfo, ColumnInfo>();
-        for (final Iterator<ColumnInfo> ite = keySet.iterator(); ite.hasNext(); ) {
+        for (final Iterator<ColumnInfo> ite = keySet.iterator(); ite.hasNext();) {
             final ColumnInfo key = ite.next();
             final ColumnInfo value = localForeignColumnInfoMap.get(key);
             _foreignLocalColumnInfoMap.put(value, key);
@@ -71,10 +70,11 @@ public class ForeignInfo implements RelationInfo {
     //                                                                              ======
     public ColumnInfo findLocalByForeign(String foreignColumnDbName) {
         final ColumnInfo keyColumnInfo = _foreignDBMeta.findColumnInfo(foreignColumnDbName);
-        final ColumnInfo resultColumnInfo = (ColumnInfo)_foreignLocalColumnInfoMap.get(keyColumnInfo);
+        final ColumnInfo resultColumnInfo = (ColumnInfo) _foreignLocalColumnInfoMap.get(keyColumnInfo);
         if (resultColumnInfo == null) {
             String msg = "Not found by foreignColumnDbName in foreignLocalColumnInfoMap:";
-            msg = msg + " foreignColumnDbName=" + foreignColumnDbName + " foreignLocalColumnInfoMap=" + _foreignLocalColumnInfoMap;
+            msg = msg + " foreignColumnDbName=" + foreignColumnDbName + " foreignLocalColumnInfoMap="
+                    + _foreignLocalColumnInfoMap;
             throw new IllegalArgumentException(msg);
         }
         return resultColumnInfo;
@@ -84,7 +84,8 @@ public class ForeignInfo implements RelationInfo {
     //                                                                              Finder
     //                                                                              ======
     public java.lang.reflect.Method findSetter() {
-        return findMethod(_localDBMeta.getEntityType(), "set" + buildInitCapPropertyName(), new Class[] { java.util.List.class });
+        return findMethod(_localDBMeta.getEntityType(), "set" + buildInitCapPropertyName(),
+                new Class[] { java.util.List.class });
     }
 
     public java.lang.reflect.Method findGetter() {
@@ -158,7 +159,7 @@ public class ForeignInfo implements RelationInfo {
         if (obj == null || !(obj instanceof ForeignInfo)) {
             return false;
         }
-        final ForeignInfo target = (ForeignInfo)obj;
+        final ForeignInfo target = (ForeignInfo) obj;
         if (!this._foreignPropertyName.equals(target.getForeignPropertyName())) {
             return false;
         }
@@ -178,30 +179,61 @@ public class ForeignInfo implements RelationInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    /**
+     * Get the property name of the foreign relation. <br />
+     * For example, if the member entity has getMemberStatus(), this returns 'memberStatus'.
+     * @return The string for property name. (NotNull)
+     */
     public String getForeignPropertyName() {
         return _foreignPropertyName;
     }
 
+    /**
+     * Get the DB meta of the local table. <br />
+     * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER's one.
+     * @return The DB meta singleton instance. (NotNull)
+     */
     public DBMeta getLocalDBMeta() {
         return _localDBMeta;
     }
 
+    /**
+     * Get the DB meta of the foreign table. <br />
+     * For example, if the relation MEMBER and MEMBER_STATUS, this returns MEMBER_STATUS's one.
+     * @return The DB meta singleton instance. (NotNull)
+     */
     public DBMeta getForeignDBMeta() {
         return _foreignDBMeta;
     }
 
+    /**
+     * Get the read-only map, key is a local column info, value is a foreign column info.
+     * @return The read-only map. (NotNull)
+     */
     public Map<ColumnInfo, ColumnInfo> getLocalForeignColumnInfoMap() {
-        return new LinkedHashMap<ColumnInfo, ColumnInfo>(_localForeignColumnInfoMap); // as snapshot
+        return Collections.unmodifiableMap(_localForeignColumnInfoMap); // as read-only
     }
 
+    /**
+     * Get the read-only map, key is a foreign column info, value is a local column info.
+     * @return The read-only map. (NotNull)
+     */
     public Map<ColumnInfo, ColumnInfo> getForeignLocalColumnInfoMap() {
-        return new LinkedHashMap<ColumnInfo, ColumnInfo>(_foreignLocalColumnInfoMap); // as snapshot
+        return Collections.unmodifiableMap(_foreignLocalColumnInfoMap); // as read-only
     }
 
+    /**
+     * Get the number of a relation. (internal property)
+     * @return The number of a relation. (NotNull, NotMinus)
+     */
     public int getRelationNo() {
         return _relationNo;
     }
 
+    /**
+     * Does the relation is one-to-one?
+     * @return Determination.
+     */
     public boolean isOneToOne() {
         return _oneToOne;
     }

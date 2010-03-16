@@ -15,6 +15,10 @@
  */
 package org.seasar.dbflute.dbmeta.info;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
 
@@ -23,6 +27,11 @@ import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
  * @author jflute
  */
 public class ColumnInfo {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    protected static final List<String> EMPTY_LIST = Collections.unmodifiableList(new ArrayList<String>());
 
     // ===================================================================================
     //                                                                           Attribute
@@ -41,6 +50,8 @@ public class ColumnInfo {
     protected final boolean _commonColumn;
     protected final OptimisticLockType _optimisticLockType;
     protected final String _columnComment;
+    protected final List<String> _foreignPropList;
+    protected final List<String> _refererrPropList;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -48,7 +59,7 @@ public class ColumnInfo {
     public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, boolean notNull, String propertyName,
             Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
             Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
-            String columnComment) {
+            String columnComment, List<String> foreignPropList, List<String> refererrPropList) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
         assertObjectNotNull("propertyName", propertyName);
@@ -67,6 +78,9 @@ public class ColumnInfo {
         this._commonColumn = commonColumn;
         this._optimisticLockType = optimisticLockType != null ? optimisticLockType : OptimisticLockType.NONE;
         this._columnComment = columnComment;
+        this._foreignPropList = foreignPropList != null ? foreignPropList : EMPTY_LIST;
+        this._refererrPropList = refererrPropList != null ? refererrPropList : EMPTY_LIST;
+
     }
 
     // ===================================================================================
@@ -146,6 +160,10 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
+    /**
+     * Get the DB meta of the column's table.
+     * @return The DB meta singleton instance. (NotNull)
+     */
     public DBMeta getDBMeta() {
         return _dbmeta;
     }
@@ -270,5 +288,32 @@ public class ColumnInfo {
      */
     public String getColumnComment() {
         return this._columnComment;
+    }
+
+    /**
+     * Get the read-only list of the foreign info related to this column. <br />
+     * It contains one-to-one relations.
+     * @return The read-only list. (NotNull: when no FK, returns empty list)
+     */
+    public List<ForeignInfo> getForeignInfoList() {
+        // find at this timing because initialization timing of column info is before FK's one.
+        final List<ForeignInfo> foreignInfoList = new ArrayList<ForeignInfo>();
+        for (String foreignProp : _foreignPropList) {
+            foreignInfoList.add(getDBMeta().findForeignInfo(foreignProp));
+        }
+        return Collections.unmodifiableList(foreignInfoList); // as read-only
+    }
+
+    /**
+     * Get the read-only list of the referrer info related to this column.
+     * @return The read-only list. (NotNull: when no reference, returns empty list)
+     */
+    public List<ReferrerInfo> getReferrerInfoList() {
+        // find at this timing because initialization timing of column info is before FK's one.
+        final List<ReferrerInfo> referrerInfoList = new ArrayList<ReferrerInfo>();
+        for (String fkProp : _refererrPropList) {
+            referrerInfoList.add(getDBMeta().findReferrerInfo(fkProp));
+        }
+        return Collections.unmodifiableList(referrerInfoList); // as read-only
     }
 }
