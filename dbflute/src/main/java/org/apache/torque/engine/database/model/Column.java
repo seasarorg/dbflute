@@ -982,7 +982,7 @@ public class Column {
         return _table.getForeignKeyList(_name);
     }
 
-    public String getForeignTableNameCommaStringWithHtmlHref() { // for SchemaHTML
+    public String getForeignTableNameCommaStringWithHtmlHref() { // mainly for SchemaHTML
         final StringBuilder sb = new StringBuilder();
         final DfDocumentProperties prop = getProperties().getDocumentProperties();
         final DfSchemaHtmlBuilder schemaHtmlBuilder = new DfSchemaHtmlBuilder(prop);
@@ -999,6 +999,35 @@ public class Column {
         }
         sb.delete(0, delimiter.length());
         return sb.toString();
+    }
+
+    /**
+     * It contains one-to-one relations.
+     * @return The property names of foreign relation as comma string for literal. (NotNull)
+     */
+    public String getForeignPropertyNameCommaStringLiteralExpression() { // mainly for ColumnInfo constructor
+        final StringBuilder sb = new StringBuilder();
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
+        final int size = foreignKeyList.size();
+        if (size == 0) {
+            return "null";
+        }
+        final String delimiter = ",";
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = foreignKeyList.get(i);
+            final String foreignPropertyName = fk.getForeignJavaBeansRulePropertyName();
+            sb.append(delimiter).append(foreignPropertyName);
+        }
+        final List<ForeignKey> referrerList = getReferrerList();
+        for (ForeignKey referrer : referrerList) {
+            if (!referrer.isOneToOne()) {
+                continue;
+            }
+            String propertyNameAsOne = referrer.getReferrerJavaBeansRulePropertyNameAsOne();
+            sb.append(delimiter).append(propertyNameAsOne);
+        }
+        sb.delete(0, delimiter.length());
+        return "\"" + sb.toString() + "\"";
     }
 
     /**
@@ -1065,11 +1094,18 @@ public class Column {
     /**
      * Get list of references to this column.
      */
-    public List<ForeignKey> getReferrers() {
+    public List<ForeignKey> getReferrerList() {
         if (_referrers == null) {
             _referrers = new ArrayList<ForeignKey>(5);
         }
         return _referrers;
+    }
+
+    /**
+     * Get list of references to this column.
+     */
+    public List<ForeignKey> getReferrers() { // old style
+        return getReferrerList();
     }
 
     protected java.util.List<ForeignKey> _singleKeyRefferrers = null;
@@ -1116,7 +1152,7 @@ public class Column {
         return sb.toString();
     }
 
-    public String getReferrerTableCommaStringWithHtmlHref() { // for SchemaHTML
+    public String getReferrerTableCommaStringWithHtmlHref() { // mainly for SchemaHTML
         if (_referrers == null) {
             _referrers = new ArrayList<ForeignKey>(5);
         }
@@ -1125,12 +1161,36 @@ public class Column {
         final String delimiter = ",<br />";
         final StringBuffer sb = new StringBuffer();
         for (ForeignKey fk : _referrers) {
-            final Table reffererTable = fk.getTable();
-            final String referrerTableName = reffererTable.getName();
+            final Table referrerTable = fk.getTable();
+            final String referrerTableName = referrerTable.getName();
             sb.append(schemaHtmlBuilder.buildRelatedTableLink(fk, referrerTableName, delimiter));
         }
         sb.delete(0, delimiter.length());
         return sb.toString();
+    }
+
+    /**
+     * It does NOT contain one-to-one relations.
+     * @return The property names of referrer relation as comma string for literal. (NotNull)
+     */
+    public String getReferrerPropertyNameCommaStringLiteralExpression() { // mainly for ColumnInfo constructor
+        final StringBuilder sb = new StringBuilder();
+        final List<ForeignKey> referrerList = getReferrers();
+        final int size = referrerList.size();
+        if (size == 0) {
+            return "null";
+        }
+        final String delimiter = ",";
+        for (int i = 0; i < size; i++) {
+            final ForeignKey fk = referrerList.get(i);
+            if (fk.isOneToOne()) {
+                continue;
+            }
+            final String referrerPropertyName = fk.getReferrerJavaBeansRulePropertyName();
+            sb.append(delimiter).append(referrerPropertyName);
+        }
+        sb.delete(0, delimiter.length());
+        return "\"" + sb.toString() + "\"";
     }
 
     // ===================================================================================

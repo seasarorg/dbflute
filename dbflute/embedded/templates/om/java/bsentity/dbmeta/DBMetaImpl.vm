@@ -47,7 +47,7 @@ public class ${myClassName} extends AbstractDBMeta {
     //                                                                         Column Info
     //                                                                         ===========
 #foreach ($col in $table.columns)
-    protected ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression});
+    protected ColumnInfo _column${col.javaBeansRulePropertyNameInitCap} = cci("${col.name}", ${col.aliasSettingExpression}, ${col.isNotNull()}, "${col.javaBeansRulePropertyName}", ${col.javaNative}.class, ${col.isPrimaryKey()}, ${col.isAutoIncrement()}, "${col.dbTypeExpression}", ${col.columnSizeSettingExpression}, ${col.columnDecimalDigitsSettingExpression}, ${col.isCommonColumn()}, ${col.optimistickLockExpression}, ${col.commentForDBMetaSettingExpression}, ${col.foreignPropertyNameCommaStringLiteralExpression}, ${col.referrerPropertyNameCommaStringLiteralExpression});
 #end
 
 #foreach ($col in $table.columns)
