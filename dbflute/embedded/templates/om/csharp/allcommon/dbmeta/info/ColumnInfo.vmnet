@@ -40,7 +40,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, bool notNull, String propertyName
                             , Type propertyType, bool primary, String columnDbType, int? columnSize
                             , int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType
-                            , String columnComment, List<String> foreignPropList, List<String> refererrPropList) {
+                            , String columnComment, List<String> foreignPropList, List<String> referrerPropList) {
             AssertObjectNotNull("dbmeta", dbmeta);
             AssertObjectNotNull("columnDbName", columnDbName);
             AssertObjectNotNull("propertyName", propertyName);
@@ -60,7 +60,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             this.optimisticLockType = optimisticLockType;
             this.columnComment = columnComment;
             this.foreignPropList = foreignPropList != null ? foreignPropList : EMPTY_LIST;
-            this.refererrPropList = refererrPropList != null ? refererrPropList : EMPTY_LIST;
+            this.referrerPropList = referrerPropList != null ? referrerPropList : EMPTY_LIST;
         }
 
         // ===============================================================================

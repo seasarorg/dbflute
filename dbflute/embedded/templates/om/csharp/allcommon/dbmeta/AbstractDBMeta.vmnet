@@ -56,19 +56,27 @@ namespace ${glPackageBaseCommonDBMeta} {
                 , String propertyName, Type propertyType, bool primary, String columnDbType
                 , int? columnSize, int? columnDecimalDigits, bool commonColumn
                 , OptimisticLockType optimisticLockType, String columnComment
-                , String foreignPropList, String referrerPropList) {
-            String delimiter = ",";
+                , String foreignListExp, String referrerListExp) {
+            char delimiter = ',';
             List<String> foreignPropList = null;
             if (foreignListExp != null && foreignListExp.Trim().Length > 0) {
-                foreignPropList = foreignListExp.Split(foreignListExp, delimiter);
+                foreignPropList = new ArrayList<String>();
+                String[] foreignPropArray = foreignListExp.Split(delimiter);
+                foreach (String foreignProp in foreignPropArray) {
+                    foreignPropList.add(foreignProp.Trim());
+                }
             }
-            List<String> refererrPropList = null;
-            if (refererrListExp != null && refererrListExp.Trim().Length > 0) {
-                refererrPropList = refererrListExp.Split(refererrListExp, delimiter);
+            List<String> referrerPropList = null;
+            if (referrerListExp != null && referrerListExp.Trim().Length > 0) {
+                referrerPropList = new ArrayList<String>();
+                String[] referrerPropArray = referrerListExp.Split(delimiter);
+                foreach (String referrerProp in referrerPropArray) {
+                    referrerPropList.add(referrerProp.Trim());
+                }
             }
             return new ${glColumnInfo}(this, columnDbName, columnAlias, notNull, propertyName, propertyType, primary
                     , columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType, columnComment
-                    , foreignPropList, refererrPropList);
+                    , foreignPropList, referrerPropList);
         }
 
         public List<${glColumnInfo}> ColumnInfoList { get { return _columnInfoList; } }
