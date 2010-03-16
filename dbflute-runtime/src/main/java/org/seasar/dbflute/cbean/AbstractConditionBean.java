@@ -690,21 +690,17 @@ public abstract class AbstractConditionBean implements ConditionBean {
         int count = 0;
         boolean last = false;
         while (true) {
-            final int deimiterIndex = remainder.indexOf(".");
+            final int deimiterIndex = remainder.indexOf(delimiter);
             final String propertyName;
             if (deimiterIndex < 0) {
                 propertyName = remainder;
                 last = true;
             } else {
                 propertyName = remainder.substring(0, deimiterIndex);
-                if (currentObj == null) {
-                    String msg = "Not found property: " + propertyName + " in " + foreignPropertyNamePath;
-                    throw new IllegalArgumentException(msg);
-                }
                 remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
             }
             final String methodName = (count == 0 ? "setupSelect_" : "with") + initCap(propertyName);
-            final Method method = DfReflectionUtil.getMethod(getClass(), methodName, new Class<?>[] {});
+            final Method method = DfReflectionUtil.getMethod(currentObj.getClass(), methodName, new Class<?>[] {});
             currentObj = DfReflectionUtil.invoke(method, currentObj, new Object[] {});
             ++count;
             if (last) {
