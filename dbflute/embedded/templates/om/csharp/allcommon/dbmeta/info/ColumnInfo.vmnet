@@ -4,10 +4,16 @@ using System;
 using System.Reflection;
 
 using ${glPackageBaseCommonDBMeta};
+using ${glPackageBaseCommonJavaLike};
 
 namespace ${glPackageBaseCommonDBMetaInfo} {
 
     public class ${myClassName} {
+
+        // ===============================================================================
+        //                                                                      Definition
+        //                                                                      ==========
+        protected static readonly List<String> EMPTY_LIST = new ArrayList<String>();
 
         // ===============================================================================
         //                                                                       Attribute
@@ -25,6 +31,8 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         protected bool commonColumn;
         protected OptimisticLockType optimisticLockType;
         protected String columnComment;
+        protected List<String> foreignPropList;
+        protected List<String> referrerPropList;
 
         // ===============================================================================
         //                                                                     Constructor
@@ -32,7 +40,7 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public ${myClassName}(${glDBMeta} dbmeta, String columnDbName, String columnAlias, bool notNull, String propertyName
                             , Type propertyType, bool primary, String columnDbType, int? columnSize
                             , int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType
-                            , String columnComment) {
+                            , String columnComment, List<String> foreignPropList, List<String> refererrPropList) {
             AssertObjectNotNull("dbmeta", dbmeta);
             AssertObjectNotNull("columnDbName", columnDbName);
             AssertObjectNotNull("propertyName", propertyName);
@@ -51,6 +59,8 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
             this.commonColumn = commonColumn;
             this.optimisticLockType = optimisticLockType;
             this.columnComment = columnComment;
+            this.foreignPropList = foreignPropList != null ? foreignPropList : EMPTY_LIST;
+            this.refererrPropList = refererrPropList != null ? refererrPropList : EMPTY_LIST;
         }
 
         // ===============================================================================
@@ -163,5 +173,21 @@ namespace ${glPackageBaseCommonDBMetaInfo} {
         public bool IsUpdateDate {
             get { return OptimisticLockType.UPDATE_DATE == optimisticLockType; }
         }
+
+        public List<${glForeignInfo}> ForeignInfoList { get {
+            List<${glForeignInfo}> foreignInfoList = new ArrayList<${glForeignInfo}>();
+            foreach (String foreignProp in foreignPropList) {
+                foreignInfoList.add(this.DBMeta.FindForeignInfo(foreignProp));
+            }
+            return foreignInfoList;
+        }}
+
+        public List<${glReferrerInfo}> ReferrerInfoList { get {
+            List<${glReferrerInfo}> referrerInfoList = new ArrayList<${glReferrerInfo}>();
+            foreach (String referrerProp in referrerPropList) {
+                referrerInfoList.add(this.DBMeta.FindReferrerInfo(referrerProp));
+            }
+            return referrerInfoList;
+        }}
     }
 }

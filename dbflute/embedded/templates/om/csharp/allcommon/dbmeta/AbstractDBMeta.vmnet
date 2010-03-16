@@ -52,8 +52,23 @@ namespace ${glPackageBaseCommonDBMeta} {
         }
 
         // createColumnInfo()
-        protected ${glColumnInfo} cci(String columnDbName, String columnAlias, bool notNull, String propertyName, Type propertyType, bool primary, String columnDbType, int? columnSize, int? columnDecimalDigits, bool commonColumn, OptimisticLockType optimisticLockType, String columnComment) {
-            return new ${glColumnInfo}(this, columnDbName, columnAlias, notNull, propertyName, propertyType, primary, columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType, columnComment);
+        protected ${glColumnInfo} cci(String columnDbName, String columnAlias, bool notNull
+                , String propertyName, Type propertyType, bool primary, String columnDbType
+                , int? columnSize, int? columnDecimalDigits, bool commonColumn
+                , OptimisticLockType optimisticLockType, String columnComment
+                , String foreignPropList, String referrerPropList) {
+            String delimiter = ",";
+            List<String> foreignPropList = null;
+            if (foreignListExp != null && foreignListExp.Trim().Length > 0) {
+                foreignPropList = foreignListExp.Split(foreignListExp, delimiter);
+            }
+            List<String> refererrPropList = null;
+            if (refererrListExp != null && refererrListExp.Trim().Length > 0) {
+                refererrPropList = refererrListExp.Split(refererrListExp, delimiter);
+            }
+            return new ${glColumnInfo}(this, columnDbName, columnAlias, notNull, propertyName, propertyType, primary
+                    , columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType, columnComment
+                    , foreignPropList, refererrPropList);
         }
 
         public List<${glColumnInfo}> ColumnInfoList { get { return _columnInfoList; } }
