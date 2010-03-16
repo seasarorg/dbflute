@@ -176,6 +176,21 @@ public interface ConditionBean extends PagingBean {
     boolean hasUnionQueryOrUnionAllQuery();
 
     // ===================================================================================
+    //                                                                 Reflection Invoking
+    //                                                                 ===================
+    /**
+     * Invoke the method 'setupSelect_Xxx()' and 'withXxx()' by the path of foreign property name. <br />
+     * For example, if this is based on PURCHASE, 'member.memberStatus' means as follows:
+     * <pre>
+     * PurchaseCB cb = new PurchaseCB();
+     * cb.setupSelect_Member().withMemberStatus();
+     * </pre>
+     * A method with parameters (using fixed condition) is unsupported.
+     * @param foreignPropertyNamePath The path string. (NotNull, NotTrimmedEmpty)
+     */
+    void invokeSetupSelect(String foreignPropertyNamePath);
+
+    // ===================================================================================
     //                                                                      Free Parameter
     //                                                                      ==============
     void xregisterFreeParameter(String key, Object value);

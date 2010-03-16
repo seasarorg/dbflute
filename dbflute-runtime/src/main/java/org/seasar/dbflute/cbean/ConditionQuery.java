@@ -127,7 +127,8 @@ public interface ConditionQuery {
     void invokeOrderBy(String columnFlexibleName, boolean isAsc);
 
     /**
-     * Invoke getting foreign conditionQuery.
+     * Invoke getting foreign conditionQuery. <br />
+     * A method with parameters (using fixed condition) is unsupported.
      * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)
      */

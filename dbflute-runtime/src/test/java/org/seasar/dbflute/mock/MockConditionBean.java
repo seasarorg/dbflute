@@ -197,9 +197,13 @@ public class MockConditionBean implements ConditionBean {
         return false;
     }
 
+    public void invokeSetupSelect(String foreignPropertyNamePath) {
+    }
+
     public void xregisterFreeParameter(String key, Object value) {
     }
 
     public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {
     }
+
 }

@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean;
 
+import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
+import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -673,6 +675,44 @@ public abstract class AbstractConditionBean implements ConditionBean {
         return getSqlClause().hasOrderByClause();
     }
 
+    // [DBFlute-0.9.6.7]
+    // ===================================================================================
+    //                                                                 Reflection Invoking
+    //                                                                 ===================
+    /**
+     * {@inheritDoc}
+     */
+    public void invokeSetupSelect(String foreignPropertyNamePath) {
+        assertStringNotNullAndNotTrimmedEmpty("foreignPropertyNamePath", foreignPropertyNamePath);
+        final String delimiter = ".";
+        Object currentObj = this;
+        String remainder = foreignPropertyNamePath;
+        int count = 0;
+        boolean last = false;
+        while (true) {
+            final int deimiterIndex = remainder.indexOf(".");
+            final String propertyName;
+            if (deimiterIndex < 0) {
+                propertyName = remainder;
+                last = true;
+            } else {
+                propertyName = remainder.substring(0, deimiterIndex);
+                if (currentObj == null) {
+                    String msg = "Not found property: " + propertyName + " in " + foreignPropertyNamePath;
+                    throw new IllegalArgumentException(msg);
+                }
+                remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
+            }
+            final String methodName = (count == 0 ? "setupSelect_" : "with") + initCap(propertyName);
+            final Method method = DfReflectionUtil.getMethod(getClass(), methodName, new Class<?>[] {});
+            currentObj = DfReflectionUtil.invoke(method, currentObj, new Object[] {});
+            ++count;
+            if (last) {
+                break;
+            }
+        }
+    }
+
     // [DBFlute-0.9.5.2]
     // ===================================================================================
     //                                                                      Free Parameter
@@ -767,6 +807,37 @@ public abstract class AbstractConditionBean implements ConditionBean {
     // ===================================================================================
     //                                                                       Assert Helper
     //                                                                       =============
+    /**
+     * Assert that the object is not null.
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     * @exception IllegalArgumentException
+     */
+    protected void assertObjectNotNull(String variableName, Object value) {
+        if (variableName == null) {
+            String msg = "The value should not be null: variableName=null value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+        if (value == null) {
+            String msg = "The value should not be null: variableName=" + variableName;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * Assert that the string is not null and not trimmed empty.
+     * @param variableName Variable name. (NotNull)
+     * @param value Value. (NotNull)
+     */
+    protected void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
+        assertObjectNotNull("variableName", variableName);
+        assertObjectNotNull("value", value);
+        if (value.trim().length() == 0) {
+            String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
     protected void assertPrimaryKeyMap(Map<String, ? extends Object> primaryKeyMap) {
         if (primaryKeyMap == null) {
             String msg = "The argument[primaryKeyMap] must not be null.";

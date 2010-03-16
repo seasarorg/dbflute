@@ -39,6 +39,7 @@ import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 import org.seasar.dbflute.util.DfCollectionUtil;
+import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTraceViewUtil;
@@ -1440,42 +1441,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     private Method helpGettingCQMethod(ConditionQuery cq, String methodName, Class<?>[] argTypes, String property) {
-        try {
-            return cq.getClass().getMethod(methodName, argTypes);
-        } catch (NoSuchMethodException e) {
-            if (argTypes != null && argTypes.length == 1) {
-                Class<?> argType = argTypes[0];
-                if (List.class.isAssignableFrom(argType)) {
-                    try {
-                        return cq.getClass().getMethod(methodName, new Class<?>[] { Collection.class });
-                    } catch (NoSuchMethodException ignored) {
-                    }
-                }
-                Class<?>[] infs = argType.getInterfaces();
-                for (Class<?> inf : infs) {
-                    try {
-                        return cq.getClass().getMethod(methodName, new Class<?>[] { inf });
-                    } catch (NoSuchMethodException ignored) {
-                    }
-                }
-            }
-            String msg = "The method is not existing:";
-            msg = msg + " methodName=" + methodName;
-            msg = msg + " argTypes=" + convertObjectArrayToStringView(argTypes);
-            msg = msg + " tableName=" + cq.getTableDbName();
-            msg = msg + " property=" + property;
-            throw new IllegalStateException(msg, e);
-        }
+        return DfReflectionUtil.getMethod(cq.getClass(), methodName, argTypes);
     }
 
     private Object helpInvokingCQMethod(ConditionQuery cq, Method method, Object[] args) {
-        try {
-            return method.invoke(cq, args);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        } catch (InvocationTargetException e) {
-            throw new IllegalStateException(e.getCause());
-        }
+        return DfReflectionUtil.invoke(method, cq, args);
     }
 
     // ===================================================================================
@@ -1704,7 +1674,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                         Assert String
     //                                         -------------
     /**
-     * Assert that the entity is not null and not trimmed empty.
+     * Assert that the string is not null and not trimmed empty.
      * @param variableName Variable name. (NotNull)
      * @param value Value. (NotNull)
      */
