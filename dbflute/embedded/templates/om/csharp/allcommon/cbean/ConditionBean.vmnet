@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections;
+using ${glPackageBaseCommonDBMeta};
 using ${glPackageBaseCommonSqlClause};
 using ${glPackageBaseCommonJdbc};
 
