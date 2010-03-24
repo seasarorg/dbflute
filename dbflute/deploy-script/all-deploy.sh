@@ -43,8 +43,9 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
-. sql2entity-clientsql.sh
-. outside-sql-test-clientsql.sh
+. clientbhv-generate.sh
+. clientbhv-sql2entity.sh
+. clientbhv-outside-sql-test.sh
 
 cd ../../dbflute-postgresql-example/dbflute_exampledb
 rm ./log/*.log

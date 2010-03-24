@@ -63,7 +63,7 @@
 	<!-- Other Examples -->
 	<property name="multipledb.seasar.example.dir" value="${workspace.base}/dbflute-multipledb-seasar-example"/>
 	<property name="multipledb.spring.example.dir" value="${workspace.base}/dbflute-multipledb-spring-example"/>
-	<property name="clientsql.example.dir" value="${workspace.base}/dbflute-clientsql-example"/>
+	<property name="clientbhv.example.dir" value="${workspace.base}/dbflute-clientbhv-example"/>
 	<property name="tricky.example.dir" value="${workspace.base}/dbflute-tricky-example"/>
 	<property name="javatest.dir" value="${workspace.base}/javatest"/>
 
@@ -411,11 +411,11 @@
 		<delete dir="${extraction.dir}"/>
 	</target>
 
-	<target name="reflect-to-clientsql" depends="prepare-reflection" description="==> reflect to clientsql example">
-		<delete file="${clientsql.example.dir}/lib/${runtime.pre.jar}"/>
-		<delete file="${clientsql.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
-		<copy file="${dist}/${runtime.jar}" tofile="${clientsql.example.dir}/lib/${runtime.jar}" overwrite="true"/>
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientsql.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+	<target name="reflect-to-clientbhv" depends="prepare-reflection" description="==> reflect to clientbhv example">
+		<delete file="${clientbhv.example.dir}/lib/${runtime.pre.jar}"/>
+		<delete file="${clientbhv.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
+		<copy file="${dist}/${runtime.jar}" tofile="${clientbhv.example.dir}/lib/${runtime.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientbhv.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 
@@ -450,7 +450,7 @@
 	  	<antcall target="reflect-to-multipledb" />
 	  	<antcall target="reflect-to-ymir" />
 	  	<antcall target="reflect-to-sastruts" />
-	  	<antcall target="reflect-to-clientsql" />
+	  	<antcall target="reflect-to-clientbhv" />
 	  	<antcall target="reflect-to-tricky" />
 	  	<antcall target="reflect-to-javatest" />
 	</target>
