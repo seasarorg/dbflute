@@ -18,6 +18,7 @@
 # o projectPrefix: (NotRequired - Default '')
 # o classAuthor: (NotRequired - Default 'DBFlute(AutoGenerator)')
 # o sourceFileEncoding: (NotRequired - Default 'UTF-8')
+# o isClientBehavior: (NotRequired - Default false)
 # o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
 # o omitDirectoryPackage (NotRequired - Default '') *CSharp Only
 # 
