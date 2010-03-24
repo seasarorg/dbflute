@@ -18,8 +18,6 @@ package org.seasar.dbflute.helper.beans;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.seasar.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
-
 /**
  * {Refers to Seasar and Extends its class}
  * @author jflute
@@ -27,7 +25,7 @@ import org.seasar.dbflute.helper.beans.exception.DfBeanIllegalPropertyException;
 public interface DfPropertyDesc {
 
     DfBeanDesc getBeanDesc();
-    
+
     String getPropertyName();
 
     Class<?> getPropertyType();
@@ -52,9 +50,9 @@ public interface DfPropertyDesc {
 
     void setField(Field field);
 
-    Object getValue(Object target) throws IllegalStateException;
+    Object getValue(Object target);
 
-    void setValue(Object target, Object value) throws DfBeanIllegalPropertyException, IllegalStateException;
+    void setValue(Object target, Object value);
 
     Object convertIfNeed(Object value);
 }

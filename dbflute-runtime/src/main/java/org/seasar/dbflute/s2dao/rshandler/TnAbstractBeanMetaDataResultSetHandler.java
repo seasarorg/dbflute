@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.Entity;
+import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
@@ -31,12 +33,13 @@ import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractDtoMetaDataResultSetHandler {
+public abstract class TnAbstractBeanMetaDataResultSetHandler implements TnResultSetHandler {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     private TnBeanMetaData beanMetaData;
+    protected TnRowCreator rowCreator;
     protected TnRelationRowCreator relationRowCreator;
 
     // ===================================================================================
@@ -49,34 +52,35 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
      */
     public TnAbstractBeanMetaDataResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
             TnRelationRowCreator relationRowCreator) {
-        super(beanMetaData, rowCreator);
         this.beanMetaData = beanMetaData;
+        this.rowCreator = rowCreator;
         this.relationRowCreator = relationRowCreator;
     }
 
     // ===================================================================================
-    //                                                                       Assist Helper
-    //                                                                       =============
+    //                                                                      Property Cache
+    //                                                                      ==============
     /**
-     * @param columnNames The set of column name. (NotNull)
+     * @param selectColumnSet The name set of select column. (NotNull)
      * @return The map of row property cache. Map{String(columnName), PropertyType} (NotNull)
      * @throws SQLException
      */
-    @Override
-    protected Map<String, TnPropertyType> createPropertyCache(Set<String> columnNames) throws SQLException {
+    protected Map<String, TnPropertyType> createPropertyCache(Set<String> selectColumnSet) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
-        return rowCreator.createPropertyCache(columnNames, beanMetaData);
+        return rowCreator.createPropertyCache(selectColumnSet, beanMetaData);
     }
 
+    // ===================================================================================
+    //                                                                          Create Row
+    //                                                                          ==========
     /**
      * @param rs Result set. (NotNull)
      * @param propertyCache The map of property cache. Map{String(columnName), PropertyType} (NotNull)
      * @return Created row. (NotNull)
      * @throws SQLException
      */
-    @Override
     protected Object createRow(ResultSet rs, Map<String, TnPropertyType> propertyCache) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
@@ -86,28 +90,28 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
     }
 
     /**
-     * @param columnNames The set of column name. (NotNull)
+     * @param selectColumnSet The name set of select column. (NotNull)
      * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<String, TnPropertyType>> createRelationPropertyCache(Set<String> columnNames)
+    protected Map<String, Map<String, TnPropertyType>> createRelationPropertyCache(Set<String> selectColumnSet)
             throws SQLException {
-        return relationRowCreator.createPropertyCache(columnNames, beanMetaData);
+        return relationRowCreator.createPropertyCache(selectColumnSet, beanMetaData);
     }
 
     /**
      * @param rs Result set. (NotNull)
      * @param rpt The type of relation property. (NotNull)
-     * @param columnNames The set of column name. (NotNull)
+     * @param selectColumnSet The name set of select column. (NotNull)
      * @param relKeyValues The map of relation key values. (Nullable)
      * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
      * @return Created relation row. (Nullable)
      * @throws SQLException
      */
-    protected Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
+    protected Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> selectColumnSet,
             Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyType>> relationPropertyCache)
             throws SQLException {
-        return relationRowCreator.createRelationRow(rs, rpt, columnNames, relKeyValues, relationPropertyCache);
+        return relationRowCreator.createRelationRow(rs, rpt, selectColumnSet, relKeyValues, relationPropertyCache);
     }
 
     /**
@@ -121,6 +125,13 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler extends TnAbstractD
             final Set<String> names = bmd.getModifiedPropertyNames(row);
             names.clear();
         }
+    }
+
+    // ===================================================================================
+    //                                                                       Select Column
+    //                                                                       =============
+    protected Set<String> createSelectColumnSet(ResultSet rs) throws SQLException {
+        return ResourceContext.createSelectColumnSet(rs);
     }
 
     // ===================================================================================

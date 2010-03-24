@@ -76,7 +76,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
 
     protected void mappingBean(ResultSet rs, BeanRowHandler handler) throws SQLException {
         // Lazy initialization because if the result is zero, the resources are unused.
-        Set<String> columnNames = null; // Set<String(columnName)>
+        Set<String> selectColumnSet = null; // Set<String(columnName)>
         Map<String, TnPropertyType> propertyCache = null; // Map<String(columnName), PropertyType>
         Map<String, Map<String, TnPropertyType>> relationPropertyCache = null; // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
         TnRelationRowCache relRowCache = null;
@@ -97,11 +97,11 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
         final Map<String, Integer> selectIndexMap = ResourceContext.getSelectIndexMap();
 
         while (rs.next()) {
-            if (columnNames == null) {
-                columnNames = createColumnNames(rs);
+            if (selectColumnSet == null) {
+                selectColumnSet = createSelectColumnSet(rs);
             }
             if (propertyCache == null) {
-                propertyCache = createPropertyCache(columnNames);
+                propertyCache = createPropertyCache(selectColumnSet);
             }
 
             // Create row instance of base table by row property cache.
@@ -117,7 +117,7 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
             }
 
             if (relationPropertyCache == null) {
-                relationPropertyCache = createRelationPropertyCache(columnNames);
+                relationPropertyCache = createRelationPropertyCache(selectColumnSet);
             }
             if (relRowCache == null) {
                 relRowCache = createRelationRowCache(relSize);
@@ -134,12 +134,12 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
                 }
 
                 final Map<String, Object> relKeyValues = new HashMap<String, Object>();
-                final TnRelationKey relKey = createRelationKey(rs, rpt, columnNames, relKeyValues, selectIndexMap);
+                final TnRelationKey relKey = createRelationKey(rs, rpt, selectColumnSet, relKeyValues, selectIndexMap);
                 Object relationRow = null;
                 if (relKey != null) {
                     relationRow = relRowCache.getRelationRow(i, relKey);
                     if (relationRow == null) { // when no cache
-                        relationRow = createRelationRow(rs, rpt, columnNames, relKeyValues, relationPropertyCache);
+                        relationRow = createRelationRow(rs, rpt, selectColumnSet, relKeyValues, relationPropertyCache);
                         if (relationRow != null) {
                             relRowCache.addRelationRow(i, relKey, relationRow);
                             postCreateRow(relationRow);

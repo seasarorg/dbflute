@@ -40,27 +40,21 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     //                                                                        Row Creation
     //                                                                        ============
     /**
-     * @param rs Result set. (NotNull)
-     * @param rpt The type of relation property. (NotNull)
-     * @param columnNames The set of column name. (NotNull)
-     * @param relKeyValues The map of relation key values. (Nullable)
-     * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
-     * @return Created relation row. (Nullable)
-     * @throws SQLException
+     * {@inheritDoc}
      */
-    public Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
+    public Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> selectColumnSet,
             Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyType>> relationPropertyCache)
             throws SQLException {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
-        final TnRelationRowCreationResource res = createResourceForRow(rs, rpt, columnNames, relKeyValues,
+        final TnRelationRowCreationResource res = createResourceForRow(rs, rpt, selectColumnSet, relKeyValues,
                 relationPropertyCache);
         return createRelationRow(res);
     }
 
     protected abstract TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
-            Set<String> columnNames, Map<String, Object> relKeyValues,
+            Set<String> selectColumnSet, Map<String, Object> relKeyValues,
             Map<String, Map<String, TnPropertyType>> relationPropertyCache) throws SQLException;
 
     /**
@@ -86,7 +80,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         for (int i = 0; i < rpt.getKeySize(); ++i) {
             final String columnName = rpt.getMyKey(i) + res.getBaseSuffix();
 
-            if (!res.containsColumnName(columnName)) {
+            if (!res.containsSelectColumn(columnName)) {
                 continue;
             }
             if (!res.hasRowInstance()) {
@@ -204,12 +198,9 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     //                                                             Property Cache Creation
     //                                                             =======================
     /**
-     * @param columnNames The set of column name. (NotNull)
-     * @param bmd Bean meta data of base object. (NotNull)
-     * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
-     * @throws SQLException
+     * {@inheritDoc}
      */
-    public Map<String, Map<String, TnPropertyType>> createPropertyCache(Set<String> columnNames, TnBeanMetaData bmd)
+    public Map<String, Map<String, TnPropertyType>> createPropertyCache(Set<String> selectColumnSet, TnBeanMetaData bmd)
             throws SQLException {
         // - - - - - - - 
         // Entry Point!
@@ -219,7 +210,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
             final TnRelationPropertyType rpt = bmd.getRelationPropertyType(i);
             final String baseSuffix = "";
             final String relationNoSuffix = buildRelationNoSuffix(rpt);
-            final TnRelationRowCreationResource res = createResourceForPropertyCache(rpt, columnNames,
+            final TnRelationRowCreationResource res = createResourceForPropertyCache(rpt, selectColumnSet,
                     relationPropertyCache, baseSuffix, relationNoSuffix, getLimitRelationNestLevel());
             if (rpt == null) {
                 continue;
@@ -230,8 +221,8 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     }
 
     protected abstract TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
-            Set<String> columnNames, Map<String, Map<String, TnPropertyType>> relationPropertyCache, String baseSuffix,
-            String relationNoSuffix, int limitRelationNestLevel) throws SQLException;
+            Set<String> selectColumnSet, Map<String, Map<String, TnPropertyType>> relationPropertyCache,
+            String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException;
 
     protected void setupPropertyCache(TnRelationRowCreationResource res) throws SQLException {
         // - - - - - - - - - - - 
@@ -270,7 +261,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
     protected void setupPropertyCacheElement(TnRelationRowCreationResource res) throws SQLException {
         final String columnName = res.buildRelationColumnName();
-        if (!res.containsColumnName(columnName)) {
+        if (!res.containsSelectColumn(columnName)) {
             return;
         }
         res.savePropertyCacheElement();

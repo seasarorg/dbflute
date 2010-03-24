@@ -43,8 +43,8 @@ public class TnRelationRowCreationResource {
     /** Relation property type. */
     protected TnRelationPropertyType relationPropertyType;
 
-    /** The set of column name. */
-    protected Set<String> columnNames;
+    /** The name set of select column. */
+    protected Set<String> selectColumnSet;
 
     /** The map of relation key values. */
     protected Map<String, Object> relKeyValues;
@@ -126,10 +126,10 @@ public class TnRelationRowCreationResource {
     }
 
     // -----------------------------------------------------
-    //                                           columnNames
-    //                                           -----------
-    public boolean containsColumnName(String columnName) {
-        return columnNames.contains(columnName);
+    //                                       selectColumnSet
+    //                                       ---------------
+    public boolean containsSelectColumn(String columnName) {
+        return selectColumnSet.contains(columnName);
     }
 
     // -----------------------------------------------------
@@ -274,12 +274,12 @@ public class TnRelationRowCreationResource {
         this.resultSet = resultSet;
     }
 
-    public Set<String> getColumnNames() {
-        return columnNames;
+    public Set<String> getSelectColumnSet() {
+        return selectColumnSet;
     }
 
-    public void setColumnNames(Set<String> columnNames) {
-        this.columnNames = columnNames;
+    public void setSelectColumnSet(Set<String> selectColumnSet) {
+        this.selectColumnSet = selectColumnSet;
     }
 
     public Map<String, Object> getRelKeyValues() {

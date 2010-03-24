@@ -247,37 +247,40 @@ public class ResourceContext {
     }
 
     // -----------------------------------------------------
-    //                                          Select Index
-    //                                          ------------
-    public static Set<String> createSelectColumnNames(ResultSet rs) throws SQLException {
+    //                                         Select Column
+    //                                         -------------
+    public static Set<String> createSelectColumnSet(ResultSet rs) throws SQLException {
         final ResultSetMetaData rsmd = rs.getMetaData();
         final int count = rsmd.getColumnCount();
-        final Set<String> columnNames = new HashSet<String>();
+        final Set<String> columnSet = new HashSet<String>();
         for (int i = 0; i < count; ++i) {
             final String columnLabel = rsmd.getColumnLabel(i + 1);
             final int pos = columnLabel.lastIndexOf('.'); // for SQLite
             if (-1 < pos) {
-                columnNames.add(columnLabel.substring(pos + 1));
+                columnSet.add(columnLabel.substring(pos + 1));
             } else {
-                columnNames.add(columnLabel);
+                columnSet.add(columnLabel);
             }
         }
         final Map<String, String> selectIndexReverseMap = getSelectIndexReverseMap();
         if (selectIndexReverseMap == null) {
-            return columnNames;
+            return columnSet;
         }
-        final Set<String> realColumnNames = StringSet.createAsCaseInsensitive();
-        for (String columnName : columnNames) {
+        final Set<String> realColumnSet = StringSet.createAsCaseInsensitive();
+        for (String columnName : columnSet) {
             final String realColumnName = selectIndexReverseMap.get(columnName);
             if (realColumnName != null) { // basically true
-                realColumnNames.add(realColumnName);
+                realColumnSet.add(realColumnName);
             } else { // for derived columns and so on
-                realColumnNames.add(columnName);
+                realColumnSet.add(columnName);
             }
         }
-        return realColumnNames;
+        return realColumnSet;
     }
 
+    // -----------------------------------------------------
+    //                                          Select Index
+    //                                          ------------
     public static Map<String, Integer> getSelectIndexMap() {
         if (!ConditionBeanContext.isExistConditionBeanOnThread()) {
             return null;

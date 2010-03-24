@@ -505,17 +505,27 @@ public interface SqlClause {
     // ===================================================================================
     //                                                                       Specification
     //                                                                       =============
-    void specifySelectColumn(String tableAliasName, String columnName);
+    void specifySelectColumn(String tableAliasName, String columnName, String tableDbName);
 
     void specifyDeriveSubQuery(String aliasName, String deriveSubQuery);
 
     boolean hasSpecifiedDeriveSubQuery(String aliasName);
+
+    // [DBFLUTE-666]: unfinished
+    //void registerDerivedPropertyType(String aliasName, Class<?> propertyType);
+    //Class<?> getDerivedPropertyType(String aliasName);
 
     /**
      * Get the name of only one specified column.
      * @return The name of only one specified column. (Nullable: If it's not found or duplicated, it returns null)
      */
     String getSpecifiedColumnNameAsOne();
+
+    /**
+     * Get the table DB name of only one specified column.
+     * @return The table DB name of only one specified column. (Nullable: If it's not found or duplicated, it returns null)
+     */
+    String getSpecifiedColumnTableDbNameAsOne();
 
     /**
      * Get the name of only one specified column with alias name.

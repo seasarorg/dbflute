@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.metadata.TnDtoMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 
 /**
@@ -41,20 +40,11 @@ public interface TnRowCreator {
             throws SQLException;
 
     /**
-     * @param columnNames The set of column name. (NotNull)
+     * @param selectColumnSet The name set of select column. (NotNull)
      * @param beanMetaData Bean meta data. (NotNull)
      * @return The map of row property cache. The key is String(columnName) and the value is PropertyType. (NotNull)
      * @throws SQLException
      */
-    Map<String, TnPropertyType> createPropertyCache(Set<String> columnNames, TnBeanMetaData beanMetaData)
-            throws SQLException;
-
-    /**
-     * @param columnNames The set of column name. (NotNull)
-     * @param dtoMetaData Dto meta data. (NotNull)
-     * @return The map of property cache. Map{String(columnName), PropertyType} (NotNull)
-     * @throws SQLException
-     */
-    Map<String, TnPropertyType> createPropertyCache(Set<String> columnNames, TnDtoMetaData dtoMetaData)
+    Map<String, TnPropertyType> createPropertyCache(Set<String> selectColumnSet, TnBeanMetaData beanMetaData)
             throws SQLException;
 }

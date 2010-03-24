@@ -148,49 +148,42 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     /**
-     * Get sql clause.
-     * @return Sql clause. (NotNull)
+     * {@inheritDoc}
      */
     public SqlClause getSqlClause() {
         return _sqlClause;
     }
 
     /**
-     * Get alias name.
-     * @return Alias name. (NotNull)
+     * {@inheritDoc}
      */
     public String getAliasName() {
         return _aliasName;
     }
 
     /**
-     * Get nest level.
-     * @return Nest level.
+     * {@inheritDoc}
      */
     public int getNestLevel() {
         return _nestLevel;
     }
 
     /**
-     * Get next nest level.
-     * @return Next nest level.
+     * {@inheritDoc}
      */
     public int getNextNestLevel() {
         return _nestLevel + 1;
     }
 
     /**
-     * Is base query?
-     * @param query Condition query. (NotNull)
-     * @return Determination.
+     * {@inheritDoc}
      */
-    public boolean isBaseQuery(ConditionQuery query) {
-        return (query.getReferrerQuery() == null);
+    public boolean isBaseQuery() {
+        return (getReferrerQuery() == null);
     }
 
     /**
-     * Get the level of subQuery.
-     * @return The level of subQuery.
+     * {@inheritDoc}
      */
     public int getSubQueryLevel() {
         return _subQueryLevel;
@@ -200,17 +193,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                             Real Name
     //                                             ---------
     /**
-     * Get real alias name(that has nest level mark).
-     * @return Real alias name.
+     * {@inheritDoc}
      */
     public String getRealAliasName() {
         return getAliasName();
     }
 
     /**
-     * Get real column name(with real alias name).
-     * @param columnName Column name without alias name. This should not contain comma. (NotNull)
-     * @return Real column name.
+     * {@inheritDoc}
      */
     public String getRealColumnName(String columnName) {
         assertColumnName(columnName);
@@ -270,7 +260,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final StringBuffer sb = new StringBuffer();
         ConditionQuery query = this;
         while (true) {
-            if (query.isBaseQuery(query)) {
+            if (query.isBaseQuery()) {
                 sb.insert(0, CQ_PROPERTY + ".");
                 break;
             } else {
@@ -604,7 +594,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String uncapPropName = initUncap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, it is necessary to use uncapPropName!
-            if (isBaseQuery(this)) {
+            if (isBaseQuery()) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
             } else {
                 getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue,
@@ -619,7 +609,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String uncapPropName = initUncap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, it is necessary to use uncapPropName!
-            if (isBaseQuery(this)) {
+            if (isBaseQuery()) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
             } else {
                 getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option,
@@ -769,8 +759,20 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") as " + aliasName + endMark;
+        // [DBFLUTE-666]: unfinished
+        //registerSpecifyDerivedReferrerPropertyType(function, subQuery, aliasName);
         getSqlClause().specifyDeriveSubQuery(aliasName, clause);
     }
+
+    // [DBFLUTE-666]: unfinished
+    //protected void registerSpecifyDerivedReferrerPropertyType(String function, ConditionQuery subQuery, String aliasName) {
+    //    String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+    //    String specifiedColumnTableDbName = subQuery.getSqlClause().getSpecifiedColumnTableDbNameAsOne();
+    //    DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(specifiedColumnTableDbName);
+    //    ColumnInfo columnInfo = dbmeta.findColumnInfo(specifiedColumnName);
+    //    Class<?> propertyType = columnInfo.getPropertyType();
+    //    getSqlClause().registerDerivedPropertyType(aliasName, propertyType);
+    //}
 
     protected String getSpecifyDerivedReferrerRealColumnName(String columnName) {
         return getRealColumnName(columnName);
@@ -1185,7 +1187,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void registerInlineWhereClause(String whereClause) {
-        if (isBaseQuery(this)) {
+        if (isBaseQuery()) {
             getSqlClause().registerBaseTableInlineWhereClause(whereClause);
         } else {
             getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause, _onClauseInline);
@@ -1233,7 +1235,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * This method is for PERFORMANCE TUNING basically.
      */
     public void innerJoin() {
-        if (isBaseQuery(this)) {
+        if (isBaseQuery()) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
             msg = msg + "The method 'innerJoin()' should be called for a relation query!" + ln();

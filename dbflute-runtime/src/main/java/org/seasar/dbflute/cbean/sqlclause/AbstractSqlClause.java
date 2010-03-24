@@ -88,6 +88,10 @@ public abstract class AbstractSqlClause implements SqlClause {
     /** Specified derive sub-query map. (Nullable: This is lazy-loaded) */
     protected Map<String, String> _specifiedDeriveSubQueryMap; // [DBFlute-0.7.4]
 
+    // [DBFLUTE-666]: unfinished
+    ///** Specified derive column type map. (Nullable: This is lazy-loaded) */
+    //protected Map<String, Class<?>> _specifiedDerivedColumnTypeMap; // [DBFlute-0.9.6.7]
+
     /** The map of real column and alias of select clause. map:{realColumnName : aliasName} */
     protected Map<String, String> _selectClauseRealColumnAliasMap = new HashMap<String, String>(); // Without linked!
 
@@ -2085,15 +2089,15 @@ public abstract class AbstractSqlClause implements SqlClause {
     // ===================================================================================
     //                                                                       Specification
     //                                                                       =============
-    public void specifySelectColumn(String tableAliasName, String columnName) {
+    public void specifySelectColumn(String tableAliasName, String columnName, String tableDbName) {
         if (_specifiedSelectColumnMap == null) {
-            _specifiedSelectColumnMap = new HashMap<String, Map<String, String>>();
+            _specifiedSelectColumnMap = new HashMap<String, Map<String, String>>(); // not needs order
         }
         if (!_specifiedSelectColumnMap.containsKey(tableAliasName)) {
             _specifiedSelectColumnMap.put(tableAliasName, new LinkedHashMap<String, String>());
         }
         Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
-        elementMap.put(columnName, null); // The value is dummy for extension at the future.
+        elementMap.put(columnName, tableDbName);
         _specifiedSelectColumnMap.put(tableAliasName, elementMap);
     }
 
@@ -2111,12 +2115,36 @@ public abstract class AbstractSqlClause implements SqlClause {
         return _specifiedDeriveSubQueryMap.containsKey(aliasName);
     }
 
+    // [DBFLUTE-666]: unfinished
+    //public void registerDerivedPropertyType(String aliasName, Class<?> propertyType) {
+    //    if (_specifiedDerivedColumnTypeMap == null) {
+    //        _specifiedDerivedColumnTypeMap = StringKeyMap.createAsFlexible();
+    //    }
+    //    _specifiedDerivedColumnTypeMap.put(aliasName, propertyType);
+    //}
+    //
+    //public Class<?> getDerivedPropertyType(String aliasName) {
+    //    if (_specifiedDerivedColumnTypeMap == null) {
+    //        return null;
+    //    }
+    //    return _specifiedDerivedColumnTypeMap.get(aliasName);
+    //}
+
     public String getSpecifiedColumnNameAsOne() {
         if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
-            String tableAliasName = _specifiedSelectColumnMap.keySet().iterator().next();
-            Map<String, String> elementMap = _specifiedSelectColumnMap.get(tableAliasName);
+            Map<String, String> elementMap = _specifiedSelectColumnMap.values().iterator().next();
             if (elementMap != null && elementMap.size() == 1) {
                 return elementMap.keySet().iterator().next();
+            }
+        }
+        return null;
+    }
+
+    public String getSpecifiedColumnTableDbNameAsOne() {
+        if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {
+            Map<String, String> elementMap = _specifiedSelectColumnMap.values().iterator().next();
+            if (elementMap != null && elementMap.size() == 1) {
+                return elementMap.values().iterator().next();
             }
         }
         return null;

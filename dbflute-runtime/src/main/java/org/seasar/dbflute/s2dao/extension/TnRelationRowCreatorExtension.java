@@ -61,7 +61,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         for (int i = 0; i < rpt.getKeySize(); ++i) {
             final String columnName = rpt.getMyKey(i) + res.getBaseSuffix();
 
-            if (!res.containsColumnName(columnName)) {
+            if (!res.containsSelectColumn(columnName)) {
                 continue;
             }
             if (!res.hasRowInstance()) {
@@ -215,17 +215,16 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     @Override
     protected int getLimitRelationNestLevel() {
-        return 2;// for Compatible
+        return 2; // for Compatible
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
     protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
-            Set columnNames, Map relKeyValues, Map relationPropertyCache) throws SQLException {
+            Set<String> selectColumnSet, Map<String, Object> relKeyValues,
+            Map<String, Map<String, TnPropertyType>> relationPropertyCache) throws SQLException {
         final TnRelationRowCreationResource res = new TnRelationRowCreationResourceExtension();
         res.setResultSet(rs);
         res.setRelationPropertyType(rpt);
-        res.setColumnNames(columnNames);
+        res.setSelectColumnSet(selectColumnSet);
         res.setRelKeyValues(relKeyValues);
         res.setRelationPropertyCache(relationPropertyCache);
         res.setBaseSuffix("");// as Default
@@ -237,14 +236,12 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         return res;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    protected TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt, Set columnNames,
-            Map relationPropertyCache, String baseSuffix, String relationNoSuffix, int limitRelationNestLevel)
-            throws SQLException {
+    protected TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
+            Set<String> selectColumnSet, Map<String, Map<String, TnPropertyType>> relationPropertyCache,
+            String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException {
         final TnRelationRowCreationResource res = new TnRelationRowCreationResourceExtension();
         res.setRelationPropertyType(rpt);
-        res.setColumnNames(columnNames);
+        res.setSelectColumnSet(selectColumnSet);
         res.setRelationPropertyCache(relationPropertyCache);
         res.setBaseSuffix(baseSuffix);
         res.setRelationNoSuffix(relationNoSuffix);

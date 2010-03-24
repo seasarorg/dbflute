@@ -77,11 +77,10 @@ public interface ConditionQuery {
     int getNextNestLevel();
 
     /**
-     * Is base query?
-     * @param query Condition query. (NotNull)
+     * Is this a base query?
      * @return Determination.
      */
-    boolean isBaseQuery(ConditionQuery query);
+    boolean isBaseQuery();
 
     /**
      * Get the level of subQuery.
