@@ -75,10 +75,10 @@ namespace ${glPackageBaseCQ} {
         public void Set${tmpJavaName}_PrefixSearch(${col.javaNative} v) { Set${tmpJavaName}_LikeSearch(v, cLSOP()); }
 #end
 #if (${col.isAvailableStringInScope()})
-        public void Set${tmpJavaName}_InScope(IList<${col.JavaNative}> ls) { regINS<${col.JavaNative}>(CK_INS, cTL<${col.JavaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
+        public void Set${tmpJavaName}_InScope(IList<${col.javaNative}> ls) { regINS<${col.javaNative}>(CK_INS, cTL<${col.javaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
 #end
 #if (${col.isAvailableStringNotInScope()})
-        public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { regINS<${col.JavaNative}>(CK_NINS, cTL<${col.JavaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
+        public void Set${tmpJavaName}_NotInScope(IList<${col.JavaNative}> ls) { regINS<${col.javaNative}>(CK_NINS, cTL<${col.javaNative}>(ls), getCValue${tmpJavaName}(), "${col.name}"); }
 #end
 #if (${col.isAvailableStringLikeSearch()})
         public void Set${tmpJavaName}_LikeSearch($col.javaNative v, ${glLikeSearchOption} option)

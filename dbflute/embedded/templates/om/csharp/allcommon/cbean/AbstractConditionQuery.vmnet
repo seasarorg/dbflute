@@ -1505,7 +1505,9 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         ${glDBMeta} dbmeta = ${glDBMetaInstanceHandler}.FindDBMeta(cq.getTableDbName());
         String columnCapPropName = initCap(dbmeta.FindPropertyName(propertyName));
         String methodName = "Set" + columnCapPropName + "_" + initCap(conditionKeyName);
-        MethodInfo method = helpGettingCQMethod(cq, methodName, new Type[]{value.GetType()}, propertyName);
+        Type type = value.GetType();
+        // QQQ Does it need to convert IList if an implementation of IList?
+        MethodInfo method = helpGettingCQMethod(cq, methodName, new Type[]{type}, propertyName);
         helpInvokingCQMethod(cq, method, new Object[]{value});
     }
 
