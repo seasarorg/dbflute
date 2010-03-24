@@ -79,6 +79,13 @@ public class MockConditionBean implements ConditionBean {
         return null;
     }
 
+    public boolean canPagingCountLater() {
+        return false;
+    }
+
+    public void enablePagingCountLater() {
+    }
+
     public boolean canPagingReSelect() {
         return false;
     }
@@ -116,10 +123,6 @@ public class MockConditionBean implements ConditionBean {
 
     public int getPageStartIndex() {
         return 0;
-    }
-
-    public boolean isCountLater() {
-        return false;
     }
 
     public boolean isFetchScopeEffective() {
@@ -205,5 +208,4 @@ public class MockConditionBean implements ConditionBean {
 
     public void xregisterUnionQuerySynchronizer(UnionQuery<ConditionBean> unionQuerySynchronizer) {
     }
-
 }

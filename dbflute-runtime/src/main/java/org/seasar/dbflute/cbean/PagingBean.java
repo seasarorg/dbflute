@@ -31,10 +31,16 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     boolean isPaging();
 
     /**
-     * Is the count executed later? {for framework}
+     * Can the paging execute count later? {for framework}
      * @return Determination.
      */
-    boolean isCountLater();
+    boolean canPagingCountLater();
+
+    /**
+     * Can the paging re-select? {for framework}
+     * @return Determination.
+     */
+    boolean canPagingReSelect();
 
     // ===================================================================================
     //                                                                      Paging Setting
@@ -54,15 +60,14 @@ public interface PagingBean extends FetchNarrowingBean, OrderByBean {
     void xsetPaging(boolean paging);
 
     /**
+     * Enable paging count-later that means counting after selecting.
+     */
+    void enablePagingCountLater();
+
+    /**
      * Disable paging re-select that is executed when the page number is over page count.
      */
     void disablePagingReSelect();
-
-    /**
-     * Can the paging re-select?
-     * @return Can the paging re-select?
-     */
-    boolean canPagingReSelect();
 
     // ===================================================================================
     //                                                                       Fetch Setting

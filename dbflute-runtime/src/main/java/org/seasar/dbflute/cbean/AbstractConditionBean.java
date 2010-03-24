@@ -79,8 +79,11 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /** The configuration of statement. {Internal} (Nullable) */
     private StatementConfig _statementConfig;
 
+    /** Is the count executed later? {Internal} */
+    private boolean _pagingCountLater;
+
     /** Can the paging re-select? {Internal} */
-    private boolean _canPagingReSelect = true;
+    private boolean _pagingReSelect = true;
 
     /** The map for free parameters. {Internal} (Nullable) */
     private Map<String, Object> _freeParameterMap;
@@ -248,8 +251,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public boolean isCountLater() { // for framework
-        return false; // as default
+    public boolean canPagingCountLater() { // for framework
+        return _pagingCountLater;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean canPagingReSelect() { // for framework
+        return _pagingReSelect;
     }
 
     // -----------------------------------------------------
@@ -299,15 +309,15 @@ public abstract class AbstractConditionBean implements ConditionBean {
     /**
      * {@inheritDoc}
      */
-    public void disablePagingReSelect() {
-        _canPagingReSelect = false;
+    public void enablePagingCountLater() {
+        _pagingCountLater = true;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean canPagingReSelect() {
-        return _canPagingReSelect;
+    public void disablePagingReSelect() {
+        _pagingReSelect = false;
     }
 
     // -----------------------------------------------------

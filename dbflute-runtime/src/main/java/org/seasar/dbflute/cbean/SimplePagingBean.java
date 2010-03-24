@@ -50,10 +50,10 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     protected boolean _paging = true;
 
     /** Is the count executed later? */
-    protected boolean _countLater;
+    protected boolean _pagingCountLater;
 
     /** Can the paging re-select? */
-    protected boolean _canPagingReSelect = true;
+    protected boolean _pagingReSelect = true;
 
     /** Is fetch narrowing valid? */
     protected boolean _fetchNarrowing = true;
@@ -77,8 +77,15 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     /**
      * {@inheritDoc}
      */
-    public boolean isCountLater() { // for framework
-        return _countLater;
+    public boolean canPagingCountLater() { // for framework
+        return _pagingCountLater;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean canPagingReSelect() { // for framework
+        return _pagingReSelect;
     }
 
     // -----------------------------------------------------
@@ -132,15 +139,15 @@ public class SimplePagingBean implements PagingBean, MapParameterBean {
     /**
      * {@inheritDoc}
      */
-    public void disablePagingReSelect() {
-        _canPagingReSelect = false;
+    public void enablePagingCountLater() {
+        _pagingCountLater = true;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean canPagingReSelect() {
-        return _canPagingReSelect;
+    public void disablePagingReSelect() {
+        _pagingReSelect = false;
     }
 
     // -----------------------------------------------------

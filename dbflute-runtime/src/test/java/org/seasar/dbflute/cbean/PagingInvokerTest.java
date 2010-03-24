@@ -54,7 +54,7 @@ public class PagingInvokerTest extends PlainTestCase {
         final List<String> selectedList = new ArrayList<String>();
         final SimplePagingBean pagingBean = new SimplePagingBean() {
             @Override
-            public boolean isCountLater() {
+            public boolean canPagingCountLater() {
                 return true;
             }
         };
@@ -131,7 +131,7 @@ public class PagingInvokerTest extends PlainTestCase {
         fillList(selectedList, 19);
         final SimplePagingBean pagingBean = new SimplePagingBean() {
             @Override
-            public boolean isCountLater() {
+            public boolean canPagingCountLater() {
                 return true;
             }
         };
@@ -172,7 +172,7 @@ public class PagingInvokerTest extends PlainTestCase {
         fillList(selectedList, 20);
         final SimplePagingBean pagingBean = new SimplePagingBean() {
             @Override
-            public boolean isCountLater() {
+            public boolean canPagingCountLater() {
                 return true;
             }
         };
@@ -249,7 +249,7 @@ public class PagingInvokerTest extends PlainTestCase {
         fillList(selectedList, 19);
         final SimplePagingBean pagingBean = new SimplePagingBean() {
             @Override
-            public boolean isCountLater() {
+            public boolean canPagingCountLater() {
                 return true;
             }
         };
@@ -327,7 +327,7 @@ public class PagingInvokerTest extends PlainTestCase {
         fillList(selectedList, 19);
         final SimplePagingBean pagingBean = new SimplePagingBean() {
             @Override
-            public boolean isCountLater() {
+            public boolean canPagingCountLater() {
                 return true;
             }
         };
@@ -369,7 +369,7 @@ public class PagingInvokerTest extends PlainTestCase {
         fillList(selectedList, 20);
         final SimplePagingBean pagingBean = new SimplePagingBean() {
             @Override
-            public boolean isCountLater() {
+            public boolean canPagingCountLater() {
                 return true;
             }
         };

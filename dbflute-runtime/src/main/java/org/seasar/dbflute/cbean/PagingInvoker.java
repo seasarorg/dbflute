@@ -60,7 +60,7 @@ public class PagingInvoker<ENTITY> {
         final int allRecordCount;
         final List<ENTITY> selectedList;
         try {
-            if (pagingBean.isCountLater()) {
+            if (pagingBean.canPagingCountLater()) {
                 selectedList = handler.paging();
                 if (isCurrentLastPage(selectedList, pagingBean)) {
                     allRecordCount = deriveAllRecordCountFromLastPageValues(selectedList, pagingBean);
