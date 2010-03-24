@@ -660,9 +660,18 @@ public class Table {
         return getExtendedEntityClassName() + "Bhv";
     }
 
+    public String getExtendedBehaviorImplClassName() {
+        return getExtendedEntityClassName() + "BhvImpl";
+    }
+
     public String getExtendedBehaviorFullClassName() {
         final String extendedBehaviorPackage = getDatabase().getExtendedBehaviorPackage();
         return extendedBehaviorPackage + "." + getExtendedBehaviorClassName();
+    }
+
+    public String getExtendedBehaviorImplFullClassName() {
+        final String extendedBehaviorPackage = getDatabase().getExtendedBehaviorPackage();
+        return extendedBehaviorPackage + "." + getExtendedBehaviorImplClassName();
     }
 
     public String getExtendedConditionBeanClassName() {
@@ -724,6 +733,10 @@ public class Table {
 
     public String getBehaviorComponentName() {
         return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Bhv";
+    }
+
+    public String getBehaviorImplComponentName() {
+        return getBehaviorComponentName() + "BhvImpl";
     }
 
     // -----------------------------------------------------

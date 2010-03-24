@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans
+    PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd"
+>
+<beans>
+    <!-- The components of Behavior. -->
+#foreach ($table in $database.tables)
+	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorImplFullClassName}" autowire="byType">
+        <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
+        <property name="behaviorSelector"><ref bean="${database.behaviorSelectorComponentName}"/></property>
+#if ($table.isWritable())
+        <property name="commonColumnAutoSetupper"><ref bean="${database.commonColumnAutoSetupperComponentName}"/></property>
+#end
+    </bean>
+#end
+</beans>

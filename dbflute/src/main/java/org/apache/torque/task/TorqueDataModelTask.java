@@ -141,7 +141,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         _log.info("* * * * * * * * * * * * * * * * * * * * **");
         _log.info("* Process Client Behavior Control (Java) *");
         _log.info("* * * * * * * * * * * * * * * * * * * * **");
-        final String control = "om/java/plugin/clientbhv/ControlClientBehaviorJava.vm";
+        final String control = "om/java/plugin/clientbhv/ControlClientBhvJava.vm";
         _log.info("...Using client behavior (Java) control: " + control);
         setControlTemplate(control);
     }
@@ -151,7 +151,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         _log.info("* * * * * * * * * * * * * * * * * * * * * **");
         _log.info("* Process Client Behavior Control (CSharp) *");
         _log.info("* * * * * * * * * * * * * * * * * * * * * **");
-        final String control = "om/csharp/plugin/clientbhv/ControlClientBehaviorCSharp.vm";
+        final String control = "om/csharp/plugin/clientbhv/ControlClientBhvCSharp.vm";
         _log.info("...Using client behavior (CSharp) control: " + control);
         setControlTemplate(control);
     }

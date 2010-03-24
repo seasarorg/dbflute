@@ -16,7 +16,7 @@ public class ${glDBFluteModule} extends AbstractModule {
 
     protected DataSource dataSource;
 
-    public DBFluteModule(DataSource dataSource) {
+    public ${glDBFluteModule}(DataSource dataSource) {
         if (dataSource == null) {
             String msg = "The argument 'dataSource' should not be null!";
             throw new IllegalArgumentException(msg);
@@ -27,34 +27,21 @@ public class ${glDBFluteModule} extends AbstractModule {
     @Override
     protected void configure() {
         new ${glDBFluteInitializer}(); // Initialize!
-        
+
         // The components of DBFlute Runtime.
         ${glImplementedBehaviorSelector} behaviorSelector = new ${glImplementedBehaviorSelector}();
         BehaviorCommandInvoker behaviorCommandInvoker = new BehaviorCommandInvoker();
         ${glImplementedInvokerAssistant} invokerAssistant = createImplementedInvokerAssistant(behaviorCommandInvoker);
         behaviorCommandInvoker.setInvokerAssistant(invokerAssistant);
         ${glImplementedCommonColumnAutoSetupper} commonColumnAutoSetupper = createImplementedCommonColumnAutoSetupper();
-        
+
         bind(BehaviorSelector.class).toInstance(behaviorSelector);
         bind(BehaviorCommandInvoker.class).toInstance(behaviorCommandInvoker);
         bind(InvokerAssistant.class).toInstance(invokerAssistant);
         bind(CommonColumnAutoSetupper.class).toInstance(commonColumnAutoSetupper);
-        
+
         // The components of Behavior.
-        BehaviorCommandInvoker ker = behaviorCommandInvoker;
-        BehaviorSelector tor = behaviorSelector;
-        CommonColumnAutoSetupper per = commonColumnAutoSetupper;
-#foreach ($table in $database.tables)
-        {
-            ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
-#if ($table.isWritable())
-            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor); bhv.setCommonColumnAutoSetupper(per);
-#else
-            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor);
-#end
-            bind(${table.extendedBehaviorClassName}.class).toInstance(bhv);
-        }
-#end
+        setupBehavior(behaviorCommandInvoker, behaviorSelector, commonColumnAutoSetupper);
     }
 
     protected ${glImplementedInvokerAssistant} createImplementedInvokerAssistant(BehaviorCommandInvoker behaviorCommandInvoker) {
@@ -73,6 +60,20 @@ public class ${glDBFluteModule} extends AbstractModule {
         return new ${database.extendedImplementedCommonColumnAutoSetupperClass}();
 #else
         return new ${glImplementedCommonColumnAutoSetupper}();
+#end
+    }
+
+    protected void setupBehavior(BehaviorCommandInvoker ker, BehaviorSelector tor, CommonColumnAutoSetupper per) {
+#foreach ($table in $database.tables)
+        {
+            ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorClassName}();
+#if ($table.isWritable())
+            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor); bhv.setCommonColumnAutoSetupper(per);
+#else
+            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor);
+#end
+            bind(${table.extendedBehaviorClassName}.class).toInstance(bhv);
+        }
 #end
     }
 }

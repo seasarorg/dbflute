@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE components PUBLIC "-//SEASAR2.1//DTD S2Container//EN"
+    "http://www.seasar.org/dtd/components21.dtd">
+
+<components>
+
+    <!-- The components of Behavior as implementation of an application . -->
+#foreach ($table in $database.tables)
+    <component name="${table.behaviorImplComponentName}" class="${table.extendedBehaviorImplFullClassName}"/>
+#end
+</components>

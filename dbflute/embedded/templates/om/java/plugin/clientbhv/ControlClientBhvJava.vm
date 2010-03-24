@@ -90,6 +90,61 @@ $database.checkProperties()
 ## *****************************************************************************************************************
 ##                                                                                                           Parsing
 ##                                                                                                           *******
+
+## ===================================================================================
+##                                                                     ContainerConfig
+##                                                                     ===============
+$database.info("public void parseContainerConfig() {")
+#if ($database.isTargetContainerSeasar())
+  #foreach ($dbfluteDiconPackageName in $database.DBFluteDiconPackageNameList)
+    #set ($path = "${dbfluteDiconPackageName}" )
+    $database.makeDirectory($path)
+
+    #set ($path = "${dbfluteDiconPackageName}/${glDBFluteDiconFileName}" )
+    #set ($path = $database.filterDBFluteDiconClientBhv($path) )
+    $database.info("    ${path}")
+    $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/container/seasar/ClientBhvDBFluteDicon.${glTemplateFileExtension}", $path, "", "")
+  #end
+#end
+#if ($database.isTargetContainerSpring())
+  #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
+    #set ($path = "${dbfluteBeansPackageName}" )
+    $database.makeDirectory($path)
+
+    #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
+    #set ($path = $database.filterDBFluteBeansClientBhv($path) )
+    $database.info("    ${path}")
+    $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/container/spring/ClientBhvSpringDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
+  #end
+#end
+#if ($database.isTargetContainerLucy())
+  #foreach ($dbfluteBeansPackageName in $database.DBFluteBeansPackageNameList)
+    #set ($path = "${dbfluteBeansPackageName}" )
+    $database.makeDirectory($path)
+
+    #set ($path = "${dbfluteBeansPackageName}/${glDBFluteBeansFileName}" )
+    #set ($path = $database.filterDBFluteBeansClientBhv($path) )
+    $database.info("    ${path}")
+    $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/container/lucy/ClientBhvLucyDBFluteBeans.${glTemplateFileExtension}", $path, "", "")
+  #end
+#end
+#if ($database.isTargetContainerGuice())
+  #set ($path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteModule}.${glClassFileExtension}" )
+  #set ($path = $database.filterDBFluteModuleClientBhv($path) )
+  $database.info("    ${path}")
+  $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/container/guice/ClientBhvGuiceDBFluteModule.${glTemplateFileExtension}", $path, "", "")
+#end
+$database.info("}")
+
+## ===================================================================================
+##                                                                        Table Object
+##                                                                        ============
+#set ($path = $database.getPackageAsPath(${glPackageBaseBhv}))
+$database.makeDirectory($path)
+
+#set ($path = $database.getPackageAsPath(${glPackageExtendedBhv}))
+$database.makeDirectory($path)
+
 ##
 ## Delete old table classes.
 ##

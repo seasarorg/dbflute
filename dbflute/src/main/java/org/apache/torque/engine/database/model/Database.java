@@ -101,6 +101,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.xml.sax.Attributes;
 
 /**
@@ -1015,6 +1016,13 @@ public class Database {
         return getProperties().getDependencyInjectionProperties().getDBFluteDiconOtherIncludePathList();
     }
 
+    public String filterDBFluteDiconClientBhv(String filePath) { // as utility for client behavior
+        if (filePath.endsWith(".dicon")) {
+            filePath = DfStringUtil.replace(filePath, ".dicon", "++.dicon");
+        }
+        return filePath;
+    }
+
     // -----------------------------------------------------
     //                                         Spring & Lucy
     //                                         -------------
@@ -1044,6 +1052,23 @@ public class Database {
 
     public String getDBFluteBeansDataSourceName() {
         return getProperties().getDependencyInjectionProperties().getDBFluteBeansDataSourceName();
+    }
+
+    public String filterDBFluteBeansClientBhv(String filePath) { // as utility for client behavior
+        if (filePath.endsWith(".xml")) {
+            filePath = DfStringUtil.replace(filePath, ".xml", "ClientBhv.xml");
+        }
+        return filePath;
+    }
+
+    // -----------------------------------------------------
+    //                                                 Guice
+    //                                                 -----
+    public String filterDBFluteModuleClientBhv(String filePath) { // as utility for client behavior
+        if (filePath.endsWith(".java")) {
+            filePath = DfStringUtil.replace(filePath, ".java", "ClientBhv.java");
+        }
+        return filePath;
     }
 
     // -----------------------------------------------------

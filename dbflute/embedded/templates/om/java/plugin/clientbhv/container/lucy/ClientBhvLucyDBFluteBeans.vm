@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE lucy-config PUBLIC "-//LUCY//DTD LUCY//EN" "http://www.lucy.org/dtd/lucy-config.dtd">
+<lucy-config>
+    <!-- The components of Behavior. -->
+#foreach ($table in $database.tables)
+	<component name="${table.behaviorComponentName}" class="${table.extendedBehaviorImplFullClassName}">
+        <inject method="setBehaviorCommandInvoker">${database.behaviorCommandInvokerComponentName}</inject>
+        <inject method="setBehaviorSelector">${database.behaviorSelectorComponentName}</inject>
+#if ($table.isWritable())
+        <inject method="setCommonColumnAutoSetupper">${database.commonColumnAutoSetupperComponentName}</inject>
+#end
+    </component>
+#end
+</lucy-config>

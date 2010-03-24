@@ -44,9 +44,9 @@ $database.checkProperties()
 #set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
 #set ($glPackageExtendedBhv = "${database.extendedBehaviorPackage}")
 
-## -----------------------------------------------------------------------------------------------------
-##                                                                                    Parse table object
-##                                                                                    ------------------
+## ===================================================================================
+##                                                                        Table Object
+##                                                                        ============
 #set ($path = $database.getPackageAsPath(${glPackageBaseBhv}))
 $database.makeDirectory($path)
 

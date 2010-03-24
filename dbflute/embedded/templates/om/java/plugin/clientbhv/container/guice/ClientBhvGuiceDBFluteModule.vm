@@ -1,0 +1,35 @@
+${database.allClassCopyright}package ${glPackageBaseCommon};
+
+import javax.sql.DataSource;
+
+import org.seasar.dbflute.BehaviorSelector;
+import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
+import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
+import ${glPackageExtendedBhv}.*;
+
+/**
+ * @author ${database.classAuthor}
+ */
+public class ${glDBFluteModule}ClientBhv extends ${glDBFluteModule} {
+
+    public ${glDBFluteModule}ClientBhv(DataSource dataSource) {
+        super(dataSource);
+    }
+
+    @Override
+    protected void setupBehavior(BehaviorCommandInvoker ker, BehaviorSelector tor, CommonColumnAutoSetupper per) {
+        super.setupBehavior(ker, tor, per);
+
+#foreach ($table in $database.tables)
+        {
+            ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorImplClassName}();
+#if ($table.isWritable())
+            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor); bhv.setCommonColumnAutoSetupper(per);
+#else
+            bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor);
+#end
+            bind(${table.extendedBehaviorImplClassName}.class).toInstance(bhv);
+        }
+#end
+    }
+}
