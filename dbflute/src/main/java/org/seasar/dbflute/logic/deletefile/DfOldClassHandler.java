@@ -80,18 +80,22 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_BaseBehavior() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                return table.getBaseBehaviorClassName();
+                if (_basicProperties.isClientBehavior()) {
+                    return table.getBaseBehaviorImplClassName();
+                } else {
+                    return table.getBaseBehaviorClassName();
+                }
             }
         };
         final String packagePath = getBaseBehaviorPackage();
         final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final String suffix;
+        final String classSuffix;
         if (_basicProperties.isClientBehavior()) {
-            suffix = "Bhv" + _basicProperties.getClientBehaviorSuffix();
+            classSuffix = "Bhv" + _basicProperties.getClientBehaviorSuffix();
         } else {
-            suffix = "Bhv";
+            classSuffix = "Bhv";
         }
-        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, suffix, setupper);
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, classSuffix, setupper);
         _deletedOldTableBaseBehaviorList = deletor.deleteOldTableClass();
         showDeleteOldTableFile(_deletedOldTableBaseBehaviorList);
     }
