@@ -446,10 +446,10 @@ public abstract class DfAbstractHelperProperties {
     }
 
     protected Map<String, Object> getOutsidePropMap(String key) {
-        final String filteredKey = DfStringUtil.replace(key, "torque.", "");
+        final String propName = DfStringUtil.replace(key, "torque.", "");
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        final String mainpath = "./dfprop/" + filteredKey + ".dfprop";
-        final String envpath = "./dfprop/" + getEnvironmentType() + "/" + filteredKey + ".dfprop";
+        final String mainpath = "./dfprop/" + propName + ".dfprop";
+        final String envpath = "./dfprop/" + getEnvironmentType() + "/" + propName + ".dfprop";
         if (isEnvironmentDefault()) {
             final Map<String, Object> map = reader.readMap(mainpath);
             setupOutsidePropExMap(reader, map, mainpath);
