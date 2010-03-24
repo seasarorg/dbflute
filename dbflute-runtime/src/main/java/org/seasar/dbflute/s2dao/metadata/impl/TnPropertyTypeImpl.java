@@ -27,18 +27,24 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
  */
 public class TnPropertyTypeImpl implements TnPropertyType {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     private DfPropertyDesc propertyDesc;
 
-    private String propertyName;
+    private final String propertyName;
 
     private String columnName;
 
-    private ValueType valueType;
+    private final ValueType valueType;
 
     private boolean primaryKey = false;
 
     private boolean persistent = true;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public TnPropertyTypeImpl(DfPropertyDesc propertyDesc) {
         this(propertyDesc, TnValueTypes.OBJECT, propertyDesc.getPropertyName());
     }
@@ -64,6 +70,18 @@ public class TnPropertyTypeImpl implements TnPropertyType {
         this.columnName = columnName;
     }
 
+    // ===================================================================================
+    //                                                                      Basic Override
+    //                                                                      ==============
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + ":{" + propertyName + "(" + columnName + "), "
+                + valueType.getClass().getSimpleName() + ", " + primaryKey + ", " + persistent + "}";
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
     public DfPropertyAccessor getPropertyAccessor() {
         return propertyDesc;
     }

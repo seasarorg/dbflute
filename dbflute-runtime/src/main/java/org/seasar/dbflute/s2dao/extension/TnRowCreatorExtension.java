@@ -24,7 +24,7 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
+import org.seasar.dbflute.exception.MappingClassCastException;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
@@ -94,6 +94,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         String columnName = null;
         TnPropertyMapping mapping = null;
         String propertyName = null;
+        Object selectedValue = null;
         final Map<String, Integer> selectIndexMap = ResourceContext.getSelectIndexMap();
         final Object row;
         final DBMeta dbmeta;
@@ -117,10 +118,11 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                     propertyName = mapping.getPropertyName();
                     if (dbmeta.hasEntityPropertySetupper(propertyName)) {
                         final ValueType valueType = mapping.getValueType();
-                        final Object value = getValue(rs, columnName, valueType, selectIndexMap);
-                        dbmeta.setupEntityProperty(propertyName, row, value);
+                        selectedValue = getValue(rs, columnName, valueType, selectIndexMap);
+                        dbmeta.setupEntityProperty(propertyName, row, selectedValue);
                     } else {
-                        registerValueByReflection(rs, row, mapping, columnName, selectIndexMap);
+                        selectedValue = getValue(rs, columnName, mapping.getValueType(), selectIndexMap);
+                        mapping.getPropertyAccessor().setValue(row, selectedValue);
                     }
                 }
             } else {
@@ -129,32 +131,22 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                     columnName = entry.getKey();
                     mapping = entry.getValue();
                     propertyName = mapping.getPropertyName();
-                    registerValueByReflection(rs, row, mapping, columnName, selectIndexMap);
+                    selectedValue = getValue(rs, columnName, mapping.getValueType(), selectIndexMap);
+                    mapping.getPropertyAccessor().setValue(row, selectedValue);
                 }
             }
             return row;
         } catch (ClassCastException e) {
-            if (_log.isWarnEnabled()) {
-                String msg = ClassCastException.class.getSimpleName() + " occurred while ResultSet Handling:";
-                _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName + " dbmeta");
-            }
-            throwNonsenseClassCastException(row, dbmeta, e);
+            throwMappingClassCastException(row, dbmeta, mapping, selectedValue, e);
             return null; // unreachable
         } catch (SQLException e) {
-            if (_log.isWarnEnabled()) {
-                String msg = SQLException.class.getSimpleName() + " occurred while ResultSet Handling:";
-                _log.warn(msg + " target=" + beanClass.getSimpleName() + "." + propertyName);
+            if (_log.isDebugEnabled()) {
+                String msg = "Failed to get selected values while resultSet handlings:";
+                msg = msg + " target=" + beanClass.getSimpleName() + "." + propertyName;
+                _log.debug(msg);
             }
             throw e;
         }
-    }
-
-    protected void registerValueByReflection(ResultSet rs, Object row, TnPropertyMapping mapping, String columnName,
-            Map<String, Integer> selectIndexMap) throws SQLException {
-        final ValueType valueType = mapping.getValueType();
-        final Object value = getValue(rs, columnName, valueType, selectIndexMap);
-        final DfPropertyAccessor accessor = mapping.getPropertyAccessor();
-        accessor.setValue(row, value);
     }
 
     protected Object getValue(ResultSet rs, String columnName, ValueType valueType, Map<String, Integer> selectIndexMap)
@@ -168,40 +160,39 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         return value;
     }
 
-    protected void throwNonsenseClassCastException(Object entity, DBMeta dbmeta, ClassCastException e) {
-        String msg = "Look! Read the message below." + getLineSeparator();
-        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
-        msg = msg + "Nonsense ClassCastException occured!" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Advice]" + getLineSeparator();
-        msg = msg + "This exception may be from ClassLoader Headache about HotDeploy." + getLineSeparator();
-        msg = msg + "Please add the ignore-package setting to convention.dicon like as follows:" + getLineSeparator();
-        msg = msg + "  For example:" + getLineSeparator();
-        msg = msg + "    <initMethod name=”addIgnorePackageName”>" + getLineSeparator();
-        msg = msg + "        <arg>”com.example.xxx.dbflute”</arg>" + getLineSeparator();
-        msg = msg + "    </initMethod>" + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Exception Message]" + getLineSeparator() + e.getMessage() + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Target Entity]" + getLineSeparator() + entity + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Target Entity Class Loader]" + getLineSeparator() + entity.getClass().getClassLoader()
-                + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Target DBMeta]" + getLineSeparator() + dbmeta + getLineSeparator();
-        msg = msg + getLineSeparator();
-        msg = msg + "[Target DBMeta Class Loader]" + getLineSeparator() + dbmeta.getClass().getClassLoader()
-                + getLineSeparator();
+    protected void throwMappingClassCastException(Object entity, DBMeta dbmeta, TnPropertyMapping mapping,
+            Object selectedValue, ClassCastException e) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Failed to cast a class while data mapping!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "If you use Seasar(S2Container), this exception may be" + ln();
+        msg = msg + "from ClassLoader Headache about HotDeploy." + ln();
+        msg = msg + "Add the ignore-package setting to convention.dicon like this:" + ln();
+        msg = msg + "  For example:" + ln();
+        msg = msg + "    <initMethod name=”addIgnorePackageName”>" + ln();
+        msg = msg + "        <arg>”com.example.xxx.dbflute”</arg>" + ln();
+        msg = msg + "    </initMethod>" + ln();
+        msg = msg + "If you use an other DI container, this exception may be" + ln();
+        msg = msg + "from illegal state about your settings of DBFlute." + ln();
+        msg = msg + "Confirm your settings: for example, typeMappingMap.dfprop." + ln();
+        msg = msg + ln();
+        msg = msg + "[Exception Message]" + ln() + e.getMessage() + ln();
+        msg = msg + ln();
+        msg = msg + "[Target Entity]" + ln() + entity + ln();
+        msg = msg + "classLoader: " + entity.getClass().getClassLoader() + ln();
+        msg = msg + ln();
+        msg = msg + "[Target DBMeta]" + ln() + dbmeta + ln();
+        msg = msg + "classLoader: " + dbmeta.getClass().getClassLoader() + ln();
+        msg = msg + ln();
+        msg = msg + "[Property Mapping]" + ln() + mapping + ln();
+        msg = msg + "type: " + (mapping != null ? mapping.getClass() : null) + ln();
+        msg = msg + ln();
+        msg = msg + "[Selected Value]" + ln() + selectedValue + ln();
+        msg = msg + "type: " + (selectedValue != null ? selectedValue.getClass() : null) + ln();
         msg = msg + "* * * * * * * * * */";
-        throw new NonsenseClassCastException(msg, e);
-    }
-
-    public static class NonsenseClassCastException extends RuntimeException {
-        private static final long serialVersionUID = 1L;
-
-        public NonsenseClassCastException(String msg, ClassCastException e) {
-            super(msg, e);
-        }
+        throw new MappingClassCastException(msg, e);
     }
 
     // ===================================================================================
@@ -299,7 +290,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
-    protected String getLineSeparator() {
+    protected String ln() {
         return DfSystemUtil.getLineSeparator();
     }
 
