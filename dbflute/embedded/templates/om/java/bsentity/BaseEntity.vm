@@ -84,6 +84,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     protected ${col.javaNative} _${col.uncapitalisedJavaName};
 
 #end
+#if ($database.isMakeEntityDerivedMap())
+    // -----------------------------------------------------
+    //                                               Derived
+    //                                               -------
+    protected Map<String, Object> _derivedMap;
+
+#end
     // -----------------------------------------------------
     //                                              Internal
     //                                              --------

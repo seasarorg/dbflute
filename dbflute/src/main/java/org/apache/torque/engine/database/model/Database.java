@@ -1286,8 +1286,16 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
-    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
-        return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
+    public boolean isMakeEntityDerivedMap() {
+        return getProperties().getLittleAdjustmentProperties().isMakeEntityDerivedMap();
+    }
+
+    public boolean isMakeEntityChaseRelation() {
+        return getProperties().getLittleAdjustmentProperties().isMakeEntityChaseRelation();
+    }
+
+    public boolean isMakeConditionQueryEqualEmptyString() {
+        return getProperties().getLittleAdjustmentProperties().isMakeConditionQueryEqualEmptyString();
     }
 
     public boolean isMakeDeprecated() {
@@ -1296,14 +1304,6 @@ public class Database {
 
     public boolean isMakeRecentlyDeprecated() {
         return getProperties().getLittleAdjustmentProperties().isMakeRecentlyDeprecated();
-    }
-
-    public boolean isMakeConditionQueryEqualEmptyString() {
-        return getProperties().getLittleAdjustmentProperties().isMakeConditionQueryEqualEmptyString();
-    }
-
-    public boolean isMakeEntityChaseRelation() {
-        return getProperties().getLittleAdjustmentProperties().isMakeEntityChaseRelation();
     }
 
     public boolean hasExtendedImplementedInvokerAssistantClass() {
@@ -1364,6 +1364,10 @@ public class Database {
 
     public boolean isMakeDaoInterface() {
         return getProperties().getLittleAdjustmentProperties().isMakeDaoInterface();
+    }
+
+    public boolean isAvailableToLowerInGeneratorUnderscoreMethod() {
+        return getProperties().getLittleAdjustmentProperties().isAvailableToLowerInGeneratorUnderscoreMethod();
     }
 
     // ===================================================================================

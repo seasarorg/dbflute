@@ -65,8 +65,8 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     // ===================================================================================
     //                                                                         Make Entity
     //                                                                         ===========
-    public boolean isMakeEntityValueMap() {
-        return isProperty("isMakeEntityValueMap", false);
+    public boolean isMakeEntityDerivedMap() {
+        return isProperty("isMakeEntityDerivedMap", false);
     }
 
     public boolean isMakeEntityChaseRelation() {
