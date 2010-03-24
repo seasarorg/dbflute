@@ -94,7 +94,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         }
         if (getBasicProperties().isTargetLanguageMain()) {
             if (getBasicProperties().isTargetLanguageJava()) {
-                if (littleProp.isClientBehavior()) {
+                if (getBasicProperties().isClientBehavior()) {
                     setupControlClientBehaviorJava(littleProp);
                     return;
                 }
@@ -106,7 +106,7 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
                 _log.info("...Using Java control: " + control);
                 setControlTemplate(control);
             } else if (getBasicProperties().isTargetLanguageCSharp()) {
-                if (littleProp.isClientBehavior()) {
+                if (getBasicProperties().isClientBehavior()) {
                     setupControlClientBehaviorCSharp(littleProp);
                     return;
                 }

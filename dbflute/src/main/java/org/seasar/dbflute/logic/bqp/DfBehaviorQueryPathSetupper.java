@@ -123,24 +123,27 @@ public class DfBehaviorQueryPathSetupper {
         final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = resourceMap.entrySet();
         for (Entry<File, Map<String, Map<String, String>>> entry : entrySet) {
             final File bsbhvFile = entry.getKey();
-            String className = bsbhvFile.getName();
-            final int extIndex = className.lastIndexOf(".");
+            String tableKeyName = bsbhvFile.getName();
+            final int extIndex = tableKeyName.lastIndexOf(".");
             if (extIndex >= 0) {
-                className = className.substring(0, extIndex);
+                tableKeyName = tableKeyName.substring(0, extIndex);
             }
-            if (className.endsWith("Bhv")) {
-                className = className.substring(0, className.length() - "Bhv".length());
+            if (tableKeyName.endsWith("Bhv")) {
+                tableKeyName = tableKeyName.substring(0, tableKeyName.length() - "Bhv".length());
             }
-            final DfBasicProperties basicProperties = _buildProperties.getBasicProperties();
+            if (tableKeyName.endsWith("BhvImpl")) {
+                tableKeyName = tableKeyName.substring(0, tableKeyName.length() - "BhvImpl".length());
+            }
+            final DfBasicProperties basicProperties = getBasicProperties();
             final String projectPrefix = basicProperties.getProjectPrefix();
-            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(projectPrefix) && className.startsWith(projectPrefix)) {
-                className = className.substring(projectPrefix.length(), className.length());
+            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(projectPrefix) && tableKeyName.startsWith(projectPrefix)) {
+                tableKeyName = tableKeyName.substring(projectPrefix.length(), tableKeyName.length());
             }
             final String basePrefix = basicProperties.getBasePrefix();
-            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(basePrefix) && className.startsWith(basePrefix)) {
-                className = className.substring(basePrefix.length(), className.length());
+            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(basePrefix) && tableKeyName.startsWith(basePrefix)) {
+                tableKeyName = tableKeyName.substring(basePrefix.length(), tableKeyName.length());
             }
-            resultMap.put(className, entry.getValue());
+            resultMap.put(tableKeyName, entry.getValue());
         }
         return resultMap;
     }
@@ -172,7 +175,7 @@ public class DfBehaviorQueryPathSetupper {
             }
             exbhvName = exbhvPackage;
         }
-        Map<String, Map<String, String>> behaviorQueryPathMap = new LinkedHashMap<String, Map<String, String>>();
+        final Map<String, Map<String, String>> behaviorQueryPathMap = new LinkedHashMap<String, Map<String, String>>();
         gatherBehaviorQueryPathInfo(behaviorQueryPathMap, sqlFileList, exbhvName);
         return behaviorQueryPathMap;
     }
@@ -185,22 +188,23 @@ public class DfBehaviorQueryPathSetupper {
     protected void gatherBehaviorQueryPathInfo(Map<String, Map<String, String>> behaviorQueryPathMap,
             List<File> sqlFileList, String exbhvName) {
         final String exbhvMark = "/" + exbhvName + "/";
-        final Pattern behaviorQueryPathPattern = Pattern.compile(".+" + exbhvMark + ".+Bhv_.+.sql$");
+        final String exbhvSuffix = "Bhv";
+        final Pattern behaviorQueryPathPattern = Pattern.compile(".+" + exbhvMark + ".+" + exbhvSuffix + "_.+.sql$");
         for (File sqlFile : sqlFileList) {
             final String path = getSlashPath(sqlFile);
             final Matcher matcher = behaviorQueryPathPattern.matcher(path);
             if (!matcher.matches()) {
                 continue;
             }
-            String simpleFileName = path.substring(path.lastIndexOf(exbhvMark) + exbhvMark.length());
             String subDirectoryPath = null;
+            String simpleFileName = path.substring(path.lastIndexOf(exbhvMark) + exbhvMark.length());
             if (simpleFileName.contains("/")) {
                 subDirectoryPath = simpleFileName.substring(0, simpleFileName.lastIndexOf("/"));
                 simpleFileName = simpleFileName.substring(simpleFileName.lastIndexOf("/") + "/".length());
             }
-            final int behaviorNameMarkIndex = simpleFileName.indexOf("Bhv_");
-            final int behaviorNameEndIndex = behaviorNameMarkIndex + "Bhv".length();
-            final int behaviorQueryPathStartIndex = behaviorNameMarkIndex + "Bhv_".length();
+            final int behaviorNameMarkIndex = simpleFileName.indexOf(exbhvSuffix + "_");
+            final int behaviorNameEndIndex = behaviorNameMarkIndex + exbhvSuffix.length();
+            final int behaviorQueryPathStartIndex = behaviorNameMarkIndex + (exbhvSuffix + "_").length();
             final int behaviorQueryPathEndIndex = simpleFileName.lastIndexOf(".sql");
             final String entityName = simpleFileName.substring(0, behaviorNameMarkIndex);
             final String behaviorName = simpleFileName.substring(0, behaviorNameEndIndex);
@@ -266,9 +270,13 @@ public class DfBehaviorQueryPathSetupper {
         if (behaviorQueryPathMap.isEmpty()) {
             return new HashMap<File, Map<String, Map<String, String>>>();
         }
-        String outputDir = getBasicProperties().getGenerateOutputDirectory();
-        if (outputDir.endsWith("/")) {
-            outputDir = outputDir.substring(0, outputDir.length() - "/".length());
+        final String outputDir;
+        {
+            String tmp = getBasicProperties().getGenerateOutputDirectory();
+            if (tmp.endsWith("/")) {
+                tmp = tmp.substring(0, tmp.length() - "/".length());
+            }
+            outputDir = tmp;
         }
         final String classFileExtension = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo()
                 .getClassFileExtension();
@@ -284,7 +292,11 @@ public class DfBehaviorQueryPathSetupper {
         final FileFilter filefilter = new FileFilter() {
             public boolean accept(File file) {
                 final String path = file.getPath();
-                return path.endsWith("Bhv." + classFileExtension);
+                if (isClientBehavior()) {
+                    return path.endsWith("BhvImpl." + classFileExtension);
+                } else {
+                    return path.endsWith("Bhv." + classFileExtension);
+                }
             }
         };
         if (!bsbhvDir.exists()) {
@@ -313,9 +325,14 @@ public class DfBehaviorQueryPathSetupper {
             final Map<String, String> behaviorQueryElementMap = entry.getValue();
             final String behaviorName = behaviorQueryElementMap.get("behaviorName");
             final String behaviorQueryPath = behaviorQueryElementMap.get("behaviorQueryPath");
-            final File bsbhvFile = bsbhvFileMap.get(behaviorName);
+            File bsbhvFile = bsbhvFileMap.get(behaviorName);
             if (bsbhvFile == null) {
-                throwBehaviorNotFoundException(bsbhvFileMap, behaviorQueryElementMap, bsbhvPathBase);
+                if (behaviorName.endsWith("Bhv")) { // retry as client behavior
+                    bsbhvFile = bsbhvFileMap.get(behaviorName + "Impl");
+                }
+                if (bsbhvFile == null) {
+                    throwBehaviorNotFoundException(bsbhvFileMap, behaviorQueryElementMap, bsbhvPathBase);
+                }
             }
             Map<String, Map<String, String>> resourceElementMap = reflectResourceMap.get(bsbhvFile);
             if (resourceElementMap == null) {
@@ -358,9 +375,10 @@ public class DfBehaviorQueryPathSetupper {
     protected void handleReflectResource(Map<File, Map<String, Map<String, String>>> reflectResourceMap) {
         _log.info(" ");
         _log.info("[Behavior Query Path]");
-        final Set<File> fileKeySet = reflectResourceMap.keySet();
-        for (File bsbhvFile : fileKeySet) {
-            final Map<String, Map<String, String>> resourceElementMap = reflectResourceMap.get(bsbhvFile);
+        final Set<Entry<File, Map<String, Map<String, String>>>> entrySet = reflectResourceMap.entrySet();
+        for (Entry<File, Map<String, Map<String, String>>> entry : entrySet) {
+            final File bsbhvFile = entry.getKey();
+            final Map<String, Map<String, String>> resourceElementMap = entry.getValue();
             writeBehaviorQueryPath(bsbhvFile, resourceElementMap);
         }
         _log.info(" ");
@@ -555,6 +573,10 @@ public class DfBehaviorQueryPathSetupper {
 
     protected DfLittleAdjustmentProperties getLittleAdjustmentProperties() {
         return getProperties().getLittleAdjustmentProperties();
+    }
+
+    protected boolean isClientBehavior() {
+        return getBasicProperties().isClientBehavior();
     }
 
     public String getFlatDirectoryPackage() {

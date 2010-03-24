@@ -231,17 +231,6 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                   Source & Template
-    //                                                                   =================
-    public String getSourceFileEncoding() {
-        return getProperty("sourceFileEncoding", DEFAULT_sourceFileEncoding);
-    }
-
-    public String getTemplateFileEncoding() { // It's closet!
-        return getProperty("templateFileEncoding", DEFAULT_templateFileEncoding);
-    }
-
-    // ===================================================================================
     //                                                                           SchemaXML
     //                                                                           =========
     public String getProejctSchemaXMLFilePath() {
@@ -394,10 +383,25 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                          Source Code Line Separator
-    //                                                          ==========================
+    //                                                                     Client Behavior
+    //                                                                     ===============
+    public boolean isClientBehavior() {
+        return isProperty("isClientBehavior", false);
+    }
+
+    // ===================================================================================
+    //                                                                   Source & Template
+    //                                                                   =================
+    public String getSourceFileEncoding() {
+        return getProperty("sourceFileEncoding", DEFAULT_sourceFileEncoding);
+    }
+
+    public String getTemplateFileEncoding() { // It's closet!
+        return getProperty("templateFileEncoding", DEFAULT_templateFileEncoding);
+    }
+
     public String getSourceCodeLineSeparator() {
-        return "\r\n"; // Source Code uses CR + LF. (at 0.9.5.4)
+        return "\r\n"; // Source Code uses CR + LF. (since 0.9.5.4)
     }
 
     // ===================================================================================

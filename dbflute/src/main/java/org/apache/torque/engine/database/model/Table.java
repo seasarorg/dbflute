@@ -2702,13 +2702,13 @@ public class Table {
     }
 
     public List<String> getBehaviorQueryPathList() {
-        final Map<String, Map<String, String>> tableBqpMap = getBehaviorQueryPathMap();
-        return new ArrayList<String>(tableBqpMap.keySet());
+        final Map<String, Map<String, String>> bqpMap = getBehaviorQueryPathMap();
+        return new ArrayList<String>(bqpMap.keySet());
     }
 
     protected Map<String, String> getBehaviorQueryPathElementMap(String behaviorQueryPath) {
-        final Map<String, Map<String, String>> tableBqpMap = getBehaviorQueryPathMap();
-        return tableBqpMap.get(behaviorQueryPath);
+        final Map<String, Map<String, String>> bqpMap = getBehaviorQueryPathMap();
+        return bqpMap.get(behaviorQueryPath);
     }
 
     public String getBehaviorQueryPathDisplayName(String behaviorQueryPath) {

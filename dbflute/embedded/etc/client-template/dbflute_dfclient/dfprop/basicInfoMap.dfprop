@@ -34,7 +34,7 @@ map:{
     # 
     ; database = h2
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o targetLanguage: (Required)
     #  The target language.
@@ -44,7 +44,7 @@ map:{
     # 
     ; targetLanguage = java
     # - - - - - - - - - -/
-    
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o targetContainer: (Required)
     #  The target DI container.
@@ -168,6 +168,14 @@ map:{
     #  If source files of your project are not UTF-8, specify your encoding here.
     # 
     #; sourceFileEncoding = UTF-8
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isClientBehavior: (NotRequired - Default false)
+    #  Does the Generate task generate only client behaviors?
+    #  (This is a property for the function of ClientBehavior)
+    #
+    #; isClientBehavior = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

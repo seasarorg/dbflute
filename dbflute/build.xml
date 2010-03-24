@@ -6,7 +6,7 @@
 
 	<!-- Version -->
 	<property name="version" value="0.9.6.7"/>
-	<property name="build.version" value="${version}-RC1"/>
+	<property name="build.version" value="${version}-RC2"/>
 	<property name="pre.version" value="0.9.6.6"/>
 	<property name="runtime.version" value="0.9.6.7"/>
 	<property name="runtime.build.version" value="${runtime.version}-RC1"/>
@@ -411,7 +411,7 @@
 		<delete dir="${extraction.dir}"/>
 	</target>
 
-	<target name="reflect-to-clientsql" depends="prepare-reflection" description="==> reflect to tricky example">
+	<target name="reflect-to-clientsql" depends="prepare-reflection" description="==> reflect to clientsql example">
 		<delete file="${clientsql.example.dir}/lib/${runtime.pre.jar}"/>
 		<delete file="${clientsql.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${clientsql.example.dir}/lib/${runtime.jar}" overwrite="true"/>
