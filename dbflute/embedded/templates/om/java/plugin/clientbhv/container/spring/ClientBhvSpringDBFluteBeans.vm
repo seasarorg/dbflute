@@ -6,7 +6,7 @@
 <beans>
     <!-- The components of Behavior. -->
 #foreach ($table in $database.tables)
-	<bean id="${table.behaviorComponentName}" class="${table.extendedBehaviorImplFullClassName}" autowire="byType">
+	<bean id="${table.behaviorImplComponentName}" class="${table.extendedBehaviorImplFullClassName}" autowire="byType">
         <property name="behaviorCommandInvoker"><ref bean="${database.behaviorCommandInvokerComponentName}"/></property>
         <property name="behaviorSelector"><ref bean="${database.behaviorSelectorComponentName}"/></property>
 #if ($table.isWritable())

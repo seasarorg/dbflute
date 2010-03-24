@@ -22,7 +22,7 @@ public class ${glDBFluteModule}ClientBhv extends ${glDBFluteModule} {
 
 #foreach ($table in $database.tables)
         {
-            ${table.extendedBehaviorClassName} bhv = new ${table.extendedBehaviorImplClassName}();
+            ${table.extendedBehaviorImplClassName} bhv = new ${table.extendedBehaviorImplClassName}();
 #if ($table.isWritable())
             bhv.setBehaviorCommandInvoker(ker); bhv.setBehaviorSelector(tor); bhv.setCommonColumnAutoSetupper(per);
 #else
