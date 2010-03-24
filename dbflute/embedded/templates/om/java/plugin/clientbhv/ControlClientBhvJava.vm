@@ -163,10 +163,10 @@ $database.info("/* * * * * * * * * * * * * * {Table Class}")
     $database.info("parseTable('${table.Name}');")
 
     #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}")
-    #set ($myBaseBhvImplClassName = "${myBaseBhvClassName}Impl")
+    #set ($myBaseBhvImplClassName = "${table.baseBehaviorImplClassName}")
 
     #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}")
-    #set ($myExtendedBhvImplClassName = "${myExtendedBhvClassName}Impl")
+    #set ($myExtendedBhvImplClassName = "${table.extendedBehaviorImplClassName}")
 
     #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvImplClassName}.${glClassFileExtension}" )
     $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/ClientBhvBaseBhvImpl.${glTemplateFileExtension}", $path, "table", $table)

@@ -604,6 +604,11 @@ public class Table {
         return getBaseEntityClassName() + "Bhv";
     }
 
+    public String getBaseBehaviorImplClassName() {
+        final String suffix = getBasicProperties().getClientBehaviorSuffix();
+        return getBaseBehaviorClassName() + suffix;
+    }
+
     public String getBaseConditionBeanClassName() {
         return getBaseEntityClassName() + "CB";
     }
@@ -661,7 +666,8 @@ public class Table {
     }
 
     public String getExtendedBehaviorImplClassName() {
-        return getExtendedEntityClassName() + "BhvImpl";
+        final String suffix = getBasicProperties().getClientBehaviorSuffix();
+        return getExtendedBehaviorClassName() + suffix;
     }
 
     public String getExtendedBehaviorFullClassName() {
@@ -736,7 +742,8 @@ public class Table {
     }
 
     public String getBehaviorImplComponentName() {
-        return getBehaviorComponentName() + "BhvImpl";
+        final String suffix = getBasicProperties().getClientBehaviorSuffix();
+        return getBehaviorComponentName() + "Bhv" + suffix;
     }
 
     // -----------------------------------------------------

@@ -85,7 +85,13 @@ public class DfOldClassHandler {
         };
         final String packagePath = getBaseBehaviorPackage();
         final String classPrefix = getProjectPrefix() + getBasePrefix();
-        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, "Bhv", setupper);
+        final String suffix;
+        if (_basicProperties.isClientBehavior()) {
+            suffix = "Bhv" + _basicProperties.getClientBehaviorSuffix();
+        } else {
+            suffix = "Bhv";
+        }
+        final DfOldTableClassDeletor deletor = createTCD(packagePath, classPrefix, suffix, setupper);
         _deletedOldTableBaseBehaviorList = deletor.deleteOldTableClass();
         showDeleteOldTableFile(_deletedOldTableBaseBehaviorList);
     }
