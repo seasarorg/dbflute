@@ -63,7 +63,9 @@
 	<!-- Other Examples -->
 	<property name="multipledb.seasar.example.dir" value="${workspace.base}/dbflute-multipledb-seasar-example"/>
 	<property name="multipledb.spring.example.dir" value="${workspace.base}/dbflute-multipledb-spring-example"/>
-	<property name="clientbhv.example.dir" value="${workspace.base}/dbflute-clientbhv-example"/>
+	<property name="clientbhv.seasar.example.dir" value="${workspace.base}/dbflute-clientbhv-seasar-example"/>
+	<property name="clientbhv.spring.example.dir" value="${workspace.base}/dbflute-clientbhv-spring-example"/>
+	<property name="clientbhv.guice.example.dir" value="${workspace.base}/dbflute-clientbhv-guice-example"/>
 	<property name="tricky.example.dir" value="${workspace.base}/dbflute-tricky-example"/>
 	<property name="javatest.dir" value="${workspace.base}/javatest"/>
 
@@ -411,11 +413,11 @@
 		<delete dir="${extraction.dir}"/>
 	</target>
 
-	<target name="reflect-to-clientbhv" depends="prepare-reflection" description="==> reflect to clientbhv example">
-		<delete file="${clientbhv.example.dir}/lib/${runtime.pre.jar}"/>
-		<delete file="${clientbhv.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
-		<copy file="${dist}/${runtime.jar}" tofile="${clientbhv.example.dir}/lib/${runtime.jar}" overwrite="true"/>
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientbhv.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+	<target name="reflect-to-clientbhv" depends="prepare-reflection" description="==> reflect to clientbhv all examples">
+		<delete file="${clientbhv.seasar.example.dir}/lib/${runtime.pre.jar}"/>
+		<delete file="${clientbhv.seasar.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
+		<copy file="${dist}/${runtime.jar}" tofile="${clientbhv.seasar.example.dir}/lib/${runtime.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientbhv.seasar.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 
