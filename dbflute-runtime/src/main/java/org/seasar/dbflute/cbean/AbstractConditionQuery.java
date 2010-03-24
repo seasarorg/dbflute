@@ -50,7 +50,7 @@ import org.seasar.dbflute.util.DfTypeUtil;
  * @author jflute
  */
 public abstract class AbstractConditionQuery implements ConditionQuery {
-    // Don't format!
+// Don't format!
 
     // ===================================================================================
     //                                                                          Definition
@@ -1377,7 +1377,11 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
         final String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
-        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] { value.getClass() }, propertyName);
+        Class<?> type = value.getClass();
+        if (Collection.class.isAssignableFrom(type)) {
+            type = Collection.class;
+        }
+        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{type}, propertyName);
         helpInvokingCQMethod(cq, method, new Object[] { value });
     }
 
