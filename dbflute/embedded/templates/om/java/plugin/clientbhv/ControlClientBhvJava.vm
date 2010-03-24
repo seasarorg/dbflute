@@ -129,6 +129,9 @@ $database.info("public void parseContainerConfig() {")
   #end
 #end
 #if ($database.isTargetContainerGuice())
+  #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
+  $database.makeDirectory($path)
+
   #set ($path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteModule}.${glClassFileExtension}" )
   #set ($path = $database.filterDBFluteModuleClientBhv($path) )
   $database.info("    ${path}")
