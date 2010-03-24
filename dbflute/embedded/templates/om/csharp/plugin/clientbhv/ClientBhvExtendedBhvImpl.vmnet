@@ -1,0 +1,9 @@
+#set ($myClassName = "${myExtendedBhvImplClassName}")
+
+using System;
+
+namespace ${glPackageExtendedBhv} {
+
+    partial class ${myClassName} {
+    }
+}

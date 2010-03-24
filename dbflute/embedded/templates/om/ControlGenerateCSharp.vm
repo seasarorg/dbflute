@@ -36,7 +36,6 @@ $database.checkProperties()
 ##                                                ------
 #set ($glProjectPrefix = ${database.projectPrefix})
 #set ($glBasePrefix = ${database.basePrefix})
-#set ($glBaseSuffixForEntity = ${database.baseSuffixForEntity})
 
 ## -----------------------------------------------------
 ##                                                 Dicon
@@ -425,119 +424,59 @@ $database.checkProperties()
 ##                                                                             =======
 ## [Common]
 #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
-#set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.annotation")
-#set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.bhv")
-#set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.bhv.batch")
-#set ($glPackageBaseCommonBhvCore = "${database.baseCommonPackage}.bhv.core")
-#set ($glPackageBaseCommonBhvCoreCommand = "${database.baseCommonPackage}.bhv.core.command")
-#set ($glPackageBaseCommonBhvCoreExecution = "${database.baseCommonPackage}.bhv.core.execution")
-#set ($glPackageBaseCommonBhvLoad = "${database.baseCommonPackage}.bhv.load")
-#set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.bhv.setup")
-#set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.cbean")
-#set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.cbean.ckey")
-#set ($glPackageBaseCommonCBeanMapping = "${database.baseCommonPackage}.cbean.mapping")
-#set ($glPackageBaseCommonCBeanGrouping = "${database.baseCommonPackage}.cbean.grouping")
-#set ($glPackageBaseCommonCBeanOutsidesql = "${database.baseCommonPackage}.cbean.outsidesql")
-#set ($glPackageBaseCommonCBeanOutsidesqlExecutor = "${database.baseCommonPackage}.cbean.outsidesql.executor")
-#set ($glPackageBaseCommonCBeanPagenavi = "${database.baseCommonPackage}.cbean.pagenavi")
-#set ($glPackageBaseCommonCBeanPagenaviGroup = "${database.baseCommonPackage}.cbean.pagenavi.group")
-#set ($glPackageBaseCommonCBeanPagenaviRange = "${database.baseCommonPackage}.cbean.pagenavi.range")
-#set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.cbean.sqlclause")
-#set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.cbean.cvalue")
-#set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.cbean.coption")
-#set ($glPackageBaseCommonCOptionParts = "${database.baseCommonPackage}.cbean.coption.parts")
-#set ($glPackageBaseCommonCOptionPartsLocal = "${database.baseCommonPackage}.cbean.coption.parts.local")
-#set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.dbmeta")
-#set ($glPackageBaseCommonDBMetaHierarchy = "${database.baseCommonPackage}.dbmeta.hierarchy")
-#set ($glPackageBaseCommonDBMetaHierarchyBasic = "${database.baseCommonPackage}.dbmeta.hierarchy.basic")
-#set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.dbmeta.info")
-#set ($glPackageBaseCommonException = "${database.baseCommonPackage}.exception")
-#set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.helper")
-#set ($glPackageBaseCommonHelperCharacter = "${database.baseCommonPackage}.helper.character")
-#set ($glPackageBaseCommonHelperCharacterImpl = "${database.baseCommonPackage}.helper.character.impl")
-#set ($glPackageBaseCommonHelperCollectionOrder = "${database.baseCommonPackage}.helper.collection.order")
-#set ($glPackageBaseCommonHelperCollectionOrderImpl = "${database.baseCommonPackage}.helper.collection.order.impl")
-#set ($glPackageBaseCommonHelperStackTrace = "${database.baseCommonPackage}.helper.stacktrace")
-#set ($glPackageBaseCommonHelperStackTraceImpl = "${database.baseCommonPackage}.helper.stacktrace.impl")
-#set ($glPackageBaseCommonHelperToken = "${database.baseCommonPackage}.helper.token")
-#set ($glPackageBaseCommonHelperTokenLine = "${database.baseCommonPackage}.helper.token.line")
-#set ($glPackageBaseCommonHelperTokenLineImpl = "${database.baseCommonPackage}.helper.token.line.impl")
-#set ($glPackageBaseCommonHelperTokenFile = "${database.baseCommonPackage}.helper.token.file")
-#set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.helper.token.file.impl")
-
-#set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.javalike")
-#set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.jdbc")
-#set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.jdbc.history")
-#set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.s2container")
-#set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.s2dao")
-#set ($glPackageBaseCommonS2DaoInternal = "${database.baseCommonPackage}.s2dao.internal")
-#set ($glPackageBaseCommonS2DaoInternalValueType = "${database.baseCommonPackage}.s2dao.internal.valuetype")
-#set ($glPackageBaseCommonS2DaoInternalVarious = "${database.baseCommonPackage}.s2dao.internal.various")
-#set ($glPackageBaseCommonS2DaoInternalRsHandler = "${database.baseCommonPackage}.s2dao.internal.rshandler")
-#set ($glPackageBaseCommonS2DaoInternalSqlCommand = "${database.baseCommonPackage}.s2dao.internal.sqlcommand")
-#set ($glPackageBaseCommonS2DaoInternalSqlHandler = "${database.baseCommonPackage}.s2dao.internal.sqlhandler")
-#set ($glPackageBaseCommonS2DaoInternalSqlLog = "${database.baseCommonPackage}.s2dao.internal.sqllog")
-#set ($glPackageBaseCommonS2DaoInternalSqlParser = "${database.baseCommonPackage}.s2dao.internal.sqlparser")
-#set ($glPackageBaseCommonS2DaoInternalUtil = "${database.baseCommonPackage}.s2dao.internal.util")
-#set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.util")
-
-#if ($database.isTargetLanguageCSharp())
-  ## [Common]
-  #set ($glPackageBaseCommon = "${database.baseCommonPackage}")
-  #set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.Annotation")
-  #set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.Bhv")
-  #set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.Bhv.Batch")
-  #set ($glPackageBaseCommonBhvCore = "${database.baseCommonPackage}.Bhv.Core")
-  #set ($glPackageBaseCommonBhvCoreCommand = "${database.baseCommonPackage}.Bhv.Core.Command")
-  #set ($glPackageBaseCommonBhvCoreExecution = "${database.baseCommonPackage}.Bhv.Core.Execution")
-  #set ($glPackageBaseCommonBhvLoad = "${database.baseCommonPackage}.Bhv.Load")
-  #set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.Bhv.Setup")
-  #set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.CBean")
-  #set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.CBean.CKey")
-  #set ($glPackageBaseCommonCBeanMapping = "${database.baseCommonPackage}.CBean.Mapping")
-  #set ($glPackageBaseCommonCBeanGrouping = "${database.baseCommonPackage}.CBean.Grouping")
-  #set ($glPackageBaseCommonCBeanOutsidesql = "${database.baseCommonPackage}.CBean.OutsideSql")
-  #set ($glPackageBaseCommonCBeanOutsidesqlExecutor = "${database.baseCommonPackage}.CBean.OutsideSql.Executor")
-  #set ($glPackageBaseCommonCBeanPagenavi = "${database.baseCommonPackage}.CBean.PageNavi")
-  #set ($glPackageBaseCommonCBeanPagenaviGroup = "${database.baseCommonPackage}.CBean.PageNavi.Group")
-  #set ($glPackageBaseCommonCBeanPagenaviRange = "${database.baseCommonPackage}.CBean.PageNavi.Range")
-  #set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.CBean.SClause")
-  #set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.CBean.CValue")
-  #set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.CBean.COption")
-  #set ($glPackageBaseCommonCOptionParts = "${database.baseCommonPackage}.CBean.COption.Parts")
-  #set ($glPackageBaseCommonCOptionPartsLocal = "${database.baseCommonPackage}.CBean.COption.Parts.Local")
-  #set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.Dbm")
-  #set ($glPackageBaseCommonDBMetaHierarchy = "${database.baseCommonPackage}.Dbm.Hierarchy")
-  #set ($glPackageBaseCommonDBMetaHierarchyBasic = "${database.baseCommonPackage}.Dbm.Hierarchy.Basic")
-  #set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.Dbm.Info")
-  #set ($glPackageBaseCommonException = "${database.baseCommonPackage}.Exp")
-  #set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.Helper")
-  #set ($glPackageBaseCommonHelperCharacter = "${database.baseCommonPackage}.Helper.Character")
-  #set ($glPackageBaseCommonHelperCharacterImpl = "${database.baseCommonPackage}.Helper.Character.Impl")
-  #set ($glPackageBaseCommonHelperCollectionOrder = "${database.baseCommonPackage}.Helper.Collection.Order")
-  #set ($glPackageBaseCommonHelperCollectionOrderImpl = "${database.baseCommonPackage}.Helper.Collection.Order.Impl")
-  #set ($glPackageBaseCommonHelperStackTrace = "${database.baseCommonPackage}.Helper.StTrace")
-  #set ($glPackageBaseCommonHelperStackTraceImpl = "${database.baseCommonPackage}.Helper.StTrace.Impl")
-  #set ($glPackageBaseCommonHelperToken = "${database.baseCommonPackage}.Helper.Token")
-  #set ($glPackageBaseCommonHelperTokenLine = "${database.baseCommonPackage}.Helper.Token.Line")
-  #set ($glPackageBaseCommonHelperTokenLineImpl = "${database.baseCommonPackage}.Helper.Token.Line.Impl")
-  #set ($glPackageBaseCommonHelperTokenFile = "${database.baseCommonPackage}.Helper.Token.File")
-  #set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.Helper.Token.File.Impl")
-  #set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.JavaLike")
-  #set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.Ado")
-  #set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.Ado.History")
-  #set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.S2Container")
-  #set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.S2Dao")
-  #set ($glPackageBaseCommonS2DaoInternalValueType = "${database.baseCommonPackage}.S2Dao.Internal.VlType")
-  #set ($glPackageBaseCommonS2DaoInternalVarious = "${database.baseCommonPackage}.S2Dao.Internal.Various")
-  #set ($glPackageBaseCommonS2DaoInternalRsHandler = "${database.baseCommonPackage}.S2Dao.Internal.RsHandler")
-  #set ($glPackageBaseCommonS2DaoInternalSqlCommand = "${database.baseCommonPackage}.S2Dao.Internal.SqlCommand")
-  #set ($glPackageBaseCommonS2DaoInternalSqlHandler = "${database.baseCommonPackage}.S2Dao.Internal.SqlHandler")
-  #set ($glPackageBaseCommonS2DaoInternalSqlLog = "${database.baseCommonPackage}.S2Dao.Internal.SqlLog")
-  #set ($glPackageBaseCommonS2DaoInternalSqlParser = "${database.baseCommonPackage}.S2Dao.Internal.SqlParser")
-  #set ($glPackageBaseCommonS2DaoInternalUtil = "${database.baseCommonPackage}.S2Dao.Internal.Util")
-  #set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.Util")
-#end
+#set ($glPackageBaseCommonAnnotation = "${database.baseCommonPackage}.Annotation")
+#set ($glPackageBaseCommonBhv = "${database.baseCommonPackage}.Bhv")
+#set ($glPackageBaseCommonBhvBatch = "${database.baseCommonPackage}.Bhv.Batch")
+#set ($glPackageBaseCommonBhvCore = "${database.baseCommonPackage}.Bhv.Core")
+#set ($glPackageBaseCommonBhvCoreCommand = "${database.baseCommonPackage}.Bhv.Core.Command")
+#set ($glPackageBaseCommonBhvCoreExecution = "${database.baseCommonPackage}.Bhv.Core.Execution")
+#set ($glPackageBaseCommonBhvLoad = "${database.baseCommonPackage}.Bhv.Load")
+#set ($glPackageBaseCommonBhvSetup = "${database.baseCommonPackage}.Bhv.Setup")
+#set ($glPackageBaseCommonCBean = "${database.baseCommonPackage}.CBean")
+#set ($glPackageBaseCommonCKey = "${database.baseCommonPackage}.CBean.CKey")
+#set ($glPackageBaseCommonCBeanMapping = "${database.baseCommonPackage}.CBean.Mapping")
+#set ($glPackageBaseCommonCBeanGrouping = "${database.baseCommonPackage}.CBean.Grouping")
+#set ($glPackageBaseCommonCBeanOutsidesql = "${database.baseCommonPackage}.CBean.OutsideSql")
+#set ($glPackageBaseCommonCBeanOutsidesqlExecutor = "${database.baseCommonPackage}.CBean.OutsideSql.Executor")
+#set ($glPackageBaseCommonCBeanPagenavi = "${database.baseCommonPackage}.CBean.PageNavi")
+#set ($glPackageBaseCommonCBeanPagenaviGroup = "${database.baseCommonPackage}.CBean.PageNavi.Group")
+#set ($glPackageBaseCommonCBeanPagenaviRange = "${database.baseCommonPackage}.CBean.PageNavi.Range")
+#set ($glPackageBaseCommonSqlClause = "${database.baseCommonPackage}.CBean.SClause")
+#set ($glPackageBaseCommonCValue = "${database.baseCommonPackage}.CBean.CValue")
+#set ($glPackageBaseCommonCOption = "${database.baseCommonPackage}.CBean.COption")
+#set ($glPackageBaseCommonCOptionParts = "${database.baseCommonPackage}.CBean.COption.Parts")
+#set ($glPackageBaseCommonCOptionPartsLocal = "${database.baseCommonPackage}.CBean.COption.Parts.Local")
+#set ($glPackageBaseCommonDBMeta = "${database.baseCommonPackage}.Dbm")
+#set ($glPackageBaseCommonDBMetaHierarchy = "${database.baseCommonPackage}.Dbm.Hierarchy")
+#set ($glPackageBaseCommonDBMetaHierarchyBasic = "${database.baseCommonPackage}.Dbm.Hierarchy.Basic")
+#set ($glPackageBaseCommonDBMetaInfo = "${database.baseCommonPackage}.Dbm.Info")
+#set ($glPackageBaseCommonException = "${database.baseCommonPackage}.Exp")
+#set ($glPackageBaseCommonHelper = "${database.baseCommonPackage}.Helper")
+#set ($glPackageBaseCommonHelperCharacter = "${database.baseCommonPackage}.Helper.Character")
+#set ($glPackageBaseCommonHelperCharacterImpl = "${database.baseCommonPackage}.Helper.Character.Impl")
+#set ($glPackageBaseCommonHelperCollectionOrder = "${database.baseCommonPackage}.Helper.Collection.Order")
+#set ($glPackageBaseCommonHelperCollectionOrderImpl = "${database.baseCommonPackage}.Helper.Collection.Order.Impl")
+#set ($glPackageBaseCommonHelperStackTrace = "${database.baseCommonPackage}.Helper.StTrace")
+#set ($glPackageBaseCommonHelperStackTraceImpl = "${database.baseCommonPackage}.Helper.StTrace.Impl")
+#set ($glPackageBaseCommonHelperToken = "${database.baseCommonPackage}.Helper.Token")
+#set ($glPackageBaseCommonHelperTokenLine = "${database.baseCommonPackage}.Helper.Token.Line")
+#set ($glPackageBaseCommonHelperTokenLineImpl = "${database.baseCommonPackage}.Helper.Token.Line.Impl")
+#set ($glPackageBaseCommonHelperTokenFile = "${database.baseCommonPackage}.Helper.Token.File")
+#set ($glPackageBaseCommonHelperTokenFileImpl = "${database.baseCommonPackage}.Helper.Token.File.Impl")
+#set ($glPackageBaseCommonJavaLike = "${database.baseCommonPackage}.JavaLike")
+#set ($glPackageBaseCommonJdbc = "${database.baseCommonPackage}.Ado")
+#set ($glPackageBaseCommonJdbcHistory = "${database.baseCommonPackage}.Ado.History")
+#set ($glPackageBaseCommonS2Container = "${database.baseCommonPackage}.S2Container")
+#set ($glPackageBaseCommonS2Dao = "${database.baseCommonPackage}.S2Dao")
+#set ($glPackageBaseCommonS2DaoInternalValueType = "${database.baseCommonPackage}.S2Dao.Internal.VlType")
+#set ($glPackageBaseCommonS2DaoInternalVarious = "${database.baseCommonPackage}.S2Dao.Internal.Various")
+#set ($glPackageBaseCommonS2DaoInternalRsHandler = "${database.baseCommonPackage}.S2Dao.Internal.RsHandler")
+#set ($glPackageBaseCommonS2DaoInternalSqlCommand = "${database.baseCommonPackage}.S2Dao.Internal.SqlCommand")
+#set ($glPackageBaseCommonS2DaoInternalSqlHandler = "${database.baseCommonPackage}.S2Dao.Internal.SqlHandler")
+#set ($glPackageBaseCommonS2DaoInternalSqlLog = "${database.baseCommonPackage}.S2Dao.Internal.SqlLog")
+#set ($glPackageBaseCommonS2DaoInternalSqlParser = "${database.baseCommonPackage}.S2Dao.Internal.SqlParser")
+#set ($glPackageBaseCommonS2DaoInternalUtil = "${database.baseCommonPackage}.S2Dao.Internal.Util")
+#set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.Util")
 
 ## [Main]
 #set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
@@ -659,16 +598,6 @@ $generator.parse("om/${glResourceDirectory}/allcommon/Entity.${glTemplateFileExt
 $database.info("    parse('EntityDefinedCommonColumn');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glEntityDefinedCommonColumn}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/EntityDefinedCommonColumn.${glTemplateFileExtension}",$path ,"", "")
-
-#if ($database.isTargetLanguageJava())
-  $database.info("    parse('CommonColumnAutoSetupper');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glCommonColumnAutoSetupper}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
-
-  $database.info("    parse('CommonColumnBasicAutoSetupper');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glImplementedCommonColumnAutoSetupper}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/CommonColumnBasicAutoSetupper.${glTemplateFileExtension}",$path ,"", "")
-#end
 $database.info("}")
 
 ## -----------------------------------------------------
@@ -853,36 +782,6 @@ $database.info("    parseLikeSearchOption")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCOption})}${glLikeSearchOption}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/LikeSearchOption.${glTemplateFileExtension}",$path ,"", "")
 
-#if ($database.isTargetLanguageJava())
-  $database.info("    parseInScopeOption")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCOption})}${glInScopeOption}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/InScopeOption.${glTemplateFileExtension}",$path ,"", "")
-#end
-
-#if ($database.isTargetLanguageJava())
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonCOptionParts}))
-  $database.makeDirectory($path)
-
-  $database.info("    parseSplitOptionParts")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCOptionParts})}${glSplitOptionParts}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/parts/SplitOptionParts.${glTemplateFileExtension}",$path ,"", "")
-
-  $database.info("    parseToUpperLowerCaseOptionParts")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCOptionParts})}${glToUpperLowerCaseOptionParts}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/parts/ToUpperLowerCaseOptionParts.${glTemplateFileExtension}",$path ,"", "")
-
-  $database.info("    parseToSingleByteOptionParts")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCOptionParts})}${glToSingleByteOptionParts}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/parts/ToSingleByteOptionParts.${glTemplateFileExtension}",$path ,"", "")
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonCOptionPartsLocal}))
-  $database.makeDirectory($path)
-
-  $database.info("    parseJapaneseOptionPartsAgent")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCOptionPartsLocal})}${glJapaneseOptionPartsAgent}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/cbean/coption/parts/local/JapaneseOptionPartsAgent.${glTemplateFileExtension}",$path ,"", "")
-#end
-
 ## -------------------------------------------------------
 ##                allcommon condition-bean condition-value
 ##                ----------------------------------------
@@ -932,11 +831,9 @@ $database.info("    parse('OutsideSqlContext');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlContext}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlContext.${glTemplateFileExtension}",$path ,"", "")
 
-#if ($database.isTargetLanguageCSharp())
-  $database.info("    parse('OutsideSqlDao');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlDao}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlDao.${glTemplateFileExtension}",$path ,"", "")
-#end
+$database.info("    parse('OutsideSqlDao');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlDao}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/cbean/outsidesql/OutsideSqlDao.${glTemplateFileExtension}",$path ,"", "")
 
 $database.info("    parse('OutsideSqlOption');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonCBeanOutsidesql})}${glOutsideSqlOption}.${glClassFileExtension}" )
@@ -1044,109 +941,28 @@ $database.info("    parseAbstractDBMeta();")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMeta})}${glAbstractDBMeta}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/AbstractDBMeta.${glTemplateFileExtension}",$path,"", "")
 
-#if ($database.isTargetLanguageJava())
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy}))
-  $database.makeDirectory($path)
+#set ($path = $database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo}))
+$database.makeDirectory($path)
 
-  $database.info("    parse('HierarchyArranger');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchyArranger}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/HierarchyArranger.${glTemplateFileExtension}",$path,"", "")
+$database.info("    parse('ForeignInfo');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glForeignInfo}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ForeignInfo.${glTemplateFileExtension}",$path,"", "")
 
-  $database.info("    parse('HierarchyBasicRequest');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchyBasicRequest}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/HierarchyBasicRequest.${glTemplateFileExtension}",$path,"", "")
+$database.info("    parse('ReferrerInfo');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glReferrerInfo}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ReferrerInfo.${glTemplateFileExtension}",$path,"", "")
 
-  $database.info("    parse('HierarchyRequest');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchyRequest}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/HierarchyRequest.${glTemplateFileExtension}",$path,"", "")
+$database.info("    parse('RelationInfo');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glRelationInfo}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/RelationInfo.${glTemplateFileExtension}",$path,"", "")
 
-  $database.info("    parse('HierarchyRequestElement');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchyRequestElement}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/HierarchyRequestElement.${glTemplateFileExtension}",$path,"", "")
+$database.info("    parse('UniqueInfo');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glUniqueInfo}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/UniqueInfo.${glTemplateFileExtension}",$path,"", "")
 
-  $database.info("    parse('HierarchySourceColumn');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchySourceColumn}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/HierarchySourceColumn.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('HierarchySourceIterator');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchySourceIterator}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/HierarchySourceIterator.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('HierarchySourceRow');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchy})}${glHierarchySourceRow}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/HierarchySourceRow.${glTemplateFileExtension}",$path,"", "")
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic}))
-  $database.makeDirectory($path)
-
-  $database.info("    parse('HierarchySourceEntityColumn');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic})}${glHierarchySourceEntityColumn}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/basic/HierarchySourceEntityColumn.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('HierarchySourceEntityListIterator');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic})}${glHierarchySourceEntityListIterator}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/basic/HierarchySourceEntityListIterator.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('HierarchySourceEntityRow');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic})}${glHierarchySourceEntityRow}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/basic/HierarchySourceEntityRow.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('HierarchySourceListIterator');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic})}${glHierarchySourceListIterator}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/basic/HierarchySourceListIterator.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('HierarchySourceRowSetupper');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaHierarchyBasic})}${glHierarchySourceRowSetupper}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/hierarchy/basic/HierarchySourceRowSetupper.${glTemplateFileExtension}",$path,"", "")
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo}))
-  $database.makeDirectory($path)
-
-  $database.info("    parse('ForeignInfo');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glForeignInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ForeignInfo.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('ReferrerInfo');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glReferrerInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ReferrerInfo.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('RelationInfo');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glRelationInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/RelationInfo.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('UniqueInfo');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glUniqueInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/UniqueInfo.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('ColumnInfo');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glColumnInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ColumnInfo.${glTemplateFileExtension}",$path,"", "")
-#end
-
-#if ($database.isTargetLanguageCSharp())
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo}))
-  $database.makeDirectory($path)
-
-  $database.info("    parse('ForeignInfo');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glForeignInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ForeignInfo.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('ReferrerInfo');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glReferrerInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ReferrerInfo.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('RelationInfo');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glRelationInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/RelationInfo.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('UniqueInfo');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glUniqueInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/UniqueInfo.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('ColumnInfo');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glColumnInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ColumnInfo.${glTemplateFileExtension}",$path,"", "")
-#end
+$database.info("    parse('ColumnInfo');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonDBMetaInfo})}${glColumnInfo}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/dbmeta/info/ColumnInfo.${glTemplateFileExtension}",$path,"", "")
 
 #set ($path = $database.getPackageAsPath(${glPackageBaseCommonDBMeta}))
 $database.makeDirectory($path)
@@ -1229,16 +1045,6 @@ $database.info("    parse('RequiredOptionNotFoundException');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glRequiredOptionNotFoundException}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/exception/RequiredOptionNotFoundException.${glTemplateFileExtension}",$path,"", "")
 
-#if ($database.isTargetLanguageJava())
-  $database.info("    parseRecordHasAlreadyBeenDeletedException();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glRecordHasAlreadyBeenDeletedException}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/exception/RecordHasAlreadyBeenDeletedException.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseRecordHasOverlappedException();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glRecordHasOverlappedException}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/exception/RecordHasOverlappedException.${glTemplateFileExtension}",$path,"", "")
-#end
-
 ## DBFlute-0.7.7
 $database.info("    parse('SQLFailureException');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonException})}${glSQLFailureException}.${glClassFileExtension}" )
@@ -1268,164 +1074,6 @@ $generator.parse("om/${glResourceDirectory}/allcommon/helper/MapStringBuilder.${
 $database.info("    parse('MapStringBuilderImpl');")
 #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glMapStringBuilderImpl}.${glClassFileExtension}" )
 $generator.parse("om/${glResourceDirectory}/allcommon/helper/MapStringBuilderImpl.${glTemplateFileExtension}",$path,"", "")
-
-#if ($database.isTargetLanguageJava())
-  $database.info("    parse('StringKeyMap');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glStringKeyMap}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/StringKeyMap.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('StringSet');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelper})}${glStringSet}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/StringSet.${glTemplateFileExtension}",$path,"", "")
-#end
-
-#if ($database.isTargetLanguageJava())
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperCharacter}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperCharacterImpl}))
-  $database.makeDirectory($path)
-
-  $database.info("    parseGeneralCharacter();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperCharacter})}${glGeneralCharacter}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/character/GeneralCharacter.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseGeneralCharacterImpl();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperCharacterImpl})}${glGeneralCharacterImpl}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/character/impl/GeneralCharacterImpl.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseJapaneseCharacter();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperCharacter})}${glJapaneseCharacter}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/character/JapaneseCharacter.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseJapaneseCharacterImpl();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperCharacterImpl})}${glJapaneseCharacterImpl}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/character/impl/JapaneseCharacterImpl.${glTemplateFileExtension}",$path,"", "")
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrder}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrderImpl}))
-  $database.makeDirectory($path)
-
-  $database.info("    parseAccordingToOrder();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrder})}${glAccordingToOrder}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/collection/order/AccordingToOrder.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseAccordingToOrderOption();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrder})}${glAccordingToOrderOption}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/collection/order/AccordingToOrderOption.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseAccordingToOrderIdExtractor();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrder})}${glAccordingToOrderIdExtractor}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/collection/order/AccordingToOrderIdExtractor.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseAccordingToOrderImpl();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperCollectionOrderImpl})}${glAccordingToOrderImpl}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/collection/order/impl/AccordingToOrderImpl.${glTemplateFileExtension}",$path,"", "")
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperStackTrace}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperStackTraceImpl}))
-  $database.makeDirectory($path)
-
-  $database.info("    parse('InvokeNameExtractingResource');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperStackTrace})}${glInvokeNameExtractingResource}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/stacktrace/InvokeNameExtractingResource.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('InvokeNameExtractor');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperStackTrace})}${glInvokeNameExtractor}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/stacktrace/InvokeNameExtractor.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('InvokeNameResult');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperStackTrace})}${glInvokeNameResult}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/stacktrace/InvokeNameResult.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parse('InvokeNameExtractorImpl');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperStackTraceImpl})}${glInvokeNameExtractorImpl}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/stacktrace/impl/InvokeNameExtractorImpl.${glTemplateFileExtension}",$path,"", "")
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperToken}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperTokenLine}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperTokenLineImpl}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile}))
-  $database.makeDirectory($path)
-
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonHelperTokenFileImpl}))
-  $database.makeDirectory($path)
-
-  $database.info("    parseLineToken();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenLine})}${glLineToken}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/line/LineToken.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseLineTokenImpl();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenLineImpl})}${glLineTokenImpl}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/line/impl/LineTokenImpl.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseLineTokenizingOption();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenLine})}${glLineTokenizingOption}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/line/LineTokenizingOption.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseLineMakingOption();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenLine})}${glLineMakingOption}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/line/LineMakingOption.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileToken();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileToken}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/FileToken.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileTokenImpl();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFileImpl})}${glFileTokenImpl}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/impl/FileTokenImpl.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileTokenizingOption();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileTokenizingOption}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/FileTokenizingOption.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileTokenizingRowResource();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileTokenizingRowResource}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/FileTokenizingRowResource.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileTokenizingCallback();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileTokenizingCallback}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/FileTokenizingCallback.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileTokenizingHeaderInfo();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileTokenizingHeaderInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/FileTokenizingHeaderInfo.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileMakingOption();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileMakingOption}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/FileMakingOption.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileMakingRowResource();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileMakingRowResource}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/FileMakingRowResource.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileMakingCallback();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileMakingCallback}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/FileMakingCallback.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileMakingHeaderInfo();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileMakingHeaderInfo}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/FileMakingHeaderInfo.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileMakingSimpleFacade();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFile})}${glFileMakingSimpleFacade}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/FileMakingSimpleFacade.${glTemplateFileExtension}",$path,"", "")
-
-  $database.info("    parseFileMakingSimpleFacadeImpl();")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonHelperTokenFileImpl})}${glFileMakingSimpleFacadeImpl}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/helper/token/file/impl/FileMakingSimpleFacadeImpl.${glTemplateFileExtension}",$path,"", "")
-#end
-
 $database.info("}")
 
 ## -------------------------------------------------------
@@ -1442,30 +1090,6 @@ $database.makeDirectory($path)
   $generator.parse("om/${glResourceDirectory}/allcommon/CDef.${glTemplateFileExtension}",$path ,"" ,"")
 
   $database.info("}")
-#end
-
-## -------------------------------------------------------
-##                                         allcommon dbdef
-##                                         ---------------
-#set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
-$database.makeDirectory($path)
-
-#if ($database.isTargetLanguageJava())
-  $database.info("    parse('DBDef');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBDef}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/DBDef.${glTemplateFileExtension}",$path ,"" ,"")
-#end
-
-## -------------------------------------------------------
-##                                       allcommon buridef
-##                                       -----------------
-#set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
-$database.makeDirectory($path)
-
-#if ($database.isTargetLanguageJava() && $database.isUseBuri())
-  $database.info("    parse('BuriDef');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glBuriDef}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/BuriDef.${glTemplateFileExtension}",$path ,"" ,"")
 #end
 
 ## -------------------------------------------------------

@@ -1,0 +1,88 @@
+
+#set ($database = $schemaData.database)
+$database.enableGenerateOutputDirectory()
+
+## - - - - - - - - - - - -
+## Initialize properties.
+## - - - - - - - - - - - -
+$database.initializeAdditionalPrimaryKey()
+$database.initializeAdditionalUniqueKey()
+$database.initializeAdditionalForeignKey()
+$database.initializeClassificationDeployment()
+$database.initializeIncludeQuery()
+$database.checkProperties()
+
+## *****************************************************************************************************************
+##                                                                                                   Global Paramter
+##                                                                                                   ***************
+## ===================================================================================
+##                                                                            Language
+##                                                                            ========
+#set ($glTargetLanguage = ${database.targetLanguage})
+
+## ===================================================================================
+##                                                                  Resource Directory
+##                                                                  ==================
+#set ($glResourceDirectory = ${database.resourceDirectory})
+
+## ===================================================================================
+##                                                                           Extension
+##                                                                           =========
+#set ($glTemplateFileExtension = ${database.templateFileExtension})
+#set ($glClassFileExtension = ${database.classFileExtension})
+
+## -----------------------------------------------------
+##                                                Prefix
+##                                                ------
+#set ($glProjectPrefix = ${database.projectPrefix})
+#set ($glBasePrefix = ${database.basePrefix})
+
+## ===================================================================================
+##                                                                             Package
+##                                                                             =======
+## [Main]
+#set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
+#set ($glPackageExtendedBhv = "${database.extendedBehaviorPackage}")
+
+## -----------------------------------------------------------------------------------------------------
+##                                                                                    Parse table object
+##                                                                                    ------------------
+#set ($path = $database.getPackageAsPath(${glPackageBaseBhv}))
+$database.makeDirectory($path)
+
+#set ($path = $database.getPackageAsPath(${glPackageExtendedBhv}))
+$database.makeDirectory($path)
+
+##
+## Delete old table classes.
+##
+$database.deleteOldTableClass()
+
+##
+## Loop by tables.
+##
+$database.info("/* * * * * * * * * * * * * * {Table Class}")
+#foreach ($table in $database.tables)
+  #if (!$table.isForReferenceOnly())
+
+    $database.info("parseTable('${table.Name}');")
+
+    #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}")
+    #set ($myBaseBhvImplClassName = "${myBaseBhvClassName}Impl")
+
+    #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}")
+    #set ($myExtendedBhvImplClassName = "${myExtendedBhvClassName}Impl")
+
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvImplClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/ClientBhvBaseBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
+
+    #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvImplClassName}.${glClassFileExtension}" )
+    #if (!$files.file(${generator.OutputPath},$path).exists())
+      $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/ClientBhvExtendedBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
+    #end
+
+  #end
+#end
+$database.info("* * * * * * * * * */")
+$database.info(" ")
+

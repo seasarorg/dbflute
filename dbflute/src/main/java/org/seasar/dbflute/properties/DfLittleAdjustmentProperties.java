@@ -134,6 +134,13 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                     Client Behavior
+    //                                                                     ===============
+    public boolean isClientBehavior() {
+        return isProperty("isClientBehavior", false);
+    }
+
+    // ===================================================================================
     //                                                                               Quote
     //                                                                               =====
     protected Set<String> _quoteTableNameSet;

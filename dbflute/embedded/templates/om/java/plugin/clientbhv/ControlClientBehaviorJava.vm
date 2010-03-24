@@ -1,0 +1,127 @@
+#
+# @since DBFlute-0.9.0
+#
+#set ($database = $schemaData.database)
+$database.enableGenerateOutputDirectory()
+
+## - - - - - - - - - - - -
+## Initialize properties.
+## - - - - - - - - - - - -
+$database.initializeVersion(90)
+$database.initializeAdditionalPrimaryKey()
+$database.initializeAdditionalUniqueKey()
+$database.initializeAdditionalForeignKey()
+$database.initializeClassificationDeployment()
+$database.initializeIncludeQuery()
+$database.checkProperties()
+
+## *****************************************************************************************************************
+##                                                                                                   Global Paramter
+##                                                                                                   ***************
+## ===================================================================================
+##                                                                            Language
+##                                                                            ========
+#set ($glTargetLanguage = ${database.targetLanguage})
+
+## ===================================================================================
+##                                                                  Resource Directory
+##                                                                  ==================
+#set ($glResourceDirectory = ${database.resourceDirectory})
+
+## ===================================================================================
+##                                                                           Extension
+##                                                                           =========
+#set ($glTemplateFileExtension = ${database.templateFileExtension})
+#set ($glClassFileExtension = ${database.classFileExtension})
+
+## ===================================================================================
+##                                                                              Prefix
+##                                                                              ======
+#set ($glProjectPrefix = ${database.projectPrefix})
+#set ($glBasePrefix = ${database.basePrefix})
+#set ($glBaseSuffixForEntity = ${database.baseSuffixForEntity})
+
+## ===================================================================================
+##                                                                           Container
+##                                                                           =========
+#set ($glDBFluteDiconNamespace = "${database.DBFluteDiconNamespace}")
+#set ($glDBFluteDiconFileName = "${database.DBFluteDiconFileName}")
+#set ($glCreatorDiconFileName = "${database.DBFluteCreatorDiconFileName}")
+#set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
+#set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
+#set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
+#set ($glDBFluteModule = "${glProjectPrefix}DBFluteModule")
+
+## ===================================================================================
+##                                                                          Class Name
+##                                                                          ==========
+## -----------------------------------------------------
+##                                               Regular
+##                                               -------
+## [AllCommon]
+#set ($glAccessContext = "${glProjectPrefix}AccessContext")
+#set ($glCDef = "${glProjectPrefix}CDef")
+#set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
+#set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
+#set ($glDBFluteInitializer = "${glProjectPrefix}DBFluteInitializer")
+#set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
+#set ($glImplementedBehaviorSelector = "${glProjectPrefix}ImplementedBehaviorSelector")
+#set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}ImplementedCommonColumnAutoSetupper")
+#set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
+#set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
+#set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
+
+## ===================================================================================
+##                                                                             Package
+##                                                                             =======
+## -----------------------------------------------------
+##                                               Regular
+##                                               -------
+#set ($glPackageBaseCommon = "${database.baseCommonPackage}")
+#set ($glPackageBaseBhv = "${database.baseBehaviorPackage}")
+#set ($glPackageExtendedBhv = "${database.extendedBehaviorPackage}")
+
+## -----------------------------------------------------
+##                                               Plug-in
+##                                               -------
+## [Buri]
+#set ($glPackagePluginBuri = "${database.baseCommonPackage}.plugin.buri")
+
+## *****************************************************************************************************************
+##                                                                                                           Parsing
+##                                                                                                           *******
+##
+## Delete old table classes.
+##
+$database.deleteOldTableClass()
+
+##
+## Loop by tables.
+##
+$database.info("/* * * * * * * * * * * * * * {Table Class}")
+#foreach ($table in $database.tables)
+  #if (!$table.isForReferenceOnly())
+
+    $database.info("parseTable('${table.Name}');")
+
+    #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}")
+    #set ($myBaseBhvImplClassName = "${myBaseBhvClassName}Impl")
+
+    #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}")
+    #set ($myExtendedBhvImplClassName = "${myExtendedBhvClassName}Impl")
+
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvImplClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/ClientBhvBaseBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
+
+    #if (!$database.isStopGenerateExtendedBhv())
+      #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvImplClassName}.${glClassFileExtension}" )
+      #if (!$files.file(${generator.outputPath},$path).exists())
+        $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/ClientBhvExtendedBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
+      #end
+      $database.reflectAllExCopyright($path)
+    #end
+  #end
+#end
+$database.info("* * * * * * * * * */")
+$database.info(" ")
+

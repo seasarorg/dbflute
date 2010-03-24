@@ -89,17 +89,15 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
     protected void setupControlTemplate() {
         final DfLittleAdjustmentProperties littleProp = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
         if (littleProp.isAlternateGenerateControlValid()) {
-            _log.info("");
-            _log.info("* * * * * * * * * * * * * * *");
-            _log.info("* Process Alternate Control *");
-            _log.info("* * * * * * * * * * * * * * *");
-            final String control = littleProp.getAlternateGenerateControl();
-            _log.info("...Using alternate control: " + control);
-            setControlTemplate(control);
+            setupControlAlternate(littleProp);
             return;
         }
         if (getBasicProperties().isTargetLanguageMain()) {
             if (getBasicProperties().isTargetLanguageJava()) {
+                if (littleProp.isClientBehavior()) {
+                    setupControlClientBehaviorJava(littleProp);
+                    return;
+                }
                 _log.info("");
                 _log.info("* * * * * * * * *");
                 _log.info("* Process Java  *");
@@ -108,6 +106,10 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
                 _log.info("...Using Java control: " + control);
                 setControlTemplate(control);
             } else if (getBasicProperties().isTargetLanguageCSharp()) {
+                if (littleProp.isClientBehavior()) {
+                    setupControlClientBehaviorCSharp(littleProp);
+                    return;
+                }
                 _log.info("");
                 _log.info("* * * * * * * * * *");
                 _log.info("* Process CSharp  *");
@@ -116,19 +118,53 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
                 _log.info("...Using CSharp control: " + control);
                 setControlTemplate(control);
             } else {
-                String msg = "Unknown Main Language: " + getBasicProperties().getTargetLanguage();
+                String msg = "Unknown main language: " + getBasicProperties().getTargetLanguage();
                 throw new IllegalStateException(msg);
             }
         } else {
-            final String language = getBasicProperties().getTargetLanguage();
-            _log.info("");
-            _log.info("* * * * * * * * * *");
-            _log.info("* Process " + language + "    *");
-            _log.info("* * * * * * * * * *");
-            final String control = "om/" + language + "/Control-" + language + ".vm";
-            _log.info("...Using " + language + " control: " + control);
-            setControlTemplate(control);
+            setupControlSubLanguage();
         }
+    }
+
+    protected void setupControlAlternate(DfLittleAdjustmentProperties littleProp) {
+        _log.info("");
+        _log.info("* * * * * * * * * * * * * * *");
+        _log.info("* Process Alternate Control *");
+        _log.info("* * * * * * * * * * * * * * *");
+        final String control = littleProp.getAlternateGenerateControl();
+        _log.info("...Using alternate control: " + control);
+        setControlTemplate(control);
+    }
+
+    protected void setupControlClientBehaviorJava(DfLittleAdjustmentProperties littleProp) {
+        _log.info("");
+        _log.info("* * * * * * * * * * * * * * * * * * * * **");
+        _log.info("* Process Client Behavior Control (Java) *");
+        _log.info("* * * * * * * * * * * * * * * * * * * * **");
+        final String control = "om/java/plugin/clientbhv/ControlClientBehaviorJava.vm";
+        _log.info("...Using client behavior (Java) control: " + control);
+        setControlTemplate(control);
+    }
+
+    protected void setupControlClientBehaviorCSharp(DfLittleAdjustmentProperties littleProp) {
+        _log.info("");
+        _log.info("* * * * * * * * * * * * * * * * * * * * * **");
+        _log.info("* Process Client Behavior Control (CSharp) *");
+        _log.info("* * * * * * * * * * * * * * * * * * * * * **");
+        final String control = "om/csharp/plugin/clientbhv/ControlClientBehaviorCSharp.vm";
+        _log.info("...Using client behavior (CSharp) control: " + control);
+        setControlTemplate(control);
+    }
+
+    protected void setupControlSubLanguage() {
+        final String language = getBasicProperties().getTargetLanguage();
+        _log.info("");
+        _log.info("* * * * * * * * * *");
+        _log.info("* Process " + language + "    *");
+        _log.info("* * * * * * * * * *");
+        final String control = "om/" + language + "/Control-" + language + ".vm";
+        _log.info("...Using " + language + " control: " + control);
+        setControlTemplate(control);
     }
 
     @Override
