@@ -15,36 +15,16 @@
  */
 package org.seasar.dbflute.helper.beans;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 /**
- * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public interface DfPropertyDesc extends DfPropertyAccessor {
+public interface DfPropertyAccessor {
 
-    DfBeanDesc getBeanDesc();
+    String getPropertyName();
 
-    Method getReadMethod();
+    Class<?> getPropertyType();
 
-    void setReadMethod(Method readMethod);
+    Object getValue(Object target);
 
-    boolean hasReadMethod();
-
-    Method getWriteMethod();
-
-    void setWriteMethod(Method writeMethod);
-
-    boolean hasWriteMethod();
-
-    boolean isReadable();
-
-    boolean isWritable();
-
-    Field getField();
-
-    void setField(Field field);
-
-    Object convertIfNeed(Object value);
+    void setValue(Object target, Object value);
 }

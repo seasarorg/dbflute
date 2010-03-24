@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.metadata.impl;
 
+import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
@@ -61,6 +62,10 @@ public class TnPropertyTypeImpl implements TnPropertyType {
         this.propertyName = propertyName;
         this.valueType = valueType;
         this.columnName = columnName;
+    }
+
+    public DfPropertyAccessor getPropertyAccessor() {
+        return propertyDesc;
     }
 
     public DfPropertyDesc getPropertyDesc() {

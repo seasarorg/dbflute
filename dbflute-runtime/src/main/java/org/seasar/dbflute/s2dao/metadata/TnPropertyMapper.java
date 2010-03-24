@@ -13,38 +13,22 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.helper.beans;
+package org.seasar.dbflute.s2dao.metadata;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
+import org.seasar.dbflute.jdbc.ValueType;
 
 /**
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public interface DfPropertyDesc extends DfPropertyAccessor {
+public interface TnPropertyMapper {
 
-    DfBeanDesc getBeanDesc();
+    DfPropertyAccessor getPropertyAccessor();
 
-    Method getReadMethod();
+    ValueType getValueType();
 
-    void setReadMethod(Method readMethod);
+    String getPropertyName();
 
-    boolean hasReadMethod();
-
-    Method getWriteMethod();
-
-    void setWriteMethod(Method writeMethod);
-
-    boolean hasWriteMethod();
-
-    boolean isReadable();
-
-    boolean isWritable();
-
-    Field getField();
-
-    void setField(Field field);
-
-    Object convertIfNeed(Object value);
+    String getColumnName();
 }

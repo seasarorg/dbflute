@@ -16,21 +16,14 @@
 package org.seasar.dbflute.s2dao.metadata;
 
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
-import org.seasar.dbflute.jdbc.ValueType;
 
 /**
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public interface TnPropertyType {
+public interface TnPropertyType extends TnPropertyMapper {
 
     DfPropertyDesc getPropertyDesc();
-
-    ValueType getValueType();
-
-    String getPropertyName();
-
-    String getColumnName();
 
     void setColumnName(String columnName);
 
