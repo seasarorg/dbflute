@@ -51,7 +51,7 @@ public class ${myClassName} extends ${myAbstractBaseConditionQueryClassName} {
      * @return On-clause query. (NotNull)
      */
     public ${myConditionInlineQueryClassName} on() {
-        if (isBaseQuery(this)) { throw new IllegalConditionBeanOperationException("On-clause for local table is unavailable!"); }
+        if (isBaseQuery()) { throw new IllegalConditionBeanOperationException("On-clause for local table is unavailable!"); }
         ${myConditionInlineQueryClassName} inlineQuery = inline(); inlineQuery.xsetOnClauseInline(true); return inlineQuery;
     }
 

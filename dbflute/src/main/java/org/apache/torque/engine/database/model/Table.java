@@ -743,7 +743,7 @@ public class Table {
 
     public String getBehaviorImplComponentName() {
         final String suffix = getBasicProperties().getClientBehaviorSuffix();
-        return getBehaviorComponentName() + "Bhv" + suffix;
+        return getBehaviorComponentName() + suffix;
     }
 
     // -----------------------------------------------------

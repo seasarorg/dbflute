@@ -1286,10 +1286,6 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
-    public boolean isMakeEntityDerivedMap() {
-        return getProperties().getLittleAdjustmentProperties().isMakeEntityDerivedMap();
-    }
-
     public boolean isMakeEntityChaseRelation() {
         return getProperties().getLittleAdjustmentProperties().isMakeEntityChaseRelation();
     }

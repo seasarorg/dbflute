@@ -28,7 +28,7 @@ namespace ${glPackageBaseCQ} {
         }
         
         public ${myConditionInlineQueryClassName} On() {
-            if (isBaseQuery(this)) { throw new UnsupportedOperationException("Unsupported onClause of Base Table!"); }
+            if (isBaseQuery()) { throw new UnsupportedOperationException("Unsupported onClause of Base Table!"); }
             ${myConditionInlineQueryClassName} inlineQuery = Inline();
             inlineQuery.xsetOnClauseInline(true);
             return inlineQuery;

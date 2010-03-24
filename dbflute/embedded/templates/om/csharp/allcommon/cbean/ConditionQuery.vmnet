@@ -24,7 +24,7 @@ public interface ${glConditionQuery} {
     String getRealColumnName(String columnName);
     int getNestLevel();
     int getNextNestLevel();
-    bool isBaseQuery(${glConditionQuery} query);
+    bool isBaseQuery();
 	int getSubQueryLevel();
 	String getForeignPropertyName();
     String getRelationPath();

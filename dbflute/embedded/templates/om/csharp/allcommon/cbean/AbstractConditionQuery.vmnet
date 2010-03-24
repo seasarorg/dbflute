@@ -104,8 +104,8 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         return _nestLevel+1;
     }
 
-    public bool isBaseQuery(${glConditionQuery} query) {
-        return (query.getReferrerQuery() == null);
+    public bool isBaseQuery() {
+        return (getReferrerQuery() == null);
     }
 
 	public int getSubQueryLevel() {
@@ -165,7 +165,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         StringBuilder sb = new StringBuilder();
         ${glConditionQuery} query = this;
         while (true) {
-            if (query.isBaseQuery(query)) {
+            if (query.isBaseQuery()) {
                 sb.insert(0, CQ_PROPERTY + ".");
                 break;
             } else {
@@ -440,7 +440,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String capPropName = initCap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(capPropName, key));// If CSharp, it is necessary to use capPropName!
-            if (isBaseQuery(this)) {
+            if (isBaseQuery()) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue);
             } else {
                 getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, _onClauseInline);
@@ -455,7 +455,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
         String capPropName = initCap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(capPropName, key), option);// If CSharp, it is necessary to use capPropName!
-            if (isBaseQuery(this)) {
+            if (isBaseQuery()) {
                 getSqlClause().registerBaseTableInlineWhereClause(colName, key, cvalue, option);
             } else {
 				getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), colName, key, cvalue, option, _onClauseInline);
@@ -1313,7 +1313,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     }
 
     protected virtual void registerInlineWhereClause(String whereClause) {
-        if (isBaseQuery(this)) {
+        if (isBaseQuery()) {
             getSqlClause().registerBaseTableInlineWhereClause(whereClause);
         } else {
             getSqlClause().registerOuterJoinInlineWhereClause(getRealAliasName(), whereClause, _onClauseInline);
@@ -1356,7 +1356,7 @@ public abstract class ${myClassName} : ${glConditionQuery} {
     //                                            Inner Join
     //                                            ----------
     public void InnerJoin() {
-        if (isBaseQuery(this)) {
+        if (isBaseQuery()) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
             msg = msg + "The method 'InnerJoin()' should be called for a relation query!" + ln();

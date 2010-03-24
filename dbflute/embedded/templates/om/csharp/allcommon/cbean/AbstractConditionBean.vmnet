@@ -415,7 +415,7 @@ namespace ${glPackageBaseCommonCBean} {
             }
             String relationPath = _query.getRelationPath() != null ? _query.getRelationPath() : "";
             String tableAliasName;
-            if (_query.isBaseQuery(_query)) {
+            if (_query.isBaseQuery()) {
                 tableAliasName = _baseCB.SqlClause.getLocalTableAliasName();
             } else {
                 tableAliasName = _baseCB.SqlClause.resolveJoinAliasName(relationPath, _query.getNestLevel());

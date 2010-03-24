@@ -54,6 +54,9 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
+. clientbhv-generate.sh
+. clientbhv-sql2entity.sh
+. clientbhv-outside-sql-test.sh
 
 cd ../../dbflute-multipledb-seasar-example/dbflute_librarydb
 rm ./log/*.log
