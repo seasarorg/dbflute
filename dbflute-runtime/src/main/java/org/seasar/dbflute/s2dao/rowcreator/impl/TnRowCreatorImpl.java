@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 import org.seasar.dbflute.util.DfReflectionUtil;
@@ -49,17 +50,17 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
     /**
      * {@inheritDoc}
      */
-    public Map<String, TnPropertyType> createPropertyCache(Set<String> selectColumnSet, TnBeanMetaData beanMetaData)
+    public Map<String, TnPropertyMapping> createPropertyCache(Set<String> selectColumnSet, TnBeanMetaData beanMetaData)
             throws SQLException {
         // - - - - - - - 
         // Entry Point!
         // - - - - - - -
-        final Map<String, TnPropertyType> proprertyCache = newPropertyCache();
+        final Map<String, TnPropertyMapping> proprertyCache = newPropertyCache();
         setupPropertyCache(proprertyCache, selectColumnSet, beanMetaData);
         return proprertyCache;
     }
 
-    protected void setupPropertyCache(Map<String, TnPropertyType> proprertyCache, Set<String> selectColumnSet,
+    protected void setupPropertyCache(Map<String, TnPropertyMapping> proprertyCache, Set<String> selectColumnSet,
             TnBeanMetaData beanMetaData) throws SQLException {
         final List<TnPropertyType> ptList = beanMetaData.getPropertyTypeList();
         for (TnPropertyType pt : ptList) {
@@ -70,7 +71,7 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
         }
     }
 
-    protected void setupPropertyCacheElement(Map<String, TnPropertyType> proprertyCache, Set<String> selectColumnSet,
+    protected void setupPropertyCacheElement(Map<String, TnPropertyMapping> proprertyCache, Set<String> selectColumnSet,
             TnPropertyType pt) throws SQLException {
         if (selectColumnSet.contains(pt.getColumnName())) {
             proprertyCache.put(pt.getColumnName(), pt);
@@ -82,7 +83,7 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
         }
     }
 
-    protected void setupPropertyCacheNotPersistentElement(Map<String, TnPropertyType> proprertyCache,
+    protected void setupPropertyCacheNotPersistentElement(Map<String, TnPropertyMapping> proprertyCache,
             Set<String> selectColumnSet, TnPropertyType pt) throws SQLException {
         for (String columnName : selectColumnSet) {
             String columnNameNotUnsco = DfStringUtil.replace(columnName, "_", "");
@@ -96,7 +97,7 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
     // -----------------------------------------------------
     //                                                Common
     //                                                ------
-    protected Map<String, TnPropertyType> newPropertyCache() {
+    protected Map<String, TnPropertyMapping> newPropertyCache() {
         return StringKeyMap.createAsCaseInsensitive();
     }
 

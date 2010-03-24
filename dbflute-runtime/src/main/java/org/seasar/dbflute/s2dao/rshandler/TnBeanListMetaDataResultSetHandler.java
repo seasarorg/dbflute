@@ -30,6 +30,7 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreator;
@@ -76,9 +77,9 @@ public class TnBeanListMetaDataResultSetHandler extends TnAbstractBeanMetaDataRe
 
     protected void mappingBean(ResultSet rs, BeanRowHandler handler) throws SQLException {
         // Lazy initialization because if the result is zero, the resources are unused.
-        Set<String> selectColumnSet = null; // Set<String(columnName)>
-        Map<String, TnPropertyType> propertyCache = null; // Map<String(columnName), PropertyType>
-        Map<String, Map<String, TnPropertyType>> relationPropertyCache = null; // Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
+        Set<String> selectColumnSet = null;
+        Map<String, TnPropertyMapping> propertyCache = null;
+        Map<String, Map<String, TnPropertyMapping>> relationPropertyCache = null; // key is relationNoSuffix, columnName
         TnRelationRowCache relRowCache = null;
 
         final int relSize = getBeanMetaData().getRelationPropertyTypeSize();

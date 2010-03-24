@@ -26,10 +26,12 @@ import java.util.Map.Entry;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRelationRowCreationResource;
@@ -102,10 +104,10 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     @Override
     protected void setupRelationAllValue(TnRelationRowCreationResource res) throws SQLException {
-        final Map<String, TnPropertyType> propertyCacheElement = res.extractPropertyCacheElement();
-        final Set<Entry<String, TnPropertyType>> entrySet = propertyCacheElement.entrySet();
-        for (Entry<String, TnPropertyType> entry : entrySet) {
-            final TnPropertyType pt = entry.getValue();
+        final Map<String, TnPropertyMapping> propertyCacheElement = res.extractPropertyCacheElement();
+        final Set<Entry<String, TnPropertyMapping>> entrySet = propertyCacheElement.entrySet();
+        for (Entry<String, TnPropertyMapping> entry : entrySet) {
+            final TnPropertyMapping pt = entry.getValue();
             res.setCurrentPropertyType(pt);
             if (!isValidRelationPerPropertyLoop(res)) {
                 res.clearRowInstance();
@@ -125,12 +127,12 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     @Override
     protected void registerRelationValue(TnRelationRowCreationResource res, String columnName) throws SQLException {
-        final TnPropertyType pt = res.getCurrentPropertyType();
+        final TnPropertyMapping mapping = res.getCurrentPropertyMapping();
         Object value = null;
         if (res.containsRelKeyValueIfExists(columnName)) {
             value = res.extractRelKeyValue(columnName);
         } else {
-            final ValueType valueType = pt.getValueType();
+            final ValueType valueType = mapping.getValueType();
             final Map<String, Integer> selectIndexMap = res.getSelectIndexMap();
             if (selectIndexMap != null) {
                 value = ResourceContext.getValue(res.getResultSet(), columnName, valueType, selectIndexMap);
@@ -142,12 +144,12 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         if (value != null) {
             res.incrementValidValueCount();
             final DBMeta dbmeta = findDBMeta(res.getRow());
-            final String propertyName = pt.getPropertyName();
+            final String propertyName = mapping.getPropertyName();
             if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
                 dbmeta.setupEntityProperty(propertyName, res.getRow(), value);
             } else {
-                final DfPropertyDesc pd = pt.getPropertyDesc();
-                pd.setValue(res.getRow(), value);
+                final DfPropertyAccessor accessor = mapping.getPropertyAccessor();
+                accessor.setValue(res.getRow(), value);
             }
         }
     }
@@ -198,11 +200,11 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     @Override
     protected boolean isTargetProperty(TnRelationRowCreationResource res) throws SQLException {
-        final TnPropertyType pt = res.getCurrentPropertyType();
-        if (!pt.getPropertyDesc().hasWriteMethod()) {
+        final TnPropertyMapping mapping = res.getCurrentPropertyMapping();
+        if (!mapping.getPropertyAccessor().isWritable()) {
             return false;
         }
-        if (java.util.List.class.isAssignableFrom(pt.getPropertyDesc().getPropertyType())) {
+        if (java.util.List.class.isAssignableFrom(mapping.getPropertyAccessor().getPropertyType())) {
             return false;
         }
         return true;
@@ -220,7 +222,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,
             Set<String> selectColumnSet, Map<String, Object> relKeyValues,
-            Map<String, Map<String, TnPropertyType>> relationPropertyCache) throws SQLException {
+            Map<String, Map<String, TnPropertyMapping>> relationPropertyCache) throws SQLException {
         final TnRelationRowCreationResource res = new TnRelationRowCreationResourceExtension();
         res.setResultSet(rs);
         res.setRelationPropertyType(rpt);
@@ -237,7 +239,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     }
 
     protected TnRelationRowCreationResource createResourceForPropertyCache(TnRelationPropertyType rpt,
-            Set<String> selectColumnSet, Map<String, Map<String, TnPropertyType>> relationPropertyCache,
+            Set<String> selectColumnSet, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache,
             String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException {
         final TnRelationRowCreationResource res = new TnRelationRowCreationResourceExtension();
         res.setRelationPropertyType(rpt);

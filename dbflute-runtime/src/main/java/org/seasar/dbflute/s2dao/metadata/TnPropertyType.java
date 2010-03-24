@@ -21,7 +21,7 @@ import org.seasar.dbflute.helper.beans.DfPropertyDesc;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public interface TnPropertyType extends TnPropertyMapper {
+public interface TnPropertyType extends TnPropertyMapping {
 
     DfPropertyDesc getPropertyDesc();
 

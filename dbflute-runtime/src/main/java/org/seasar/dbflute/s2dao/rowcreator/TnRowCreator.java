@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -31,20 +31,20 @@ public interface TnRowCreator {
 
     /**
      * @param rs Result set. (NotNull)
-     * @param columnPropertyTypeMap The map of row property cache. The key is String(columnName) and the value is PropertyType. (NotNull)
+     * @param columnPropertyTypeMap The map of row property cache. The key is String(columnName) and the value is a PropertyMapping. (NotNull)
      * @param beanClass Bean class. (NotNull)
      * @return Created row. (NotNull)
      * @throws SQLException
      */
-    Object createRow(ResultSet rs, Map<String, TnPropertyType> columnPropertyTypeMap, Class<?> beanClass)
+    Object createRow(ResultSet rs, Map<String, TnPropertyMapping> columnPropertyTypeMap, Class<?> beanClass)
             throws SQLException;
 
     /**
      * @param selectColumnSet The name set of select column. (NotNull)
      * @param beanMetaData Bean meta data. (NotNull)
-     * @return The map of row property cache. The key is String(columnName) and the value is PropertyType. (NotNull)
+     * @return The map of row property cache. The key is String(columnName) and the value is a PropertyMapping. (NotNull)
      * @throws SQLException
      */
-    Map<String, TnPropertyType> createPropertyCache(Set<String> selectColumnSet, TnBeanMetaData beanMetaData)
+    Map<String, TnPropertyMapping> createPropertyCache(Set<String> selectColumnSet, TnBeanMetaData beanMetaData)
             throws SQLException;
 }

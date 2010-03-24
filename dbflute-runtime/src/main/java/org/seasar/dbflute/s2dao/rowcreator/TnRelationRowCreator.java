@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 
 /**
@@ -35,21 +35,21 @@ public interface TnRelationRowCreator {
      * @param rpt The type of relation property. (NotNull)
      * @param columnNames The set of column name. (NotNull)
      * @param relKeyValues The map of relation key values. (Nullable)
-     * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
+     * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyMapping}} (NotNull)
      * @return Created relation row. (Nullable)
      * @throws SQLException
      */
     Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
-            Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyType>> relationPropertyCache)
+            Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache)
             throws SQLException;
 
     /**
      * @param columnNames The set of column name. (NotNull)
      * @param bmd Bean meta data of base object. (NotNull)
-     * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
+     * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyMapping}} (NotNull)
      * @throws SQLException
      */
-    Map<String, Map<String, TnPropertyType>> createPropertyCache(Set<String> columnNames, TnBeanMetaData bmd)
+    Map<String, Map<String, TnPropertyMapping>> createPropertyCache(Set<String> columnNames, TnBeanMetaData bmd)
             throws SQLException;
 
 }

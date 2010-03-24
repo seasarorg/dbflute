@@ -24,7 +24,7 @@ import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.TnRelationRowCreator;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
@@ -62,10 +62,10 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler implements TnResult
     //                                                                      ==============
     /**
      * @param selectColumnSet The name set of select column. (NotNull)
-     * @return The map of row property cache. Map{String(columnName), PropertyType} (NotNull)
+     * @return The map of row property cache. Map{String(columnName), PropertyMapping} (NotNull)
      * @throws SQLException
      */
-    protected Map<String, TnPropertyType> createPropertyCache(Set<String> selectColumnSet) throws SQLException {
+    protected Map<String, TnPropertyMapping> createPropertyCache(Set<String> selectColumnSet) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
@@ -77,11 +77,11 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler implements TnResult
     //                                                                          ==========
     /**
      * @param rs Result set. (NotNull)
-     * @param propertyCache The map of property cache. Map{String(columnName), PropertyType} (NotNull)
+     * @param propertyCache The map of property cache. Map{String(columnName), PropertyMapping} (NotNull)
      * @return Created row. (NotNull)
      * @throws SQLException
      */
-    protected Object createRow(ResultSet rs, Map<String, TnPropertyType> propertyCache) throws SQLException {
+    protected Object createRow(ResultSet rs, Map<String, TnPropertyMapping> propertyCache) throws SQLException {
         // - - - - - - - - -
         // Override for Bean
         // - - - - - - - - -
@@ -91,10 +91,10 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler implements TnResult
 
     /**
      * @param selectColumnSet The name set of select column. (NotNull)
-     * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
+     * @return The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyMapping}} (NotNull)
      * @throws SQLException
      */
-    protected Map<String, Map<String, TnPropertyType>> createRelationPropertyCache(Set<String> selectColumnSet)
+    protected Map<String, Map<String, TnPropertyMapping>> createRelationPropertyCache(Set<String> selectColumnSet)
             throws SQLException {
         return relationRowCreator.createPropertyCache(selectColumnSet, beanMetaData);
     }
@@ -104,12 +104,12 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler implements TnResult
      * @param rpt The type of relation property. (NotNull)
      * @param selectColumnSet The name set of select column. (NotNull)
      * @param relKeyValues The map of relation key values. (Nullable)
-     * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyType}} (NotNull)
+     * @param relationPropertyCache The map of relation property cache. Map{String(relationNoSuffix), Map{String(columnName), PropertyMapping}} (NotNull)
      * @return Created relation row. (Nullable)
      * @throws SQLException
      */
     protected Object createRelationRow(ResultSet rs, TnRelationPropertyType rpt, Set<String> selectColumnSet,
-            Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyType>> relationPropertyCache)
+            Map<String, Object> relKeyValues, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache)
             throws SQLException {
         return relationRowCreator.createRelationRow(rs, rpt, selectColumnSet, relKeyValues, relationPropertyCache);
     }

@@ -24,11 +24,11 @@ import java.util.Map.Entry;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
-import org.seasar.dbflute.helper.beans.DfPropertyDesc;
+import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.InternalMapContext;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
 import org.seasar.dbflute.util.DfSystemUtil;
 
@@ -83,20 +83,16 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                                Main
     //                                                                                ====
     /**
-     * @param rs Result set. (NotNull)
-     * @param propertyCache The map of property cache. Map{String(columnName), PropertyType} (NotNull)
-     * @param beanClass Bean class. (NotNull)
-     * @return Created row. (NotNull)
-     * @throws SQLException
+     * {@inheritDoc}
      */
-    public Object createRow(ResultSet rs, Map<String, TnPropertyType> propertyCache, Class<?> beanClass)
+    public Object createRow(ResultSet rs, Map<String, TnPropertyMapping> propertyCache, Class<?> beanClass)
             throws SQLException {
         if (propertyCache.isEmpty()) {
             String msg = "The propertyCache should not be empty: bean=" + beanClass.getName();
             throw new IllegalStateException(msg);
         }
         String columnName = null;
-        TnPropertyType pt = null;
+        TnPropertyMapping mapping = null;
         String propertyName = null;
         final Map<String, Integer> selectIndexMap = ResourceContext.getSelectIndexMap();
         final Object row;
@@ -114,26 +110,26 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
         try {
             if (dbmeta != null) {
-                final Set<Entry<String, TnPropertyType>> entrySet = propertyCache.entrySet();
-                for (Entry<String, TnPropertyType> entry : entrySet) {
+                final Set<Entry<String, TnPropertyMapping>> entrySet = propertyCache.entrySet();
+                for (Entry<String, TnPropertyMapping> entry : entrySet) {
                     columnName = entry.getKey();
-                    pt = entry.getValue();
-                    propertyName = pt.getPropertyName();
+                    mapping = entry.getValue();
+                    propertyName = mapping.getPropertyName();
                     if (dbmeta.hasEntityPropertySetupper(propertyName)) {
-                        final ValueType valueType = pt.getValueType();
+                        final ValueType valueType = mapping.getValueType();
                         final Object value = getValue(rs, columnName, valueType, selectIndexMap);
                         dbmeta.setupEntityProperty(propertyName, row, value);
                     } else {
-                        registerValueByReflection(rs, row, pt, columnName, selectIndexMap);
+                        registerValueByReflection(rs, row, mapping, columnName, selectIndexMap);
                     }
                 }
             } else {
-                final Set<Entry<String, TnPropertyType>> entrySet = propertyCache.entrySet();
-                for (Entry<String, TnPropertyType> entry : entrySet) {
+                final Set<Entry<String, TnPropertyMapping>> entrySet = propertyCache.entrySet();
+                for (Entry<String, TnPropertyMapping> entry : entrySet) {
                     columnName = entry.getKey();
-                    pt = entry.getValue();
-                    propertyName = pt.getPropertyName();
-                    registerValueByReflection(rs, row, pt, columnName, selectIndexMap);
+                    mapping = entry.getValue();
+                    propertyName = mapping.getPropertyName();
+                    registerValueByReflection(rs, row, mapping, columnName, selectIndexMap);
                 }
             }
             return row;
@@ -153,12 +149,12 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
     }
 
-    protected void registerValueByReflection(ResultSet rs, Object row, TnPropertyType pt, String columnName,
+    protected void registerValueByReflection(ResultSet rs, Object row, TnPropertyMapping mapping, String columnName,
             Map<String, Integer> selectIndexMap) throws SQLException {
-        final ValueType valueType = pt.getValueType();
+        final ValueType valueType = mapping.getValueType();
         final Object value = getValue(rs, columnName, valueType, selectIndexMap);
-        final DfPropertyDesc pd = pt.getPropertyDesc();
-        pd.setValue(row, value);
+        final DfPropertyAccessor accessor = mapping.getPropertyAccessor();
+        accessor.setValue(row, value);
     }
 
     protected Object getValue(ResultSet rs, String columnName, ValueType valueType, Map<String, Integer> selectIndexMap)

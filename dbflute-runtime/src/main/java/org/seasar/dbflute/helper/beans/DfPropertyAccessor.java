@@ -27,4 +27,8 @@ public interface DfPropertyAccessor {
     Object getValue(Object target);
 
     void setValue(Object target, Object value);
+
+    boolean isReadable();
+
+    boolean isWritable();
 }

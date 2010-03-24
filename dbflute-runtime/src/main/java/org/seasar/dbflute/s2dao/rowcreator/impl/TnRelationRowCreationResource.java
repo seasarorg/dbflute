@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 
 /**
@@ -49,8 +49,8 @@ public class TnRelationRowCreationResource {
     /** The map of relation key values. */
     protected Map<String, Object> relKeyValues;
 
-    /** The map of relation property cache. */
-    protected Map<String, Map<String, TnPropertyType>> relationPropertyCache;// Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>
+    /** The map of relation property cache. (keys are relationNoSuffix, columnName) */
+    protected Map<String, Map<String, TnPropertyMapping>> relationPropertyCache;
 
     /** The suffix of base object. */
     protected String baseSuffix;
@@ -64,8 +64,8 @@ public class TnRelationRowCreationResource {
     /** The current relation nest level. Default is one. */
     protected int currentRelationNestLevel;
 
-    /** Current property type. This variable is temporary. */
-    protected TnPropertyType currentPropertyType;
+    /** Current property mapping. This variable is temporary. */
+    protected TnPropertyMapping currentPropertyMapping;
 
     /** The count of valid value. */
     protected int validValueCount;
@@ -156,15 +156,15 @@ public class TnRelationRowCreationResource {
     //                                 ---------------------
     // The type of relationPropertyCache is Map<String(relationNoSuffix), Map<String(columnName), PropertyType>>.
     public void initializePropertyCacheElement() {
-        relationPropertyCache.put(relationNoSuffix, new HashMap<String, TnPropertyType>());
+        relationPropertyCache.put(relationNoSuffix, new HashMap<String, TnPropertyMapping>());
     }
 
     public boolean hasPropertyCacheElement() {
-        final Map<String, TnPropertyType> propertyCacheElement = extractPropertyCacheElement();
+        final Map<String, TnPropertyMapping> propertyCacheElement = extractPropertyCacheElement();
         return propertyCacheElement != null && !propertyCacheElement.isEmpty();
     }
 
-    public Map<String, TnPropertyType> extractPropertyCacheElement() {
+    public Map<String, TnPropertyMapping> extractPropertyCacheElement() {
         return relationPropertyCache.get(relationNoSuffix);
     }
 
@@ -172,19 +172,19 @@ public class TnRelationRowCreationResource {
         if (!hasPropertyCacheElement()) {
             initializePropertyCacheElement();
         }
-        final Map<String, TnPropertyType> propertyCacheElement = extractPropertyCacheElement();
+        final Map<String, TnPropertyMapping> propertyCacheElement = extractPropertyCacheElement();
         final String columnName = buildRelationColumnName();
         if (propertyCacheElement.containsKey(columnName)) {
             return;
         }
-        propertyCacheElement.put(columnName, currentPropertyType);
+        propertyCacheElement.put(columnName, currentPropertyMapping);
     }
 
     // -----------------------------------------------------
     //                                                suffix
     //                                                ------
     public String buildRelationColumnName() {
-        return currentPropertyType.getColumnName() + relationNoSuffix;
+        return currentPropertyMapping.getColumnName() + relationNoSuffix;
     }
 
     public void addRelationNoSuffix(String additionalRelationNoSuffix) {
@@ -306,11 +306,11 @@ public class TnRelationRowCreationResource {
         this.relationPropertyType = rpt;
     }
 
-    public Map<String, Map<String, TnPropertyType>> getRelationPropertyCache() {
+    public Map<String, Map<String, TnPropertyMapping>> getRelationPropertyCache() {
         return relationPropertyCache;
     }
 
-    public void setRelationPropertyCache(Map<String, Map<String, TnPropertyType>> relationPropertyCache) {
+    public void setRelationPropertyCache(Map<String, Map<String, TnPropertyMapping>> relationPropertyCache) {
         this.relationPropertyCache = relationPropertyCache;
     }
 
@@ -346,12 +346,12 @@ public class TnRelationRowCreationResource {
         this.currentRelationNestLevel = currentRelationNestLevel;
     }
 
-    public TnPropertyType getCurrentPropertyType() {
-        return currentPropertyType;
+    public TnPropertyMapping getCurrentPropertyMapping() {
+        return currentPropertyMapping;
     }
 
-    public void setCurrentPropertyType(TnPropertyType propertyType) {
-        this.currentPropertyType = propertyType;
+    public void setCurrentPropertyType(TnPropertyMapping propertyType) {
+        this.currentPropertyMapping = propertyType;
     }
 
     public boolean isCreateDeadLink() {

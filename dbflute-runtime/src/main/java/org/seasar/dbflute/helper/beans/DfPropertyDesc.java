@@ -38,10 +38,6 @@ public interface DfPropertyDesc extends DfPropertyAccessor {
 
     boolean hasWriteMethod();
 
-    boolean isReadable();
-
-    boolean isWritable();
-
     Field getField();
 
     void setField(Field field);

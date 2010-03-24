@@ -22,7 +22,7 @@ import org.seasar.dbflute.jdbc.ValueType;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public interface TnPropertyMapper {
+public interface TnPropertyMapping {
 
     DfPropertyAccessor getPropertyAccessor();
 
