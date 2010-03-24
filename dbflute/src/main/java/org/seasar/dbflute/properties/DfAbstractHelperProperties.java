@@ -432,17 +432,17 @@ public abstract class DfAbstractHelperProperties {
     //                                                              Outside Properties
     //                                                              ==================
     protected String getOutsidePropString(String key) {
-        final String filteredKey = DfStringUtil.replace(key, "torque.", "");
+        final String propName = DfStringUtil.replace(key, "torque.", "");
         final DfStringFileReader reader = new DfStringFileReader();
         if (!isEnvironmentDefault()) {
             final String environmentType = getEnvironmentType();
-            final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
+            final String path = "./dfprop/" + environmentType + "/" + propName + ".dfprop";
             final String str = reader.readString(path);
             if (str.trim().length() > 0) {
                 return str;
             }
         }
-        return reader.readString("./dfprop/" + filteredKey + ".dfprop");
+        return reader.readString("./dfprop/" + propName + ".dfprop");
     }
 
     protected Map<String, Object> getOutsidePropMap(String key) {
@@ -477,17 +477,17 @@ public abstract class DfAbstractHelperProperties {
     }
 
     protected List<Object> getOutsidePropList(String key) {
-        final String filteredKey = DfStringUtil.replace(key, "torque.", "");
+        final String propName = DfStringUtil.replace(key, "torque.", "");
         final DfListStringFileReader reader = new DfListStringFileReader();
         if (!isEnvironmentDefault()) {
             final String environmentType = getEnvironmentType();
-            final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
+            final String path = "./dfprop/" + environmentType + "/" + propName + ".dfprop";
             List<Object> list = reader.readList(path);
             if (!list.isEmpty()) {
                 return list;
             }
         }
-        return reader.readList("./dfprop/" + filteredKey + ".dfprop");
+        return reader.readList("./dfprop/" + propName + ".dfprop");
     }
 
     // ===============================================================================
