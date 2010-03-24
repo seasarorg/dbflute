@@ -448,15 +448,32 @@ public abstract class DfAbstractHelperProperties {
     protected Map<String, Object> getOutsidePropMap(String key) {
         final String filteredKey = DfStringUtil.replace(key, "torque.", "");
         final DfMapStringFileReader reader = new DfMapStringFileReader();
-        if (!isEnvironmentDefault()) {
-            final String environmentType = getEnvironmentType();
-            final String path = "./dfprop/" + environmentType + "/" + filteredKey + ".dfprop";
-            final Map<String, Object> map = reader.readMap(path);
-            if (!map.isEmpty()) {
-                return map;
+        final String mainpath = "./dfprop/" + filteredKey + ".dfprop";
+        final String envpath = "./dfprop/" + getEnvironmentType() + "/" + filteredKey + ".dfprop";
+        if (isEnvironmentDefault()) {
+            final Map<String, Object> map = reader.readMap(mainpath);
+            setupOutsidePropExMap(reader, map, mainpath);
+            return map;
+        } else {
+            Map<String, Object> map = reader.readMap(envpath);
+            if (map.isEmpty()) {
+                map = reader.readMap(mainpath);
+                setupOutsidePropExMap(reader, map, mainpath);
             }
+            setupOutsidePropExMap(reader, map, envpath);
+            return map;
         }
-        return reader.readMap("./dfprop/" + filteredKey + ".dfprop");
+    }
+
+    protected void setupOutsidePropExMap(DfMapStringFileReader reader, Map<String, Object> map, String path) {
+        if (!path.endsWith(".dfprop")) {
+            String msg = "The path should end with '.dfprop':";
+            msg = msg + " path=" + path;
+            throw new IllegalStateException(msg);
+        }
+        path = path.substring(0, path.length() - ".dfprop".length()) + "+.dfprop";
+        final Map<String, Object> exMap = reader.readMap(path);
+        map.putAll(exMap);
     }
 
     protected List<Object> getOutsidePropList(String key) {
