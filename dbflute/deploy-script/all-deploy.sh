@@ -111,6 +111,9 @@ rm ./log/*.log
 . doc.sh
 . generate.sh
 . sql2entity.sh
+. clientbhv-generate.sh
+. clientbhv-sql2entity.sh
+. clientbhv-outside-sql-test.sh
 
 cd ../
 cd ../dbflute-spring-example/

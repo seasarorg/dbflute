@@ -418,6 +418,14 @@
 		<delete file="${clientbhv.seasar.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
 		<copy file="${dist}/${runtime.jar}" tofile="${clientbhv.seasar.example.dir}/lib/${runtime.jar}" overwrite="true"/>
 		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientbhv.seasar.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<delete file="${clientbhv.spring.example.dir}/lib/${runtime.pre.jar}"/>
+		<delete file="${clientbhv.spring.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
+		<copy file="${dist}/${runtime.jar}" tofile="${clientbhv.spring.example.dir}/lib/${runtime.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientbhv.spring.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<delete file="${clientbhv.guice.example.dir}/lib/${runtime.pre.jar}"/>
+		<delete file="${clientbhv.guice.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
+		<copy file="${dist}/${runtime.jar}" tofile="${clientbhv.guice.example.dir}/lib/${runtime.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientbhv.guice.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 
