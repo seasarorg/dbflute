@@ -7,7 +7,7 @@ using Seasar.Quill.Attrs;
 namespace ${glPackageExtendedBhv} {
 
     [Implementation]
-    public partial class ${myClassName} : ${myExtendedBhvName} {
+    public partial class ${myClassName} : ${myExtendedBhvClassName} {
 
         // ===============================================================================
         //                                                                      Definition
