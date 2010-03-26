@@ -1,4 +1,4 @@
-#set ($myClassName = "${myExtendedBhvInterfaceName}")
+#set ($myClassName = "${myExtendedBhvClassName}")
 
 using System;
 using System.Collections.Generic;

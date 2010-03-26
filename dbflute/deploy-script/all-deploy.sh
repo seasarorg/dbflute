@@ -43,9 +43,9 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
-. clientbhv-generate.sh
-. clientbhv-sql2entity.sh
-. clientbhv-outside-sql-test.sh
+. bhvap-generate.sh
+. bhvap-sql2entity.sh
+. bhvap-outside-sql-test.sh
 
 cd ../../dbflute-postgresql-example/dbflute_exampledb
 rm ./log/*.log
@@ -54,9 +54,9 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
-. clientbhv-generate.sh
-. clientbhv-sql2entity.sh
-. clientbhv-outside-sql-test.sh
+. bhvap-generate.sh
+. bhvap-sql2entity.sh
+. bhvap-outside-sql-test.sh
 
 cd ../../dbflute-multipledb-seasar-example/dbflute_librarydb
 rm ./log/*.log
@@ -111,9 +111,9 @@ rm ./log/*.log
 . doc.sh
 . generate.sh
 . sql2entity.sh
-. clientbhv-generate.sh
-. clientbhv-sql2entity.sh
-. clientbhv-outside-sql-test.sh
+. bhvap-generate.sh
+. bhvap-sql2entity.sh
+. bhvap-outside-sql-test.sh
 
 cd ../
 cd ../dbflute-spring-example/

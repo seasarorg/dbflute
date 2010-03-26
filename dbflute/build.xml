@@ -63,9 +63,9 @@
 	<!-- Other Examples -->
 	<property name="multipledb.seasar.example.dir" value="${workspace.base}/dbflute-multipledb-seasar-example"/>
 	<property name="multipledb.spring.example.dir" value="${workspace.base}/dbflute-multipledb-spring-example"/>
-	<property name="clientbhv.seasar.example.dir" value="${workspace.base}/dbflute-clientbhv-seasar-example"/>
-	<property name="clientbhv.spring.example.dir" value="${workspace.base}/dbflute-clientbhv-spring-example"/>
-	<property name="clientbhv.guice.example.dir" value="${workspace.base}/dbflute-clientbhv-guice-example"/>
+	<property name="bhvap.seasar.example.dir" value="${workspace.base}/dbflute-bhvap-seasar-example"/>
+	<property name="bhvap.spring.example.dir" value="${workspace.base}/dbflute-bhvap-spring-example"/>
+	<property name="bhvap.guice.example.dir" value="${workspace.base}/dbflute-bhvap-guice-example"/>
 	<property name="tricky.example.dir" value="${workspace.base}/dbflute-tricky-example"/>
 	<property name="javatest.dir" value="${workspace.base}/javatest"/>
 
@@ -413,19 +413,19 @@
 		<delete dir="${extraction.dir}"/>
 	</target>
 
-	<target name="reflect-to-clientbhv" depends="prepare-reflection" description="==> reflect to clientbhv all examples">
-		<delete file="${clientbhv.seasar.example.dir}/lib/${runtime.pre.jar}"/>
-		<delete file="${clientbhv.seasar.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
-		<copy file="${dist}/${runtime.jar}" tofile="${clientbhv.seasar.example.dir}/lib/${runtime.jar}" overwrite="true"/>
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientbhv.seasar.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
-		<delete file="${clientbhv.spring.example.dir}/lib/${runtime.pre.jar}"/>
-		<delete file="${clientbhv.spring.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
-		<copy file="${dist}/${runtime.jar}" tofile="${clientbhv.spring.example.dir}/lib/${runtime.jar}" overwrite="true"/>
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientbhv.spring.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
-		<delete file="${clientbhv.guice.example.dir}/lib/${runtime.pre.jar}"/>
-		<delete file="${clientbhv.guice.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
-		<copy file="${dist}/${runtime.jar}" tofile="${clientbhv.guice.example.dir}/lib/${runtime.jar}" overwrite="true"/>
-		<copy file="${dist}/${runtime.sources.jar}" tofile="${clientbhv.guice.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+	<target name="reflect-to-bhvap" depends="prepare-reflection" description="==> reflect to bhvap all examples">
+		<delete file="${bhvap.seasar.example.dir}/lib/${runtime.pre.jar}"/>
+		<delete file="${bhvap.seasar.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
+		<copy file="${dist}/${runtime.jar}" tofile="${bhvap.seasar.example.dir}/lib/${runtime.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${bhvap.seasar.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<delete file="${bhvap.spring.example.dir}/lib/${runtime.pre.jar}"/>
+		<delete file="${bhvap.spring.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
+		<copy file="${dist}/${runtime.jar}" tofile="${bhvap.spring.example.dir}/lib/${runtime.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${bhvap.spring.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
+		<delete file="${bhvap.guice.example.dir}/lib/${runtime.pre.jar}"/>
+		<delete file="${bhvap.guice.example.dir}/lib/sources/${runtime.sources.pre.jar}"/>
+		<copy file="${dist}/${runtime.jar}" tofile="${bhvap.guice.example.dir}/lib/${runtime.jar}" overwrite="true"/>
+		<copy file="${dist}/${runtime.sources.jar}" tofile="${bhvap.guice.example.dir}/lib/sources/${runtime.sources.jar}" overwrite="true"/>
 		<delete dir="${extraction.dir}"/>
 	</target>
 
@@ -460,7 +460,7 @@
 	  	<antcall target="reflect-to-multipledb" />
 	  	<antcall target="reflect-to-ymir" />
 	  	<antcall target="reflect-to-sastruts" />
-	  	<antcall target="reflect-to-clientbhv" />
+	  	<antcall target="reflect-to-bhvap" />
 	  	<antcall target="reflect-to-tricky" />
 	  	<antcall target="reflect-to-javatest" />
 	</target>

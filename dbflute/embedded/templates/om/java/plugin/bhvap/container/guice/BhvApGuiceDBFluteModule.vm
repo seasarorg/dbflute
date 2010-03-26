@@ -10,9 +10,9 @@ import ${glPackageExtendedBhv}.*;
 /**
  * @author ${database.classAuthor}
  */
-public class ${glDBFluteModule}ClientBhv extends ${glDBFluteModule} {
+public class ${glDBFluteModule}BhvAp extends ${glDBFluteModule} {
 
-    public ${glDBFluteModule}ClientBhv(DataSource dataSource) {
+    public ${glDBFluteModule}BhvAp(DataSource dataSource) {
         super(dataSource);
     }
 
