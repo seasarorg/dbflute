@@ -1016,7 +1016,7 @@ public class Database {
         return getProperties().getDependencyInjectionProperties().getDBFluteDiconOtherIncludePathList();
     }
 
-    public String filterDBFluteDiconClientBhv(String filePath) { // as utility for client behavior
+    public String filterDBFluteDiconBhvAp(String filePath) { // as utility for application behavior
         if (filePath.endsWith(".dicon")) {
             filePath = DfStringUtil.replace(filePath, ".dicon", "++.dicon");
         }
@@ -1054,9 +1054,9 @@ public class Database {
         return getProperties().getDependencyInjectionProperties().getDBFluteBeansDataSourceName();
     }
 
-    public String filterDBFluteBeansClientBhv(String filePath) { // as utility for client behavior
+    public String filterDBFluteBeansBhvAp(String filePath) { // as utility for application behavior
         if (filePath.endsWith(".xml")) {
-            filePath = DfStringUtil.replace(filePath, ".xml", "ClientBhv.xml");
+            filePath = DfStringUtil.replace(filePath, ".xml", "BhvAp.xml");
         }
         return filePath;
     }
@@ -1064,9 +1064,9 @@ public class Database {
     // -----------------------------------------------------
     //                                                 Guice
     //                                                 -----
-    public String filterDBFluteModuleClientBhv(String filePath) { // as utility for client behavior
+    public String filterDBFluteModuleBhvAp(String filePath) { // as utility for application behavior
         if (filePath.endsWith(".java")) {
-            filePath = DfStringUtil.replace(filePath, ".java", "ClientBhv.java");
+            filePath = DfStringUtil.replace(filePath, ".java", "BhvAp.java");
         }
         return filePath;
     }

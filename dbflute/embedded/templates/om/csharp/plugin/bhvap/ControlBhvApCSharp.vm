@@ -68,17 +68,17 @@ $database.info("/* * * * * * * * * * * * * * {Table Class}")
     $database.info("parseTable('${table.Name}');")
 
     #set ($myBaseBhvClassName = "${table.baseBehaviorClassName}")
-    #set ($myBaseBhvImplClassName = "${table.baseBehaviorImplClassName}")
+    #set ($myBaseBhvApClassName = "${table.baseBehaviorApClassName}")
 
     #set ($myExtendedBhvClassName = "${table.extendedBehaviorClassName}")
-    #set ($myExtendedBhvImplClassName = "${table.extendedBehaviorImplClassName}")
+    #set ($myExtendedBhvApClassName = "${table.extendedBehaviorApClassName}")
 
-    #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvImplClassName}.${glClassFileExtension}" )
-    $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/ClientBhvBaseBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
+    #set ( $path = "${database.getPackageAsPath(${glPackageBaseBhv})}${myBaseBhvApClassName}.${glClassFileExtension}" )
+    $generator.parse("om/${glResourceDirectory}/plugin/bhvap/BhvApBaseBhvAp.${glTemplateFileExtension}", $path, "table", $table)
 
-    #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvImplClassName}.${glClassFileExtension}" )
+    #set ( $path = "${database.getPackageAsPath(${glPackageExtendedBhv})}${myExtendedBhvApClassName}.${glClassFileExtension}" )
     #if (!$files.file(${generator.OutputPath},$path).exists())
-      $generator.parse("om/${glResourceDirectory}/plugin/clientbhv/ClientBhvExtendedBhvImpl.${glTemplateFileExtension}", $path, "table", $table)
+      $generator.parse("om/${glResourceDirectory}/plugin/bhvap/BhvApExtendedBhvAp.${glTemplateFileExtension}", $path, "table", $table)
     #end
 
   #end

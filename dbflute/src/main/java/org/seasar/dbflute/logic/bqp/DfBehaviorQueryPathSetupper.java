@@ -131,8 +131,11 @@ public class DfBehaviorQueryPathSetupper {
             if (tableKeyName.endsWith("Bhv")) {
                 tableKeyName = tableKeyName.substring(0, tableKeyName.length() - "Bhv".length());
             }
-            if (tableKeyName.endsWith("BhvImpl")) {
-                tableKeyName = tableKeyName.substring(0, tableKeyName.length() - "BhvImpl".length());
+            if (isApplicationBehavior()) {
+                final String suffix = "Bhv" + getBasicProperties().getApplicationBehaviorSuffix();
+                if (tableKeyName.endsWith(suffix)) {
+                    tableKeyName = tableKeyName.substring(0, tableKeyName.length() - suffix.length());
+                }
             }
             final DfBasicProperties basicProperties = getBasicProperties();
             final String projectPrefix = basicProperties.getProjectPrefix();
@@ -292,8 +295,9 @@ public class DfBehaviorQueryPathSetupper {
         final FileFilter filefilter = new FileFilter() {
             public boolean accept(File file) {
                 final String path = file.getPath();
-                if (isClientBehavior()) {
-                    return path.endsWith("BhvImpl." + classFileExtension);
+                if (isApplicationBehavior()) {
+                    final String suffix = "Bhv" + getBasicProperties().getApplicationBehaviorSuffix();
+                    return path.endsWith(suffix + "." + classFileExtension);
                 } else {
                     return path.endsWith("Bhv." + classFileExtension);
                 }
@@ -327,8 +331,9 @@ public class DfBehaviorQueryPathSetupper {
             final String behaviorQueryPath = behaviorQueryElementMap.get("behaviorQueryPath");
             File bsbhvFile = bsbhvFileMap.get(behaviorName);
             if (bsbhvFile == null) {
-                if (behaviorName.endsWith("Bhv")) { // retry as client behavior
-                    bsbhvFile = bsbhvFileMap.get(behaviorName + "Impl");
+                if (isApplicationBehavior() && behaviorName.endsWith("Bhv")) { // retry as application behavior
+                    final String suffix = getBasicProperties().getApplicationBehaviorSuffix();
+                    bsbhvFile = bsbhvFileMap.get(behaviorName + suffix);
                 }
                 if (bsbhvFile == null) {
                     throwBehaviorNotFoundException(bsbhvFileMap, behaviorQueryElementMap, bsbhvPathBase);
@@ -575,8 +580,8 @@ public class DfBehaviorQueryPathSetupper {
         return getProperties().getLittleAdjustmentProperties();
     }
 
-    protected boolean isClientBehavior() {
-        return getBasicProperties().isClientBehavior();
+    protected boolean isApplicationBehavior() {
+        return getBasicProperties().isApplicationBehavior();
     }
 
     public String getFlatDirectoryPackage() {

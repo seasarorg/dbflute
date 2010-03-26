@@ -604,8 +604,8 @@ public class Table {
         return getBaseEntityClassName() + "Bhv";
     }
 
-    public String getBaseBehaviorImplClassName() {
-        final String suffix = getBasicProperties().getClientBehaviorSuffix();
+    public String getBaseBehaviorApClassName() {
+        final String suffix = getBasicProperties().getApplicationBehaviorSuffix();
         return getBaseBehaviorClassName() + suffix;
     }
 
@@ -665,8 +665,8 @@ public class Table {
         return getExtendedEntityClassName() + "Bhv";
     }
 
-    public String getExtendedBehaviorImplClassName() {
-        final String suffix = getBasicProperties().getClientBehaviorSuffix();
+    public String getExtendedBehaviorApClassName() {
+        final String suffix = getBasicProperties().getApplicationBehaviorSuffix();
         return getExtendedBehaviorClassName() + suffix;
     }
 
@@ -675,9 +675,9 @@ public class Table {
         return extendedBehaviorPackage + "." + getExtendedBehaviorClassName();
     }
 
-    public String getExtendedBehaviorImplFullClassName() {
+    public String getExtendedBehaviorApFullClassName() {
         final String extendedBehaviorPackage = getDatabase().getExtendedBehaviorPackage();
-        return extendedBehaviorPackage + "." + getExtendedBehaviorImplClassName();
+        return extendedBehaviorPackage + "." + getExtendedBehaviorApClassName();
     }
 
     public String getExtendedConditionBeanClassName() {
@@ -741,8 +741,8 @@ public class Table {
         return getDatabase().filterComponentNameWithProjectPrefix(getUncapitalisedJavaName()) + "Bhv";
     }
 
-    public String getBehaviorImplComponentName() {
-        final String suffix = getBasicProperties().getClientBehaviorSuffix();
+    public String getBehaviorApComponentName() {
+        final String suffix = getBasicProperties().getApplicationBehaviorSuffix();
         return getBehaviorComponentName() + suffix;
     }
 

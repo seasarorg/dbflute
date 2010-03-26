@@ -94,8 +94,8 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         }
         if (getBasicProperties().isTargetLanguageMain()) {
             if (getBasicProperties().isTargetLanguageJava()) {
-                if (getBasicProperties().isClientBehavior()) {
-                    setupControlClientBehaviorJava(littleProp);
+                if (getBasicProperties().isApplicationBehavior()) {
+                    setupControlApplicationBehaviorJava(littleProp);
                     return;
                 }
                 _log.info("");
@@ -106,8 +106,8 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
                 _log.info("...Using Java control: " + control);
                 setControlTemplate(control);
             } else if (getBasicProperties().isTargetLanguageCSharp()) {
-                if (getBasicProperties().isClientBehavior()) {
-                    setupControlClientBehaviorCSharp(littleProp);
+                if (getBasicProperties().isApplicationBehavior()) {
+                    setupControlApplicationBehaviorCSharp(littleProp);
                     return;
                 }
                 _log.info("");
@@ -136,23 +136,23 @@ public class TorqueDataModelTask extends DfAbstractDbMetaTexenTask {
         setControlTemplate(control);
     }
 
-    protected void setupControlClientBehaviorJava(DfLittleAdjustmentProperties littleProp) {
+    protected void setupControlApplicationBehaviorJava(DfLittleAdjustmentProperties littleProp) {
         _log.info("");
-        _log.info("* * * * * * * * * * * * * * * * * * * * **");
-        _log.info("* Process Client Behavior Control (Java) *");
-        _log.info("* * * * * * * * * * * * * * * * * * * * **");
-        final String control = "om/java/plugin/clientbhv/ControlClientBhvJava.vm";
-        _log.info("...Using client behavior (Java) control: " + control);
+        _log.info("* * * * * * * * * * * * * * * * * * * * * * * *");
+        _log.info("* Process Application Behavior Control (Java) *");
+        _log.info("* * * * * * * * * * * * * * * * * * * * * * * *");
+        final String control = "om/java/plugin/bhvap/ControlBhvApJava.vm";
+        _log.info("...Using application behavior (Java) control: " + control);
         setControlTemplate(control);
     }
 
-    protected void setupControlClientBehaviorCSharp(DfLittleAdjustmentProperties littleProp) {
+    protected void setupControlApplicationBehaviorCSharp(DfLittleAdjustmentProperties littleProp) {
         _log.info("");
-        _log.info("* * * * * * * * * * * * * * * * * * * * * **");
-        _log.info("* Process Client Behavior Control (CSharp) *");
-        _log.info("* * * * * * * * * * * * * * * * * * * * * **");
-        final String control = "om/csharp/plugin/clientbhv/ControlClientBhvCSharp.vm";
-        _log.info("...Using client behavior (CSharp) control: " + control);
+        _log.info("* * * * * * * * * * * * * * * * * * * * * * * * *");
+        _log.info("* Process Application Behavior Control (CSharp) *");
+        _log.info("* * * * * * * * * * * * * * * * * * * * * * * * *");
+        final String control = "om/csharp/plugin/bhvap/ControlBhvApCSharp.vm";
+        _log.info("...Using application behavior (CSharp) control: " + control);
         setControlTemplate(control);
     }
 
