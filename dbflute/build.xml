@@ -450,7 +450,7 @@
     <!-- Reflection for Mac  -->
 	<!-- = = = = = = = = = = -->
 
-	<target name="reflect-to-all-for-mac" depends="prepare-reflection" description="==> reflect to other examples">
+	<target name="reflect-to-all-for-mac" depends="prepare-reflection" description="==> reflect to all examples">
 	  	<antcall target="reflect-to-basic" />
 	  	<antcall target="reflect-to-spring" />
 	  	<antcall target="reflect-to-guice" />
@@ -469,7 +469,7 @@
     <!-- Reflection for Windows  -->
 	<!-- = = = = = = = = = = = = -->
 
-	<target name="reflect-to-all-for-win" depends="prepare-reflection" description="==> reflect to other examples">
+	<target name="reflect-to-all-for-win" depends="prepare-reflection" description="==> reflect to all examples">
 	  	<antcall target="reflect-to-oracle" />
 	  	<antcall target="reflect-to-db2" />
 	  	<antcall target="reflect-to-sqlserver" />
