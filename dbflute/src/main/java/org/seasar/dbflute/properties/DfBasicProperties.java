@@ -383,13 +383,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                     Client Behavior
-    //                                                                     ===============
-    public boolean isApplicationBehavior() {
-        return isProperty("isApplicationBehavior", false);
+    //                                                                Application Behavior
+    //                                                                ====================
+    public boolean isGenerateOnlyApplicationBehavior() {
+        return isProperty("isGenerateOnlyApplicationBehavior", false);
     }
 
-    public String getApplicationBehaviorSuffix() {
+    public String getApplicationBehaviorAdditionalSuffix() {
         return "Ap";
     }
 

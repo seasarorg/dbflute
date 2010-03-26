@@ -18,7 +18,7 @@
 # o projectPrefix: (NotRequired - Default '')
 # o classAuthor: (NotRequired - Default 'DBFlute(AutoGenerator)')
 # o sourceFileEncoding: (NotRequired - Default 'UTF-8')
-# o isApplicationBehavior: (NotRequired - Default false)
+# o isGenerateOnlyApplicationBehavior: (NotRequired - Default false)
 # o flatDirectoryPackage (NotRequired - Default '') *CSharp Only
 # o omitDirectoryPackage (NotRequired - Default '') *CSharp Only
 # 
@@ -172,11 +172,11 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isApplicationBehavior: (NotRequired - Default false)
+    # o isGenerateOnlyApplicationBehavior: (NotRequired - Default false)
     #  Does the Generate task generate only application behaviors?
     #  (This is a property for the function of ApplicationBehavior)
     #
-    #; isApplicationBehavior = false
+    #; isGenerateOnlyApplicationBehavior = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

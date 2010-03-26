@@ -605,7 +605,7 @@ public class Table {
     }
 
     public String getBaseBehaviorApClassName() {
-        final String suffix = getBasicProperties().getApplicationBehaviorSuffix();
+        final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
         return getBaseBehaviorClassName() + suffix;
     }
 
@@ -666,7 +666,7 @@ public class Table {
     }
 
     public String getExtendedBehaviorApClassName() {
-        final String suffix = getBasicProperties().getApplicationBehaviorSuffix();
+        final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
         return getExtendedBehaviorClassName() + suffix;
     }
 
@@ -742,7 +742,7 @@ public class Table {
     }
 
     public String getBehaviorApComponentName() {
-        final String suffix = getBasicProperties().getApplicationBehaviorSuffix();
+        final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
         return getBehaviorComponentName() + suffix;
     }
 
