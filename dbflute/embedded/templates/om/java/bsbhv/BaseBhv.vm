@@ -148,6 +148,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     protected <ENTITY extends ${myExtendedObjectClassName}> void doSelectCursor(${myConditionBeanClassName} cb, EntityRowHandler<ENTITY> entityRowHandler, Class<ENTITY> entityType) {
         assertCBNotNull(cb); assertObjectNotNull("entityRowHandler<${myExtendedObjectClassName}>", entityRowHandler); assertObjectNotNull("entityType", entityType);
+        assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
         delegateSelectCursor(cb, entityRowHandler, entityType);
     }
 
@@ -247,6 +248,7 @@ public abstract class ${myClassName} extends ${myExtendClassName} {
 
     protected <ENTITY extends ${myExtendedObjectClassName}> ListResultBean<ENTITY> doSelectList(${myConditionBeanClassName} cb, Class<ENTITY> entityType) {
         assertCBNotNull(cb); assertObjectNotNull("entityType", entityType);
+        assertSpecifyDerivedReferrerEntityProperty(cb, entityType);
         return createListResultBean(cb, delegateSelectList(cb, entityType));
     }
 

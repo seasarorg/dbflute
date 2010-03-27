@@ -4,6 +4,7 @@ ant -f build.xml reflect-to-spring
 ant -f build.xml reflect-to-guice
 ant -f build.xml reflect-to-mysql
 ant -f build.xml reflect-to-postgresql
+ant -f build.xml reflect-to-bhvap
 
 cd ../dbflute-basic-example/dbflute_exampledb
 rm ./log/*.log
@@ -33,9 +34,6 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
-. bhvap-generate.sh
-. bhvap-sql2entity.sh
-. bhvap-outside-sql-test.sh
 
 cd ../../dbflute-postgresql-example/dbflute_exampledb
 rm ./log/*.log
@@ -44,6 +42,13 @@ rm ./log/*.log
 . generate.sh
 . sql2entity.sh
 . outside-sql-test.sh
+
+cd ../../dbflute-mysql-example/dbflute_exampledb
+. bhvap-generate.sh
+. bhvap-sql2entity.sh
+. bhvap-outside-sql-test.sh
+
+cd ../../dbflute-postgresql-example/dbflute_exampledb
 . bhvap-generate.sh
 . bhvap-sql2entity.sh
 . bhvap-outside-sql-test.sh
