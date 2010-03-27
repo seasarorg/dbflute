@@ -179,20 +179,22 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
     //                                                                     ===============
     protected Map<String, Map<String, String>> _additionalUesrMap;
 
-    @SuppressWarnings("unchecked")
     public Map<String, Map<String, String>> getAdditionalUserMap() {
         if (_additionalUesrMap != null) {
             return _additionalUesrMap;
         }
-        Object obj = getReplaceSchemaDefinitionMap().get("additionalUserMap");
-        if (obj == null) {
-            return new HashMap<String, Map<String, String>>();
-        }
-        if (!(obj instanceof Map<?, ?>)) {
+        final Object obj = getReplaceSchemaDefinitionMap().get("additionalUserMap");
+        if (obj != null && !(obj instanceof Map<?, ?>)) {
             String msg = "The type of the property 'additionalUserMap' should be Map: " + obj;
             throw new DfIllegalPropertyTypeException(msg);
         }
-        _additionalUesrMap = (Map<String, Map<String, String>>) obj;
+        if (obj == null) {
+            _additionalUesrMap = new HashMap<String, Map<String, String>>();
+        } else {
+            @SuppressWarnings("unchecked")
+            final Map<String, Map<String, String>> map = (Map<String, Map<String, String>>) obj;
+            _additionalUesrMap = map;
+        }
         return _additionalUesrMap;
     }
 

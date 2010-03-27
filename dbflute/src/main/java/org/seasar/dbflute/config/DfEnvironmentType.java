@@ -15,24 +15,45 @@
  */
 package org.seasar.dbflute.config;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author jflute
  * @since 0.7.9 (2008/08/26 Tuesday)
  */
 public class DfEnvironmentType {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    /** Log instance. */
+    public static final Log _log = LogFactory.getLog(DfEnvironmentType.class);
+
     private static final DfEnvironmentType _instance = new DfEnvironmentType();
     private static final String DEFAULT_ENVIRONMENT_TYPE = "df:default";
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected String _environmentType = DEFAULT_ENVIRONMENT_TYPE;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     private DfEnvironmentType() {
     }
 
+    // ===================================================================================
+    //                                                                           Singleton
+    //                                                                           =========
     public static DfEnvironmentType getInstance() {
         return _instance;
     }
 
+    // ===================================================================================
+    //                                                                    Environment Type
+    //                                                                    ================
     public boolean isDefault() {
         return _environmentType != null && _environmentType.equalsIgnoreCase(DEFAULT_ENVIRONMENT_TYPE);
     }
@@ -51,6 +72,7 @@ public class DfEnvironmentType {
         if (environmentType.startsWith("${dfenv}")) {
             return;
         }
+        _log.info("...Setting environmentType '" + environmentType + "'");
         _environmentType = environmentType;
     }
 }

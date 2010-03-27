@@ -3,11 +3,10 @@ package org.seasar.dbflute.properties;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.config.DfDatabaseNameMapping;
+import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfoCSharp;
@@ -314,8 +313,12 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     protected String filterBase(String packageString) {
-        if (getPackageBase().trim().length() > 0) {
-            return getPackageBase() + "." + packageString;
+        return filterBase(packageString, getPackageBase());
+    }
+
+    protected String filterBase(String packageString, String packageBase) {
+        if (packageBase.trim().length() > 0) {
+            return packageBase + "." + packageString;
         } else {
             return packageString;
         }
@@ -388,17 +391,23 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                Application Behavior
     //                                                                ====================
-    public static final String KEY_applicationBehaviorMap = "applicationBehaviorMap";
     protected Map<String, String> _applicationBehaviorMap;
 
     public Map<String, String> getApplicationBehaviorMap() {
-        if (_applicationBehaviorMap == null) {
-            final Map<String, Object> map = mapProp("torque." + KEY_applicationBehaviorMap, DEFAULT_EMPTY_MAP);
-            final Set<Entry<String, Object>> entrySet = map.entrySet();
+        if (_applicationBehaviorMap != null) {
+            return _applicationBehaviorMap;
+        }
+        final Object obj = getBasicInfoMap().get("applicationBehaviorMap");
+        if (obj != null && !(obj instanceof Map<?, ?>)) {
+            String msg = "The type of the property 'applicationBehaviorMap' should be Map: " + obj;
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        if (obj == null) {
             _applicationBehaviorMap = new HashMap<String, String>();
-            for (Entry<String, Object> entry : entrySet) {
-                _applicationBehaviorMap.put(entry.getKey(), (String) entry.getValue());
-            }
+        } else {
+            @SuppressWarnings("unchecked")
+            final Map<String, String> map = (Map<String, String>) obj;
+            _applicationBehaviorMap = map;
         }
         return _applicationBehaviorMap;
     }
@@ -407,13 +416,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return isProperty("isGenerateOnlyApplicationBehavior", false, getApplicationBehaviorMap());
     }
 
-    public String getLibraryBehaviorPackageBase() {
-        final String packageBase = getPackageBase(); // as default
-        return getProperty("libraryBehaviorPackageBase", packageBase, getApplicationBehaviorMap());
+    public String getLibraryBehaviorPackage() {
+        final String extendedBehaviorPackage = getExtendedBehaviorPackage(); // as default
+        return getProperty("libraryBehaviorPackage", extendedBehaviorPackage, getApplicationBehaviorMap());
     }
 
     public String getLibraryBehaviorProjectPrefix() {
-        return getProperty("libraryBehaviorPackageBase", "", getApplicationBehaviorMap());
+        return getProperty("libraryBehaviorProjectPrefix", "", getApplicationBehaviorMap());
     }
 
     public String getApplicationBehaviorAdditionalSuffix() { // It's closet!
@@ -438,17 +447,23 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                         Flat/Omit Directory Package
     //                                                         ===========================
-    public static final String KEY_outputPackageAdjustmentMap = "outputPackageAdjustmentMap";
     protected Map<String, String> _outputPackageAdjustmentMap;
 
     public Map<String, String> getOutputPackageAdjustmentMap() {
-        if (_outputPackageAdjustmentMap == null) {
-            final Map<String, Object> map = mapProp("torque." + KEY_outputPackageAdjustmentMap, DEFAULT_EMPTY_MAP);
-            final Set<Entry<String, Object>> entrySet = map.entrySet();
+        if (_outputPackageAdjustmentMap != null) {
+            return _outputPackageAdjustmentMap;
+        }
+        final Object obj = getBasicInfoMap().get("outputPackageAdjustmentMap");
+        if (obj != null && !(obj instanceof Map<?, ?>)) {
+            String msg = "The type of the property 'outputPackageAdjustmentMap' should be Map: " + obj;
+            throw new DfIllegalPropertyTypeException(msg);
+        }
+        if (obj == null) {
             _outputPackageAdjustmentMap = new HashMap<String, String>();
-            for (Entry<String, Object> entry : entrySet) {
-                _outputPackageAdjustmentMap.put(entry.getKey(), (String) entry.getValue());
-            }
+        } else {
+            @SuppressWarnings("unchecked")
+            final Map<String, String> map = (Map<String, String>) obj;
+            _outputPackageAdjustmentMap = map;
         }
         return _outputPackageAdjustmentMap;
     }

@@ -178,7 +178,7 @@ map:{
     #    If you want to generate only application behaviors at Generate task,
     #    set true. This property is main signal for Application Behavior.
     #    Other properties (for Application Behavior) work when this property is true. 
-    #   o libraryBehaviorPackageBase: (NotRequired - Default same as packageBase)
+    #   o libraryBehaviorPackage: (NotRequired - Default same as applicationBehavior's one)
     #    If application behavior package is different from library behavior's one,
     #    set the property a value 'library behavior's one'.
     #   o libraryBehaviorProjectPrefix: (NotRequired - Default '' (means bhvlib has no prefix))
@@ -188,7 +188,7 @@ map:{
     #
     #; applicationBehaviorMap = map:{
     #    ; isGenerateOnlyApplicationBehavior = false
-    #    ; libraryBehaviorPackageBase = 
+    #    ; libraryBehaviorPackage = 
     #    ; libraryBehaviorProjectPrefix = 
     #}
     # - - - - - - - - - -/
