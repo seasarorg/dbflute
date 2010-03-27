@@ -261,7 +261,7 @@ namespace ${myDBMetaPackageName} {
         public override String ConditionBeanTypeName { get { return null; } }
 #end
 #if (${isExistBehavior})
-        public override String BehaviorTypeName { get { return "${myExtendedBhvPackageName}.${myExtendedBhvInterfaceName}"; } }
+        public override String BehaviorTypeName { get { return "${myExtendedBhvPackageName}.${myExtendedBhvClassName}"; } }
 #else
         public override String BehaviorTypeName { get { return null; } }
 #end
