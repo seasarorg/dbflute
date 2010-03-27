@@ -39,6 +39,6 @@ public class WayOfSQLite implements DBWay {
     //                                                                   SQLException Info
     //                                                                   =================
     public boolean isUniqueConstraintException(String sqlState, Integer errorCode) {
-        return "23001".equals(sqlState);
+        return false; // sqlState is null and errorCode is 0 always...
     }
 }
