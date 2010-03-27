@@ -167,7 +167,7 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         }
         final String beginQuote;
         final String endQuote;
-        if (getBasicProperties().isDatabaseSqlServer()) {
+        if (getBasicProperties().isDatabaseSQLServer()) {
             beginQuote = "[";
             endQuote = "]";
         } else {

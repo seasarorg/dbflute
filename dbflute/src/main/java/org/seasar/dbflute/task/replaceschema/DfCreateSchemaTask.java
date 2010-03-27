@@ -121,7 +121,7 @@ public class DfCreateSchemaTask extends DfAbstractReplaceSchemaTask {
         // /= = = = = = = = = = = = = = = = = 
         // Unsupported at MySQL and SQLServer
         // = = = = = = = = = =/
-        if (getBasicProperties().isDatabaseMySQL() || getBasicProperties().isDatabaseSqlServer()) {
+        if (getBasicProperties().isDatabaseMySQL() || getBasicProperties().isDatabaseSQLServer()) {
             String msg = "AdditionalDropDefinitionSchema is unsupported at MySQL and SQLServer!";
             throw new UnsupportedOperationException(msg);
         }

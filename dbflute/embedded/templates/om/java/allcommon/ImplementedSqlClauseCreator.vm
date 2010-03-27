@@ -29,7 +29,7 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
 	 */
     public SqlClause createSqlClause(String tableDbName) {
         DBMetaProvider dbmetaProvider = new ${glDBMetaInstanceHandler}();
-        SqlClause sqlClause;
+        SqlClause sqlClause; // dynamic resolution but no perfect (almost static)
         if (isCurrentDBDef(DBDef.MySQL)) {
             sqlClause = new SqlClauseMySql(tableDbName).provider(dbmetaProvider);
         } else if (isCurrentDBDef(DBDef.PostgreSQL)) {
@@ -46,7 +46,10 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
             sqlClause = new SqlClauseH2(tableDbName).provider(dbmetaProvider);
         } else if (isCurrentDBDef(DBDef.Derby)) {
             sqlClause = new SqlClauseDerby(tableDbName).provider(dbmetaProvider);
+        } else if (isCurrentDBDef(DBDef.SQLite)) {
+            sqlClause = new SqlClauseSqlite(tableDbName).provider(dbmetaProvider);
         } else {
+            // for the database when generating
             sqlClause = new SqlClause${database.generateDbName}(tableDbName).provider(dbmetaProvider);
         }
         if (isDisableSelectIndex()) {

@@ -62,25 +62,63 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                     NotNull NotString
     //                                     -----------------
-    protected boolean processNotNullNotString(String tableName, String columnName, Object obj,
-            PreparedStatement statement, int bindCount) throws SQLException {
+    protected boolean processNotNullNotString(String tableName, String columnName, Object obj, PreparedStatement ps,
+            int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (!isNotNullNotString(obj)) {
             return false;
         }
-        if (obj instanceof Time) {
-            statement.setTime(bindCount, (Time) obj);
-        } else if (obj instanceof Timestamp) {
-            statement.setTimestamp(bindCount, (Timestamp) obj);
-        } else if (obj instanceof Date) {
-            statement.setDate(bindCount, DfTypeUtil.toSqlDate((Date) obj));
-        } else if (obj instanceof BigDecimal) {
-            statement.setBigDecimal(bindCount, (BigDecimal) obj);
-        } else if (obj instanceof Boolean) {
-            statement.setBoolean(bindCount, (Boolean) obj);
-        } else {
-            statement.setObject(bindCount, obj);
+        final DfColumnMetaInfo columnMetaInfo = columnMetaInfoMap.get(columnName);
+        if (columnMetaInfo != null) {
+            final Class<?> columnType = getColumnType4Judgement(columnMetaInfo);
+            if (columnType != null) {
+                doProcessNotNullNotStringByColumnType(obj, ps, bindCount, columnType);
+                return true;
+            }
         }
+        doProcessNotNullNotStringByInstanceType(obj, ps, bindCount);
         return true;
+    }
+
+    protected void doProcessNotNullNotStringByColumnType(Object obj, PreparedStatement ps, int bindCount,
+            Class<?> columnType) throws SQLException {
+        if (Integer.class.isAssignableFrom(columnType)) {
+            ps.setInt(bindCount, DfTypeUtil.toInteger(obj));
+        } else if (Long.class.isAssignableFrom(columnType)) {
+            ps.setLong(bindCount, DfTypeUtil.toLong(obj));
+        } else if (BigDecimal.class.isAssignableFrom(columnType)) {
+            ps.setBigDecimal(bindCount, DfTypeUtil.toBigDecimal(obj));
+        } else if (Time.class.isAssignableFrom(columnType)) {
+            ps.setTime(bindCount, DfTypeUtil.toTime(obj));
+        } else if (Timestamp.class.isAssignableFrom(columnType)) {
+            ps.setTimestamp(bindCount, DfTypeUtil.toTimestamp(obj));
+        } else if (Date.class.isAssignableFrom(columnType)) {
+            ps.setDate(bindCount, DfTypeUtil.toSqlDate(obj));
+        } else if (Boolean.class.isAssignableFrom(columnType)) {
+            ps.setBoolean(bindCount, DfTypeUtil.toBoolean(obj));
+        } else {
+            ps.setObject(bindCount, obj);
+        }
+    }
+
+    protected void doProcessNotNullNotStringByInstanceType(Object obj, PreparedStatement ps, int bindCount)
+            throws SQLException {
+        if (obj instanceof Integer) {
+            ps.setInt(bindCount, (Integer) obj);
+        } else if (obj instanceof Long) {
+            ps.setLong(bindCount, (Long) obj);
+        } else if (obj instanceof BigDecimal) {
+            ps.setBigDecimal(bindCount, (BigDecimal) obj);
+        } else if (obj instanceof Time) {
+            ps.setTime(bindCount, (Time) obj);
+        } else if (obj instanceof Timestamp) {
+            ps.setTimestamp(bindCount, (Timestamp) obj);
+        } else if (obj instanceof Date) {
+            ps.setDate(bindCount, DfTypeUtil.toSqlDate((Date) obj));
+        } else if (obj instanceof Boolean) {
+            ps.setBoolean(bindCount, (Boolean) obj);
+        } else {
+            ps.setObject(bindCount, obj);
+        }
     }
 
     protected boolean isNotNullNotString(Object obj) {
@@ -90,7 +128,7 @@ public abstract class DfAbsractDataWriter {
     // -----------------------------------------------------
     //                                            Null Value
     //                                            ----------
-    protected boolean processNull(String tableName, String columnName, Object value, PreparedStatement statement,
+    protected boolean processNull(String tableName, String columnName, Object value, PreparedStatement ps,
             int bindCount, Map<String, DfColumnMetaInfo> columnMetaInfoMap) throws SQLException {
         if (!isNullValue(value)) {
             return false;
@@ -101,7 +139,7 @@ public abstract class DfAbsractDataWriter {
         }
         final int jdbcType = columnMetaInfo.getJdbcDefValue();
         try {
-            statement.setNull(bindCount, jdbcType);
+            ps.setNull(bindCount, jdbcType);
         } catch (SQLException e) {
             if (jdbcType != Types.OTHER) {
                 throw e;
@@ -109,7 +147,7 @@ public abstract class DfAbsractDataWriter {
             final String torqueType = _columnHandler.getColumnJdbcType(columnMetaInfo);
             final Integer mappedJdbcType = TypeMap.getJdbcDefValueByJdbcType(torqueType);
             try {
-                statement.setNull(bindCount, mappedJdbcType);
+                ps.setNull(bindCount, mappedJdbcType);
             } catch (SQLException ignored) {
                 String msg = "Failed to re-try setNull(" + columnName + ", " + mappedJdbcType + "):";
                 msg = msg + " " + ignored.getMessage();

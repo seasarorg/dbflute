@@ -31,7 +31,7 @@ public abstract class DfAbstractReplaceSchemaTask extends DfAbstractTask {
                 return true;
             }
         }
-        if (getBasicProperties().isDatabaseSqlServer()) {
+        if (getBasicProperties().isDatabaseSQLServer()) {
             if (line.startsWith("exec sys.sp_addextendedproperty @name=n'ms_description'")) {
                 return true;
             }

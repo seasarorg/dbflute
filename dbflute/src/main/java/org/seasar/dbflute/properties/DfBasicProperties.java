@@ -112,7 +112,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getDatabaseType().equalsIgnoreCase("db2");
     }
 
-    public boolean isDatabaseSqlServer() {
+    public boolean isDatabaseSQLServer() {
         return getDatabaseType().equalsIgnoreCase("mssql");
     }
 
@@ -122,6 +122,10 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
 
     public boolean isDatabaseDerby() {
         return getDatabaseType().equalsIgnoreCase("derby");
+    }
+
+    public boolean isDatabaseSQLite() {
+        return getDatabaseType().equalsIgnoreCase("sqlite");
     }
 
     public boolean isDatabaseMsAccess() {

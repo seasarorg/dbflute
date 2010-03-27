@@ -106,6 +106,9 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 return true;
             }
         }
+        if (isSQLite() && tableName.startsWith("sqlite_")) {
+            return true;
+        }
         return false;
     }
 

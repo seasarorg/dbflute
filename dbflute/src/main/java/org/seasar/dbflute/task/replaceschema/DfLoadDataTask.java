@@ -147,7 +147,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         final DfBasicProperties basicProperties = DfBuildProperties.getInstance().getBasicProperties();
         if (xlsDataHandlerImpl == null) {
             final DfXlsDataHandlerImpl xlsDataHandler;
-            if (basicProperties.isDatabaseSqlServer()) {
+            if (basicProperties.isDatabaseSQLServer()) {
                 xlsDataHandler = new DfXlsDataHandlerSqlServer();
             } else {
                 xlsDataHandler = new DfXlsDataHandlerImpl();

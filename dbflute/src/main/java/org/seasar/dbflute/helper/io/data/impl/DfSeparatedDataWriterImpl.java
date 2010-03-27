@@ -184,7 +184,7 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
 
                             // If the value is not null and the value has the own type except string,
                             // It registers the value to statement by the type.
-                            if (processNotNullNotString(tableName, columnName, obj, ps, bindCount)) {
+                            if (processNotNullNotString(tableName, columnName, obj, ps, bindCount, columnMetaInfoMap)) {
                                 bindCount++;
                                 continue;
                             }

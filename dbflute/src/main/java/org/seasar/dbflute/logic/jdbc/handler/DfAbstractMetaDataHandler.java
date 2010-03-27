@@ -204,7 +204,11 @@ public class DfAbstractMetaDataHandler {
     }
 
     protected boolean isSQLServer() {
-        return getBasicProperties().isDatabaseSqlServer();
+        return getBasicProperties().isDatabaseSQLServer();
+    }
+
+    protected boolean isSQLite() {
+        return getBasicProperties().isDatabaseSQLite();
     }
 
     protected boolean isMsAccess() {

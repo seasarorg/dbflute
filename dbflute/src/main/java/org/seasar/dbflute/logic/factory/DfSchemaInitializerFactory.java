@@ -65,7 +65,7 @@ public class DfSchemaInitializerFactory {
             initializer = createSchemaInitializerOracle();
         } else if (_basicProperties.isDatabaseDB2()) {
             initializer = createSchemaInitializerDB2();
-        } else if (_basicProperties.isDatabaseSqlServer()) {
+        } else if (_basicProperties.isDatabaseSQLServer()) {
             initializer = createSchemaInitializerSqlServer();
         } else if (_basicProperties.isDatabaseH2()) {
             initializer = createSchemaInitializerH2();

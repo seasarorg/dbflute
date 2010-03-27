@@ -66,7 +66,7 @@ public class DfDbCommentExtractorFactory {
             extractor.setDataSource(_dataSource);
             extractor.setSchema(_schema);
             return extractor;
-        } else if (_basicProperties.isDatabaseSqlServer()) {
+        } else if (_basicProperties.isDatabaseSQLServer()) {
             final DfDbCommentExtractorSqlServer extractor = new DfDbCommentExtractorSqlServer();
             extractor.setDataSource(_dataSource);
             extractor.setSchema(_schema);

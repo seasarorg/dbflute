@@ -719,7 +719,7 @@ public class Database {
     }
 
     public boolean isDatabaseSQLServer() {
-        return getBasicProperties().isDatabaseSqlServer();
+        return getBasicProperties().isDatabaseSQLServer();
     }
 
     public boolean isDatabaseDerby() {

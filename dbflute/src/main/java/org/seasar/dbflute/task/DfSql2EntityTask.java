@@ -819,7 +819,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected String filterProcedureName4PmbNameAboutVendorDependency(String procedureName) {
         // Because SQLServer returns 'Abc;1'.
-        if (getBasicProperties().isDatabaseSqlServer() && procedureName.contains(";")) {
+        if (getBasicProperties().isDatabaseSQLServer() && procedureName.contains(";")) {
             procedureName = procedureName.substring(0, procedureName.indexOf(";"));
         }
         return procedureName;
@@ -827,7 +827,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected String filterColumnNameAboutVendorDependency(String columnName) {
         // Because SQLServer returns '@returnValue'.
-        if (getBasicProperties().isDatabaseSqlServer() && columnName.startsWith("@")) {
+        if (getBasicProperties().isDatabaseSQLServer() && columnName.startsWith("@")) {
             columnName = columnName.substring("@".length());
         }
         return columnName;

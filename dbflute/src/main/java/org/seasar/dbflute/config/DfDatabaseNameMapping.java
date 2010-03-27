@@ -44,9 +44,10 @@ public class DfDatabaseNameMapping {
         tmp = tmp + "     ; mssql      = map:{generateName = SqlServer  ; defName = sqlserver}";
         tmp = tmp + "     ; h2         = map:{generateName = H2         ; defName = h2}";
         tmp = tmp + "     ; derby      = map:{generateName = Derby      ; defName = derby}";
+        tmp = tmp + "     ; sqlite     = map:{generateName = Sqlite     ; defName = sqlite}";
+        tmp = tmp + "     ; msaccess   = map:{generateName = Default    ; defName = msaccess}";
         tmp = tmp + "     ; firebird   = map:{generateName = Firebird   ; defName = firebird}";
         tmp = tmp + "     ; interbase  = map:{generateName = Interbase  ; defName = unknown}";
-        tmp = tmp + "     ; msaccess   = map:{generateName = Default    ; defName = msaccess}";
         tmp = tmp + "     ; default    = map:{generateName = Default    ; defName = unknown}";
         tmp = tmp + "}";
         _databaseNameMappingString = tmp;

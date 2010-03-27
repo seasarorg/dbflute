@@ -63,7 +63,7 @@ public class DfJDBCDriverDownloadHandler {
             dbMark = "ojdbc";
         } else if (basicProperties.isDatabaseDB2()) {
             dbMark = "db2jcc";
-        } else if (basicProperties.isDatabaseSqlServer()) {
+        } else if (basicProperties.isDatabaseSQLServer()) {
             dbMark = "sqljdbc";
         } else if (basicProperties.isDatabaseH2()) {
             dbMark = "h2";
