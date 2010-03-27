@@ -75,7 +75,7 @@ public class SelectListCBCommand<ENTITY extends Entity> extends AbstractSelectCB
     //                                                               =====================
     @Override
     public String buildSqlExecutionKey() {
-        final String entityName = _entityType.getClass().getSimpleName();
+        final String entityName = _entityType.getSimpleName();
         return super.buildSqlExecutionKey() + ":" + entityName;
     }
 

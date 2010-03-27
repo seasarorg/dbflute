@@ -82,7 +82,7 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
     public String buildSqlExecutionKey() {
         // entity row handler uses name (not simple) because of no-name inner class
         final String handlerName = _entityRowHandler.getClass().getName();
-        final String entityName = _entityType.getClass().getSimpleName();
+        final String entityName = _entityType.getSimpleName();
         return super.buildSqlExecutionKey() + ":" + handlerName + ":" + entityName;
     }
 
