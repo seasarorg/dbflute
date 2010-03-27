@@ -437,7 +437,7 @@ namespace ${glPackageBaseCommonS2Dao} {
             }
 
             protected bool isClassNameEndsWith(String className) {
-                String[] suffixArray = new String[]{"Bhv", "BehaviorReadable", "BehaviorWritable"};
+                String[] suffixArray = new String[]{"Bhv", "BhvAp", "BehaviorReadable", "BehaviorWritable"};
                 foreach (String suffix in suffixArray) { if (className.EndsWith(suffix)) { return true; } }
                 return false;
             }
