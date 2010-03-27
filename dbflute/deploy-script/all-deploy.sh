@@ -107,16 +107,19 @@ rm ./log/*.log
 . sql2entity.sh
 
 cd ../../dbflute-mysql-example/dbflute_exampledb
+. bhvap-doc
 . bhvap-generate.sh
 . bhvap-sql2entity.sh
 . bhvap-outside-sql-test.sh
 
 cd ../../dbflute-postgresql-example/dbflute_exampledb
+. bhvap-doc
 . bhvap-generate.sh
 . bhvap-sql2entity.sh
 . bhvap-outside-sql-test.sh
 
 cd ../../dbflute-tricky-example/dbflute_exampledb
+. bhvap-doc
 . bhvap-generate.sh
 . bhvap-sql2entity.sh
 . bhvap-outside-sql-test.sh

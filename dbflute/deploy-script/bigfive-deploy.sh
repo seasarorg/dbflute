@@ -44,11 +44,13 @@ rm ./log/*.log
 . outside-sql-test.sh
 
 cd ../../dbflute-mysql-example/dbflute_exampledb
+. bhvap-doc.sh
 . bhvap-generate.sh
 . bhvap-sql2entity.sh
 . bhvap-outside-sql-test.sh
 
 cd ../../dbflute-postgresql-example/dbflute_exampledb
+. bhvap-doc.sh
 . bhvap-generate.sh
 . bhvap-sql2entity.sh
 . bhvap-outside-sql-test.sh
