@@ -175,8 +175,9 @@ map:{
     #  The settings for Application Behavior.
     #  Elements of this map are as below:
     #   o isApplicationBehaviorProject: (NotRequired - Default false)
-    #    If you want to generate only application behaviors at Generate task,
-    #    set true. This property is main signal for Application Behavior.
+    #    Does the project is for application behaviors?
+    #    This property is a main signal for Application Behavior.
+    #    Other properties (for Application Behavior) work when this is true.
     #   o libraryProjectPackageBase: (NotRequired - Default same as application's one)
     #    If application package base is different from library's one,
     #    set the property a value 'library's one'.
