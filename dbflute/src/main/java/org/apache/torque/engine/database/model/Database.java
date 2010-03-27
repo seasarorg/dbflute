@@ -904,6 +904,10 @@ public class Database {
         return getProperties().getBasicProperties().getExtendedEntityPackage();
     }
 
+    public String getLibraryBehaviorPackageBase() { // for Application Behavior
+        return getBasicProperties().getLibraryBehaviorPackageBase();
+    }
+
     // -----------------------------------------------------
     //                                             Flat/Omit
     //                                             ---------

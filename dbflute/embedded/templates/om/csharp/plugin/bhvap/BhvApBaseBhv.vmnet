@@ -1,13 +1,13 @@
 #set ($myClassName = "${myExtendedBhvApClassName}")
 
 using System;
-
 using Seasar.Quill.Attrs;
+using ${glPackageExtendedBhvLib};
 
-namespace ${glPackageExtendedBhv} {
+namespace ${glPackageExtendedBhvAp} {
 
     [Implementation]
-    public partial class ${myClassName} : ${myExtendedBhvClassName} {
+    public partial class ${myClassName} : ${myExtendedBhvLibClassName} {
 
         // ===============================================================================
         //                                                                      Definition

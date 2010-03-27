@@ -1,7 +1,10 @@
 package org.seasar.dbflute.properties;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.config.DfDatabaseNameMapping;
@@ -385,12 +388,36 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                Application Behavior
     //                                                                ====================
-    public boolean isGenerateOnlyApplicationBehavior() {
-        return isProperty("isGenerateOnlyApplicationBehavior", false);
+    public static final String KEY_applicationBehaviorMap = "applicationBehaviorMap";
+    protected Map<String, String> _applicationBehaviorMap;
+
+    public Map<String, String> getApplicationBehaviorMap() {
+        if (_applicationBehaviorMap == null) {
+            final Map<String, Object> map = mapProp("torque." + KEY_applicationBehaviorMap, DEFAULT_EMPTY_MAP);
+            final Set<Entry<String, Object>> entrySet = map.entrySet();
+            _applicationBehaviorMap = new HashMap<String, String>();
+            for (Entry<String, Object> entry : entrySet) {
+                _applicationBehaviorMap.put(entry.getKey(), (String) entry.getValue());
+            }
+        }
+        return _applicationBehaviorMap;
     }
 
-    public String getApplicationBehaviorAdditionalSuffix() {
-        return "Ap";
+    public boolean isGenerateOnlyApplicationBehavior() {
+        return isProperty("isGenerateOnlyApplicationBehavior", false, getApplicationBehaviorMap());
+    }
+
+    public String getLibraryBehaviorPackageBase() {
+        final String packageBase = getPackageBase(); // as default
+        return getProperty("libraryBehaviorPackageBase", packageBase, getApplicationBehaviorMap());
+    }
+
+    public String getLibraryBehaviorProjectPrefix() {
+        return getProperty("libraryBehaviorPackageBase", "", getApplicationBehaviorMap());
+    }
+
+    public String getApplicationBehaviorAdditionalSuffix() { // It's closet!
+        return getProperty("applicationBehaviorAdditionalSuffix", "Ap", getApplicationBehaviorMap());
     }
 
     // ===================================================================================
@@ -411,6 +438,21 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                         Flat/Omit Directory Package
     //                                                         ===========================
+    public static final String KEY_outputPackageAdjustmentMap = "outputPackageAdjustmentMap";
+    protected Map<String, String> _outputPackageAdjustmentMap;
+
+    public Map<String, String> getOutputPackageAdjustmentMap() {
+        if (_outputPackageAdjustmentMap == null) {
+            final Map<String, Object> map = mapProp("torque." + KEY_outputPackageAdjustmentMap, DEFAULT_EMPTY_MAP);
+            final Set<Entry<String, Object>> entrySet = map.entrySet();
+            _outputPackageAdjustmentMap = new HashMap<String, String>();
+            for (Entry<String, Object> entry : entrySet) {
+                _outputPackageAdjustmentMap.put(entry.getKey(), (String) entry.getValue());
+            }
+        }
+        return _outputPackageAdjustmentMap;
+    }
+
     // CSharp Only
     public boolean isFlatDirectoryPackageValid() {
         final String str = getFlatDirectoryPackage();
@@ -422,9 +464,12 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
      * @return The package for flat directory. (Nullable)
      */
     public String getFlatDirectoryPackage() {
-        return getProperty("flatDirectoryPackage", null);
+        final String key = "flatDirectoryPackage";
+        final String defaultProp = getProperty(key, null); // for compatible
+        return getProperty(key, defaultProp, getOutputPackageAdjustmentMap());
     }
 
+    // CSharp Only
     public boolean isOmitDirectoryPackageValid() {
         final String str = getOmitDirectoryPackage();
         return str != null && str.trim().length() > 0 && !str.trim().equals("null");
@@ -435,7 +480,9 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
      * @return The package for omit directory. (Nullable)
      */
     public String getOmitDirectoryPackage() {
-        return getProperty("omitDirectoryPackage", null);
+        final String key = "omitDirectoryPackage";
+        final String defaultProp = getProperty(key, null); // for compatible
+        return getProperty(key, defaultProp, getOutputPackageAdjustmentMap());
     }
 
     public void checkDirectoryPackage() {

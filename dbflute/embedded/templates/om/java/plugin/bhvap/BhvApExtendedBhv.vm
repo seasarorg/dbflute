@@ -1,7 +1,7 @@
-${database.allClassCopyright}package ${glPackageExtendedBhv};
+${database.allClassCopyright}package ${glPackageExtendedBhvAp};
 #set ($myClassName = "${myExtendedBhvApClassName}")
 
-import ${glPackageBaseBhv}.${myBaseBhvApClassName};
+import ${glPackageBaseBhvAp}.${myBaseBhvApClassName};
 
 /**
  * The behavior of ${table.name} as implementation of an application.

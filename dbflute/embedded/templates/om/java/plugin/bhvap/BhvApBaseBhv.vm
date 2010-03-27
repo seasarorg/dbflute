@@ -1,7 +1,7 @@
-${database.allClassCopyright}package ${glPackageBaseBhv};
+${database.allClassCopyright}package ${glPackageBaseBhvAp};
 #set ($myClassName = "${myBaseBhvApClassName}")
 
-import ${glPackageBaseBhv}.${myBaseBhvApClassName};
+import ${glPackageExtendedBhvLib}.${myExtendedBhvLibClassName};
 
 /**
  * The base behavior of ${table.name} as implementation of an application.
@@ -12,7 +12,7 @@ import ${glPackageBaseBhv}.${myBaseBhvApClassName};
  * </p>
  * @author ${database.classAuthor}
  */
-public class ${myClassName} extends ${myBaseBhvClassName} {
+public class ${myClassName} extends ${myExtendedBhvLibClassName} {
 
     // ===================================================================================
     //                                                                          Definition

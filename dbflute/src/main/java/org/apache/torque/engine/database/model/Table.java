@@ -629,6 +629,10 @@ public class Table {
 
     public String getExtendedEntityClassName() {
         final String projectPrefix = getDatabase().getProjectPrefix();
+        return buildExtendedEntityClassName(projectPrefix);
+    }
+
+    protected String buildExtendedEntityClassName(String projectPrefix) {
         if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
             return projectPrefix + getSchemaPrefix() + getJavaName();
         } else {
@@ -668,6 +672,11 @@ public class Table {
     public String getExtendedBehaviorApClassName() {
         final String suffix = getBasicProperties().getApplicationBehaviorAdditionalSuffix();
         return getExtendedBehaviorClassName() + suffix;
+    }
+
+    public String getExtendedBehaviorLibClassName() {
+        final String projectPrefix = getBasicProperties().getLibraryBehaviorProjectPrefix();
+        return buildExtendedEntityClassName(projectPrefix) + "Bhv";
     }
 
     public String getExtendedBehaviorFullClassName() {
