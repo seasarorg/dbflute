@@ -52,6 +52,7 @@ import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingSimpleFacade;
 import org.seasar.dbflute.helper.token.file.impl.FileMakingSimpleFacadeImpl;
+import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -171,6 +172,27 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
     }
 
     protected abstract ListResultBean<? extends Entity> doReadList(ConditionBean cb);
+
+    // for selectList() and selectCursor() (on sub class)
+    protected <ENTITY extends Entity> void assertSpecifyDerivedReferrerEntityProperty(ConditionBean cb,
+            Class<ENTITY> entityType) {
+        final List<String> aliasList = cb.getSqlClause().getSpecifiedDerivingAliasList();
+        for (String alias : aliasList) { // if derived referrer does not exist, empty loop
+            final Method[] methods = entityType.getMethods();
+            final String expectedName = "set" + DfStringUtil.replace(alias, "_", "");
+            boolean exists = false;
+            for (Method method : methods) {
+                final String methodName = method.getName();
+                if (methodName.startsWith("set") && expectedName.equalsIgnoreCase(methodName)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                ConditionBeanContext.throwSpecifyDerivedReferrerEntityPropertyNotFoundException(alias, entityType);
+            }
+        }
+    }
 
     // ===================================================================================
     //                                                                           Page Read

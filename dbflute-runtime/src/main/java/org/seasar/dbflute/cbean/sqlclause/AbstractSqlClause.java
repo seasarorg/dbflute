@@ -17,6 +17,7 @@ package org.seasar.dbflute.cbean.sqlclause;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -86,7 +87,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     protected Map<String, Map<String, String>> _backupSpecifiedSelectColumnMap; // [DBFlute-0.9.5.3]
 
     /** Specified derive sub-query map. (Nullable: This is lazy-loaded) */
-    protected Map<String, String> _specifiedDeriveSubQueryMap; // [DBFlute-0.7.4]
+    protected Map<String, String> _specifiedDerivingSubQueryMap; // [DBFlute-0.7.4]
 
     // [DBFLUTE-666]: unfinished
     ///** Specified derive column type map. (Nullable: This is lazy-loaded) */
@@ -455,8 +456,8 @@ public abstract class AbstractSqlClause implements SqlClause {
         }
 
         // [DBFlute-0.7.4]
-        if (_specifiedDeriveSubQueryMap != null && !_specifiedDeriveSubQueryMap.isEmpty()) {
-            final Collection<String> deriveSubQuerySet = _specifiedDeriveSubQueryMap.values();
+        if (_specifiedDerivingSubQueryMap != null && !_specifiedDerivingSubQueryMap.isEmpty()) {
+            final Collection<String> deriveSubQuerySet = _specifiedDerivingSubQueryMap.values();
             for (String deriveSubQuery : deriveSubQuerySet) {
                 sb.append(ln()).append("     ");
                 sb.append(", ").append(deriveSubQuery);
@@ -2101,34 +2102,28 @@ public abstract class AbstractSqlClause implements SqlClause {
         _specifiedSelectColumnMap.put(tableAliasName, elementMap);
     }
 
-    public void specifyDeriveSubQuery(String aliasName, String deriveSubQuery) {
-        if (_specifiedDeriveSubQueryMap == null) {
-            _specifiedDeriveSubQueryMap = new LinkedHashMap<String, String>();
+    public void specifyDerivingSubQuery(String aliasName, String deriveSubQuery) {
+        if (_specifiedDerivingSubQueryMap == null) {
+            _specifiedDerivingSubQueryMap = new LinkedHashMap<String, String>();
         }
-        _specifiedDeriveSubQueryMap.put(aliasName, deriveSubQuery);
+        _specifiedDerivingSubQueryMap.put(aliasName, deriveSubQuery);
     }
 
-    public boolean hasSpecifiedDeriveSubQuery(String aliasName) {
-        if (_specifiedDeriveSubQueryMap == null) {
+    public boolean hasSpecifiedDerivingSubQuery(String aliasName) {
+        if (_specifiedDerivingSubQueryMap == null) {
             return false;
         }
-        return _specifiedDeriveSubQueryMap.containsKey(aliasName);
+        return _specifiedDerivingSubQueryMap.containsKey(aliasName);
     }
 
-    // [DBFLUTE-666]: unfinished
-    //public void registerDerivedPropertyType(String aliasName, Class<?> propertyType) {
-    //    if (_specifiedDerivedColumnTypeMap == null) {
-    //        _specifiedDerivedColumnTypeMap = StringKeyMap.createAsFlexible();
-    //    }
-    //    _specifiedDerivedColumnTypeMap.put(aliasName, propertyType);
-    //}
-    //
-    //public Class<?> getDerivedPropertyType(String aliasName) {
-    //    if (_specifiedDerivedColumnTypeMap == null) {
-    //        return null;
-    //    }
-    //    return _specifiedDerivedColumnTypeMap.get(aliasName);
-    //}
+    public List<String> getSpecifiedDerivingAliasList() {
+        if (_specifiedDerivingSubQueryMap == null) {
+            @SuppressWarnings("unchecked")
+            final List<String> emptyList = Collections.EMPTY_LIST;
+            return emptyList;
+        }
+        return new ArrayList<String>(_specifiedDerivingSubQueryMap.keySet());
+    }
 
     public String getSpecifiedColumnNameAsOne() {
         if (_specifiedSelectColumnMap != null && _specifiedSelectColumnMap.size() == 1) {

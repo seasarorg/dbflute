@@ -383,7 +383,7 @@ public class ConditionBeanContext {
     public static void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "A property for derived-referrer was Not Found in the entity!" + ln();
+        msg = msg + "A property for derived-referrer was NOT FOUND in the entity!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "You should implement a property(setter and getter) in the entity." + ln();

@@ -1,14 +1,10 @@
 package org.seasar.dbflute.cbean.chelper;
 
-import java.lang.reflect.Method;
-
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.ConditionQuery;
 import org.seasar.dbflute.cbean.SubQuery;
-import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
-import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * The function of specify derived-referrer.
@@ -17,11 +13,18 @@ import org.seasar.dbflute.util.DfStringUtil;
  * @param <LOCAL_CQ> The type of local condition-query.
  */
 public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends ConditionQuery> {
+
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected ConditionBean _baseCB;
     protected LOCAL_CQ _localCQ;
     protected HpSDRSetupper<REFERRER_CB, LOCAL_CQ> _querySetupper;
     protected DBMetaProvider _dbmetaProvider;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public HpSDRFunction(ConditionBean baseCB, LOCAL_CQ localCQ, HpSDRSetupper<REFERRER_CB, LOCAL_CQ> querySetupper,
             DBMetaProvider dbmetaProvider) {
         _baseCB = baseCB;
@@ -30,6 +33,9 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _dbmetaProvider = dbmetaProvider;
     }
 
+    // ===================================================================================
+    //                                                                            Function
+    //                                                                            ========
     /**
      * Set up the sub query of referrer for the scalar 'count'.
      * <pre>
@@ -138,38 +144,42 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
         _querySetupper.setup("avg", subQuery, _localCQ, aliasName.trim());
     }
 
+    // ===================================================================================
+    //                                                                       Assist Helper
+    //                                                                       =============
     protected void assertAliasName(String aliasName) {
         if (aliasName == null || aliasName.trim().length() == 0) {
             throwSpecifyDerivedReferrerInvalidAliasNameException();
         }
-        String tableDbName = _baseCB.getTableDbName();
-        DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
-        Method[] methods = dbmeta.getEntityType().getMethods();
-        String targetMethodName = "set" + replaceString(aliasName, "_", "").toLowerCase();
-        boolean existsSetterMethod = false;
-        for (Method method : methods) {
-            if (!method.getName().startsWith("set")) {
-                continue;
-            }
-            if (targetMethodName.equals(method.getName().toLowerCase())) {
-                existsSetterMethod = true;
-                break;
-            }
-        }
-        if (!existsSetterMethod) {
-            throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
-        }
+        // *this check was moved to runtime (when creating a behavior command)
+        //String tableDbName = _baseCB.getTableDbName();
+        //DBMeta dbmeta = _dbmetaProvider.provideDBMetaChecked(tableDbName);
+        //Method[] methods = dbmeta.getEntityType().getMethods();
+        //String targetMethodName = "set" + replaceString(aliasName, "_", "").toLowerCase();
+        //boolean existsSetterMethod = false;
+        //for (Method method : methods) {
+        //    if (!method.getName().startsWith("set")) {
+        //        continue;
+        //    }
+        //    if (targetMethodName.equals(method.getName().toLowerCase())) {
+        //        existsSetterMethod = true;
+        //        break;
+        //    }
+        //}
+        //if (!existsSetterMethod) {
+        //    throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, dbmeta.getEntityType());
+        //}
     }
 
     protected void throwSpecifyDerivedReferrerInvalidAliasNameException() {
         ConditionBeanContext.throwSpecifyDerivedReferrerInvalidAliasNameException(_localCQ);
     }
 
-    protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
-        ConditionBeanContext.throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, entityType);
-    }
+    //protected void throwSpecifyDerivedReferrerEntityPropertyNotFoundException(String aliasName, Class<?> entityType) {
+    //    ConditionBeanContext.throwSpecifyDerivedReferrerEntityPropertyNotFoundException(aliasName, entityType);
+    //}
 
-    protected String replaceString(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
-    }
+    //protected String replaceString(String text, String fromText, String toText) {
+    //    return DfStringUtil.replace(text, fromText, toText);
+    //}
 }

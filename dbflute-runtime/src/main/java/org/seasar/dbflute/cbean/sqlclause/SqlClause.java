@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean.sqlclause;
 
+import java.util.List;
 import java.util.Map;
 
 import org.seasar.dbflute.cbean.ckey.ConditionKey;
@@ -507,13 +508,11 @@ public interface SqlClause {
     //                                                                       =============
     void specifySelectColumn(String tableAliasName, String columnName, String tableDbName);
 
-    void specifyDeriveSubQuery(String aliasName, String deriveSubQuery);
+    void specifyDerivingSubQuery(String aliasName, String deriveSubQuery);
 
-    boolean hasSpecifiedDeriveSubQuery(String aliasName);
+    boolean hasSpecifiedDerivingSubQuery(String aliasName);
 
-    // [DBFLUTE-666]: unfinished
-    //void registerDerivedPropertyType(String aliasName, Class<?> propertyType);
-    //Class<?> getDerivedPropertyType(String aliasName);
+    List<String> getSpecifiedDerivingAliasList();
 
     /**
      * Get the name of only one specified column.

@@ -759,20 +759,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
         String endIndent = "       ";
         String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") as " + aliasName + endMark;
-        // [DBFLUTE-666]: unfinished
-        //registerSpecifyDerivedReferrerPropertyType(function, subQuery, aliasName);
-        getSqlClause().specifyDeriveSubQuery(aliasName, clause);
+        getSqlClause().specifyDerivingSubQuery(aliasName, clause);
     }
-
-    // [DBFLUTE-666]: unfinished
-    //protected void registerSpecifyDerivedReferrerPropertyType(String function, ConditionQuery subQuery, String aliasName) {
-    //    String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
-    //    String specifiedColumnTableDbName = subQuery.getSqlClause().getSpecifiedColumnTableDbNameAsOne();
-    //    DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(specifiedColumnTableDbName);
-    //    ColumnInfo columnInfo = dbmeta.findColumnInfo(specifiedColumnName);
-    //    Class<?> propertyType = columnInfo.getPropertyType();
-    //    getSqlClause().registerDerivedPropertyType(aliasName, propertyType);
-    //}
 
     protected String getSpecifyDerivedReferrerRealColumnName(String columnName) {
         return getRealColumnName(columnName);
@@ -1281,14 +1269,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void registerSpecifiedDerivedOrderBy_Asc(String aliasName) {
-        if (!getSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
+        if (!getSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
         }
         getSqlClause().registerOrderBy(aliasName, null, true);
     }
 
     protected void registerSpecifiedDerivedOrderBy_Desc(String aliasName) {
-        if (!getSqlClause().hasSpecifiedDeriveSubQuery(aliasName)) {
+        if (!getSqlClause().hasSpecifiedDerivingSubQuery(aliasName)) {
             throwSpecifiedDerivedOrderByAliasNameNotFoundException(aliasName);
         }
         getSqlClause().registerOrderBy(aliasName, null, false);
