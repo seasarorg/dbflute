@@ -16,10 +16,10 @@
 package org.seasar.dbflute.cbean.sqlclause;
 
 /**
- * SqlClause for H2.
+ * SqlClause for SQLite.
  * @author jflute
  */
-public class SqlClauseH2 extends AbstractSqlClause {
+public class SqlClauseSqlite extends AbstractSqlClause {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -37,7 +37,7 @@ public class SqlClauseH2 extends AbstractSqlClause {
      * Constructor.
      * @param tableDbName The DB name of table. (NotNull)
      **/
-    public SqlClauseH2(String tableDbName) {
+    public SqlClauseSqlite(String tableDbName) {
         super(tableDbName);
     }
 

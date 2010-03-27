@@ -28,6 +28,7 @@ import org.seasar.dbflute.dbway.WayOfMySQL;
 import org.seasar.dbflute.dbway.WayOfOracle;
 import org.seasar.dbflute.dbway.WayOfPostgreSQL;
 import org.seasar.dbflute.dbway.WayOfSQLServer;
+import org.seasar.dbflute.dbway.WayOfSQLite;
 import org.seasar.dbflute.dbway.WayOfUnknown;
 
 /**
@@ -47,6 +48,7 @@ public enum DBDef {
     , FireBird("firebird", null, new WayOfFirebird())
     , H2("h2", null, new WayOfH2())
     , Derby("derby", null, new WayOfDerby())
+    , SQLite("sqlite", null, new WayOfSQLite())
     , MSAccess("msaccess", null, new WayOfMSAccess())
     , Unknown("unknown", null, new WayOfUnknown());
 

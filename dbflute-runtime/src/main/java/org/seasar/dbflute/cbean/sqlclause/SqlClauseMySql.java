@@ -78,6 +78,9 @@ public class SqlClauseMySql extends AbstractSqlClause {
         _fetchScopeSqlSuffix = "";
     }
 
+    // ===================================================================================
+    //                                                                       Lock Override
+    //                                                                       =============
     /**
      * {@inheritDoc}
      */
@@ -86,6 +89,9 @@ public class SqlClauseMySql extends AbstractSqlClause {
         return this;
     }
 
+    // ===================================================================================
+    //                                                                       Hint Override
+    //                                                                       =============
     /**
      * {@inheritDoc}
      */
