@@ -80,7 +80,7 @@ public class DfOldClassHandler {
     public void deleteOldTableClass_for_BaseBehavior() {
         final NotDeleteTCNSetupper setupper = new NotDeleteTCNSetupper() {
             public String setup(Table table) {
-                if (_basicProperties.isGenerateOnlyApplicationBehavior()) {
+                if (_basicProperties.isApplicationBehaviorProject()) {
                     return table.getBaseBehaviorApClassName();
                 } else {
                     return table.getBaseBehaviorClassName();
@@ -90,7 +90,7 @@ public class DfOldClassHandler {
         final String packagePath = getBaseBehaviorPackage();
         final String classPrefix = getProjectPrefix() + getBasePrefix();
         final String classSuffix;
-        if (_basicProperties.isGenerateOnlyApplicationBehavior()) {
+        if (_basicProperties.isApplicationBehaviorProject()) {
             final String additionalSuffix = _basicProperties.getApplicationBehaviorAdditionalSuffix();
             classSuffix = "Bhv" + additionalSuffix;
         } else {

@@ -131,7 +131,7 @@ public class DfBehaviorQueryPathSetupper {
             final DfBasicProperties basicProperties = getBasicProperties();
             final String bhvSuffix;
             final String projectPrefix;
-            if (isGenerateOnlyApplicationBehavior()) {
+            if (isApplicationBehaviorProject()) {
                 bhvSuffix = "Bhv" + getApplicationBehaviorAdditionalSuffix();
                 projectPrefix = getLibraryProjectPrefix();
             } else { // main is here
@@ -305,7 +305,7 @@ public class DfBehaviorQueryPathSetupper {
             // relation point between SQL file and BsBhv
             File bsbhvFile = bsbhvFileMap.get(behaviorName);
             if (bsbhvFile == null) {
-                if (isGenerateOnlyApplicationBehavior()) {
+                if (isApplicationBehaviorProject()) {
                     final String projectPrefixLib = getLibraryProjectPrefix();
                     String retryName = behaviorName;
                     if (retryName.startsWith(projectPrefixLib)) { // ex) LbFooBhv --> FooBhv
@@ -340,7 +340,7 @@ public class DfBehaviorQueryPathSetupper {
         final FileFilter filefilter = new FileFilter() {
             public boolean accept(File file) {
                 final String path = file.getPath();
-                if (isGenerateOnlyApplicationBehavior()) {
+                if (isApplicationBehaviorProject()) {
                     final String additionalSuffix = getApplicationBehaviorAdditionalSuffix();
                     final String bhvSuffix = "Bhv" + additionalSuffix;
                     return path.endsWith(bhvSuffix + "." + classFileExtension);
@@ -597,8 +597,8 @@ public class DfBehaviorQueryPathSetupper {
         return getProperties().getLittleAdjustmentProperties();
     }
 
-    protected boolean isGenerateOnlyApplicationBehavior() {
-        return getBasicProperties().isGenerateOnlyApplicationBehavior();
+    protected boolean isApplicationBehaviorProject() {
+        return getBasicProperties().isApplicationBehaviorProject();
     }
 
     protected String getLibraryProjectPrefix() {

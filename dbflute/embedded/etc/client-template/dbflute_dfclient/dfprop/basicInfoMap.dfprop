@@ -174,22 +174,16 @@ map:{
     # o applicationBehaviorMap: (NotRequired - Default map:{})
     #  The settings for Application Behavior.
     #  Elements of this map are as below:
-    #   o isGenerateOnlyApplicationBehavior: (NotRequired - Default false)
+    #   o isApplicationBehaviorProject: (NotRequired - Default false)
     #    If you want to generate only application behaviors at Generate task,
     #    set true. This property is main signal for Application Behavior.
-    #    Other properties (for Application Behavior) work when this property is true. 
     #   o libraryProjectPackageBase: (NotRequired - Default same as application's one)
     #    If application package base is different from library's one,
     #    set the property a value 'library's one'.
-    #   o libraryProjectPrefix: (NotRequired - Default '' (means library has no prefix))
-    #    If application project prefix is different from library's one,
-    #    set the property a value 'library's one'.
-    #    If a prefix is valid and both have a same prefix, you need to set this.
     #
     #; applicationBehaviorMap = map:{
-    #    ; isGenerateOnlyApplicationBehavior = false
+    #    ; isApplicationBehaviorProject = false
     #    ; libraryProjectPackageBase = 
-    #    ; libraryProjectPrefix = 
     #}
     # - - - - - - - - - -/
 

@@ -904,8 +904,8 @@ public class Database {
         return getProperties().getBasicProperties().getExtendedEntityPackage();
     }
 
-    public String getLibraryAllcommonPackage() { // for Application Behavior
-        return getBasicProperties().getLibraryAllcommonPackage();
+    public String getLibraryAllCommonPackage() { // for Application Behavior
+        return getBasicProperties().getLibraryAllCommonPackage();
     }
 
     public String getLibraryBehaviorPackage() { // for Application Behavior
@@ -914,6 +914,10 @@ public class Database {
 
     public String getLibraryProjectPrefix() { // for Application Behavior
         return getBasicProperties().getLibraryProjectPrefix();
+    }
+
+    public String getApplicationAllCommonPackage() { // for Application Behavior
+        return getBasicProperties().getApplicationAllCommonPackage();
     }
 
     // -----------------------------------------------------

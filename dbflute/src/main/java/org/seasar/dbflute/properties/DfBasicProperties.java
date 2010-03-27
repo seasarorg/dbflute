@@ -265,7 +265,13 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public String getBaseCommonPackage() {
-        return filterBase(getProperty("baseCommonPackage", getPackageInfo().getBaseCommonPackage()));
+        final String key = "baseCommonPackage";
+        final String baseCommonPackage = getProperty(key, getPackageInfo().getBaseCommonPackage());
+        if (isApplicationBehaviorProject()) {
+            return getLibraryAllCommonPackage(); // basically for Sql2Entity task at BhvAp mode
+        } else {
+            return filterBase(baseCommonPackage);
+        }
     }
 
     public String getBaseBehaviorPackage() {
@@ -412,8 +418,8 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return _applicationBehaviorMap;
     }
 
-    public boolean isGenerateOnlyApplicationBehavior() {
-        return isProperty("isGenerateOnlyApplicationBehavior", false, getApplicationBehaviorMap());
+    public boolean isApplicationBehaviorProject() {
+        return isProperty("isApplicationBehaviorProject", false, getApplicationBehaviorMap());
     }
 
     public String getLibraryProjectPackageBase() {
@@ -422,7 +428,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getProperty("libraryProjectPackageBase", defaultBase, map);
     }
 
-    public String getLibraryAllcommonPackage() {
+    public String getLibraryAllCommonPackage() {
         final String packageBase = getLibraryProjectPackageBase();
         final String allcommonSimplePackage = getPackageInfo().getBaseCommonPackage();
         return filterBase(allcommonSimplePackage, packageBase);
@@ -434,9 +440,20 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return filterBase(exbhvSimplePackage, packageBase);
     }
 
+    public String getApplicationAllCommonPackage() {
+        return filterBase(getPackageInfo().getBaseCommonPackage());
+    }
+
     public String getLibraryProjectPrefix() {
-        final Map<String, String> map = getApplicationBehaviorMap();
-        return getProperty("libraryProjectPrefix", "", map);
+        return getProjectPrefix();
+        // *conldn't achieve
+        //final Map<String, String> map = getApplicationBehaviorMap();
+        //return getProperty("libraryProjectPrefix", "", map);
+
+        // #   o libraryProjectPrefix: (NotRequired - Default '' (means library has no prefix))
+        // #    If application project prefix is different from library's one,
+        // #    set the property a value 'library's one'.
+        // #    If a prefix is valid and both have a same prefix, you need to set this.
     }
 
     public String getApplicationBehaviorAdditionalSuffix() { // It's closet!
