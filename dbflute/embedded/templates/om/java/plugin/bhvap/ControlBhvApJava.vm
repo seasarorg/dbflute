@@ -50,26 +50,8 @@ $database.checkProperties()
 #set ($glCustomizerDiconFileName = "${database.DBFluteCustomizerDiconFileName}")
 #set ($glJ2eeDiconResourceName = "${database.j2eeDiconResourceName}")
 #set ($glDBFluteBeansFileName = "${database.DBFluteBeansFileName}")
-#set ($glDBFluteModule = "${glProjectPrefix}DBFluteModule")
-
-## ===================================================================================
-##                                                                          Class Name
-##                                                                          ==========
-## -----------------------------------------------------
-##                                               Regular
-##                                               -------
-## [AllCommon]
-#set ($glAccessContext = "${glProjectPrefix}AccessContext")
-#set ($glCDef = "${glProjectPrefix}CDef")
-#set ($glDBCurrent = "${glProjectPrefix}DBCurrent")
-#set ($glDBFluteConfig = "${glProjectPrefix}DBFluteConfig")
-#set ($glDBFluteInitializer = "${glProjectPrefix}DBFluteInitializer")
-#set ($glEntityDefinedCommonColumn = "${glProjectPrefix}EntityDefinedCommonColumn")
-#set ($glImplementedBehaviorSelector = "${glProjectPrefix}ImplementedBehaviorSelector")
-#set ($glImplementedCommonColumnAutoSetupper = "${glProjectPrefix}ImplementedCommonColumnAutoSetupper")
-#set ($glImplementedInvokerAssistant = "${glProjectPrefix}ImplementedInvokerAssistant")
-#set ($glImplementedSqlClauseCreator = "${glProjectPrefix}ImplementedSqlClauseCreator")
-#set ($glDBMetaInstanceHandler = "${glProjectPrefix}DBMetaInstanceHandler")
+#set ($glDBFluteModuleAp = "${database.DBFluteModuleBhvApClassName}")
+#set ($glDBFluteModuleLib = "${database.libraryProjectPrefix}DBFluteModule")
 
 ## ===================================================================================
 ##                                                                             Package
@@ -77,9 +59,10 @@ $database.checkProperties()
 ## -----------------------------------------------------
 ##                                               Regular
 ##                                               -------
-#set ($glPackageBaseCommon = "${database.baseCommonPackage}")
+#set ($glPackageBaseCommonAp = "${database.baseCommonPackage}")
 #set ($glPackageBaseBhvAp = "${database.baseBehaviorPackage}")
 #set ($glPackageExtendedBhvAp = "${database.extendedBehaviorPackage}")
+#set ($glPackageBaseCommonLib = "${database.libraryAllcommonPackage}")
 #set ($glPackageExtendedBhvLib = "${database.libraryBehaviorPackage}")
 
 ## -----------------------------------------------------
@@ -130,11 +113,10 @@ $database.info("public void parseContainerConfig() {")
   #end
 #end
 #if ($database.isTargetContainerGuice())
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommon}))
+  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonAp}))
   $database.makeDirectory($path)
 
-  #set ($path = "${database.getPackageAsPath(${glPackageBaseCommon})}${glDBFluteModule}.${glClassFileExtension}" )
-  #set ($path = $database.filterDBFluteModuleBhvAp($path) )
+  #set ($path = "${database.getPackageAsPath(${glPackageBaseCommonAp})}${glDBFluteModuleAp}.${glClassFileExtension}" )
   $database.info("    ${path}")
   $generator.parse("om/${glResourceDirectory}/plugin/bhvap/container/guice/BhvApGuiceDBFluteModule.${glTemplateFileExtension}", $path, "", "")
 #end

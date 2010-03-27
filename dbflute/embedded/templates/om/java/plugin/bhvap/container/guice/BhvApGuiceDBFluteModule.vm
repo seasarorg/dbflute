@@ -1,18 +1,19 @@
-${database.allClassCopyright}package ${glPackageBaseCommon};
+${database.allClassCopyright}package ${glPackageBaseCommonAp};
 
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.BehaviorSelector;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
-import ${glPackageExtendedBhv}.*;
+import ${glPackageBaseCommonLib}.${glDBFluteModuleLib};
+import ${glPackageExtendedBhvAp}.*;
 
 /**
  * @author ${database.classAuthor}
  */
-public class ${glDBFluteModule}BhvAp extends ${glDBFluteModule} {
+public class ${glDBFluteModuleAp} extends ${glDBFluteModuleLib} {
 
-    public ${glDBFluteModule}BhvAp(DataSource dataSource) {
+    public ${glDBFluteModuleAp}(DataSource dataSource) {
         super(dataSource);
     }
 

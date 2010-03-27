@@ -40,7 +40,6 @@ $database.checkProperties()
 ## ===================================================================================
 ##                                                                             Package
 ##                                                                             =======
-#set ($glPackageBaseCommon = "${database.baseCommonPackage}")
 #set ($glPackageBaseBhvAp = "${database.baseBehaviorPackage}")
 #set ($glPackageExtendedBhvAp = "${database.extendedBehaviorPackage}")
 #set ($glPackageExtendedBhvLib = "${database.libraryBehaviorPackage}")

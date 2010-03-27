@@ -904,8 +904,16 @@ public class Database {
         return getProperties().getBasicProperties().getExtendedEntityPackage();
     }
 
+    public String getLibraryAllcommonPackage() { // for Application Behavior
+        return getBasicProperties().getLibraryAllcommonPackage();
+    }
+
     public String getLibraryBehaviorPackage() { // for Application Behavior
         return getBasicProperties().getLibraryBehaviorPackage();
+    }
+
+    public String getLibraryProjectPrefix() { // for Application Behavior
+        return getBasicProperties().getLibraryProjectPrefix();
     }
 
     // -----------------------------------------------------
@@ -1068,6 +1076,10 @@ public class Database {
     // -----------------------------------------------------
     //                                                 Guice
     //                                                 -----
+    public String getDBFluteModuleBhvApClassName() {
+        return getProjectPrefix() + "DBFluteModuleBhvAp";
+    }
+
     public String filterDBFluteModuleBhvAp(String filePath) { // as utility for application behavior
         if (filePath.endsWith(".java")) {
             filePath = DfStringUtil.replace(filePath, ".java", "BhvAp.java");

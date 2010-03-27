@@ -675,7 +675,7 @@ public class Table {
     }
 
     public String getExtendedBehaviorLibClassName() {
-        final String projectPrefix = getBasicProperties().getLibraryBehaviorProjectPrefix();
+        final String projectPrefix = getBasicProperties().getLibraryProjectPrefix();
         return buildExtendedEntityClassName(projectPrefix) + "Bhv";
     }
 

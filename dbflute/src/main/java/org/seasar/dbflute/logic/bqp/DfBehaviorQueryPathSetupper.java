@@ -128,20 +128,21 @@ public class DfBehaviorQueryPathSetupper {
             if (extIndex >= 0) {
                 tableKeyName = tableKeyName.substring(0, extIndex);
             }
-            if (tableKeyName.endsWith("Bhv")) {
-                tableKeyName = tableKeyName.substring(0, tableKeyName.length() - "Bhv".length());
-            }
-            if (isGenerateOnlyApplicationBehavior()) {
-                final String additionalSuffix = getApplicationBehaviorAdditionalSuffix();
-                final String bhvSuffix = "Bhv" + additionalSuffix;
-                if (tableKeyName.endsWith(bhvSuffix)) {
-                    tableKeyName = tableKeyName.substring(0, tableKeyName.length() - bhvSuffix.length());
-                }
-            }
             final DfBasicProperties basicProperties = getBasicProperties();
-            final String projectPrefix = basicProperties.getProjectPrefix();
+            final String bhvSuffix;
+            final String projectPrefix;
+            if (isGenerateOnlyApplicationBehavior()) {
+                bhvSuffix = "Bhv" + getApplicationBehaviorAdditionalSuffix();
+                projectPrefix = getLibraryProjectPrefix();
+            } else { // main is here
+                bhvSuffix = "Bhv";
+                projectPrefix = basicProperties.getProjectPrefix();
+            }
+            if (tableKeyName.endsWith(bhvSuffix)) {
+                tableKeyName = tableKeyName.substring(0, tableKeyName.length() - bhvSuffix.length());
+            }
             if (DfStringUtil.isNotNullAndNotTrimmedEmpty(projectPrefix) && tableKeyName.startsWith(projectPrefix)) {
-                tableKeyName = tableKeyName.substring(projectPrefix.length(), tableKeyName.length());
+                tableKeyName = tableKeyName.substring(projectPrefix.length());
             }
             final String basePrefix = basicProperties.getBasePrefix();
             if (DfStringUtil.isNotNullAndNotTrimmedEmpty(basePrefix) && tableKeyName.startsWith(basePrefix)) {
@@ -282,17 +283,60 @@ public class DfBehaviorQueryPathSetupper {
             }
             outputDir = tmp;
         }
-        final String classFileExtension = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo()
-                .getClassFileExtension();
-        final String projectPrefix = getBasicProperties().getProjectPrefix();
-        final String basePrefix = getBasicProperties().getBasePrefix();
         final String bsbhvPackage = getBasicProperties().getBaseBehaviorPackage();
-
         final DfPackagePathHandler packagePathHandler = new DfPackagePathHandler(getBasicProperties());
         packagePathHandler.setFileSeparatorSlash(true);
         final String bsbhvPathBase = outputDir + "/" + packagePathHandler.getPackageAsPath(bsbhvPackage);
 
         final File bsbhvDir = new File(bsbhvPathBase);
+        if (!bsbhvDir.exists()) {
+            _log.warn("The base behavior directory was not found: bsbhvDir=" + bsbhvDir);
+            return new HashMap<File, Map<String, Map<String, String>>>();
+        }
+        final Map<String, File> bsbhvFileMap = createBsBhvFileMap(bsbhvDir);
+
+        final Map<File, Map<String, Map<String, String>>> reflectResourceMap = new HashMap<File, Map<String, Map<String, String>>>();
+        final Set<Entry<String, Map<String, String>>> entrySet = behaviorQueryPathMap.entrySet();
+        for (Entry<String, Map<String, String>> entry : entrySet) {
+            final Map<String, String> behaviorQueryElementMap = entry.getValue();
+            final String behaviorName = behaviorQueryElementMap.get("behaviorName"); // on SQL file
+            final String behaviorQueryPath = behaviorQueryElementMap.get("behaviorQueryPath");
+
+            // relation point between SQL file and BsBhv
+            File bsbhvFile = bsbhvFileMap.get(behaviorName);
+            if (bsbhvFile == null) {
+                if (isGenerateOnlyApplicationBehavior()) {
+                    final String projectPrefixLib = getLibraryProjectPrefix();
+                    String retryName = behaviorName;
+                    if (retryName.startsWith(projectPrefixLib)) { // ex) LbFooBhv --> FooBhv
+                        retryName.substring(projectPrefixLib.length());
+                    }
+                    final String projectPrefixAp = getBasicProperties().getProjectPrefix();
+                    retryName = projectPrefixAp + retryName; // ex) FooBhv --> BpFooBhv
+                    final String additionalSuffix = getApplicationBehaviorAdditionalSuffix();
+                    retryName = retryName + additionalSuffix; // ex) BpFooBhv --> BpFooBhvAp
+                    bsbhvFile = bsbhvFileMap.get(retryName);
+                }
+                if (bsbhvFile == null) {
+                    throwBehaviorNotFoundException(bsbhvFileMap, behaviorQueryElementMap, bsbhvPathBase);
+                }
+            }
+
+            Map<String, Map<String, String>> resourceElementMap = reflectResourceMap.get(bsbhvFile);
+            if (resourceElementMap == null) {
+                resourceElementMap = new LinkedHashMap<String, Map<String, String>>();
+                reflectResourceMap.put(bsbhvFile, resourceElementMap);
+            }
+            if (!resourceElementMap.containsKey(behaviorQueryPath)) {
+                resourceElementMap.put(behaviorQueryPath, behaviorQueryElementMap);
+            }
+        }
+        return reflectResourceMap;
+    }
+
+    protected Map<String, File> createBsBhvFileMap(File bsbhvDir) {
+        final String classFileExtension = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo()
+                .getClassFileExtension();
         final FileFilter filefilter = new FileFilter() {
             public boolean accept(File file) {
                 final String path = file.getPath();
@@ -305,11 +349,6 @@ public class DfBehaviorQueryPathSetupper {
                 }
             }
         };
-        if (!bsbhvDir.exists()) {
-            _log.warn("The base behavior directory was not found: bsbhvDir=" + bsbhvDir);
-            return new HashMap<File, Map<String, Map<String, String>>>();
-        }
-
         final List<File> bsbhvFileList = Arrays.asList(bsbhvDir.listFiles(filefilter));
         final Map<String, File> bsbhvFileMap = new HashMap<String, File>();
         for (File bsbhvFile : bsbhvFileList) {
@@ -321,36 +360,10 @@ public class DfBehaviorQueryPathSetupper {
             } else {
                 bsbhvSimpleName = path;
             }
-            final String behaviorName = removeBasePrefix(bsbhvSimpleName, projectPrefix, basePrefix);
+            final String behaviorName = removeBasePrefix(bsbhvSimpleName);
             bsbhvFileMap.put(behaviorName, bsbhvFile);
         }
-
-        final Map<File, Map<String, Map<String, String>>> reflectResourceMap = new HashMap<File, Map<String, Map<String, String>>>();
-        final Set<Entry<String, Map<String, String>>> entrySet = behaviorQueryPathMap.entrySet();
-        for (Entry<String, Map<String, String>> entry : entrySet) {
-            final Map<String, String> behaviorQueryElementMap = entry.getValue();
-            final String behaviorName = behaviorQueryElementMap.get("behaviorName");
-            final String behaviorQueryPath = behaviorQueryElementMap.get("behaviorQueryPath");
-            File bsbhvFile = bsbhvFileMap.get(behaviorName);
-            if (bsbhvFile == null) {
-                if (isGenerateOnlyApplicationBehavior() && behaviorName.endsWith("Bhv")) { // retry as application behavior
-                    final String additionalSuffix = getApplicationBehaviorAdditionalSuffix();
-                    bsbhvFile = bsbhvFileMap.get(behaviorName + additionalSuffix);
-                }
-                if (bsbhvFile == null) {
-                    throwBehaviorNotFoundException(bsbhvFileMap, behaviorQueryElementMap, bsbhvPathBase);
-                }
-            }
-            Map<String, Map<String, String>> resourceElementMap = reflectResourceMap.get(bsbhvFile);
-            if (resourceElementMap == null) {
-                resourceElementMap = new LinkedHashMap<String, Map<String, String>>();
-                reflectResourceMap.put(bsbhvFile, resourceElementMap);
-            }
-            if (!resourceElementMap.containsKey(behaviorQueryPath)) {
-                resourceElementMap.put(behaviorQueryPath, behaviorQueryElementMap);
-            }
-        }
-        return reflectResourceMap;
+        return bsbhvFileMap;
     }
 
     protected void throwBehaviorNotFoundException(Map<String, File> bsbhvFileMap,
@@ -525,19 +538,21 @@ public class DfBehaviorQueryPathSetupper {
         }
     }
 
-    protected String removeBasePrefix(String simpleClassName, String projectPrefix, String basePrefix) {
+    protected String removeBasePrefix(String bsbhvSimpleName) {
+        final String projectPrefix = getBasicProperties().getProjectPrefix();
+        final String basePrefix = getBasicProperties().getBasePrefix();
         final String prefix = projectPrefix + basePrefix;
-        if (!simpleClassName.startsWith(prefix)) {
-            return simpleClassName;
+        if (!bsbhvSimpleName.startsWith(prefix)) {
+            return bsbhvSimpleName;
         }
         final int prefixLength = prefix.length();
-        if (!Character.isUpperCase(simpleClassName.substring(prefixLength).charAt(0))) {
-            return simpleClassName;
+        if (!Character.isUpperCase(bsbhvSimpleName.substring(prefixLength).charAt(0))) {
+            return bsbhvSimpleName;
         }
-        if (simpleClassName.length() <= prefixLength) {
-            return simpleClassName;
+        if (bsbhvSimpleName.length() <= prefixLength) {
+            return bsbhvSimpleName;
         }
-        return projectPrefix + simpleClassName.substring(prefixLength);
+        return projectPrefix + bsbhvSimpleName.substring(prefixLength);
     }
 
     // ===================================================================================
@@ -584,6 +599,10 @@ public class DfBehaviorQueryPathSetupper {
 
     protected boolean isGenerateOnlyApplicationBehavior() {
         return getBasicProperties().isGenerateOnlyApplicationBehavior();
+    }
+
+    protected String getLibraryProjectPrefix() {
+        return getBasicProperties().getLibraryProjectPrefix();
     }
 
     protected String getApplicationBehaviorAdditionalSuffix() {

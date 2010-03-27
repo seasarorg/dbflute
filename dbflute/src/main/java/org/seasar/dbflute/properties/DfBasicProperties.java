@@ -416,13 +416,27 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return isProperty("isGenerateOnlyApplicationBehavior", false, getApplicationBehaviorMap());
     }
 
-    public String getLibraryBehaviorPackage() {
-        final String extendedBehaviorPackage = getExtendedBehaviorPackage(); // as default
-        return getProperty("libraryBehaviorPackage", extendedBehaviorPackage, getApplicationBehaviorMap());
+    public String getLibraryProjectPackageBase() {
+        final String defaultBase = getPackageBase();
+        final Map<String, String> map = getApplicationBehaviorMap();
+        return getProperty("libraryProjectPackageBase", defaultBase, map);
     }
 
-    public String getLibraryBehaviorProjectPrefix() {
-        return getProperty("libraryBehaviorProjectPrefix", "", getApplicationBehaviorMap());
+    public String getLibraryAllcommonPackage() {
+        final String packageBase = getLibraryProjectPackageBase();
+        final String allcommonSimplePackage = getPackageInfo().getBaseCommonPackage();
+        return filterBase(allcommonSimplePackage, packageBase);
+    }
+
+    public String getLibraryBehaviorPackage() {
+        final String packageBase = getLibraryProjectPackageBase();
+        final String exbhvSimplePackage = getPackageInfo().getExtendedBehaviorPackage();
+        return filterBase(exbhvSimplePackage, packageBase);
+    }
+
+    public String getLibraryProjectPrefix() {
+        final Map<String, String> map = getApplicationBehaviorMap();
+        return getProperty("libraryProjectPrefix", "", map);
     }
 
     public String getApplicationBehaviorAdditionalSuffix() { // It's closet!
