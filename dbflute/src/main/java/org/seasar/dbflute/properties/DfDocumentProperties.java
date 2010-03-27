@@ -43,8 +43,9 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                    Output Directory
     //                                                                    ================
-    public String getDocumentOutputDirectory() { // It's closet!
-        return getProperty("documentOutputDirectory", "./output/doc", getDocumentDefinitionMap());
+    public String getDocumentOutputDirectory() {
+        final String defaultValue = "./output/doc";
+        return getProperty("documentOutputDirectory", defaultValue, getDocumentDefinitionMap());
     }
 
     // ===================================================================================
@@ -204,6 +205,17 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
             text = text.replaceAll(SPECIAL_LINE_SEPARATOR, literalLineSeparator);
         }
         return text;
+    }
+
+    // ===================================================================================
+    //                                                                          SchemaHTML
+    //                                                                          ==========
+    public String getSchemaHtmlFileName(String defaultNonExtName) {
+        return getProperty("schemaHtmlFileName", defaultNonExtName + ".html", getDocumentDefinitionMap());
+    }
+
+    public boolean isSuppressSchemaHtmlOutsideSql() {
+        return isProperty("isSuppressSchemaHtmlOutsideSql", false, getDocumentDefinitionMap());
     }
 
     // ===================================================================================

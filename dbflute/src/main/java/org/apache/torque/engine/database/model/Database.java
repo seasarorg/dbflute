@@ -1537,6 +1537,18 @@ public class Database {
         return getProperties().getDocumentProperties().isEntityJavaDocDbCommentValid();
     }
 
+    public String getSchemaHtmlFileName() {
+        final String defaultName = getAppData().getName();
+        return getProperties().getDocumentProperties().getSchemaHtmlFileName(defaultName);
+    }
+
+    public boolean isSchemaHtmlOutsideSqlValid() {
+        if (getProperties().getDocumentProperties().isSuppressSchemaHtmlOutsideSql()) {
+            return false;
+        }
+        return hasTableBqpMap() || isGenerateProcedureParameterBean();
+    }
+
     // ===================================================================================
     //                                                               Simple DTO Properties
     //                                                               =====================

@@ -1,17 +1,23 @@
 # /---------------------------------------------------------------------------
 # documentDefinitionMap: (NotRequired - Default 'map:{}')
 #
+# o documentOutputDirectory (NotRequired - Default './output/doc')
 # o aliasDelimiterInDbComment (NotRequired - Default '')
 # o isEntityJavaDocDbCommentValid (NotRequired - Default false)
 # o isEntityDBMetaDbCommentValid (NotRequired - Default false)
+# o schemaHtmlFileName (NotRequired - Default 'project-schema-[project-name].html')
+# o isSuppressSchemaHtmlOutsideSql (NotRequired - Default false)
 # o dataXlsTemplateRecordLimit (NotRequired - Default '')
 # o isDataXlsTemplateContainsCommonColumn (NotRequired - Default false)
 # 
 # Example:
 # map:{
+#     ; documentOutputDirectory = ./output/doc
 #     ; aliasDelimiterInDbComment = :
 #     ; isEntityJavaDocDbCommentValid = true
 #     ; isEntityDBMetaDbCommentValid = true
+#     ; schemaHtmlFileName = xxx.html
+#     ; isSuppressSchemaHtmlOutsideSql = false
 #     ; dataXlsTemplateRecordLimit = 10
 #     ; isDataXlsTemplateContainsCommonColumn = false
 # }
@@ -19,6 +25,15 @@
 # *The line that starts with '#' means comment-out.
 #
 map:{
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o documentOutputDirectory (NotRequired - Default './output/doc')
+    #  The output directory mainly for schemaHtml and data xls template.
+    #  Basically you don't need this.
+    #  It is considered of value that it always exists at same plain.
+    # 
+    #; documentOutputDirectory = ./output/doc
+    # - - - - - - - - - -/
+
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o aliasDelimiterInDbComment (NotRequired - Default '')
     #  If the alias exists in its DB comment like as follows:
@@ -31,17 +46,35 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isEntityJavaDocDbCommentValid (NotRequired - Default 'false')
+    # o isEntityJavaDocDbCommentValid (NotRequired - Default false)
     #  Does it allow DB comment to be on java-doc?
     # 
     #; isEntityJavaDocDbCommentValid = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isEntityDBMetaDbCommentValid (NotRequired - Default 'false')
+    # o isEntityDBMetaDbCommentValid (NotRequired - Default false)
     #  Does it allow DB comment to be on DB meta of entity?
     # 
     #; isEntityDBMetaDbCommentValid = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o schemaHtmlFileName (NotRequired - Default 'project-schema-[project-name].html')
+    #  The file name (not contain path) of schemaHtml.
+    #  Basically you don't need this.
+    #  (For example, when you use Application Behavior, you need this)
+    # 
+    #; schemaHtmlFileName = xxx.html
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isSuppressSchemaHtmlOutsideSql (NotRequired - Default false)
+    #  Does it remove outsideSql information from schemaHtml?
+    #  Basically you don't need this.
+    #  OutsideSql information (related to tables) is very useful.
+    # 
+    #; isSuppressSchemaHtmlOutsideSql = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -54,7 +87,7 @@ map:{
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # o isDataXlsTemplateContainsCommonColumn (NotRequired - Default 'false')
+    # o isDataXlsTemplateContainsCommonColumn (NotRequired - Default false)
     #  Does data excel template contain common columns?
     #  Basically you don't need this
     #  because common columns are resolved on replace-schema.

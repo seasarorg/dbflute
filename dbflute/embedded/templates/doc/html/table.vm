@@ -3,7 +3,7 @@ ${table.aliasExpression}${table.name}
 #if ($database.hasAdditionalSchema() && $table.hasSchema())
 &nbsp;<span class="tableschema">on ${table.schema}</span>
 #end
-#if ($table.hasBehaviorQueryPath())
+#if ($database.isSchemaHtmlOutsideSqlValid() && $table.hasBehaviorQueryPath())
 &nbsp;<span class="bqpcount"><a href="${database.sharp}${table.javaName}Sql">(outsideSql=${table.behaviorQueryPathList.size()})</a></span>
 #end
 </h2>

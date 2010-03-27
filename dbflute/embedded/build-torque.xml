@@ -183,8 +183,7 @@
   <!-- ================================================================ -->
   <!-- G E N E R A T E   D O C S                                        -->
   <!-- ================================================================ -->
-  <!-- Generates documentation to                                       -->
-  <!-- ${torque.doc.dir}/project-schema.html                            -->
+  <!-- Generates documentation to project-schema-xxx.html               -->
   <!-- ================================================================ -->
 
   <target name="doc" description="==> generates documentation for your datamodel">
@@ -198,7 +197,6 @@
     <df-doc
       contextProperties="${torque.contextProperties}"
       controlTemplate="${torque.template.doc}"
-      outputFormat="${torque.doc.format}"
       templatePath="${torque.templatePath}"
       useClasspath="${torque.useClasspath}"
       environmentType="${dfenv}">

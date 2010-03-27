@@ -197,7 +197,7 @@
 #if ($database.hasClassificationDefinitionMap())
 <p class="sublink"><a href="#cdef">Classification Definition</a></p>
 #end
-#if ($database.hasTableBqpMap() || $database.isGenerateProcedureParameterBean())
+#if ($database.isSchemaHtmlOutsideSqlValid())
 <p class="sublink"><a href="#outsidesql">OutsideSql List</a></p>
 #end
 
@@ -290,7 +290,7 @@ $generator.parse("doc/html/table.vm", null, "table", $table)
 </table>
 #end
 
-#if ($database.hasTableBqpMap() || $database.isGenerateProcedureParameterBean())
+#if ($database.isSchemaHtmlOutsideSqlValid())
 <h2 id="outsidesql">OutsideSql List</h2>
 #foreach ($table in $database.tableDisplaySortedList)
 #if ($table.hasBehaviorQueryPath())

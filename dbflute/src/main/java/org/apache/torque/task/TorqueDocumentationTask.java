@@ -97,11 +97,6 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     private static final Log _log = LogFactory.getLog(TorqueDocumentationTask.class);
 
     // ===================================================================================
-    //                                                                           Attribute
-    //                                                                           =========
-    private String _outputFormat; // basically 'html' (defined at default.properties)
-
-    // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
     @Override
@@ -270,19 +265,7 @@ public class TorqueDocumentationTask extends DfAbstractDbMetaTexenTask {
     //                                                                       =============
     public Context initControlContext() throws Exception {
         super.initControlContext();
-        _context.put("outputFormat", _outputFormat);
         _context.put("escape", new Escape());
         return _context;
-    }
-
-    // ===================================================================================
-    //                                                                            Accessor
-    //                                                                            ========
-    public String getOutputFormat() {
-        return _outputFormat;
-    }
-
-    public void setOutputFormat(String v) {
-        _outputFormat = v;
     }
 }

@@ -4,11 +4,7 @@
 #set ($database = $schemaData.database)
 $database.enableDocumentOutputDirectory()
 
-#if ($outputFormat=="html")
-  #set ($outFile = "${schemaData.name}.html")
-#else
-  #set ($outFile = "${schemaData.name}.xml")
-#end
+#set ($outFile = "${database.schemaHtmlFileName}")
 
 File to be created: $outFile
 
@@ -21,4 +17,4 @@ $database.initializeAdditionalUniqueKey()
 $database.initializeAdditionalForeignKey()
 $database.initializeClassificationDeployment()
 
-$generator.parse("doc/$outputFormat/datamodel.vm", $outFile, "dataModel", $dataModel)
+$generator.parse("doc/html/datamodel.vm", $outFile, "dataModel", $dataModel)
