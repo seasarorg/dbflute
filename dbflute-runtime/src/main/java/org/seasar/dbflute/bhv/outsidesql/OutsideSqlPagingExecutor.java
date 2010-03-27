@@ -30,7 +30,6 @@ import org.seasar.dbflute.cbean.ResultBeanBuilder;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 
-
 /**
  * The paging executor of outside-SQL.
  * @author jflute
@@ -49,20 +48,17 @@ public class OutsideSqlPagingExecutor {
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
 
-	/** The current database definition. (NotNull) */
+    /** The current database definition. (NotNull) */
     protected final DBDef _currentDBDef;
-	
-	/** The default configuration of statement. (Nullable) */
-	protected final StatementConfig _defaultStatementConfig;
+
+    /** The default configuration of statement. (Nullable) */
+    protected final StatementConfig _defaultStatementConfig;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker
-                                  , OutsideSqlOption outsideSqlOption
-                                  , String tableDbName
-                                  , DBDef currentDBDef
-                                  , StatementConfig defaultStatementConfig) {
+    public OutsideSqlPagingExecutor(BehaviorCommandInvoker behaviorCommandInvoker, OutsideSqlOption outsideSqlOption,
+            String tableDbName, DBDef currentDBDef, StatementConfig defaultStatementConfig) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
@@ -105,9 +101,17 @@ public class OutsideSqlPagingExecutor {
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
+        return doSelectList(path, pmb, entityType);
+    }
+
+    protected <ENTITY> ListResultBean<ENTITY> doSelectList(String path, PagingBean pmb, Class<ENTITY> entityType) {
         setupScrollableCursorIfNeeds();
-        List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
-        return new ResultBeanBuilder<ENTITY>(_tableDbName).buildListResultBean(resultList);
+        final List<ENTITY> selectedList = invoke(createSelectListCommand(path, pmb, entityType));
+        return createListResultBean(selectedList);
+    }
+
+    protected <ENTITY> ListResultBean<ENTITY> createListResultBean(List<ENTITY> selectedList) {
+        return new ResultBeanBuilder<ENTITY>(_tableDbName).buildListResultBean(selectedList);
     }
 
     /**
@@ -165,30 +169,40 @@ public class OutsideSqlPagingExecutor {
      * @return The result bean of paging. (NotNull)
      * @exception org.seasar.dbflute.exception.OutsideSqlNotFoundException When the outside-SQL is not found.
      */
-    public <ENTITY> PagingResultBean<ENTITY> selectPage(final String path
-                                                      , final PagingBean pmb
-                                                      , final Class<ENTITY> entityType) {
+    public <ENTITY> PagingResultBean<ENTITY> selectPage(String path, PagingBean pmb, Class<ENTITY> entityType) {
+        final PagingHandler<ENTITY> handler = createPagingHandler(path, pmb, entityType);
+        final PagingInvoker<ENTITY> invoker = createPagingInvoker();
+        return invoker.invokePaging(handler);
+    }
+
+    protected <ENTITY> PagingHandler<ENTITY> createPagingHandler(final String path, final PagingBean pmb,
+            final Class<ENTITY> entityType) {
         final OutsideSqlEntityExecutor<PagingBean> countExecutor = createCountExecutor();
-        final PagingHandler<ENTITY> handler = new PagingHandler<ENTITY>() {
+        return new PagingHandler<ENTITY>() {
             public PagingBean getPagingBean() {
                 return pmb;
             }
+
             public int count() {
                 pmb.xsetPaging(false);
                 return countExecutor.selectEntityWithDeletedCheck(path, pmb, Integer.class);
             }
+
             public List<ENTITY> paging() {
                 pmb.xsetPaging(true);
-                return selectList(path, pmb, entityType);
+                return doSelectList(path, pmb, entityType);
             }
         };
-        final PagingInvoker<ENTITY> invoker = new PagingInvoker<ENTITY>(_tableDbName);
-        return invoker.invokePaging(handler);
     }
 
     protected OutsideSqlEntityExecutor<PagingBean> createCountExecutor() {
         final OutsideSqlOption countOption = _outsideSqlOption.copyOptionWithoutPaging();
-        return new OutsideSqlEntityExecutor<PagingBean>(_behaviorCommandInvoker, countOption, _tableDbName, _currentDBDef);
+        return new OutsideSqlEntityExecutor<PagingBean>(_behaviorCommandInvoker, countOption, _tableDbName,
+                _currentDBDef);
+    }
+
+    protected <ENTITY> PagingInvoker<ENTITY> createPagingInvoker() {
+        return new PagingInvoker<ENTITY>(_tableDbName);
     }
 
     protected void setupScrollableCursorIfNeeds() {
@@ -212,11 +226,13 @@ public class OutsideSqlPagingExecutor {
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, Object pmb, Class<ENTITY> entityType) {
+    protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, Object pmb,
+            Class<ENTITY> entityType) {
         return xsetupCommand(new OutsideSqlSelectListCommand<ENTITY>(), path, pmb, entityType);
     }
 
-    private <ENTITY> OutsideSqlSelectListCommand<ENTITY> xsetupCommand(OutsideSqlSelectListCommand<ENTITY> command, String path, Object pmb, Class<ENTITY> entityType) {
+    private <ENTITY> OutsideSqlSelectListCommand<ENTITY> xsetupCommand(OutsideSqlSelectListCommand<ENTITY> command,
+            String path, Object pmb, Class<ENTITY> entityType) {
         command.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setOutsideSqlPath(path);
@@ -241,7 +257,7 @@ public class OutsideSqlPagingExecutor {
     //                                                                              Option
     //                                                                              ======
     public OutsideSqlPagingExecutor configure(StatementConfig statementConfig) {
-		_outsideSqlOption.setStatementConfig(statementConfig);
+        _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }
 

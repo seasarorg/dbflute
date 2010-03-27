@@ -30,7 +30,6 @@ import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 
-
 /**
  * The executor of outside-SQL. <br />
  * <pre>
@@ -69,25 +68,23 @@ public class OutsideSqlBasicExecutor {
     /** Table DB name. (NotNull) */
     protected final String _tableDbName;
 
-	/** The current database definition. (NotNull) */
+    /** The current database definition. (NotNull) */
     protected final DBDef _currentDBDef;
-	
-	/** The default configuration of statement. (Nullable) */
-	protected final StatementConfig _defaultStatementConfig;
+
+    /** The default configuration of statement. (Nullable) */
+    protected final StatementConfig _defaultStatementConfig;
 
     /** Is it dynamic binding? */
     protected boolean _dynamicBinding;
-	
-	/** The configuration of statement. (Nullable) */
-	protected StatementConfig _statementConfig;
+
+    /** The configuration of statement. (Nullable) */
+    protected StatementConfig _statementConfig;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlBasicExecutor(BehaviorCommandInvoker behaviorCommandInvoker
-                                 , String tableDbName
-                                 , DBDef currentDBDef
-                                 , StatementConfig defaultStatementConfig) {
+    public OutsideSqlBasicExecutor(BehaviorCommandInvoker behaviorCommandInvoker, String tableDbName,
+            DBDef currentDBDef, StatementConfig defaultStatementConfig) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._tableDbName = tableDbName;
         this._currentDBDef = currentDBDef;
@@ -108,7 +105,11 @@ public class OutsideSqlBasicExecutor {
      */
     public <ENTITY> ListResultBean<ENTITY> selectList(String path, Object pmb, Class<ENTITY> entityType) {
         List<ENTITY> resultList = invoke(createSelectListCommand(path, pmb, entityType));
-        return new ResultBeanBuilder<ENTITY>(_tableDbName).buildListResultBean(resultList);
+        return createListResultBean(resultList);
+    }
+
+    protected <ENTITY> ListResultBean<ENTITY> createListResultBean(List<ENTITY> selectedList) {
+        return new ResultBeanBuilder<ENTITY>(_tableDbName).buildListResultBean(selectedList);
     }
 
     // ===================================================================================
@@ -134,15 +135,19 @@ public class OutsideSqlBasicExecutor {
      * @param pmb The parameter-bean for procedure. (NotNull)
      */
     public void call(ProcedurePmb pmb) {
-        if (pmb == null) { throw new IllegalArgumentException("The argument of call() 'pmb' should not be null!"); }
+        if (pmb == null) {
+            throw new IllegalArgumentException("The argument of call() 'pmb' should not be null!");
+        }
         invoke(createCallCommand(pmb.getProcedureName(), pmb));
     }
 
     // ===================================================================================
     //                                                                    Behavior Command
     //                                                                    ================
-    protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, Object pmb, Class<ENTITY> entityType) {
-        final OutsideSqlSelectListCommand<ENTITY> cmd = xsetupCommand(new OutsideSqlSelectListCommand<ENTITY>(), path, pmb);
+    protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, Object pmb,
+            Class<ENTITY> entityType) {
+        final OutsideSqlSelectListCommand<ENTITY> cmd = xsetupCommand(new OutsideSqlSelectListCommand<ENTITY>(), path,
+                pmb);
         cmd.setEntityType(entityType);
         return cmd;
     }
@@ -155,7 +160,8 @@ public class OutsideSqlBasicExecutor {
         return xsetupCommand(new OutsideSqlCallCommand(), path, pmb);
     }
 
-    private <COMMAND extends AbstractOutsideSqlCommand<?>> COMMAND xsetupCommand(COMMAND command, String path, Object pmb) {
+    private <COMMAND extends AbstractOutsideSqlCommand<?>> COMMAND xsetupCommand(COMMAND command, String path,
+            Object pmb) {
         command.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setOutsideSqlPath(path);
@@ -182,7 +188,7 @@ public class OutsideSqlBasicExecutor {
     //                                       Result Handling
     //                                       ---------------
     /**
-     * Specify cursor handling. <br />
+     * Specify cursor handling.
      * <pre>
      * # ex) Your Program
      * #
@@ -192,11 +198,15 @@ public class OutsideSqlBasicExecutor {
      * @return The cursor executor of outside-SQL. (NotNull)
      */
     public OutsideSqlCursorExecutor<Object> cursorHandling() {
-        return new OutsideSqlCursorExecutor<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName, _currentDBDef);
+        return createOutsideSqlCursorExecutor(createOutsideSqlOption());
+    }
+
+    protected OutsideSqlCursorExecutor<Object> createOutsideSqlCursorExecutor(OutsideSqlOption option) {
+        return new OutsideSqlCursorExecutor<Object>(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
     }
 
     /**
-     * Specify entity handling. <br />
+     * Specify entity handling.
      * <pre>
      * # ex) Your Program
      * #
@@ -206,7 +216,11 @@ public class OutsideSqlBasicExecutor {
      * @return The cursor executor of outside-SQL. (NotNull)
      */
     public OutsideSqlEntityExecutor<Object> entityHandling() {
-        return new OutsideSqlEntityExecutor<Object>(_behaviorCommandInvoker, createOutsideSqlOption(), _tableDbName, _currentDBDef);
+        return createOutsideSqlEntityExecutor(createOutsideSqlOption());
+    }
+
+    protected OutsideSqlEntityExecutor<Object> createOutsideSqlEntityExecutor(OutsideSqlOption option) {
+        return new OutsideSqlEntityExecutor<Object>(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef);
     }
 
     // -----------------------------------------------------
@@ -214,7 +228,7 @@ public class OutsideSqlBasicExecutor {
     //                                                ------
     /**
      * Option of autoPaging. <br />
-     * If you invoke this, you don't need to write paging condition on your SQL. <br />
+     * If you invoke this, you don't need to write paging condition on your SQL.
      * <pre>
      * # ex) Your SQL {MySQL}
      * #
@@ -230,13 +244,12 @@ public class OutsideSqlBasicExecutor {
     public OutsideSqlPagingExecutor autoPaging() {
         final OutsideSqlOption option = createOutsideSqlOption();
         option.autoPaging();
-        return new OutsideSqlPagingExecutor(_behaviorCommandInvoker, option, _tableDbName
-                                          , _currentDBDef, _defaultStatementConfig);
+        return createOutsideSqlPagingExecutor(option);
     }
 
     /**
      * Option of manualPaging. <br />
-     * If you invoke this, you need to write paging condition on your SQL. <br />
+     * If you invoke this, you need to write paging condition on your SQL.
      * <pre>
      * # ex) Your SQL {MySQL}
      * #
@@ -252,8 +265,12 @@ public class OutsideSqlBasicExecutor {
     public OutsideSqlPagingExecutor manualPaging() {
         final OutsideSqlOption option = createOutsideSqlOption();
         option.manualPaging();
-        return new OutsideSqlPagingExecutor(_behaviorCommandInvoker, option, _tableDbName
-                                          , _currentDBDef, _defaultStatementConfig);
+        return createOutsideSqlPagingExecutor(option);
+    }
+
+    protected OutsideSqlPagingExecutor createOutsideSqlPagingExecutor(OutsideSqlOption option) {
+        return new OutsideSqlPagingExecutor(_behaviorCommandInvoker, option, _tableDbName, _currentDBDef,
+                _defaultStatementConfig);
     }
 
     // -----------------------------------------------------
@@ -271,17 +288,17 @@ public class OutsideSqlBasicExecutor {
         _statementConfig = statementConfig;
         return this;
     }
-	
+
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected OutsideSqlOption createOutsideSqlOption() {
         final OutsideSqlOption option = new OutsideSqlOption();
-		option.setStatementConfig(_statementConfig);
+        option.setStatementConfig(_statementConfig);
         if (_dynamicBinding) {
             option.dynamicBinding();
         }
-		option.setTableDbName(_tableDbName);// as information
+        option.setTableDbName(_tableDbName);// as information
         return option;
     }
 }
