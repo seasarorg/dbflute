@@ -1,7 +1,10 @@
 package org.seasar.dbflute.properties;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * @author jflute
@@ -38,8 +41,9 @@ public final class DfRefreshProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                     Detail Property
     //                                                                     ===============
-    public String getProjectName() {
-        return getRefreshPropertyRequired("projectName");
+    public List<String> getProjectNameList() {
+        final String prop = getRefreshPropertyRequired("projectName");
+        return DfStringUtil.splitListTrimmed(prop, "/");
     }
 
     public String getRequestUrl() {

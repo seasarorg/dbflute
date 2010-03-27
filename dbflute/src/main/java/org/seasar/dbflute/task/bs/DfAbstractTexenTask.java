@@ -500,11 +500,14 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         if (!isRefresh()) {
             return;
         }
+        final List<String> projectNameList = getRefreshProjectNameList();
+        for (String projectName : projectNameList) {
+            doRefreshResources(projectName);
+        }
+    }
 
-        final String projectName = getRefreshProjectName();
+    protected void doRefreshResources(String projectName) {
         final StringBuilder sb = new StringBuilder().append("refresh?");
-
-        // Refresh the project!
         sb.append(projectName).append("=INFINITE");
 
         final URL url = getRefreshRequestURL(sb.toString());
@@ -548,9 +551,9 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return 3 * 1000;
     }
 
-    protected String getRefreshProjectName() {
+    protected List<String> getRefreshProjectNameList() {
         final DfRefreshProperties prop = getProperties().getRefreshProperties();
-        return prop.getProjectName();
+        return prop.getProjectNameList();
     }
 
     protected URL getRefreshRequestURL(String path) {
