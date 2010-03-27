@@ -20,10 +20,10 @@ import java.util.List;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
-import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.EntityRowHandler;
+import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 
@@ -80,7 +80,10 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
     //                                                               =====================
     @Override
     public String buildSqlExecutionKey() {
-        return super.buildSqlExecutionKey() + ":" + _entityRowHandler.getClass().getName();
+        // entity row handler uses name (not simple) because of no-name inner class
+        final String handlerName = _entityRowHandler.getClass().getName();
+        final String entityName = _entityType.getClass().getSimpleName();
+        return super.buildSqlExecutionKey() + ":" + handlerName + ":" + entityName;
     }
 
     public SqlExecutionCreator createSqlExecutionCreator() {

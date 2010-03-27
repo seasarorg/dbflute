@@ -570,7 +570,7 @@ public class BehaviorCommandInvoker {
     }
 
     protected List<InvokeNameResult> extractBehaviorInvoke(StackTraceElement[] stackTrace) {
-        final String[] names = new String[] { "Bhv", "BehaviorReadable", "BehaviorWritable", "PagingInvoker" };
+        final String[] names = new String[] { "Bhv", "BhvAp", "BehaviorReadable", "BehaviorWritable", "PagingInvoker" };
         final List<String> suffixList = Arrays.asList(names);
         final List<String> keywordList = Arrays
                 .asList(new String[] { "Bhv$", "BehaviorReadable$", "BehaviorWritable$" });

@@ -21,7 +21,6 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 
-
 /**
  * @author jflute
  * @param <RESULT> The type of result.
@@ -61,14 +60,16 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
     //                                                               =====================
     public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        return _tableDbName + ":" + getCommandName() + "(" + _conditionBeanType.getSimpleName() + ")";
+        final String cbName = _conditionBeanType.getSimpleName();
+        return _tableDbName + ":" + getCommandName() + "(" + cbName + ")";
     }
 
     protected SqlExecution createSelectCBExecution(Class<? extends ConditionBean> cbType, TnResultSetHandler handler) {
         return createSelectCBExecution(handler, new String[] { "pmb" }, new Class<?>[] { cbType });
     }
 
-    protected SelectCBExecution createSelectCBExecution(TnResultSetHandler handler, String[] argNames, Class<?>[] argTypes) {
+    protected SelectCBExecution createSelectCBExecution(TnResultSetHandler handler, String[] argNames,
+            Class<?>[] argTypes) {
         final SelectCBExecution cmd = new SelectCBExecution(_dataSource, _statementFactory, handler);
         cmd.setArgNames(argNames);
         cmd.setArgTypes(argTypes);
