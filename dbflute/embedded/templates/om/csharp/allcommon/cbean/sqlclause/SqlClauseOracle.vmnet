@@ -1,4 +1,4 @@
-#set ($myClassName = "${glSqlClause}${database.generateDbName}")
+#set ($myClassName = "${glSqlClause}Oracle")
 
 using System;
 
