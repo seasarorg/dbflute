@@ -385,6 +385,7 @@ $database.checkProperties()
 #set ($glInternalSqlParser = "${glProjectPrefix}InternalSqlParser")
 #set ($glInternalSqlTokenizer = "${glProjectPrefix}InternalSqlTokenizer")
 #set ($glInternalBindVariableUtil = "${glProjectPrefix}InternalBindVariableUtil")
+#set ($glAnsiStringType = "${glProjectPrefix}AnsiStringType")
 
 ## [Allcommon-S2Dao-Internal-ValueType]
 #set ($glInternalBytesOidType = "${glProjectPrefix}InternalBytesOidType")
@@ -476,6 +477,8 @@ $database.checkProperties()
 #set ($glPackageBaseCommonS2DaoInternalSqlLog = "${database.baseCommonPackage}.S2Dao.Internal.SqlLog")
 #set ($glPackageBaseCommonS2DaoInternalSqlParser = "${database.baseCommonPackage}.S2Dao.Internal.SqlParser")
 #set ($glPackageBaseCommonS2DaoInternalUtil = "${database.baseCommonPackage}.S2Dao.Internal.Util")
+#set ($glPackageBaseCommonS2DaoInternalValueType = "${database.baseCommonPackage}.S2Dao.Internal.ValueType")
+#set ($glPackageBaseCommonS2DaoInternalValueTypePlugin = "${database.baseCommonPackage}.S2Dao.Internal.ValueType.Plugin")
 #set ($glPackageBaseCommonUtil = "${database.baseCommonPackage}.Util")
 
 ## [Main]
@@ -1416,12 +1419,26 @@ $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/TxSetting.${glTempla
   #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalSqlParser})}${glInternalCommandContextCreator}.${glClassFileExtension}" )
   $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/sqlparser/InternalCommandContextCreator.${glTemplateFileExtension}",$path,"", "")
 
-  #set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalUtil}))
-  $database.makeDirectory($path)
+#set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalUtil}))
+$database.makeDirectory($path)
 
-  $database.info("    parse('InternalBindVariableUtil');")
-  #set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalUtil})}${glInternalBindVariableUtil}.${glClassFileExtension}" )
-  $generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/util/InternalBindVariableUtil.${glTemplateFileExtension}",$path,"", "")
+$database.info("    parse('InternalBindVariableUtil');")
+#set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalUtil})}${glInternalBindVariableUtil}.${glClassFileExtension}" )
+$generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/util/InternalBindVariableUtil.${glTemplateFileExtension}",$path,"", "")
+
+#
+# *for the future
+#
+##set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalValueType}))
+#$database.makeDirectory($path)
+#
+##set ($path = $database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalValueTypePlugin}))
+#$database.makeDirectory($path)
+#
+#$database.info("    parse('AnsiStringType');")
+##set ( $path = "${database.getPackageAsPath(${glPackageBaseCommonS2DaoInternalValueTypePlugin})}${glAnsiStringType}.${glClassFileExtension}" )
+#$generator.parse("om/${glResourceDirectory}/allcommon/s2dao/internal/valuetype/plugin/AnsiStringType.${glTemplateFileExtension}",$path,"", "")
+
 $database.info("}")
 
 ## -----------------------------------------------------------------------------------------------------

@@ -1361,6 +1361,25 @@ public class Column {
         return false;
     }
 
+    // - - - - -
+    // [DB Type]
+    // - - - - -
+    public boolean isDbTypeCharOrVarchar() {
+        final String dbType = getDbType();
+        if (dbType == null) {
+            return false;
+        }
+        return dbType.startsWith("char") || dbType.startsWith("varchar");
+    }
+
+    public boolean isDbTypeNCharOrNVarchar() {
+        final String dbType = getDbType();
+        if (dbType == null) {
+            return false;
+        }
+        return dbType.startsWith("nchar") || dbType.startsWith("nvarchar");
+    }
+
     // ===================================================================================
     //                                                              Sql2Entity Information
     //                                                              ======================

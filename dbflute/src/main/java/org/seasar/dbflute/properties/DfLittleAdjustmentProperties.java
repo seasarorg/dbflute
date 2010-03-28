@@ -185,6 +185,16 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
+    //                                                                          Value Type
+    //                                                                          ==========
+    // S2Dao.NET does not implement ValueType attribute,
+    // so this property is invalid. At the future,
+    // DBFlute may implement ValueType Framework. 
+    public boolean isUseAnsiStringTypeToNotUnicode() { // It's closet! CSharp Only
+        return isProperty("isUseAnsiStringTypeToNotUnicode", false);
+    }
+
+    // ===================================================================================
     //                                                                   Alternate Control
     //                                                                   =================
     public boolean isAlternateGenerateControlValid() {
