@@ -105,7 +105,6 @@ public class BehaviorCommandInvoker {
         behaviorCommand.setDataSource(_invokerAssistant.assistDataSource());
         behaviorCommand.setStatementFactory(_invokerAssistant.assistStatementFactory());
         behaviorCommand.setBeanMetaDataFactory(_invokerAssistant.assistBeanMetaDataFactory());
-        behaviorCommand.setValueTypeFactory(_invokerAssistant.assistValueTypeFactory());
         behaviorCommand.setSqlFileEncoding(getSqlFileEncoding());
     }
 

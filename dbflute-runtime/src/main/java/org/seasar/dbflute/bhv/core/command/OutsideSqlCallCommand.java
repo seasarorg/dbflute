@@ -112,7 +112,6 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
         // The attribute of SqlCommand.
         // - - - - - - - - - - - - - - -
         final TnProcedureMetaDataFactory factory = createProcedureMetaDataFactory();
-        factory.setValueTypeFactory(_valueTypeFactory);
         final Class<?> pmbType = (pmb != null ? pmb.getClass() : null);
         final TnProcedureMetaData metaData = factory.createProcedureMetaData(procedureName, pmbType);
         return createProcedureCommand(metaData);

@@ -25,7 +25,7 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactory;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
+import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -35,13 +35,10 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
 
     protected Class<?> beanClass;
     protected TnBeanAnnotationReader beanAnnotationReader;
-    protected TnValueTypeFactory valueTypeFactory;
 
-    public TnAbstractPropertyTypeFactory(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader,
-            TnValueTypeFactory valueTypeFactory) {
+    public TnAbstractPropertyTypeFactory(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader) {
         this.beanClass = beanClass;
         this.beanAnnotationReader = beanAnnotationReader;
-        this.valueTypeFactory = valueTypeFactory;
     }
 
     public TnPropertyType[] createDtoPropertyTypes() {
@@ -85,9 +82,9 @@ public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFac
     protected ValueType getValueType(DfPropertyDesc propertyDesc) {
         final String name = beanAnnotationReader.getValueType(propertyDesc);
         if (name != null) {
-            return valueTypeFactory.getValueTypeByName(name);
+            return TnValueTypes.getPluginValueType(name);
         }
-        Class<?> type = propertyDesc.getPropertyType();
-        return valueTypeFactory.getValueTypeByClass(type);
+        final Class<?> type = propertyDesc.getPropertyType();
+        return TnValueTypes.getValueType(type);
     }
 }

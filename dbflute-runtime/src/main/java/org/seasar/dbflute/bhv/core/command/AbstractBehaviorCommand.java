@@ -34,7 +34,6 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
 import org.seasar.dbflute.s2dao.rshandler.TnBeanCursorMetaDataResultSetHandler;
 import org.seasar.dbflute.s2dao.rshandler.TnBeanListMetaDataResultSetHandler;
 import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateDynamicCommand;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
@@ -61,7 +60,6 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     protected DataSource _dataSource;
     protected StatementFactory _statementFactory;
     protected TnBeanMetaDataFactory _beanMetaDataFactory;
-    protected TnValueTypeFactory _valueTypeFactory;
     protected String _sqlFileEncoding;
 
     // ===================================================================================
@@ -209,9 +207,6 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
         if (_beanMetaDataFactory == null) {
             throw new IllegalStateException(buildAssertMessage("_beanMetaDataFactory", methodName));
         }
-        if (_valueTypeFactory == null) {
-            throw new IllegalStateException(buildAssertMessage("_valueTypeFactory", methodName));
-        }
         if (_sqlFileEncoding == null) {
             throw new IllegalStateException(buildAssertMessage("_sqlFileEncoding", methodName));
         }
@@ -267,10 +262,6 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
 
     public void setBeanMetaDataFactory(TnBeanMetaDataFactory beanMetaDataFactory) {
         _beanMetaDataFactory = beanMetaDataFactory;
-    }
-
-    public void setValueTypeFactory(TnValueTypeFactory valueTypeFactory) {
-        _valueTypeFactory = valueTypeFactory;
     }
 
     public void setSqlFileEncoding(String sqlFileEncoding) {

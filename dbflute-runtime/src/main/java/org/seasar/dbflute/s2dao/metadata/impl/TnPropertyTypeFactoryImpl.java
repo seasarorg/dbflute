@@ -24,7 +24,6 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -34,9 +33,8 @@ public class TnPropertyTypeFactoryImpl extends TnAbstractPropertyTypeFactory {
 
     protected DBMeta _dbmeta;
 
-    public TnPropertyTypeFactoryImpl(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader,
-            TnValueTypeFactory valueTypeFactory) {
-        super(beanClass, beanAnnotationReader, valueTypeFactory);
+    public TnPropertyTypeFactoryImpl(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader) {
+        super(beanClass, beanAnnotationReader);
         initializeResources();
     }
 

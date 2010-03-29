@@ -35,7 +35,6 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactory;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactoryBuilder;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactoryBuilder;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -47,7 +46,6 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
     //                                                                           Attribute
     //                                                                           =========
     protected DataSource _dataSource;
-    protected TnValueTypeFactory _valueTypeFactory;
 
     // ===================================================================================
     //                                                                            Creation
@@ -153,9 +151,7 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
     }
 
     protected TnPropertyTypeFactoryBuilder createPropertyTypeFactoryBuilder() {
-        TnPropertyTypeFactoryBuilderImpl impl = new TnPropertyTypeFactoryBuilderImpl();
-        impl.setValueTypeFactory(_valueTypeFactory);
-        return impl;
+        return new TnPropertyTypeFactoryBuilderImpl();
     }
 
     protected TnRelationPropertyTypeFactory createRelationPropertyTypeFactory(Class<?> originalBeanClass,
@@ -186,9 +182,5 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
 
     public void setDataSource(final DataSource dataSource) {
         this._dataSource = dataSource;
-    }
-
-    public void setValueTypeFactory(TnValueTypeFactory valueTypeFactory) {
-        this._valueTypeFactory = valueTypeFactory;
     }
 }

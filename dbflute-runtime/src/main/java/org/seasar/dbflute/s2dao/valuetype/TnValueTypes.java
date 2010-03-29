@@ -54,6 +54,8 @@ import org.seasar.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.SerializableType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.TnBytesOidType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.TnStringClobType;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -146,6 +148,10 @@ public class TnValueTypes {
 
         // Because object type is to be handle as special type.
         //registerBasicValueType(Object.class, OBJECT);
+
+        // plug-in
+        registerPluginValueType("stringClobType", new TnStringClobType());
+        registerPluginValueType("bytesOidType", new TnBytesOidType());
     }
 
     // ===================================================================================

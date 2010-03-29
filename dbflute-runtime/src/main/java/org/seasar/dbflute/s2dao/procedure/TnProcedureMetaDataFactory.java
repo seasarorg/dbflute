@@ -29,7 +29,6 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
@@ -41,7 +40,6 @@ public class TnProcedureMetaDataFactory {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected TnValueTypeFactory _valueTypeFactory;
     protected TnFieldProcedureAnnotationReader _annotationReader = new TnFieldProcedureAnnotationReader();
 
     // ===================================================================================
@@ -142,7 +140,7 @@ public class TnProcedureMetaDataFactory {
     protected ValueType getValueType(final DfBeanDesc dtoDesc, final Field field) {
         final String name = _annotationReader.getValueType(dtoDesc, field);
         if (name != null) {
-            return _valueTypeFactory.getValueTypeByName(name);
+            return TnValueTypes.getPluginValueType(name);
         }
         final Class<?> type = field.getType();
         if (List.class.isAssignableFrom(type)) { // is for out parameter cursor.
@@ -154,7 +152,7 @@ public class TnProcedureMetaDataFactory {
                 return TnValueTypes.SERIALIZABLE_BYTE_ARRAY;
             }
         }
-        return _valueTypeFactory.getValueTypeByClass(type);
+        return TnValueTypes.getValueType(type);
     }
 
     protected boolean isCurrentDBDef(DBDef currentDBDef) {
@@ -184,10 +182,6 @@ public class TnProcedureMetaDataFactory {
             throw new NullPointerException("clazz");
         }
         return Collection.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz) || clazz.isArray();
-    }
-
-    public void setValueTypeFactory(final TnValueTypeFactory valueTypeFactory) {
-        this._valueTypeFactory = valueTypeFactory;
     }
 
     protected static class TnFieldProcedureAnnotationReader {

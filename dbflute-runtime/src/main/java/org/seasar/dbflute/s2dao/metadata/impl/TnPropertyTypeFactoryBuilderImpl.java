@@ -18,7 +18,6 @@ package org.seasar.dbflute.s2dao.metadata.impl;
 import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactory;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactoryBuilder;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -26,13 +25,7 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
  */
 public class TnPropertyTypeFactoryBuilderImpl implements TnPropertyTypeFactoryBuilder {
 
-    protected TnValueTypeFactory valueTypeFactory;
-
-    public void setValueTypeFactory(TnValueTypeFactory valueTypeFactory) {
-        this.valueTypeFactory = valueTypeFactory;
-    }
-
     public TnPropertyTypeFactory build(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader) {
-        return new TnPropertyTypeFactoryImpl(beanClass, beanAnnotationReader, valueTypeFactory);
+        return new TnPropertyTypeFactoryImpl(beanClass, beanAnnotationReader);
     }
 }
