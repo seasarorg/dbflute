@@ -20,6 +20,8 @@ import java.lang.reflect.Modifier;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -28,6 +30,8 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
+import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -81,11 +85,12 @@ public class TnProcedureMetaDataFactory {
     }
 
     protected TnProcedureParameterType getProcedureParameterType(final DfBeanDesc dtoDesc, final Field field) {
-        final String procedureParameter = _annotationReader.getProcedureParameter(dtoDesc, field);
-        if (procedureParameter == null) {
+        final String parameterInfo = _annotationReader.getParameterInfo(dtoDesc, field);
+        if (parameterInfo == null) {
             return null;
         }
-        final String type = extractParameterType(procedureParameter);
+        final Map<String, String> parameterInfoMap = extractParameterInfoMap(parameterInfo, field);
+        final String type = parameterInfoMap.get("type");
         field.setAccessible(true);
         final TnProcedureParameterType ppt = new TnProcedureParameterType(field);
         if (type.equalsIgnoreCase("in")) {
@@ -105,34 +110,34 @@ public class TnProcedureMetaDataFactory {
             msg = msg + " parameterType=" + type;
             throw new IllegalStateException(msg);
         }
-        final Integer index = extractParameterIndex(procedureParameter, field);
+        final Integer index = parseIndexAsInteger(parameterInfoMap.get("index"), parameterInfo, field);
         ppt.setParameterIndex(index);
         final ValueType valueType = findValueType(dtoDesc, field);
         ppt.setValueType(valueType);
         return ppt;
     }
 
-    protected String extractParameterType(String procedureParameter) {
-        if (procedureParameter.contains(",")) {
-            return procedureParameter.substring(0, procedureParameter.indexOf(",")).trim();
+    protected Map<String, String> extractParameterInfoMap(String parameterInfo, Field field) {
+        final List<String> list = DfStringUtil.splitListTrimmed(parameterInfo, ",");
+        if (list.size() != 2) {
+            String msg = "The size of parameterInfo elements was illegal:";
+            msg = msg + " elements=" + list + " info=" + parameterInfo + " name=" + field.getName();
+            throw new IllegalStateException(msg);
         }
-        return procedureParameter.trim();
+        final Map<String, String> map = new HashMap<String, String>();
+        map.put("type", list.get(0));
+        map.put("index", list.get(1));
+        return map;
     }
 
-    protected Integer extractParameterIndex(String procedureParameter, Field field) {
-        if (procedureParameter.contains(",")) {
-            String tmp = procedureParameter.substring(procedureParameter.indexOf(",") + ",".length()).trim();
-            try {
-                return Integer.valueOf(tmp);
-            } catch (NumberFormatException e) {
-                String msg = "The parameter index should be number:";
-                msg = msg + " class=" + field.getDeclaringClass().getSimpleName();
-                msg = msg + " field=" + field.getName();
-                msg = msg + " parameterIndex=" + tmp + " procedureParameter=" + procedureParameter;
-                throw new IllegalStateException(msg, e);
-            }
+    protected Integer parseIndexAsInteger(String index, String parameterInfo, Field field) {
+        try {
+            return DfTypeUtil.toInteger(index);
+        } catch (NumberFormatException e) {
+            String msg = "Failed to parse the parameter index as Integer:";
+            msg = msg + " index=" + index + " info=" + parameterInfo + " parameter=" + field.getName();
+            throw new IllegalStateException(msg);
         }
-        return null;
     }
 
     protected ValueType findValueType(DfBeanDesc dtoDesc, Field field) {
@@ -172,17 +177,12 @@ public class TnProcedureMetaDataFactory {
     }
 
     protected static class TnFieldProcedureAnnotationReader {
-        protected String PROCEDURE_PARAMETER_SUFFIX;
-        protected String VALUE_TYPE_SUFFIX;
+        protected static final String PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
+        protected static final String VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
 
-        public TnFieldProcedureAnnotationReader() {
-            PROCEDURE_PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
-            VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
-        }
-
-        public String getProcedureParameter(DfBeanDesc dtoDesc, Field field) {
-            String fieldName = removeInstanceVariablePrefix(field.getName());// *Point
-            String annotationName = fieldName + PROCEDURE_PARAMETER_SUFFIX;
+        public String getParameterInfo(DfBeanDesc dtoDesc, Field field) {
+            String fieldName = removeInstanceVariablePrefix(field.getName()); // don't forget
+            String annotationName = fieldName + PARAMETER_SUFFIX;
             if (dtoDesc.hasField(annotationName)) {
                 Field f = dtoDesc.getField(annotationName);
                 return (String) getValue(f, null);
@@ -192,7 +192,7 @@ public class TnProcedureMetaDataFactory {
         }
 
         public String getValueType(DfBeanDesc dtoDesc, Field field) {
-            String fieldName = removeInstanceVariablePrefix(field.getName());// *Point
+            String fieldName = removeInstanceVariablePrefix(field.getName()); // don't forget
             String annotationName = fieldName + VALUE_TYPE_SUFFIX;
             if (dtoDesc.hasField(annotationName)) {
                 Field f = dtoDesc.getField(annotationName);

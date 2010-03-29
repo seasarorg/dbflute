@@ -31,7 +31,7 @@ public class DfTypeUtilTest extends PlainTestCase {
     // -----------------------------------------------------
     //                                                String
     //                                                ------
-    public void test_toString() throws UnsupportedEncodingException {
+    public void test_toString_basic() throws UnsupportedEncodingException {
         // ## Arrange & Act & Assert ##
         assertNull(DfTypeUtil.toString(null));
         assertEquals("", DfTypeUtil.toString(""));
@@ -44,7 +44,7 @@ public class DfTypeUtilTest extends PlainTestCase {
     // -----------------------------------------------------
     //                                               Integer
     //                                               -------
-    public void test_toInteger() {
+    public void test_toInteger_basic() {
         // ## Arrange & Act & Assert ##
         assertNull(DfTypeUtil.toInteger(null));
         assertNull(DfTypeUtil.toInteger(""));
@@ -52,6 +52,22 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals(Integer.valueOf(33333), DfTypeUtil.toInteger("33333"));
         assertEquals(Integer.valueOf(-33333), DfTypeUtil.toInteger("-33333"));
         assertEquals(Integer.valueOf(33333), DfTypeUtil.toInteger("33,333"));
+    }
+
+    public void test_toInteger_notNumber() {
+        // ## Arrange ##
+        String notNumber = "foo";
+
+        // ## Act ##
+        try {
+            DfTypeUtil.toInteger(notNumber);
+
+            // ## Assert ##
+            fail();
+        } catch (NumberFormatException e) {
+            // OK
+            log(e.getMessage());
+        }
     }
 
     // -----------------------------------------------------

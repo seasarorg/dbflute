@@ -223,7 +223,7 @@ public final class DfTypeUtil {
         if (str == null || str.trim().length() == 0) {
             return null;
         }
-        return new Integer(normalize(str));
+        return Integer.valueOf(normalize(str));
     }
 
     public static int toPrimitiveInt(Object obj) {
