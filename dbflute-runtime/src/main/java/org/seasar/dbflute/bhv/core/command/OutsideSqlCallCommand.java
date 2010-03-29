@@ -127,7 +127,7 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
     }
 
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    // InternalProcedureCommand switches argument so this is unnecessary actually!
+    // TnProcedureCommand switches argument so this is unnecessary actually!
     // - - - - - - - - - -/
     public Object[] getSqlExecutionArgument() {
         return new Object[] { _parameterBean };
