@@ -149,7 +149,7 @@ public class TnValueTypes {
         // Because object type is to be handle as special type.
         //registerBasicValueType(Object.class, OBJECT);
 
-        // plug-in
+        // plug-in (default)
         registerPluginValueType("stringClobType", new TnStringClobType());
         registerPluginValueType("bytesOidType", new TnBytesOidType());
     }

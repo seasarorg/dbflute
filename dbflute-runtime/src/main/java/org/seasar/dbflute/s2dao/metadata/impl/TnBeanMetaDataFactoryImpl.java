@@ -110,13 +110,13 @@ public class TnBeanMetaDataFactoryImpl implements TnBeanMetaDataFactory {
             @SuppressWarnings("unchecked")
             public Set<String> getModifiedPropertyNames(Object bean) {
                 DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(bean.getClass());
-                String propertyName = "modifiedPropertyNames";
+                final String propertyName = "modifiedPropertyNames";
                 if (!beanDesc.hasPropertyDesc(propertyName)) {
                     return Collections.EMPTY_SET;
                 } else {
-                    DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
-                    Object value = propertyDesc.getValue(bean);
-                    Set<String> names = (Set<String>) value;
+                    final DfPropertyDesc propertyDesc = beanDesc.getPropertyDesc(propertyName);
+                    final Object value = propertyDesc.getValue(bean);
+                    final Set<String> names = (Set<String>) value;
                     return names;
                 }
             }

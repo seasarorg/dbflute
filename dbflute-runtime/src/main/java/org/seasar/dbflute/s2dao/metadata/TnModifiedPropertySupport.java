@@ -22,5 +22,11 @@ import java.util.Set;
  * @author jflute
  */
 public interface TnModifiedPropertySupport {
-    Set<String> getModifiedPropertyNames(Object obj);
+
+    /**
+     * Get the name set of modified properties from the bean.
+     * @param bean The target bean object. (NotNull)
+     * @return The name set of modified properties for the bean. (NotNull)
+     */
+    Set<String> getModifiedPropertyNames(Object bean);
 }
