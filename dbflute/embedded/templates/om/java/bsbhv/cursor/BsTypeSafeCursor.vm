@@ -31,11 +31,22 @@ public class ${myClassName} {
     protected ResultSet _rs;
 
 #foreach ($col in $table.columns)
+#if ($col.isJavaNativeStringClob())
+    protected ValueType _vt${col.javaName} = vt(${col.javaNative}.class, "stringClobType");
+#elseif ($col.isJavaNativeBytesOid())
+    protected ValueType _vt${col.javaName} = vt(${col.javaNative}.class, "bytesOidType");
+#else
     protected ValueType _vt${col.javaName} = vt(${col.javaNative}.class);
+#end
 #end
 
     protected ValueType vt(Class<?> type) {
         return TnValueTypes.getValueType(type);
+    }
+
+    protected ValueType vt(Class<?> type, String name) {
+        ValueType valueType = TnValueTypes.getPluginValueType(name);
+        return valueType != null ? valueType : vt(type);
     }
 
     // ===================================================================================
