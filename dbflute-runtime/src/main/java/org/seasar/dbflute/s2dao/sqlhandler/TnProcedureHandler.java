@@ -20,7 +20,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,7 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnProcedureHandler extends TnBasicSelectHandler {
+public class TnProcedureHandler extends TnBasicHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -51,22 +50,24 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnProcedureHandler(final DataSource dataSource, final String sql, final TnResultSetHandler resultSetHandler,
-            final StatementFactory statementFactory, final TnProcedureMetaData procedureMetaData) {
-        super(dataSource, sql, resultSetHandler, statementFactory);
+    public TnProcedureHandler(final DataSource dataSource, final String sql, final StatementFactory statementFactory,
+            final TnProcedureMetaData procedureMetaData) {
+        super(dataSource, sql, statementFactory);
         this.procedureMetaData = procedureMetaData;
     }
 
     // ===================================================================================
     //                                                                             Execute
     //                                                                             =======
-    @SuppressWarnings("unchecked")
-    public Object execute(final Connection connection, final Object[] args, final Class[] argTypes) {
+    public Object execute(final Object[] args) {
+        final Class<?>[] argTypes = getArgTypes(args);
         final Object dto = getArgumentDto(args);
         logSql(args, argTypes);
+        Connection conn = null;
         CallableStatement cs = null;
         try {
-            cs = prepareCallableStatement(connection);
+            conn = getConnection();
+            cs = prepareCallableStatement(conn);
             bindArgs(cs, dto);
             Object returnValue = null;
             if (cs.execute()) {
@@ -85,9 +86,10 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
             return handleOutParameters(cs, dto, returnValue);
         } catch (SQLException e) {
             handleSQLException(e, cs);
-            return null;// unreachable
+            return null; // unreachable
         } finally {
             close(cs);
+            close(conn);
         }
     }
 
@@ -135,6 +137,7 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
         int i = 0;
         for (TnProcedureParameterType ppt : procedureMetaData.parameterTypes()) {
             final ValueType valueType = ppt.getValueType();
+            // if INOUT parameter, both are true
             if (ppt.isOutType()) {
                 valueType.registerOutParameter(cs, i + 1);
             }
@@ -143,25 +146,6 @@ public class TnProcedureHandler extends TnBasicSelectHandler {
                 valueType.bindValue(cs, i + 1, value);
             }
             ++i;
-        }
-    }
-
-    protected Object handleResultSet(final CallableStatement cs) throws SQLException {
-        ResultSet rs = null;
-        try {
-            rs = getResultSet(cs);
-            return getResultSetHandler().handle(rs);
-        } finally {
-            close(rs);
-        }
-    }
-
-    protected ResultSet getResultSet(Statement statement) {
-        try {
-            return statement.getResultSet();
-        } catch (SQLException e) {
-            handleSQLException(e, statement);
-            return null;// unreachable
         }
     }
 

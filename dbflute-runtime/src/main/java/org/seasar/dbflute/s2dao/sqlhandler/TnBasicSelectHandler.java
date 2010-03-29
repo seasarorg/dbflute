@@ -59,7 +59,7 @@ public class TnBasicSelectHandler extends TnBasicHandler {
     }
 
     public Object execute(Object[] args, Class<?>[] argTypes) {
-        Connection conn = getConnection();
+        final Connection conn = getConnection();
         try {
             return execute(conn, args, argTypes);
         } finally {

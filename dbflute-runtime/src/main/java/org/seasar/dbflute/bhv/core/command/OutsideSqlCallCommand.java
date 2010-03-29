@@ -19,7 +19,6 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
-import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.procedure.TnProcedureMetaData;
 import org.seasar.dbflute.s2dao.procedure.TnProcedureMetaDataFactory;
 import org.seasar.dbflute.s2dao.sqlcommand.TnProcedureCommand;
@@ -69,7 +68,7 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
         outsideSqlContext.setMethodName(getCommandName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
-		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
+        outsideSqlContext.setupBehaviorQueryPathIfNeeds();
         OutsideSqlContext.setOutsideSqlContextOnThread(outsideSqlContext);
     }
 
@@ -124,9 +123,7 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
     }
 
     protected TnProcedureCommand createProcedureCommand(TnProcedureMetaData metaData) {
-        // Because a procedure command does not use result set handler.
-        final TnResultSetHandler resultSetHandler = new NullResultSetHandler(); 
-        return new TnProcedureCommand(_dataSource, resultSetHandler, _statementFactory, metaData);
+        return new TnProcedureCommand(_dataSource, _statementFactory, metaData);
     }
 
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

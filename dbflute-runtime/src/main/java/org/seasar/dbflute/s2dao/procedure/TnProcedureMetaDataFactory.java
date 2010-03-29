@@ -41,8 +41,8 @@ public class TnProcedureMetaDataFactory {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected TnValueTypeFactory valueTypeFactory;
-    protected InternalFieldProcedureAnnotationReader annotationReader = new InternalFieldProcedureAnnotationReader();
+    protected TnValueTypeFactory _valueTypeFactory;
+    protected TnFieldProcedureAnnotationReader _annotationReader = new TnFieldProcedureAnnotationReader();
 
     // ===================================================================================
     //                                                                                Main
@@ -85,7 +85,7 @@ public class TnProcedureMetaDataFactory {
     }
 
     protected TnProcedureParameterType getProcedureParameterType(final DfBeanDesc dtoDesc, final Field field) {
-        final String procedureParameter = annotationReader.getProcedureParameter(dtoDesc, field);
+        final String procedureParameter = _annotationReader.getProcedureParameter(dtoDesc, field);
         if (procedureParameter == null) {
             return null;
         }
@@ -140,12 +140,12 @@ public class TnProcedureMetaDataFactory {
     }
 
     protected ValueType getValueType(final DfBeanDesc dtoDesc, final Field field) {
-        final String name = annotationReader.getValueType(dtoDesc, field);
+        final String name = _annotationReader.getValueType(dtoDesc, field);
         if (name != null) {
-            return valueTypeFactory.getValueTypeByName(name);
+            return _valueTypeFactory.getValueTypeByName(name);
         }
         final Class<?> type = field.getType();
-        if (List.class.isAssignableFrom(type)) {// is for out parameter cursor.
+        if (List.class.isAssignableFrom(type)) { // is for out parameter cursor.
             if (isCurrentDBDef(DBDef.Oracle)) {
                 return TnValueTypes.ORACLE_RESULT_SET;
             } else if (isCurrentDBDef(DBDef.PostgreSQL)) {
@@ -154,7 +154,7 @@ public class TnProcedureMetaDataFactory {
                 return TnValueTypes.SERIALIZABLE_BYTE_ARRAY;
             }
         }
-        return valueTypeFactory.getValueTypeByClass(type);
+        return _valueTypeFactory.getValueTypeByClass(type);
     }
 
     protected boolean isCurrentDBDef(DBDef currentDBDef) {
@@ -187,14 +187,14 @@ public class TnProcedureMetaDataFactory {
     }
 
     public void setValueTypeFactory(final TnValueTypeFactory valueTypeFactory) {
-        this.valueTypeFactory = valueTypeFactory;
+        this._valueTypeFactory = valueTypeFactory;
     }
 
-    protected static class InternalFieldProcedureAnnotationReader {
+    protected static class TnFieldProcedureAnnotationReader {
         protected String PROCEDURE_PARAMETER_SUFFIX;
         protected String VALUE_TYPE_SUFFIX;
 
-        public InternalFieldProcedureAnnotationReader() {
+        public TnFieldProcedureAnnotationReader() {
             PROCEDURE_PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
             VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
         }

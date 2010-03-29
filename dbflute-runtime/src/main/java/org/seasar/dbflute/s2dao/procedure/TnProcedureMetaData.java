@@ -45,6 +45,28 @@ public class TnProcedureMetaData {
     // ===================================================================================
     //                                                                             Factory
     //                                                                             =======
+    public String createSql() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        int size = parameterTypes().size();
+        if (hasReturnParameterType()) {
+            sb.append("? = ");
+            size--;
+        }
+        sb.append("call ").append(getProcedureName()).append("(");
+        for (int i = 0; i < size; i++) {
+            sb.append("?, ");
+        }
+        if (size > 0) {
+            sb.setLength(sb.length() - 2);
+        }
+        sb.append(")}");
+        return sb.toString();
+    }
+
+    // ===================================================================================
+    //                                                                             Factory
+    //                                                                             =======
     protected Map<String, TnProcedureParameterType> createUnorderedMap() {
         return new HashMap<String, TnProcedureParameterType>();
     }

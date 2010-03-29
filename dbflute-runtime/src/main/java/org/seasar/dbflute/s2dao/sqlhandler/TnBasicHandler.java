@@ -55,11 +55,22 @@ public class TnBasicHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
+    /**
+     * Constructor. You need to set SQL later.
+     * @param ds The data source. (NotNull)
+     * @param statementFactory The factory of statement. (NotNull)
+     */
     public TnBasicHandler(DataSource ds, StatementFactory statementFactory) {
         setDataSource(ds);
         setStatementFactory(statementFactory);
     }
 
+    /**
+     * Constructor. (full property parameter)
+     * @param ds The data source. (NotNull)
+     * @param sql The SQL string. (NotNull)
+     * @param statementFactory The factory of statement. (NotNull)
+     */
     public TnBasicHandler(DataSource ds, String sql, StatementFactory statementFactory) {
         setDataSource(ds);
         setSql(sql);
