@@ -13,14 +13,13 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.procedure;
+package org.seasar.dbflute.s2dao.metadata;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -29,7 +28,6 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -41,6 +39,7 @@ public class TnProcedureMetaDataFactory {
     //                                                                           Attribute
     //                                                                           =========
     protected TnFieldProcedureAnnotationReader _annotationReader = new TnFieldProcedureAnnotationReader();
+    protected TnProcedureValueTypeProvider _valueTypeProvider = new TnProcedureValueTypeProvider();
 
     // ===================================================================================
     //                                                                                Main
@@ -65,7 +64,6 @@ public class TnProcedureMetaDataFactory {
             final Class<?> clazz = stack.pop();
             registerParameterType(metaData, pmbDesc, clazz.getDeclaredFields());
         }
-
         return metaData;
     }
 
@@ -109,7 +107,7 @@ public class TnProcedureMetaDataFactory {
         }
         final Integer index = extractParameterIndex(procedureParameter, field);
         ppt.setParameterIndex(index);
-        final ValueType valueType = getValueType(dtoDesc, field);
+        final ValueType valueType = findValueType(dtoDesc, field);
         ppt.setValueType(valueType);
         return ppt;
     }
@@ -137,34 +135,23 @@ public class TnProcedureMetaDataFactory {
         return null;
     }
 
-    protected ValueType getValueType(final DfBeanDesc dtoDesc, final Field field) {
+    protected ValueType findValueType(DfBeanDesc dtoDesc, Field field) {
         final String name = _annotationReader.getValueType(dtoDesc, field);
-        if (name != null) {
-            return TnValueTypes.getPluginValueType(name);
-        }
         final Class<?> type = field.getType();
-        if (List.class.isAssignableFrom(type)) { // is for out parameter cursor.
-            if (isCurrentDBDef(DBDef.Oracle)) {
-                return TnValueTypes.ORACLE_RESULT_SET;
-            } else if (isCurrentDBDef(DBDef.PostgreSQL)) {
-                return TnValueTypes.POSTGRE_RESULT_SET;
-            } else {
-                return TnValueTypes.SERIALIZABLE_BYTE_ARRAY;
-            }
-        }
-        return TnValueTypes.getValueType(type);
+        final DBDef currentDBDef = ResourceContext.currentDBDef();
+        return _valueTypeProvider.provideValueType(name, type, currentDBDef);
     }
 
     protected boolean isCurrentDBDef(DBDef currentDBDef) {
         return ResourceContext.isCurrentDBDef(currentDBDef);
     }
 
-    protected boolean isInstanceField(final Field field) {
+    protected boolean isInstanceField(Field field) {
         final int mod = field.getModifiers();
         return !Modifier.isStatic(mod) && !Modifier.isFinal(mod);
     }
 
-    protected boolean isDtoType(final Class<?> clazz) {
+    protected boolean isDtoType(Class<?> clazz) {
         return !isSimpleType(clazz) && !isContainerType(clazz);
     }
 
@@ -177,7 +164,7 @@ public class TnProcedureMetaDataFactory {
                 || Calendar.class.isAssignableFrom(clazz) || clazz == byte[].class;
     }
 
-    protected boolean isContainerType(final Class<?> clazz) {
+    protected boolean isContainerType(Class<?> clazz) {
         if (clazz == null) {
             throw new NullPointerException("clazz");
         }

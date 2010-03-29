@@ -20,7 +20,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
-import org.seasar.dbflute.s2dao.procedure.TnProcedureMetaData;
+import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaData;
 import org.seasar.dbflute.s2dao.sqlhandler.TnProcedureHandler;
 
 /**

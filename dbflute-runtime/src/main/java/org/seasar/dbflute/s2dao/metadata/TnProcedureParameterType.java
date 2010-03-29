@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.procedure;
+package org.seasar.dbflute.s2dao.metadata;
 
 import java.lang.reflect.Field;
 

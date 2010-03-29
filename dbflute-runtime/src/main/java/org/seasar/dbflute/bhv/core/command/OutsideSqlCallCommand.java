@@ -19,8 +19,8 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
-import org.seasar.dbflute.s2dao.procedure.TnProcedureMetaData;
-import org.seasar.dbflute.s2dao.procedure.TnProcedureMetaDataFactory;
+import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaData;
+import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaDataFactory;
 import org.seasar.dbflute.s2dao.sqlcommand.TnProcedureCommand;
 
 /**

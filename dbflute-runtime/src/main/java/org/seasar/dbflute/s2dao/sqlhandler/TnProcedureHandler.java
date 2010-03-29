@@ -30,10 +30,10 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
+import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaData;
+import org.seasar.dbflute.s2dao.metadata.TnProcedureParameterType;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
-import org.seasar.dbflute.s2dao.procedure.TnProcedureMetaData;
-import org.seasar.dbflute.s2dao.procedure.TnProcedureParameterType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
