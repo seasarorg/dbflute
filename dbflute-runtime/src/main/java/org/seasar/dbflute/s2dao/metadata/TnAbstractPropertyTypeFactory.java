@@ -13,7 +13,7 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.s2dao.metadata.impl;
+package org.seasar.dbflute.s2dao.metadata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +22,7 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.jdbc.ValueType;
-import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
-import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactory;
+import org.seasar.dbflute.s2dao.metadata.impl.TnPropertyTypeImpl;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
 /**
