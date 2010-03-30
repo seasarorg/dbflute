@@ -70,10 +70,10 @@ public class TnProcedureHandler extends TnBasicHandler {
             bindArgs(cs, pmb);
 
             // Execute the procedure!
-            // The return means whether the first result is a result set.
+            // The return means whether the first result is a (not-parameter) result set.
             final boolean executed = cs.execute();
 
-            handleClosetResult(cs, pmb, executed); // should be before out-parameter handling
+            handleNotParamResult(cs, pmb, executed); // should be before out-parameter handling
             handleOutParameter(cs, pmb, executed);
             return pmb;
         } catch (SQLException e) {
@@ -125,13 +125,13 @@ public class TnProcedureHandler extends TnBasicHandler {
     }
 
     /**
-     * Handle closet result set, for example, (MS) SQLServer.
+     * Handle not-parameter result set, for example, MySQL and (MS) SQLServer.
      * @param cs The statement of procedure. (NotNull)
      * @param pmb The parameter bean from arguments. (NotNull)
      * @param executed The return value of execute() that means whether the first result is a result set. 
      * @throws SQLException
      */
-    protected void handleClosetResult(CallableStatement cs, Object pmb, boolean executed) throws SQLException {
+    protected void handleNotParamResult(CallableStatement cs, Object pmb, boolean executed) throws SQLException {
         if (pmb == null) {
             return;
         }
@@ -140,9 +140,9 @@ public class TnProcedureHandler extends TnBasicHandler {
                 return;
             }
         }
-        final List<TnProcedureParameterType> closetList = _procedureMetaData.getClosetResultTypeList();
+        final List<TnProcedureParameterType> resultList = _procedureMetaData.getNotParamResultTypeList();
         ResultSet rs = null;
-        for (TnProcedureParameterType ppt : closetList) {
+        for (TnProcedureParameterType ppt : resultList) {
             try {
                 rs = cs.getResultSet();
                 if (rs == null) {

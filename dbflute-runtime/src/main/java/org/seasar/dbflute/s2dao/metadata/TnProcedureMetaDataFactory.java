@@ -97,10 +97,10 @@ public class TnProcedureMetaDataFactory {
         } else if (type.equalsIgnoreCase("return")) {
             ppt.setOutType(true);
             ppt.setReturnType(true);
-        } else if (type.equalsIgnoreCase("closetResult")) {
-            ppt.setClosetResultType(true);
+        } else if (type.equalsIgnoreCase("notParamResult")) {
+            ppt.setNotParamResultType(true);
         } else {
-            String msg = "The parameter type should be 'in' or 'out' or 'inout' or 'return':";
+            String msg = "The parameter type should be 'in' or 'out' or 'inout' or 'return' or 'notParamResult':";
             msg = msg + " class=" + parameterDesc.getBeanDesc().getBeanClass().getSimpleName();
             msg = msg + " property=" + parameterDesc.getPropertyName();
             throw new IllegalStateException(msg);

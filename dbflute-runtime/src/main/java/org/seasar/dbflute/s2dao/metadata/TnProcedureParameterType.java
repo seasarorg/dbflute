@@ -35,7 +35,7 @@ public class TnProcedureParameterType {
     private boolean _inType;
     private boolean _outType;
     private boolean _returnType;
-    private boolean _closetResultType;
+    private boolean _notParamResultType;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -120,11 +120,11 @@ public class TnProcedureParameterType {
         this._returnType = returnType;
     }
 
-    public boolean isClosetResultType() {
-        return _closetResultType;
+    public boolean isNotParamResultType() {
+        return _notParamResultType;
     }
 
-    public void setClosetResultType(final boolean closetResultType) {
-        this._closetResultType = closetResultType;
+    public void setNotParamResultType(final boolean notParamResultType) {
+        this._notParamResultType = notParamResultType;
     }
 }
