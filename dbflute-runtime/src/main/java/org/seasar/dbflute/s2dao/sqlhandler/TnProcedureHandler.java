@@ -67,11 +67,8 @@ public class TnProcedureHandler extends TnBasicHandler {
             conn = getConnection();
             cs = prepareCallableStatement(conn);
             bindArgs(cs, pmb);
-            Object returnResultSet = null;
-            if (cs.execute()) {
-                returnResultSet = handleReturnResultSet(cs);
-            }
-            return handleOutParameters(cs, pmb, returnResultSet);
+            final boolean executed = cs.execute();
+            return handleOutParameters(cs, pmb, executed);
         } catch (SQLException e) {
             handleSQLException(e, cs);
             return null; // unreachable
@@ -81,20 +78,17 @@ public class TnProcedureHandler extends TnBasicHandler {
         }
     }
 
-    protected Object handleReturnResultSet(CallableStatement cs) throws SQLException {
-        Object returnResultSet = null;
-        final ResultSet rs = cs.getResultSet();
-        if (rs != null) {
-            final TnResultSetHandler handler = createReturnResultSetHandler(rs);
-            try {
-                returnResultSet = handler.handle(rs);
-            } finally {
-                if (rs != null) {
-                    rs.close();
-                }
-            }
+    protected Object getParameterBean(Object[] args) {
+        if (args.length == 0) {
+            return null;
         }
-        return returnResultSet;
+        if (args.length == 1) {
+            if (args[0] == null) {
+                throw new IllegalStateException("args[0] should not be null!");
+            }
+            return args[0];
+        }
+        throw new IllegalStateException("The size of args should be 1: " + args.length);
     }
 
     protected CallableStatement prepareCallableStatement(final Connection connection) {
@@ -123,7 +117,7 @@ public class TnProcedureHandler extends TnBasicHandler {
         }
     }
 
-    protected Object handleOutParameters(CallableStatement cs, Object pmb, Object returnValue) throws SQLException {
+    protected Object handleOutParameters(CallableStatement cs, Object pmb, boolean executed) throws SQLException {
         if (pmb == null) {
             return null;
         }
@@ -144,25 +138,34 @@ public class TnProcedureHandler extends TnBasicHandler {
                     }
                 }
                 ppt.setValue(pmb, value);
-            } else if (ppt.isReturnType()) {
-                ppt.setValue(pmb, returnValue);
+            } else if (ppt.isReturnType()) { // non out parameter return
+                // basically false because return value is treated as out parameter
+                // this process is for just in case
+                Object returnResultSet = null;
+                if (executed) {
+                    returnResultSet = handleNonOutReturnResultSet(cs);
+                }
+                ppt.setValue(pmb, returnResultSet);
             }
             ++i;
         }
         return pmb;
     }
 
-    protected Object getParameterBean(Object[] args) {
-        if (args.length == 0) {
-            return null;
-        }
-        if (args.length == 1) {
-            if (args[0] == null) {
-                throw new IllegalStateException("args[0] should not be null!");
+    protected Object handleNonOutReturnResultSet(CallableStatement cs) throws SQLException {
+        Object returnResultSet = null;
+        final ResultSet rs = cs.getResultSet();
+        if (rs != null) {
+            final TnResultSetHandler handler = createReturnResultSetHandler(rs);
+            try {
+                returnResultSet = handler.handle(rs);
+            } finally {
+                if (rs != null) {
+                    rs.close();
+                }
             }
-            return args[0];
         }
-        throw new IllegalStateException("The size of args should be 1: " + args.length);
+        return returnResultSet;
     }
 
     // ===================================================================================
