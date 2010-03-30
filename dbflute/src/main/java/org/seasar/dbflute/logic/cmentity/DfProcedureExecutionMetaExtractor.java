@@ -67,11 +67,10 @@ public class DfProcedureExecutionMetaExtractor {
         for (DfProcedureMetaInfo procedure : procedureList) {
             final String procedureName = procedure.getProcedureName();
             final String procedureFullName = procedure.getProcedureFullName();
-            if (!prop.isExecutionMetaProcedureName(procedureFullName)
-                    || !prop.isExecutionMetaProcedureName(procedureName)) {
-                continue;
+            if (prop.isExecutionMetaProcedureName(procedureFullName)
+                    || prop.isExecutionMetaProcedureName(procedureName)) {
+                doExtractExecutionMetaData(dataSource, procedure);
             }
-            doExtractExecutionMetaData(dataSource, procedure);
         }
     }
 
