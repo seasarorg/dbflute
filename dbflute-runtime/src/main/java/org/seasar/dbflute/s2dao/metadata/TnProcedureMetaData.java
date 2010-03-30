@@ -15,11 +15,11 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -30,17 +30,16 @@ public class TnProcedureMetaData {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String procedureName;
-    private Map<String, TnProcedureParameterType> unorderedMap = createUnorderedMap();
-    private Map<String, TnProcedureParameterType> parameterTypes = createParameterTypes();
-    private TnProcedureParameterType returnParameterType = null;
-    private boolean returnType;
+    private final String _procedureName;
+    private final Map<String, TnProcedureParameterType> _parameterTypeMap = createParameterTypeMap();
+    private final SortedSet<TnProcedureParameterType> _parameterTypeSortedSet = createParameterTypeSet();
+    private TnProcedureParameterType _returnParameterType;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnProcedureMetaData(final String procedureName) {
-        this.procedureName = procedureName;
+        this._procedureName = procedureName;
     }
 
     // ===================================================================================
@@ -49,7 +48,7 @@ public class TnProcedureMetaData {
     public String createSql() {
         final StringBuilder sb = new StringBuilder();
         sb.append("{");
-        int size = parameterTypes().size();
+        int size = getParameterTypeSortedSet().size();
         if (hasReturnParameterType()) {
             sb.append("? = ");
             size--;
@@ -68,41 +67,19 @@ public class TnProcedureMetaData {
     // ===================================================================================
     //                                                                             Factory
     //                                                                             =======
-    protected Map<String, TnProcedureParameterType> createUnorderedMap() {
-        return new HashMap<String, TnProcedureParameterType>();
+    protected Map<String, TnProcedureParameterType> createParameterTypeMap() {
+        return new HashMap<String, TnProcedureParameterType>(); // unordered
     }
 
-    protected Map<String, TnProcedureParameterType> createParameterTypes() {
-        return new TreeMap<String, TnProcedureParameterType>(new ParameterComparator());
+    protected SortedSet<TnProcedureParameterType> createParameterTypeSet() {
+        return new TreeSet<TnProcedureParameterType>(new ParameterSetComparator());
     }
 
-    protected class ParameterComparator implements Comparator<String> {
-        public int compare(String o1, String o2) {
-            final int oneGreaterThanTwo = 1;
-            final int twoGreaterThanOne = -1;
-            final TnProcedureParameterType parameterType1 = unorderedMap.get(o1);
-            final TnProcedureParameterType parameterType2 = unorderedMap.get(o2);
-            if (parameterType1.isReturnType()) {
-                return twoGreaterThanOne; // Return type is prior
-            }
-            if (parameterType2.isReturnType()) {
-                return oneGreaterThanTwo; // Return type is prior
-            }
+    protected class ParameterSetComparator implements Comparator<TnProcedureParameterType> {
+        public int compare(TnProcedureParameterType parameterType1, TnProcedureParameterType parameterType2) {
             final Integer parameterIndex1 = parameterType1.getParameterIndex();
             final Integer parameterIndex2 = parameterType2.getParameterIndex();
-            if (parameterIndex1 == null) {
-                if (parameterIndex2 == null) {
-                    return oneGreaterThanTwo; // No changes
-                } else {
-                    return oneGreaterThanTwo; // Not null is prior
-                }
-            } else {
-                if (parameterIndex2 == null) {
-                    return twoGreaterThanOne; // Not null is prior
-                } else {
-                    return parameterIndex1.compareTo(parameterIndex2);
-                }
-            }
+            return parameterIndex1.compareTo(parameterIndex2);
         }
     }
 
@@ -110,28 +87,27 @@ public class TnProcedureMetaData {
     //                                                                            Accessor
     //                                                                            ========
     public String getProcedureName() {
-        return procedureName;
+        return _procedureName;
     }
 
-    public Collection<TnProcedureParameterType> parameterTypes() {
-        return parameterTypes.values();
+    public SortedSet<TnProcedureParameterType> getParameterTypeSortedSet() {
+        return _parameterTypeSortedSet;
     }
 
-    public void addParameterType(final TnProcedureParameterType parameterType) {
+    public void addParameterType(TnProcedureParameterType parameterType) {
         final String name = parameterType.getParameterName();
-        unorderedMap.put(name, parameterType);
-        parameterTypes.put(name, parameterType);
+        _parameterTypeMap.put(name, parameterType);
+        _parameterTypeSortedSet.add(parameterType);
         if (parameterType.isReturnType()) {
-            returnType = true;
-            returnParameterType = parameterType;
+            _returnParameterType = parameterType;
         }
     }
 
     public boolean hasReturnParameterType() {
-        return returnType;
+        return _returnParameterType != null;
     }
 
     public TnProcedureParameterType getReturnParameterType() {
-        return returnParameterType;
+        return _returnParameterType;
     }
 }

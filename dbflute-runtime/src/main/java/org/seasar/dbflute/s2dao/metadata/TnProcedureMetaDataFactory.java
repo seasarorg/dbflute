@@ -103,7 +103,8 @@ public class TnProcedureMetaDataFactory {
             msg = msg + " property=" + parameterDesc.getPropertyName();
             throw new IllegalStateException(msg);
         }
-        final Integer index = parseIndexAsInteger(parameterInfoMap.get("index"), parameterInfo, parameterDesc);
+        final String indexExp = parameterInfoMap.get("index");
+        final Integer index = parseIndexAsInteger(indexExp, parameterInfo, parameterDesc);
         ppt.setParameterIndex(index);
         final ValueType valueType = findValueType(parameterDesc);
         ppt.setValueType(valueType);
