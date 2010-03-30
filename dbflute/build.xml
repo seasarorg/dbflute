@@ -47,7 +47,6 @@
 	<property name="oracle.example.dir" value="${workspace.base}/dbflute-oracle-example"/>
 	<property name="sqlserver.example.dir" value="${workspace.base}/dbflute-sqlserver-example"/>
 	<property name="db2.example.dir" value="${workspace.base}/dbflute-db2-example"/>
-	<property name="sqlserver.example.dir" value="${workspace.base}/dbflute-db2-example"/>
 	<property name="msaccess.example.dir" value="${workspace.base}/dbflute-msaccess-example"/>
 
 	<!-- Friendly Examples -->
