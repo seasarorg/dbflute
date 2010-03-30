@@ -396,7 +396,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                     //    final String columnLabel = metaData.getColumnLabel(i + 1);
                     //}
                     final DfProcedureClosetResultMetaInfo metaInfo = new DfProcedureClosetResultMetaInfo();
-                    metaInfo.setPropertyName("closetResult" + (closetIndex + 1));
+                    metaInfo.setPropertyName("closetResultList" + (closetIndex + 1));
                     procedure.addClosetResultMetaInfo(metaInfo);
                     ++closetIndex;
                 } while (cs.getMoreResults());
