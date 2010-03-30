@@ -57,7 +57,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                                                           Attribute
     //                                                                           =========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-#set ($variableName = _$database.initUncap(${propertyName}))
+#set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
     /** ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} */
     protected ${propertyType} ${variableName};
@@ -160,7 +160,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         final String c = ", ";
         final StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-#set ($variableName = _$database.initUncap(${propertyName}))
+#set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($propertyType.equals("java.util.Date"))
         sb.append(c).append(formatUtilDate(${variableName}));
@@ -179,10 +179,10 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                                                            Accessor
     //                                                                            ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-#set ($variableName = _$database.initUncap(${propertyName}))
+#set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
     /**
-     * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
      * @return The value of ${propertyName}. (Nullable & NotEmptyString: if the value is empty string, returns null)
      */
     public ${propertyType} get${database.initCap($propertyName)}() {
@@ -205,7 +205,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if (!$database.hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter($pmbClassName, $propertyName))
 
     /**
-     * [set] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}) {
@@ -215,7 +215,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      * @param ${propertyName}Option The option of likeSearch for ${propertyName}. (Nullable)
      */
@@ -227,7 +227,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as prefixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as prefixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${propertyName}) {
@@ -238,7 +238,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as containSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as containSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${propertyName}) {
@@ -249,7 +249,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
 
     /**
-     * [set as suffixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as suffixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${propertyName}) {
@@ -270,7 +270,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
 
     /**
-     * [set as fromDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as fromDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${propertyName}) {
@@ -280,7 +280,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
 
     /**
-     * [set as toDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
+     * [set as toDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${propertyName}) {

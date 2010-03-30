@@ -49,7 +49,7 @@ namespace ${glPackageExtendedParameterBean} {
         //                                                                       Attribute
         //                                                                       =========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-#set ($variableName = _$database.initUncap(${propertyName}))
+#set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
         protected ${propertyType} ${variableName};
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
@@ -95,7 +95,7 @@ namespace ${glPackageExtendedParameterBean} {
             String c = ", ";
             StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-#set ($variableName = _$database.initUncap(${propertyName}))
+#set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($propertyType.equals("byte[]"))
             sb.Append(c).Append(FormatByteArray(${variableName}));
@@ -112,7 +112,7 @@ namespace ${glPackageExtendedParameterBean} {
         //                                                                        Accessor
         //                                                                        ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
-#set ($variableName = _$database.initUncap(${propertyName}))
+#set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
         public ${propertyType} ${database.initCap($propertyName)} {
 #if ($propertyType.endsWith("String"))

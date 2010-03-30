@@ -45,6 +45,10 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return isProperty("isGenerateProcedureParameterBean", false);
     }
 
+    public boolean isGenerateProcedureCustomizeEntity() {
+        return isProperty("isGenerateProcedureCustomizeEntity", false);
+    }
+
     protected List<String> _targetProcedureCatalogList;
 
     protected List<String> getTargetProcedureCatalogList() {
