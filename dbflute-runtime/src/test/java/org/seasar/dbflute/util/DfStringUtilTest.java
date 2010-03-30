@@ -93,11 +93,12 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("fooName", DfStringUtil.toBeansPropertyName("FooName"));
         assertEquals("fooName", DfStringUtil.toBeansPropertyName("fooName"));
         assertEquals("BFooName", DfStringUtil.toBeansPropertyName("BFooName"));
-        assertEquals("bFooName", DfStringUtil.toBeansPropertyName("bFooName"));
+        assertEquals("BFooName", DfStringUtil.toBeansPropertyName("bFooName"));
+        assertEquals("bbFooName", DfStringUtil.toBeansPropertyName("bbFooName"));
         assertEquals("f", DfStringUtil.toBeansPropertyName("f"));
         assertEquals("f", DfStringUtil.toBeansPropertyName("F"));
-        assertEquals("FOO_NAME", DfStringUtil.toBeansPropertyName("FOO_NAME"));
-        assertEquals("foo_name", DfStringUtil.toBeansPropertyName("foo_name"));
+        assertEquals("fooName", DfStringUtil.toBeansPropertyName("FOO_NAME"));
+        assertEquals("fooName", DfStringUtil.toBeansPropertyName("foo_name"));
     }
 
     // ===================================================================================
