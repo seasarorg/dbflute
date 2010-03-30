@@ -310,9 +310,9 @@ public class Column {
     //                               Uncapitalised Java Name
     //                               -----------------------
     /**
-     * Get variable name to use in Java sources (= uncapitalised java name)
+     * Get variable name to use in Java sources (= uncapitalized java name)
      */
-    public String getUncapitalisedJavaName() {
+    public String getUncapitalisedJavaName() { // allowed spell miss
         return StringUtils.uncapitalise(getJavaName());
     }
 
@@ -320,10 +320,10 @@ public class Column {
     //                         Java Beans Rule Property Name
     //                         -----------------------------
     /**
-     * Get variable name to use in Java sources (= uncapitalised java name)
+     * Get variable name to use in Java sources (= uncapitalized java name)
      */
     public String getJavaBeansRulePropertyName() {
-        return DfStringUtil.decapitalizePropertyName(getJavaName());
+        return DfStringUtil.toBeansPropertyName(getJavaName());
     }
 
     public String getJavaBeansRulePropertyNameInitCap() {

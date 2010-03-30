@@ -1724,8 +1724,8 @@ public class Database {
     }
 
     // ===================================================================================
-    //                                                        Type Map Helper for Template
-    //                                                        ============================
+    //                                                                 Type Mapping Helper
+    //                                                                 ===================
     public String convertJavaNativeByJdbcType(String jdbcType) {
         try {
             return TypeMap.findJavaNativeByJdbcType(jdbcType, null, null);
@@ -1736,41 +1736,43 @@ public class Database {
         }
     }
 
+    // ===================================================================================
+    //                                                                 Name Convert Helper
+    //                                                                 ===================
     public String convertJavaNameByJdbcNameAsTable(String jdbcName) {
+        // Don't use DfStringUtil.camelize() because
+        // it saves compatible and here simple is best.
+        // (DfStringUtil.camelize() is used at parameter bean and other sub objects)
         if (getBasicProperties().isTableNameCamelCase()) {
             return jdbcName;
         }
         final List<String> inputs = new ArrayList<String>(2);
         inputs.add(jdbcName);
         inputs.add(getDefaultJavaNamingMethod());
-        return StringUtils.capitalise(generateName(NameFactory.JAVA_GENERATOR, inputs));
-    }
-
-    public String convertUncapitalisedJavaNameByJdbcNameAsTable(String jdbcName) {
-        return StringUtils.uncapitalise(convertJavaNameByJdbcNameAsTable(jdbcName));
+        return StringUtils.capitalise(generateName(inputs)); // use title case
     }
 
     public String convertJavaNameByJdbcNameAsColumn(String jdbcName) {
+        // same policy as table naming
         if (getBasicProperties().isColumnNameCamelCase()) {
             return jdbcName;
         }
         final List<String> inputs = new ArrayList<String>(2);
         inputs.add(jdbcName);
         inputs.add(getDefaultJavaNamingMethod());
-        return StringUtils.capitalise(generateName(NameFactory.JAVA_GENERATOR, inputs));
+        return StringUtils.capitalise(generateName(inputs)); // use title case
     }
 
     public String convertUncapitalisedJavaNameByJdbcNameAsColumn(String jdbcName) {
-        return StringUtils.uncapitalise(convertJavaNameByJdbcNameAsColumn(jdbcName));
+        return DfStringUtil.initUncap(convertJavaNameByJdbcNameAsColumn(jdbcName));
     }
 
     /**
      * Generate name.
-     * @param algorithmName Algorithm name.
      * @param inputs Inputs.
      * @return Generated name.
      */
-    protected String generateName(String algorithmName, List<?> inputs) {
+    protected String generateName(List<?> inputs) {
         String javaName = null;
         try {
             javaName = NameFactory.generateName(NameFactory.JAVA_GENERATOR, inputs);
@@ -1843,14 +1845,11 @@ public class Database {
     //                                                String
     //                                                ------
     public String initCap(String str) {
-        if (str == null) {
-            String msg = "Argument[str] must not be null.";
-            throw new IllegalArgumentException(msg);
-        }
-        if (str.length() == 0) {
-            return "";
-        }
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
+        return DfStringUtil.initCap(str);
+    }
+
+    public String initUncap(String str) {
+        return DfStringUtil.initUncap(str);
     }
 
     public boolean isInitNumber(String str) {

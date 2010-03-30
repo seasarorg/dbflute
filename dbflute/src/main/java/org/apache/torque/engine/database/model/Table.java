@@ -563,23 +563,23 @@ public class Table {
     }
 
     // -----------------------------------------------------
-    //                               Uncapitalised Java Name
+    //                               Uncapitalized Java Name
     //                               -----------------------
     /**
-     * Get variable name to use in Java sources (= uncapitalised java name)
+     * Get variable name to use in Java sources (= uncapitalized java name)
      */
-    public String getUncapitalisedJavaName() {
-        return StringUtils.uncapitalise(getJavaName());
+    public String getUncapitalisedJavaName() { // allowed spell miss
+        return DfStringUtil.initUncap(getJavaName());
     }
 
     // -----------------------------------------------------
     //                         Java Beans Rule Property Name
     //                         -----------------------------
     /**
-     * Get variable name to use in Java sources (= uncapitalised java name)
+     * Get variable name to use in Java sources (= uncapitalized java name)
      */
     public String getJavaBeansRulePropertyName() {
-        return DfStringUtil.decapitalizePropertyName(getJavaName());
+        return DfStringUtil.toBeansPropertyName(getJavaName());
     }
 
     // -----------------------------------------------------
@@ -711,7 +711,8 @@ public class Table {
 
     protected String getSchemaPrefix() {
         if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
-            return DfStringUtil.initCapAfterTrimming(_schema);
+            // schema of DB2 may have space either size
+            return DfStringUtil.initCapTrimmed(_schema);
         }
         return "";
     }
@@ -1966,19 +1967,6 @@ public class Table {
     // ===================================================================================
     //                                                                             Utility
     //                                                                             =======
-    protected String makeJavaName(String fieldName) {
-        String result = null;
-        List<String> inputs = new ArrayList<String>(2);
-        inputs.add(fieldName);
-        inputs.add(_javaNamingMethod);
-        try {
-            result = NameFactory.generateName(NameFactory.JAVA_GENERATOR, inputs);
-        } catch (EngineException e) {
-            _log.error(e, e);
-        }
-        return StringUtils.capitalise(result);
-    }
-
     /**
      * Returns the elements of the list, separated by commas.
      * @param list a list of Columns
@@ -2428,19 +2416,6 @@ public class Table {
             return "";
         }
         return column.getJavaName();
-    }
-
-    protected String buildVersionNoJavaName(String versionNoFieldName) {
-        if (versionNoFieldName != null && versionNoFieldName.trim().length() != 0) {
-            final DfBasicProperties basicProperties = getBasicProperties();
-            if (basicProperties.isColumnNameCamelCase()) {
-                return versionNoFieldName;
-            } else {
-                return makeJavaName(versionNoFieldName);
-            }
-        } else {
-            return "";
-        }
     }
 
     public String getVersionNoPropertyName() {

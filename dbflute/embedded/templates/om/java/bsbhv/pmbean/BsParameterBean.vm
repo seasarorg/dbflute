@@ -36,18 +36,19 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                   -------------------
 #set ($procedureParameterIndex = 0)
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($annotationPropName = ${propertyName})
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
-    public static final String ${propertyName}_PROCEDURE_PARAMETER = "in, ${procedureParameterIndex}";
+    public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "in, ${procedureParameterIndex}";
 #set ($procedureParameterIndex = $procedureParameterIndex + 1)
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterOut($pmbClassName, $propertyName))
-    public static final String ${propertyName}_PROCEDURE_PARAMETER = "out, ${procedureParameterIndex}";
+    public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "out, ${procedureParameterIndex}";
 #set ($procedureParameterIndex = $procedureParameterIndex + 1)
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterInOut($pmbClassName, $propertyName))
-    public static final String ${propertyName}_PROCEDURE_PARAMETER = "inout, ${procedureParameterIndex}";
+    public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "inout, ${procedureParameterIndex}";
 #set ($procedureParameterIndex = $procedureParameterIndex + 1)
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
-    public static final String ${propertyName}_PROCEDURE_PARAMETER = "return, -1";
+    public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "return, -1";
 #end
 #end
 #end
@@ -56,13 +57,14 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                                                           Attribute
     //                                                                           =========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = _$database.initUncap(${propertyName}))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
     /** ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} */
-    protected ${propertyType} _${propertyName};
+    protected ${propertyType} ${variableName};
 
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
     /** The value of likeSearchOption for ${propertyName}. */
-    protected LikeSearchOption _${propertyName}InternalLikeSearchOption;
+    protected LikeSearchOption ${variableName}InternalLikeSearchOption;
 
 #end
 #end
@@ -158,13 +160,14 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         final String c = ", ";
         final StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = _$database.initUncap(${propertyName}))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($propertyType.equals("java.util.Date"))
-        sb.append(c).append(formatUtilDate(_${propertyName}));
+        sb.append(c).append(formatUtilDate(${variableName}));
 #elseif ($propertyType.equals("byte[]"))
-        sb.append(c).append(formatByteArray(_${propertyName}));
+        sb.append(c).append(formatByteArray(${variableName}));
 #else
-        sb.append(c).append(_${propertyName});
+        sb.append(c).append(${variableName});
 #end
 #end
         if (sb.length() > 0) { sb.delete(0, c.length()); }
@@ -176,6 +179,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                                                            Accessor
     //                                                                            ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = _$database.initUncap(${propertyName}))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
     /**
      * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)} <br />
@@ -184,17 +188,17 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     public ${propertyType} get${database.initCap($propertyName)}() {
 #if ($propertyType.endsWith("String"))
 #if ($database.isShortCharHandlingValid() && $database.isPmbMetaDataPropertyRefColumnChar($pmbClassName, $propertyName))
-        String filtered = convertEmptyToNull(_${propertyName});
+        String filtered = convertEmptyToNull(${variableName});
         filtered = handleShortChar("${propertyName}", filtered, ${database.getPmbMetaDataPropertyRefSize($pmbClassName, $propertyName)});
         return filtered;
 #else
-        return convertEmptyToNull(_${propertyName});
+        return convertEmptyToNull(${variableName});
 #end
 #else
 #if ($propertyType.equals("java.util.Date"))
-        return convertToUtilDate(_${propertyName});
+        return convertToUtilDate(${variableName});
 #else
-        return _${propertyName};
+        return ${variableName};
 #end
 #end
     }
@@ -205,7 +209,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}) {
-        _${propertyName} = ${propertyName};
+        ${variableName} = ${propertyName};
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
@@ -216,8 +220,8 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @param ${propertyName}Option The option of likeSearch for ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}, LikeSearchOption ${propertyName}Option) {
-        _${propertyName} = ${propertyName};
-        _${propertyName}InternalLikeSearchOption = ${propertyName}Option;
+        ${variableName} = ${propertyName};
+        ${variableName}InternalLikeSearchOption = ${propertyName}Option;
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
@@ -227,8 +231,8 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${propertyName}) {
-        _${propertyName} = ${propertyName};
-        _${propertyName}InternalLikeSearchOption = new LikeSearchOption().likePrefix();
+        ${variableName} = ${propertyName};
+        ${variableName}InternalLikeSearchOption = new LikeSearchOption().likePrefix();
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
@@ -238,8 +242,8 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${propertyName}) {
-        _${propertyName} = ${propertyName};
-        _${propertyName}InternalLikeSearchOption = new LikeSearchOption().likeContain();
+        ${variableName} = ${propertyName};
+        ${variableName}InternalLikeSearchOption = new LikeSearchOption().likeContain();
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
@@ -249,8 +253,8 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${propertyName}) {
-        _${propertyName} = ${propertyName};
-        _${propertyName}InternalLikeSearchOption = new LikeSearchOption().likeSuffix();
+        ${variableName} = ${propertyName};
+        ${variableName}InternalLikeSearchOption = new LikeSearchOption().likeSuffix();
     }
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
@@ -260,7 +264,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @return The internal option of likeSearch for ${propertyName}. (Nullable)
      */
     public LikeSearchOption get${database.initCap($propertyName)}InternalLikeSearchOption() {
-        return _${propertyName}InternalLikeSearchOption;
+        return ${variableName}InternalLikeSearchOption;
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
@@ -270,7 +274,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${propertyName}) {
-        _${propertyName} = new FromToOption().compareAsDate().filterFromDate(${propertyName});
+        ${variableName} = new FromToOption().compareAsDate().filterFromDate(${propertyName});
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
@@ -280,7 +284,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * @param ${propertyName} The value of ${propertyName}. (Nullable)
      */
     public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${propertyName}) {
-        _${propertyName} = new FromToOption().compareAsDate().filterToDate(${propertyName});
+        ${variableName} = new FromToOption().compareAsDate().filterToDate(${propertyName});
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))
@@ -292,7 +296,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      * ${database.getMapValue($classificationMap, 'comment')}
      */
     public void set${database.initCap($propertyName)}_${classificationMap.get('name')}() {
-        _${propertyName} = ${glPackageBaseCommon}.${glCDef}.${classificationName}.${classificationMap.get('name')}.code();
+        ${variableName} = ${glPackageBaseCommon}.${glCDef}.${classificationName}.${classificationMap.get('name')}.code();
     }
 #end
 #end

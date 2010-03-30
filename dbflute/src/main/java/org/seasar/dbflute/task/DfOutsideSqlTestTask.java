@@ -29,7 +29,6 @@ import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlChecker;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
-import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -103,11 +102,11 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
             }
 
             protected String removeBlockComment(final String sql) {
-                return DfSqlStringUtil.removeBlockComment(sql);
+                return DfStringUtil.removeBlockComment(sql);
             }
 
             protected String removeLineComment(final String sql) {
-                return DfSqlStringUtil.removeLineComment(sql);
+                return DfStringUtil.removeLineComment(sql);
             }
 
             @Override

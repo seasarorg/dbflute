@@ -30,14 +30,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.model.AppData;
 import org.apache.torque.engine.database.model.Column;
 import org.apache.torque.engine.database.model.Database;
-import org.apache.torque.engine.database.model.NameFactory;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.TypeMap;
 import org.apache.velocity.VelocityContext;
@@ -74,7 +72,6 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
-import org.seasar.dbflute.util.DfSqlStringUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 /**
@@ -655,11 +652,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String removeBlockComment(final String sql) {
-        return DfSqlStringUtil.removeBlockComment(sql);
+        return DfStringUtil.removeBlockComment(sql);
     }
 
     protected String removeLineComment(final String sql) {
-        return DfSqlStringUtil.removeLineComment(sql); // With removing CR
+        return DfStringUtil.removeLineComment(sql); // with removing CR
     }
 
     protected String resolveEntityNameIfNeeds(String className, File file) {
@@ -807,14 +804,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected String convertProcedureNameToPmbName(String procedureUniqueName) {
         procedureUniqueName = replaceString(procedureUniqueName, ".", "_");
         procedureUniqueName = filterProcedureName4PmbNameAboutVendorDependency(procedureUniqueName);
-        if (procedureUniqueName.contains("_")) {
-            procedureUniqueName = generateCapitalisedJavaName(procedureUniqueName.toUpperCase());
-        } else {
-            boolean allUpperCase = isAllUpperCase(procedureUniqueName);
-            procedureUniqueName = StringUtils.capitalise(allUpperCase ? procedureUniqueName.toLowerCase()
-                    : procedureUniqueName);
-        }
-        return procedureUniqueName + "Pmb";
+        return DfStringUtil.camelize(procedureUniqueName) + "Pmb";
     }
 
     protected String filterProcedureName4PmbNameAboutVendorDependency(String procedureName) {
@@ -825,42 +815,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return procedureName;
     }
 
+    protected String convertColumnNameToPropertyName(String columnName) {
+        columnName = filterColumnNameAboutVendorDependency(columnName);
+        return DfStringUtil.camelize(columnName);
+    }
+
     protected String filterColumnNameAboutVendorDependency(String columnName) {
         // Because SQLServer returns '@returnValue'.
         if (getBasicProperties().isDatabaseSQLServer() && columnName.startsWith("@")) {
             columnName = columnName.substring("@".length());
         }
         return columnName;
-    }
-
-    protected String convertColumnNameToPropertyName(String columnName) {
-        if (columnName.contains("_")) {
-            columnName = generateUncapitalisedJavaName(columnName.toUpperCase());
-        } else {
-            boolean allUpperCase = isAllUpperCase(columnName);
-            columnName = StringUtils.uncapitalise(allUpperCase ? columnName.toLowerCase() : columnName);
-        }
-        return columnName;
-    }
-
-    protected boolean isAllUpperCase(String name) {
-        char[] charArray = name.toCharArray();
-        boolean allUpperCase = true;
-        for (char ch : charArray) {
-            if (Character.isLowerCase(ch)) {
-                allUpperCase = false;
-                break;
-            }
-        }
-        return allUpperCase;
-    }
-
-    protected String generateUncapitalisedJavaName(String name) {
-        return StringUtils.uncapitalise(NameFactory.generateJavaNameByMethodUnderscore(name));
-    }
-
-    protected String generateCapitalisedJavaName(String name) {
-        return StringUtils.capitalise(NameFactory.generateJavaNameByMethodUnderscore(name));
     }
 
     // ===================================================================================

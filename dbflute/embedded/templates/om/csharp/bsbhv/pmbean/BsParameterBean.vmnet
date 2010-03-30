@@ -30,16 +30,17 @@ namespace ${glPackageExtendedParameterBean} {
         //                               Procedure Parameter
         //                               -------------------
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($annotationPropName = $database.initUncap(${propertyName}))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #set ($columnName = $database.getPmbMetaDataPropertyColumnName($pmbClassName, $propertyName))
 #if ($database.isPmbMetaDataPropertyOptionProcedureParameterIn($pmbClassName, $propertyName))
-        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "${columnName}, in";
+        public static readonly String ${annotationPropName}_PROCEDURE_PARAMETER = "${columnName}, in";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterOut($pmbClassName, $propertyName))
-        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "${columnName}, out";
+        public static readonly String ${annotationPropName}_PROCEDURE_PARAMETER = "${columnName}, out";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterInOut($pmbClassName, $propertyName))
-        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "${columnName}, inout";
+        public static readonly String ${annotationPropName}_PROCEDURE_PARAMETER = "${columnName}, inout";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
-        public static readonly String ${propertyName}_PROCEDURE_PARAMETER = "${columnName}, return";
+        public static readonly String ${annotationPropName}_PROCEDURE_PARAMETER = "${columnName}, return";
 #end
 #end
 #end
@@ -48,10 +49,11 @@ namespace ${glPackageExtendedParameterBean} {
         //                                                                       Attribute
         //                                                                       =========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = _$database.initUncap(${propertyName}))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-        protected ${propertyType} _${propertyName};
+        protected ${propertyType} ${variableName};
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
-        protected ${glLikeSearchOption} _${propertyName}InternalLikeSearchOption;
+        protected ${glLikeSearchOption} ${variableName}InternalLikeSearchOption;
 
 #end
 #end
@@ -93,11 +95,12 @@ namespace ${glPackageExtendedParameterBean} {
             String c = ", ";
             StringBuilder sb = new StringBuilder();
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = _$database.initUncap(${propertyName}))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
 #if ($propertyType.equals("byte[]"))
-            sb.Append(c).Append(FormatByteArray(_${propertyName}));
+            sb.Append(c).Append(FormatByteArray(${variableName}));
 #else
-            sb.Append(c).Append(_${propertyName});
+            sb.Append(c).Append(${variableName});
 #end
 #end
             if (sb.Length > 0) { sb.Remove(0, c.Length); }
@@ -109,61 +112,62 @@ namespace ${glPackageExtendedParameterBean} {
         //                                                                        Accessor
         //                                                                        ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
+#set ($variableName = _$database.initUncap(${propertyName}))
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
         public ${propertyType} ${database.initCap($propertyName)} {
 #if ($propertyType.endsWith("String"))
-            get { return ($propertyType)ConvertEmptyToNullIfString(_${propertyName}); }
+            get { return ($propertyType)ConvertEmptyToNullIfString(${variableName}); }
 #else
-            get { return _${propertyName}; }
+            get { return ${variableName}; }
 #end
 #if (!$database.hasPmbMetaDataPropertyOptionOriginalOnlyOneSetter($pmbClassName, $propertyName))
-            set { _${propertyName} = value; }
+            set { ${variableName} = value; }
 #end
         }
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
         public void Set${database.initCap($propertyName)}(${propertyType} ${propertyName}, ${glLikeSearchOption} ${propertyName}Option) {
-            _${propertyName} = ${propertyName};
-            _${propertyName}InternalLikeSearchOption = ${propertyName}Option;
+            ${variableName} = ${propertyName};
+            ${variableName}InternalLikeSearchOption = ${propertyName}Option;
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
 
         public void Set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${propertyName}) {
-            _${propertyName} = ${propertyName};
-            _${propertyName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikePrefix();
+            ${variableName} = ${propertyName};
+            ${variableName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikePrefix();
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
 
         public void Set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${propertyName}) {
-            _${propertyName} = ${propertyName};
-            _${propertyName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikeContain();
+            ${variableName} = ${propertyName};
+            ${variableName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikeContain();
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
 
         public void Set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${propertyName}) {
-            _${propertyName} = ${propertyName};
-            _${propertyName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikeSuffix();
+            ${variableName} = ${propertyName};
+            ${variableName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikeSuffix();
         }
 #end
 #if ($database.hasPmbMetaDataPropertyOptionAnyLikeSearch($pmbClassName, $propertyName))
 
         public ${glLikeSearchOption} ${database.initCap($propertyName)}InternalLikeSearchOption { get {
-            return _${propertyName}InternalLikeSearchOption;
+            return ${variableName}InternalLikeSearchOption;
         }}
 #end
 #if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
 
         public void Set${database.initCap($propertyName)}_FromDate(${propertyType} ${propertyName}) {
-            _${propertyName} = new ${glFromToOption}().CompareAsDate().filterFromDate(${propertyName});
+            ${variableName} = new ${glFromToOption}().CompareAsDate().filterFromDate(${propertyName});
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
 
         public void Set${database.initCap($propertyName)}_ToDate(${propertyType} ${propertyName}) {
-            _${propertyName} = new ${glFromToOption}().CompareAsDate().filterToDate(${propertyName});
+            ${variableName} = new ${glFromToOption}().CompareAsDate().filterToDate(${propertyName});
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))

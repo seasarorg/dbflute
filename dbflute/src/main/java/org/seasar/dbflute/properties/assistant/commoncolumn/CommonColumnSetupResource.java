@@ -24,7 +24,7 @@ public class CommonColumnSetupResource {
     }
 
     public String getPropertyNameInitCap() {
-        return DfStringUtil.initCapAfterTrimming(propertyName);
+        return DfStringUtil.initCapTrimmed(propertyName);
     }
 
     public String getPropertyVariableName() {
