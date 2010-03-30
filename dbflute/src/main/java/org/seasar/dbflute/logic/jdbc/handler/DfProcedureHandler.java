@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -393,8 +394,17 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
 
     protected void setupProcedureColumnMetaInfo(DfProcedureMetaInfo procedureMetaInfo, ResultSet columnRs)
             throws SQLException {
+        final Set<String> uniqueSet = new HashSet<String>();
         while (columnRs.next()) {
             final String columnName = columnRs.getString("COLUMN_NAME");
+
+            // filter duplicated informations
+            // because Oracle package procedure may return them
+            if (uniqueSet.contains(columnName)) {
+                continue;
+            }
+            uniqueSet.add(columnName);
+
             final Integer procedureColumnType;
             {
                 final String columnType = columnRs.getString("COLUMN_TYPE");

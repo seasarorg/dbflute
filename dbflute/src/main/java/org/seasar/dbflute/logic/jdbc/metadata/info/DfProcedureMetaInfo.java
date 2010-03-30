@@ -1,9 +1,7 @@
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
@@ -63,20 +61,6 @@ public class DfProcedureMetaInfo {
         String comment = procedureComment;
         comment = prop.resolvePreTextForSchemaHtml(comment);
         return comment;
-    }
-
-    public List<DfProcedureColumnMetaInfo> getProcedureColumnUniqueList() {
-        final List<DfProcedureColumnMetaInfo> uniqueList = new ArrayList<DfProcedureColumnMetaInfo>();
-        final Set<String> nameSet = new HashSet<String>();
-        for (DfProcedureColumnMetaInfo column : procedureColumnList) {
-            final String columnName = column.getColumnName();
-            if (nameSet.contains(columnName)) {
-                continue;
-            }
-            nameSet.add(columnName);
-            uniqueList.add(column);
-        }
-        return uniqueList;
     }
 
     @Override

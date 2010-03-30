@@ -19,6 +19,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,9 +76,7 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected void doExtractExecutionMetaData(DataSource dataSource, DfProcedureMetaInfo procedure) throws SQLException {
-        // use unique list because Oracle package procedure may return duplicated information 
-        final List<DfProcedureColumnMetaInfo> columnList = procedure.getProcedureColumnUniqueList();
-
+        final List<DfProcedureColumnMetaInfo> columnList = procedure.getProcedureColumnList();
         final List<Object> testValueList = new ArrayList<Object>();
         final boolean existsReturn = existsReturnValue(columnList);
         setupTestValueList(columnList, testValueList);
@@ -154,6 +153,7 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected void doSetupTestValueList(DfProcedureColumnMetaInfo column, List<Object> testValueList) {
+        final String stringValue = "0";
         final DfProcedureColumnType columnType = column.getProcedureColumnType();
         if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
             return;
@@ -163,7 +163,7 @@ public class DfProcedureExecutionMetaExtractor {
             final int jdbcDefType = column.getJdbcType();
             final String jdbcType = TypeMap.findJdbcTypeByJdbcDefValue(jdbcDefType);
             if (jdbcType == null) {
-                testValueList.add("0");
+                testValueList.add(stringValue);
                 return;
             }
             final Integer columnSize = column.getColumnSize();
@@ -173,13 +173,13 @@ public class DfProcedureExecutionMetaExtractor {
             if (containsAsEndsWith(nativeType, numberList)) {
                 testValue = 0;
             } else if (containsAsEndsWith(nativeType, dateList)) {
-                testValue = DfTypeUtil.toDate("2010-03-30");
+                testValue = DfTypeUtil.toTimestamp("2010-03-31 12:34:56");
             } else if (containsAsEndsWith(nativeType, booleanList)) {
                 testValue = Boolean.FALSE;
             } else if (containsAsEndsWith(nativeType, binaryList)) {
-                return; // binary type is unsupported here
+                testValue = stringValue; // binary type is unsupported here
             } else { // as String
-                testValue = "0";
+                testValue = stringValue;
             }
             testValueList.add(testValue);
         }
@@ -230,7 +230,11 @@ public class DfProcedureExecutionMetaExtractor {
                 cs.setObject(index + 1, testValueList.remove(0));
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
-                cs.registerOutParameter(index + 1, column.getJdbcType());
+                if (isOracleCursor(column)) {
+                    cs.registerOutParameter(index + 1, -10); // means cursor in Oracle
+                } else {
+                    cs.registerOutParameter(index + 1, column.getJdbcType());
+                }
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
                 cs.registerOutParameter(index + 1, column.getJdbcType());
@@ -239,6 +243,12 @@ public class DfProcedureExecutionMetaExtractor {
             }
             ++index;
         }
+    }
+
+    protected boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
+        final int jdbcType = column.getJdbcType();
+        final String dbTypeName = column.getDbTypeName();
+        return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor");
     }
 
     protected Map<String, DfColumnMetaInfo> extractColumnMetaInfoMap(ResultSet rs, String sql) throws SQLException {
