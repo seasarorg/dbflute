@@ -17,6 +17,7 @@ package org.seasar.dbflute.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author jflute
@@ -71,42 +72,6 @@ public class DfStringUtil {
                 return sb.toString();
             }
         } while (true);
-    }
-
-    // ===================================================================================
-    //                                                                               Split
-    //                                                                               =====
-    /**
-     * @param str The split target string. (NotNull)
-     * @param delimiter The delimiter for split. (NotNull)
-     * @return The split list. (NotNull)
-     */
-    public static List<String> splitList(final String str, final String delimiter) {
-        return doSplitList(str, delimiter, false);
-    }
-
-    /**
-     * @param str The split target string. (NotNull)
-     * @param delimiter The delimiter for split. (NotNull)
-     * @return The split list that their elements is trimmed. (NotNull)
-     */
-    public static List<String> splitListTrimmed(final String str, final String delimiter) {
-        return doSplitList(str, delimiter, true);
-    }
-
-    protected static List<String> doSplitList(final String str, final String delimiter, boolean trim) {
-        final List<String> list = new ArrayList<String>();
-        int i = 0;
-        int j = str.indexOf(delimiter);
-        for (int h = 0; j >= 0; h++) {
-            final String element = str.substring(i, j);
-            list.add(trim ? element.trim() : element);
-            i = j + delimiter.length();
-            j = str.indexOf(delimiter, i);
-        }
-        final String element = str.substring(i);
-        list.add(trim ? element.trim() : element);
-        return list;
     }
 
     // ===================================================================================
@@ -165,8 +130,56 @@ public class DfStringUtil {
     }
 
     // ===================================================================================
-    //                                                                     Initial Convert
-    //                                                                     ===============
+    //                                                                       List Handling
+    //                                                                       =============
+    /**
+     * @param str The split target string. (NotNull)
+     * @param delimiter The delimiter for split. (NotNull)
+     * @return The split list. (NotNull)
+     */
+    public static List<String> splitList(final String str, final String delimiter) {
+        return doSplitList(str, delimiter, false);
+    }
+
+    /**
+     * @param str The split target string. (NotNull)
+     * @param delimiter The delimiter for split. (NotNull)
+     * @return The split list that their elements is trimmed. (NotNull)
+     */
+    public static List<String> splitListTrimmed(final String str, final String delimiter) {
+        return doSplitList(str, delimiter, true);
+    }
+
+    protected static List<String> doSplitList(final String str, final String delimiter, boolean trim) {
+        final List<String> list = new ArrayList<String>();
+        int i = 0;
+        int j = str.indexOf(delimiter);
+        for (int h = 0; j >= 0; h++) {
+            final String element = str.substring(i, j);
+            list.add(trim ? element.trim() : element);
+            i = j + delimiter.length();
+            j = str.indexOf(delimiter, i);
+        }
+        final String element = str.substring(i);
+        list.add(trim ? element.trim() : element);
+        return list;
+    }
+
+    public static boolean containsIgnoreCase(String target, List<String> strList) {
+        if (target == null || strList == null) {
+            return false;
+        }
+        for (String str : strList) {
+            if (target.equalsIgnoreCase(str)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ===================================================================================
+    //                                                                    Initial Handling
+    //                                                                    ================
     public static String initCap(String str) {
         if (str == null) {
             return null;
@@ -180,7 +193,7 @@ public class DfStringUtil {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    public static String initCapAfterTrimming(String str) {
+    public static String initCapTrimmed(String str) {
         if (str == null) {
             return null;
         }
@@ -201,50 +214,18 @@ public class DfStringUtil {
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
 
-    // ===================================================================================
-    //                                                                      Naming Convert
-    //                                                                      ==============
-    public static String decamelizePropertyName(String s) {
-        if (s == null) {
+    public static String initUncapTrimmed(String str) {
+        if (str == null) {
             return null;
         }
-        if (s.length() == 1) {
-            return s.toUpperCase();
-        }
-        StringBuilder sb = new StringBuilder(40);
-        int pos = 0;
-        for (int i = 1; i < s.length(); ++i) {
-            if (Character.isUpperCase(s.charAt(i))) {
-                if (sb.length() != 0) {
-                    sb.append('_');
-                }
-                sb.append(s.substring(pos, i).toUpperCase());
-                pos = i;
-            }
-        }
-        if (sb.length() != 0) {
-            sb.append('_');
-        }
-        sb.append(s.substring(pos, s.length()).toUpperCase());
-        return sb.toString();
-    }
+        str = str.trim();
+        return initUncap(str);
 
-    public static String decapitalizePropertyName(String propertyName) {
-        if (propertyName == null || propertyName.length() == 0) {
-            return propertyName;
-        }
-        if (propertyName.length() > 1 && Character.isUpperCase(propertyName.charAt(1))
-                && Character.isUpperCase(propertyName.charAt(0))) {
-            return propertyName;
-        }
-        char chars[] = propertyName.toCharArray();
-        chars[0] = Character.toLowerCase(chars[0]);
-        return new String(chars);
     }
 
     // ===================================================================================
-    //                                                                       Extract Scope
-    //                                                                       =============
+    //                                                                      Scope Handling
+    //                                                                      ==============
     public static String extractFirstScope(String targetStr, String beginMark, String endMark) {
         if (targetStr == null || beginMark == null || endMark == null) {
             return null;
@@ -287,17 +268,132 @@ public class DfStringUtil {
     }
 
     // ===================================================================================
-    //                                                                         List String
-    //                                                                         ===========
-    public static boolean containsIgnoreCase(String target, List<String> strList) {
-        if (target == null || strList == null) {
-            return false;
+    //                                                                       Name Handling
+    //                                                                       =============
+    public static String camelize(String decamelName) {
+        final StringBuilder sb = new StringBuilder();
+        final StringTokenizer tok = new StringTokenizer(decamelName, "_");
+        while (tok.hasMoreTokens()) {
+            String part = ((String) tok.nextElement());
+            boolean allUpperCase = true;
+            for (int i = 1; i < part.length(); ++i) {
+                if (isLowerCase(part.charAt(i))) {
+                    allUpperCase = false;
+                }
+            }
+            if (allUpperCase) {
+                part = part.toLowerCase();
+            }
+            sb.append(initCap(part));
         }
-        for (String str : strList) {
-            if (target.equalsIgnoreCase(str)) {
-                return true;
+        return sb.toString();
+    }
+
+    public static String decamelize(String camelName) {
+        if (camelName == null) {
+            return null;
+        }
+        if (camelName.length() == 1) {
+            return camelName.toUpperCase();
+        }
+        StringBuilder sb = new StringBuilder(40);
+        int pos = 0;
+        for (int i = 1; i < camelName.length(); ++i) {
+            if (isUpperCase(camelName.charAt(i))) {
+                if (sb.length() != 0) {
+                    sb.append('_');
+                }
+                sb.append(camelName.substring(pos, i).toUpperCase());
+                pos = i;
             }
         }
-        return false;
+        if (sb.length() != 0) {
+            sb.append('_');
+        }
+        sb.append(camelName.substring(pos, camelName.length()).toUpperCase());
+        return sb.toString();
+    }
+
+    public static String toBeansPropertyName(String name) { // according to Java Beans rule
+        if (name == null || name.length() == 0) {
+            return name;
+        }
+        name = camelize(name);
+        if (name.length() > 1 && isUpperCase(name.charAt(0), name.charAt(1))) {
+            return name;
+        }
+        final char chars[] = name.toCharArray();
+        chars[0] = Character.toLowerCase(chars[0]);
+        return new String(chars);
+    }
+
+    private static boolean isUpperCase(char c) {
+        return Character.isUpperCase(c);
+    }
+
+    private static boolean isUpperCase(char c1, char c2) {
+        return isUpperCase(c1) && isUpperCase(c2);
+    }
+
+    private static boolean isLowerCase(char c) {
+        return Character.isLowerCase(c);
+    }
+
+    // ===================================================================================
+    //                                                                        SQL Handling
+    //                                                                        ============
+    public static String removeBlockComment(final String sql) {
+        if (sql == null) {
+            return null;
+        }
+        final String beginMark = "/*";
+        final String endMark = "*/";
+        final StringBuilder sb = new StringBuilder();
+        String tmp = sql;
+        while (true) {
+            if (tmp.indexOf(beginMark) < 0) {
+                sb.append(tmp);
+                break;
+            }
+            if (tmp.indexOf(endMark) < 0) {
+                sb.append(tmp);
+                break;
+            }
+            if (tmp.indexOf(beginMark) > tmp.indexOf(endMark)) {
+                final int borderIndex = tmp.indexOf(endMark) + endMark.length();
+                sb.append(tmp.substring(0, borderIndex));
+                tmp = tmp.substring(borderIndex);
+                continue;
+            }
+            sb.append(tmp.substring(0, tmp.indexOf(beginMark)));
+            tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
+        }
+        return sb.toString();
+    }
+
+    public static String removeLineComment(final String sql) { // with removing CR!
+        if (sql == null) {
+            return null;
+        }
+        final StringBuilder sb = new StringBuilder();
+        final String[] lines = sql.split("\n");
+        for (String line : lines) {
+            if (line == null) {
+                continue;
+            }
+            line = removeCR(line); // remove CR!
+            if (line.startsWith("--")) {
+                continue;
+            }
+            sb.append(line).append("\n");
+        }
+        return sb.toString();
+    }
+
+    private static String removeCR(String str) {
+        if (str == null) {
+            return null;
+        }
+        return str.replaceAll("\r", "");
     }
 }

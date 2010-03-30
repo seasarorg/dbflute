@@ -72,15 +72,13 @@ public class TnProcedureMetaData {
     }
 
     protected SortedSet<TnProcedureParameterType> createParameterTypeSet() {
-        return new TreeSet<TnProcedureParameterType>(new ParameterSetComparator());
-    }
-
-    protected class ParameterSetComparator implements Comparator<TnProcedureParameterType> {
-        public int compare(TnProcedureParameterType parameterType1, TnProcedureParameterType parameterType2) {
-            final Integer parameterIndex1 = parameterType1.getParameterIndex();
-            final Integer parameterIndex2 = parameterType2.getParameterIndex();
-            return parameterIndex1.compareTo(parameterIndex2);
-        }
+        return new TreeSet<TnProcedureParameterType>(new Comparator<TnProcedureParameterType>() {
+            public int compare(TnProcedureParameterType parameterType1, TnProcedureParameterType parameterType2) {
+                final Integer parameterIndex1 = parameterType1.getParameterIndex();
+                final Integer parameterIndex2 = parameterType2.getParameterIndex();
+                return parameterIndex1.compareTo(parameterIndex2);
+            }
+        });
     }
 
     // ===================================================================================

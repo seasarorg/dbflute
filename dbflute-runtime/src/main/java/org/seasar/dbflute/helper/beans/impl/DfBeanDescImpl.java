@@ -207,134 +207,6 @@ public class DfBeanDescImpl implements DfBeanDesc {
         return (String[]) _methodsMap.keySet().toArray(new String[_methodsMap.size()]);
     }
 
-    //
-    //    public String[] getConstructorParameterNames(final Class[] parameterTypes) {
-    //        return getConstructorParameterNames(getConstructor(parameterTypes));
-    //    }
-    //
-    //    public String[] getConstructorParameterNames(final Constructor constructor) {
-    //        if (constructorParameterNamesCache == null) {
-    //            constructorParameterNamesCache = createConstructorParameterNamesCache();
-    //        }
-    //
-    //        if (!constructorParameterNamesCache.containsKey(constructor)) {
-    //            throw new ConstructorNotFoundRuntimeException(beanClass, constructor.getParameterTypes());
-    //        }
-    //        return (String[]) constructorParameterNamesCache.get(constructor);
-    //
-    //    }
-    //
-    //    public String[] getMethodParameterNamesNoException(final String methodName, final Class[] parameterTypes) {
-    //        return getMethodParameterNamesNoException(getMethod(methodName, parameterTypes));
-    //    }
-    //
-    //    public String[] getMethodParameterNames(final String methodName, final Class[] parameterTypes) {
-    //        return getMethodParameterNames(getMethod(methodName, parameterTypes));
-    //    }
-    //
-    //    public String[] getMethodParameterNames(final Method method) {
-    //        String[] names = getMethodParameterNamesNoException(method);
-    //        if (names == null || names.length != method.getParameterTypes().length) {
-    //            throw new IllegalDiiguRuntimeException();
-    //        }
-    //        return names;
-    //    }
-    //
-    //    public String[] getMethodParameterNamesNoException(final Method method) {
-    //        if (methodParameterNamesCache == null) {
-    //            methodParameterNamesCache = createMethodParameterNamesCache();
-    //        }
-    //
-    //        if (!methodParameterNamesCache.containsKey(method)) {
-    //            throw new MethodNotFoundRuntimeException(beanClass, method.getName(), method.getParameterTypes());
-    //        }
-    //        return (String[]) methodParameterNamesCache.get(method);
-    //    }
-    //
-    //    private Map createConstructorParameterNamesCache() {
-    //        final Map map = new HashMap();
-    //        final ClassPool pool = ClassPoolUtil.getClassPool(beanClass);
-    //        for (int i = 0; i < constructors.length; ++i) {
-    //            final Constructor constructor = constructors[i];
-    //            if (constructor.getParameterTypes().length == 0) {
-    //                map.put(constructor, EMPTY_STRING_ARRAY);
-    //                continue;
-    //            }
-    //            final CtClass clazz = ClassPoolUtil.toCtClass(pool, constructor.getDeclaringClass());
-    //            final CtClass[] parameterTypes = ClassPoolUtil.toCtClassArray(pool, constructor.getParameterTypes());
-    //            try {
-    //                final String[] names = getParameterNames(clazz.getDeclaredConstructor(parameterTypes));
-    //                map.put(constructor, names);
-    //            } catch (final NotFoundException e) {
-    //                _log.debug("The constructor was not found: class=" + beanClass.getName() + " constructor="
-    //                        + constructor);
-    //            }
-    //        }
-    //        return map;
-    //    }
-    //
-    //    private Map createMethodParameterNamesCache() {
-    //        final Map map = new HashMap();
-    //        final ClassPool pool = ClassPoolUtil.getClassPool(beanClass);
-    //        for (final Iterator it = methodsCache.values().iterator(); it.hasNext();) {
-    //            final Method[] methods = (Method[]) it.next();
-    //            for (int i = 0; i < methods.length; ++i) {
-    //                final Method method = methods[i];
-    //                if (method.getParameterTypes().length == 0) {
-    //                    map.put(methods[i], EMPTY_STRING_ARRAY);
-    //                    continue;
-    //                }
-    //                final CtClass clazz = ClassPoolUtil.toCtClass(pool, method.getDeclaringClass());
-    //                final CtClass[] parameterTypes = ClassPoolUtil.toCtClassArray(pool, method.getParameterTypes());
-    //                try {
-    //                    final String[] names = getParameterNames(clazz.getDeclaredMethod(method.getName(), parameterTypes));
-    //                    map.put(methods[i], names);
-    //                } catch (final NotFoundException e) {
-    //                    _log.debug("The method was not found: class=" + beanClass.getName() + " method=" + method);
-    //                }
-    //            }
-    //        }
-    //        return map;
-    //    }
-    //
-    //    private String[] getParameterNames(final CtBehavior behavior) throws NotFoundException {
-    //        final MethodInfo methodInfo = behavior.getMethodInfo();
-    //        final ParameterAnnotationsAttribute attribute = (ParameterAnnotationsAttribute) methodInfo
-    //                .getAttribute(ParameterAnnotationsAttribute.visibleTag);
-    //        if (attribute == null) {
-    //            return null;
-    //        }
-    //        final int numParameters = behavior.getParameterTypes().length;
-    //        final String[] parameterNames = new String[numParameters];
-    //        final Annotation[][] annotationsArray = attribute.getAnnotations();
-    //        if (annotationsArray == null || annotationsArray.length != numParameters) {
-    //            return null;
-    //        }
-    //        for (int i = 0; i < numParameters; ++i) {
-    //            final String parameterName = getParameterName(annotationsArray[i]);
-    //            if (parameterName == null) {
-    //                return null;
-    //            }
-    //            parameterNames[i] = parameterName;
-    //        }
-    //        return parameterNames;
-    //    }
-    //
-    //    private String getParameterName(final Annotation[] annotations) {
-    //        Annotation nameAnnotation = null;
-    //        for (int i = 0; i < annotations.length; ++i) {
-    //            final Annotation annotation = annotations[i];
-    //            if (PARAMETER_NAME_ANNOTATION.equals(annotation.getTypeName())) {
-    //                nameAnnotation = annotation;
-    //                break;
-    //            }
-    //        }
-    //        if (nameAnnotation == null) {
-    //            return null;
-    //        }
-    //        return ((StringMemberValue) nameAnnotation.getMemberValue("value")).getValue();
-    //    }
-
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
@@ -431,33 +303,33 @@ public class DfBeanDescImpl implements DfBeanDesc {
     }
 
     private void setupPropertyDescs() {
-        Method[] methods = _beanClass.getMethods();
+        final Method[] methods = _beanClass.getMethods();
         for (int i = 0; i < methods.length; i++) {
-            Method m = methods[i];
+            final Method m = methods[i];
             if (DfReflectionUtil.isBridgeMethod(m) || DfReflectionUtil.isSyntheticMethod(m)) {
                 continue;
             }
-            String methodName = m.getName();
+            final String methodName = m.getName();
             if (methodName.startsWith("get")) {
                 if (m.getParameterTypes().length != 0 || methodName.equals("getClass")
                         || m.getReturnType() == void.class) {
                     continue;
                 }
-                String propertyName = decapitalizePropertyName(methodName.substring(3));
+                final String propertyName = toBeansPropertyName(methodName.substring(3));
                 setupReadMethod(m, propertyName);
             } else if (methodName.startsWith("is")) {
                 if (m.getParameterTypes().length != 0 || !m.getReturnType().equals(Boolean.TYPE)
                         && !m.getReturnType().equals(Boolean.class)) {
                     continue;
                 }
-                String propertyName = decapitalizePropertyName(methodName.substring(2));
+                final String propertyName = toBeansPropertyName(methodName.substring(2));
                 setupReadMethod(m, propertyName);
             } else if (methodName.startsWith("set")) {
                 if (m.getParameterTypes().length != 1 || methodName.equals("setClass")
                         || m.getReturnType() != void.class) {
                     continue;
                 }
-                String propertyName = decapitalizePropertyName(methodName.substring(3));
+                final String propertyName = toBeansPropertyName(methodName.substring(3));
                 setupWriteMethod(m, propertyName);
             }
         }
@@ -467,17 +339,8 @@ public class DfBeanDescImpl implements DfBeanDesc {
         _invalidPropertyNames.clear();
     }
 
-    private static String decapitalizePropertyName(String name) {
-        if (DfStringUtil.isNullOrEmpty(name)) {
-            return name;
-        }
-        if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) && Character.isUpperCase(name.charAt(0))) {
-
-            return name;
-        }
-        char chars[] = name.toCharArray();
-        chars[0] = Character.toLowerCase(chars[0]);
-        return new String(chars);
+    private static String toBeansPropertyName(String name) {
+        return DfStringUtil.toBeansPropertyName(name);
     }
 
     private void addPropertyDesc(DfPropertyDesc propertyDesc) {

@@ -67,9 +67,8 @@ public class TnProcedureHandler extends TnBasicHandler {
             conn = getConnection();
             cs = prepareCallableStatement(conn);
             bindArgs(cs, pmb);
-            final boolean executed = cs.execute();
             boolean handledReturn = false;
-            if (executed) {
+            if (cs.execute()) {
                 handledReturn = handleNonOutReturnResultSet(cs, pmb);
             }
             handleOutParameter(cs, pmb, handledReturn);

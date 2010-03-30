@@ -89,7 +89,7 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
                     throw new IllegalStateException(msg);
                 }
                 final Class<?> elementType = ppt.getElementType();
-                if (elementType != null) {
+                if (elementType == null) {
                     String msg = "The parameter type for result set should have generic type of List:";
                     msg = msg + " parameter=" + ppt.getParameterName() + " type=" + parameterType;
                     throw new IllegalStateException(msg);
