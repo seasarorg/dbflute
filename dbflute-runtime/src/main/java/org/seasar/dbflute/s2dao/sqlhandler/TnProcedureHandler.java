@@ -166,7 +166,7 @@ public class TnProcedureHandler extends TnBasicHandler {
         for (TnProcedureParameterType ppt : _procedureMetaData.getParameterTypeSortedSet()) {
             final ValueType valueType = ppt.getValueType();
             if (ppt.isReturnType() && handledReturn) {
-                ++index; // Is this really needed?
+                ++index; // it needs
                 continue;
             }
             if (ppt.isOutType()) {
