@@ -144,7 +144,7 @@ public class TnProcedureHandler extends TnBasicHandler {
                 if (rs == null) {
                     break;
                 }
-                final TnResultSetHandler handler = createReturnResultSetHandler(rs);
+                final TnResultSetHandler handler = createResultSetHandler(ppt, rs);
                 Object beanList = handler.handle(rs);
                 ppt.setValue(pmb, beanList);
                 if (!cs.getMoreResults()) {
@@ -176,7 +176,7 @@ public class TnProcedureHandler extends TnBasicHandler {
                 Object value = valueType.getValue(cs, index + 1);
                 if (value instanceof ResultSet) {
                     final ResultSet rs = (ResultSet) value;
-                    final TnResultSetHandler handler = createOutParameterResultSetHandler(ppt, rs);
+                    final TnResultSetHandler handler = createResultSetHandler(ppt, rs);
                     try {
                         value = handler.handle(rs);
                     } finally {
@@ -223,12 +223,7 @@ public class TnProcedureHandler extends TnBasicHandler {
     // ===================================================================================
     //                                                                    ResultSetHandler
     //                                                                    ================
-    protected TnResultSetHandler createReturnResultSetHandler(ResultSet resultSet) {
-        TnProcedureParameterType ppt = _procedureMetaData.getReturnParameterType();
-        return _resultSetHandlerProvider.provideResultSetHandler(ppt, resultSet);
-    }
-
-    protected TnResultSetHandler createOutParameterResultSetHandler(TnProcedureParameterType ppt, ResultSet resultSet) {
-        return _resultSetHandlerProvider.provideResultSetHandler(ppt, resultSet);
+    protected TnResultSetHandler createResultSetHandler(TnProcedureParameterType ppt, ResultSet rs) {
+        return _resultSetHandlerProvider.provideResultSetHandler(ppt, rs);
     }
 }
