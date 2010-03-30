@@ -18,6 +18,7 @@ public class DfParameterBeanMetaData {
     protected Map<String, String> propertyNameColumnNameMap; // only when this is for procedure
     protected String procedureName; // only when this is for procedure
     protected File sqlFile; // when procedure, always null
+    protected boolean refCustomizeEntity;
 
     // ===================================================================================
     //                                                                      Basic Override
@@ -90,5 +91,13 @@ public class DfParameterBeanMetaData {
 
     public void setSqlFile(File sqlFile) {
         this.sqlFile = sqlFile;
+    }
+
+    public boolean isRefCustomizeEntity() {
+        return refCustomizeEntity;
+    }
+
+    public void setRefCustomizeEntity(boolean refCustomizeEntity) {
+        this.refCustomizeEntity = refCustomizeEntity;
     }
 }

@@ -371,6 +371,10 @@ public class Database {
         return getParameterBeanBasicHandler().getPmbMetaDataProcedureName(className);
     }
 
+    public boolean isPmbMetaDataRefCustomizeEntity(String className) {
+        return getParameterBeanBasicHandler().isPmbMetaDataRefCustomizeEntity(className);
+    }
+
     public boolean isPmbMetaDataPropertyOptionProcedureParameterIn(String className, String propertyName) {
         return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionProcedureParameterIn(className, propertyName);
     }

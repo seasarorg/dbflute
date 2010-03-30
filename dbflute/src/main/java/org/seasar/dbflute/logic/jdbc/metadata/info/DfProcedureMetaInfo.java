@@ -24,8 +24,8 @@ public class DfProcedureMetaInfo {
     protected String procedureComment;
     protected boolean procedureSynonym;
 
-    protected List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = new ArrayList<DfProcedureColumnMetaInfo>();
-    protected List<DfProcedureClosetResultMetaInfo> closetResultMetaInfoList = new ArrayList<DfProcedureClosetResultMetaInfo>();
+    protected List<DfProcedureColumnMetaInfo> procedureColumnList = new ArrayList<DfProcedureColumnMetaInfo>();
+    protected List<DfProcedureNotParamResultMetaInfo> notParamResultList = new ArrayList<DfProcedureNotParamResultMetaInfo>();
 
     public String getProcedureDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
@@ -65,8 +65,8 @@ public class DfProcedureMetaInfo {
 
     @Override
     public String toString() {
-        return "{" + procedureFullName + ", " + procedureType + ", " + procedureComment + ", "
-                + procedureColumnMetaInfoList + ", closet=" + closetResultMetaInfoList.size() + "}";
+        return "{" + procedureFullName + ", " + procedureType + ", " + procedureComment + ", " + procedureColumnList
+                + ", notParamResult=" + notParamResultList.size() + "}";
     }
 
     public enum DfProcedureType {
@@ -154,19 +154,19 @@ public class DfProcedureMetaInfo {
         this.procedureSynonym = procedureSynonym;
     }
 
-    public List<DfProcedureColumnMetaInfo> getProcedureColumnMetaInfoList() {
-        return procedureColumnMetaInfoList;
+    public List<DfProcedureColumnMetaInfo> getProcedureColumnList() {
+        return procedureColumnList;
     }
 
-    public void addProcedureColumnMetaInfo(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
-        procedureColumnMetaInfoList.add(procedureColumnMetaInfo);
+    public void addProcedureColumnMetaInfo(DfProcedureColumnMetaInfo procedureColumn) {
+        procedureColumnList.add(procedureColumn);
     }
 
-    public List<DfProcedureClosetResultMetaInfo> getClosetResultMetaInfoList() {
-        return closetResultMetaInfoList;
+    public List<DfProcedureNotParamResultMetaInfo> getNotParamResultList() {
+        return notParamResultList;
     }
 
-    public void addClosetResultMetaInfo(DfProcedureClosetResultMetaInfo closetResultMetaInfo) {
-        this.closetResultMetaInfoList.add(closetResultMetaInfo);
+    public void addNotParamResult(DfProcedureNotParamResultMetaInfo notParamResult) {
+        this.notParamResultList.add(notParamResult);
     }
 }

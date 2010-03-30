@@ -1,11 +1,11 @@
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.properties.DfDocumentProperties;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 
 public class DfProcedureColumnMetaInfo {
@@ -17,7 +17,7 @@ public class DfProcedureColumnMetaInfo {
     protected Integer decimalDigits;
     protected String columnComment;
     protected DfProcedureColumnType procedureColumnType;
-    protected List<DfColumnMetaInfo> columnMetaInfoList = new ArrayList<DfColumnMetaInfo>(); // if result set
+    protected Map<String, DfColumnMetaInfo> columnMetaInfoMap = DfCollectionUtil.emptyMap(); // if result set
 
     public String getColumnDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
@@ -40,6 +40,10 @@ public class DfProcedureColumnMetaInfo {
         }
         sb.append(" <span class=\"type\">(").append(procedureColumnType.alias()).append(")</span>");
         return sb.toString();
+    }
+
+    public boolean hasColumnMetaInfo() {
+        return !columnMetaInfoMap.isEmpty();
     }
 
     public boolean hasColumnComment() {
@@ -129,11 +133,11 @@ public class DfProcedureColumnMetaInfo {
         this.columnComment = columnComment;
     }
 
-    public List<DfColumnMetaInfo> getColumnMetaInfoList() {
-        return columnMetaInfoList;
+    public Map<String, DfColumnMetaInfo> getColumnMetaInfoMap() {
+        return columnMetaInfoMap;
     }
 
-    public void addColumnMetaInfo(DfColumnMetaInfo columnMetaInfo) {
-        this.columnMetaInfoList.add(columnMetaInfo);
+    public void setColumnMetaInfoMap(Map<String, DfColumnMetaInfo> columnMetaInfoMap) {
+        this.columnMetaInfoMap = columnMetaInfoMap;
     }
 }

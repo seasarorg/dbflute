@@ -24,17 +24,27 @@ public class DfStandardApiPackageResolver {
     // ===================================================================================
     //                                                                            Resolver
     //                                                                            ========
-    public String resolvePackageName(String typeName) { // [DBFLUTE-271]
+    public String resolvePackageName(String typeName) {
+        return doResolvePackageName(typeName, false);
+    }
+
+    public String resolvePackageNameExceptUtil(String typeName) {
+        return doResolvePackageName(typeName, true);
+    }
+
+    protected String doResolvePackageName(String typeName, boolean exceptUtil) {
         if (typeName == null) {
             return typeName;
         }
         final DfBasicProperties prop = _basicProperties;
         if (prop.isTargetLanguageJava()) {
-            if (typeName.startsWith("List<") && typeName.endsWith(">")) {
-                return "java.util." + typeName;
-            }
-            if (typeName.startsWith("Map<") && typeName.endsWith(">")) {
-                return "java.util." + typeName;
+            if (!exceptUtil) {
+                if (typeName.startsWith("List<") && typeName.endsWith(">")) {
+                    return "java.util." + typeName;
+                }
+                if (typeName.startsWith("Map<") && typeName.endsWith(">")) {
+                    return "java.util." + typeName;
+                }
             }
             if (typeName.equals("BigDecimal")) {
                 return "java.math." + typeName;
@@ -45,8 +55,10 @@ public class DfStandardApiPackageResolver {
             if (typeName.equals("Timestamp")) {
                 return "java.sql." + typeName;
             }
-            if (typeName.equals("Date")) {
-                return "java.util." + typeName;
+            if (!exceptUtil) {
+                if (typeName.equals("Date")) {
+                    return "java.util." + typeName;
+                }
             }
         } else if (prop.isTargetLanguageCSharp()) {
             if (typeName.startsWith("IList<") && typeName.endsWith(">")) {

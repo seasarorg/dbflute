@@ -1,6 +1,8 @@
 ${database.allClassCopyright}package ${glPackageBaseParameterBean};
 #set ($myClassName = "${myBaseParameterBeanClassName}")
 
+import java.util.*;
+
 #if ($database.isPmbMetaDataForProcedure($pmbClassName))
 import org.seasar.dbflute.outsidesql.ProcedurePmb;
 #else
@@ -16,6 +18,9 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 import org.seasar.dbflute.cbean.coption.FromToOption;
 #end
 import org.seasar.dbflute.util.DfTypeUtil;
+#if ($database.isPmbMetaDataRefCustomizeEntity($pmbClassName))
+import ${glPackageExtendedCustomizeEntity}.*;
+#end
 
 /**
  * The parameter-bean of ${pmbClassName}.
@@ -35,7 +40,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                   Procedure Parameter
     //                                   -------------------
 #set ($procedureParameterIndex = 0)
-#set ($procedureClosetResultIndex = 1000)
+#set ($procedureNotParamResultIndex = 1000)
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($annotationPropName = ${propertyName})
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
@@ -51,8 +56,8 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "return, -1";
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterResult($pmbClassName, $propertyName))
-    public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "closetResult, ${procedureClosetResultIndex}";
-#set ($procedureClosetResultIndex = $procedureClosetResultIndex + 1)
+    public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "notParamResult, ${procedureNotParamResultIndex}";
+#set ($procedureNotParamResultIndex = $procedureNotParamResultIndex + 1)
 #end
 #end
 #end
@@ -130,11 +135,11 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return ShortCharHandlingMode.${database.shortCharHandlingMode};
     }
 
-    protected java.util.Date convertToUtilDate(java.util.Date date) {
+    protected Date convertToUtilDate(Date date) {
         return DfTypeUtil.toDate(date); // if sub class, re-create as pure date
     }
 
-    protected String formatUtilDate(java.util.Date date) {
+    protected String formatUtilDate(Date date) {
 #if ($database.isDatabaseOracle())
         String pattern = "yyyy-MM-dd HH:mm:ss"; // for Oracle
 #else
@@ -166,7 +171,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($variableName = "_$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
-#if ($propertyType.equals("java.util.Date"))
+#if ($propertyType.equals("Date"))
         sb.append(c).append(formatUtilDate(${variableName}));
 #elseif ($propertyType.equals("byte[]"))
         sb.append(c).append(formatByteArray(${variableName}));
@@ -187,7 +192,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
     /**
      * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @return The value of ${propertyName}. (Nullable & NotEmptyString: if the value is empty string, returns null)
+     * @return The value of ${propertyName}. (Nullable, NotEmptyString(when String): if empty string, returns null)
      */
     public ${propertyType} get${database.initCap($propertyName)}() {
 #if ($propertyType.endsWith("String"))
@@ -199,7 +204,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
         return convertEmptyToNull(${variableName});
 #end
 #else
-#if ($propertyType.equals("java.util.Date"))
+#if ($propertyType.equals("Date"))
         return convertToUtilDate(${variableName});
 #else
         return ${variableName};

@@ -136,6 +136,14 @@ public class DfParameterBeanBasicHandler {
         return findPmbMetaData(className).getProcedureName();
     }
 
+    public boolean isPmbMetaDataRefCustomizeEntity(String className) {
+        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
+        if (metaData == null) {
+            return false;
+        }
+        return metaData.isRefCustomizeEntity();
+    }
+
     public boolean isPmbMetaDataPropertyOptionProcedureParameterIn(String className, String propertyName) {
         String option = findPmbMetaDataPropertyOption(className, propertyName);
         return option != null && option.trim().equalsIgnoreCase(DfProcedureColumnType.procedureColumnIn.toString());
@@ -173,7 +181,7 @@ public class DfParameterBeanBasicHandler {
     //                                           LikeSeasrch
     //                                           -----------
     public boolean hasPmbMetaDataPropertyOptionAnyLikeSearch(String className) {
-        DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
+        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
         if (metaData == null) {
             return false;
         }
@@ -213,7 +221,7 @@ public class DfParameterBeanBasicHandler {
     //                                                FromTo
     //                                                ------
     public boolean hasPmbMetaDataPropertyOptionAnyFromTo(String className) {
-        DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
+        final DfParameterBeanMetaData metaData = _pmbMetaDataMap.get(className);
         if (metaData == null) {
             return false;
         }

@@ -4,6 +4,7 @@
 # The various settings about outsideSql. 
 # 
 # o isGenerateProcedureParameterBean: (NotRequired - Default false)
+# o isGenerateProcedureCustomizeEntity: (NotRequired - Default false)
 # o targetProcedureCatalogList: (NotRequired - Default list:{})
 # o targetProcedureSchemaList: (NotRequired - Default list:{})
 # o targetProcedureNameList: (NotRequired - Default list:{})
@@ -21,13 +22,29 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o isGenerateProcedureParameterBean: (NotRequired - Default false)
     #   [true]
-    #     Does it generate the parameter bean for procedure?
+    #     The parameter beans for procedure are auto-generated.
     #     If you call the procedure from DBFlute, you should specify 'true'!
     #
     #   [false]
     #     Non.
     #
     ; isGenerateProcedureParameterBean = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isGenerateProcedureCustomizeEntity: (NotRequired - Default false)
+    #   [true]
+    #     The customize entities for procedure's out-parameter
+    #     and not-param-result are auto-generated.
+    #     And also not-param-result's properties are auto-generated.
+    #     Target procedures are executed actually at Sql2Entity task.
+    #     (because of getting from execution meta data (result set meta data))
+    #     This property is valid when isGenerateProcedureParameterBean is true.
+    #
+    #   [false]
+    #     Non.
+    #
+    ; isGenerateProcedureCustomizeEntity = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.logic.jdbc.handler;
 
-import java.sql.CallableStatement;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,10 +29,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.torque.engine.database.model.TypeMap;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.logic.factory.DfProcedureSynonymExtractorFactory;
-import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureClosetResultMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
@@ -45,7 +42,6 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties.ProcedureSynonymHandlingType;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -56,7 +52,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========
-    private static final Log _log = LogFactory.getLog(DfColumnHandler.class);
+    private static final Log _log = LogFactory.getLog(DfProcedureHandler.class);
 
     // ===================================================================================
     //                                                                           Attribute
@@ -76,19 +72,6 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
      * @throws SQLException
      */
     public Map<String, DfProcedureMetaInfo> getAvailableProcedureMap(DataSource dataSource) throws SQLException {
-        return getAvailableProcedureMap(dataSource, false);
-    }
-
-    /**
-     * Get the map of available meta information. <br />
-     * The map key is procedure unique name.
-     * @param dataSource The data source for getting meta data. (NotNull)
-     * @param execution Does it get execution meta data?
-     * @return The map of available procedure meta informations. (NotNull)
-     * @throws SQLException
-     */
-    public Map<String, DfProcedureMetaInfo> getAvailableProcedureMap(DataSource dataSource, boolean execution)
-            throws SQLException {
         final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
         final String schemaName = databaseProperties.getDatabaseSchema();
         final DfOutsideSqlProperties outsideSqlProperties = getProperties().getOutsideSqlProperties();
@@ -133,14 +116,6 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             }
         }
         procedureOrderedMap.putAll(additionalSchemaProcedureMap);
-        if (execution) {
-            try {
-                processExecutionMetaData(dataSource, procedureList);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw e;
-            }
-        }
         return procedureOrderedMap;
     }
 
@@ -325,166 +300,6 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             msg = msg + " elect=" + secondName + secondType + " skipped=" + firstName + firstType;
         }
         _log.info(msg);
-    }
-
-    // -----------------------------------------------------
-    //                                   Execution Meta Data
-    //                                   -------------------
-    protected void processExecutionMetaData(DataSource dataSource, List<DfProcedureMetaInfo> procedureList)
-            throws SQLException {
-        for (DfProcedureMetaInfo procedure : procedureList) {
-            doProcessExecutionMetaData(dataSource, procedure);
-        }
-    }
-
-    protected void doProcessExecutionMetaData(DataSource dataSource, DfProcedureMetaInfo procedure) throws SQLException {
-        final List<Object> numberList = getProperties().getTypeMappingProperties().getJavaNativeNumberList();
-        final List<Object> dateList = getProperties().getTypeMappingProperties().getJavaNativeDateList();
-        final List<Object> booleanList = getProperties().getTypeMappingProperties().getJavaNativeBooleanList();
-        final List<Object> binaryList = getProperties().getTypeMappingProperties().getJavaNativeBinaryList();
-        final String procedureFullName = procedure.getProcedureFullName();
-        final List<DfProcedureColumnMetaInfo> columnList = procedure.getProcedureColumnMetaInfoList();
-        final List<Object> testValueList = new ArrayList<Object>();
-        boolean existsReturn = false;
-        for (DfProcedureColumnMetaInfo column : columnList) {
-            final DfProcedureColumnType columnType = column.getProcedureColumnType();
-            if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
-                existsReturn = true;
-                continue;
-            }
-            if (DfProcedureColumnType.procedureColumnIn.equals(columnType)
-                    || DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-                final int jdbcDefType = column.getJdbcType();
-                final Integer columnSize = column.getColumnSize();
-                final Integer decimalDigits = column.getDecimalDigits();
-                final String jdbcType = TypeMap.findJdbcTypeByJdbcDefValue(jdbcDefType);
-                final String nativeType = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
-                Object testValue = null;
-                if (containsAsEndsWith(nativeType, numberList)) {
-                    testValue = 0;
-                } else if (containsAsEndsWith(nativeType, dateList)) {
-                    testValue = DfTypeUtil.toDate("2010-03-30");
-                } else if (containsAsEndsWith(nativeType, booleanList)) {
-                    testValue = Boolean.FALSE;
-                } else if (containsAsEndsWith(nativeType, binaryList)) {
-                    return; // binary type is unsupported here
-                } else { // as String
-                    testValue = "0";
-                }
-                testValueList.add(testValue);
-            }
-        }
-        final String sql = createSql(procedureFullName, columnList.size(), existsReturn);
-        CallableStatement cs = null;
-        try {
-            cs = dataSource.getConnection().prepareCall(sql);
-            final List<DfProcedureColumnMetaInfo> boundColumnList = new ArrayList<DfProcedureColumnMetaInfo>();
-            setupBindParameter(cs, columnList, testValueList, boundColumnList);
-            ResultSet rs = null;
-            _log.info("...Calling: " + sql);
-            if (cs.execute()) {
-                int closetIndex = 0;
-                do {
-                    rs = cs.getResultSet();
-                    if (rs == null) {
-                        break;
-                    }
-                    // TODO jflute - making customize entity
-                    //final ResultSetMetaData metaData = rs.getMetaData();
-                    //final int columnCount = metaData.getColumnCount();
-                    //for (int i = 0; i < columnCount; i++) {
-                    //    final String columnLabel = metaData.getColumnLabel(i + 1);
-                    //}
-                    final DfProcedureClosetResultMetaInfo metaInfo = new DfProcedureClosetResultMetaInfo();
-                    metaInfo.setPropertyName("closetResultList" + (closetIndex + 1));
-                    procedure.addClosetResultMetaInfo(metaInfo);
-                    ++closetIndex;
-                } while (cs.getMoreResults());
-            }
-            int index = 0;
-            for (DfProcedureColumnMetaInfo column : boundColumnList) {
-                final DfProcedureColumnType columnType = column.getProcedureColumnType();
-                if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
-                    ++index;
-                    continue;
-                }
-                //final Object obj = cs.getObject(index + 1);
-                //if (obj instanceof ResultSet) {
-                //    rs = (ResultSet) obj;
-                //    final ResultSetMetaData metaData = rs.getMetaData();
-                //    final int columnCount = metaData.getColumnCount();
-                //    for (int i = 0; i < columnCount; i++) {
-                //        final String columnLabel = metaData.getColumnLabel(i + 1);
-                //    }
-                //}
-                ++index;
-            }
-        } catch (SQLException e) {
-            String msg = "*Failed to execute the procedure for getting meta data:" + ln();
-            msg = msg + " " + sql;
-            msg = msg + " " + e.getMessage();
-            _log.info(msg); // continued
-        } finally {
-            if (cs != null) {
-                cs.close();
-            }
-        }
-    }
-
-    protected boolean containsAsEndsWith(String str, List<Object> ls) {
-        for (Object current : ls) {
-            final String currentString = (String) current;
-            if (str.endsWith(currentString)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public String createSql(String procedureName, int bindSize, boolean existsReturn) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        final int argSize;
-        {
-            if (existsReturn) {
-                sb.append("? = ");
-                argSize = bindSize - 1;
-            } else {
-                argSize = bindSize;
-            }
-        }
-        sb.append("call ").append(procedureName).append("(");
-        for (int i = 0; i < argSize; i++) {
-            sb.append("?, ");
-        }
-        if (argSize > 0) {
-            sb.setLength(sb.length() - 2);
-        }
-        sb.append(")}");
-        return sb.toString();
-    }
-
-    protected void setupBindParameter(CallableStatement cs, List<DfProcedureColumnMetaInfo> columnList,
-            List<Object> testValueList, List<DfProcedureColumnMetaInfo> boundColumnList) throws SQLException {
-        int index = 0;
-        for (DfProcedureColumnMetaInfo column : columnList) {
-            final DfProcedureColumnType columnType = column.getProcedureColumnType();
-            if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
-                cs.registerOutParameter(index + 1, column.getJdbcType());
-                boundColumnList.add(column);
-            } else if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
-                cs.setObject(index + 1, testValueList.remove(0));
-                boundColumnList.add(column);
-            } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
-                cs.registerOutParameter(index + 1, column.getJdbcType());
-                boundColumnList.add(column);
-            } else if (DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-                cs.registerOutParameter(index + 1, column.getJdbcType());
-                cs.setObject(index + 1, testValueList.remove(0));
-                boundColumnList.add(column);
-            }
-            ++index;
-        }
     }
 
     // ===================================================================================
@@ -685,7 +500,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         if (!isPostgreSQL()) {
             return;
         }
-        final List<DfProcedureColumnMetaInfo> columnMetaInfoList = procedureMetaInfo.getProcedureColumnMetaInfoList();
+        final List<DfProcedureColumnMetaInfo> columnMetaInfoList = procedureMetaInfo.getProcedureColumnList();
         boolean existsResultSetParameter = false;
         boolean existsResultSetReturn = false;
         int resultSetReturnIndex = 0;
