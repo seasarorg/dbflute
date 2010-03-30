@@ -97,8 +97,8 @@ public class TnProcedureMetaDataFactory {
         } else if (type.equalsIgnoreCase("return")) {
             ppt.setOutType(true);
             ppt.setReturnType(true);
-        } else if (type.equalsIgnoreCase("resultCloset")) {
-            ppt.setResultClosetType(true);
+        } else if (type.equalsIgnoreCase("closetResult")) {
+            ppt.setClosetResultType(true);
         } else {
             String msg = "The parameter type should be 'in' or 'out' or 'inout' or 'return':";
             msg = msg + " class=" + parameterDesc.getBeanDesc().getBeanClass().getSimpleName();

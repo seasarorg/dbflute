@@ -36,7 +36,7 @@ public class TnProcedureMetaData {
     private final Map<String, TnProcedureParameterType> _parameterTypeMap = createParameterTypeMap();
     private final SortedSet<TnProcedureParameterType> _parameterTypeSortedSet = createParameterTypeSet();
     private List<TnProcedureParameterType> _bindParameterTypeList; // lazy load
-    private List<TnProcedureParameterType> _resultClosetTypeList; // lazy load
+    private List<TnProcedureParameterType> _closetResultTypeList; // lazy load
     private TnProcedureParameterType _returnParameterType;
     private boolean _fixed;
 
@@ -92,7 +92,7 @@ public class TnProcedureMetaData {
     public void fix() {
         _fixed = true;
         getBindParameterTypeList(); // for lazy-loading
-        getResultClosetTypeList(); // for lazy-loading
+        getClosetResultTypeList(); // for lazy-loading
     }
 
     // ===================================================================================
@@ -113,7 +113,7 @@ public class TnProcedureMetaData {
         final SortedSet<TnProcedureParameterType> parameterTypeSortedSet = getParameterTypeSortedSet();
         final List<TnProcedureParameterType> bindList = new ArrayList<TnProcedureParameterType>();
         for (TnProcedureParameterType ppt : parameterTypeSortedSet) {
-            if (!ppt.isResultClosetType()) {
+            if (!ppt.isClosetResultType()) {
                 bindList.add(ppt);
             }
         }
@@ -121,18 +121,18 @@ public class TnProcedureMetaData {
         return bindList;
     }
 
-    public List<TnProcedureParameterType> getResultClosetTypeList() {
-        if (_resultClosetTypeList != null) {
-            return _resultClosetTypeList;
+    public List<TnProcedureParameterType> getClosetResultTypeList() {
+        if (_closetResultTypeList != null) {
+            return _closetResultTypeList;
         }
         final SortedSet<TnProcedureParameterType> parameterTypeSortedSet = getParameterTypeSortedSet();
         final List<TnProcedureParameterType> closetList = new ArrayList<TnProcedureParameterType>();
         for (TnProcedureParameterType ppt : parameterTypeSortedSet) {
-            if (ppt.isResultClosetType()) {
+            if (ppt.isClosetResultType()) {
                 closetList.add(ppt);
             }
         }
-        _resultClosetTypeList = closetList;
+        _closetResultTypeList = closetList;
         return closetList;
     }
 

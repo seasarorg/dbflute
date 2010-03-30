@@ -68,8 +68,12 @@ public class TnProcedureHandler extends TnBasicHandler {
             conn = getConnection();
             cs = prepareCallableStatement(conn);
             bindArgs(cs, pmb);
+
+            // Execute the procedure!
+            // The return means whether the first result is a result set.
             final boolean executed = cs.execute();
-            handleResultCloset(cs, pmb, executed); // should be before out-parameter handling
+
+            handleClosetResult(cs, pmb, executed); // should be before out-parameter handling
             handleOutParameter(cs, pmb, executed);
             return pmb;
         } catch (SQLException e) {
@@ -124,10 +128,10 @@ public class TnProcedureHandler extends TnBasicHandler {
      * Handle closet result set, for example, (MS) SQLServer.
      * @param cs The statement of procedure. (NotNull)
      * @param pmb The parameter bean from arguments. (NotNull)
-     * @param executed The return value of execute(). 
+     * @param executed The return value of execute() that means whether the first result is a result set. 
      * @throws SQLException
      */
-    protected void handleResultCloset(CallableStatement cs, Object pmb, boolean executed) throws SQLException {
+    protected void handleClosetResult(CallableStatement cs, Object pmb, boolean executed) throws SQLException {
         if (pmb == null) {
             return;
         }
@@ -136,7 +140,7 @@ public class TnProcedureHandler extends TnBasicHandler {
                 return;
             }
         }
-        final List<TnProcedureParameterType> closetList = _procedureMetaData.getResultClosetTypeList();
+        final List<TnProcedureParameterType> closetList = _procedureMetaData.getClosetResultTypeList();
         ResultSet rs = null;
         for (TnProcedureParameterType ppt : closetList) {
             try {
@@ -145,7 +149,7 @@ public class TnProcedureHandler extends TnBasicHandler {
                     break;
                 }
                 final TnResultSetHandler handler = createResultSetHandler(ppt, rs);
-                Object beanList = handler.handle(rs);
+                final Object beanList = handler.handle(rs);
                 ppt.setValue(pmb, beanList);
                 if (!cs.getMoreResults()) {
                     break;
@@ -162,7 +166,7 @@ public class TnProcedureHandler extends TnBasicHandler {
      * Handle result set for out-parameter.
      * @param cs The statement of procedure. (NotNull)
      * @param pmb The parameter bean from arguments. (NotNull)
-     * @param executed The return value of execute(). 
+     * @param executed The return value of execute() that means whether the first result is a result set.
      * @throws SQLException
      */
     protected void handleOutParameter(CallableStatement cs, Object pmb, boolean executed) throws SQLException {
