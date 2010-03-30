@@ -19,9 +19,13 @@ import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
+import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
+import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaDataFactory;
+import org.seasar.dbflute.s2dao.rshandler.TnMapListResultSetHandler;
 import org.seasar.dbflute.s2dao.sqlcommand.TnProcedureCommand;
+import org.seasar.dbflute.s2dao.sqlcommand.TnProcedureCommand.TnProcedureResultSetHandlerFactory;
 
 /**
  * The behavior command for OutsideSql.execute().
@@ -122,7 +126,21 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
     }
 
     protected TnProcedureCommand createProcedureCommand(TnProcedureMetaData metaData) {
-        return new TnProcedureCommand(_dataSource, _statementFactory, metaData);
+        return new TnProcedureCommand(_dataSource, _statementFactory, metaData,
+                createProcedureResultSetHandlerFactory());
+    }
+
+    protected TnProcedureResultSetHandlerFactory createProcedureResultSetHandlerFactory() {
+        return new TnProcedureResultSetHandlerFactory() {
+            public TnResultSetHandler createBeanHandler(Class<?> beanClass) {
+                final TnBeanMetaData beanMetaData = _beanMetaDataFactory.createBeanMetaData(beanClass);
+                return createBeanListResultSetHandler(beanMetaData);
+            }
+
+            public TnResultSetHandler createDefaultHandler() {
+                return new TnMapListResultSetHandler();
+            }
+        };
     }
 
     // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

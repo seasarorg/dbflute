@@ -29,7 +29,7 @@ import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnBeanCursorMetaDataResultSetHandler extends TnBeanListMetaDataResultSetHandler {
+public class TnBeanCursorResultSetHandler extends TnBeanListResultSetHandler {
 
     // ===================================================================================
     //                                                                         Constructor
@@ -39,7 +39,7 @@ public class TnBeanCursorMetaDataResultSetHandler extends TnBeanListMetaDataResu
      * @param rowCreator Row creator. (NotNull)
      * @param relationRowCreator Relation row creator. (NotNul)
      */
-    public TnBeanCursorMetaDataResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
+    public TnBeanCursorResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
             TnRelationRowCreator relationRowCreator) {
         super(beanMetaData, rowCreator, relationRowCreator);
     }

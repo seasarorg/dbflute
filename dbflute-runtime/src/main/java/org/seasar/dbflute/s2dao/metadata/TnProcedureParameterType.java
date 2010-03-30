@@ -15,8 +15,6 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
-import java.lang.reflect.Field;
-
 import org.seasar.dbflute.jdbc.ValueType;
 
 /**
@@ -28,91 +26,96 @@ public class TnProcedureParameterType {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    private String parameterName;
-    private Integer parameterIndex;
-    private Field field;
-    private ValueType valueType;
-    private boolean inType;
-    private boolean outType;
-    private boolean returnType;
+    private final TnProcedureParameterAccessor _parameterAccessor;
+    private final String _parameterName;
+    private final Class<?> _parameterType;
+    private final Class<?> _elementType;
+    private Integer _parameterIndex;
+    private ValueType _valueType;
+    private boolean _inType;
+    private boolean _outType;
+    private boolean _returnType;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnProcedureParameterType(Field field) {
-        this.field = field;
-        this.parameterName = field.getName();
+    public TnProcedureParameterType(TnProcedureParameterAccessor parameterAccessor, String parameterName,
+            Class<?> parameterType, Class<?> elementType) {
+        this._parameterAccessor = parameterAccessor;
+        this._parameterName = parameterName;
+        this._parameterType = parameterType;
+        this._elementType = elementType;
+    }
+
+    public static interface TnProcedureParameterAccessor {
+        Object getValue(Object target);
+
+        void setValue(Object target, Object value);
     }
 
     // ===================================================================================
     //                                                                         Field Value
     //                                                                         ===========
     public Object getValue(Object target) {
-        try {
-            return field.get(target);
-        } catch (IllegalAccessException e) {
-            String msg = "The getting of the field threw the exception:";
-            msg = msg + " class=" + field.getDeclaringClass().getSimpleName();
-            msg = msg + " field=" + field.getName();
-            throw new IllegalStateException(msg, e);
-        }
+        return _parameterAccessor.getValue(target);
     }
 
     public void setValue(Object target, Object value) {
-        try {
-            field.set(target, value);
-        } catch (IllegalAccessException e) {
-            String msg = "The setting of the field threw the exception:";
-            msg = msg + " class=" + field.getDeclaringClass().getSimpleName();
-            msg = msg + " field=" + field.getName();
-            throw new IllegalStateException(msg, e);
-        }
+        _parameterAccessor.setValue(target, value);
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public String getParameterName() {
-        return parameterName;
+        return _parameterName;
     }
-    
+
+    public Class<?> getParameterType() {
+        return _parameterType;
+    }
+
+    public Class<?> getElementType() {
+        return _elementType;
+    }
+
     public Integer getParameterIndex() {
-        return parameterIndex;
+        return _parameterIndex;
     }
-    
+
     public void setParameterIndex(Integer parameterIndex) {
-        this.parameterIndex = parameterIndex;
+        this._parameterIndex = parameterIndex;
     }
 
     public ValueType getValueType() {
-        return valueType;
+        return _valueType;
     }
 
     public void setValueType(final ValueType valueType) {
-        this.valueType = valueType;
+        this._valueType = valueType;
     }
 
     public boolean isInType() {
-        return inType;
+        return _inType;
     }
 
     public void setInType(final boolean inType) {
-        this.inType = inType;
+        this._inType = inType;
     }
 
     public boolean isOutType() {
-        return outType;
+        return _outType;
     }
 
     public void setOutType(final boolean outType) {
-        this.outType = outType;
+        this._outType = outType;
     }
 
     public boolean isReturnType() {
-        return returnType;
+        return _returnType;
     }
 
     public void setReturnType(final boolean returnType) {
-        this.returnType = returnType;
+        this._returnType = returnType;
     }
 }

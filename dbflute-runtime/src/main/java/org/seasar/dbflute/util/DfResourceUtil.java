@@ -141,7 +141,7 @@ public class DfResourceUtil {
             String msg = url.getClass().getSimpleName() + "#openStream() threw the IO exception!";
             throw new IllegalStateException(msg, e);
         }
-        DfResourceUtil.makeFileAndClose(in, outputFilename);
+        makeFileAndClose(in, outputFilename);
     }
 
     // ===================================================================================

@@ -51,7 +51,7 @@ public class DfAssertUtil {
     public static void assertStringNotNullAndNotTrimmedEmpty(String variableName, String value) {
         assertObjectNotNull("variableName", variableName);
         assertObjectNotNull("value", value);
-        if (value.trim().length() ==0) {
+        if (value.trim().length() == 0) {
             String msg = "The value should not be empty: variableName=" + variableName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }

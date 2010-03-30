@@ -15,13 +15,19 @@
  */
 package org.seasar.dbflute.s2dao.sqlcommand;
 
+import java.sql.ResultSet;
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
+import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaData;
+import org.seasar.dbflute.s2dao.metadata.TnProcedureParameterType;
 import org.seasar.dbflute.s2dao.sqlhandler.TnProcedureHandler;
+import org.seasar.dbflute.s2dao.sqlhandler.TnProcedureHandler.TnProcedureResultSetHandlerProvider;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -32,18 +38,26 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DataSource dataSource;
-    protected StatementFactory statementFactory;
-    protected TnProcedureMetaData procedureMetaData;
+    protected DataSource _dataSource;
+    protected StatementFactory _statementFactory;
+    protected TnProcedureMetaData _procedureMetaData;
+    protected TnProcedureResultSetHandlerFactory _procedureResultSetHandlerFactory;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnProcedureCommand(DataSource dataSource, StatementFactory statementFactory,
-            TnProcedureMetaData procedureMetaData) {
-        this.dataSource = dataSource;
-        this.statementFactory = statementFactory;
-        this.procedureMetaData = procedureMetaData;
+            TnProcedureMetaData procedureMetaData, TnProcedureResultSetHandlerFactory procedureResultSetHandlerFactory) {
+        this._dataSource = dataSource;
+        this._statementFactory = statementFactory;
+        this._procedureMetaData = procedureMetaData;
+        this._procedureResultSetHandlerFactory = procedureResultSetHandlerFactory;
+    }
+
+    public static interface TnProcedureResultSetHandlerFactory {
+        TnResultSetHandler createBeanHandler(Class<?> beanClass);
+
+        TnResultSetHandler createDefaultHandler();
     }
 
     // ===================================================================================
@@ -59,7 +73,26 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
     }
 
     protected TnProcedureHandler createProcedureHandler() {
-        final String sql = procedureMetaData.createSql();
-        return new TnProcedureHandler(dataSource, sql, statementFactory, procedureMetaData);
+        final String sql = _procedureMetaData.createSql();
+        return new TnProcedureHandler(_dataSource, sql, _statementFactory, _procedureMetaData,
+                createProcedureResultSetHandlerFactory());
+    }
+
+    protected TnProcedureResultSetHandlerProvider createProcedureResultSetHandlerFactory() {
+        return new TnProcedureResultSetHandlerProvider() {
+            public TnResultSetHandler provideResultSetHandler(TnProcedureParameterType ppt, ResultSet rs) {
+                final Class<?> parameterType = ppt.getParameterType();
+                if (!List.class.isAssignableFrom(parameterType)) {
+                    String msg = "The parameter type for result set should be List:";
+                    msg = msg + " parameter=" + ppt.getParameterName() + " type=" + parameterType;
+                    throw new IllegalStateException(msg);
+                }
+                final Class<?> elementType = ppt.getElementType();
+                if (elementType != null) {
+                    return _procedureResultSetHandlerFactory.createBeanHandler(elementType);
+                }
+                return _procedureResultSetHandlerFactory.createDefaultHandler();
+            }
+        };
     }
 }

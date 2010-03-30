@@ -1,4 +1,4 @@
-package org.seasar.dbflute.bhv.core.command;
+package org.seasar.dbflute.s2dao.rshandler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,18 +8,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.seasar.dbflute.bhv.core.command.AbstractBehaviorCommand.DynamicScalarResultSetHandler;
 import org.seasar.dbflute.mock.MockResultSet;
 import org.seasar.dbflute.mock.MockValueType;
+import org.seasar.dbflute.s2dao.rshandler.TnScalarDynamicResultSetHandler;
 import org.seasar.dbflute.unit.PlainTestCase;
 
 /**
  * @author jflute
  * @since 0.9.6.4 (2010/01/22 Friday)
  */
-public class DynamicScalarResultSetHandlerTest extends PlainTestCase {
+public class TnScalarDynamicResultSetHandlerTest extends PlainTestCase {
 
-    public void test_DynamicScalarResultSetHandler_handle_scalar() throws SQLException {
+    public void test_handle_scalar() throws SQLException {
         // ## Arrange ##
         MockValueType valueType = new MockValueType() {
             @Override
@@ -28,7 +28,7 @@ public class DynamicScalarResultSetHandlerTest extends PlainTestCase {
                 return 99;
             }
         };
-        DynamicScalarResultSetHandler handler = new DynamicScalarResultSetHandler(valueType) {
+        TnScalarDynamicResultSetHandler handler = new TnScalarDynamicResultSetHandler(valueType) {
             @Override
             protected <ELEMENT> List<ELEMENT> newArrayList() {
                 fail("should not be called");
@@ -56,7 +56,7 @@ public class DynamicScalarResultSetHandlerTest extends PlainTestCase {
         assertEquals(99, actual);
     }
 
-    public void test_DynamicScalarResultSetHandler_handle_scalarList() throws SQLException {
+    public void test_handle_scalarList() throws SQLException {
         // ## Arrange ##
         MockValueType valueType = new MockValueType() {
             private int count = 0;
@@ -68,7 +68,7 @@ public class DynamicScalarResultSetHandlerTest extends PlainTestCase {
         };
         final String mark = "called";
         final Set<String> markSet = new HashSet<String>();
-        DynamicScalarResultSetHandler handler = new DynamicScalarResultSetHandler(valueType) {
+        TnScalarDynamicResultSetHandler handler = new TnScalarDynamicResultSetHandler(valueType) {
             @Override
             protected <ELEMENT> List<ELEMENT> newArrayList() {
                 if (markSet.contains(mark)) {

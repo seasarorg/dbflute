@@ -15,11 +15,6 @@
  */
 package org.seasar.dbflute.bhv.core.command;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.sql.DataSource;
 
 import org.seasar.dbflute.bhv.core.BehaviorCommand;
@@ -31,8 +26,11 @@ import org.seasar.dbflute.s2dao.extension.TnRowCreatorExtension;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
-import org.seasar.dbflute.s2dao.rshandler.TnBeanCursorMetaDataResultSetHandler;
-import org.seasar.dbflute.s2dao.rshandler.TnBeanListMetaDataResultSetHandler;
+import org.seasar.dbflute.s2dao.rshandler.TnBeanCursorResultSetHandler;
+import org.seasar.dbflute.s2dao.rshandler.TnBeanListResultSetHandler;
+import org.seasar.dbflute.s2dao.rshandler.TnScalarDynamicResultSetHandler;
+import org.seasar.dbflute.s2dao.rshandler.TnScalarListResultSetHandler;
+import org.seasar.dbflute.s2dao.rshandler.TnScalarResultSetHandler;
 import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateDynamicCommand;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
 
@@ -81,21 +79,21 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     // -----------------------------------------------------
     //                                      ResultSetHandler
     //                                      ----------------
-    protected TnResultSetHandler createBeanListMetaDataResultSetHandler(TnBeanMetaData bmd) {
-        final TnRowCreatorExtension rowCreator = createInternalRowCreator(bmd);
-        final TnRelationRowCreatorExtension relationRowCreator = createInternalRelationRowCreator(bmd);
-        return new TnBeanListMetaDataResultSetHandler(bmd, rowCreator, relationRowCreator);
+    protected TnResultSetHandler createBeanListResultSetHandler(TnBeanMetaData bmd) {
+        final TnRowCreatorExtension rowCreator = createRowCreator(bmd);
+        final TnRelationRowCreatorExtension relationRowCreator = createRelationRowCreator(bmd);
+        return new TnBeanListResultSetHandler(bmd, rowCreator, relationRowCreator);
     }
 
-    protected TnResultSetHandler createBeanCursorMetaDataResultSetHandler(TnBeanMetaData bmd) {
-        final TnRowCreatorExtension rowCreator = createInternalRowCreator(bmd);
-        final TnRelationRowCreatorExtension relationRowCreator = createInternalRelationRowCreator(bmd);
-        return new TnBeanCursorMetaDataResultSetHandler(bmd, rowCreator, relationRowCreator);
+    protected TnResultSetHandler createBeanCursorResultSetHandler(TnBeanMetaData bmd) {
+        final TnRowCreatorExtension rowCreator = createRowCreator(bmd);
+        final TnRelationRowCreatorExtension relationRowCreator = createRelationRowCreator(bmd);
+        return new TnBeanCursorResultSetHandler(bmd, rowCreator, relationRowCreator);
     }
 
     protected TnResultSetHandler createScalarResultSetHandler(Class<?> objectType) {
         final ValueType valueType = TnValueTypes.getValueType(objectType);
-        return new ScalarResultSetHandler(valueType);
+        return new TnScalarResultSetHandler(valueType);
     }
 
     protected TnResultSetHandler createScalarListResultSetHandler(Class<?> objectType) {
@@ -105,87 +103,20 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
 
     protected TnResultSetHandler createDynamicScalarResultSetHandler(Class<?> objectType) {
         final ValueType valueType = TnValueTypes.getValueType(objectType);
-        return new DynamicScalarResultSetHandler(valueType);
+        return new TnScalarDynamicResultSetHandler(valueType);
     }
 
     protected TnResultSetHandler createScalarListResultSetHandler(ValueType valueType) {
-        return new ScalarListResultSetHandler(valueType);
+        return new TnScalarListResultSetHandler(valueType);
     }
 
-    protected static class ScalarResultSetHandler implements TnResultSetHandler {
-        private ValueType valueType;
-
-        public ScalarResultSetHandler(ValueType valueType) {
-            this.valueType = valueType;
-        }
-
-        public Object handle(ResultSet rs) throws SQLException {
-            while (rs.next()) {
-                return valueType.getValue(rs, 1);
-            }
-            return null;
-        }
-    }
-
-    protected static class ScalarListResultSetHandler implements TnResultSetHandler {
-        private ValueType valueType;
-
-        public ScalarListResultSetHandler(ValueType valueType) {
-            this.valueType = valueType;
-        }
-
-        public Object handle(ResultSet rs) throws SQLException {
-            final List<Object> ret = new ArrayList<Object>();
-            while (rs.next()) {
-                ret.add(valueType.getValue(rs, 1));
-            }
-            return ret;
-        }
-    }
-
-    protected static class DynamicScalarResultSetHandler implements TnResultSetHandler {
-        private ValueType valueType;
-
-        public DynamicScalarResultSetHandler(ValueType valueType) {
-            this.valueType = valueType;
-        }
-
-        public Object handle(ResultSet rs) throws SQLException {
-            List<Object> retList = null;
-            Object ret = null;
-            int index = 0;
-            while (rs.next()) {
-                if (index == 1) { // second loop
-                    retList = newArrayList();
-                    retList.add(ret);
-                }
-                ret = valueType.getValue(rs, 1);
-                if (retList != null) { // true at second or more loop
-                    retList.add(ret);
-                }
-                ++index;
-            }
-            return retList != null ? retList : ret;
-        }
-
-        protected <ELEMENT> List<ELEMENT> newArrayList() {
-            return new ArrayList<ELEMENT>();
-        }
-    }
-
-    protected static class NullResultSetHandler implements TnResultSetHandler {
-        public Object handle(ResultSet rs) throws SQLException {
-            return null;
-        }
-    }
-
-    protected TnRowCreatorExtension createInternalRowCreator(TnBeanMetaData bmd) {
+    protected TnRowCreatorExtension createRowCreator(TnBeanMetaData bmd) {
         final Class<?> clazz = bmd != null ? bmd.getBeanClass() : null;
         return TnRowCreatorExtension.createRowCreator(clazz);
     }
 
-    protected TnRelationRowCreatorExtension createInternalRelationRowCreator(TnBeanMetaData bmd) {
-        return new TnRelationRowCreatorExtension(); // Not yet implemented about performance tuning!
+    protected TnRelationRowCreatorExtension createRelationRowCreator(TnBeanMetaData bmd) {
+        return TnRelationRowCreatorExtension.createRelationRowCreator();
     }
 
     // ===================================================================================

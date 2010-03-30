@@ -33,7 +33,7 @@ import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public abstract class TnAbstractBeanMetaDataResultSetHandler implements TnResultSetHandler {
+public abstract class TnAbstractBeanResultSetHandler implements TnResultSetHandler {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -50,7 +50,7 @@ public abstract class TnAbstractBeanMetaDataResultSetHandler implements TnResult
      * @param rowCreator Row creator. (NotNull)
      * @param relationRowCreator Relation row creator. (NotNul)
      */
-    public TnAbstractBeanMetaDataResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
+    public TnAbstractBeanResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
             TnRelationRowCreator relationRowCreator) {
         this.beanMetaData = beanMetaData;
         this.rowCreator = rowCreator;

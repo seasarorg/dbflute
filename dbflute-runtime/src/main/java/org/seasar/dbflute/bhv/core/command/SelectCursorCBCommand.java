@@ -91,7 +91,7 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
                 TnBeanMetaData bmd = createBeanMetaData();
-                TnResultSetHandler handler = createBeanCursorMetaDataResultSetHandler(bmd);
+                TnResultSetHandler handler = createBeanCursorResultSetHandler(bmd);
                 return createSelectCBExecution(_conditionBeanType, handler);
             }
         };

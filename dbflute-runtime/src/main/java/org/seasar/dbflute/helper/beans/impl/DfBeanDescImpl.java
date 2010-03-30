@@ -192,7 +192,6 @@ public class DfBeanDescImpl implements DfBeanDesc {
     }
 
     public Method[] getMethods(String methodName) throws DfBeanMethodNotFoundException {
-
         Method[] methods = (Method[]) _methodsMap.get(methodName);
         if (methods == null) {
             throw new DfBeanMethodNotFoundException(_beanClass, methodName, null);

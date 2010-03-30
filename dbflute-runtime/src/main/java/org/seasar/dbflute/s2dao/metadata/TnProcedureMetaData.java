@@ -33,6 +33,7 @@ public class TnProcedureMetaData {
     private String procedureName;
     private Map<String, TnProcedureParameterType> unorderedMap = createUnorderedMap();
     private Map<String, TnProcedureParameterType> parameterTypes = createParameterTypes();
+    private TnProcedureParameterType returnParameterType = null;
     private boolean returnType;
 
     // ===================================================================================
@@ -122,10 +123,15 @@ public class TnProcedureMetaData {
         parameterTypes.put(name, parameterType);
         if (parameterType.isReturnType()) {
             returnType = true;
+            returnParameterType = parameterType;
         }
     }
 
     public boolean hasReturnParameterType() {
         return returnType;
+    }
+
+    public TnProcedureParameterType getReturnParameterType() {
+        return returnParameterType;
     }
 }

@@ -29,7 +29,7 @@ import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
  * @author jflute
  */
 @SuppressWarnings("unchecked")
-public class TnBeanArrayMetaDataResultSetHandler extends TnBeanListMetaDataResultSetHandler {
+public class TnBeanArrayResultSetHandler extends TnBeanListResultSetHandler {
 
 	// ===================================================================================
     //                                                                         Constructor
@@ -39,7 +39,7 @@ public class TnBeanArrayMetaDataResultSetHandler extends TnBeanListMetaDataResul
      * @param rowCreator Row creator. (NotNull)
      * @param relationRowCreator Relation row creator. (NotNul)
      */
-    public TnBeanArrayMetaDataResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator, TnRelationRowCreator relationRowCreator) {
+    public TnBeanArrayResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator, TnRelationRowCreator relationRowCreator) {
         super(beanMetaData, rowCreator, relationRowCreator);
     }
 	

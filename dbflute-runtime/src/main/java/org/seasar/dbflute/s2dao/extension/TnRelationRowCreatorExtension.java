@@ -42,6 +42,10 @@ import org.seasar.dbflute.s2dao.rowcreator.impl.TnRelationRowCreatorImpl;
  */
 public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
+    public static TnRelationRowCreatorExtension createRelationRowCreator() {
+        return new TnRelationRowCreatorExtension();
+    }
+
     @Override
     protected Object createRelationRow(TnRelationRowCreationResource res) throws SQLException {
         // - - - - - - - - - - - 

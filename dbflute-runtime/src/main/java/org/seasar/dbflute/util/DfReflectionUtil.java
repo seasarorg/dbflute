@@ -15,13 +15,20 @@
  */
 package org.seasar.dbflute.util;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -253,6 +260,70 @@ public class DfReflectionUtil {
 
     public static boolean isStatic(int modifier) {
         return Modifier.isStatic(modifier);
+    }
+
+    // ===================================================================================
+    //                                                                             Generic
+    //                                                                             =======
+    public static Class<?> getGenericType(Type type) {
+        return getRawClass(getGenericParameter(type, 0));
+    }
+
+    protected static boolean isTypeOf(Type type, Class<?> clazz) {
+        if (Class.class.isInstance(type)) {
+            return clazz.isAssignableFrom(Class.class.cast(type));
+        }
+        if (ParameterizedType.class.isInstance(type)) {
+            final ParameterizedType parameterizedType = ParameterizedType.class.cast(type);
+            return isTypeOf(parameterizedType.getRawType(), clazz);
+        }
+        return false;
+    }
+
+    protected static Class<?> getRawClass(Type type) {
+        if (Class.class.isInstance(type)) {
+            return Class.class.cast(type);
+        }
+        if (ParameterizedType.class.isInstance(type)) {
+            final ParameterizedType parameterizedType = ParameterizedType.class.cast(type);
+            return getRawClass(parameterizedType.getRawType());
+        }
+        if (WildcardType.class.isInstance(type)) {
+            final WildcardType wildcardType = WildcardType.class.cast(type);
+            final Type[] types = wildcardType.getUpperBounds();
+            return getRawClass(types[0]);
+        }
+        if (GenericArrayType.class.isInstance(type)) {
+            final GenericArrayType genericArrayType = GenericArrayType.class.cast(type);
+            final Class<?> rawClass = getRawClass(genericArrayType.getGenericComponentType());
+            return Array.newInstance(rawClass, 0).getClass();
+        }
+        return null;
+    }
+
+    protected static Type getGenericParameter(Type type, int index) {
+        if (!ParameterizedType.class.isInstance(type)) {
+            return null;
+        }
+        final List<Type> genericParameter = getGenericParameterList(type);
+        if (genericParameter.isEmpty()) {
+            return null;
+        }
+        return genericParameter.get(index);
+    }
+
+    protected static List<Type> getGenericParameterList(Type type) {
+        if (ParameterizedType.class.isInstance(type)) {
+            final ParameterizedType paramType = ParameterizedType.class.cast(type);
+            return Arrays.asList(paramType.getActualTypeArguments());
+        }
+        if (GenericArrayType.class.isInstance(type)) {
+            final GenericArrayType arrayType = GenericArrayType.class.cast(type);
+            return getGenericParameterList(arrayType.getGenericComponentType());
+        }
+        @SuppressWarnings("unchecked")
+        List<Type> emptyList = Collections.EMPTY_LIST;
+        return emptyList;
     }
 
     // ===================================================================================
