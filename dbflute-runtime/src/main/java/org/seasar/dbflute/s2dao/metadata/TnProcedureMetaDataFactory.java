@@ -21,7 +21,6 @@ import java.lang.reflect.Type;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +67,7 @@ public class TnProcedureMetaDataFactory {
                 registerParameterType(procedureMetaData, parameterDesc);
             }
         }
+        procedureMetaData.fix();
         return procedureMetaData;
     }
 
@@ -80,12 +80,12 @@ public class TnProcedureMetaDataFactory {
     }
 
     protected TnProcedureParameterType getProcedureParameterType(DfPropertyDesc parameterDesc) {
-        final String parameterInfo = _annotationReader.getParameterInfo(parameterDesc);
-        if (parameterInfo == null) {
+        final String specificationExp = _annotationReader.getParameterSpecification(parameterDesc);
+        if (specificationExp == null) {
             return null;
         }
-        final Map<String, String> parameterInfoMap = extractParameterInfoMap(parameterInfo, parameterDesc);
-        final String type = parameterInfoMap.get("type");
+        final TnProcedureParameterSpec spec = parseParameterSpec(specificationExp, parameterDesc);
+        final String type = spec.getParameterType();
         final TnProcedureParameterType ppt = createProcedureParameterType(parameterDesc);
         if (type.equalsIgnoreCase("in")) {
             ppt.setInType(true);
@@ -97,15 +97,15 @@ public class TnProcedureMetaDataFactory {
         } else if (type.equalsIgnoreCase("return")) {
             ppt.setOutType(true);
             ppt.setReturnType(true);
+        } else if (type.equalsIgnoreCase("resultCloset")) {
+            ppt.setResultClosetType(true);
         } else {
             String msg = "The parameter type should be 'in' or 'out' or 'inout' or 'return':";
             msg = msg + " class=" + parameterDesc.getBeanDesc().getBeanClass().getSimpleName();
             msg = msg + " property=" + parameterDesc.getPropertyName();
             throw new IllegalStateException(msg);
         }
-        final String indexExp = parameterInfoMap.get("index");
-        final Integer index = parseIndexAsInteger(indexExp, parameterInfo, parameterDesc);
-        ppt.setParameterIndex(index);
+        ppt.setParameterOrder(spec.getParameterOrder());
         final ValueType valueType = findValueType(parameterDesc);
         ppt.setValueType(valueType);
         return ppt;
@@ -126,33 +126,51 @@ public class TnProcedureMetaDataFactory {
     }
 
     // ===================================================================================
-    //                                                                      Parameter Info
-    //                                                                      ==============
-    protected Map<String, String> extractParameterInfoMap(String parameterInfo, DfPropertyDesc parameterDesc) {
-        final List<String> list = DfStringUtil.splitListTrimmed(parameterInfo, ",");
+    //                                                             Parameter Specification
+    //                                                             =======================
+    protected TnProcedureParameterSpec parseParameterSpec(String specExp, DfPropertyDesc parameterDesc) {
+        final List<String> list = DfStringUtil.splitListTrimmed(specExp, ",");
         if (list.size() != 2) {
             String msg = "The size of parameterInfo elements was illegal:";
-            msg = msg + " elements=" + list + " info=" + parameterInfo;
+            msg = msg + " elements=" + list + " spec=" + specExp;
             msg = msg + " parameter=" + parameterDesc.getPropertyName();
             msg = msg + " pmb=" + parameterDesc.getBeanDesc().getBeanClass().getSimpleName();
             throw new IllegalStateException(msg);
         }
-        final Map<String, String> map = new HashMap<String, String>();
-        map.put("type", list.get(0));
-        map.put("index", list.get(1));
-        return map;
-    }
-
-    protected Integer parseIndexAsInteger(String index, String parameterInfo, DfPropertyDesc parameterDesc) {
+        final TnProcedureParameterSpec spec = new TnProcedureParameterSpec();
+        spec.setParameterType(list.get(0));
+        final String order = list.get(1);
         try {
-            return DfTypeUtil.toInteger(index);
+            spec.setParameterOrder(DfTypeUtil.toInteger(list.get(1)));
         } catch (NumberFormatException e) {
             String msg = "Failed to parse the parameter index as Integer:";
-            msg = msg + " index=" + index + " info=" + parameterInfo;
+            msg = msg + " order=" + order + " spec=" + specExp;
             msg = msg + " parameter=" + parameterDesc.getPropertyName();
             msg = msg + " pmb=" + parameterDesc.getBeanDesc().getBeanClass().getSimpleName();
 
             throw new IllegalStateException(msg);
+        }
+        return spec;
+    }
+
+    protected static class TnProcedureParameterSpec {
+        protected String _parameterType;
+        protected Integer _parameterOrder;
+
+        public String getParameterType() {
+            return _parameterType;
+        }
+
+        public void setParameterType(String parameterType) {
+            this._parameterType = parameterType;
+        }
+
+        public Integer getParameterOrder() {
+            return _parameterOrder;
+        }
+
+        public void setParameterOrder(Integer parameterOrder) {
+            this._parameterOrder = parameterOrder;
         }
     }
 
@@ -205,7 +223,7 @@ public class TnProcedureMetaDataFactory {
         protected static final String PARAMETER_SUFFIX = "_PROCEDURE_PARAMETER";
         protected static final String VALUE_TYPE_SUFFIX = "_VALUE_TYPE";
 
-        public String getParameterInfo(DfPropertyDesc propertyDesc) {
+        public String getParameterSpecification(DfPropertyDesc propertyDesc) {
             final String propertyName = propertyDesc.getPropertyName();
             final String annotationName = propertyName + PARAMETER_SUFFIX;
             final DfBeanDesc pmbDesc = propertyDesc.getBeanDesc();

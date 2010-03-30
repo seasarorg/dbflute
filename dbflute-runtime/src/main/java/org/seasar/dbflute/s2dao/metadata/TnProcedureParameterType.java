@@ -30,11 +30,12 @@ public class TnProcedureParameterType {
     private final String _parameterName;
     private final Class<?> _parameterType;
     private final Class<?> _elementType;
-    private Integer _parameterIndex;
+    private Integer _parameterOrder; // only for order (not use setting index)
     private ValueType _valueType;
     private boolean _inType;
     private boolean _outType;
     private boolean _returnType;
+    private boolean _resultClosetType;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -79,12 +80,12 @@ public class TnProcedureParameterType {
         return _elementType;
     }
 
-    public Integer getParameterIndex() {
-        return _parameterIndex;
+    public Integer getParameterOrder() {
+        return _parameterOrder;
     }
 
-    public void setParameterIndex(Integer parameterIndex) {
-        this._parameterIndex = parameterIndex;
+    public void setParameterOrder(Integer parameterOrder) {
+        this._parameterOrder = parameterOrder;
     }
 
     public ValueType getValueType() {
@@ -117,5 +118,13 @@ public class TnProcedureParameterType {
 
     public void setReturnType(final boolean returnType) {
         this._returnType = returnType;
+    }
+
+    public boolean isResultClosetType() {
+        return _resultClosetType;
+    }
+
+    public void setResultClosetType(final boolean resultClosetType) {
+        this._resultClosetType = resultClosetType;
     }
 }

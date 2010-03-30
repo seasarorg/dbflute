@@ -15,8 +15,10 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -33,7 +35,22 @@ public class TnProcedureMetaData {
     private final String _procedureName;
     private final Map<String, TnProcedureParameterType> _parameterTypeMap = createParameterTypeMap();
     private final SortedSet<TnProcedureParameterType> _parameterTypeSortedSet = createParameterTypeSet();
+    private List<TnProcedureParameterType> _bindParameterTypeList; // lazy load
+    private List<TnProcedureParameterType> _resultClosetTypeList; // lazy load
     private TnProcedureParameterType _returnParameterType;
+    private boolean _fixed;
+
+    protected Map<String, TnProcedureParameterType> createParameterTypeMap() {
+        return new HashMap<String, TnProcedureParameterType>(); // unordered
+    }
+
+    protected SortedSet<TnProcedureParameterType> createParameterTypeSet() {
+        return new TreeSet<TnProcedureParameterType>(new Comparator<TnProcedureParameterType>() {
+            public int compare(TnProcedureParameterType o1, TnProcedureParameterType o2) {
+                return o1.getParameterOrder().compareTo(o2.getParameterOrder());
+            }
+        });
+    }
 
     // ===================================================================================
     //                                                                         Constructor
@@ -48,16 +65,21 @@ public class TnProcedureMetaData {
     public String createSql() {
         final StringBuilder sb = new StringBuilder();
         sb.append("{");
-        int size = getParameterTypeSortedSet().size();
-        if (hasReturnParameterType()) {
-            sb.append("? = ");
-            size--;
+        final int argSize;
+        {
+            final int bindSize = getBindParameterTypeList().size();
+            if (hasReturnParameterType()) {
+                sb.append("? = ");
+                argSize = bindSize - 1;
+            } else {
+                argSize = bindSize;
+            }
         }
         sb.append("call ").append(getProcedureName()).append("(");
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < argSize; i++) {
             sb.append("?, ");
         }
-        if (size > 0) {
+        if (argSize > 0) {
             sb.setLength(sb.length() - 2);
         }
         sb.append(")}");
@@ -65,20 +87,12 @@ public class TnProcedureMetaData {
     }
 
     // ===================================================================================
-    //                                                                             Factory
-    //                                                                             =======
-    protected Map<String, TnProcedureParameterType> createParameterTypeMap() {
-        return new HashMap<String, TnProcedureParameterType>(); // unordered
-    }
-
-    protected SortedSet<TnProcedureParameterType> createParameterTypeSet() {
-        return new TreeSet<TnProcedureParameterType>(new Comparator<TnProcedureParameterType>() {
-            public int compare(TnProcedureParameterType parameterType1, TnProcedureParameterType parameterType2) {
-                final Integer parameterIndex1 = parameterType1.getParameterIndex();
-                final Integer parameterIndex2 = parameterType2.getParameterIndex();
-                return parameterIndex1.compareTo(parameterIndex2);
-            }
-        });
+    //                                                                                 Fix
+    //                                                                                 ===
+    public void fix() {
+        _fixed = true;
+        getBindParameterTypeList(); // for lazy-loading
+        getResultClosetTypeList(); // for lazy-loading
     }
 
     // ===================================================================================
@@ -88,17 +102,38 @@ public class TnProcedureMetaData {
         return _procedureName;
     }
 
-    public SortedSet<TnProcedureParameterType> getParameterTypeSortedSet() {
+    private SortedSet<TnProcedureParameterType> getParameterTypeSortedSet() {
         return _parameterTypeSortedSet;
     }
 
-    public void addParameterType(TnProcedureParameterType parameterType) {
-        final String name = parameterType.getParameterName();
-        _parameterTypeMap.put(name, parameterType);
-        _parameterTypeSortedSet.add(parameterType);
-        if (parameterType.isReturnType()) {
-            _returnParameterType = parameterType;
+    public List<TnProcedureParameterType> getBindParameterTypeList() {
+        if (_bindParameterTypeList != null) {
+            return _bindParameterTypeList;
         }
+        final SortedSet<TnProcedureParameterType> parameterTypeSortedSet = getParameterTypeSortedSet();
+        final List<TnProcedureParameterType> bindList = new ArrayList<TnProcedureParameterType>();
+        for (TnProcedureParameterType ppt : parameterTypeSortedSet) {
+            if (!ppt.isResultClosetType()) {
+                bindList.add(ppt);
+            }
+        }
+        _bindParameterTypeList = bindList;
+        return bindList;
+    }
+
+    public List<TnProcedureParameterType> getResultClosetTypeList() {
+        if (_resultClosetTypeList != null) {
+            return _resultClosetTypeList;
+        }
+        final SortedSet<TnProcedureParameterType> parameterTypeSortedSet = getParameterTypeSortedSet();
+        final List<TnProcedureParameterType> closetList = new ArrayList<TnProcedureParameterType>();
+        for (TnProcedureParameterType ppt : parameterTypeSortedSet) {
+            if (ppt.isResultClosetType()) {
+                closetList.add(ppt);
+            }
+        }
+        _resultClosetTypeList = closetList;
+        return closetList;
     }
 
     public boolean hasReturnParameterType() {
@@ -107,5 +142,23 @@ public class TnProcedureMetaData {
 
     public TnProcedureParameterType getReturnParameterType() {
         return _returnParameterType;
+    }
+
+    public void addParameterType(TnProcedureParameterType parameterType) {
+        if (parameterType == null) {
+            String msg = "The argument 'parameterType' should not be null!";
+            throw new IllegalStateException(msg);
+        }
+        if (_fixed) {
+            String msg = "This object has already been fixed:";
+            msg = msg + " added=" + parameterType.getParameterName();
+            throw new IllegalStateException(msg);
+        }
+        final String name = parameterType.getParameterName();
+        _parameterTypeMap.put(name, parameterType);
+        _parameterTypeSortedSet.add(parameterType);
+        if (parameterType.isReturnType()) {
+            _returnParameterType = parameterType;
+        }
     }
 }
