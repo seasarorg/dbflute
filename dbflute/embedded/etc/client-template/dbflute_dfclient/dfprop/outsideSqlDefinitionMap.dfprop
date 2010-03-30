@@ -8,6 +8,7 @@
 # o targetProcedureCatalogList: (NotRequired - Default list:{})
 # o targetProcedureSchemaList: (NotRequired - Default list:{})
 # o targetProcedureNameList: (NotRequired - Default list:{})
+# o executionMetaProcedureNameList: (NotRequired - Default list:{})
 # o procedureSynonymHandlingType: (NotRequired - Default NONE)
 # o isRequiredSqlTitle: (NotRequired - Default false)
 # o isRequiredSqlDescription: (NotRequired - Default false)
@@ -39,7 +40,7 @@ map:{
     #     And also not-param-result's properties are auto-generated.
     #     Target procedures are executed actually at Sql2Entity task.
     #     (because of getting from execution meta data (result set meta data))
-    #     This property is valid when isGenerateProcedureParameterBean is true.
+    #     This property is valid only when isGenerateProcedureParameterBean is true.
     #
     #   [false]
     #     Non.
@@ -67,10 +68,19 @@ map:{
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # o targetProcedureNameList: (NotRequired - Default list:{})
     #  You can specify target name of generated parameter bean for procedure.
-    #  This property is valid only when generateProcedureParameterBean is valid.
+    #  This property is valid only when isGenerateProcedureParameterBean is valid.
     #  ex) list:{prefix:SP_}
     #
     #; targetProcedureNameList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o executionMetaProcedureNameList: (NotRequired - Default list:{})
+    #  You can specify target name of generated customize entity for procedure.
+    #  This property is valid only when isGenerateProcedureCustomizeEntity is valid.
+    #  ex) list:{prefix:SP_}
+    #
+    #; executionMetaProcedureNameList = list:{FULL_NAME ; prefix:PREFIX_ ; suffix:_SUFFIX ; contain:KEYWORD}
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

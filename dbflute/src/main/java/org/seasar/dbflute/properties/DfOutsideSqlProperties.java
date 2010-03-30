@@ -141,6 +141,32 @@ public final class DfOutsideSqlProperties extends DfAbstractHelperProperties {
         return false;
     }
 
+    protected List<String> _executionMetaProcedureNameList;
+
+    protected List<String> getExecutionMetaProcedureNameList() {
+        if (_executionMetaProcedureNameList != null) {
+            return _executionMetaProcedureNameList;
+        }
+        _executionMetaProcedureNameList = getOutsideSqlPropertyAsList("executionMetaProcedureNameList");
+        if (_executionMetaProcedureNameList == null) {
+            _executionMetaProcedureNameList = new ArrayList<String>();
+        }
+        return _executionMetaProcedureNameList;
+    }
+
+    public boolean isExecutionMetaProcedureName(String procedureName) {
+        final List<String> executionMetaProcedureList = getExecutionMetaProcedureNameList();
+        if (executionMetaProcedureList == null || executionMetaProcedureList.isEmpty()) {
+            return true;
+        }
+        for (String procedureNameHint : executionMetaProcedureList) {
+            if (isHitByTheHint(procedureName, procedureNameHint)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public ProcedureSynonymHandlingType getProcedureSynonymHandlingType() {
         final String key = "procedureSynonymHandlingType";
         final String property = getProperty(key, ProcedureSynonymHandlingType.NONE.name(), getOutsideSqlDefinitionMap());

@@ -16,6 +16,7 @@
 package org.seasar.dbflute.logic.cmentity;
 
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -61,25 +63,34 @@ public class DfProcedureExecutionMetaExtractor {
     //                                                                             =======
     public void extractExecutionMetaData(DataSource dataSource, List<DfProcedureMetaInfo> procedureList)
             throws SQLException {
+        final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
         for (DfProcedureMetaInfo procedure : procedureList) {
+            final String procedureName = procedure.getProcedureName();
+            final String procedureFullName = procedure.getProcedureFullName();
+            if (!prop.isExecutionMetaProcedureName(procedureFullName)
+                    || !prop.isExecutionMetaProcedureName(procedureName)) {
+                continue;
+            }
             doExtractExecutionMetaData(dataSource, procedure);
         }
     }
 
     protected void doExtractExecutionMetaData(DataSource dataSource, DfProcedureMetaInfo procedure) throws SQLException {
-        final String procedureFullName = procedure.getProcedureFullName();
         final List<DfProcedureColumnMetaInfo> columnList = procedure.getProcedureColumnList();
         final List<Object> testValueList = new ArrayList<Object>();
         final boolean existsReturn = existsReturnValue(columnList);
         setupTestValueList(columnList, testValueList);
-        final String sql = createSql(procedureFullName, columnList.size(), existsReturn);
+        final String sql = createSql(procedure.getProcedureSqlName(), columnList.size(), existsReturn);
+        Connection conn = null;
         CallableStatement cs = null;
         try {
+            _log.info("...Calling: " + sql);
+            conn = dataSource.getConnection();
+            conn.setAutoCommit(false);
             cs = dataSource.getConnection().prepareCall(sql);
             final List<DfProcedureColumnMetaInfo> boundColumnList = new ArrayList<DfProcedureColumnMetaInfo>();
             setupBindParameter(cs, columnList, testValueList, boundColumnList);
             ResultSet rs = null;
-            _log.info("...Calling: " + sql);
             if (cs.execute()) {
                 int closetIndex = 0;
                 do {
@@ -118,6 +129,9 @@ public class DfProcedureExecutionMetaExtractor {
         } finally {
             if (cs != null) {
                 cs.close();
+            }
+            if (conn != null) {
+                conn.rollback();
             }
         }
     }
