@@ -68,10 +68,11 @@ public class TnProcedureHandler extends TnBasicHandler {
             cs = prepareCallableStatement(conn);
             bindArgs(cs, pmb);
             final boolean executed = cs.execute();
+            boolean handledReturn = false;
             if (executed) {
-                handleNonOutReturnResultSet(cs, pmb);
+                handledReturn = handleNonOutReturnResultSet(cs, pmb);
             }
-            handleOutParameters(cs, pmb);
+            handleOutParameter(cs, pmb, handledReturn);
             return pmb;
         } catch (SQLException e) {
             handleSQLException(e, cs);
@@ -126,43 +127,51 @@ public class TnProcedureHandler extends TnBasicHandler {
      * @param cs The statement of procedure. (NotNull)
      * @param pmb The parameter bean from arguments. (NotNull)
      * @throws SQLException
+     * @return Was the return handled actually?
      */
-    protected void handleNonOutReturnResultSet(CallableStatement cs, Object pmb) throws SQLException {
+    protected boolean handleNonOutReturnResultSet(CallableStatement cs, Object pmb) throws SQLException {
         if (pmb == null) {
-            return;
+            return false;
         }
         final TnProcedureParameterType ppt = _procedureMetaData.getReturnParameterType();
         if (ppt == null) {
-            return;
+            return false;
         }
         Object returnResultSet = null;
         final ResultSet rs = cs.getResultSet();
-        if (rs != null) {
-            final TnResultSetHandler handler = createReturnResultSetHandler(rs);
-            try {
-                returnResultSet = handler.handle(rs);
-            } finally {
-                rs.close();
-            }
+        if (rs == null) {
+            return false;
         }
-        ppt.setValue(pmb, returnResultSet);
+        final TnResultSetHandler handler = createReturnResultSetHandler(rs);
+        try {
+            returnResultSet = handler.handle(rs);
+            ppt.setValue(pmb, returnResultSet);
+        } finally {
+            rs.close();
+        }
+        return true;
     }
 
     /**
      * Handle result set for out-parameter.
      * @param cs The statement of procedure. (NotNull)
      * @param pmb The parameter bean from arguments. (NotNull)
+     * @param handledReturn Has already the return been handled?
      * @throws SQLException
      */
-    protected void handleOutParameters(CallableStatement cs, Object pmb) throws SQLException {
+    protected void handleOutParameter(CallableStatement cs, Object pmb, boolean handledReturn) throws SQLException {
         if (pmb == null) {
             return;
         }
-        int i = 0;
+        int index = 0;
         for (TnProcedureParameterType ppt : _procedureMetaData.getParameterTypeSortedSet()) {
             final ValueType valueType = ppt.getValueType();
+            if (ppt.isReturnType() && handledReturn) {
+                ++index; // Is this really needed?
+                continue;
+            }
             if (ppt.isOutType()) {
-                Object value = valueType.getValue(cs, i + 1);
+                Object value = valueType.getValue(cs, index + 1);
                 if (value instanceof ResultSet) {
                     final ResultSet rs = (ResultSet) value;
                     final TnResultSetHandler handler = createOutParameterResultSetHandler(ppt, rs);
@@ -176,7 +185,7 @@ public class TnProcedureHandler extends TnBasicHandler {
                 }
                 ppt.setValue(pmb, value);
             }
-            ++i;
+            ++index;
         }
     }
 

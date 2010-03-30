@@ -17,6 +17,7 @@ package org.seasar.dbflute.s2dao.sqlcommand;
 
 import java.sql.ResultSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -57,7 +58,7 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
     public static interface TnProcedureResultSetHandlerFactory {
         TnResultSetHandler createBeanHandler(Class<?> beanClass);
 
-        TnResultSetHandler createDefaultHandler();
+        TnResultSetHandler createMapHandler();
     }
 
     // ===================================================================================
@@ -89,9 +90,15 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
                 }
                 final Class<?> elementType = ppt.getElementType();
                 if (elementType != null) {
+                    String msg = "The parameter type for result set should have generic type of List:";
+                    msg = msg + " parameter=" + ppt.getParameterName() + " type=" + parameterType;
+                    throw new IllegalStateException(msg);
+                }
+                if (Map.class.isAssignableFrom(elementType)) {
+                    return _procedureResultSetHandlerFactory.createMapHandler();
+                } else {
                     return _procedureResultSetHandlerFactory.createBeanHandler(elementType);
                 }
-                return _procedureResultSetHandlerFactory.createDefaultHandler();
             }
         };
     }

@@ -137,7 +137,7 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
                 return createBeanListResultSetHandler(beanMetaData);
             }
 
-            public TnResultSetHandler createDefaultHandler() {
+            public TnResultSetHandler createMapHandler() {
                 return new TnMapListResultSetHandler();
             }
         };
