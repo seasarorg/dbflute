@@ -100,7 +100,8 @@ public class TnProcedureMetaDataFactory {
         } else if (type.equalsIgnoreCase("notParamResult")) {
             ppt.setNotParamResultType(true);
         } else {
-            String msg = "The parameter type should be 'in' or 'out' or 'inout' or 'return' or 'notParamResult':";
+            String msg = "The parameter type should be 'in, out, inout, return, notParamResult':";
+            msg = msg + " type=" + type;
             msg = msg + " class=" + parameterDesc.getBeanDesc().getBeanClass().getSimpleName();
             msg = msg + " property=" + parameterDesc.getPropertyName();
             throw new IllegalStateException(msg);
