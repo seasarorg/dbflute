@@ -75,7 +75,9 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected void doExtractExecutionMetaData(DataSource dataSource, DfProcedureMetaInfo procedure) throws SQLException {
-        final List<DfProcedureColumnMetaInfo> columnList = procedure.getProcedureColumnList();
+        // use unique list because Oracle package procedure may return duplicated information 
+        final List<DfProcedureColumnMetaInfo> columnList = procedure.getProcedureColumnUniqueList();
+
         final List<Object> testValueList = new ArrayList<Object>();
         final boolean existsReturn = existsReturnValue(columnList);
         setupTestValueList(columnList, testValueList);
