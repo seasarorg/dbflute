@@ -35,6 +35,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                   Procedure Parameter
     //                                   -------------------
 #set ($procedureParameterIndex = 0)
+#set ($procedureClosetResultIndex = 1000)
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($annotationPropName = ${propertyName})
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
@@ -49,6 +50,9 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 #set ($procedureParameterIndex = $procedureParameterIndex + 1)
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
     public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "return, -1";
+#elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterResult($pmbClassName, $propertyName))
+    public static final String ${annotationPropName}_PROCEDURE_PARAMETER = "closetResult, ${procedureClosetResultIndex}";
+#set ($procedureClosetResultIndex = $procedureClosetResultIndex + 1)
 #end
 #end
 #end

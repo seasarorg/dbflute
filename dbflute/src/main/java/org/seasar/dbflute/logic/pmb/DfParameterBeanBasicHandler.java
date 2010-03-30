@@ -156,6 +156,11 @@ public class DfParameterBeanBasicHandler {
         return option != null && option.trim().equalsIgnoreCase(DfProcedureColumnType.procedureColumnReturn.toString());
     }
 
+    public boolean isPmbMetaDataPropertyOptionProcedureParameterResult(String className, String propertyName) {
+        String option = findPmbMetaDataPropertyOption(className, propertyName);
+        return option != null && option.trim().equalsIgnoreCase(DfProcedureColumnType.procedureColumnResult.toString());
+    }
+
     // ===================================================================================
     //                                                                              Option
     //                                                                              ======

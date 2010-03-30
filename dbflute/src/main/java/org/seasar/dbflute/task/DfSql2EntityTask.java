@@ -16,8 +16,6 @@
 package org.seasar.dbflute.task;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -60,6 +58,7 @@ import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureClosetResultMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
@@ -701,14 +700,17 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final Map<String, String> propertyNameColumnNameMap = new LinkedHashMap<String, String>();
             final List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = metaInfo
                     .getProcedureColumnMetaInfoList();
-            int index = 0;
+            final List<DfProcedureClosetResultMetaInfo> closetResultMetaDataList = metaInfo
+                    .getClosetResultMetaInfoList();
+
             final String pmbName = convertProcedureNameToPmbName(procedureUniqueName);
             final String procedureSqlName = metaInfo.getProcedureSqlName();
 
             _log.info("[" + pmbName + "]: " + procedureSqlName + " // " + metaInfo.getProcedureType());
-            if (procedureColumnMetaInfoList.isEmpty()) {
+            if (procedureColumnMetaInfoList.isEmpty() && closetResultMetaDataList.isEmpty()) {
                 _log.info("    *No Parameter");
             }
+            int index = 0;
             for (DfProcedureColumnMetaInfo columnMetaInfo : procedureColumnMetaInfoList) {
                 String columnName = columnMetaInfo.getColumnName();
                 if (columnName == null || columnName.trim().length() == 0) {
@@ -733,6 +735,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                 _log.info(msg);
                 ++index;
             }
+            for (DfProcedureClosetResultMetaInfo closetResultMetaInfo : closetResultMetaDataList) {
+                final String propertyName = closetResultMetaInfo.getPropertyName();
+                final String propertyType = "java.util.List<java.util.Map<String, Object>>"; // TODO jflute
+                propertyNameTypeMap.put(propertyName, propertyType);
+                propertyNameOptionMap.put(propertyName, DfProcedureColumnType.procedureColumnResult.toString());
+                propertyNameColumnNameMap.put(propertyName, "CLOSET_RESULT");
+                String msg = "    " + propertyType + " " + propertyName + ";";
+                msg = msg + " // " + DfProcedureColumnType.procedureColumnResult;
+                _log.info(msg);
+            }
             parameterBeanMetaData.setClassName(pmbName);
             parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
             parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
@@ -749,17 +761,9 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                   Procedure Meta Info
     //                                   -------------------
     protected Map<String, DfProcedureMetaInfo> getAvailableProcedureMap() throws SQLException {
-        Connection conn = null;
-        try {
-            conn = getDataSource().getConnection();
-            final DatabaseMetaData metaData = conn.getMetaData();
-            _procedureHandler.includeProcedureSynonym(getDataSource());
-            return _procedureHandler.getAvailableProcedureMap(metaData);
-        } finally {
-            if (conn != null) {
-                conn.close();
-            }
-        }
+        _procedureHandler.includeProcedureSynonym(getDataSource());
+        final boolean executed = getProperties().getOutsideSqlProperties().isGenerateProcedureCustomizeEntity();
+        return _procedureHandler.getAvailableProcedureMap(getDataSource(), executed);
     }
 
     // -----------------------------------------------------

@@ -25,6 +25,7 @@ public class DfProcedureMetaInfo {
     protected boolean procedureSynonym;
 
     protected List<DfProcedureColumnMetaInfo> procedureColumnMetaInfoList = new ArrayList<DfProcedureColumnMetaInfo>();
+    protected List<DfProcedureClosetResultMetaInfo> closetResultMetaInfoList = new ArrayList<DfProcedureClosetResultMetaInfo>();
 
     public String getProcedureDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
@@ -65,7 +66,7 @@ public class DfProcedureMetaInfo {
     @Override
     public String toString() {
         return "{" + procedureFullName + ", " + procedureType + ", " + procedureComment + ", "
-                + procedureColumnMetaInfoList + "}";
+                + procedureColumnMetaInfoList + ", closet=" + closetResultMetaInfoList.size() + "}";
     }
 
     public enum DfProcedureType {
@@ -159,5 +160,13 @@ public class DfProcedureMetaInfo {
 
     public void addProcedureColumnMetaInfo(DfProcedureColumnMetaInfo procedureColumnMetaInfo) {
         procedureColumnMetaInfoList.add(procedureColumnMetaInfo);
+    }
+
+    public List<DfProcedureClosetResultMetaInfo> getClosetResultMetaInfoList() {
+        return closetResultMetaInfoList;
+    }
+
+    public void addClosetResultMetaInfo(DfProcedureClosetResultMetaInfo closetResultMetaInfo) {
+        this.closetResultMetaInfoList.add(closetResultMetaInfo);
     }
 }

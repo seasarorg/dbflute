@@ -1,5 +1,8 @@
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.properties.DfDocumentProperties;
@@ -14,6 +17,7 @@ public class DfProcedureColumnMetaInfo {
     protected Integer decimalDigits;
     protected String columnComment;
     protected DfProcedureColumnType procedureColumnType;
+    protected List<DfColumnMetaInfo> columnMetaInfoList = new ArrayList<DfColumnMetaInfo>(); // if result set
 
     public String getColumnDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
@@ -123,5 +127,13 @@ public class DfProcedureColumnMetaInfo {
 
     public void setColumnComment(String columnComment) {
         this.columnComment = columnComment;
+    }
+
+    public List<DfColumnMetaInfo> getColumnMetaInfoList() {
+        return columnMetaInfoList;
+    }
+
+    public void addColumnMetaInfo(DfColumnMetaInfo columnMetaInfo) {
+        this.columnMetaInfoList.add(columnMetaInfo);
     }
 }

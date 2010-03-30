@@ -55,8 +55,6 @@ package org.apache.torque.engine.database.model;
  */
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -388,6 +386,11 @@ public class Database {
 
     public boolean isPmbMetaDataPropertyOptionProcedureParameterReturn(String className, String propertyName) {
         return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionProcedureParameterReturn(className,
+                propertyName);
+    }
+
+    public boolean isPmbMetaDataPropertyOptionProcedureParameterResult(String className, String propertyName) {
+        return getParameterBeanBasicHandler().isPmbMetaDataPropertyOptionProcedureParameterResult(className,
                 propertyName);
     }
 
@@ -1934,9 +1937,7 @@ public class Database {
         final String schemaName = getDatabaseSchema();
         final DataSource dataSource = getDataSource();
         try {
-            final Connection conn = dataSource.getConnection();
-            final DatabaseMetaData metaData = conn.getMetaData();
-            final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(metaData);
+            final Map<String, DfProcedureMetaInfo> procedureMap = handler.getAvailableProcedureMap(dataSource);
             _procedureMetaInfoList = new ArrayList<DfProcedureMetaInfo>(procedureMap.values());
             return _procedureMetaInfoList;
         } catch (SQLException e) {
