@@ -147,31 +147,39 @@ public class DfProcedureExecutionMetaExtractor {
 
     protected void setupTestValueList(List<DfProcedureColumnMetaInfo> columnList, List<Object> testValueList) {
         for (DfProcedureColumnMetaInfo column : columnList) {
-            final DfProcedureColumnType columnType = column.getProcedureColumnType();
-            if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
-                continue;
+            doSetupTestValueList(column, testValueList);
+        }
+    }
+
+    protected void doSetupTestValueList(DfProcedureColumnMetaInfo column, List<Object> testValueList) {
+        final DfProcedureColumnType columnType = column.getProcedureColumnType();
+        if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
+            return;
+        }
+        if (DfProcedureColumnType.procedureColumnIn.equals(columnType)
+                || DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
+            final int jdbcDefType = column.getJdbcType();
+            final String jdbcType = TypeMap.findJdbcTypeByJdbcDefValue(jdbcDefType);
+            if (jdbcType == null) {
+                testValueList.add("0");
+                return;
             }
-            if (DfProcedureColumnType.procedureColumnIn.equals(columnType)
-                    || DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-                final int jdbcDefType = column.getJdbcType();
-                final Integer columnSize = column.getColumnSize();
-                final Integer decimalDigits = column.getDecimalDigits();
-                final String jdbcType = TypeMap.findJdbcTypeByJdbcDefValue(jdbcDefType);
-                final String nativeType = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
-                Object testValue = null;
-                if (containsAsEndsWith(nativeType, numberList)) {
-                    testValue = 0;
-                } else if (containsAsEndsWith(nativeType, dateList)) {
-                    testValue = DfTypeUtil.toDate("2010-03-30");
-                } else if (containsAsEndsWith(nativeType, booleanList)) {
-                    testValue = Boolean.FALSE;
-                } else if (containsAsEndsWith(nativeType, binaryList)) {
-                    return; // binary type is unsupported here
-                } else { // as String
-                    testValue = "0";
-                }
-                testValueList.add(testValue);
+            final Integer columnSize = column.getColumnSize();
+            final Integer decimalDigits = column.getDecimalDigits();
+            final String nativeType = TypeMap.findJavaNativeByJdbcType(jdbcType, columnSize, decimalDigits);
+            Object testValue = null;
+            if (containsAsEndsWith(nativeType, numberList)) {
+                testValue = 0;
+            } else if (containsAsEndsWith(nativeType, dateList)) {
+                testValue = DfTypeUtil.toDate("2010-03-30");
+            } else if (containsAsEndsWith(nativeType, booleanList)) {
+                testValue = Boolean.FALSE;
+            } else if (containsAsEndsWith(nativeType, binaryList)) {
+                return; // binary type is unsupported here
+            } else { // as String
+                testValue = "0";
             }
+            testValueList.add(testValue);
         }
     }
 
