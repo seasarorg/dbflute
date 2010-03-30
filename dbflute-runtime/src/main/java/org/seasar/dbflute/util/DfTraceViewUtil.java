@@ -19,6 +19,8 @@ package org.seasar.dbflute.util;
  * @author jflute
  */
 public class DfTraceViewUtil {
+    // implementation when jflute was young
+    // it remains without refactoring
 
     /**
      * Convert to performance view.
