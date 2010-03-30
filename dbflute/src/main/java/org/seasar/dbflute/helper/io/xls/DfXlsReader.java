@@ -43,7 +43,6 @@ import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
-import org.seasar.dbflute.util.DfBase64Util;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -331,7 +330,7 @@ public class DfXlsReader {
                 s = "\"\""; // for preventing trimming later
             }
             if (isCellBase64Formatted(cell)) {
-                return DfBase64Util.decode(s);
+                return DfTypeUtil.decodeAsBase64(s);
             }
             return s;
         case HSSFCell.CELL_TYPE_BOOLEAN:

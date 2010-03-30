@@ -21,8 +21,6 @@ import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.s2dao.extension.TnBeanMetaDataFactoryExtension;
 import org.seasar.dbflute.s2dao.jdbc.TnStatementFactoryImpl;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaDataFactory;
-import org.seasar.dbflute.s2dao.valuetype.TnValueTypeFactory;
-import org.seasar.dbflute.s2dao.valuetype.impl.TnValueTypeFactoryImpl;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 #if ($database.isTargetContainerSeasar())
@@ -52,7 +50,6 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     protected volatile SqlClauseCreator _sqlClauseCreator;
     protected volatile StatementFactory _statementFactory;
     protected volatile TnBeanMetaDataFactory _beanMetaDataFactory;
-    protected volatile TnValueTypeFactory _valueTypeFactory;
     protected volatile SequenceCacheHandler _sequenceCacheHandler;
 
     // -----------------------------------------------------
@@ -163,28 +160,7 @@ public class ${glImplementedInvokerAssistant} implements InvokerAssistant {
     protected TnBeanMetaDataFactory createBeanMetaDataFactory() {
         final TnBeanMetaDataFactoryExtension factory = new TnBeanMetaDataFactoryExtension();
         factory.setDataSource(_dataSource);
-        factory.setValueTypeFactory(assistValueTypeFactory());
         return factory;
-    }
-
-    // -----------------------------------------------------
-    //                                    Value Type Factory
-    //                                    ------------------
-    public TnValueTypeFactory assistValueTypeFactory() { // Lazy component
-        if (_valueTypeFactory != null) {
-            return _valueTypeFactory;
-        }
-        synchronized (this) {
-            if (_valueTypeFactory != null) {
-                return _valueTypeFactory;
-            }
-            _valueTypeFactory = createValueTypeFactory();
-        }
-        return _valueTypeFactory;
-    }
-
-    protected TnValueTypeFactory createValueTypeFactory() {
-        return new TnValueTypeFactoryImpl();
     }
 
     // -----------------------------------------------------

@@ -47,7 +47,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     public static final String ${propertyName}_PROCEDURE_PARAMETER = "inout, ${procedureParameterIndex}";
 #set ($procedureParameterIndex = $procedureParameterIndex + 1)
 #elseif ($database.isPmbMetaDataPropertyOptionProcedureParameterReturn($pmbClassName, $propertyName))
-    public static final String ${propertyName}_PROCEDURE_PARAMETER = "return";
+    public static final String ${propertyName}_PROCEDURE_PARAMETER = "return, -1";
 #end
 #end
 #end

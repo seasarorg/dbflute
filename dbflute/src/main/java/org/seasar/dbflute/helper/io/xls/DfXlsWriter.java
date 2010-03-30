@@ -33,7 +33,6 @@ import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataSet;
 import org.seasar.dbflute.helper.dataset.DfDataSetConstants;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
-import org.seasar.dbflute.util.DfBase64Util;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -150,7 +149,7 @@ public class DfXlsWriter implements DfDataSetConstants {
             cell.setCellValue((Date) value);
             cell.setCellStyle(dateStyle);
         } else if (value instanceof byte[]) {
-            cell.setCellValue(createRichTextString(DfBase64Util.encode((byte[]) value)));
+            cell.setCellValue(createRichTextString(DfTypeUtil.encodeAsBase64((byte[]) value)));
             cell.setCellStyle(base64Style);
         } else if (value instanceof Boolean) {
             cell.setCellValue(((Boolean) value).booleanValue());
