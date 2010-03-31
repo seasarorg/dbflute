@@ -31,6 +31,7 @@ import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.rowcreator.impl.TnRowCreatorImpl;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -142,7 +143,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         } catch (SQLException e) {
             if (_log.isDebugEnabled()) {
                 String msg = "Failed to get selected values while resultSet handlings:";
-                msg = msg + " target=" + beanClass.getSimpleName() + "." + propertyName;
+                msg = msg + " target=" + DfTypeUtil.toClassTitle(beanClass) + "." + propertyName;
                 _log.debug(msg);
             }
             throw e;

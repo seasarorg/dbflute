@@ -497,7 +497,7 @@ public class IfCommentEvaluator {
         msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
         msg = msg + ln();
         msg = msg + "[Not Found Method]" + ln();
-        msg = msg + (baseObject != null ? baseObject.getClass().getSimpleName() + "." : "");
+        msg = msg + (baseObject != null ? DfTypeUtil.toClassTitle(baseObject) + "." : "");
         msg = msg + notFoundMethod + "()" + ln();
         msg = msg + ln();
         msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();
@@ -523,7 +523,7 @@ public class IfCommentEvaluator {
         msg = msg + "[IF Comment Expression]" + ln() + _expression + ln();
         msg = msg + ln();
         msg = msg + "[Not Found Property]" + ln();
-        msg = msg + (baseObject != null ? baseObject.getClass().getSimpleName() + "." : "");
+        msg = msg + (baseObject != null ? DfTypeUtil.toClassTitle(baseObject) + "." : "");
         msg = msg + notFoundProperty + ln();
         msg = msg + ln();
         msg = msg + "[Specified ParameterBean]" + ln() + getDisplayParameterBean() + ln();

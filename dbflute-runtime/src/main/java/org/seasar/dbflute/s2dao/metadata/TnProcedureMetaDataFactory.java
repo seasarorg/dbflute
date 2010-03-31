@@ -102,7 +102,7 @@ public class TnProcedureMetaDataFactory {
         } else {
             String msg = "The parameter type should be 'in, out, inout, return, notParamResult':";
             msg = msg + " type=" + type;
-            msg = msg + " class=" + parameterDesc.getBeanDesc().getBeanClass().getSimpleName();
+            msg = msg + " class=" + DfTypeUtil.toClassTitle(parameterDesc.getBeanDesc().getBeanClass());
             msg = msg + " property=" + parameterDesc.getPropertyName();
             throw new IllegalStateException(msg);
         }
@@ -135,7 +135,7 @@ public class TnProcedureMetaDataFactory {
             String msg = "The size of parameterInfo elements was illegal:";
             msg = msg + " elements=" + list + " spec=" + specExp;
             msg = msg + " parameter=" + parameterDesc.getPropertyName();
-            msg = msg + " pmb=" + parameterDesc.getBeanDesc().getBeanClass().getSimpleName();
+            msg = msg + " pmb=" + DfTypeUtil.toClassTitle(parameterDesc.getBeanDesc().getBeanClass());
             throw new IllegalStateException(msg);
         }
         final TnProcedureParameterSpec spec = new TnProcedureParameterSpec();
@@ -147,7 +147,7 @@ public class TnProcedureMetaDataFactory {
             String msg = "Failed to parse the parameter index as Integer:";
             msg = msg + " order=" + order + " spec=" + specExp;
             msg = msg + " parameter=" + parameterDesc.getPropertyName();
-            msg = msg + " pmb=" + parameterDesc.getBeanDesc().getBeanClass().getSimpleName();
+            msg = msg + " pmb=" + DfTypeUtil.toClassTitle(parameterDesc.getBeanDesc().getBeanClass());
 
             throw new IllegalStateException(msg);
         }
@@ -253,7 +253,7 @@ public class TnProcedureMetaDataFactory {
                 return field.get(target);
             } catch (IllegalAccessException e) {
                 String msg = "The getting of the field threw the exception:";
-                msg = msg + " class=" + field.getDeclaringClass().getSimpleName();
+                msg = msg + " class=" + DfTypeUtil.toClassTitle(field.getDeclaringClass());
                 msg = msg + " field=" + field.getName();
                 throw new IllegalStateException(msg, e);
             }

@@ -200,12 +200,12 @@ public class TnProcedureHandler extends TnBasicHandler {
     //                                                                          ==========
     @Override
     protected String getDisplaySql(final Object[] args) { // for procedure call
-        String sql = getSql();
-        Object dto = getParameterBean(args);
+        final String sql = getSql();
+        final Object dto = getParameterBean(args);
         if (args == null || dto == null) {
             return sql;
         }
-        StringBuilder sb = new StringBuilder(100);
+        final StringBuilder sb = new StringBuilder(100);
         int pos = 0;
         int pos2 = 0;
         for (TnProcedureParameterType ppt : _procedureMetaData.getBindParameterTypeList()) {

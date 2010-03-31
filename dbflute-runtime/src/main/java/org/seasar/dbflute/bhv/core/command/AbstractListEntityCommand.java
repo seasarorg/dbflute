@@ -25,6 +25,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -94,7 +95,8 @@ public abstract class AbstractListEntityCommand extends AbstractBehaviorCommand<
     //                                                               =====================
     public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        return _tableDbName + ":" + getCommandName() + "(List<" + _entityType.getSimpleName() + ">)";
+        final String entityName = DfTypeUtil.toClassTitle(_entityType);
+        return _tableDbName + ":" + getCommandName() + "(List<" + entityName + ">)";
     }
 
     public Object[] getSqlExecutionArgument() {

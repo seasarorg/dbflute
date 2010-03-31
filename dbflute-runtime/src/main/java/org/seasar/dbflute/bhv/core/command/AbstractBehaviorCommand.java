@@ -33,6 +33,7 @@ import org.seasar.dbflute.s2dao.rshandler.TnScalarListResultSetHandler;
 import org.seasar.dbflute.s2dao.rshandler.TnScalarResultSetHandler;
 import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateDynamicCommand;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -155,7 +156,7 @@ public abstract class AbstractBehaviorCommand<RESULT> implements BehaviorCommand
     //                                                                      ==============
     @Override
     public String toString() {
-        return getClass().getSimpleName() + ":{" + buildSqlExecutionKey() + "}";
+        return DfTypeUtil.toClassTitle(this) + ":{" + buildSqlExecutionKey() + "}";
     }
 
     // ===================================================================================

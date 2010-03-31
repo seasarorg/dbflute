@@ -30,6 +30,7 @@ import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -156,7 +157,7 @@ public class ValueAndTypeSetupper {
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your method call:" + ln();
-        final String beanName = resourceBean.getClass().getSimpleName();
+        final String beanName = DfTypeUtil.toClassTitle(resourceBean);
         final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
         msg = msg + "    " + beanName + "." + methodName + ln();
         msg = msg + ln();
@@ -176,7 +177,7 @@ public class ValueAndTypeSetupper {
         msg = msg + "Please confirm your method call:" + ln();
         msg = msg + "  For example:" + ln();
         msg = msg + "    before (x):" + ln();
-        final String beanName = resourceBean.getClass().getSimpleName();
+        final String beanName = DfTypeUtil.toClassTitle(resourceBean.getClass().getName());
         final String methodName = "set" + initCap(currentName) + "_LikeSearch(value, likeSearchOption);";
         msg = msg + "      " + beanName + " pmb = new " + beanName + "();" + ln();
         msg = msg + "      LikeSearchOption likeSearchOption = new LikeSearchOption().likeContain();" + ln();

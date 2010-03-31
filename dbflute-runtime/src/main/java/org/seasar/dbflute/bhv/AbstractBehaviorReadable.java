@@ -642,25 +642,25 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
 
     // assertLoadReferrerArgument() as Internal
     protected void xassLRArg(Entity entity, ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
-        assertObjectNotNull("entity(" + getDBMeta().getEntityType().getSimpleName() + ")", entity);
+        assertObjectNotNull("entity(" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ")", entity);
         assertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
     }
 
     protected void xassLRArg(List<? extends Entity> entityList,
             ConditionBeanSetupper<? extends ConditionBean> conditionBeanSetupper) {
-        assertObjectNotNull("List<" + getDBMeta().getEntityType().getSimpleName() + ">", entityList);
+        assertObjectNotNull("List<" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ">", entityList);
         assertObjectNotNull("conditionBeanSetupper", conditionBeanSetupper);
     }
 
     protected void xassLRArg(Entity entity,
             LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
-        assertObjectNotNull("entity(" + getDBMeta().getEntityType().getSimpleName() + ")", entity);
+        assertObjectNotNull("entity(" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ")", entity);
         assertObjectNotNull("loadReferrerOption", loadReferrerOption);
     }
 
     protected void xassLRArg(List<? extends Entity> entityList,
             LoadReferrerOption<? extends ConditionBean, ? extends Entity> loadReferrerOption) {
-        assertObjectNotNull("List<" + getDBMeta().getEntityType().getSimpleName() + ">", entityList);
+        assertObjectNotNull("List<" + DfTypeUtil.toClassTitle(getDBMeta().getEntityType()) + ">", entityList);
         assertObjectNotNull("loadReferrerOption", loadReferrerOption);
     }
 
@@ -950,7 +950,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         try {
             return (ENTITY) entity;
         } catch (ClassCastException e) {
-            String msg = "The entity should be " + clazz.getSimpleName();
+            String msg = "The entity should be " + DfTypeUtil.toClassTitle(clazz);
             msg = msg + " but it was: " + entity.getClass();
             throw new RuntimeException(msg, e);
         }
@@ -963,7 +963,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         try {
             return (CB) cb;
         } catch (ClassCastException e) {
-            String msg = "The condition-bean should be " + clazz.getSimpleName();
+            String msg = "The condition-bean should be " + DfTypeUtil.toClassTitle(clazz);
             msg = msg + " but it was: " + cb.getClass();
             throw new RuntimeException(msg, e);
         }

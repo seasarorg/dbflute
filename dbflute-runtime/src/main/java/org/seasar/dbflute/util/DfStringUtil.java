@@ -271,6 +271,9 @@ public class DfStringUtil {
     //                                                                       Name Handling
     //                                                                       =============
     public static String camelize(String decamelName) {
+        if (isNullOrTrimmedEmpty(decamelName)) {
+            return decamelName;
+        }
         final StringBuilder sb = new StringBuilder();
         final StringTokenizer tok = new StringTokenizer(decamelName, "_");
         while (tok.hasMoreTokens()) {
@@ -290,8 +293,8 @@ public class DfStringUtil {
     }
 
     public static String decamelize(String camelName) {
-        if (camelName == null) {
-            return null;
+        if (isNullOrTrimmedEmpty(camelName)) {
+            return camelName;
         }
         if (camelName.length() == 1) {
             return camelName.toUpperCase();
@@ -315,7 +318,7 @@ public class DfStringUtil {
     }
 
     public static String toBeansPropertyName(String name) { // according to Java Beans rule
-        if (name == null || name.length() == 0) {
+        if (isNullOrTrimmedEmpty(name)) {
             return name;
         }
         name = camelize(name);

@@ -21,6 +21,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -42,7 +43,7 @@ public class SelectScalarCBCommand<RESULT> extends AbstractSelectCBCommand<RESUL
     //                                                                   =================
     public String getCommandName() {
         assertStatus("getCommandName");
-        final String resultTypeName = _resultType.getSimpleName();
+        final String resultTypeName = DfTypeUtil.toClassTitle(_resultType);
         final String scalarMethodName = _selectClauseType.toString().toLowerCase();
         return "scalarSelect(" + resultTypeName + ")." + scalarMethodName;
     }

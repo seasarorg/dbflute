@@ -27,6 +27,7 @@ import org.seasar.dbflute.exception.DangerousResultSizeException;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The cursor executor of outside-SQL.
@@ -119,8 +120,8 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     protected <ENTITY> String buildSearchKey4Log(String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
         String tmp = "Table  = " + _outsideSqlOption.getTableDbName() + ln();
         tmp = tmp + "Path   = " + path + ln();
-        tmp = tmp + "Pmb    = " + (pmb != null ? pmb.getClass().getSimpleName() : "null") + ":" + pmb + ln();
-        tmp = tmp + "Entity = " + (entityType != null ? entityType.getSimpleName() : "null") + ln();
+        tmp = tmp + "Pmb    = " + DfTypeUtil.toClassTitle(pmb) + ":" + pmb + ln();
+        tmp = tmp + "Entity = " + DfTypeUtil.toClassTitle(entityType) + ln();
         tmp = tmp + "Option = " + _outsideSqlOption;
         return tmp;
     }

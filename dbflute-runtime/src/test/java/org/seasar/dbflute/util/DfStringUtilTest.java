@@ -1,5 +1,14 @@
 package org.seasar.dbflute.util;
 
+import static org.seasar.dbflute.util.DfStringUtil.camelize;
+import static org.seasar.dbflute.util.DfStringUtil.decamelize;
+import static org.seasar.dbflute.util.DfStringUtil.extractFirstScope;
+import static org.seasar.dbflute.util.DfStringUtil.removeLineComment;
+import static org.seasar.dbflute.util.DfStringUtil.rtrim;
+import static org.seasar.dbflute.util.DfStringUtil.splitList;
+import static org.seasar.dbflute.util.DfStringUtil.splitListTrimmed;
+import static org.seasar.dbflute.util.DfStringUtil.toBeansPropertyName;
+
 import java.util.List;
 
 import org.seasar.dbflute.unit.PlainTestCase;
@@ -12,7 +21,7 @@ public class DfStringUtilTest extends PlainTestCase {
 
     public void test_splitList() {
         String ln = DfSystemUtil.getLineSeparator();
-        List<String> splitList = DfStringUtil.splitList("aaa" + ln + "bbb" + ln + "ccc", ln);
+        List<String> splitList = splitList("aaa" + ln + "bbb" + ln + "ccc", ln);
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
         assertEquals("ccc", splitList.get(2));
@@ -28,7 +37,7 @@ public class DfStringUtilTest extends PlainTestCase {
 
     public void test_splitListTrimmed_trim() {
         String ln = DfSystemUtil.getLineSeparator();
-        List<String> splitList = DfStringUtil.splitListTrimmed("aaa " + ln + "bbb" + ln + " ccc", ln);
+        List<String> splitList = splitListTrimmed("aaa " + ln + "bbb" + ln + " ccc", ln);
         assertEquals("aaa", splitList.get(0));
         assertEquals("bbb", splitList.get(1));
         assertEquals("ccc", splitList.get(2));
@@ -38,12 +47,12 @@ public class DfStringUtilTest extends PlainTestCase {
     //                                                                                Trim
     //                                                                                ====
     public void test_rtrim_default() {
-        assertNull(DfStringUtil.rtrim(null));
-        assertEquals(" foo", DfStringUtil.rtrim(" foo "));
-        assertEquals(" foo", DfStringUtil.rtrim(" foo \n "));
-        assertEquals(" foo", DfStringUtil.rtrim(" foo \n \n"));
-        assertEquals(" foo", DfStringUtil.rtrim(" foo \r\n "));
-        assertEquals(" foo", DfStringUtil.rtrim(" foo \r\n \r\n"));
+        assertNull(rtrim(null));
+        assertEquals(" foo", rtrim(" foo "));
+        assertEquals(" foo", rtrim(" foo \n "));
+        assertEquals(" foo", rtrim(" foo \n \n"));
+        assertEquals(" foo", rtrim(" foo \r\n "));
+        assertEquals(" foo", rtrim(" foo \r\n \r\n"));
     }
 
     public void test_rtrim_originalTrimTarget() {
@@ -59,7 +68,7 @@ public class DfStringUtilTest extends PlainTestCase {
     //                                                                      ==============
     public void test_extractFirstScope_basic() {
         assertEquals("BAR", DfStringUtil.extractFirstScope("FOObeginBARendDODO", "begin", "end"));
-        assertEquals("BAR", DfStringUtil.extractFirstScope("FOObeginBARend", "begin", "end"));
+        assertEquals("BAR", extractFirstScope("FOObeginBARend", "begin", "end"));
         assertEquals("BAR", DfStringUtil.extractFirstScope("beginBARendDODO", "begin", "end"));
         assertEquals(null, DfStringUtil.extractFirstScope("beginBARedDODO", "begin", "end"));
         assertEquals(null, DfStringUtil.extractFirstScope("begnBARendDODO", "begin", "end"));
@@ -74,14 +83,14 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("FooName", DfStringUtil.camelize("foo_name"));
         assertEquals("FooNameBar", DfStringUtil.camelize("foo_nameBar"));
         assertEquals("FooBar", DfStringUtil.camelize("foo_Bar"));
-        assertEquals("FooNBar", DfStringUtil.camelize("foo_nBar"));
+        assertEquals("FooNBar", camelize("foo_nBar"));
         assertEquals("FooNBar", DfStringUtil.camelize("FOO_nBar"));
         assertEquals("Foo", DfStringUtil.camelize("FOO"));
     }
 
     public void test_decamelize_basic() {
         assertEquals("FOO_NAME", DfStringUtil.decamelize("FooName"));
-        assertEquals("FOO_NAME", DfStringUtil.decamelize("fooName"));
+        assertEquals("FOO_NAME", decamelize("fooName"));
         assertEquals("F", DfStringUtil.decamelize("f"));
         assertEquals("F_O_O__NAME_BAR", DfStringUtil.decamelize("FOO_NameBar"));
         assertEquals("FOO__NAME_BAR", DfStringUtil.decamelize("foo_NameBar"));
@@ -92,7 +101,7 @@ public class DfStringUtilTest extends PlainTestCase {
     public void test_toBeanPropertyName_basic() {
         assertEquals("fooName", DfStringUtil.toBeansPropertyName("FooName"));
         assertEquals("fooName", DfStringUtil.toBeansPropertyName("fooName"));
-        assertEquals("BFooName", DfStringUtil.toBeansPropertyName("BFooName"));
+        assertEquals("BFooName", toBeansPropertyName("BFooName"));
         assertEquals("BFooName", DfStringUtil.toBeansPropertyName("bFooName"));
         assertEquals("bbFooName", DfStringUtil.toBeansPropertyName("bbFooName"));
         assertEquals("f", DfStringUtil.toBeansPropertyName("f"));
@@ -109,7 +118,7 @@ public class DfStringUtilTest extends PlainTestCase {
         sql = sql + "bbbb\n";
         sql = sql + "--\n";
         sql = sql + "cccc\n";
-        String removed = DfStringUtil.removeLineComment(sql);
+        String removed = removeLineComment(sql);
         System.out.println(removed);
         assertEquals("aaaa\nbbbb\ncccc\n", removed);
     }

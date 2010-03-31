@@ -26,6 +26,7 @@ import org.seasar.dbflute.cbean.EntityRowHandler;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -82,7 +83,7 @@ public class SelectCursorCBCommand<ENTITY extends Entity> extends AbstractSelect
     public String buildSqlExecutionKey() {
         // entity row handler uses name (not simple) because of no-name inner class
         final String handlerName = _entityRowHandler.getClass().getName();
-        final String entityName = _entityType.getSimpleName();
+        final String entityName = DfTypeUtil.toClassTitle(_entityType);
         return super.buildSqlExecutionKey() + ":" + handlerName + ":" + entityName;
     }
 

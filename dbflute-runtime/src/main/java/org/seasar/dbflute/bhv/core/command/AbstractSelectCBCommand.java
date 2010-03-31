@@ -20,6 +20,7 @@ import org.seasar.dbflute.bhv.core.execution.SelectCBExecution;
 import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -60,7 +61,7 @@ public abstract class AbstractSelectCBCommand<RESULT> extends AbstractBehaviorCo
     //                                                               =====================
     public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        final String cbName = _conditionBeanType.getSimpleName();
+        final String cbName = DfTypeUtil.toClassTitle(_conditionBeanType);
         return _tableDbName + ":" + getCommandName() + "(" + cbName + ")";
     }
 

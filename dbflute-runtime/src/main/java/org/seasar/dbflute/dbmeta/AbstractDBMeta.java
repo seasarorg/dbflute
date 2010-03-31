@@ -43,6 +43,7 @@ import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.util.DfAssertUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The abstract class of DB meta.
@@ -1132,8 +1133,8 @@ public abstract class AbstractDBMeta implements DBMeta {
         Class<? extends Entity> entityType = getEntityType();
         Class<? extends Entity> targetType = entity.getClass();
         if (!entityType.isAssignableFrom(targetType)) {
-            String name = entityType.getSimpleName();
-            String msg = "The entity should be " + name + " but it was: " + targetType;
+            final String titleName = DfTypeUtil.toClassTitle(entityType);
+            String msg = "The entity should be " + titleName + " but it was: " + targetType;
             throw new IllegalStateException(msg);
         }
     }

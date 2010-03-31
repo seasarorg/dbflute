@@ -70,13 +70,15 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
         // (actually the args has same parameter as context)
 
         final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
-        final Object pmb = outsideSqlContext.getParameterBean();
+        final Object pmb = outsideSqlContext.getParameterBean(); // basically implements ProcedurePmb
         final TnProcedureHandler handler = createProcedureHandler(pmb);
-        // The logging message SQL of procedure is unnecessary
-        // because only the procedure name and parameter-bean are enough to debug.
-        // (And because making args from parameter bean requires great care...)
-        //handler.setLoggingMessageSqlArgs(...);
-        return handler.execute(new Object[] { pmb });
+        final Object[] onlyPmbArgs = new Object[] { pmb };
+
+        // The method that builds display SQL is overridden for procedure
+        // so it can set arguments which have only parameter bean
+        handler.setExceptionMessageSqlArgs(onlyPmbArgs);
+
+        return handler.execute(onlyPmbArgs);
     }
 
     protected TnProcedureHandler createProcedureHandler(Object pmb) {

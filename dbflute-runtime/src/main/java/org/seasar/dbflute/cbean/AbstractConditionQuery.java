@@ -553,7 +553,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
         msg = msg + "Please confirm your method call:" + ln();
-        final String beanName = getClass().getSimpleName();
+        final String beanName = DfTypeUtil.toClassTitle(this);
         final String methodName = "set" + capPropName + "_LikeSearch('" + value + "', likeSearchOption);";
         msg = msg + "    " + beanName + "." + methodName + ln();
         msg = msg + "* * * * * * * * * */" + ln();
@@ -1686,7 +1686,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                      ==============
     @Override
     public String toString() {
-        return getClass().getSimpleName() + ":{aliasName=" + _aliasName + ", nestLevel=" + _nestLevel
+        final String titleName = DfTypeUtil.toClassTitle(this);
+        return titleName + ":{aliasName=" + _aliasName + ", nestLevel=" + _nestLevel
                 + ", subQueryLevel=" + _subQueryLevel + ", foreignPropertyName=" + _foreignPropertyName
                 + ", relationPath=" + _relationPath + ", onClauseInline=" + _onClauseInline + "}";
     }

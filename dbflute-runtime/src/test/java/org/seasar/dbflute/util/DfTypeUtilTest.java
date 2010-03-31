@@ -1,6 +1,7 @@
 package org.seasar.dbflute.util;
 
 import static org.seasar.dbflute.util.DfTypeUtil.AD_ORIGIN_MILLISECOND;
+import static org.seasar.dbflute.util.DfTypeUtil.toClassTitle;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
@@ -39,6 +40,31 @@ public class DfTypeUtilTest extends PlainTestCase {
         assertEquals("3", DfTypeUtil.toString(3));
         assertEquals("3", DfTypeUtil.toString(3L));
         assertEquals("3.7", DfTypeUtil.toString(new BigDecimal("3.7")));
+    }
+
+    public void test_toClassTitle_basic() {
+        assertNull(toClassTitle(null));
+        assertEquals("", toClassTitle(""));
+        assertEquals("  ", toClassTitle("  "));
+        assertEquals("Foo", toClassTitle("com.example.Foo"));
+        assertEquals("Foo", toClassTitle("Foo"));
+        assertEquals("Foo$Bar", toClassTitle("com.example.Foo$Bar"));
+        assertEquals("Foo$1", toClassTitle("com.example.Foo$1"));
+        assertEquals("Foo$1", toClassTitle("Foo$1"));
+        assertEquals("String", toClassTitle(String.class));
+        assertEquals("Object", toClassTitle(Object.class.getName()));
+        assertEquals("Object", toClassTitle(Object.class));
+        Object inner = new Object() {
+        };
+        assertEquals(getClass().getSimpleName() + "$1", toClassTitle(inner.getClass().getName()));
+        assertEquals(getClass().getSimpleName() + "$1", toClassTitle(inner.getClass()));
+        assertEquals(getClass().getSimpleName() + "$1", toClassTitle(inner));
+        assertEquals(getClass().getSimpleName() + "$TestTitle", toClassTitle(TestTitle.class.getName()));
+        assertEquals(getClass().getSimpleName() + "$TestTitle", toClassTitle(TestTitle.class));
+        assertEquals(getClass().getSimpleName() + "$TestTitle", toClassTitle(new TestTitle()));
+    }
+
+    private static class TestTitle {
     }
 
     // -----------------------------------------------------

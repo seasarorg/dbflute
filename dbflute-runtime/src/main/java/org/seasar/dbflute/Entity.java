@@ -184,6 +184,10 @@ public interface Entity {
             return (31 * result) + (value instanceof byte[] ? ((byte[]) value).length : value.hashCode());
         }
 
+        public static String toClassTitle(Entity entity) {
+            return DfTypeUtil.toClassTitle(entity);
+        }
+
         public static String toString(Date date, String pattern) {
             if (date == null) {
                 return null;

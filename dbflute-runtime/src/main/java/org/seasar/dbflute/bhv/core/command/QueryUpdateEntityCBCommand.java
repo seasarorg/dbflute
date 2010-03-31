@@ -21,6 +21,7 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.outsidesql.OutsideSqlOption;
 import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateQueryAutoDynamicCommand;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -66,8 +67,10 @@ public class QueryUpdateEntityCBCommand extends AbstractEntityCommand {
     //                                                               =====================
     public String buildSqlExecutionKey() {
         assertStatus("buildSqlExecutionKey");
-        String main = _tableDbName + ":" + getCommandName();
-        String type = "(" + _entityType.getSimpleName() + ", " + _conditionBeanType.getSimpleName() + ")";
+        final String main = _tableDbName + ":" + getCommandName();
+        final String entityName = DfTypeUtil.toClassTitle(_entityType);
+        final String cbName = DfTypeUtil.toClassTitle(_conditionBeanType);
+        final String type = "(" + entityName + ", " + cbName + ")";
         return main + type;
     }
 

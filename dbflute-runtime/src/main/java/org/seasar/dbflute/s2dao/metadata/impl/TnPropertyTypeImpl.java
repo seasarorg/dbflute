@@ -20,6 +20,7 @@ import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -75,8 +76,8 @@ public class TnPropertyTypeImpl implements TnPropertyType {
     //                                                                      ==============
     @Override
     public String toString() {
-        return getClass().getSimpleName() + ":{" + propertyName + "(" + columnName + "), "
-                + valueType.getClass().getSimpleName() + ", " + primaryKey + ", " + persistent + "}";
+        return DfTypeUtil.toClassTitle(this) + ":{" + propertyName + "(" + columnName + "), "
+                + DfTypeUtil.toClassTitle(valueType) + ", " + primaryKey + ", " + persistent + "}";
     }
 
     // ===================================================================================

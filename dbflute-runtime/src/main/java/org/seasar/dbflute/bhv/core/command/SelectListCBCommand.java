@@ -25,6 +25,7 @@ import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.cbean.FetchAssistContext;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -75,7 +76,7 @@ public class SelectListCBCommand<ENTITY extends Entity> extends AbstractSelectCB
     //                                                               =====================
     @Override
     public String buildSqlExecutionKey() {
-        final String entityName = _entityType.getSimpleName();
+        final String entityName = DfTypeUtil.toClassTitle(_entityType);
         return super.buildSqlExecutionKey() + ":" + entityName;
     }
 

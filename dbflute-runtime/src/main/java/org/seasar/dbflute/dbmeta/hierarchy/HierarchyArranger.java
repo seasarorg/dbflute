@@ -29,6 +29,7 @@ import org.seasar.dbflute.dbmeta.info.ColumnInfo;
 import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The arranger of hierarchy.
@@ -667,8 +668,8 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
             final Class<?>[] parameterTypes = method.getParameterTypes();
             String msg = "Invoking method threw the exception:" + lineSeparator;
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
-            msg = msg + "[" + method.getDeclaringClass().getSimpleName() + "." + method.getName() + "()]"
-                    + lineSeparator;
+            msg = msg + "[" + DfTypeUtil.toClassTitle(method.getDeclaringClass()) + "." + method.getName()
+                    + "()]" + lineSeparator;
             msg = msg + " methodArgTypes     = {" + createTypeViewFromTypeArray(parameterTypes) + "}" + lineSeparator;
             msg = msg + " specifiedArgValues = {" + createValueViewFromValueArray(args) + "}" + lineSeparator;
             msg = msg + " specifiedArgTypes  = {" + createTypeViewFromValueArray(args) + "}" + lineSeparator;
@@ -713,7 +714,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         final StringBuffer sb = new StringBuffer();
         for (int i = 0; i < array.length; i++) {
             final Object value = array[i];
-            final String typeName = value != null ? value.getClass().getSimpleName() : "null";
+            final String typeName = value != null ? DfTypeUtil.toClassTitle(value) : "null";
             if (sb.length() == 0) {
                 sb.append(typeName);
             } else {
@@ -728,9 +729,9 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
         for (int i = 0; i < array.length; i++) {
             final Class<?> type = array[i];
             if (sb.length() == 0) {
-                sb.append(type.getSimpleName());
+                sb.append(DfTypeUtil.toClassTitle(type));
             } else {
-                sb.append(", ").append(type.getSimpleName());
+                sb.append(", ").append(DfTypeUtil.toClassTitle(type));
             }
         }
         return sb.toString();

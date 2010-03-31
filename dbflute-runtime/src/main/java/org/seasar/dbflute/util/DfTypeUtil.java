@@ -148,6 +148,28 @@ public final class DfTypeUtil {
         }
     }
 
+    public static String toClassTitle(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        final String fqcn;
+        if (obj instanceof Class<?>) {
+            fqcn = ((Class<?>) obj).getName();
+        } else if (obj instanceof String) {
+            fqcn = (String) obj;
+        } else {
+            fqcn = obj.getClass().getName();
+        }
+        if (fqcn == null || fqcn.trim().length() == 0) {
+            return fqcn;
+        }
+        final int dotLastIndex = fqcn.lastIndexOf(".");
+        if (dotLastIndex < 0) {
+            return fqcn;
+        }
+        return fqcn.substring(dotLastIndex + ".".length());
+    }
+
     public static String encodeAsBase64(final byte[] inData) {
         if (inData == null || inData.length == 0) {
             return "";

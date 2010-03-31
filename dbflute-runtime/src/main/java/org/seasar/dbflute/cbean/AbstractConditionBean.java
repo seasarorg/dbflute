@@ -36,6 +36,7 @@ import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The condition-bean as abstract.
@@ -866,7 +867,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
 
     protected void assertSetupSelectBeforeUnion(String foreignPropertyName) {
         if (hasUnionQueryOrUnionAllQuery()) {
-            throwSetupSelectAfterUnionException(this.getClass().getSimpleName(), foreignPropertyName);
+            final String titleName = DfTypeUtil.toClassTitle(this);
+            throwSetupSelectAfterUnionException(titleName, foreignPropertyName);
         }
     }
 
@@ -891,7 +893,8 @@ public abstract class AbstractConditionBean implements ConditionBean {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(getClass().getSimpleName()).append(":").append(ln());
+        final String titleName = DfTypeUtil.toClassTitle(this);
+        sb.append(titleName).append(":").append(ln());
         try {
             sb.append(toDisplaySql());
         } catch (RuntimeException e) {
