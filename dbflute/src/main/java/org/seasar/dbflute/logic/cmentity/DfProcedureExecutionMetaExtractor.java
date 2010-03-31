@@ -246,6 +246,9 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
+        if (!isOracle()) {
+            return false;
+        }
         final int jdbcType = column.getJdbcType();
         final String dbTypeName = column.getDbTypeName();
         return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor");
