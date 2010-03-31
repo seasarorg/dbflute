@@ -7,6 +7,7 @@ import java.util.Properties;
 
 import org.seasar.dbflute.helper.language.DfLanguageDependencyInfo;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -37,7 +38,7 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         if (obj != null) {
             if (!(obj instanceof String)) {
                 String msg = "The key's value should be string:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                msg = msg + " " + DfTypeUtil.toClassTitle(obj) + "=" + obj;
                 throw new IllegalStateException(msg);
             }
             String value = (String) obj;
@@ -56,7 +57,7 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         if (obj != null) {
             if (!(obj instanceof String)) {
                 String msg = "The key's value should be boolean:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                msg = msg + " " + DfTypeUtil.toClassTitle(obj) + "=" + obj;
                 throw new IllegalStateException(msg);
             }
             String value = (String) obj;
@@ -75,7 +76,7 @@ public final class DfDependencyInjectionProperties extends DfAbstractHelperPrope
         if (obj != null) {
             if (!(obj instanceof Map<?, ?>)) {
                 String msg = "The key's value should be map:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                msg = msg + " " + DfTypeUtil.toClassTitle(obj) + "=" + obj;
                 throw new IllegalStateException(msg);
             }
             @SuppressWarnings("unchecked")

@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
 
@@ -216,7 +217,7 @@ public class DfSimpleDataSourceCreator implements DfDataSourceCreator {
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + ":" + _dataSourceProvider;
+            return DfTypeUtil.toClassTitle(this) + ":" + _dataSourceProvider;
         }
     }
 

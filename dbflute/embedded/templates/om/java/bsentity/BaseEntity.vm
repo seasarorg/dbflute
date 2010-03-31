@@ -456,7 +456,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return The display string of all columns and relation existences. (NotNull)
      */
     public String toString() {
-        return buildDisplayString(getClass().getSimpleName(), true, true);
+        return buildDisplayString(InternalUtil.toClassTitle(this), true, true);
     }
 
     /**

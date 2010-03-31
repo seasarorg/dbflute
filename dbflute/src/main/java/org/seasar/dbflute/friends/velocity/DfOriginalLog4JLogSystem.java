@@ -8,6 +8,7 @@ import org.apache.log4j.PatternLayout;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.SimpleLog4JLogSystem;
 import org.seasar.dbflute.friends.log4j.DfOriginalRollingFileAppender;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * DBFlute original LogSystem using Log4j that extends the SimpleLog4JLogSystem of Velocity. <br />
@@ -45,9 +46,9 @@ public class DfOriginalLog4JLogSystem extends SimpleLog4JLogSystem {
             logger.addAppender(appender);
 
             logVelocityMessage(0, ""); // as begin mark.
-            logVelocityMessage(0, getClass().getSimpleName() + " initialized using logfile '" + logfile + "'");
+            logVelocityMessage(0, DfTypeUtil.toClassTitle(this) + " initialized using logfile '" + logfile + "'");
         } catch (Exception e) {
-            _log.warn("PANIC : error configuring " + getClass().getSimpleName() + " : ", e);
+            _log.warn("PANIC : error configuring " + DfTypeUtil.toClassTitle(this) + " : ", e);
         }
     }
 

@@ -10,6 +10,7 @@ import org.seasar.dbflute.BehaviorSelector;
 import org.seasar.dbflute.bhv.BehaviorReadable;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.util.DfTraceViewUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 #if ($database.isTargetContainerSeasar())
 import org.seasar.framework.container.S2Container;
@@ -67,44 +68,6 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     /** The container of Slim3. */
     protected S3Container _container;
 #end
-
-    // ===================================================================================
-    //                                                                           Component
-    //                                                                           =========
-#if ($database.isTargetContainerSeasar() || $database.isTargetContainerSpring() || $database.isTargetContainerLucy())
-    @SuppressWarnings("unchecked")
-#end
-    public <COMPONENT> COMPONENT getComponent(Class<COMPONENT> componentType) {
-        assertObjectNotNull("componentType", componentType);
-        assertObjectNotNull("_container", _container);
-#if ($database.isTargetContainerSeasar())
-        try {
-		    return (COMPONENT)_container.getComponent(componentType);
-		} catch (ComponentNotFoundRuntimeException e) { // Normally it doesn't come.
-		    final COMPONENT component;
-		    try {
-		        // for HotDeploy Mode
-		        component = (COMPONENT)_container.getRoot().getComponent(componentType);
-		    } catch (ComponentNotFoundRuntimeException ignored) {
-		        throw e;
-		    }
-		    _container = _container.getRoot(); // Change container.
-		    return component;
-		}
-#end
-#if ($database.isTargetContainerSpring())
-		return (COMPONENT)_container.getBean(initUncap(componentType.getSimpleName()));
-#end
-#if ($database.isTargetContainerLucy())
-		return (COMPONENT)_container.get(initUncap(componentType.getSimpleName()));
-#end
-#if ($database.isTargetContainerGuice())
-		return _container.getInstance(componentType);
-#end
-#if ($database.isTargetContainerSlim3())
-		return _container.lookup(componentType.getSimpleName());
-#end
-    }
 
     // ===================================================================================
     //                                                                          Initialize
@@ -190,10 +153,52 @@ public class ${glImplementedBehaviorSelector} implements BehaviorSelector {
     }
 
     // ===================================================================================
+    //                                                                           Component
+    //                                                                           =========
+#if ($database.isTargetContainerSeasar() || $database.isTargetContainerSpring() || $database.isTargetContainerLucy())
+    @SuppressWarnings("unchecked")
+#end
+    protected <COMPONENT> COMPONENT getComponent(Class<COMPONENT> componentType) { // only for behavior
+        assertObjectNotNull("componentType", componentType);
+        assertObjectNotNull("_container", _container);
+#if ($database.isTargetContainerSeasar())
+        try {
+		    return (COMPONENT)_container.getComponent(componentType);
+		} catch (ComponentNotFoundRuntimeException e) { // Normally it doesn't come.
+		    final COMPONENT component;
+		    try {
+		        // for HotDeploy Mode
+		        component = (COMPONENT)_container.getRoot().getComponent(componentType);
+		    } catch (ComponentNotFoundRuntimeException ignored) {
+		        throw e;
+		    }
+		    _container = _container.getRoot(); // Change container.
+		    return component;
+		}
+#end
+#if ($database.isTargetContainerSpring())
+		return (COMPONENT)_container.getBean(initUncap(toClassTitle(componentType)));
+#end
+#if ($database.isTargetContainerLucy())
+		return (COMPONENT)_container.get(initUncap(toClassTitle(componentType)));
+#end
+#if ($database.isTargetContainerGuice())
+		return _container.getInstance(componentType);
+#end
+#if ($database.isTargetContainerSlim3())
+		return _container.lookup(toClassTitle(componentType));
+#end
+    }
+
+    // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String initUncap(String str) {
         return str.substring(0, 1).toLowerCase() + str.substring(1);
+    }
+
+    protected String toClassTitle(Object obj) {
+        return DfTypeUtil.toClassTitle(obj);
     }
 
     protected <KEY, VALUE> HashMap<KEY, VALUE> newHashMap() {

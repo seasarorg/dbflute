@@ -17,6 +17,7 @@ import org.seasar.dbflute.exception.DfRequiredPropertyNotFoundException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -158,7 +159,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             final Object obj = entry.getValue();
             if (!(obj instanceof List<?>)) {
                 String msg = "The type of element in the property 'columnExceptMap' should be List:";
-                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+                msg = msg + " type=" + DfTypeUtil.toClassTitle(obj) + " value=" + obj;
                 throw new DfIllegalPropertyTypeException(msg);
             }
             @SuppressWarnings("unchecked")
@@ -209,7 +210,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             }
             if (!(obj instanceof Map<?, ?>)) {
                 String msg = "The type of schema value in the property 'additionalSchemaMap' should be Map:";
-                msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+                msg = msg + " type=" + DfTypeUtil.toClassTitle(obj) + " value=" + obj;
                 throw new DfIllegalPropertyTypeException(msg);
             }
             @SuppressWarnings("unchecked")
@@ -236,7 +237,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             info.setObjectTypeTargetList(objectTypeTargetList);
         } else if (!(obj instanceof List<?>)) {
             String msg = "The type of objectTypeTargetList in the property 'additionalSchemaMap' should be List:";
-            msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+            msg = msg + " type=" + DfTypeUtil.toClassTitle(obj) + " value=" + obj;
             throw new DfIllegalPropertyTypeException(msg);
         } else {
             @SuppressWarnings("unchecked")
@@ -253,7 +254,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             info.setTableExceptList(tableExceptList);
         } else if (!(obj instanceof List<?>)) {
             String msg = "The type of tableExceptList in the property 'additionalSchemaMap' should be List:";
-            msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+            msg = msg + " type=" + DfTypeUtil.toClassTitle(obj) + " value=" + obj;
             throw new DfIllegalPropertyTypeException(msg);
         } else {
             @SuppressWarnings("unchecked")
@@ -270,7 +271,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             info.setTableTargetList(tableTargetList);
         } else if (!(obj instanceof List<?>)) {
             String msg = "The type of tableTargetList in the property 'additionalSchemaMap' should be List:";
-            msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+            msg = msg + " type=" + DfTypeUtil.toClassTitle(obj) + " value=" + obj;
             throw new DfIllegalPropertyTypeException(msg);
         } else {
             @SuppressWarnings("unchecked")
@@ -288,7 +289,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             info.setSupplementaryConnectionMap(supplementaryConnectionMap);
         } else if (!(obj instanceof Map<?, ?>)) {
             String msg = "The type of supplementaryConnectionMap in the property 'additionalSchemaMap' should be Map:";
-            msg = msg + " type=" + (obj != null ? obj.getClass().getSimpleName() : null) + " value=" + obj;
+            msg = msg + " type=" + DfTypeUtil.toClassTitle(obj) + " value=" + obj;
             throw new DfIllegalPropertyTypeException(msg);
         } else {
             @SuppressWarnings("unchecked")

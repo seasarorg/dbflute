@@ -3,6 +3,8 @@ package org.seasar.dbflute.properties;
 import java.util.Map;
 import java.util.Properties;
 
+import org.seasar.dbflute.util.DfTypeUtil;
+
 /**
  * @author jflute
  * @since 0.8.8.1 (2009/01/09 Friday)
@@ -39,7 +41,7 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
         if (obj != null) {
             if (!(obj instanceof String)) {
                 String msg = "The key's value should be string:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                msg = msg + " " + DfTypeUtil.toClassTitle(obj) + "=" + obj;
                 throw new IllegalStateException(msg);
             }
             String value = (String) obj;
@@ -58,7 +60,7 @@ public final class DfOptimisticLockProperties extends DfAbstractHelperProperties
         if (obj != null) {
             if (!(obj instanceof String)) {
                 String msg = "The key's value should be boolean:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                msg = msg + " " + DfTypeUtil.toClassTitle(obj) + "=" + obj;
                 throw new IllegalStateException(msg);
             }
             String value = (String) obj;

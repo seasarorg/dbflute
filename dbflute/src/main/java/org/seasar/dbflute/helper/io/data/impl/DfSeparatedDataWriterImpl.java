@@ -36,6 +36,7 @@ import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuilder;
 import org.seasar.dbflute.helper.io.data.impl.internal.DfInternalSqlBuildingResult;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * @author jflute
@@ -247,9 +248,9 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
                         ps.execute();
                     } catch (SQLException e) {
                         if (_errorContinue) {
-                            final String simpleName = e.getClass().getSimpleName();
+                            final String titleName = DfTypeUtil.toClassTitle(e);
                             final StringBuilder sb = new StringBuilder();
-                            sb.append("The statement threw ").append(simpleName).append("! The detail is as follows:");
+                            sb.append("The statement threw ").append(titleName).append("! The detail is as follows:");
                             sb.append(ln()).append("  Message    = ");
                             sb.append(e.getMessage());
                             sb.append(ln()).append("  Parameters = ");

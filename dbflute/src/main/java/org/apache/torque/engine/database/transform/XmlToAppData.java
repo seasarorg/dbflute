@@ -71,6 +71,7 @@ import org.apache.torque.engine.database.model.Index;
 import org.apache.torque.engine.database.model.Table;
 import org.apache.torque.engine.database.model.Unique;
 import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.util.DfTypeUtil;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -160,7 +161,7 @@ public class XmlToAppData extends DefaultHandler {
                 br.close();
             }
         } catch (Exception e) {
-            String msg = getClass().getSimpleName() + ".parseFile() threw the exception:";
+            String msg = DfTypeUtil.toClassTitle(this) + ".parseFile() threw the exception:";
             msg = msg + " xmlFile=" + xmlFile;
             throw new RuntimeException(msg, e);
         }

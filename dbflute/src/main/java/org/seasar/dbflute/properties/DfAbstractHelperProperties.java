@@ -23,6 +23,7 @@ import org.seasar.dbflute.util.DfNameHintUtil;
 import org.seasar.dbflute.util.DfPropertyUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyBooleanFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyIntegerFormatException;
 import org.seasar.dbflute.util.DfPropertyUtil.PropertyNotFoundException;
@@ -107,7 +108,7 @@ public abstract class DfAbstractHelperProperties {
         if (obj != null) {
             if (!(obj instanceof String)) {
                 String msg = "The key's value should be string:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                msg = msg + " " + DfTypeUtil.toClassTitle(obj) + "=" + obj;
                 throw new IllegalStateException(msg);
             }
             String value = (String) obj;
@@ -125,7 +126,7 @@ public abstract class DfAbstractHelperProperties {
         if (obj != null) {
             if (!(obj instanceof String)) {
                 String msg = "The key's value should be string:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                msg = msg + " " + DfTypeUtil.toClassTitle(obj) + "=" + obj;
                 throw new IllegalStateException(msg);
             }
             String value = (String) obj;
@@ -149,7 +150,7 @@ public abstract class DfAbstractHelperProperties {
         if (obj != null) {
             if (!(obj instanceof String)) {
                 String msg = "The key's value should be boolean:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                msg = msg + " " + DfTypeUtil.toClassTitle(obj) + "=" + obj;
                 throw new IllegalStateException(msg);
             }
             String value = (String) obj;
@@ -173,7 +174,7 @@ public abstract class DfAbstractHelperProperties {
         if (obj != null) {
             if (!(obj instanceof String)) {
                 String msg = "The key's value should be boolean:";
-                msg = msg + " " + obj.getClass().getSimpleName() + "=" + obj;
+                msg = msg + " " + DfTypeUtil.toClassTitle(obj) + "=" + obj;
                 throw new IllegalStateException(msg);
             }
             String value = (String) obj;

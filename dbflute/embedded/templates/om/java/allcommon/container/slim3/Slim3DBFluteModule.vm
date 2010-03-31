@@ -9,6 +9,7 @@ import org.seasar.dbflute.bhv.BehaviorReadable;
 import org.seasar.dbflute.bhv.core.BehaviorCommandInvoker;
 import org.seasar.dbflute.bhv.core.CommonColumnAutoSetupper;
 import org.seasar.dbflute.bhv.core.InvokerAssistant;
+import org.seasar.dbflute.util.DfTypeUtil;
 import ${glPackageExtendedBhv}.*;
 
 /**
@@ -82,7 +83,7 @@ public class ${glDBFluteModule} {
         final S3Container container = S3ContainerFactory.getInstance().getContainer();
         final String name;
         if (BehaviorReadable.class.isAssignableFrom(type)) {
-            name = type.getSimpleName();
+            name = DfTypeUtil.toClassTitle(type);
         } else {
             name = type.getName();
         }

@@ -15,6 +15,7 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 import org.seasar.framework.container.S2Container;
 
 /**
@@ -189,7 +190,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
 
     protected String createBehaviorName(BuriDataFieldType src, String dtoClassName) {
         final Class<?> tgtClass = DfReflectionUtil.forName(dtoClassName);
-        final String shtName = tgtClass.getSimpleName() + "Bhv";
+        final String shtName = DfTypeUtil.toClassTitle(tgtClass) + "Bhv";
         return shtName;
     }
 
