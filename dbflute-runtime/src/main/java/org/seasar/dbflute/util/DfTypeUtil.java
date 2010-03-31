@@ -148,6 +148,21 @@ public final class DfTypeUtil {
         }
     }
 
+    /**
+     * Convert the object to class title name.
+     * <pre>
+     * o com.example.Foo to Foo
+     * o com.example.Foo$Bar to Foo$Bar
+     * o com.example.Foo$1 to Foo$1
+     * o Foo to Foo
+     * o Foo$Bar to Foo$Bar
+     * </pre>
+     * If the object is Class, it uses Class.getName() as convert target string. <br />
+     * If the object is String, it uses it directly as convert target string. <br />
+     * If the object is the other object, it uses obj.getClass().getName() as convert target string.
+     * @param obj The target object. String or Class are treated as special. (Nullable: if null, returns null)
+     * @return The string as class title. (Nullable: when the argument is null)
+     */
     public static String toClassTitle(Object obj) {
         if (obj == null) {
             return null;
