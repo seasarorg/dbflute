@@ -17,7 +17,6 @@ import org.seasar.dbflute.cbean.coption.LikeSearchOption;
 #if ($database.hasPmbMetaDataPropertyOptionAnyFromTo($pmbClassName))
 import org.seasar.dbflute.cbean.coption.FromToOption;
 #end
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
 #if ($database.isPmbMetaDataRefCustomizeEntity($pmbClassName))
 import ${glPackageExtendedCustomizeEntity}.*;
@@ -168,7 +167,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(DfStringUtil.toClassTitleName(getClass().getName())).append(":");
+        sb.append(DfTypeUtil.toClassTitle(this)).append(":");
         sb.append(xbuildColumnString());
         return sb.toString();
     }
