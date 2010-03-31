@@ -44,7 +44,7 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
 	@Override
     protected void setupBindVariables(Object bean) {
         setupInsertBindVariables(bean);
-        setLoggingMessageSqlArgs(bindVariables);
+        setExceptionMessageSqlArgs(bindVariables);
     }
 
 	@Override

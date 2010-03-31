@@ -100,12 +100,12 @@ public class OutsideSqlCallCommand extends AbstractOutsideSqlCommand<Void> {
         return new SqlExecutionCreator() {
             public SqlExecution createSqlExecution() {
                 final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
-                return createOutsideSqlCallCommand(outsideSqlContext);
+                return createOutsideSqlProcedureExecution(outsideSqlContext);
             }
         };
     }
 
-    protected SqlExecution createOutsideSqlCallCommand(OutsideSqlContext outsideSqlContext) {
+    protected SqlExecution createOutsideSqlProcedureExecution(OutsideSqlContext outsideSqlContext) {
         // - - - - - - - - - - - - - - - - - - - - - - -
         // The attribute of Specified-OutsideSqlContext.
         // - - - - - - - - - - - - - - - - - - - - - - -

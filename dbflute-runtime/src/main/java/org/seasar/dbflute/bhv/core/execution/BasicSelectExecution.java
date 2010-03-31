@@ -60,7 +60,7 @@ public class BasicSelectExecution extends TnAbstractDynamicCommand {
         final CommandContext ctx = apply(args);
         final TnBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
         final Object[] bindVariableArray = ctx.getBindVariables();
-        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        selectHandler.setExceptionMessageSqlArgs(bindVariableArray);
         return selectHandler.execute(bindVariableArray, ctx.getBindVariableTypes());
     }
 

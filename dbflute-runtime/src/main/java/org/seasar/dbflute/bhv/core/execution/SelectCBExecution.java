@@ -70,7 +70,7 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
         final String finalClause = setupRealClause(args, bindVariableList, bindVariableTypeList);
         final TnBasicSelectHandler selectHandler = createBasicSelectHandler(finalClause, this.resultSetHandler);
         final Object[] bindVariableArray = bindVariableList.toArray();
-        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        selectHandler.setExceptionMessageSqlArgs(bindVariableArray);
         return selectHandler.execute(bindVariableArray, toClassArray(bindVariableTypeList));
     }
 

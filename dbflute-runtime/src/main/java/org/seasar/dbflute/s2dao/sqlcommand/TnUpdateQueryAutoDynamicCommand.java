@@ -79,7 +79,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         }
         CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
         TnCommandContextHandler handler = createCommandContextHandler(context);
-        handler.setLoggingMessageSqlArgs(context.getBindVariables());
+        handler.setExceptionMessageSqlArgs(context.getBindVariables());
         handler.setPropertyTypeList(propertyTypeList);
         int rows = handler.execute(args);
         return Integer.valueOf(rows);

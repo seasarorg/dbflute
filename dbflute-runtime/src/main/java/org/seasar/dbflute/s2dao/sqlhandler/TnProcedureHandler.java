@@ -51,7 +51,7 @@ public class TnProcedureHandler extends TnBasicHandler {
         this._resultSetHandlerProvider = resultSetHandlerProvider;
     }
 
-    public static interface TnProcedureResultSetHandlerProvider {
+    public static interface TnProcedureResultSetHandlerProvider { // is needed to construct an instance
         TnResultSetHandler provideResultSetHandler(TnProcedureParameterType ppt, ResultSet rs);
     }
 

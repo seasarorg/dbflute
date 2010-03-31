@@ -640,7 +640,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      */
     protected void assertEntityOfInsert(Entity entity) {
     }
-    
+
     // -----------------------------------------------------
     //                                                Update
     //                                                ------
@@ -907,7 +907,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         return xsetupEntityCommand(new DeleteNonstrictEntityCommand(), entity);
     }
 
-    private <COMMAND extends AbstractEntityCommand> COMMAND xsetupEntityCommand(COMMAND command, Entity entity) {
+    protected <COMMAND extends AbstractEntityCommand> COMMAND xsetupEntityCommand(COMMAND command, Entity entity) {
         command.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setEntityType(entity.getClass());
@@ -948,7 +948,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
      * @param entityList The list of entity. (NotNull, NotEmpty)
      * @return The command of behavior. (NotNull)
      */
-    private <COMMAND extends AbstractListEntityCommand> COMMAND xsetupListEntityCommand(COMMAND command,
+    protected <COMMAND extends AbstractListEntityCommand> COMMAND xsetupListEntityCommand(COMMAND command,
             List<? extends Entity> entityList) {
         if (entityList.isEmpty()) {
             String msg = "The argument 'entityList' should not be empty: " + entityList;

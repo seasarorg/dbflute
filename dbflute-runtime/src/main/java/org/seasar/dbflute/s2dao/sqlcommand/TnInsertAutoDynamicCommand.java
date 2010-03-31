@@ -60,7 +60,7 @@ public class TnInsertAutoDynamicCommand implements TnSqlCommand, SqlExecution {
         final String sql = createInsertSql(bmd, propertyTypes);
         final TnInsertAutoHandler handler = createInsertAutoHandler(bmd, propertyTypes);
         handler.setSql(sql);
-        handler.setLoggingMessageSqlArgs(args);
+        handler.setExceptionMessageSqlArgs(args);
         final int rows = handler.execute(args);
         return Integer.valueOf(rows);
     }

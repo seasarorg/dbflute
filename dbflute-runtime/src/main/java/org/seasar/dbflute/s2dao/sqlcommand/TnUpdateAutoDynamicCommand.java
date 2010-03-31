@@ -72,7 +72,7 @@ public class TnUpdateAutoDynamicCommand extends TnAbstractSqlCommand {
         }
         TnUpdateAutoHandler handler = createInternalUpdateAutoHandler(bmd, propertyTypes);
         handler.setSql(createUpdateSql(bmd, propertyTypes, bean));
-        handler.setLoggingMessageSqlArgs(args);
+        handler.setExceptionMessageSqlArgs(args);
         int i = handler.execute(args);
 
         // [Comment Out]: This statement moved to the handler at [DBFlute-0.8.0].

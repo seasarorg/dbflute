@@ -866,7 +866,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         return command;
     }
 
-    private <COMMAND extends AbstractBehaviorCommand<?>> COMMAND xsetupSelectCommand(COMMAND command) {
+    protected <COMMAND extends AbstractBehaviorCommand<?>> COMMAND xsetupSelectCommand(COMMAND command) {
         command.setTableDbName(getTableDbName());
         _behaviorCommandInvoker.injectComponentProperty(command);
         return command;

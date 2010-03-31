@@ -50,7 +50,7 @@ public class TnBasicHandler {
     private DataSource dataSource;
     private String sql;
     private StatementFactory statementFactory;
-    private Object[] loggingMessageSqlArgs;
+    private Object[] exceptionMessageSqlArgs;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -242,15 +242,15 @@ public class TnBasicHandler {
     }
 
     protected void handleSQLException(SQLException e, Statement statement, boolean uniqueConstraintValid) {
-        String completeSql = buildLoggingMessageSql();
+        String completeSql = buildExceptionMessageSql();
         new SQLExceptionHandler().handleSQLException(e, statement, uniqueConstraintValid, completeSql);
     }
 
-    protected String buildLoggingMessageSql() {
+    protected String buildExceptionMessageSql() {
         String completeSql = null;
-        if (sql != null && loggingMessageSqlArgs != null) {
+        if (sql != null && exceptionMessageSqlArgs != null) {
             try {
-                completeSql = getDisplaySql(loggingMessageSqlArgs);
+                completeSql = getDisplaySql(exceptionMessageSqlArgs);
             } catch (RuntimeException ignored) {
             }
         }
@@ -413,7 +413,7 @@ public class TnBasicHandler {
         this.statementFactory = statementFactory;
     }
 
-    public void setLoggingMessageSqlArgs(Object[] loggingMessageSqlArgs) {
-        this.loggingMessageSqlArgs = loggingMessageSqlArgs;
+    public void setExceptionMessageSqlArgs(Object[] exceptionMessageSqlArgs) {
+        this.exceptionMessageSqlArgs = exceptionMessageSqlArgs;
     }
 }

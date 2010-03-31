@@ -146,21 +146,36 @@ public class OutsideSqlBasicExecutor {
     //                                                                    ================
     protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, Object pmb,
             Class<ENTITY> entityType) {
-        final OutsideSqlSelectListCommand<ENTITY> cmd = xsetupCommand(new OutsideSqlSelectListCommand<ENTITY>(), path,
-                pmb);
+        final OutsideSqlSelectListCommand<ENTITY> cmd;
+        {
+            final OutsideSqlSelectListCommand<ENTITY> newed = newOutsideSqlSelectListCommand();
+            cmd = xsetupCommand(newed, path, pmb); // has a little generic headache...
+        }
         cmd.setEntityType(entityType);
         return cmd;
     }
 
+    protected <ENTITY> OutsideSqlSelectListCommand<ENTITY> newOutsideSqlSelectListCommand() {
+        return new OutsideSqlSelectListCommand<ENTITY>();
+    }
+
     protected BehaviorCommand<Integer> createExecuteCommand(String path, Object pmb) {
-        return xsetupCommand(new OutsideSqlExecuteCommand(), path, pmb);
+        return xsetupCommand(newOutsideSqlExecuteCommand(), path, pmb);
+    }
+
+    protected OutsideSqlExecuteCommand newOutsideSqlExecuteCommand() {
+        return new OutsideSqlExecuteCommand();
     }
 
     protected BehaviorCommand<Void> createCallCommand(String path, Object pmb) {
-        return xsetupCommand(new OutsideSqlCallCommand(), path, pmb);
+        return xsetupCommand(newOutsideSqlCallCommand(), path, pmb);
     }
 
-    private <COMMAND extends AbstractOutsideSqlCommand<?>> COMMAND xsetupCommand(COMMAND command, String path,
+    protected OutsideSqlCallCommand newOutsideSqlCallCommand() {
+        return new OutsideSqlCallCommand();
+    }
+
+    protected <COMMAND extends AbstractOutsideSqlCommand<?>> COMMAND xsetupCommand(COMMAND command, String path,
             Object pmb) {
         command.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(command);

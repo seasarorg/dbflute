@@ -58,7 +58,7 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     protected Object executeSql(DataSource ds, String sql, Object[] args) {
         TnBasicSelectHandler selectHandler = createSelectHandler(ds, sql);
         if (args != null) {
-            selectHandler.setLoggingMessageSqlArgs(args);
+            selectHandler.setExceptionMessageSqlArgs(args);
         }
         return selectHandler.execute(args);
     }

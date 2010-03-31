@@ -156,10 +156,15 @@ public class OutsideSqlEntityExecutor<PARAMETER_BEAN> {
     //                                                                    ================
     protected <ENTITY> BehaviorCommand<List<ENTITY>> createSelectListCommand(String path, PARAMETER_BEAN pmb,
             Class<ENTITY> entityType) {
-        return xsetupCommand(new OutsideSqlSelectListCommand<ENTITY>(), path, pmb, entityType);
+        final OutsideSqlSelectListCommand<ENTITY> newed = newOutsideSqlSelectListCommand();
+        return xsetupCommand(newed, path, pmb, entityType);
     }
 
-    private <ENTITY> OutsideSqlSelectListCommand<ENTITY> xsetupCommand(OutsideSqlSelectListCommand<ENTITY> command,
+    protected <ENTITY> OutsideSqlSelectListCommand<ENTITY> newOutsideSqlSelectListCommand() {
+        return new OutsideSqlSelectListCommand<ENTITY>();
+    }
+
+    protected <ENTITY> OutsideSqlSelectListCommand<ENTITY> xsetupCommand(OutsideSqlSelectListCommand<ENTITY> command,
             String path, PARAMETER_BEAN pmb, Class<ENTITY> entityType) {
         command.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(command);

@@ -24,6 +24,7 @@ import javax.sql.DataSource;
 import org.seasar.dbflute.bhv.core.SqlExecution;
 import org.seasar.dbflute.jdbc.StatementFactory;
 import org.seasar.dbflute.outsidesql.OutsideSqlContext;
+import org.seasar.dbflute.outsidesql.ProcedurePmb;
 import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureParameterType;
@@ -55,7 +56,7 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
         this._procedureResultSetHandlerFactory = procedureResultSetHandlerFactory;
     }
 
-    public static interface TnProcedureResultSetHandlerFactory {
+    public static interface TnProcedureResultSetHandlerFactory { // is needed to construct an instance
         TnResultSetHandler createBeanHandler(Class<?> beanClass);
 
         TnResultSetHandler createMapHandler();
@@ -65,18 +66,62 @@ public class TnProcedureCommand implements TnSqlCommand, SqlExecution {
     //                                                                             Execute
     //                                                                             =======
     public Object execute(final Object[] args) {
-        final TnProcedureHandler handler = createProcedureHandler();
+        // the args is unused because of getting from context
+        // (actually the args has same parameter as context)
+
         final OutsideSqlContext outsideSqlContext = OutsideSqlContext.getOutsideSqlContextOnThread();
         final Object pmb = outsideSqlContext.getParameterBean();
-        // The logging message SQL of procedure is unnecessary.
+        final TnProcedureHandler handler = createProcedureHandler(pmb);
+        // The logging message SQL of procedure is unnecessary
+        // because only the procedure name and parameter-bean are enough to debug.
+        // (And because making args from parameter bean requires great care...)
         //handler.setLoggingMessageSqlArgs(...);
         return handler.execute(new Object[] { pmb });
     }
 
-    protected TnProcedureHandler createProcedureHandler() {
-        final String sql = _procedureMetaData.createSql();
+    protected TnProcedureHandler createProcedureHandler(Object pmb) {
+        final String sql = buildSql(pmb);
         return new TnProcedureHandler(_dataSource, sql, _statementFactory, _procedureMetaData,
                 createProcedureResultSetHandlerFactory());
+    }
+
+    protected String buildSql(Object pmb) {
+        final String procedureName = _procedureMetaData.getProcedureName();
+        final int bindSize = _procedureMetaData.getBindParameterTypeList().size();
+        final boolean existsReturn = _procedureMetaData.hasReturnParameterType();
+
+        // default is that escape is valid
+        // but basically pmb is ProcedurePmb here
+        boolean kakou = true;
+        if (pmb instanceof ProcedurePmb) { // so you can specify through ProcedurePmb
+            kakou = ((ProcedurePmb) pmb).isEscapeStatement();
+        }
+        return doBuildSql(procedureName, bindSize, existsReturn, kakou);
+    }
+
+    protected String doBuildSql(String procedureName, int bindSize, boolean existsReturn, boolean kakou) {
+        final StringBuilder sb = new StringBuilder();
+        final int argSize;
+        {
+            if (existsReturn) {
+                sb.append("? = ");
+                argSize = bindSize - 1;
+            } else {
+                argSize = bindSize;
+            }
+        }
+        sb.append("call ").append(procedureName).append("(");
+        for (int i = 0; i < argSize; i++) {
+            sb.append("?, ");
+        }
+        if (argSize > 0) {
+            sb.setLength(sb.length() - 2);
+        }
+        sb.append(")");
+        if (kakou) {
+            sb.insert(0, "{").append("}");
+        }
+        return sb.toString();
     }
 
     protected TnProcedureResultSetHandlerProvider createProcedureResultSetHandlerFactory() {

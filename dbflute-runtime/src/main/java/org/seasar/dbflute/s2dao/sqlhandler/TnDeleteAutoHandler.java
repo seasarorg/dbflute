@@ -42,6 +42,6 @@ public class TnDeleteAutoHandler extends TnAbstractAutoHandler {
 	@Override
     protected void setupBindVariables(Object bean) {
         setupDeleteBindVariables(bean);
-        setLoggingMessageSqlArgs(bindVariables);
+        setExceptionMessageSqlArgs(bindVariables);
     }
 }

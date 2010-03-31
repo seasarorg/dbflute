@@ -42,7 +42,7 @@ public class TnUpdateAutoHandler extends TnAbstractAutoHandler {
 	@Override
     protected void setupBindVariables(Object bean) {
         setupUpdateBindVariables(bean);
-        setLoggingMessageSqlArgs(bindVariables);
+        setExceptionMessageSqlArgs(bindVariables);
     }
 
 	@Override

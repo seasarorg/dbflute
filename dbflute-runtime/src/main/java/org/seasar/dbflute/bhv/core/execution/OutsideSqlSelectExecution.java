@@ -120,7 +120,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
         addBindVariableInfo(ctx, bindVariableList, bindVariableTypeList);
         final TnBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
         final Object[] bindVariableArray = bindVariableList.toArray();
-        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        selectHandler.setExceptionMessageSqlArgs(bindVariableArray);
         return selectHandler.execute(bindVariableArray, toClassArray(bindVariableTypeList));
     }
 
@@ -134,7 +134,7 @@ public class OutsideSqlSelectExecution extends TnAbstractDynamicCommand {
         final CommandContext ctx = apply(args);
         final TnBasicSelectHandler selectHandler = createBasicSelectHandler(ctx.getSql(), this.resultSetHandler);
         final Object[] bindVariableArray = ctx.getBindVariables();
-        selectHandler.setLoggingMessageSqlArgs(bindVariableArray);
+        selectHandler.setExceptionMessageSqlArgs(bindVariableArray);
         return selectHandler.execute(bindVariableArray, ctx.getBindVariableTypes());
     }
 

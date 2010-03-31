@@ -65,7 +65,7 @@ public abstract class TnAbstractAutoStaticCommand extends TnAbstractStaticComman
         handler.setOptimisticLockHandling(optimisticLockHandling);
         handler.setVersionNoAutoIncrementOnMemory(versionNoAutoIncrementOnMemory);
         handler.setSql(getSql());
-        handler.setLoggingMessageSqlArgs(args);
+        handler.setExceptionMessageSqlArgs(args);
         int rows = handler.execute(args);
         return Integer.valueOf(rows);
     }

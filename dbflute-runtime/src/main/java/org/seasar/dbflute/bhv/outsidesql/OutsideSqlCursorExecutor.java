@@ -42,16 +42,14 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     /** The DB name of table. (NotNull) */
     protected final String _tableDbName;
 
-	/** The current database definition. (NotNull) */
+    /** The current database definition. (NotNull) */
     protected DBDef _currentDBDef;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public OutsideSqlCursorExecutor(BehaviorCommandInvoker behaviorCommandInvoker
-                                  , OutsideSqlOption outsideSqlOption
-                                  , String tableDbName
-                                  , DBDef currentDBDef) {
+    public OutsideSqlCursorExecutor(BehaviorCommandInvoker behaviorCommandInvoker, OutsideSqlOption outsideSqlOption,
+            String tableDbName, DBDef currentDBDef) {
         this._behaviorCommandInvoker = behaviorCommandInvoker;
         this._outsideSqlOption = outsideSqlOption;
         this._tableDbName = tableDbName;
@@ -77,10 +75,15 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     //                                                                    Behavior Command
     //                                                                    ================
     protected BehaviorCommand<Object> createSelectCursorCommand(String path, PARAMETER_BEAN pmb, CursorHandler handler) {
-        return xsetupCommand(new OutsideSqlSelectCursorCommand(), path, pmb, handler);
+        return xsetupCommand(newOutsideSqlSelectCursorCommand(), path, pmb, handler);
     }
 
-    private OutsideSqlSelectCursorCommand xsetupCommand(OutsideSqlSelectCursorCommand command, String path, PARAMETER_BEAN pmb, CursorHandler handler) {
+    protected OutsideSqlSelectCursorCommand newOutsideSqlSelectCursorCommand() {
+        return new OutsideSqlSelectCursorCommand();
+    }
+
+    protected OutsideSqlSelectCursorCommand xsetupCommand(OutsideSqlSelectCursorCommand command, String path,
+            PARAMETER_BEAN pmb, CursorHandler handler) {
         command.setTableDbName(_tableDbName);
         _behaviorCommandInvoker.injectComponentProperty(command);
         command.setOutsideSqlPath(path);
@@ -110,7 +113,7 @@ public class OutsideSqlCursorExecutor<PARAMETER_BEAN> {
     }
 
     public OutsideSqlCursorExecutor<PARAMETER_BEAN> configure(StatementConfig statementConfig) {
-		_outsideSqlOption.setStatementConfig(statementConfig);
+        _outsideSqlOption.setStatementConfig(statementConfig);
         return this;
     }
 }

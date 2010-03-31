@@ -57,7 +57,7 @@ public class TnDeleteQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         String twoWaySql = buildQueryDeleteTwoWaySql(cb);
         CommandContext context = createCommandContext(twoWaySql, argNames, argTypes, args);
         TnCommandContextHandler handler = createCommandContextHandler(context);
-        handler.setLoggingMessageSqlArgs(context.getBindVariables());
+        handler.setExceptionMessageSqlArgs(context.getBindVariables());
         int rows = handler.execute(args);
         return Integer.valueOf(rows);
     }

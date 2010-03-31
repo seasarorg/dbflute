@@ -28,4 +28,12 @@ public interface ProcedurePmb extends ParameterBean {
      * @return The value of procedure name. (NotNull)
      */
     String getProcedureName();
+
+    /**
+     * Does it escape the procedure statement? <br />
+     * If true, 'call SP_FOO()' to '{call = SP_FOO()}'. <br />
+     * This default value should be true basically.
+     * @return Determination.
+     */
+    boolean isEscapeStatement();
 }
