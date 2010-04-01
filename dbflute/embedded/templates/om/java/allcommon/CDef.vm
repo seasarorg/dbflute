@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.seasar.dbflute.jdbc.Classification;
+import org.seasar.dbflute.jdbc.ClassificationCodeType;
+import org.seasar.dbflute.jdbc.ClassificationMeta;
 
 /**
  * The definition of classification.
@@ -11,19 +13,53 @@ import org.seasar.dbflute.jdbc.Classification;
  */
 public interface ${glCDef} extends Classification {
 
+    public enum DefMeta implements ClassificationMeta {
+#set ($count = 0)
+#foreach ($classificationName in $database.classificationNameList)
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
+#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+#set ($existTop = true)
+#end
+#if ($count != 0)
+        ,
+#end
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+        /** $classificationTopMap.get('topComment') */
+#end
+        ${classificationName}
+#set ($count = $count + 1)
+#end
+        ;
+        public Classification codeOf(Object code) {
+#foreach ($classificationName in $database.classificationNameList)
+            if ("${classificationName}".equals(name())) { return ${glCDef}.${classificationName}.codeOf(code); }
+#end
+            throw new IllegalStateException("Unknown definition: " + this);
+        }
+
+        public ClassificationCodeType codeType() {
+#foreach ($classificationName in $database.classificationNameList)
+#set ($existTop = false)
+#if ($database.classificationTopDefinitionMap.containsKey($classificationName))
+#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+#set ($existTop = true)
+#end
+#if ($existTop && $classificationTopMap.containsKey('dataType'))
+            if ("${classificationName}".equals(name())) { return ClassificationCodeType.${classificationTopMap.get('dataType')}; }
+#end
+#end
+            return ClassificationCodeType.String; // as default
+        }
+    }
+
 #foreach ($classificationName in $database.classificationNameList)
 #set ($classificationMapList = $database.classificationDefinitionMap.get($classificationName))
 #set ($existTop = false)
 #if ($database.classificationTopDefinitionMap.containsKey($classificationName))
-  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
-  #set ($existTop = true)
+#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($classificationName))
+#set ($existTop = true)
 #end
-#if ($database.isInitNumber($classificationName))
-    // The classification name that its initial character is number is unsupported!
-    // public enum ${classificationName} {
-    // }
-
-#else
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
     /**
      * $classificationTopMap.get('topComment')
@@ -45,11 +81,7 @@ public interface ${glCDef} extends Classification {
         private String _code; private String _alias;
         private ${classificationName}(String code, String alias) { _code = code; _alias = alias; }
         public String code() { return _code; } public String alias() { return _alias; }
-#if ($existTop && $classificationTopMap.containsKey('dataType'))
-        public Classification.DataType dataType() { return Classification.DataType.${classificationTopMap.get('dataType')}; }
-#else
-        public Classification.DataType dataType() { return Classification.DataType.String; }
-#end
+        public ClassificationMeta meta() { return ${glCDef}.DefMeta.${classificationName}; }
         public static ${classificationName} codeOf(Object code) {
             if (code == null) { return null; } if (code instanceof ${classificationName}) { return (${classificationName})code; }
             return _codeValueMap.get(code.toString().toLowerCase());
@@ -61,6 +93,5 @@ public interface ${glCDef} extends Classification {
 #end
     }
 
-#end
 #end
 }

@@ -294,8 +294,8 @@ namespace ${myDBMetaPackageName} {
         protected Map<String, EntityPropertySetupper<${myExtendedObjectClassName}>> _entityPropertySetupperMap = new LinkedHashMap<String, EntityPropertySetupper<${myExtendedObjectClassName}>>();
 
         protected void InitializeEntityPropertySetupper() {
-#foreach ($column in $table.columns)
-            RegisterEntityPropertySetupper("$column.name", "$column.javaName", new EntityProperty${column.javaName}Setupper(), _entityPropertySetupperMap);
+#foreach ($col in $table.columns)
+            RegisterEntityPropertySetupper("$col.name", "$col.javaName", new EntityProperty${col.javaName}Setupper(), _entityPropertySetupperMap);
 #end
         }
 

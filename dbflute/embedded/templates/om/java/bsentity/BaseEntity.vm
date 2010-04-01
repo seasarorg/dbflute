@@ -141,43 +141,49 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
 #if ($table.hasClassification())
     // ===================================================================================
-    //                                                          Classification Classifying
-    //                                                          ==========================
+    //                                                             Classification Property
+    //                                                             =======================
 #foreach ($col in $table.columns)
 #if ($col.hasClassification())
 #set ($existTop = false)
 #if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
-  #set ($existTop = true)
-#end
+#set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
+#set ($existTop = true)
     /**
      * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
+     * @param cdef The instance of classification definition (as ENUM type). (Nullable)
      */
-    public void set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cls) {
+    public void set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
 #if ($col.isJavaNativeStringObject())
-        set${col.javaName}(cls != null ? cls.code() : null);
-#elseif ($col.isJavaNativeValueOfAbleObject())
-        set${col.javaName}(cls != null ? ${col.javaNative}.valueOf(cls.code()) : null);
+        set${col.javaName}(cdef != null ? cdef.code() : null);
 #else
-        set${col.javaName}(cls != null ? new ${col.javaNative}(cls.code()) : null);
+        set${col.javaName}(cdef != null ? InternalUtil.toNumber(cdef.code(), ${col.javaNative}.class) : null);
 #end
     }
 
     /**
-     * Same as set${col.javaName}As${col.classificationName}(cls). <br />
+     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
+     * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
+     * @return The instance of classification definition (as ENUM type). (Nullable)
      */
-    public void classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
-        set${col.javaName}As${col.classificationName}(cls);
+    public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
+        return ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
     }
 
+#end
+#end
+#end
+    // ===================================================================================
+    //                                                              Classification Setting
+    //                                                              ======================
+#foreach ($col in $table.columns)
+#if ($col.hasClassification())
 #foreach ($classificationMap in $col.classificationMapList)
     /**
      * Set the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
@@ -187,6 +193,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
     }
 
+#if ($database.isMakeEntityOldStyleClassify())
     /**
      * Same as set${col.javaName}_${classificationMap.get('name')}. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
@@ -197,29 +204,23 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 
 #end
 #end
+#if ($database.isMakeEntityOldStyleClassify())
+    /**
+     * Same as set${col.javaName}As${col.classificationName}(cdef). <br />
+     * @param cdef The instance of classification definition (as ENUM type). (Nullable)
+     */
+    public void classify${col.javaName}(${glCDef}.${col.classificationName} cdef) {
+        set${col.javaName}As${col.classificationName}(cdef);
+    }
+
+#end
+#end
 #end
     // ===================================================================================
     //                                                        Classification Determination
     //                                                        ============================
 #foreach ($col in $table.columns)
 #if ($col.hasClassification())
-#set ($existTop = false)
-#if ($database.classificationTopDefinitionMap.containsKey($col.classificationName))
-  #set ($classificationTopMap = $database.classificationTopDefinitionMap.get($col.classificationName))
-  #set ($existTop = true)
-#end
-    /**
-     * Get the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
-#if ($existTop && $classificationTopMap.containsKey('topComment'))
-     * $classificationTopMap.get('topComment')
-#end
-     * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
-     * @return The instance of classification definition (ENUM type). (Nullable)
-     */
-    public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
-        return ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
-    }
-
 #foreach ($classificationMap in $col.classificationMapList)
     /**
      * Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
@@ -228,8 +229,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return Determination.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
-        ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
-        return cls != null ? cls.equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
+        ${glCDef}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();
+        return cdef != null ? cdef.equals(${glCDef}.${col.classificationName}.${classificationMap.get('name')}) : false;
     }
 
 #end
@@ -247,8 +248,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return The string of classification name. (Nullable)
      */
     public String get${col.JavaName}Name() {
-        ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
-        return cls != null ? cls.name() : null;
+        ${glCDef}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();
+        return cdef != null ? cdef.name() : null;
     }
 
 #end
@@ -258,8 +259,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      * @return The string of classification alias. (Nullable)
      */
     public String get${col.JavaName}Alias() {
-        ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
-        return cls != null ? cls.alias() : null;
+        ${glCDef}.${col.classificationName} cdef = get${col.javaName}As${col.classificationName}();
+        return cdef != null ? cdef.alias() : null;
     }
 
 #end
@@ -636,7 +637,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
      * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
-    public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
+    ${col.propertySettingModifier} void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
         _modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
         this._${col.uncapitalisedJavaName} = ${col.uncapitalisedJavaName};
     }
@@ -662,7 +663,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     /**
      * {@inheritDoc}
      */
-    public void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
+    ${col.propertySettingModifier} void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
         set${targetJavaName}(${uncapitalisedJavaName});
     }
 #end

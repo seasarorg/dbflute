@@ -22,12 +22,14 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
      */
     ${javaNative} get${javaName}();
 
+#if (!$database.isForcedClassificationHandling() || !$database.isAllClassificationColumn($filteredColumnName))
     /**
      * Set the value of ${uncapitalisedJavaName}.
      * @param ${uncapitalisedJavaName} The instance of the property type. (Nullable)
      */
     void set${javaName}(${javaNative} ${uncapitalisedJavaName});
-#if (${database.isAllClassificationColumn($filteredColumnName)})
+#end
+#if ($database.isAllClassificationColumn($filteredColumnName))
 #set ($classificationName = $database.getAllClassificationName($filteredColumnName))
 #set ($classificationList = $database.getClassificationMapList($classificationName))
 #foreach ($classificationMap in $classificationList)

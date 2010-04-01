@@ -25,9 +25,9 @@ namespace ${glPackageBaseCQ} {
 #set ($tmpUncapitalisedJavaName = "${col.uncapitalisedJavaName}")
 #if (${col.isJavaNativeStringObject()})
 
-        public void Set${tmpJavaName}_Equal(${col.javaNative} v) { DoSet${tmpJavaName}_Equal(fRES(v)); }
+        ${col.propertySettingModifier} void Set${tmpJavaName}_Equal(${col.javaNative} v) { DoSet${tmpJavaName}_Equal(fRES(v)); }
 #if (${col.isAvailableStringEmptyString()})
-        public void Set${tmpJavaName}_Equal_EmptyString() { DoSet${tmpJavaName}_Equal(""); }
+        ${col.propertySettingModifier} void Set${tmpJavaName}_Equal_EmptyString() { DoSet${tmpJavaName}_Equal(""); }
 #end
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.ClassificationMapList)
@@ -42,9 +42,9 @@ namespace ${glPackageBaseCQ} {
 #end
         protected void DoSet${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, v); }
 #if (${col.isAvailableStringNotEqual()})
-        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { DoSet${tmpJavaName}_NotEqual(fRES(v)); }
+        ${col.propertySettingModifier} void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { DoSet${tmpJavaName}_NotEqual(fRES(v)); }
 #if (${col.isAvailableStringEmptyString()})
-        public void Set${tmpJavaName}_NotEqual_EmptyString() { DoSet${tmpJavaName}_NotEqual(""); }
+        ${col.propertySettingModifier} void Set${tmpJavaName}_NotEqual_EmptyString() { DoSet${tmpJavaName}_NotEqual(""); }
 #end
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.ClassificationMapList)
@@ -237,7 +237,7 @@ namespace ${glPackageBaseCQ} {
 #end
 #if (${col.isJavaNativeNumberObject()})
 
-        public void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, v); }
+        ${col.propertySettingModifier} void Set${tmpJavaName}_Equal(${col.javaNative} v) { reg${tmpJavaName}(CK_EQ, v); }
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.classificationMapList)
         /// <summary>
@@ -251,7 +251,7 @@ namespace ${glPackageBaseCQ} {
 #end
 #end
 #if (${col.isAvailableNumberNotEqual()})
-        public void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, v); }
+        ${col.propertySettingModifier} void Set${tmpJavaName}_NotEqual(${col.javaNative} v) { reg${tmpJavaName}(CK_NE, v); }
 #end
 #if (${col.hasClassification()})
 #foreach ($classificationMap in $col.classificationMapList)

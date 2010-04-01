@@ -25,6 +25,9 @@ import org.seasar.dbflute.dbmeta.hierarchy.HierarchyRequest;
 #if ($table.isBuriTarget())
 import ${glPackagePluginBuri}.${glBuriDef};
 #end
+#if ($table.hasPrimaryKeyForcedClassificationSetting())
+import ${glPackageBaseCommon}.${glCDef};
+#end
 #if (${table.hasPrimaryKey()} && $table.hasReferrerAsMany())
 import ${glPackageExtendedBhv}.*;
 #end

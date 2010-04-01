@@ -6,6 +6,8 @@
 # o isAvailableAddingSchemaToTableSqlName: (NotRequired - Default false)
 # o isAvailableDatabaseDependency: (NotRequired - Default false)
 # o isAvailableNonPrimaryKeyWritable: (NotRequired - Default false)
+# o isCheckSelectedClassification: (NotRequired - Default false)
+# o isForceClassificationSetting: (NotRequired - Default false)
 # o isMakeEntityChaseRelation: (NotRequired - Default false)
 # o isMakeConditionQueryEqualEmptyString: (NotRequired - Default false)
 # o isMakeDeprecated: (NotRequired - Default false)
@@ -14,6 +16,7 @@
 # o extendedImplementedCommonColumnAutoSetupperClass: (NotRequired - Default '')
 # o extendedS2DaoSettingClass: (NotRequired - Default '')
 # o shortCharHandlingMode: (NotRequired - Default NONE)
+# o quoteTableNameList: (NotRequired - Default list:{})
 # 
 # *The line that starts with '#' means comment-out.
 #
@@ -50,6 +53,32 @@ map:{
     #     Non.
     #
     #; isAvailableNonPrimaryKeyWritable = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isCheckSelectedClassification: (NotRequired - Default false)
+    #   [true]
+    #     Check a code of a column related to classification
+    #     whether it's one of classification when it's selected.
+    #     If wrong, throws an exception (when selecting).
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isCheckSelectedClassification = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isForceClassificationSetting: (NotRequired - Default false)
+    #   [true]
+    #     Force developer to set a code of a column related to classification
+    #     by classification type-safe method of Entity and ConditionBean.
+    #     A setter method of original type becomes 'protected' scope.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isForceClassificationSetting = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -143,6 +172,14 @@ map:{
     #   LFILL - It fills the parameter by left spaces.
     #
     #; shortCharHandlingMode = NONE
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o quoteTableNameList: (NotRequired - Default list:{})
+    #  The list of table DB names that need to be quoted.
+    #  Specified tables is quoted on auto-generated SQL.
+    #
+    #; quoteTableNameList = list:{}
     # - - - - - - - - - -/
 }
 # ----------------/
