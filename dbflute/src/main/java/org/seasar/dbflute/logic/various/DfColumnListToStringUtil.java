@@ -25,7 +25,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 /**
  * @author jflute
  */
-public class DfTorqueColumnListToStringUtil {
+public class DfColumnListToStringUtil {
 
     public static String getColumnArgsString(List<Column> columnList) {
         validateColumnList(columnList);

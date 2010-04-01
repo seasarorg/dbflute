@@ -74,7 +74,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.schemahtml.DfSchemaHtmlBuilder;
-import org.seasar.dbflute.logic.various.DfTorqueColumnListToStringUtil;
+import org.seasar.dbflute.logic.various.DfColumnListToStringUtil;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
@@ -1717,7 +1717,7 @@ public class Table {
      * @return The value of primaryKeyArgsString. (NotNull)
      */
     public String getPrimaryKeyArgsString() {
-        return DfTorqueColumnListToStringUtil.getColumnArgsString(getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnArgsString(getPrimaryKey());
     }
 
     /**
@@ -1726,7 +1726,7 @@ public class Table {
      */
     public String getPrimaryKeyArgsJavaDocString() {
         final String ln = getBasicProperties().getSourceCodeLineSeparator();
-        return DfTorqueColumnListToStringUtil.getColumnArgsJavaDocString(getPrimaryKey(), ln);
+        return DfColumnListToStringUtil.getColumnArgsJavaDocString(getPrimaryKey(), ln);
     }
 
     /**
@@ -1734,7 +1734,7 @@ public class Table {
      * @return The value of primaryKeyArgsAssertString. (NotNull)
      */
     public String getPrimaryKeyArgsAssertString() {
-        return DfTorqueColumnListToStringUtil.getColumnArgsAssertString(getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnArgsAssertString(getPrimaryKey());
     }
 
     /**
@@ -1742,7 +1742,7 @@ public class Table {
      * @return The value of primaryKeyArgsAssertStringCSharp. (NotNull)
      */
     public String getPrimaryKeyArgsAssertStringCSharp() {
-        return DfTorqueColumnListToStringUtil.getColumnArgsAssertStringCSharp(getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnArgsAssertStringCSharp(getPrimaryKey());
     }
 
     /**
@@ -1750,7 +1750,7 @@ public class Table {
      * @return The value of primaryKeyArgsSetupString. (NotNull)
      */
     public String getPrimaryKeyArgsSetupString() {
-        return DfTorqueColumnListToStringUtil.getColumnArgsSetupString(null, getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnArgsSetupString(null, getPrimaryKey());
     }
 
     /**
@@ -1759,7 +1759,7 @@ public class Table {
      * @return The value of primaryKeyArgsSetupString. (NotNull)
      */
     public String getPrimaryKeyArgsSetupString(String beanName) {
-        return DfTorqueColumnListToStringUtil.getColumnArgsSetupString(beanName, getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnArgsSetupString(beanName, getPrimaryKey());
     }
 
     /**
@@ -1767,7 +1767,7 @@ public class Table {
      * @return The value of primaryKeyArgsSetupStringCSharp. (NotNull)
      */
     public String getPrimaryKeyArgsSetupStringCSharp() {
-        return DfTorqueColumnListToStringUtil.getColumnArgsSetupStringCSharp(null, getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnArgsSetupStringCSharp(null, getPrimaryKey());
     }
 
     /**
@@ -1776,7 +1776,7 @@ public class Table {
      * @return The value of primaryKeyArgsSetupStringCSharp. (NotNull)
      */
     public String getPrimaryKeyArgsSetupStringCSharp(String beanName) {
-        return DfTorqueColumnListToStringUtil.getColumnArgsSetupStringCSharp(beanName, getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnArgsSetupStringCSharp(beanName, getPrimaryKey());
     }
 
     /**
@@ -1784,7 +1784,7 @@ public class Table {
      * @return The value of primaryKeyArgsConditionSetupString. (NotNull)
      */
     public String getPrimaryKeyArgsConditionSetupString() {
-        return DfTorqueColumnListToStringUtil.getColumnArgsConditionSetupString(getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnArgsConditionSetupString(getPrimaryKey());
     }
 
     /**
@@ -1792,7 +1792,7 @@ public class Table {
      * @return The value of primaryKeyArgsConditionSetupStringCSharp. (NotNull)
      */
     public String getPrimaryKeyArgsConditionSetupStringCSharp() {
-        return DfTorqueColumnListToStringUtil.getColumnArgsConditionSetupStringCSharp(getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnArgsConditionSetupStringCSharp(getPrimaryKey());
     }
 
     /**
@@ -1831,7 +1831,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyOrderByAscString() {
-        return DfTorqueColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "asc");
+        return DfColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "asc");
     }
 
     /**
@@ -1839,7 +1839,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyOrderByDescString() {
-        return DfTorqueColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "desc");
+        return DfColumnListToStringUtil.getColumnOrderByString(getPrimaryKey(), "desc");
     }
 
     // -----------------------------------------------------
@@ -1850,7 +1850,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyDispValueString() {
-        return DfTorqueColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "get");
+        return DfColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "get");
     }
 
     /**
@@ -1858,7 +1858,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyDispValueStringByGetterInitCap() {
-        return DfTorqueColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "Get");
+        return DfColumnListToStringUtil.getColumnDispValueString(getPrimaryKey(), "Get");
     }
 
     // -----------------------------------------------------
@@ -1869,7 +1869,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyNameCommaString() {
-        return DfTorqueColumnListToStringUtil.getColumnNameCommaString(getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnNameCommaString(getPrimaryKey());
     }
 
     /**
@@ -1877,7 +1877,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyUncapitalisedJavaNameCommaString() {
-        return DfTorqueColumnListToStringUtil.getColumnUncapitalisedJavaNameCommaString(getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnUncapitalisedJavaNameCommaString(getPrimaryKey());
     }
 
     /**
@@ -1885,7 +1885,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyJavaNameCommaString() {
-        return DfTorqueColumnListToStringUtil.getColumnJavaNameCommaString(getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnJavaNameCommaString(getPrimaryKey());
     }
 
     /**
@@ -1893,7 +1893,7 @@ public class Table {
      * @return Generated string.
      */
     public String getPrimaryKeyGetterCommaString() {
-        return DfTorqueColumnListToStringUtil.getColumnGetterCommaString(getPrimaryKey());
+        return DfColumnListToStringUtil.getColumnGetterCommaString(getPrimaryKey());
     }
 
     // -----------------------------------------------------

@@ -68,7 +68,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.DfFixedConditionInvalidClassificationEmbeddedCommentException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
-import org.seasar.dbflute.logic.various.DfTorqueColumnListToStringUtil;
+import org.seasar.dbflute.logic.various.DfColumnListToStringUtil;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
@@ -706,7 +706,7 @@ public class ForeignKey {
      * @return Generated string.
      */
     public String getLocalColumnNameCommaString() {
-        return DfTorqueColumnListToStringUtil.getColumnNameCommaString(getLocalColumnList());
+        return DfColumnListToStringUtil.getColumnNameCommaString(getLocalColumnList());
     }
 
     /**
