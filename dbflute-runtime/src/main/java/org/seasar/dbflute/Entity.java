@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -32,53 +33,60 @@ public interface Entity {
     //                                                                              DBMeta
     //                                                                              ======
     /**
-     * Get the instance of target dbmeta.
-     * @return DBMeta. (NotNull)
+     * Get the target DB meta.
+     * @return The instance of DBMeta type. (NotNull)
      */
-    public DBMeta getDBMeta();
+    DBMeta getDBMeta();
 
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
     /**
      * Get table DB name.
-     * @return Table DB name. (NotNull)
+     * @return The string for name. (NotNull)
      */
-    public String getTableDbName();
+    String getTableDbName();
 
     /**
-     * Get table property name.
-     * @return Table property name. (NotNull)
+     * Get table property name according to Java Beans rule.
+     * @return The string for name. (NotNull)
      */
-    public String getTablePropertyName();
+    String getTablePropertyName();
 
     // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
+    //                                                                         Primary Key
+    //                                                                         ===========
     /**
-     * Has the value of primary-key?
-     * @return Determination.
+     * Does it have the value of primary keys?
+     * @return Determination. (if all PK values are not null, returns true)
      */
-    public boolean hasPrimaryKeyValue();
+    boolean hasPrimaryKeyValue();
 
     // ===================================================================================
     //                                                                 Modified Properties
     //                                                                 ===================
     /**
-     * Get modified property names. (JavaBeansRule)
-     * @return Modified property names. (NotNull)
+     * Get modified property names. (basically for Framework)<br />
+     * The properties needs to be according to Java Beans rule.
+     * @return The set instance that contains property names. (NotNull)
      */
-    public Set<String> getModifiedPropertyNames();
+    Set<String> getModifiedPropertyNames();
 
     /**
-     * Clear modified property names.
+     * Clear modified property names. (basically for Framework)
      */
-    public void clearModifiedPropertyNames();
+    void clearModifiedPropertyNames();
 
     /**
-     * Entity modified properties.
+     * Does it have modifications of property names. (basically for Framework)
+     * @return Determination.
      */
-    public static class EntityModifiedProperties implements java.io.Serializable {
+    boolean hasModification();
+
+    /**
+     * Entity modified properties. (basically for Framework)
+     */
+    public static class EntityModifiedProperties implements Serializable {
 
         /** Serial version UID. (Default) */
         private static final long serialVersionUID = 1L;
@@ -87,8 +95,8 @@ public interface Entity {
         protected Set<String> _propertiesSet = new LinkedHashSet<String>();
 
         /**
-         * Add property name. (JavaBeansRule)
-         * @param propertyName Property name. (Nullable)
+         * Add property name. (according to Java Beans rule)
+         * @param propertyName The string for name. (Nullable)
          */
         public void addPropertyName(String propertyName) {
             _propertiesSet.add(propertyName);
@@ -118,8 +126,8 @@ public interface Entity {
         }
 
         /**
-         * Remove property name from the set. (JavaBeansRule)
-         * @param propertyName Property name. (Nullable)
+         * Remove property name from the set. (according to Java Beans rule)
+         * @param propertyName The string for name. (Nullable)
          */
         public void remove(String propertyName) {
             _propertiesSet.remove(propertyName);
@@ -132,7 +140,7 @@ public interface Entity {
     /**
      * @return The display string of basic informations with one-nested relation values. (NotNull)
      */
-    public String toStringWithRelation();
+    String toStringWithRelation();
 
     /**
      * @param name The name for display. (Nullable: If it's null, it does not have a name)
@@ -140,7 +148,7 @@ public interface Entity {
      * @param relation Does it contains relation existences or not?
      * @return The display string for this entity. (NotNull)
      */
-    public String buildDisplayString(String name, boolean column, boolean relation);
+    String buildDisplayString(String name, boolean column, boolean relation);
 
     // ===================================================================================
     //                                                                      Display String
