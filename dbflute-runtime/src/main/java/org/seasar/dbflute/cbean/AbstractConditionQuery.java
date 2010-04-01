@@ -562,30 +562,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void invokeQueryLikeSearch(String columnFlexibleName, Object value, LikeSearchOption option) {
-        if (value == null) {
-            return;
-        }
-        final DBMeta dbmeta = findDBMeta(getTableDbName());
-        final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
-        final String methodName = "set" + columnCapPropName + "_LikeSearch";
-        final Class<?>[] parameterTypes = new Class<?>[] { value.getClass(), LikeSearchOption.class };
-        final Method method = helpGettingCQMethod(this, methodName, parameterTypes);
-        if (method == null) {
-            String msg = "Not found the method for setting a like-search condition(query):";
-            msg = msg + " columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " value=" + value;
-            msg = msg + " option=" + option;
-            msg = msg + " methodName=" + methodName;
-            throw new ConditionInvokingFailureException(msg);
-        }
-        try {
-            helpInvokingCQMethod(this, method, new Object[] { value, option });
-        } catch (ReflectionFailureException e) {
-            String msg = "Failed to invoke the method for setting a like-search condition(query):";
-            msg = msg + " columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " methodName=" + methodName;
-            throw new ConditionInvokingFailureException(msg, e);
-        }
+        invokeQuery(columnFlexibleName, "likeSearch", value, option);
     }
 
     // -----------------------------------------------------
@@ -1370,6 +1347,19 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * {@inheritDoc}
      */
     public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value) {
+        doInvokeQuery(columnFlexibleName, conditionKeyName, value, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value, ConditionOption option) {
+        assertObjectNotNull("option", option);
+        doInvokeQuery(columnFlexibleName, conditionKeyName, value, option);
+    }
+
+    protected void doInvokeQuery(String columnFlexibleName, String conditionKeyName, Object value,
+            ConditionOption option) {
         assertStringNotNullAndNotTrimmedEmpty("columnFlexibleName", columnFlexibleName);
         assertStringNotNullAndNotTrimmedEmpty("conditionKeyName", conditionKeyName);
         if (value == null) {
@@ -1381,29 +1371,47 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
         final String methodName = "set" + columnCapPropName + "_" + initCap(conditionKeyName);
-        Class<?> type = value.getClass();
-        if (Collection.class.isAssignableFrom(type)) {
-            type = Collection.class;
+        final Class<?> type = value.getClass();
+        final Class<?>[] parameterTypes;
+        if (option != null) {
+            parameterTypes = new Class<?>[] { type, option.getClass() };
+        } else {
+            parameterTypes = new Class<?>[] { type };
         }
-        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] { type });
+        final Method method = helpGettingCQMethod(cq, methodName, parameterTypes);
         if (method == null) {
             String msg = "Not found the method for setting a condition(query):";
             msg = msg + " columnFlexibleName=" + columnFlexibleName;
             msg = msg + " conditionKeyName=" + conditionKeyName;
             msg = msg + " value=" + value;
+            msg = msg + " option=" + option;
             msg = msg + " methodName=" + methodName;
             throw new ConditionInvokingFailureException(msg);
         }
         try {
-            helpInvokingCQMethod(cq, method, new Object[] { value });
+            final Object[] args;
+            if (option != null) {
+                args = new Object[] { value, option };
+            } else {
+                args = new Object[] { value };
+            }
+            helpInvokingCQMethod(cq, method, args);
         } catch (ReflectionFailureException e) {
             String msg = "Failed to invoke the method for setting a condition(query):";
             msg = msg + " columnFlexibleName=" + columnFlexibleName;
             msg = msg + " conditionKeyName=" + conditionKeyName;
             msg = msg + " value=" + value;
+            msg = msg + " option=" + option;
             msg = msg + " methodName=" + methodName;
             throw new ConditionInvokingFailureException(msg, e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void invokeQueryEqual(String columnFlexibleName, Object value) {
+        invokeQuery(columnFlexibleName, CK_EQ.getConditionKey(), value);
     }
 
     /**
@@ -1497,11 +1505,32 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     private Method helpGettingCQMethod(ConditionQuery cq, String methodName, Class<?>[] argTypes) {
-        return DfReflectionUtil.getPublicMethod(cq.getClass(), methodName, argTypes);
+        Class<? extends ConditionQuery> clazz = cq.getClass();
+        Method method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
+        if (method == null && argTypes != null) {
+            if (argTypes.length == 1 && Collection.class.isAssignableFrom(argTypes[0])) {
+                method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, new Class[] { Collection.class });
+            } else if (argTypes.length == 2 && ConditionOption.class.isAssignableFrom(argTypes[1])) {
+                Class<?> superType = argTypes[1].getSuperclass();
+                method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, new Class[] { superType });
+                if (method == null) { // only once more
+                    superType = argTypes[1].getSuperclass();
+                    method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, new Class[] { superType });
+                }
+            } else if (argTypes.length == 3 && ConditionOption.class.isAssignableFrom(argTypes[2])) {
+                Class<?> superType = argTypes[2].getSuperclass();
+                method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, new Class[] { superType });
+                if (method == null) { // only once more
+                    superType = argTypes[2].getSuperclass();
+                    method = DfReflectionUtil.getAccessibleMethod(clazz, methodName, new Class[] { superType });
+                }
+            }
+        }
+        return method;
     }
 
     private Object helpInvokingCQMethod(ConditionQuery cq, Method method, Object[] args) {
-        return DfReflectionUtil.invoke(method, cq, args);
+        return DfReflectionUtil.invokeForcedly(method, cq, args);
     }
 
     // ===================================================================================

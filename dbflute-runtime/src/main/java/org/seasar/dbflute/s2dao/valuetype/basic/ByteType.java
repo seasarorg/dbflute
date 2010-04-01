@@ -66,12 +66,4 @@ public class ByteType extends TnAbstractValueType {
             cs.setByte(parameterName, DfTypeUtil.toPrimitiveByte(value));
         }
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        Byte var = DfTypeUtil.toByte(value);
-        return DfTypeUtil.toText(var);
-    }
 }

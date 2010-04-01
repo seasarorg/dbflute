@@ -65,12 +65,4 @@ public class ShortType extends TnAbstractValueType {
             cs.setShort(parameterName, DfTypeUtil.toPrimitiveShort(value));
         }
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        Short var = DfTypeUtil.toShort(value);
-        return DfTypeUtil.toText(var);
-    }
 }

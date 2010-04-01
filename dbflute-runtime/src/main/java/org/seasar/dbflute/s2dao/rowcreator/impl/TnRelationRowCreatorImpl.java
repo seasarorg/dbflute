@@ -241,9 +241,6 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         final List<TnPropertyType> ptList = nextBmd.getPropertyTypeList();
         for (TnPropertyType pt : ptList) {
             res.setCurrentPropertyType(pt);
-            if (!isTargetProperty(res)) {
-                continue;
-            }
             setupPropertyCacheElement(res);
         }
 
@@ -319,11 +316,6 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
     //                                                                     ===============
     protected boolean isTargetRelation(TnRelationRowCreationResource res) throws SQLException {
         return true;
-    }
-
-    protected boolean isTargetProperty(TnRelationRowCreationResource res) throws SQLException {
-        final TnPropertyMapping mapping = res.getCurrentPropertyMapping();
-        return mapping.getPropertyAccessor().isWritable();
     }
 
     protected boolean isCreateDeadLink() {

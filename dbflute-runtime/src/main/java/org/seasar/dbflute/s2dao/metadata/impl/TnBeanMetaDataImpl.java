@@ -27,9 +27,11 @@ import org.seasar.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGeneratorFactory;
+import org.seasar.dbflute.s2dao.metadata.TnBeanAnnotationReader;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.metadata.TnModifiedPropertySupport;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
+import org.seasar.dbflute.s2dao.metadata.TnPropertyTypeFactory;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyType;
 import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
 
@@ -37,11 +39,17 @@ import org.seasar.dbflute.s2dao.metadata.TnRelationPropertyTypeFactory;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaData {
+public class TnBeanMetaDataImpl implements TnBeanMetaData {
 
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
+    protected final Class<?> _beanClass;
+    protected final StringKeyMap<TnPropertyType> _propertyTypeMap = StringKeyMap.createAsCaseInsensitive();
+    protected final List<TnPropertyType> _propertyTypeList = new ArrayList<TnPropertyType>();
+    protected TnBeanAnnotationReader _beanAnnotationReader;
+    protected TnPropertyTypeFactory _propertyTypeFactory;
+
     /** The name of table. (NotNull: If it's not entity, this value is 'df:Unknown') */
     protected String _tableName;
 
@@ -60,13 +68,40 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
     //                                                                         Constructor
     //                                                                         ===========
     public TnBeanMetaDataImpl(Class<?> beanClass) {
-        super(beanClass);
+        this._beanClass = beanClass;
+    }
+
+    // ===================================================================================
+    //                                                                          Bean Class
+    //                                                                          ==========
+    public Class<?> getBeanClass() {
+        return _beanClass;
+    }
+
+    // ===================================================================================
+    //                                                                       Property Type
+    //                                                                       =============
+    public List<TnPropertyType> getPropertyTypeList() {
+        return _propertyTypeList;
+    }
+
+    public TnPropertyType getPropertyType(String propertyName) {
+        final TnPropertyType propertyType = (TnPropertyType) _propertyTypeMap.get(propertyName);
+        if (propertyType == null) {
+            String msg = "The propertyName was not found in the map:";
+            msg = msg + " propertyName=" + propertyName + " propertyTypeMap=" + _propertyTypeMap;
+            throw new IllegalStateException(msg);
+        }
+        return propertyType;
+    }
+
+    public boolean hasPropertyType(String propertyName) {
+        return _propertyTypeMap.get(propertyName) != null;
     }
 
     // ===================================================================================
     //                                                                          Initialize
     //                                                                          ==========
-    @Override
     public void initialize() { // non thread safe
         DfBeanDesc beanDesc = DfBeanDescFactory.getBeanDesc(getBeanClass());
         setupTableName(beanDesc);
@@ -96,6 +131,11 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
             TnRelationPropertyType rpt = relationPropertyTypes[i];
             addRelationPropertyType(rpt);
         }
+    }
+
+    protected void addPropertyType(TnPropertyType propertyType) {
+        _propertyTypeMap.put(propertyType.getPropertyName(), propertyType);
+        _propertyTypeList.add(propertyType);
     }
 
     protected void setupPrimaryKey() {
@@ -307,5 +347,16 @@ public class TnBeanMetaDataImpl extends TnDtoMetaDataImpl implements TnBeanMetaD
 
     public void setRelationPropertyTypeFactory(TnRelationPropertyTypeFactory relationPropertyTypeFactory) {
         this._relationPropertyTypeFactory = relationPropertyTypeFactory;
+    }
+
+    // ===================================================================================
+    //                                                                            Accessor
+    //                                                                            ========
+    public void setBeanAnnotationReader(TnBeanAnnotationReader beanAnnotationReader) {
+        this._beanAnnotationReader = beanAnnotationReader;
+    }
+
+    public void setPropertyTypeFactory(TnPropertyTypeFactory propertyTypeFactory) {
+        this._propertyTypeFactory = propertyTypeFactory;
     }
 }

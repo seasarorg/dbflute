@@ -65,13 +65,4 @@ public class IntegerType extends TnAbstractValueType {
             cs.setInt(parameterName, DfTypeUtil.toPrimitiveInt(value));
         }
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        Integer var = DfTypeUtil.toInteger(value);
-        return DfTypeUtil.toText(var);
-    }
-
 }

@@ -39,7 +39,6 @@ public class BooleanType extends TnAbstractValueType {
     }
 
     public Object getValue(ResultSet resultSet, String columnName) throws SQLException {
-
         return DfTypeUtil.toBoolean(resultSet.getObject(columnName));
     }
 
@@ -48,7 +47,6 @@ public class BooleanType extends TnAbstractValueType {
     }
 
     public Object getValue(CallableStatement cs, String parameterName) throws SQLException {
-
         return DfTypeUtil.toBoolean(cs.getObject(parameterName));
     }
 
@@ -66,13 +64,5 @@ public class BooleanType extends TnAbstractValueType {
         } else {
             cs.setBoolean(parameterName, DfTypeUtil.toPrimitiveBoolean(value));
         }
-    }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        Boolean var = DfTypeUtil.toBoolean(value);
-        return DfTypeUtil.toText(var);
     }
 }

@@ -63,16 +63,13 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
     protected void setupPropertyCache(Map<String, TnPropertyMapping> proprertyCache, Set<String> selectColumnSet,
             TnBeanMetaData beanMetaData) throws SQLException {
         final List<TnPropertyType> ptList = beanMetaData.getPropertyTypeList();
-        for (TnPropertyType pt : ptList) {
-            if (!isTargetProperty(pt)) {
-                continue;
-            }
+        for (TnPropertyType pt : ptList) { // already been filtered as target only
             setupPropertyCacheElement(proprertyCache, selectColumnSet, pt);
         }
     }
 
-    protected void setupPropertyCacheElement(Map<String, TnPropertyMapping> proprertyCache, Set<String> selectColumnSet,
-            TnPropertyType pt) throws SQLException {
+    protected void setupPropertyCacheElement(Map<String, TnPropertyMapping> proprertyCache,
+            Set<String> selectColumnSet, TnPropertyType pt) throws SQLException {
         if (selectColumnSet.contains(pt.getColumnName())) {
             proprertyCache.put(pt.getColumnName(), pt);
         } else if (selectColumnSet.contains(pt.getPropertyName())) {
@@ -99,13 +96,5 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
     //                                                ------
     protected Map<String, TnPropertyMapping> newPropertyCache() {
         return StringKeyMap.createAsCaseInsensitive();
-    }
-
-    // ===================================================================================
-    //                                                                     Extension Point
-    //                                                                     ===============
-    protected boolean isTargetProperty(TnPropertyType pt) throws SQLException {
-        // If the property is not writable, the property is out of target!
-        return pt.getPropertyDesc().isWritable();
     }
 }

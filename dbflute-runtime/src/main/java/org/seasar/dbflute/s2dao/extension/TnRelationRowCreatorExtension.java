@@ -27,7 +27,6 @@ import org.seasar.dbflute.cbean.ConditionBean;
 import org.seasar.dbflute.cbean.ConditionBeanContext;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.helper.beans.DfPropertyAccessor;
-import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
@@ -88,10 +87,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
             }
 
             final String yourKey = rpt.getYourKey(i);
-            final TnPropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
-            final DfPropertyDesc pd = pt.getPropertyDesc();
-            pd.setValue(res.getRow(), value);
-            continue;
+            final TnPropertyMapping mapping = bmd.getPropertyTypeByColumnName(yourKey);
+            setValue(res, mapping, dbmeta, value);
         }
     }
 
@@ -148,13 +145,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         if (value != null) {
             res.incrementValidValueCount();
             final DBMeta dbmeta = findDBMeta(res.getRow());
-            final String propertyName = mapping.getPropertyName();
-            if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
-                dbmeta.setupEntityProperty(propertyName, res.getRow(), value);
-            } else {
-                final DfPropertyAccessor accessor = mapping.getPropertyAccessor();
-                accessor.setValue(res.getRow(), value);
-            }
+            setValue(res, mapping, dbmeta, value);
         }
     }
 
@@ -164,6 +155,16 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
      */
     protected DBMeta findDBMeta(Object row) {
         return TnRowCreatorExtension.findCachedDBMeta(row);
+    }
+
+    protected void setValue(TnRelationRowCreationResource res, TnPropertyMapping mapping, DBMeta dbmeta, Object value) {
+        final String propertyName = mapping.getPropertyName();
+        if (dbmeta != null && dbmeta.hasEntityPropertySetupper(propertyName)) {
+            dbmeta.setupEntityProperty(propertyName, res.getRow(), value);
+        } else {
+            final DfPropertyAccessor accessor = mapping.getPropertyAccessor();
+            accessor.setValue(res.getRow(), value);
+        }
     }
 
     @Override
@@ -181,11 +182,8 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
         // Set up property cache about current beanMetaData.
         final TnBeanMetaData nextBmd = res.getRelationBeanMetaData();
         final List<TnPropertyType> ptList = nextBmd.getPropertyTypeList();
-        for (TnPropertyType pt : ptList) {
+        for (TnPropertyType pt : ptList) { // already been filtered as target only
             res.setCurrentPropertyType(pt);
-            if (!isTargetProperty(res)) {
-                continue;
-            }
             setupPropertyCacheElement(res);
         }
 
@@ -200,18 +198,6 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
                 res.decrementCurrentRelationNestLevel();
             }
         }
-    }
-
-    @Override
-    protected boolean isTargetProperty(TnRelationRowCreationResource res) throws SQLException {
-        final TnPropertyMapping mapping = res.getCurrentPropertyMapping();
-        if (!mapping.getPropertyAccessor().isWritable()) {
-            return false;
-        }
-        if (java.util.List.class.isAssignableFrom(mapping.getPropertyAccessor().getPropertyType())) {
-            return false;
-        }
-        return true;
     }
 
     @Override

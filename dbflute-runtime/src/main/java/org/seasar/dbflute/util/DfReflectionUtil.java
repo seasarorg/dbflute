@@ -224,7 +224,22 @@ public class DfReflectionUtil {
         }
     }
 
-    public static boolean isInstanceField(Field field) {
+    public static boolean isStaticFinalField(Field field) {
+        final int mod = field.getModifiers();
+        return Modifier.isStatic(mod) && Modifier.isFinal(mod);
+    }
+
+    public static boolean isStaticVariableField(Field field) {
+        final int mod = field.getModifiers();
+        return Modifier.isStatic(mod) && !Modifier.isFinal(mod);
+    }
+
+    public static boolean isInstanceFinalField(Field field) {
+        final int mod = field.getModifiers();
+        return !Modifier.isStatic(mod) && Modifier.isFinal(mod);
+    }
+
+    public static boolean isInstanceVariableField(Field field) {
         final int mod = field.getModifiers();
         return !Modifier.isStatic(mod) && !Modifier.isFinal(mod);
     }
@@ -237,17 +252,17 @@ public class DfReflectionUtil {
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
-    public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
+    public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
-        return findMethod(clazz, methodName, parameterTypes, false);
+        return findMethod(clazz, methodName, argTypes, false);
     }
 
-    public static Method getPublicMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
+    public static Method getPublicMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
         assertObjectNotNull("clazz", clazz);
-        return findMethod(clazz, methodName, parameterTypes, true);
+        return findMethod(clazz, methodName, argTypes, true);
     }
 
-    protected static Method findMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes, boolean publicOnly) {
+    protected static Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes, boolean publicOnly) {
         assertObjectNotNull("clazz", clazz);
         for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
             final Method[] methods = target.getDeclaredMethods();
@@ -264,11 +279,11 @@ public class DfReflectionUtil {
                 }
                 if (methodName.equals(current.getName())) {
                     final Class<?>[] types = current.getParameterTypes();
-                    if (types.length != parameterTypes.length) {
+                    if (types.length != argTypes.length) {
                         continue;
                     }
                     for (int j = 0; j < types.length; j++) {
-                        if (types[j] != parameterTypes[j]) {
+                        if (types[j] != argTypes[j]) {
                             continue;
                         }
                     }
@@ -305,13 +320,20 @@ public class DfReflectionUtil {
 
     public static Object invokeForcedly(Method method, Object target, Object[] args) {
         assertObjectNotNull("method", method);
-        method.setAccessible(true);
+        if (!isPublicMethod(method) && !method.isAccessible()) {
+            method.setAccessible(true);
+        }
         return invoke(method, target, args);
     }
 
     public static Object invokeStatic(Method method, Object[] args) {
         assertObjectNotNull("method", method);
         return invoke(method, null, args);
+    }
+
+    public static boolean isPublicMethod(Method method) {
+        final int mod = method.getModifiers();
+        return Modifier.isPublic(mod);
     }
 
     public static boolean isBridgeMethod(final Method method) {

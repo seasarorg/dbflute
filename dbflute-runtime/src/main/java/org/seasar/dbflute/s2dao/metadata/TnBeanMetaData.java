@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
+import java.util.List;
 import java.util.Set;
 
 import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
@@ -23,7 +24,33 @@ import org.seasar.dbflute.s2dao.identity.TnIdentifierGenerator;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public interface TnBeanMetaData extends TnDtoMetaData {
+public interface TnBeanMetaData {
+
+    /**
+     * Get the type of bean.
+     * @return The type of bean. (NotNull) 
+     */
+    Class<?> getBeanClass();
+
+    /**
+     * Get the list of property type.
+     * @return The list of property type. (NotNull)
+     */
+    List<TnPropertyType> getPropertyTypeList();
+
+    /**
+     * Get the property type by the key as case insensitive.
+     * @param propertyName The name of property. (NotNull)
+     * @return The type of property. (Nullable)
+     */
+    TnPropertyType getPropertyType(String propertyName);
+
+    /**
+     * Does it has the property type by the key as case insensitive.
+     * @param propertyName The name of property. (NotNull)
+     * @return Determination.
+     */
+    boolean hasPropertyType(String propertyName);
 
     String getTableName();
 

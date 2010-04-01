@@ -27,7 +27,6 @@ import java.sql.Types;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
 import org.seasar.dbflute.util.DfResourceUtil;
-import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -82,15 +81,6 @@ public class BytesType extends TnAbstractValueType {
 
     public Object getValue(final CallableStatement cs, final String parameterName) throws SQLException {
         return trait.get(cs, parameterName);
-    }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        } else if (value instanceof byte[]) {
-            return DfTypeUtil.toText((byte[]) value);
-        }
-        return DfTypeUtil.toText(value);
     }
 
     public static byte[] toBytes(final InputStream is) throws SQLException {

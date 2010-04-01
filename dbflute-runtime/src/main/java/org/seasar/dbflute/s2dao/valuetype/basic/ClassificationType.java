@@ -80,17 +80,4 @@ public class ClassificationType extends TnAbstractValueType {
         String msg = "Binding as classification for Procedure is unsupported: value=" + value;
         throw new UnsupportedOperationException(msg);
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        if (!(value instanceof Classification)) {
-            String msg = "The value should be classification:";
-            msg = msg + " value=" + value + " type=" + value.getClass();
-            throw new IllegalStateException(msg);
-        }
-        final Classification cls = (Classification) value;
-        return cls.code();
-    }
 }

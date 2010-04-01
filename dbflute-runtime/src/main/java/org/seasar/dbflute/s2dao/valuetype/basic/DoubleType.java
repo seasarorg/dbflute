@@ -65,12 +65,4 @@ public class DoubleType extends TnAbstractValueType {
             cs.setDouble(parameterName, DfTypeUtil.toPrimitiveDouble(value));
         }
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        Double var = DfTypeUtil.toDouble(value);
-        return DfTypeUtil.toText(var);
-    }
 }

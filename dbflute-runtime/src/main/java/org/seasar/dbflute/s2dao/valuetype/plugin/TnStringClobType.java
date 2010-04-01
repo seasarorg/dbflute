@@ -85,13 +85,4 @@ public class TnStringClobType extends TnAbstractValueType {
             cs.setCharacterStream(parameterName, new StringReader(s), s.length());
         }
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        String var = DfTypeUtil.toString(value);
-        return DfTypeUtil.toText(var);
-    }
-
 }

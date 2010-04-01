@@ -86,23 +86,39 @@ public class ForeignInfo implements RelationInfo {
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
-    public void write(Entity target, Entity value) {
-        invokeMethod(writer(), target, new Object[] { value });
+    @SuppressWarnings("unchecked")
+    public <PROPERTY extends Entity> PROPERTY read(Entity localEntity) {
+        return (PROPERTY) invokeMethod(reader(), localEntity, new Object[] {});
+    }
+
+    public Method reader() {
+        final Class<? extends Entity> localType = _localDBMeta.getEntityType();
+        final String methodName = buildAccessorName("get");
+        final Method method = findMethod(localType, buildAccessorName("get"), new Class[] {});
+        if (method == null) {
+            String msg = "Failed to find the method by the name:";
+            msg = msg + " methodName=" + methodName;
+            throw new IllegalStateException(msg);
+        }
+        return method;
+    }
+
+    public void write(Entity localEntity, Entity foreignEntity) {
+        invokeMethod(writer(), localEntity, new Object[] { foreignEntity });
     }
 
     public Method writer() {
         final Class<? extends Entity> localType = _localDBMeta.getEntityType();
         final Class<? extends Entity> foreignType = _foreignDBMeta.getEntityType();
-        return findMethod(localType, buildAccessorName("set"), new Class[] { foreignType });
-    }
-
-    @SuppressWarnings("unchecked")
-    public <PROPERTY extends Entity> PROPERTY read(Entity target) {
-        return (PROPERTY) invokeMethod(reader(), target, new Object[] {});
-    }
-
-    public Method reader() {
-        return findMethod(_localDBMeta.getEntityType(), buildAccessorName("get"), new Class[] {});
+        final String methodName = buildAccessorName("set");
+        final Method method = findMethod(localType, methodName, new Class[] { foreignType });
+        if (method == null) {
+            String msg = "Failed to find the method by the name:";
+            msg = msg + " methodName=" + methodName;
+            msg = msg + " foreignType=" + foreignType;
+            throw new IllegalStateException(msg);
+        }
+        return method;
     }
 
     protected String buildAccessorName(String prefix) {
@@ -135,8 +151,8 @@ public class ForeignInfo implements RelationInfo {
         return DfStringUtil.initCap(name);
     }
 
-    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
-        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, parameterTypes);
+    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
     }
 
     protected Object invokeMethod(Method method, Object target, Object[] args) {

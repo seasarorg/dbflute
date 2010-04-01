@@ -379,11 +379,7 @@ public abstract class AbstractBehaviorWritable extends AbstractBehaviorReadable 
         if (!dbmeta.hasSequence() || dbmeta.hasTwoOrMorePrimaryKeys() || entity.hasPrimaryKeyValue()) {
             return;
         }
-        final java.math.BigDecimal sequenceValue = readNextVal();
-        final String columnDbName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
-        final java.util.Map<String, String> map = new java.util.HashMap<String, String>();
-        map.put(columnDbName, sequenceValue.toString());
-        dbmeta.acceptPrimaryKeyMap(entity, map);
+        dbmeta.getPrimaryUniqueInfo().getFirstColumn().write(entity, readNextVal());
     }
 
     // =====================================================================================

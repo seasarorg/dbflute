@@ -72,13 +72,6 @@ public class UtilDateAsSqlDateType extends TnAbstractValueType {
     }
 
     // ===================================================================================
-    //                                                                             To Text
-    //                                                                             =======
-    public String toText(Object value) {
-        return _sqlDateType.toText(value);
-    }
-
-    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected java.util.Date toUtilDate(Object value) {

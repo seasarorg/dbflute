@@ -15,17 +15,22 @@
  */
 package org.seasar.dbflute.dbmeta;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.seasar.dbflute.Entity;
@@ -43,6 +48,7 @@ import org.seasar.dbflute.helper.mapstring.impl.MapStringBuilderImpl;
 import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfAssertUtil;
+import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -693,21 +699,27 @@ public abstract class AbstractDBMeta implements DBMeta {
             Map<String, ? extends Object> columnValueMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
         entity.clearModifiedPropertyNames();
-        MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap);
-        List<ColumnInfo> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
+        final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap);
+        final List<ColumnInfo> columnInfoList = getPrimaryUniqueInfo().getUniqueColumnList();
         for (ColumnInfo columnInfo : columnInfoList) {
-            String columnName = columnInfo.getColumnDbName();
-            String propertyName = columnInfo.getPropertyName();
-            String uncapPropName = initUncap(propertyName);
-            Class<?> propertyType = columnInfo.getPropertyType();
+            final String columnName = columnInfo.getColumnDbName();
+            final String propertyName = columnInfo.getPropertyName();
+            final String uncapPropName = initUncap(propertyName);
+            final Class<?> propertyType = columnInfo.getPropertyType();
             if (analyzer.init(columnName, uncapPropName, propertyName)) {
                 final Object value;
                 if (String.class.isAssignableFrom(propertyType)) {
                     value = analyzer.analyzeString(propertyType);
                 } else if (Number.class.isAssignableFrom(propertyType)) {
                     value = analyzer.analyzeNumber(propertyType);
-                } else if (java.util.Date.class.isAssignableFrom(propertyType)) {
+                } else if (Date.class.isAssignableFrom(propertyType)) {
                     value = analyzer.analyzeDate(propertyType);
+                } else if (Boolean.class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeBoolean(propertyType);
+                } else if (byte[].class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeBinary(propertyType);
+                } else if (UUID.class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeUUID(propertyType);
                 } else {
                     value = analyzer.analyzeOther(propertyType);
                 }
@@ -719,21 +731,27 @@ public abstract class AbstractDBMeta implements DBMeta {
     protected <ENTITY extends Entity> void doAcceptColumnValueMap(ENTITY entity,
             Map<String, ? extends Object> columnValueMap, Map<String, Eps<ENTITY>> entityPropertySetupperMap) {
         MapAssertUtil.assertColumnValueMapNotNullAndNotEmpty(columnValueMap);
-        MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap);
-        List<ColumnInfo> columnInfoList = getColumnInfoList();
+        final MapStringValueAnalyzer analyzer = new MapStringValueAnalyzer(columnValueMap);
+        final List<ColumnInfo> columnInfoList = getColumnInfoList();
         for (ColumnInfo columnInfo : columnInfoList) {
-            String columnName = columnInfo.getColumnDbName();
-            String propertyName = columnInfo.getPropertyName();
-            String uncapPropName = initUncap(propertyName);
-            Class<?> propertyType = columnInfo.getPropertyType();
+            final String columnName = columnInfo.getColumnDbName();
+            final String propertyName = columnInfo.getPropertyName();
+            final String uncapPropName = initUncap(propertyName);
+            final Class<?> propertyType = columnInfo.getPropertyType();
             if (analyzer.init(columnName, uncapPropName, propertyName)) {
                 final Object value;
                 if (String.class.isAssignableFrom(propertyType)) {
                     value = analyzer.analyzeString(propertyType);
                 } else if (Number.class.isAssignableFrom(propertyType)) {
                     value = analyzer.analyzeNumber(propertyType);
-                } else if (java.util.Date.class.isAssignableFrom(propertyType)) {
+                } else if (Date.class.isAssignableFrom(propertyType)) {
                     value = analyzer.analyzeDate(propertyType);
+                } else if (Boolean.class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeBoolean(propertyType);
+                } else if (byte[].class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeBinary(propertyType);
+                } else if (UUID.class.isAssignableFrom(propertyType)) {
+                    value = analyzer.analyzeUUID(propertyType);
                 } else {
                     value = analyzer.analyzeOther(propertyType);
                 }
@@ -1060,7 +1078,6 @@ public abstract class AbstractDBMeta implements DBMeta {
     /**
      * This class is for Internal. Don't use this!
      */
-    @SuppressWarnings("unchecked")
     protected static class MapStringValueAnalyzer {
         protected Map<String, ? extends Object> _valueMap;
         protected String _columnName;
@@ -1078,89 +1095,74 @@ public abstract class AbstractDBMeta implements DBMeta {
             return _valueMap.containsKey(_columnName);
         }
 
-        public <COLUMN_TYPE> COLUMN_TYPE analyzeString(Class<COLUMN_TYPE> javaType) {
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeString(Class<PROPERTY> javaType) {
             final Object obj = _valueMap.get(_columnName);
             if (obj == null) {
                 return null;
             }
             helpCheckingTypeString(obj, _uncapPropName, javaType.getName());
-            return (COLUMN_TYPE) obj;
+            return (PROPERTY) obj;
         }
 
-        public <COLUMN_TYPE> COLUMN_TYPE analyzeNumber(Class<COLUMN_TYPE> javaType) {
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeNumber(Class<PROPERTY> javaType) {
+            final Object obj = _valueMap.get(_columnName);
+            return (PROPERTY) DfTypeUtil.toNumber(obj, javaType);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeDate(Class<PROPERTY> javaType) {
+            final Object obj = _valueMap.get(_columnName);
+            if (Time.class.isAssignableFrom(javaType)) {
+                return (PROPERTY) DfTypeUtil.toTime(obj);
+            } else if (Timestamp.class.isAssignableFrom(javaType)) {
+                return (PROPERTY) DfTypeUtil.toTimestamp(obj);
+            } else {
+                return (PROPERTY) DfTypeUtil.toDate(obj);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeBoolean(Class<PROPERTY> javaType) {
+            final Object obj = _valueMap.get(_columnName);
+            return (PROPERTY) DfTypeUtil.toBoolean(obj);
+        }
+
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeBinary(Class<PROPERTY> javaType) {
             final Object obj = _valueMap.get(_columnName);
             if (obj == null) {
                 return null;
             }
-            if (javaType.isAssignableFrom(obj.getClass())) {
-                return (COLUMN_TYPE) obj;
+            if (obj instanceof Serializable) {
+                return (PROPERTY) DfTypeUtil.toBinary((Serializable) obj);
             }
-            return (COLUMN_TYPE) newInstanceByConstructor(javaType, String.class, obj.toString());
+            throw new UnsupportedOperationException("unsupported binary type: " + obj.getClass());
         }
 
-        public <COLUMN_TYPE> COLUMN_TYPE analyzeDate(Class<COLUMN_TYPE> javaType) {
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeUUID(Class<PROPERTY> javaType) {
             final Object obj = _valueMap.get(_columnName);
-            if (obj == null) {
-                return null;
-            }
-            if (javaType.isAssignableFrom(obj.getClass())) {
-                return (COLUMN_TYPE) obj;
-            }
-            return (COLUMN_TYPE) newInstanceByConstructor(javaType, long.class, helpParsingDateString(obj,
-                    _uncapPropName, javaType.getName()));
+            return (PROPERTY) DfTypeUtil.toUUID(obj);
         }
 
-        public <COLUMN_TYPE> COLUMN_TYPE analyzeOther(Class<COLUMN_TYPE> javaType) {
+        @SuppressWarnings("unchecked")
+        public <PROPERTY> PROPERTY analyzeOther(Class<PROPERTY> javaType) {
             final Object obj = _valueMap.get(_columnName);
             if (obj == null) {
                 return null;
             }
             if (Classification.class.isAssignableFrom(javaType)) {
-                try {
-                    final Method codeOfMethod = javaType.getMethod("codeOf", new Class[] { Object.class });
-                    return (COLUMN_TYPE) codeOfMethod.invoke(null, new Object[] { obj });
-                } catch (Exception e) {
-                    String msg = "The method threw the exception: javaType=" + javaType + " obj=" + obj;
-                    throw new IllegalStateException(msg, e);
-                }
+                final Class<?>[] argTypes = new Class[] { Object.class };
+                final Method method = DfReflectionUtil.getPublicMethod(javaType, "codeOf", argTypes);
+                return (PROPERTY) DfReflectionUtil.invokeStatic(method, new Object[] { obj });
             }
-            return (COLUMN_TYPE) obj;
+            return (PROPERTY) obj;
         }
 
         private void helpCheckingTypeString(Object value, String uncapPropName, String typeName) {
             MapStringUtil.checkTypeString(value, uncapPropName, typeName);
-        }
-
-        private long helpParsingDateString(Object value, String uncapPropName, String typeName) {
-            return MapStringUtil.parseDateStringAsMillis(value, uncapPropName, typeName);
-        }
-
-        protected Object newInstanceByConstructor(Class targetType, Class argType, Object arg) {
-            java.lang.reflect.Constructor constructor;
-            try {
-                constructor = targetType.getConstructor(new Class[] { argType });
-            } catch (SecurityException e) {
-                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new IllegalStateException(msg, e);
-            } catch (NoSuchMethodException e) {
-                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new IllegalStateException(msg, e);
-            }
-            try {
-                return constructor.newInstance(new Object[] { arg });
-            } catch (IllegalArgumentException e) {
-                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new IllegalStateException(msg, e);
-            } catch (InstantiationException e) {
-                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new IllegalStateException(msg, e);
-            } catch (IllegalAccessException e) {
-                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new IllegalStateException(msg, e);
-            } catch (InvocationTargetException e) {
-                String msg = "targetType=" + targetType + " argType=" + argType + " arg=" + arg;
-                throw new IllegalStateException(msg, e.getCause());
-            }
         }
     }
 

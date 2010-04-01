@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.s2dao.valuetype.basic;
 
-import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -66,13 +65,4 @@ public class BigDecimalType extends TnAbstractValueType {
             cs.setBigDecimal(parameterName, DfTypeUtil.toBigDecimal(value));
         }
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        BigDecimal var = DfTypeUtil.toBigDecimal(value);
-        return DfTypeUtil.toText(var);
-    }
-
 }

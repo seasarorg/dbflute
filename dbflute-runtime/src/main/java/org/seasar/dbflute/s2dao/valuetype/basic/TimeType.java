@@ -70,11 +70,4 @@ public class TimeType extends TnAbstractValueType {
     protected Time toTime(Object value) {
         return DfTypeUtil.toTime(value);
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        return DfTypeUtil.toText(toTime(value));
-    }
 }

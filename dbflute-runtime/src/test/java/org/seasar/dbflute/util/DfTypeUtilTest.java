@@ -3,6 +3,7 @@ package org.seasar.dbflute.util;
 import static org.seasar.dbflute.util.DfTypeUtil.AD_ORIGIN_MILLISECOND;
 import static org.seasar.dbflute.util.DfTypeUtil.toClassTitle;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -644,6 +645,15 @@ public class DfTypeUtilTest extends PlainTestCase {
         // ## Arrange & Act & Assert ##
         assertNull(DfTypeUtil.toBinary(null));
         assertNotNull(DfTypeUtil.toBinary(""));
+    }
+
+    public void test_toBinary_byteArray() throws UnsupportedEncodingException {
+        // ## Arrange ##
+        final byte[] bytes = "foo".getBytes("UTF-8");
+
+        // ## Act & Assert ##
+        assertEquals(bytes, DfTypeUtil.toBinary(bytes));
+        assertTrue(bytes instanceof Serializable); // confirmation
     }
 
     public void test_toBinary_serializable() {

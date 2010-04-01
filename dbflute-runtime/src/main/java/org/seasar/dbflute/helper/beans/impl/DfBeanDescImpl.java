@@ -493,7 +493,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
             if (!_fieldMap.containsKey(fname)) {
                 field.setAccessible(true);
                 _fieldMap.put(fname, field);
-                if (DfReflectionUtil.isInstanceField(field)) {
+                if (DfReflectionUtil.isInstanceVariableField(field)) {
                     if (hasPropertyDesc(fname)) {
                         DfPropertyDesc pd = getPropertyDesc(field.getName());
                         pd.setField(field);

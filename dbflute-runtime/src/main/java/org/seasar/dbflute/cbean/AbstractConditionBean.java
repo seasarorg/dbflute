@@ -16,10 +16,14 @@
 package org.seasar.dbflute.cbean;
 
 import java.lang.reflect.Method;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.seasar.dbflute.cbean.chelper.HpAbstractSpecification;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause;
@@ -204,37 +208,44 @@ public abstract class AbstractConditionBean implements ConditionBean {
         acceptPrimaryKeyMap(mapListString.generateMap(primaryKeyMapString));
     }
 
-    protected void checkTypeString(Object value, String propertyName, String typeName) {
+    protected void xcheckTypeString(Object value, String propertyName, Class<?> type) {
         if (value == null) {
             throw new IllegalArgumentException("The value should not be null: " + propertyName);
         }
         if (!(value instanceof String)) {
+            String typeName = DfTypeUtil.toClassTitle(type);
             String msg = "The value of " + propertyName + " should be " + typeName + " or String: ";
             msg = msg + "valueType=" + value.getClass() + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
     }
 
-    protected long parseDateStringAsMillis(Object value, String propertyName, String typeName) {
-        checkTypeString(value, propertyName, typeName);
-        try {
-            final String valueString = (String) value;
-            if (valueString.indexOf("-") >= 0 && valueString.indexOf("-") != valueString.lastIndexOf("-")) {
-                return java.sql.Timestamp.valueOf(valueString).getTime();
-            } else {
-                return getParseDateFormat().parse((String) value).getTime();
-            }
-        } catch (java.text.ParseException e) {
-            String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
-            throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
-        } catch (RuntimeException e) {
-            String msg = "The value of " + propertyName + " should be " + typeName + ". but: " + value;
-            throw new RuntimeException(msg + " threw the exception: value=[" + value + "]", e);
+    @SuppressWarnings("unchecked")
+    protected <NUMBER extends Number> NUMBER xparseNumber(Object obj, String propertyName, Class<NUMBER> type) {
+        xcheckTypeString(obj, propertyName, type);
+        return (NUMBER) DfTypeUtil.toNumber(obj, type);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <DATE extends Date> DATE xparseDate(Object obj, String propertyName, Class<DATE> type) {
+        xcheckTypeString(obj, propertyName, type);
+        if (Time.class.isAssignableFrom(type)) {
+            return (DATE) DfTypeUtil.toTime(obj);
+        } else if (Timestamp.class.isAssignableFrom(type)) {
+            return (DATE) DfTypeUtil.toTimestamp(obj);
+        } else { // basically Date
+            return (DATE) DfTypeUtil.toDate(obj);
         }
     }
 
-    private java.text.DateFormat getParseDateFormat() {
-        return java.text.DateFormat.getDateTimeInstance();
+    protected Boolean xparseBoolean(Object obj, String propertyName, Class<?> type) {
+        xcheckTypeString(obj, propertyName, type);
+        return DfTypeUtil.toBoolean(obj);
+    }
+
+    protected UUID xparseUUID(Object obj, String propertyName, Class<?> type) {
+        xcheckTypeString(obj, propertyName, type);
+        return DfTypeUtil.toUUID(obj);
     }
 
     // ===================================================================================

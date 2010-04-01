@@ -23,7 +23,6 @@ import java.sql.Types;
 import java.util.UUID;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
-import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The value type of UUID.
@@ -69,12 +68,5 @@ public class UUIDType extends TnAbstractValueType {
         } else {
             cs.setObject(parameterName, value, getSqlType());
         }
-    }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        return DfTypeUtil.toText(value);
     }
 }

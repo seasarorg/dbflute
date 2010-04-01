@@ -42,7 +42,5 @@ public interface ValueType {
 
     void registerOutParameter(CallableStatement cs, String parameterName) throws SQLException;
 
-    String toText(Object value);
-
     int getSqlType();
 }

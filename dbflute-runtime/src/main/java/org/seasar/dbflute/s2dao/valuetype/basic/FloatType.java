@@ -30,9 +30,6 @@ import org.seasar.dbflute.util.DfTypeUtil;
  */
 public class FloatType extends TnAbstractValueType {
 
-    /**
-     * インスタンスを構築します。
-     */
     public FloatType() {
         super(Types.FLOAT);
     }
@@ -68,13 +65,4 @@ public class FloatType extends TnAbstractValueType {
             cs.setFloat(parameterName, DfTypeUtil.toPrimitiveFloat(value));
         }
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        Float var = DfTypeUtil.toFloat(value);
-        return DfTypeUtil.toText(var);
-    }
-
 }

@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -1433,7 +1434,7 @@ public final class DfTypeUtil {
         } catch (ParseDateException e) {
             String msg = "Failed to parse the object to calendar:";
             msg = msg + " obj=" + obj + " pattern=" + pattern;
-            throw new ParseCalendarParseException(msg, e);
+            throw new ParseCalendarException(msg, e);
         }
         if (date != null) {
             final Calendar cal = Calendar.getInstance();
@@ -1443,15 +1444,15 @@ public final class DfTypeUtil {
         return null;
     }
 
-    public static class ParseCalendarParseException extends RuntimeException {
+    public static class ParseCalendarException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public ParseCalendarParseException(String msg, Exception e) {
+        public ParseCalendarException(String msg, Exception e) {
             super(msg, e);
         }
     }
 
-    public static class ParseCalendarNumberFormatException extends ParseCalendarParseException {
+    public static class ParseCalendarNumberFormatException extends ParseCalendarException {
         private static final long serialVersionUID = 1L;
 
         public ParseCalendarNumberFormatException(String msg, Exception e) {
@@ -1459,7 +1460,7 @@ public final class DfTypeUtil {
         }
     }
 
-    public static class ParseCalendarOutOfCalendarException extends ParseCalendarParseException {
+    public static class ParseCalendarOutOfCalendarException extends ParseCalendarException {
         private static final long serialVersionUID = 1L;
 
         public ParseCalendarOutOfCalendarException(String msg, Exception e) {
@@ -1561,7 +1562,7 @@ public final class DfTypeUtil {
             } else {
                 String msg = "Failed to parse the boolean string:";
                 msg = msg + " value=" + str;
-                throw new ToBooleanParseException(msg);
+                throw new ParseBooleanException(msg);
             }
         } else if (obj instanceof byte[]) {
             return toBoolean(toSerializable((byte[]) obj)); // recursive
@@ -1575,11 +1576,48 @@ public final class DfTypeUtil {
         return wrapper != null ? wrapper.booleanValue() : false;
     }
 
-    public static class ToBooleanParseException extends RuntimeException {
+    public static class ParseBooleanException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public ToBooleanParseException(String msg) {
+        public ParseBooleanException(String msg) {
             super(msg);
+        }
+    }
+
+    // ===================================================================================
+    //                                                                                UUID
+    //                                                                                ====
+    public static UUID toUUID(Object obj) {
+        if (obj == null) {
+            return (UUID) obj;
+        } else if (obj instanceof UUID) {
+            return (UUID) obj;
+        } else if (obj instanceof String) {
+            return toUUIDFromString((String) obj);
+        } else {
+            return toUUIDFromString(obj.toString());
+        }
+    }
+
+    protected static UUID toUUIDFromString(String str) {
+        try {
+            return UUID.fromString(str);
+        } catch (RuntimeException e) {
+            String msg = "Failed to parse the string as UUID:";
+            msg = msg + "str=" + str;
+            throw new ParseUUIDException(msg);
+        }
+    }
+
+    public static class ParseUUIDException extends RuntimeException {
+        private static final long serialVersionUID = 1L;
+
+        public ParseUUIDException(String msg) {
+            super(msg);
+        }
+
+        public ParseUUIDException(String msg, Throwable e) {
+            super(msg, e);
         }
     }
 
@@ -1589,6 +1627,9 @@ public final class DfTypeUtil {
     public static byte[] toBinary(Serializable obj) {
         if (obj == null) {
             return null;
+        }
+        if (obj instanceof byte[]) {
+            return (byte[]) obj;
         }
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -1671,153 +1712,6 @@ public final class DfTypeUtil {
             return Byte.valueOf((byte) 0);
         }
         return obj;
-    }
-
-    // ===================================================================================
-    //                                                                                Text
-    //                                                                                ====
-    // /- - - - - - - - - - - - - - - - - - - - - - - - - - 
-    // The text cannot be null.
-    // If the value is null, it returns 'null' text.
-    // - - - - - - - - - -/
-    /**
-     * @return The 'null' text as string. (NotNull)
-     */
-    public static String nullText() {
-        return NULL;
-    }
-
-    public static String toText(Number value) {
-        if (value == null) {
-            return NULL;
-        }
-        return value.toString();
-    }
-
-    public static String toText(Boolean value) {
-        if (value == null) {
-            return NULL;
-        }
-        return quote(value.toString());
-    }
-
-    public static String toText(String value) {
-        if (value == null) {
-            return NULL;
-        }
-        return quote(value);
-    }
-
-    /**
-     * @param value The instance of Date. (Nullable: If the value is null, returns 'null'.)
-     * @return The text for the argument. (NotNull)
-     */
-    public static String toText(Date value) {
-        if (value == null) {
-            return NULL;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(value);
-        StringBuilder sb = new StringBuilder();
-        appendCalendarDate(sb, calendar);
-        return quote(sb.toString());
-    }
-
-    public static String toText(Time value) {
-        if (value == null) {
-            return NULL;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(value);
-        StringBuilder sb = new StringBuilder();
-        appendCalendarTime(sb, calendar);
-        appendTimeDecimalPart(sb, calendar.get(Calendar.MILLISECOND));
-        return quote(sb.toString());
-    }
-
-    public static String toText(Timestamp value) {
-        if (value == null) {
-            return NULL;
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(value);
-        StringBuilder sb = new StringBuilder(30);
-        appendCalendarDate(sb, calendar);
-        appendCalendarTime(sb, calendar);
-        appendTimeDecimalPart(sb, value.getNanos());
-        return quote(sb.toString());
-    }
-
-    public static String toText(byte[] value) {
-        if (value == null) {
-            return NULL;
-        }
-        return quote(value.getClass() + "(byteLength=" + Integer.toString(value.length) + ")");
-    }
-
-    public static String toText(Object value) {
-        if (value == null) {
-            return NULL;
-        }
-        return quote(value.toString());
-    }
-
-    // yyyy-MM-dd
-    protected static void appendCalendarDate(StringBuilder sb, Calendar calendar) {
-        int year = calendar.get(Calendar.YEAR);
-        sb.append(year);
-        sb.append('-');
-        int month = calendar.get(Calendar.MONTH) + 1;
-        if (month < 10) {
-            sb.append('0');
-        }
-        sb.append(month);
-        sb.append('-');
-        int date = calendar.get(Calendar.DATE);
-        if (date < 10) {
-            sb.append('0');
-        }
-        sb.append(date);
-    }
-
-    // HH:mm:ss
-    protected static void appendCalendarTime(StringBuilder sb, Calendar calendar) {
-        if (sb.length() > 0) {
-            sb.append(' ');
-        }
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        if (hour < 10) {
-            sb.append('0');
-        }
-        sb.append(hour);
-        sb.append(':');
-        int minute = calendar.get(Calendar.MINUTE);
-        if (minute < 10) {
-            sb.append('0');
-        }
-        sb.append(minute);
-        sb.append(':');
-        int second = calendar.get(Calendar.SECOND);
-        if (second < 10) {
-            sb.append('0');
-        }
-        sb.append(second);
-    }
-
-    // .SSS
-    protected static void appendTimeDecimalPart(StringBuilder sb, int decimalPart) {
-        if (decimalPart == 0) {
-            return;
-        }
-        if (sb.length() > 0) {
-            sb.append('.');
-        }
-        sb.append(decimalPart);
-    }
-
-    // 'text'
-    protected static String quote(String text) {
-        return "'" + text + "'";
     }
 
     // ===================================================================================

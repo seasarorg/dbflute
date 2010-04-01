@@ -69,11 +69,4 @@ public class SqlDateType extends TnAbstractValueType {
     protected java.sql.Date toSqlDate(Object value) {
         return DfTypeUtil.toSqlDate(value);
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        return DfTypeUtil.toText(toSqlDate(value));
-    }
 }

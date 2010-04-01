@@ -65,13 +65,4 @@ public class LongType extends TnAbstractValueType {
             cs.setLong(parameterName, DfTypeUtil.toPrimitiveLong(value));
         }
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        Long var = DfTypeUtil.toLong(value);
-        return DfTypeUtil.toText(var);
-    }
-
 }

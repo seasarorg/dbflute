@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.exception.MappingClassCastException;
@@ -42,8 +44,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory
-            .getLog(TnRowCreatorExtension.class);
+    private static final Log _log = LogFactory.getLog(TnRowCreatorExtension.class);
 
     /** The key of DBMeta cache. */
     protected static final String DBMETA_CACHE_KEY = "df:DBMetaCache";

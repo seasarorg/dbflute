@@ -72,13 +72,6 @@ public class UtilDateAsTimestampType extends TnAbstractValueType {
     }
 
     // ===================================================================================
-    //                                                                             To Text
-    //                                                                             =======
-    public String toText(Object value) {
-        return _timestampType.toText(value);
-    }
-
-    // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
     protected java.util.Date toUtilDate(Object value) {

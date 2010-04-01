@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.cbean;
 
+import org.seasar.dbflute.cbean.coption.ConditionOption;
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.exception.ConditionInvokingFailureException;
@@ -120,6 +121,24 @@ public interface ConditionQuery {
      * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
     void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
+
+    /**
+     * Invoke setting query with option. {ResolveRelation}
+     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
+     * @param conditionKeyName The name of the conditionKey. (NotNull)
+     * @param value The value of the condition. (NotNull)
+     * @param option The option of the condition. (NotNull)
+     * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
+     */
+    void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value, ConditionOption option);
+
+    /**
+     * Invoke setting query of equal. {ResolveRelation}
+     * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
+     * @param value The value of the condition. (NotNull)
+     * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
+     */
+    void invokeQueryEqual(String columnFlexibleName, Object value);
 
     /**
      * Invoke adding orderBy. {ResolveRelation}

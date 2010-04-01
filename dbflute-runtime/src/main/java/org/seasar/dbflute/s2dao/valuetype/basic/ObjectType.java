@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
-import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -64,12 +63,5 @@ public class ObjectType extends TnAbstractValueType {
         } else {
             cs.setObject(parameterName, value);
         }
-    }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        return DfTypeUtil.toText(value);
     }
 }

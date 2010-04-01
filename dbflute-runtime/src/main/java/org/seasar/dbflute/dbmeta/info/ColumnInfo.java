@@ -15,10 +15,15 @@
  */
 package org.seasar.dbflute.dbmeta.info;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
@@ -26,6 +31,7 @@ import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * The information of column.
@@ -93,27 +99,60 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
-    public void write(Entity target, Object value) {
-        invokeMethod(writer(), target, new Object[] { value });
+    @SuppressWarnings("unchecked")
+    public <PROPERTY> PROPERTY read(Entity entity) {
+        return (PROPERTY) invokeMethod(reader(), entity, new Object[] {});
+    }
+
+    public Method reader() {
+        final Class<? extends Entity> entityType = _dbmeta.getEntityType();
+        final String methodName = buildAccessorName("get");
+        final Method method = findMethod(entityType, methodName, new Class<?>[] {});
+        if (method == null) {
+            String msg = "Failed to find the method by the name:";
+            msg = msg + " methodName=" + methodName;
+            throw new IllegalStateException(msg);
+        }
+        return method;
+    }
+
+    public void write(Entity entity, Object value) {
+        final Object converted;
+        if (Number.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toNumber(value, _propertyType);
+        } else if (Timestamp.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toTimestamp(value);
+        } else if (Time.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toTime(value);
+        } else if (Date.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toDate(value);
+        } else if (Boolean.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toBoolean(value);
+        } else if (byte[].class.isAssignableFrom(_propertyType)) {
+            if (value instanceof Serializable) {
+                converted = DfTypeUtil.toBinary((Serializable) value);
+            } else {
+                converted = value; // no change
+            }
+        } else if (UUID.class.isAssignableFrom(_propertyType)) {
+            converted = DfTypeUtil.toUUID(value);
+        } else {
+            converted = value;
+        }
+        invokeMethod(writer(), entity, new Object[] { converted });
     }
 
     public Method writer() {
         final Class<? extends Entity> entityType = _dbmeta.getEntityType();
+        final String methodName = buildAccessorName("set");
         final Method method = findMethod(entityType, buildAccessorName("set"), new Class<?>[] { _propertyType });
         if (method == null) {
-            String msg = "";
+            String msg = "Failed to find the method by the name:";
+            msg = msg + " methodName=" + methodName;
+            msg = msg + " propertyType=" + _propertyType;
             throw new IllegalStateException(msg);
         }
         return findMethod(_dbmeta.getEntityType(), buildAccessorName("set"), new Class<?>[] { _propertyType });
-    }
-
-    @SuppressWarnings("unchecked")
-    public <PROPERTY> PROPERTY read(Entity target) {
-        return (PROPERTY) invokeMethod(reader(), target, new Object[] {});
-    }
-
-    public Method reader() {
-        return findMethod(_dbmeta.getEntityType(), buildAccessorName("get"), new Class<?>[] {});
     }
 
     protected String buildAccessorName(String prefix) {
@@ -127,12 +166,12 @@ public class ColumnInfo {
         return DfStringUtil.initCap(name);
     }
 
-    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
-        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, parameterTypes);
+    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
     }
 
     protected Object invokeMethod(Method method, Object target, Object[] args) {
-        return DfReflectionUtil.invoke(method, target, args);
+        return DfReflectionUtil.invokeForcedly(method, target, args);
     }
 
     protected void assertObjectNotNull(String variableName, Object value) {

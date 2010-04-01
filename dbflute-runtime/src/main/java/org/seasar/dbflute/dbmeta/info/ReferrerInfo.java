@@ -96,21 +96,37 @@ public class ReferrerInfo implements RelationInfo {
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
-    public void write(Entity target, List<? extends Entity> value) {
-        invokeMethod(writer(), target, new Object[] { value });
-    }
-
-    public Method writer() {
-        return findMethod(_localDBMeta.getEntityType(), buildAccessorName("set"), new Class[] { List.class });
-    }
-
     @SuppressWarnings("unchecked")
-    public <PROPERTY extends List> PROPERTY read(Entity target) {
-        return (PROPERTY) invokeMethod(reader(), target, new Object[] {});
+    public <PROPERTY extends List> PROPERTY read(Entity localEntity) {
+        return (PROPERTY) invokeMethod(reader(), localEntity, new Object[] {});
     }
 
     public Method reader() {
-        return findMethod(_localDBMeta.getEntityType(), buildAccessorName("get"), new Class[] {});
+        final Class<? extends Entity> localType = _localDBMeta.getEntityType();
+        final String methodName = buildAccessorName("get");
+        final Method method = findMethod(localType, methodName, new Class[] {});
+        if (method == null) {
+            String msg = "Failed to find the method by the name:";
+            msg = msg + " methodName=" + methodName;
+            throw new IllegalStateException(msg);
+        }
+        return method;
+    }
+
+    public void write(Entity localEntity, List<? extends Entity> referrerEntityList) {
+        invokeMethod(writer(), localEntity, new Object[] { referrerEntityList });
+    }
+
+    public Method writer() {
+        final Class<? extends Entity> localType = _localDBMeta.getEntityType();
+        final String methodName = buildAccessorName("set");
+        final Method method = findMethod(localType, methodName, new Class[] { List.class });
+        if (method == null) {
+            String msg = "Failed to find the method by the name:";
+            msg = msg + " methodName=" + methodName;
+            throw new IllegalStateException(msg);
+        }
+        return method;
     }
 
     protected String buildAccessorName(String prefix) {
@@ -143,8 +159,8 @@ public class ReferrerInfo implements RelationInfo {
         return DfStringUtil.initCap(name);
     }
 
-    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
-        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, parameterTypes);
+    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
+        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, argTypes);
     }
 
     protected Object invokeMethod(Method method, Object target, Object[] args) {

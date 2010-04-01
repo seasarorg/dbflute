@@ -79,13 +79,4 @@ public class CharacterType extends TnAbstractValueType {
             cs.setString(parameterName, DfTypeUtil.toString(value));
         }
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        String var = DfTypeUtil.toString(value);
-        return DfTypeUtil.toText(var);
-    }
-
 }

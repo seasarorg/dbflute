@@ -21,7 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
-import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -58,9 +57,4 @@ public class OracleResultSetType extends TnAbstractValueType {
     public void bindValue(CallableStatement cs, String parameterName, Object value) throws SQLException {
         throw new SQLException("not supported");
     }
-
-    public String toText(Object value) {
-        return DfTypeUtil.nullText();
-    }
-
 }

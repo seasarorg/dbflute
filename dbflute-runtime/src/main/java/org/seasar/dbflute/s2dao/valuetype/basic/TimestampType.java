@@ -70,11 +70,4 @@ public class TimestampType extends TnAbstractValueType {
     protected Timestamp toTimestamp(Object value) {
         return DfTypeUtil.toTimestamp(value);
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        return DfTypeUtil.toText(toTimestamp(value));
-    }
 }

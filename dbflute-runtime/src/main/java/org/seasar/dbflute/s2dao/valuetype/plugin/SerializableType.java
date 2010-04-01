@@ -65,11 +65,4 @@ public class SerializableType extends BytesType {
     protected Serializable deserialize(final Object bytes) throws SQLException {
         return DfTypeUtil.toSerializable((byte[]) bytes);
     }
-
-    public String toText(Object value) {
-        if (value == null) {
-            return DfTypeUtil.nullText();
-        }
-        return DfTypeUtil.toText(value);
-    }
 }

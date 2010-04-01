@@ -15,9 +15,6 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
@@ -31,39 +28,26 @@ import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
  */
 public abstract class TnAbstractPropertyTypeFactory implements TnPropertyTypeFactory {
 
+    // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
     protected Class<?> beanClass;
     protected TnBeanAnnotationReader beanAnnotationReader;
 
+    // ===================================================================================
+    //                                                                         Constructor
+    //                                                                         ===========
     public TnAbstractPropertyTypeFactory(Class<?> beanClass, TnBeanAnnotationReader beanAnnotationReader) {
         this.beanClass = beanClass;
         this.beanAnnotationReader = beanAnnotationReader;
     }
 
-    public TnPropertyType[] createDtoPropertyTypes() {
-        List<TnPropertyType> list = new ArrayList<TnPropertyType>();
-        DfBeanDesc beanDesc = getBeanDesc();
-        List<String> proppertyNameList = beanDesc.getProppertyNameList();
-        for (String proppertyName : proppertyNameList) {
-            DfPropertyDesc pd = beanDesc.getPropertyDesc(proppertyName);
-            TnPropertyType pt = createPropertyType(pd);
-            list.add(pt);
-        }
-        return (TnPropertyType[]) list.toArray(new TnPropertyType[list.size()]);
-    }
-
+    // ===================================================================================
+    //                                                                     Property Helper
+    //                                                                     ===============
     protected DfBeanDesc getBeanDesc() {
         return DfBeanDescFactory.getBeanDesc(beanClass);
     }
-
-    protected boolean isRelation(DfPropertyDesc propertyDesc) {
-        return beanAnnotationReader.hasRelationNo(propertyDesc);
-    }
-
-    protected boolean isPrimaryKey(DfPropertyDesc propertyDesc) {
-        return beanAnnotationReader.getId(propertyDesc) != null;
-    }
-
-    protected abstract boolean isPersistent(TnPropertyType propertyType);
 
     protected TnPropertyType createPropertyType(DfPropertyDesc propertyDesc) {
         final String columnName = getColumnName(propertyDesc);
