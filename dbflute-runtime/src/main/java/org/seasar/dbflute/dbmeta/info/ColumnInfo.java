@@ -91,9 +91,13 @@ public class ColumnInfo {
     }
 
     // ===================================================================================
-    //                                                                              Finder
-    //                                                                              ======
-    public Method findSetter() {
+    //                                                                          Reflection
+    //                                                                          ==========
+    public void write(Entity target, Object value) {
+        invokeMethod(writer(), target, new Object[] { value });
+    }
+
+    public Method writer() {
         final Class<? extends Entity> entityType = _dbmeta.getEntityType();
         final Method method = findMethod(entityType, buildAccessorName("set"), new Class<?>[] { _propertyType });
         if (method == null) {
@@ -103,7 +107,12 @@ public class ColumnInfo {
         return findMethod(_dbmeta.getEntityType(), buildAccessorName("set"), new Class<?>[] { _propertyType });
     }
 
-    public Method findGetter() {
+    @SuppressWarnings("unchecked")
+    public <PROPERTY> PROPERTY read(Entity target) {
+        return (PROPERTY) invokeMethod(reader(), target, new Object[] {});
+    }
+
+    public Method reader() {
         return findMethod(_dbmeta.getEntityType(), buildAccessorName("get"), new Class<?>[] {});
     }
 
@@ -120,6 +129,10 @@ public class ColumnInfo {
 
     protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
         return DfReflectionUtil.getAccessibleMethod(clazz, methodName, parameterTypes);
+    }
+
+    protected Object invokeMethod(Method method, Object target, Object[] args) {
+        return DfReflectionUtil.invoke(method, target, args);
     }
 
     protected void assertObjectNotNull(String variableName, Object value) {

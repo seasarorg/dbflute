@@ -126,9 +126,9 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
      * @return The two-way SQL of query update. (Nullable: If the set of modified properties is empty, return null.)
      */
     protected String buildQueryUpdateTwoWaySql(Entity entity, ConditionBean cb, List<TnPropertyType> propertyTypeList) {
-        Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
-        DBMeta dbmeta = entity.getDBMeta();
-        Set<String> modifiedPropertyNames = entity.getModifiedPropertyNames();
+        final Map<String, String> columnParameterMap = new LinkedHashMap<String, String>();
+        final DBMeta dbmeta = entity.getDBMeta();
+        final Set<String> modifiedPropertyNames = entity.getModifiedPropertyNames();
         if (modifiedPropertyNames.isEmpty()) {
             return null;
         }
@@ -136,10 +136,10 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
         try {
             for (String propertyName : modifiedPropertyNames) {
                 currentPropertyName = propertyName;
-                ColumnInfo columnInfo = dbmeta.findColumnInfo(propertyName);
-                String columnName = columnInfo.getColumnDbName();
-                Method getter = columnInfo.findGetter();
-                Object value = getter.invoke(entity, (Object[]) null);
+                final ColumnInfo columnInfo = dbmeta.findColumnInfo(propertyName);
+                final String columnName = columnInfo.getColumnDbName();
+                final Method reader = columnInfo.reader();
+                final Object value = reader.invoke(entity, (Object[]) null);
                 if (value != null) {
                     columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
 
@@ -151,20 +151,20 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
                 }
             }
             if (dbmeta.hasVersionNo()) {
-                ColumnInfo columnInfo = dbmeta.getVersionNoColumnInfo();
-                String columnName = columnInfo.getColumnDbName();
+                final ColumnInfo columnInfo = dbmeta.getVersionNoColumnInfo();
+                final String columnName = columnInfo.getColumnDbName();
                 columnParameterMap.put(columnName, columnName + " + 1");
             }
             if (dbmeta.hasUpdateDate()) {
                 ColumnInfo columnInfo = dbmeta.getUpdateDateColumnInfo();
-                Method setter = columnInfo.findSetter();
-                setter.invoke(entity, ResourceContext.getAccessTimestamp());
-                String columnName = columnInfo.getColumnDbName();
-                String propertyName = columnInfo.getPropertyName();
+                final Method writer = columnInfo.writer();
+                writer.invoke(entity, ResourceContext.getAccessTimestamp());
+                final String columnName = columnInfo.getColumnDbName();
+                final String propertyName = columnInfo.getPropertyName();
                 columnParameterMap.put(columnName, "/*entity." + propertyName + "*/null");
 
                 // add property type
-                TnPropertyType propertyType = beanMetaData.getPropertyType(propertyName);
+                final TnPropertyType propertyType = beanMetaData.getPropertyType(propertyName);
                 propertyTypeList.add(propertyType);
             }
         } catch (RuntimeException e) {

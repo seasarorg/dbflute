@@ -34,6 +34,6 @@ public class HierarchySourceEntityColumn implements HierarchySourceColumn {
     }
 
     public java.lang.reflect.Method findGetter() {
-        return columnInfo.findGetter();
+        return columnInfo.reader();
     }
 }

@@ -761,7 +761,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         try {
             for (ColumnInfo columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
-                Method getterMethod = columnInfo.findGetter();
+                Method getterMethod = columnInfo.reader();
                 Object value = getterMethod.invoke(entity, (Object[]) null);
                 value = filterClassificationValueIfNeeds(value);
                 helpAppendingColumnValueString(sb, delimiter, equal, columnName, value);
@@ -792,7 +792,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             List<ColumnInfo> columnInfoList = getColumnInfoList();
             for (ColumnInfo columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
-                Method getterMethod = columnInfo.findGetter();
+                Method getterMethod = columnInfo.reader();
                 Object value = getterMethod.invoke(entity, (Object[]) null);
                 valueMap.put(columnName, value);
             }
@@ -808,7 +808,7 @@ public abstract class AbstractDBMeta implements DBMeta {
             List<ColumnInfo> columnInfoList = getColumnInfoList();
             for (ColumnInfo columnInfo : columnInfoList) {
                 String columnName = columnInfo.getColumnDbName();
-                Method getterMethod = columnInfo.findGetter();
+                Method getterMethod = columnInfo.reader();
                 Object value = getterMethod.invoke(entity, (Object[]) null);
                 valueMap.put(columnName, helpGettingColumnStringValue(value));
             }

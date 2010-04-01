@@ -18,9 +18,11 @@ package org.seasar.dbflute.dbmeta.info;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
@@ -92,13 +94,22 @@ public class ReferrerInfo implements RelationInfo {
     }
 
     // ===================================================================================
-    //                                                                              Finder
-    //                                                                              ======
-    public java.lang.reflect.Method findSetter() {
-        return findMethod(_localDBMeta.getEntityType(), buildAccessorName("set"), new Class[] { java.util.List.class });
+    //                                                                          Reflection
+    //                                                                          ==========
+    public void write(Entity target, List<? extends Entity> value) {
+        invokeMethod(writer(), target, new Object[] { value });
     }
 
-    public java.lang.reflect.Method findGetter() {
+    public Method writer() {
+        return findMethod(_localDBMeta.getEntityType(), buildAccessorName("set"), new Class[] { List.class });
+    }
+
+    @SuppressWarnings("unchecked")
+    public <PROPERTY extends List> PROPERTY read(Entity target) {
+        return (PROPERTY) invokeMethod(reader(), target, new Object[] {});
+    }
+
+    public Method reader() {
         return findMethod(_localDBMeta.getEntityType(), buildAccessorName("get"), new Class[] {});
     }
 
@@ -134,6 +145,10 @@ public class ReferrerInfo implements RelationInfo {
 
     protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
         return DfReflectionUtil.getAccessibleMethod(clazz, methodName, parameterTypes);
+    }
+
+    protected Object invokeMethod(Method method, Object target, Object[] args) {
+        return DfReflectionUtil.invoke(method, target, args);
     }
 
     protected void assertObjectNotNull(String variableName, Object value) {

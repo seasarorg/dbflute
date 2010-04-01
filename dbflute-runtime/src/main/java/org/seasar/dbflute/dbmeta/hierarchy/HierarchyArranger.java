@@ -542,7 +542,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
 
     @SuppressWarnings("unchecked")
     protected java.util.List<Entity> extractReferrerList(Entity entity, ReferrerInfo referrerInfo) {
-        return (java.util.List<Entity>) invoke(referrerInfo.findGetter(), entity, new Object[] {});
+        return (java.util.List<Entity>) invoke(referrerInfo.reader(), entity, new Object[] {});
     }
 
     // ===================================================================================
@@ -566,7 +566,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
             msg = msg + " table=" + entity.getTableDbName() + " column=" + columnDbName;
             throw new IllegalStateException(msg);
         }
-        invoke(entity.getDBMeta().findColumnInfo(columnDbName).findSetter(), entity, new Object[] { columnValue });
+        invoke(entity.getDBMeta().findColumnInfo(columnDbName).writer(), entity, new Object[] { columnValue });
     }
 
     protected void injectColumnValueMapToDestination(Entity entity, final Map<String, Object> columnValueMap) {
@@ -586,7 +586,7 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
     }
 
     protected void injectReferrerList(Entity entity, ReferrerInfo referrerInfo, java.util.List<Entity> referrerList) {
-        invoke(referrerInfo.findSetter(), entity, new Object[] { referrerList });
+        invoke(referrerInfo.writer(), entity, new Object[] { referrerList });
     }
 
     protected void injectForeignPrimaryKey(Entity foreignEntity, Map<String, Object> foreigPrimaryKeyMap) {
