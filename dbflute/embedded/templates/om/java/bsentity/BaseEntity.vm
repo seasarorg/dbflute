@@ -98,31 +98,47 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     // ===================================================================================
     //                                                                          Table Name
     //                                                                          ==========
+    /**
+     * {@inheritDoc}
+     */
     public String getTableDbName() {
         return "${table.name}";
     }
 
-    public String getTablePropertyName() { // as JavaBeansRule
+    /**
+     * {@inheritDoc}
+     */
+    public String getTablePropertyName() { // according to Java Beans rule
         return "${table.javaBeansRulePropertyName}";
     }
 
+    // ===================================================================================
+    //                                                                              DBMeta
+    //                                                                              ======
+    /**
+     * {@inheritDoc}
+     */
+    public DBMeta getDBMeta() {
 #if ($isSql2Entity)
-    // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
-    public DBMeta getDBMeta() {
         return ${myDBMetaPackageName}.${myDBMetaClassName}.getInstance();
-    }
-
 #else
-    // ===================================================================================
-    //                                                                              DBMeta
-    //                                                                              ======
-    public DBMeta getDBMeta() {
         return ${glDBMetaInstanceHandler}.findDBMeta(getTableDbName());
+#end
     }
 
+    // ===================================================================================
+    //                                                                         Primary Key
+    //                                                                         ===========
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasPrimaryKeyValue() {
+#foreach ($col in $table.primaryKey)
+        if (_${col.uncapitalisedJavaName} == null) { return false; }
 #end
+        return ${table.hasPrimaryKey()};
+    }
+
 #if ($table.hasClassification())
     // ===================================================================================
     //                                                          Classification Classifying
@@ -151,6 +167,17 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
     }
 
+    /**
+     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+#if ($existTop && $classificationTopMap.containsKey('topComment'))
+     * $classificationTopMap.get('topComment')
+#end
+     * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
+     */
+    public void set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cls) {
+        classify${col.javaName}(cls);
+    }
+
 #foreach ($classificationMap in $col.classificationMapList)
     /**
      * Classify the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
@@ -158,6 +185,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
      */
     public void classify${col.javaName}${classificationMap.get('name')}() {
         classify${col.javaName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
+    }
+
+    /**
+     * Set the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    public void set${col.javaName}_${classificationMap.get('name')}() {
+        classify${col.javaName}${classificationMap.get('name')}();
     }
 
 #end
@@ -178,7 +213,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
-     * @return The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
+     * <p>It's treated as case insensitive and if the code value is null, it returns null.</p>
+     * @return The instance of classification definition (ENUM type). (Nullable)
      */
     public ${glCDef}.${col.classificationName} get${col.javaName}As${col.classificationName}() {
         return ${glCDef}.${col.classificationName}.codeOf(_${col.uncapitalisedJavaName});
@@ -188,10 +224,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     /**
      * Is the value of ${col.uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
      * $database.buildClassificationApplicationComment($classificationMap)
-     * <p>
-     * The difference of capital letters and small letters is NOT distinguished.
-     * If the value is null, this method returns false!
-     * </p>
+     * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return Determination.
      */
     public boolean is${col.JavaName}${classificationMap.get('name')}() {
@@ -211,7 +244,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if ($col.hasClassificationName())
     /**
      * Get the value of the column '${col.uncapitalisedJavaName}' as classification name.
-     * @return The value of the column '${col.uncapitalisedJavaName}' as classification name. (Nullable)
+     * @return The string of classification name. (Nullable)
      */
     public String get${col.JavaName}Name() {
         ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
@@ -222,7 +255,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if (${col.hasClassificationAlias()})
     /**
      * Get the value of the column '${col.uncapitalisedJavaName}' as classification alias.
-     * @return The value of the column '${col.uncapitalisedJavaName}' as classification alias. (Nullable)
+     * @return The string of classification alias. (Nullable)
      */
     public String get${col.JavaName}Alias() {
         ${glCDef}.${col.classificationName} cls = get${col.javaName}As${col.classificationName}();
@@ -350,18 +383,11 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
 #end
     // ===================================================================================
-    //                                                                       Determination
-    //                                                                       =============
-    public boolean hasPrimaryKeyValue() {
-#foreach ($col in $table.primaryKey)
-        if (_${col.uncapitalisedJavaName} == null) { return false; }
-#end
-        return ${table.hasPrimaryKey()};
-    }
-
-    // ===================================================================================
     //                                                                 Modified Properties
     //                                                                 ===================
+    /**
+     * {@inheritDoc}
+     */
     public Set<String> getModifiedPropertyNames() {
         return _modifiedProperties.getPropertyNames();
     }
@@ -370,10 +396,16 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
         return new EntityModifiedProperties();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void clearModifiedPropertyNames() {
         _modifiedProperties.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean hasModification() {
         return !_modifiedProperties.isEmpty();
     }
@@ -383,24 +415,23 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     //                                                              Common Column Handling
     //                                                              ======================
     /**
-     * Enable common column auto set up. {for after disable because the default is enabled}
+     * {@inheritDoc}
      */
     public void enableCommonColumnAutoSetup() {
         _canCommonColumnAutoSetup = true;
     }
 
     /**
-     * Disables auto set-up of common columns.
+     * {@inheritDoc}
      */
     public void disableCommonColumnAutoSetup() {
         _canCommonColumnAutoSetup = false;
     }
-    
+
     /**
-     * Can the entity set up common column by auto?
-     * @return Determination.
+     * {@inheritDoc}
      */
-    public boolean canCommonColumnAutoSetup() { // for Framework
+    public boolean canCommonColumnAutoSetup() {
         return _canCommonColumnAutoSetup;
     }
 #end
@@ -594,7 +625,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #end
      * @return The value of the column '${col.name}'. (Nullable)
      */
-    public ${col.JavaNative} get${col.javaName}() {
+    public ${col.javaNative} get${col.javaName}() {
         return _${col.uncapitalisedJavaName};
     }
 
@@ -603,7 +634,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #if ($col.isCommentForJavaDocValid())
      * ${col.commentForJavaDoc}
 #end
-     * @param ${col.UncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
+     * @param ${col.uncapitalisedJavaName} The value of the column '${col.name}'. (Nullable)
      */
     public void set${col.javaName}(${col.javaNative} ${col.uncapitalisedJavaName}) {
         _modifiedProperties.addPropertyName("${col.javaBeansRulePropertyName}");
@@ -622,16 +653,14 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
 #set ($targetJavaName = ${table.findTargetColumnJavaNameByCommonColumnName(${columnName})})
 
     /**
-     * Get the value of the column '${uncapitalisedJavaName}'. <br />
-     * @return The value of the column '${uncapitalisedJavaName}'. (Nullable)
+     * {@inheritDoc}
      */
     public ${javaNative} get${javaName}() {
         return get${targetJavaName}();
     }
 
     /**
-     * Set the value of the column '${uncapitalisedJavaName}'. <br />
-     * @param ${uncapitalisedJavaName} The value of the column '${uncapitalisedJavaName}'. (Nullable)
+     * {@inheritDoc}
      */
     public void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
         set${targetJavaName}(${uncapitalisedJavaName});

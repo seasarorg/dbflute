@@ -18,15 +18,15 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
 
     /**
      * Get the value of ${uncapitalisedJavaName}.
-     * @return The value of ${uncapitalisedJavaName}. (Nullable)
+     * @return The instance of the property type. (Nullable)
      */
-    public ${javaNative} get${javaName}();
+    ${javaNative} get${javaName}();
 
     /**
      * Set the value of ${uncapitalisedJavaName}.
-     * @param ${uncapitalisedJavaName} The value of ${uncapitalisedJavaName}. (Nullable)
+     * @param ${uncapitalisedJavaName} The instance of the property type. (Nullable)
      */
-    public void set${javaName}(${javaNative} ${uncapitalisedJavaName});
+    void set${javaName}(${javaNative} ${uncapitalisedJavaName});
 #if (${database.isAllClassificationColumn($filteredColumnName)})
 #set ($classificationName = $database.getAllClassificationName($filteredColumnName))
 #set ($classificationList = $database.getClassificationMapList($classificationName))
@@ -36,36 +36,40 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
      * Classify the value of ${uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
-    public void classify${javaName}${classificationMap.get('name')}();
+    void classify${javaName}${classificationMap.get('name')}();
+
+    /**
+     * Set the value of ${uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    void set${javaName}_${classificationMap.get('name')}();
 
     /**
      * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
      * $database.buildClassificationApplicationComment($classificationMap)
-     * <p>
-     * The difference of capital letters and small letters is NOT distinguished.
-     * If the value is null, this method returns false!
-     * </p>
+     * <p>It's treated as case insensitive and if the code value is null, it returns false.</p>
      * @return Determination.
      */
-    public boolean is${javaName}${classificationMap.get('name')}();
+    boolean is${javaName}${classificationMap.get('name')}();
 #end
 #end
 #end
 #end
 
     /**
-	 * Enable common column auto set up. {for after disable because the default is enabled}
+	 * Enable common column auto set up. <br />
+	 * It's only for after disable because the default is enabled.
 	 */
-    public void enableCommonColumnAutoSetup();
+    void enableCommonColumnAutoSetup();
 
     /**
 	 * Disable common column auto set up.
 	 */
-    public void disableCommonColumnAutoSetup();
-	
+    void disableCommonColumnAutoSetup();
+
     /**
-	 * Can the entity set up common column by auto?
+	 * Can the entity set up common column by auto? (basically for Framework)
 	 * @return Determination.
 	 */
-	public boolean canCommonColumnAutoSetup();
+	boolean canCommonColumnAutoSetup();
 }

@@ -576,7 +576,7 @@ public class Table {
     //                         Java Beans Rule Property Name
     //                         -----------------------------
     /**
-     * Get variable name to use in Java sources (= uncapitalized java name)
+     * Get property name to use in Java sources (according to java beans rule)
      */
     public String getJavaBeansRulePropertyName() {
         return DfStringUtil.initBeansProp(getJavaName());
