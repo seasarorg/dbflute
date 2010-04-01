@@ -314,7 +314,6 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
 
     protected boolean containsTableColumnIncludeQueryMap(String javaTypeName, String queryTypeName, String tableName,
             String columnName) {
-
         final InternalTableColumnJudgement judgement = new InternalTableColumnJudgement();
         judgement.setQueryMap(getIncludeQueryMap());
         return judgement.containsTableColumn(javaTypeName, queryTypeName, tableName, columnName);
@@ -322,7 +321,6 @@ public final class DfIncludeQueryProperties extends DfAbstractHelperProperties {
 
     protected boolean containsTableColumnExcludeQueryMap(String javaTypeName, String queryTypeName, String tableName,
             String columnName) {
-
         final InternalTableColumnJudgement judgement = new InternalTableColumnJudgement();
         judgement.setQueryMap(getExcludeQueryMap());
         return judgement.containsTableColumn(javaTypeName, queryTypeName, tableName, columnName);

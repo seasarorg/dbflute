@@ -13,12 +13,14 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.friends.torque;
+package org.seasar.dbflute.logic.various;
 
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.torque.engine.database.model.Column;
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**
  * @author jflute
@@ -31,7 +33,15 @@ public class DfTorqueColumnListToStringUtil {
         final StringBuilder sb = new StringBuilder();
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
             final Column pk = (Column) ite.next();
-            final String javaNative = pk.getJavaNative();
+            final String javaNative;
+            if (pk.isForceClassificationSetting()) {
+                final DfBasicProperties prop = getBasicProperties();
+                final String projectPrefix = prop.getProjectPrefix();
+                final String classificationName = pk.getClassificationName();
+                javaNative = projectPrefix + "CDef." + classificationName;
+            } else {
+                javaNative = pk.getJavaNative();
+            }
             final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
             if (sb.length() > 0) {
                 sb.append(", ");
@@ -87,12 +97,12 @@ public class DfTorqueColumnListToStringUtil {
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
             Column pk = (Column) ite.next();
             final String javaName = pk.getJavaName();
-            final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
-            final String setterString = beanPrefix + "set" + javaName + "(" + uncapitalisedJavaName + ");";
+            final String variable = pk.getUncapitalisedJavaName();
+            final String setter = beanPrefix + "set" + javaName + "(" + variable + ");";
             if ("".equals(result)) {
-                result = setterString;
+                result = setter;
             } else {
-                result = result + setterString;
+                result = result + setter;
             }
         }
         return result;
@@ -106,41 +116,49 @@ public class DfTorqueColumnListToStringUtil {
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
             Column pk = (Column) ite.next();
             final String javaName = pk.getJavaName();
-            final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
-            final String setterString = beanPrefix + javaName + " = " + uncapitalisedJavaName + ";";
+            final String variable = pk.getUncapitalisedJavaName();
+            final String setter = beanPrefix + javaName + " = " + variable + ";";
             if ("".equals(result)) {
-                result = setterString;
+                result = setter;
             } else {
-                result = result + setterString;
+                result = result + setter;
             }
         }
         return result;
     }
 
     public static String getColumnArgsConditionSetupString(List<Column> columnList) {
-        validateColumnList(columnList);
-
-        final StringBuilder sb = new StringBuilder();
-        for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
-            Column pk = (Column) ite.next();
-            final String javaName = pk.getJavaName();
-            final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
-            final String setterString = "cb.query().set" + javaName + "_Equal(" + uncapitalisedJavaName + ");";
-            sb.append(setterString);
-        }
-        return sb.toString();
+        return doGetColumnArgsConditionSetupString(columnList, false);
     }
 
     public static String getColumnArgsConditionSetupStringCSharp(List<Column> columnList) {
+        return doGetColumnArgsConditionSetupString(columnList, true);
+    }
+
+    private static String doGetColumnArgsConditionSetupString(List<Column> columnList, boolean csharp) {
         validateColumnList(columnList);
 
         final StringBuilder sb = new StringBuilder();
         for (Iterator<Column> ite = columnList.iterator(); ite.hasNext();) {
             Column pk = (Column) ite.next();
             final String javaName = pk.getJavaName();
-            final String uncapitalisedJavaName = pk.getUncapitalisedJavaName();
-            final String setterString = "cb.Query().Set" + javaName + "_Equal(" + uncapitalisedJavaName + ");";
-            sb.append(setterString);
+            final String variable = pk.getUncapitalisedJavaName();
+            final String setter;
+            if (pk.isForceClassificationSetting()) {
+                final String cls = pk.getClassificationName();
+                if (csharp) {
+                    setter = "cb.Query().Set" + javaName + "_Equal_As" + cls + "(" + variable + ");";
+                } else {
+                    setter = "cb.query().set" + javaName + "_Equal_As" + cls + "(" + variable + ");";
+                }
+            } else {
+                if (csharp) {
+                    setter = "cb.Query().Set" + javaName + "_Equal(" + variable + ");";
+                } else {
+                    setter = "cb.query().set" + javaName + "_Equal(" + variable + ");";
+                }
+            }
+            sb.append(setter);
         }
         return sb.toString();
     }
@@ -241,6 +259,10 @@ public class DfTorqueColumnListToStringUtil {
             }
         }
         return result;
+    }
+
+    private static DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
     }
 
     private static void validateColumnList(List<Column> columnList) {

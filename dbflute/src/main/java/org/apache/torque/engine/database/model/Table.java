@@ -71,10 +71,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
 import org.seasar.dbflute.DBDef;
 import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.friends.torque.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.schemahtml.DfSchemaHtmlBuilder;
+import org.seasar.dbflute.logic.various.DfTorqueColumnListToStringUtil;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBehaviorFilterProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
@@ -2015,6 +2015,16 @@ public class Table {
         final Column[] columns = getColumns();
         for (Column column : columns) {
             if (column.hasClassification()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasPrimaryKeyForcedClassificationSetting() {
+        final List<Column> columns = getPrimaryKey();
+        for (Column column : columns) {
+            if (column.isForceClassificationSetting()) {
                 return true;
             }
         }

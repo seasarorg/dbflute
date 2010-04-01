@@ -73,6 +73,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.xml.sax.Attributes;
 
@@ -1536,6 +1537,7 @@ public class Column {
     //                                                                       Include Query
     //                                                                       =============
     protected boolean hasQueryRestrictionByClassification() {
+        // basically classification is not allowed to greater and less condition
         return hasClassification();
     }
 
@@ -1547,9 +1549,10 @@ public class Column {
     //                                                String
     //                                                ------
     public boolean isAvailableStringNotEqual() {
-        if (hasQueryRestrictionByFlgClassification()) {
-            return false;
-        }
+        // *because of being simplistic
+        //if (hasQueryRestrictionByFlgClassification()) {
+        //    return false;
+        //}
         return getIncludeQueryProperties().isAvailableStringNotEqual(getTableName(), getName());
     }
 
@@ -1608,9 +1611,10 @@ public class Column {
     }
 
     public boolean isAvailableStringNotInScope() {
-        if (hasQueryRestrictionByFlgClassification()) {
-            return false;
-        }
+        // *because of being simplistic
+        //if (hasQueryRestrictionByFlgClassification()) {
+        //    return false;
+        //}
         return getIncludeQueryProperties().isAvailableStringNotInScope(getTableName(), getName());
     }
 
@@ -1628,9 +1632,10 @@ public class Column {
     //                                                Number
     //                                                ------
     public boolean isAvailableNumberNotEqual() {
-        if (hasQueryRestrictionByFlgClassification()) {
-            return false;
-        }
+        // *because of being simplistic
+        //if (hasQueryRestrictionByFlgClassification()) {
+        //    return false;
+        //}
         return getIncludeQueryProperties().isAvailableNumberNotEqual(getTableName(), getName());
     }
 
@@ -1668,9 +1673,10 @@ public class Column {
     }
 
     public boolean isAvailableNumberNotInScope() {
-        if (hasQueryRestrictionByFlgClassification()) {
-            return false;
-        }
+        // *because of being simplistic
+        //if (hasQueryRestrictionByFlgClassification()) {
+        //    return false;
+        //}
         return getIncludeQueryProperties().isAvailableNumberNotInScope(getTableName(), getName());
     }
 
@@ -1869,6 +1875,29 @@ public class Column {
             return classificationName;
         }
         return database.getClassificationName(getTableName(), getName());
+    }
+
+    public String getClassificationMetaSettingExpression() { // for DBMeta
+        if (!hasClassification()) {
+            return "null";
+        }
+        final String classificationName = getClassificationName();
+        final String projectPrefix = getProperties().getBasicProperties().getProjectPrefix();
+        return projectPrefix + "CDef.DefMeta." + classificationName;
+    }
+
+    public boolean isCheckSelectedClassification() {
+        final DfLittleAdjustmentProperties littleProp = getProperties().getLittleAdjustmentProperties();
+        return littleProp.isCheckSelectedClassification() && hasClassification();
+    }
+
+    public boolean isForceClassificationSetting() {
+        final DfLittleAdjustmentProperties littleProp = getProperties().getLittleAdjustmentProperties();
+        return littleProp.isForceClassificationSetting() && hasClassification();
+    }
+
+    public String getPropertySettingModifier() {
+        return isForceClassificationSetting() ? "protected" : "public";
     }
 
     public List<Map<String, String>> getClassificationMapList() {

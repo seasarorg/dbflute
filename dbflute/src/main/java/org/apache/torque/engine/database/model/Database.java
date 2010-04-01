@@ -77,9 +77,6 @@ import org.apache.torque.engine.EngineException;
 import org.apache.velocity.texen.util.FileUtil;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.config.DfDatabaseNameMapping;
-import org.seasar.dbflute.friends.torque.DfAdditionalForeignKeyInitializer;
-import org.seasar.dbflute.friends.torque.DfAdditionalPrimaryKeyInitializer;
-import org.seasar.dbflute.friends.torque.DfAdditionalUniqueKeyInitializer;
 import org.seasar.dbflute.friends.velocity.DfGenerator;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.context.DfDataSourceContext;
@@ -92,6 +89,9 @@ import org.seasar.dbflute.logic.outsidesql.DfSqlFileCollector;
 import org.seasar.dbflute.logic.pathhandling.DfPackagePathHandler;
 import org.seasar.dbflute.logic.pmb.DfParameterBeanBasicHandler;
 import org.seasar.dbflute.logic.pmb.DfParameterBeanMetaData;
+import org.seasar.dbflute.logic.various.DfAdditionalForeignKeyInitializer;
+import org.seasar.dbflute.logic.various.DfAdditionalPrimaryKeyInitializer;
+import org.seasar.dbflute.logic.various.DfAdditionalUniqueKeyInitializer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfClassificationProperties;
@@ -1313,6 +1313,22 @@ public class Database {
         return getProperties().getLittleAdjustmentProperties().isAvailableNonPrimaryKeyWritable();
     }
 
+    public boolean isCheckSelectedClassification() {
+        return getProperties().getLittleAdjustmentProperties().isCheckSelectedClassification();
+    }
+
+    public boolean isForceClassificationSetting() {
+        return getProperties().getLittleAdjustmentProperties().isForceClassificationSetting();
+    }
+
+    public boolean isCDefToStringReturnsName() {
+        return getProperties().getLittleAdjustmentProperties().isCDefToStringReturnsName();
+    }
+
+    public boolean isMakeEntityOldStyleClassify() {
+        return getProperties().getLittleAdjustmentProperties().isMakeEntityOldStyleClassify();
+    }
+
     public boolean isMakeEntityChaseRelation() {
         return getProperties().getLittleAdjustmentProperties().isMakeEntityChaseRelation();
     }
@@ -1363,10 +1379,6 @@ public class Database {
 
     public String getShortCharHandlingModeCode() {
         return getProperties().getLittleAdjustmentProperties().getShortCharHandlingModeCode();
-    }
-
-    public boolean isCDefToStringReturnsName() {
-        return getProperties().getLittleAdjustmentProperties().isCDefToStringReturnsName();
     }
 
     public boolean isStopGenerateExtendedBhv() {

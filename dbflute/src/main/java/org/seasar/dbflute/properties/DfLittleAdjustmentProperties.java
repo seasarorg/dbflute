@@ -56,17 +56,43 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                             Non PrimaryKey Writable
-    //                                                             =======================
+    //                                                                            Behavior
+    //                                                                            ========
     public boolean isAvailableNonPrimaryKeyWritable() {
         return isProperty("isAvailableNonPrimaryKeyWritable", false);
     }
 
     // ===================================================================================
-    //                                                                         Make Entity
-    //                                                                         ===========
+    //                                                                      Classification
+    //                                                                      ==============
+    public boolean isCheckSelectedClassification() {
+        return isProperty("isCheckSelectedClassification", false);
+    }
+
+    public boolean isForceClassificationSetting() {
+        return isProperty("isForceClassificationSetting", false);
+    }
+
+    public boolean isCDefToStringReturnsName() { // It's closet!
+        return isProperty("isCDefToStringReturnsName", false);
+    }
+
+    public boolean isMakeEntityOldStyleClassify() { // It's closet!
+        return isProperty("isMakeEntityOldStyleClassify", true);
+    }
+
+    // ===================================================================================
+    //                                                                              Entity
+    //                                                                              ======
     public boolean isMakeEntityChaseRelation() {
         return isProperty("isMakeEntityChaseRelation", false);
+    }
+
+    // ===================================================================================
+    //                                                                      ConditionQuery
+    //                                                                      ==============
+    public boolean isMakeConditionQueryEqualEmptyString() {
+        return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }
 
     // ===================================================================================
@@ -78,13 +104,6 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
 
     public boolean isMakeRecentlyDeprecated() {
         return isProperty("isMakeRecentlyDeprecated", true);
-    }
-
-    // ===================================================================================
-    //                                                                 Make ConditionQuery
-    //                                                                 ===================
-    public boolean isMakeConditionQueryEqualEmptyString() {
-        return isProperty("isMakeConditionQueryEqualEmptyString", false);
     }
 
     // ===================================================================================
@@ -178,17 +197,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
     }
 
     // ===================================================================================
-    //                                                                                CDef
-    //                                                                                ====
-    public boolean isCDefToStringReturnsName() { // It's closet!
-        return isProperty("isCDefToStringReturnsName", false);
-    }
-
-    // ===================================================================================
     //                                                                          Value Type
     //                                                                          ==========
     // S2Dao.NET does not implement ValueType attribute,
-    // so this property is invalid. At the future,
+    // so this property is INVALID now. At the future,
     // DBFlute may implement ValueType Framework. 
     public boolean isUseAnsiStringTypeToNotUnicode() { // It's closet! CSharp Only
         return isProperty("isUseAnsiStringTypeToNotUnicode", false);

@@ -1,4 +1,4 @@
-package org.seasar.dbflute.friends.torque;
+package org.seasar.dbflute.logic.various;
 
 import org.apache.tools.ant.Project;
 import org.apache.torque.engine.database.model.AppData;
