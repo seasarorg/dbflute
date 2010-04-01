@@ -15,6 +15,7 @@
  */
 package org.seasar.dbflute.dbmeta.info;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +23,8 @@ import java.util.List;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
+import org.seasar.dbflute.util.DfReflectionUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * The information of column.
@@ -89,41 +92,29 @@ public class ColumnInfo {
     // ===================================================================================
     //                                                                              Finder
     //                                                                              ======
-    public java.lang.reflect.Method findSetter() {
-        return findMethod(_dbmeta.getEntityType(), "set" + buildInitCapPropertyName(),
-                new Class<?>[] { this._propertyType });
+    public Method findSetter() {
+        return findMethod(_dbmeta.getEntityType(), buildAccessorName("set"), new Class<?>[] { _propertyType });
     }
 
-    public java.lang.reflect.Method findGetter() {
-        return findMethod(_dbmeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class<?>[] {});
+    public Method findGetter() {
+        return findMethod(_dbmeta.getEntityType(), buildAccessorName("get"), new Class<?>[] {});
     }
 
-    protected String buildInitCapPropertyName() {
-        return initCap(this._propertyName);
+    protected String buildAccessorName(String prefix) {
+        return prefix + initCap(_propertyName);
     }
 
     // ===================================================================================
     //                                                                      General Helper
     //                                                                      ==============
     protected String initCap(final String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
+        return DfStringUtil.initCap(name);
     }
 
-    protected java.lang.reflect.Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
-        try {
-            return clazz.getMethod(methodName, argTypes);
-        } catch (NoSuchMethodException ex) {
-            String msg = "class=" + clazz + " method=" + methodName + "-" + java.util.Arrays.asList(argTypes);
-            throw new RuntimeException(msg, ex);
-        }
+    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
+        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, parameterTypes);
     }
 
-    /**
-     * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
-     */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
             String msg = "The value should not be null: variableName=null value=" + value;

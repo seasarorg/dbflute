@@ -467,7 +467,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
             if (sequenceObject instanceof BigDecimal) {
                 return (BigDecimal) sequenceObject;
             }
-            return (BigDecimal) helpConvertingSequenceObject(BigDecimal.class, sequenceObject);
+            return helpConvertingSequenceObject(sequenceObject, BigDecimal.class);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("The table does not have sequence: " + getTableDbName(), e);
         } catch (Exception e) {
@@ -475,8 +475,9 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         }
     }
 
-    protected Object helpConvertingSequenceObject(Class<?> resultClass, Object sequenceObject) {
-        return DfTypeUtil.toNumber(resultClass, sequenceObject);
+    @SuppressWarnings("unchecked")
+    protected <RESULT> RESULT helpConvertingSequenceObject(Object sequenceObject, Class<?> resultClass) {
+        return (RESULT) DfTypeUtil.toNumber(sequenceObject, resultClass);
     }
 
     // ===================================================================================

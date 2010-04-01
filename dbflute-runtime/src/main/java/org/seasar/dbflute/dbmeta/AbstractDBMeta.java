@@ -873,13 +873,13 @@ public abstract class AbstractDBMeta implements DBMeta {
     protected void throwIllegalClassificationCodeException(ColumnInfo columnInfo, Object code) {
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
-        msg = msg + "Failed to get the classification!" + ln();
+        msg = msg + "Failed to get the classification by the code!" + ln();
         msg = msg + ln();
         msg = msg + "[Advice]" + ln();
-        msg = msg + "Please confirm the data of classication column on your database." + ln();
-        msg = msg + "The column data may NOT be one of defined classification on DBFlute." + ln();
+        msg = msg + "Please confirm the code value of the classication column on your database." + ln();
+        msg = msg + "The code may NOT be one of classification code defined on DBFlute." + ln();
         msg = msg + ln();
-        msg = msg + "[Data]" + ln() + code + ln();
+        msg = msg + "[Code]" + ln() + code + ln();
         msg = msg + ln();
         msg = msg + "[Classication]" + ln() + columnInfo.getClassificationMeta() + ln();
         msg = msg + ln();

@@ -188,9 +188,9 @@ public class BehaviorCommandInvoker {
         // Convert and Return!
         // - - - - - - - - - -
         if (retType.isPrimitive()) {
-            ret = convertPrimitiveWrapper(retType, ret);
+            ret = convertPrimitiveWrapper(ret, retType);
         } else if (Number.class.isAssignableFrom(retType)) {
-            ret = convertNumber(retType, ret);
+            ret = convertNumber(ret, retType);
         }
 
         // - - - - - - - - - - - -
@@ -842,12 +842,12 @@ public class BehaviorCommandInvoker {
     // ===================================================================================
     //                                                                      Convert Helper
     //                                                                      ==============
-    protected Object convertPrimitiveWrapper(Class<?> retType, Object ret) {
-        return DfTypeUtil.toWrapper(retType, ret);
+    protected Object convertPrimitiveWrapper(Object ret, Class<?> retType) {
+        return DfTypeUtil.toWrapper(ret, retType);
     }
 
-    protected Object convertNumber(Class<?> retType, Object ret) {
-        return DfTypeUtil.toNumber(retType, ret);
+    protected Object convertNumber(Object ret, Class<?> retType) {
+        return DfTypeUtil.toNumber(ret, retType);
     }
 
     // ===================================================================================

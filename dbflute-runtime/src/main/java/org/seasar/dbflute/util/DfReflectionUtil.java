@@ -171,6 +171,39 @@ public class DfReflectionUtil {
     // ===================================================================================
     //                                                                               Field
     //                                                                               =====
+    public static Field getAccessibleField(Class<?> clazz, String fieldName) {
+        assertObjectNotNull("clazz", clazz);
+        return findField(clazz, fieldName, false);
+    }
+
+    public static Field getPublicField(Class<?> clazz, String fieldName) {
+        assertObjectNotNull("clazz", clazz);
+        return findField(clazz, fieldName, true);
+    }
+
+    protected static Field findField(Class<?> clazz, String fieldName, boolean publicOnly) {
+        assertObjectNotNull("clazz", clazz);
+        for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
+            final Field[] fields = target.getDeclaredFields();
+            for (int i = 0; i < fields.length; ++i) {
+                final Field current = fields[i];
+                final int modifiers = current.getModifiers();
+                if (publicOnly && !Modifier.isPublic(modifiers)) {
+                    continue;
+                }
+                if (target != clazz) { // if super class
+                    if (!Modifier.isPublic(modifiers) && !Modifier.isProtected(modifiers)) {
+                        continue;
+                    }
+                }
+                if (fieldName.equals(current.getName())) {
+                    return current;
+                }
+            }
+        }
+        return null;
+    }
+
     public static Object getValue(Field field, Object target) {
         assertObjectNotNull("field", field);
         try {
@@ -182,6 +215,7 @@ public class DfReflectionUtil {
     }
 
     public static void setValue(Field field, Object target, Object value) {
+        assertObjectNotNull("field", field);
         try {
             field.set(target, value);
         } catch (IllegalAccessException e) {
@@ -191,30 +225,62 @@ public class DfReflectionUtil {
     }
 
     public static boolean isInstanceField(Field field) {
-        int mod = field.getModifiers();
+        final int mod = field.getModifiers();
         return !Modifier.isStatic(mod) && !Modifier.isFinal(mod);
     }
 
     public static boolean isPublicField(Field field) {
-        int mod = field.getModifiers();
+        final int mod = field.getModifiers();
         return Modifier.isPublic(mod);
     }
 
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
-    public static Method getMethod(Class<?> clazz, String name, Class<?>[] parameterTypes) {
-        try {
-            return clazz.getMethod(name, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            String msg = "Not found the method in the class: ";
-            msg = msg + " method=" + name + (parameterTypes != null ? Arrays.asList(parameterTypes) : "");
-            msg = msg + " class=" + clazz;
-            throw new IllegalStateException(msg, e);
+    public static Method getAccessibleMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
+        assertObjectNotNull("clazz", clazz);
+        return findMethod(clazz, methodName, parameterTypes, false);
+    }
+
+    public static Method getPublicMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
+        assertObjectNotNull("clazz", clazz);
+        return findMethod(clazz, methodName, parameterTypes, true);
+    }
+
+    protected static Method findMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes, boolean publicOnly) {
+        assertObjectNotNull("clazz", clazz);
+        for (Class<?> target = clazz; target != Object.class; target = target.getSuperclass()) {
+            final Method[] methods = target.getDeclaredMethods();
+            for (int i = 0; i < methods.length; ++i) {
+                final Method current = methods[i];
+                final int modifiers = current.getModifiers();
+                if (publicOnly && !Modifier.isPublic(modifiers)) {
+                    continue;
+                }
+                if (target != clazz) { // if super class
+                    if (!Modifier.isPublic(modifiers) && !Modifier.isProtected(modifiers)) {
+                        continue;
+                    }
+                }
+                if (methodName.equals(current.getName())) {
+                    final Class<?>[] types = current.getParameterTypes();
+                    if (types.length != parameterTypes.length) {
+                        continue;
+                    }
+                    for (int j = 0; j < types.length; j++) {
+                        if (types[j] != parameterTypes[j]) {
+                            continue;
+                        }
+                    }
+                    return current;
+                }
+            }
         }
+        return null;
     }
 
     public static Object invoke(Method method, Object target, Object[] args) {
+        assertObjectNotNull("method", method);
         try {
             return method.invoke(target, args);
         } catch (InvocationTargetException ex) {
@@ -235,6 +301,17 @@ public class DfReflectionUtil {
             msg = msg + " args=" + (args != null ? Arrays.asList(args) : "");
             throw new IllegalStateException(msg, e);
         }
+    }
+
+    public static Object invokeForcedly(Method method, Object target, Object[] args) {
+        assertObjectNotNull("method", method);
+        method.setAccessible(true);
+        return invoke(method, target, args);
+    }
+
+    public static Object invokeStatic(Method method, Object[] args) {
+        assertObjectNotNull("method", method);
+        return invoke(method, null, args);
     }
 
     public static boolean isBridgeMethod(final Method method) {

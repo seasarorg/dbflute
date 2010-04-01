@@ -293,7 +293,7 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                              Number
     //                                                                              ======
-    public static Object toNumber(Class<?> type, Object obj) {
+    public static Number toNumber(Object obj, Class<?> type) {
         if (type == Integer.class) {
             return toInteger(obj);
         } else if (type == Double.class) {
@@ -311,7 +311,7 @@ public final class DfTypeUtil {
         } else if (type == BigInteger.class) {
             return toBigInteger(obj);
         }
-        return obj;
+        return null;
     }
 
     // -----------------------------------------------------
@@ -1626,7 +1626,7 @@ public final class DfTypeUtil {
     // ===================================================================================
     //                                                                             Wrapper
     //                                                                             =======
-    public static Object toWrapper(Class<?> type, Object obj) {
+    public static Object toWrapper(Object obj, Class<?> type) {
         if (type == int.class) {
             Integer i = toInteger(obj);
             if (i != null) {

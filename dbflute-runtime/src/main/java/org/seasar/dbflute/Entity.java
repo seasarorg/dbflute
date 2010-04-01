@@ -154,6 +154,11 @@ public interface Entity {
     //                                                                      Display String
     //                                                                      ==============
     public static final class InternalUtil {
+        @SuppressWarnings("unchecked")
+        public static <NUMBER extends Number> NUMBER toNumber(Object obj, Class<NUMBER> type) {
+            return (NUMBER) DfTypeUtil.toNumber(obj, type);
+        }
+
         public static boolean isSameValue(Object value1, Object value2) {
             if (value1 == null && value2 == null) {
                 return true;

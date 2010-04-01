@@ -197,7 +197,7 @@ public class SequenceCache {
     }
 
     protected Object toResultType(BigDecimal value) {
-        return DfTypeUtil.toNumber(_resultType, value);
+        return DfTypeUtil.toNumber(value, _resultType);
     }
 
     // ===================================================================================

@@ -248,11 +248,11 @@ public class DfPropertyDescImpl implements DfPropertyDesc {
     }
 
     private Object convertPrimitiveWrapper(Object arg) {
-        return DfTypeUtil.toWrapper(propertyType, arg);
+        return DfTypeUtil.toWrapper(arg, propertyType);
     }
 
     private Object convertNumber(Object arg) {
-        return DfTypeUtil.toNumber(propertyType, arg);
+        return DfTypeUtil.toNumber(arg, propertyType);
     }
 
     private Object convertDate(Object arg) {

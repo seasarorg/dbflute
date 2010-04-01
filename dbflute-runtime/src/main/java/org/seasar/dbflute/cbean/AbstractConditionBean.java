@@ -711,7 +711,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
             }
             final String methodName = (count == 0 ? "setupSelect_" : "with") + initCap(propertyName);
-            final Method method = DfReflectionUtil.getMethod(currentObj.getClass(), methodName, new Class<?>[] {});
+            final Method method = DfReflectionUtil.getPublicMethod(currentObj.getClass(), methodName, new Class<?>[] {});
             currentObj = DfReflectionUtil.invoke(method, currentObj, new Object[] {});
             ++count;
             if (last) {

@@ -36,6 +36,7 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
+import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 import org.seasar.dbflute.util.DfCollectionUtil;
@@ -1435,7 +1436,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     private Method helpGettingCQMethod(ConditionQuery cq, String methodName, Class<?>[] argTypes, String property) {
-        return DfReflectionUtil.getMethod(cq.getClass(), methodName, argTypes);
+        return DfReflectionUtil.getPublicMethod(cq.getClass(), methodName, argTypes);
     }
 
     private Object helpInvokingCQMethod(ConditionQuery cq, Method method, Object[] args) {
@@ -1481,39 +1482,62 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
      * create the option of like search as prefix search.
      * @return The option of like search as prefix search. (NotNull)
      */
-    protected LikeSearchOption cLSOP() {
+    protected LikeSearchOption cLSOP() { // createLikeSearchOption
         return new LikeSearchOption().likePrefix();
     }
 
-    /**
-     * @param col Target collection. (Nullable)
-     * @param <PROPERTY_TYPE> The type of property.
-     * @return List. (Nullable: If the argument is null, returns null.)
-     */
-    protected <PROPERTY_TYPE> List<PROPERTY_TYPE> cTL(Collection<PROPERTY_TYPE> col) {
-        return convertToList(col);
+    @SuppressWarnings("unchecked")
+    protected <PROPERTY extends Number> PROPERTY cTNum(Object obj, Class<PROPERTY> type) { // convert to number
+        return (PROPERTY)DfTypeUtil.toNumber(obj, type);
     }
 
     /**
      * @param col Target collection. (Nullable)
-     * @param <PROPERTY_TYPE> The type of property.
+     * @param <PROPERTY> The type of property.
      * @return List. (Nullable: If the argument is null, returns null.)
      */
-    private <PROPERTY_TYPE> List<PROPERTY_TYPE> convertToList(Collection<PROPERTY_TYPE> col) {
+    protected <PROPERTY> List<PROPERTY> cTL(Collection<PROPERTY> col) { // convert to list
+        return convertToList(col);
+    }
+
+    protected List<String> cTStrL(Collection<? extends Classification> col) { // convert to string list
+        final List<String> list = new ArrayList<String>();
+        for (Classification cls : col) {
+            list.add(cls.code());
+        }
+        return list;
+    }
+
+    protected <PROPERTY extends Number> List<PROPERTY> cTNumL(Collection<? extends Classification> col, Class<PROPERTY> type) { // convert to number list
+        final List<PROPERTY> list = new ArrayList<PROPERTY>();
+        for (Classification cls : col) {
+            @SuppressWarnings("unchecked")
+            final PROPERTY value = (PROPERTY)DfTypeUtil.toNumber(cls.code(), type);
+            list.add(value);
+        }
+        return list;
+    }
+
+    /**
+     * @param col Target collection. (Nullable)
+     * @param <PROPERTY> The type of property.
+     * @return List. (Nullable: If the argument is null, returns null.)
+     */
+    private <PROPERTY> List<PROPERTY> convertToList(Collection<PROPERTY> col) {
         if (col == null) {
             return null;
         }
         if (col instanceof List<?>) {
-            return filterRemoveNullOrEmptyValueFromList((List<PROPERTY_TYPE>) col);
+            return filterRemoveNullOrEmptyValueFromList((List<PROPERTY>) col);
         }
-        return filterRemoveNullOrEmptyValueFromList(new ArrayList<PROPERTY_TYPE>(col));
+        return filterRemoveNullOrEmptyValueFromList(new ArrayList<PROPERTY>(col));
     }
 
     private <PROPERTY_TYPE> List<PROPERTY_TYPE> filterRemoveNullOrEmptyValueFromList(List<PROPERTY_TYPE> ls) {
         if (ls == null) {
             return null;
         }
-        List<PROPERTY_TYPE> newList = new ArrayList<PROPERTY_TYPE>();
+        final List<PROPERTY_TYPE> newList = new ArrayList<PROPERTY_TYPE>();
         for (Iterator<PROPERTY_TYPE> ite = ls.iterator(); ite.hasNext();) {
             final PROPERTY_TYPE element = ite.next();
             if (element == null) {

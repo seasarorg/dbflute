@@ -15,7 +15,7 @@
  */
 package org.seasar.dbflute.dbmeta.info;
 
-import java.util.Arrays;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.util.DfReflectionUtil;
+import org.seasar.dbflute.util.DfStringUtil;
 
 /**
  * The information of foreign relation.
@@ -84,16 +86,15 @@ public class ForeignInfo implements RelationInfo {
     //                                                                              Finder
     //                                                                              ======
     public java.lang.reflect.Method findSetter() {
-        return findMethod(_localDBMeta.getEntityType(), "set" + buildInitCapPropertyName(),
-                new Class[] { java.util.List.class });
+        return findMethod(_localDBMeta.getEntityType(), buildAccessorName("set"), new Class[] { java.util.List.class });
     }
 
     public java.lang.reflect.Method findGetter() {
-        return findMethod(_localDBMeta.getEntityType(), "get" + buildInitCapPropertyName(), new Class[] {});
+        return findMethod(_localDBMeta.getEntityType(), buildAccessorName("get"), new Class[] {});
     }
 
-    protected String buildInitCapPropertyName() {
-        return initCap(this._foreignPropertyName);
+    protected String buildAccessorName(String prefix) {
+        return prefix + initCap(_foreignPropertyName);
     }
 
     // ===================================================================================
@@ -119,24 +120,13 @@ public class ForeignInfo implements RelationInfo {
     //                                                                      General Helper
     //                                                                      ==============
     protected String initCap(final String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
+        return DfStringUtil.initCap(name);
     }
 
-    protected java.lang.reflect.Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {
-        try {
-            return clazz.getMethod(methodName, argTypes);
-        } catch (NoSuchMethodException ex) {
-            String msg = "class=" + clazz + " method=" + methodName + "-" + Arrays.asList(argTypes);
-            throw new RuntimeException(msg, ex);
-        }
+    protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] parameterTypes) {
+        return DfReflectionUtil.getAccessibleMethod(clazz, methodName, parameterTypes);
     }
 
-    /**
-     * Assert that the object is not null.
-     * @param variableName Variable name. (NotNull)
-     * @param value Value. (NotNull)
-     * @exception IllegalArgumentException
-     */
     protected void assertObjectNotNull(String variableName, Object value) {
         if (variableName == null) {
             String msg = "The value should not be null: variableName=null value=" + value;
