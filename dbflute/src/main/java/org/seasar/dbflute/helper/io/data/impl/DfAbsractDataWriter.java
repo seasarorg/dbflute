@@ -32,11 +32,11 @@ import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfTypeUtil.ParseBooleanException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimeException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimeOutOfCalendarException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampOutOfCalendarException;
-import org.seasar.dbflute.util.DfTypeUtil.ToBooleanParseException;
 
 /**
  * @author jflute
@@ -264,7 +264,7 @@ public abstract class DfAbsractDataWriter {
             Boolean booleanValue = DfTypeUtil.toBoolean(value);
             ps.setBoolean(bindCount, booleanValue);
             return true;
-        } catch (ToBooleanParseException ignored) {
+        } catch (ParseBooleanException ignored) {
             return false; // couldn't parse as boolean
         }
     }

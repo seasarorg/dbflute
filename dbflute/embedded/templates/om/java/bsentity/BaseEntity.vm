@@ -159,6 +159,8 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     public void set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cdef) {
 #if ($col.isJavaNativeStringObject())
         set${col.javaName}(cdef != null ? cdef.code() : null);
+#elseif ($col.isJavaNativeBooleanObject())
+        set${col.javaName}(cdef != null ? Boolean.valueOf(cdef.code()) : null);
 #else
         set${col.javaName}(cdef != null ? InternalUtil.toNumber(cdef.code(), ${col.javaNative}.class) : null);
 #end

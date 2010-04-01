@@ -69,43 +69,30 @@ public class ${myClassName} extends AbstractConditionBean {
         {
             Object obj = primaryKeyMap.get("${col.name}");
             if (obj instanceof ${col.javaNative}) {
-                query().set${col.javaName}_Equal((${col.javaNative})obj);
+                query().invokeQuery("${col.name}", "equal", obj);
             } else {
 #if ($col.isJavaNativeStringObject())
-                checkTypeString(obj, "${col.uncapitalisedJavaName}", "${col.javaNative}");
-                query().set${col.javaName}_Equal((String)obj);
-            }
-        }
+                xcheckTypeString(obj, "${col.uncapitalisedJavaName}", ${col.javaNative}.class);
+                query().invokeQueryEqual("${col.name}", obj);
+#elseif ($col.isJavaNativeNumberObject())
+                query().invokeQueryEqual("${col.name}", xparseNumber(obj, "${col.uncapitalisedJavaName}", ${col.javaNative}.class));
+#elseif ($col.isJavaNativeDateObject())
+                query().invokeQueryEqual("${col.name}", xparseDate(obj, "${col.uncapitalisedJavaName}", ${col.javaNative}.class));
+#elseif ($col.isJavaNativeBooleanObject())
+                query().invokeQueryEqual("${col.name}", xparseBoolean(obj, "${col.uncapitalisedJavaName}", ${col.javaNative}.class));
+#elseif ($col.isJavaNativeBinaryObject())
+                throw new UnsupportedOperationException("This method does not support binary type");
+#elseif ($col.isJavaNativeUUIDObject())
+                query().invokeQueryEqual("${col.name}", xparseUUID(obj, "${col.uncapitalisedJavaName}", ${col.javaNative}.class));
 #else
-#if ($col.isJavaNativeDateObject())
-                query().set${col.javaName}_Equal(new ${col.javaNative}(parseDateStringAsMillis(obj, "${col.uncapitalisedJavaName}", "${col.javaNative}")));
-            }
-        }
-#else
-#if (${col.isJavaNativeBinaryObject()})
-                query().set${col.javaName}_Equal(null);// Binary as String is out of target.
-            }
-        }
-#else
-#if (${col.isJavaNativeUUIDObject()})
-                query().set${col.javaName}_Equal(java.util.UUID.fromString((String)obj));
-            }
-        }
-#else
-                query().set${col.javaName}_Equal(new ${col.javaNative}((String)obj));
+                query().invokeQueryEqual("${col.name}", new ${col.javaNative}((String)obj));
+#end
             }
         }
 #end
-#end
-#end
-#end
-#end
 #else
-
-        String msg = "This table has no primary-keys: " + getTableDbName();
-        throw new IllegalStateException(msg);
+        throw new UnsupportedOperationException("This table has no primary-key: " + getTableDbName());
 #end
-
     }
 
     // ===================================================================================
