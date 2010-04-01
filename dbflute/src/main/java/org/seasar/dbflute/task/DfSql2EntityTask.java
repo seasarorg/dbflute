@@ -806,7 +806,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected String convertColumnNameToPropertyName(String columnName) {
         columnName = filterColumnNameAboutVendorDependency(columnName);
-        return DfStringUtil.toBeansPropertyName(columnName);
+        return DfStringUtil.initBeansProp(DfStringUtil.camelize(columnName));
     }
 
     protected String filterColumnNameAboutVendorDependency(String columnName) {

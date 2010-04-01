@@ -323,7 +323,7 @@ public class Column {
      * Get variable name to use in Java sources (= uncapitalized java name)
      */
     public String getJavaBeansRulePropertyName() {
-        return DfStringUtil.toBeansPropertyName(getJavaName());
+        return DfStringUtil.initBeansProp(getJavaName());
     }
 
     public String getJavaBeansRulePropertyNameInitCap() {
