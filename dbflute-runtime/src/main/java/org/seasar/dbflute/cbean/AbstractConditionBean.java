@@ -28,6 +28,7 @@ import org.seasar.dbflute.cbean.sqlclause.WhereClauseSimpleFilter;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.dbmeta.info.ColumnInfo;
+import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.PagingPageSizeNotPlusException;
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
@@ -37,6 +38,7 @@ import org.seasar.dbflute.util.DfReflectionUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 
 /**
  * The condition-bean as abstract.
@@ -711,8 +713,22 @@ public abstract class AbstractConditionBean implements ConditionBean {
                 remainder = remainder.substring(deimiterIndex + delimiter.length(), remainder.length());
             }
             final String methodName = (count == 0 ? "setupSelect_" : "with") + initCap(propertyName);
-            final Method method = DfReflectionUtil.getPublicMethod(currentObj.getClass(), methodName, new Class<?>[] {});
-            currentObj = DfReflectionUtil.invoke(method, currentObj, new Object[] {});
+            final Method method = DfReflectionUtil
+                    .getPublicMethod(currentObj.getClass(), methodName, new Class<?>[] {});
+            if (method == null) {
+                String msg = "Not found the method for setupSelect:";
+                msg = msg + " foreignPropertyNamePath=" + foreignPropertyNamePath;
+                msg = msg + " methodName=" + methodName;
+                throw new ConditionInvokingFailureException(msg);
+            }
+            try {
+                currentObj = DfReflectionUtil.invoke(method, currentObj, new Object[] {});
+            } catch (ReflectionFailureException e) {
+                String msg = "Failed to invoke the method:";
+                msg = msg + " foreignPropertyNamePath=" + foreignPropertyNamePath;
+                msg = msg + " methodName=" + methodName;
+                throw new ConditionInvokingFailureException(msg, e);
+            }
             ++count;
             if (last) {
                 break;

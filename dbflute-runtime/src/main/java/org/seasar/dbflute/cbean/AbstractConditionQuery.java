@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.cbean;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +33,7 @@ import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.cbean.sqlclause.OrderByClause.ManumalOrderInfo;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMetaProvider;
+import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.exception.RequiredOptionNotFoundException;
 import org.seasar.dbflute.jdbc.Classification;
@@ -45,13 +45,13 @@ import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTraceViewUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 
 /**
  * The abstract class of condition-query.
  * @author jflute
  */
 public abstract class AbstractConditionQuery implements ConditionQuery {
-// Don't format!
 
     // ===================================================================================
     //                                                                          Definition
@@ -546,8 +546,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void throwLikeSearchOptionNotFoundException(String colName, String value) {
-        DBMeta dbmeta = getDBMetaProvider().provideDBMeta(getTableDbName());
-        String capPropName = initCap(dbmeta.findPropertyName(colName));
+        final DBMeta dbmeta = getDBMetaProvider().provideDBMeta(getTableDbName());
+        final String capPropName = initCap(dbmeta.findPropertyName(colName));
         String msg = "Look! Read the message below." + ln();
         msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
         msg = msg + "The likeSearchOption was Not Found! (Should not be null!)" + ln();
@@ -568,21 +568,23 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
         final String methodName = "set" + columnCapPropName + "_LikeSearch";
-        Method method = null;
-        try {
-            method = this.getClass().getMethod(methodName, new Class[] { value.getClass(), LikeSearchOption.class });
-        } catch (NoSuchMethodException e) {
-            String msg = "The columnFlexibleName is not existing in this table:";
+        final Class<?>[] parameterTypes = new Class<?>[] { value.getClass(), LikeSearchOption.class };
+        final Method method = helpGettingCQMethod(this, methodName, parameterTypes);
+        if (method == null) {
+            String msg = "Not found the method for setting a like-search condition(query):";
             msg = msg + " columnFlexibleName=" + columnFlexibleName;
-            msg = msg + " tableName=" + getTableDbName() + " methodName=" + methodName;
-            throw new RuntimeException(msg, e);
+            msg = msg + " value=" + value;
+            msg = msg + " option=" + option;
+            msg = msg + " methodName=" + methodName;
+            throw new ConditionInvokingFailureException(msg);
         }
         try {
-            method.invoke(this, new Object[] { value, option });
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e.getCause());
+            helpInvokingCQMethod(this, method, new Object[] { value, option });
+        } catch (ReflectionFailureException e) {
+            String msg = "Failed to invoke the method for setting a like-search condition(query):";
+            msg = msg + " columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " methodName=" + methodName;
+            throw new ConditionInvokingFailureException(msg, e);
         }
     }
 
@@ -590,9 +592,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          Inline Query
     //                                          ------------
     protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String colName) {
-        DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        String propertyName = dbmeta.findPropertyName(colName);
-        String uncapPropName = initUncap(propertyName);
+        final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        final String propertyName = dbmeta.findPropertyName(colName);
+        final String uncapPropName = initUncap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));// If Java, it is necessary to use uncapPropName!
             if (isBaseQuery()) {
@@ -605,9 +607,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void regIQ(ConditionKey key, Object value, ConditionValue cvalue, String colName, ConditionOption option) {
-        DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        String propertyName = dbmeta.findPropertyName(colName);
-        String uncapPropName = initUncap(propertyName);
+        final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        final String propertyName = dbmeta.findPropertyName(colName);
+        final String uncapPropName = initUncap(propertyName);
         if (key.isValidRegistration(cvalue, value, key.getConditionKey() + " of " + getRealAliasName() + "." + colName)) {
             key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);// If Java, it is necessary to use uncapPropName!
             if (isBaseQuery()) {
@@ -637,16 +639,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String propertyName, String inScopeOption) {
         assertObjectNotNull("InScopeSubQyery(" + columnName + ")", subQuery);
         inScopeOption = inScopeOption != null ? inScopeOption + " " : "";
-        String realColumnName = getInScopeSubQueryRealColumnName(columnName);
+        final String realColumnName = getInScopeSubQueryRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
+        final String subQueryClause = getInScopeSubQuerySql(subQuery, relatedColumnName, propertyName);
         int subQueryLevel = subQuery.getSubQueryLevel();
-        String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        String endIndent = "       ";
-        String clause = realColumnName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln() + endIndent
-                + ")" + endMark;
+        final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        final String endIndent = "       ";
+        final String clause = realColumnName + " " + inScopeOption + "in (" + beginMark + subQueryClause + ln()
+                + endIndent + ")" + endMark;
         registerWhereClause(clause);
     }
 
@@ -655,9 +657,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected String getInScopeSubQuerySql(ConditionQuery subQuery, String relatedColumnName, String propertyName) {
-        String tableAliasName = getSqlClause().getLocalTableAliasName();
-        String selectClause = "select " + tableAliasName + "." + relatedColumnName;
-        String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
+        final String tableAliasName = getSqlClause().getLocalTableAliasName();
+        final String selectClause = "select " + tableAliasName + "." + relatedColumnName;
+        final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
                 selectClause, tableAliasName);
         return selectClause + " " + fromWhereClause;
     }
@@ -685,29 +687,29 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String subQueryClause;
         if (columnName.contains(",") && relatedColumnName.contains(",")) {
             // Two-or-More Primary Keys
-            List<String> columnNameSplit = DfStringUtil.splitList(columnName, ",");
-            String[] realColumnNames = new String[columnNameSplit.size()];
+            final List<String> columnNameSplit = DfStringUtil.splitList(columnName, ",");
+            final String[] realColumnNames = new String[columnNameSplit.size()];
             for (int i = 0; i < columnNameSplit.size(); i++) {
                 realColumnNames[i] = getExistsSubQueryRealColumnName(columnNameSplit.get(i).trim());
             }
-            List<String> relatedColumnSplit = DfStringUtil.splitList(relatedColumnName, ",");
-            String[] relatedColumnNames = new String[columnNameSplit.size()];
+            final List<String> relatedColumnSplit = DfStringUtil.splitList(relatedColumnName, ",");
+            final String[] relatedColumnNames = new String[columnNameSplit.size()];
             for (int i = 0; i < relatedColumnSplit.size(); i++) {
                 relatedColumnNames[i] = relatedColumnSplit.get(i).trim();
             }
             subQueryClause = getExistsSubQuerySql(subQuery, realColumnNames, relatedColumnNames, propertyName);
         } else {
             // Normal
-            String realColumnName = getExistsSubQueryRealColumnName(columnName);
+            final String realColumnName = getExistsSubQueryRealColumnName(columnName);
             subQueryClause = getExistsSubQuerySql(subQuery, realColumnName, relatedColumnName, propertyName);
         }
 
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        String endIndent = "       ";
-        String clause = existsOption + "exists (" + beginMark + subQueryClause + ln() + endIndent + ")" + endMark;
+        final int subQueryLevel = subQuery.getSubQueryLevel();
+        final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        final String endIndent = "       ";
+        final String clause = existsOption + "exists (" + beginMark + subQueryClause + ln() + endIndent + ")" + endMark;
         registerWhereClause(clause);
     }
 
@@ -721,24 +723,24 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected String getExistsSubQuerySql(ConditionQuery subQuery, String realColumnName, String relatedColumnName,
             String propertyName) {
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        String tableAliasName = "dfsublocal_" + subQueryLevel;
-        String selectClause = "select " + tableAliasName + "." + relatedColumnName;
-        String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
-                selectClause, tableAliasName, realColumnName);
+        final int subQueryLevel = subQuery.getSubQueryLevel();
+        final String tableAliasName = "dfsublocal_" + subQueryLevel;
+        final String selectClause = "select " + tableAliasName + "." + relatedColumnName;
+        final String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName,
+                propertyName, selectClause, tableAliasName, realColumnName);
         return selectClause + " " + fromWhereClause;
     }
 
     protected String getExistsSubQuerySql(ConditionQuery subQuery, String[] realColumnNames,
             String[] relatedColumnNames, String propertyName) {
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        String tableAliasName = "dfsublocal_" + subQueryLevel;
+        final int subQueryLevel = subQuery.getSubQueryLevel();
+        final String tableAliasName = "dfsublocal_" + subQueryLevel;
 
         // Because sub-query may be only allowed to return a single column.
-        String selectClause = "select " + tableAliasName + "." + relatedColumnNames[0];
+        final String selectClause = "select " + tableAliasName + "." + relatedColumnNames[0];
 
-        String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnNames, propertyName,
-                selectClause, tableAliasName, realColumnNames);
+        final String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnNames,
+                propertyName, selectClause, tableAliasName, realColumnNames);
         return selectClause + " " + fromWhereClause;
     }
 
@@ -750,16 +752,16 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String relatedColumnName, String propertyName, String aliasName) {
         assertObjectNotNull("SpecifyDerivedReferrer(function)", function);
         assertObjectNotNull("SpecifyDerivedReferrer(" + columnName + ")", subQuery);
-        String realColumnName = getSpecifyDerivedReferrerRealColumnName(columnName);
+        final String realColumnName = getSpecifyDerivedReferrerRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        String subQueryClause = getSpecifyDerivedReferrerSubQuerySql(function, subQuery, realColumnName,
+        final String subQueryClause = getSpecifyDerivedReferrerSubQuerySql(function, subQuery, realColumnName,
                 relatedColumnName, propertyName, aliasName);
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        String endIndent = "       ";
-        String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") as " + aliasName + endMark;
+        final int subQueryLevel = subQuery.getSubQueryLevel();
+        final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        final String endIndent = "       ";
+        final String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") as " + aliasName + endMark;
         getSqlClause().specifyDerivingSubQuery(aliasName, clause);
     }
 
@@ -770,14 +772,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected String getSpecifyDerivedReferrerSubQuerySql(String function, ConditionQuery subQuery,
             String realColumnName, String relatedColumnName, String propertyName, String aliasName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
-        String tableAliasName = "dfsublocal_" + subQueryLevel;
-        String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        final String tableAliasName = "dfsublocal_" + subQueryLevel;
+        final String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
         if (specifiedColumnName == null || specifiedColumnName.trim().length() == 0) {
             throwSpecifyDerivedReferrerInvalidColumnSpecificationException(function, aliasName);
         }
-        String deriveColumnName;
+        final String deriveColumnName;
         {
-            String specifiedColumnRealName = subQuery.getSqlClause().getSpecifiedColumnRealNameAsOne();
+            final String specifiedColumnRealName = subQuery.getSqlClause().getSpecifiedColumnRealNameAsOne();
             if (!specifiedColumnRealName.startsWith(subQuery.getSqlClause().getLocalTableAliasName())) {
                 // The column is on related table.
                 deriveColumnName = specifiedColumnRealName;
@@ -790,31 +792,31 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         }
         subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
-        String connect = xbuildFunctionConnector(function);
+        final String connect = xbuildFunctionConnector(function);
         if (subQuery.getSqlClause().hasUnionQuery()) {
-            String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
+            final String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
+            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
             if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
                 String msg = "The derived-referrer is unavailable when no primary key or two-or-more primary keys:";
                 msg = msg + " table=" + subQuery.getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
-            String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
-            String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
+            final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+            final String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
                     + relatedColumnName + ", " + deriveColumnName;
-            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
+            final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
                     selectClause, tableAliasName);
-            String mainSql = selectClause + " " + fromWhereClause;
-            String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
+            final String mainSql = selectClause + " " + fromWhereClause;
+            final String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
             return "select " + function + connect + "dfsubquerymain." + specifiedColumnName + ")" + ln() + "  from ("
                     + beginMark + mainSql + ln() + "       ) dfsubquerymain" + endMark + ln() + " where "
                     + joinCondition;
         } else {
-            String selectClause = "select " + function + connect + deriveColumnName + ")";
-            String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
-                    selectClause, tableAliasName, realColumnName);
+            final String selectClause = "select " + function + connect + deriveColumnName + ")";
+            final String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName,
+                    propertyName, selectClause, tableAliasName, realColumnName);
             return selectClause + " " + fromWhereClause;
         }
     }
@@ -851,18 +853,18 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String relatedColumnName, String propertyName, String operand, Object value, String parameterPropertyName) {
         assertObjectNotNull("QueryDerivedReferrer(function)", function);
         assertObjectNotNull("QueryDerivedReferrer(" + columnName + ")", subQuery);
-        String realColumnName = getQueryDerivedReferrerRealColumnName(columnName);
+        final String realColumnName = getQueryDerivedReferrerRealColumnName(columnName);
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        String subQueryClause = getQueryDerivedReferrerSubQuerySql(function, subQuery, realColumnName,
+        final String subQueryClause = getQueryDerivedReferrerSubQuerySql(function, subQuery, realColumnName,
                 relatedColumnName, propertyName, value);
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        String endIndent = "       ";
-        String parameter = "/*pmb." + getLocationBase(parameterPropertyName) + "*/null";
-        String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") " + operand + " " + parameter + " "
-                + endMark;
+        final int subQueryLevel = subQuery.getSubQueryLevel();
+        final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        final String endIndent = "       ";
+        final String parameter = "/*pmb." + getLocationBase(parameterPropertyName) + "*/null";
+        final String clause = "(" + beginMark + subQueryClause + ln() + endIndent + ") " + operand + " " + parameter
+                + " " + endMark;
         registerWhereClause(clause);
     }
 
@@ -873,14 +875,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected String getQueryDerivedReferrerSubQuerySql(String function, ConditionQuery subQuery,
             String realColumnName, String relatedColumnName, String propertyName, Object value) {
         int subQueryLevel = subQuery.getSubQueryLevel();
-        String tableAliasName = "dfsublocal_" + subQueryLevel;
-        String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        final String tableAliasName = "dfsublocal_" + subQueryLevel;
+        final String specifiedColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
         if (specifiedColumnName == null || specifiedColumnName.trim().length() == 0) {
             throwQueryDerivedReferrerInvalidColumnSpecificationException(function);
         }
-        String deriveColumnName;
+        final String deriveColumnName;
         {
-            String specifiedColumnRealName = subQuery.getSqlClause().getSpecifiedColumnRealNameAsOne();
+            final String specifiedColumnRealName = subQuery.getSqlClause().getSpecifiedColumnRealNameAsOne();
             if (!specifiedColumnRealName.startsWith(subQuery.getSqlClause().getLocalTableAliasName())) {
                 // the column is on related table.
                 deriveColumnName = specifiedColumnRealName;
@@ -893,31 +895,31 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         }
         subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
-        String connect = xbuildFunctionConnector(function);
+        final String connect = xbuildFunctionConnector(function);
         if (subQuery.getSqlClause().hasUnionQuery()) {
-            String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
+            final String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
+            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
             if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
                 String msg = "The derived-referrer is unavailable when no primary key or two-or-more primary keys:";
                 msg = msg + " table=" + subQuery.getTableDbName();
                 throw new IllegalConditionBeanOperationException(msg);
             }
-            String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
-            String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
+            final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+            final String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
                     + relatedColumnName + ", " + deriveColumnName;
-            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
+            final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
                     selectClause, tableAliasName);
-            String mainSql = selectClause + " " + fromWhereClause;
-            String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
+            final String mainSql = selectClause + " " + fromWhereClause;
+            final String joinCondition = "dfsubquerymain." + relatedColumnName + " = " + realColumnName;
             return "select " + function + connect + "dfsubquerymain." + specifiedColumnName + ")" + ln() + "  from ("
                     + beginMark + mainSql + ln() + "       ) dfsubquerymain" + endMark + ln() + " where "
                     + joinCondition;
         } else {
-            String selectClause = "select " + function + connect + deriveColumnName + ")";
-            String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName, propertyName,
-                    selectClause, tableAliasName, realColumnName);
+            final String selectClause = "select " + function + connect + deriveColumnName + ")";
+            final String fromWhereClause = buildCorrelationSubQueryFromWhereClause(subQuery, relatedColumnName,
+                    propertyName, selectClause, tableAliasName, realColumnName);
             return selectClause + " " + fromWhereClause;
         }
     }
@@ -931,8 +933,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (deriveColumnName.contains(".")) {
             deriveColumnName = deriveColumnName.substring(deriveColumnName.lastIndexOf(".") + ".".length());
         }
-        DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
-        Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
+        final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
+        final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
             if (!Number.class.isAssignableFrom(deriveColumnType)) {
                 throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType,
@@ -940,7 +942,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             }
         }
         if (value != null) {
-            Class<?> parameterType = value.getClass();
+            final Class<?> parameterType = value.getClass();
             if (String.class.isAssignableFrom(deriveColumnType)) {
                 if (!String.class.isAssignableFrom(parameterType)) {
                     throwQueryDerivedReferrerUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType,
@@ -976,7 +978,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         assertObjectNotNull("ScalarSubQuery(" + propertyName + ")", subQuery);
 
         // Get the specified column before it disappears at sub-query making.
-        String deriveRealColumnName;
+        final String deriveRealColumnName;
         {
             String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
             if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
@@ -986,14 +988,14 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
 
         xincrementLocalSubQueryLevelIfNeeds(subQuery);
-        String subQueryClause = getScalarSubQuerySql(function, subQuery, propertyName);
-        int subQueryLevel = subQuery.getSubQueryLevel();
-        String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
-        String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-        String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-        String endIndent = "       ";
-        String clause = deriveRealColumnName + " " + operand + " (" + beginMark + subQueryClause + ln() + endIndent
-                + ") " + endMark;
+        final String subQueryClause = getScalarSubQuerySql(function, subQuery, propertyName);
+        final int subQueryLevel = subQuery.getSubQueryLevel();
+        final String subQueryIdentity = propertyName + "[" + subQueryLevel + "]";
+        final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+        final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+        final String endIndent = "       ";
+        final String clause = deriveRealColumnName + " " + operand + " (" + beginMark + subQueryClause + ln()
+                + endIndent + ") " + endMark;
         registerWhereClause(clause);
     }
 
@@ -1003,34 +1005,34 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected String getScalarSubQuerySql(String function, ConditionQuery subQuery, String propertyName) {
         int subQueryLevel = subQuery.getSubQueryLevel();
-        String tableAliasName = "dfsublocal_" + subQueryLevel;
-        String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
+        final String tableAliasName = "dfsublocal_" + subQueryLevel;
+        final String deriveColumnName = subQuery.getSqlClause().getSpecifiedColumnNameAsOne();
         if (deriveColumnName == null || deriveColumnName.trim().length() == 0) {
             throwScalarSubQueryInvalidColumnSpecificationException(function);
         }
         assertScalarSubQueryColumnType(function, subQuery, deriveColumnName);
         subQuery.getSqlClause().clearSpecifiedSelectColumn(); // specified columns disappear at this timing
-        DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
+        final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
         if (!dbmeta.hasPrimaryKey() || dbmeta.hasTwoOrMorePrimaryKeys()) {
             String msg = "The scalar-sub-query is unavailable when no primary key or two-or-more primary keys:";
             msg = msg + " table=" + subQuery.getTableDbName();
             throw new IllegalConditionBeanOperationException(msg);
         }
-        String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
+        final String primaryKeyName = dbmeta.getPrimaryUniqueInfo().getFirstColumn().getColumnDbName();
         if (subQuery.getSqlClause().hasUnionQuery()) {
-            String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
-            String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
-            String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
-            String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
+            final String subQueryIdentity = propertyName + "[" + subQueryLevel + ":subquerymain]";
+            final String beginMark = getSqlClause().resolveSubQueryBeginMark(subQueryIdentity) + ln();
+            final String endMark = getSqlClause().resolveSubQueryEndMark(subQueryIdentity);
+            final String selectClause = "select " + tableAliasName + "." + primaryKeyName + ", " + tableAliasName + "."
                     + deriveColumnName;
-            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName,
+            final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName,
                     selectClause, tableAliasName);
-            String mainSql = selectClause + " " + fromWhereClause;
+            final String mainSql = selectClause + " " + fromWhereClause;
             return "select " + function + "(dfsubquerymain." + deriveColumnName + ")" + ln() + "  from (" + beginMark
                     + mainSql + ln() + "       ) dfsubquerymain" + endMark;
         } else {
-            String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
-            String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName,
+            final String selectClause = "select " + function + "(" + tableAliasName + "." + deriveColumnName + ")";
+            final String fromWhereClause = buildPlainSubQueryFromWhereClause(subQuery, primaryKeyName, propertyName,
                     selectClause, tableAliasName);
             return selectClause + " " + fromWhereClause;
         }
@@ -1041,8 +1043,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     }
 
     protected void assertScalarSubQueryColumnType(String function, ConditionQuery subQuery, String deriveColumnName) {
-        DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
-        Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
+        final DBMeta dbmeta = findDBMeta(subQuery.getTableDbName());
+        final Class<?> deriveColumnType = dbmeta.findColumnInfo(deriveColumnName).getPropertyType();
         if ("sum".equalsIgnoreCase(function) || "avg".equalsIgnoreCase(function)) {
             if (!Number.class.isAssignableFrom(deriveColumnType)) {
                 throwScalarSubQueryUnmatchedColumnTypeException(function, deriveColumnName, deriveColumnType);
@@ -1084,7 +1086,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     protected String buildCorrelationSubQueryFromWhereClause(ConditionQuery subQuery, String relatedColumnName,
             String propertyName, String selectClause, String tableAliasName, String realColumnName) {
         String clause = xprepareCorrelationSubQueryFromWhereClause(subQuery, propertyName, tableAliasName);
-        String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
+        final String joinCondition = tableAliasName + "." + relatedColumnName + " = " + realColumnName;
         clause = xreplaceCorrelationSubQueryFromWhereClause(clause, selectClause, joinCondition);
         return clause;
     }
@@ -1093,8 +1095,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
             String propertyName, String selectClause, String tableAliasName, String[] realColumnNames) {
         String clause = xprepareCorrelationSubQueryFromWhereClause(subQuery, propertyName, tableAliasName);
 
-        String joinCondition;
-        StringBuilder sb = new StringBuilder();
+        final String joinCondition;
+        final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < relatedColumnNames.length; i++) {
             if (sb.length() > 0) {
                 sb.append(ln()).append("   and ");
@@ -1123,8 +1125,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected String xreplaceCorrelationSubQueryFromWhereClause(String clause, String selectClause, String joinCondition) {
         // Replace template marks. These are very important!
-        String firstConditionAfter = ln() + "   and ";
-        SqlClause sc = getSqlClause();
+        final String firstConditionAfter = ln() + "   and ";
+        final SqlClause sc = getSqlClause();
         clause = replaceString(clause, sc.getWhereClauseMark(), "where " + joinCondition);
         clause = replaceString(clause, sc.getWhereFirstConditionMark(), joinCondition + firstConditionAfter);
         clause = replaceString(clause, sc.getUnionSelectClauseMark(), selectClause);
@@ -1153,9 +1155,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                          ------------
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
             String colName) {
-        DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        String propertyName = dbmeta.findPropertyName(colName);
-        String uncapPropName = initUncap(propertyName);
+        final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        final String propertyName = dbmeta.findPropertyName(colName);
+        final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key));
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue);
@@ -1163,9 +1165,9 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     protected void setupConditionValueAndRegisterWhereClause(ConditionKey key, Object value, ConditionValue cvalue,
             String colName, ConditionOption option) {
-        DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
-        String propertyName = dbmeta.findPropertyName(colName);
-        String uncapPropName = initUncap(propertyName);
+        final DBMeta dbmeta = getDBMetaProvider().provideDBMetaChecked(getTableDbName());
+        final String propertyName = dbmeta.findPropertyName(colName);
+        final String uncapPropName = initUncap(propertyName);
         // If Java, it is necessary to use uncapPropName!
         key.setupConditionValue(cvalue, value, getLocation(uncapPropName, key), option);
         getSqlClause().registerWhereClause(getRealColumnName(colName), key, cvalue, option);
@@ -1347,8 +1349,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(columnFlexibleName));
         final String methodName = "get" + columnCapPropName;
-        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {}, columnFlexibleName);
-        return (ConditionValue) helpInvokingCQMethod(this, method, new Object[] {});
+        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {});
+        if (method == null) {
+            String msg = "Not found the method for getting value:";
+            msg = msg + " columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " methodName=" + methodName;
+            throw new ConditionInvokingFailureException(msg);
+        }
+        try {
+            return (ConditionValue) helpInvokingCQMethod(this, method, new Object[] {});
+        } catch (ReflectionFailureException e) {
+            String msg = "Failed to invoke the method for getting value:";
+            msg = msg + " columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " methodName=" + methodName;
+            throw new ConditionInvokingFailureException(msg, e);
+        }
     }
 
     /**
@@ -1370,8 +1385,25 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         if (Collection.class.isAssignableFrom(type)) {
             type = Collection.class;
         }
-        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[]{type}, propertyName);
-        helpInvokingCQMethod(cq, method, new Object[] { value });
+        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] { type });
+        if (method == null) {
+            String msg = "Not found the method for setting a condition(query):";
+            msg = msg + " columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " conditionKeyName=" + conditionKeyName;
+            msg = msg + " value=" + value;
+            msg = msg + " methodName=" + methodName;
+            throw new ConditionInvokingFailureException(msg);
+        }
+        try {
+            helpInvokingCQMethod(cq, method, new Object[] { value });
+        } catch (ReflectionFailureException e) {
+            String msg = "Failed to invoke the method for setting a condition(query):";
+            msg = msg + " columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " conditionKeyName=" + conditionKeyName;
+            msg = msg + " value=" + value;
+            msg = msg + " methodName=" + methodName;
+            throw new ConditionInvokingFailureException(msg, e);
+        }
     }
 
     /**
@@ -1386,8 +1418,24 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         final DBMeta dbmeta = findDBMeta(cq.getTableDbName());
         final String columnCapPropName = initCap(dbmeta.findPropertyName(propertyName));
         final String methodName = "addOrderBy_" + columnCapPropName + "_" + ascDesc;
-        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] {}, propertyName);
+        final Method method = helpGettingCQMethod(cq, methodName, new Class<?>[] {});
+        if (method == null) {
+            String msg = "Not found the method for adding a order-by condition:";
+            msg = msg + " columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " isAsc=" + isAsc;
+            msg = msg + " methodName=" + methodName;
+            throw new ConditionInvokingFailureException(msg);
+        }
         helpInvokingCQMethod(cq, method, new Object[] {});
+        try {
+            helpInvokingCQMethod(cq, method, new Object[] {});
+        } catch (ReflectionFailureException e) {
+            String msg = "Failed to invoke the method for setting a condition(query):";
+            msg = msg + " columnFlexibleName=" + columnFlexibleName;
+            msg = msg + " isAsc=" + isAsc;
+            msg = msg + " methodName=" + methodName;
+            throw new ConditionInvokingFailureException(msg, e);
+        }
     }
 
     /**
@@ -1396,8 +1444,21 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     public ConditionQuery invokeForeignCQ(String foreignPropertyName) {
         assertStringNotNullAndNotTrimmedEmpty("foreignPropertyName", foreignPropertyName);
         final String methodName = "query" + initCap(foreignPropertyName);
-        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {}, foreignPropertyName);
-        return (ConditionQuery) helpInvokingCQMethod(this, method, new Object[] {});
+        final Method method = helpGettingCQMethod(this, methodName, new Class<?>[] {});
+        if (method == null) {
+            String msg = "Not found the method for getting a foreign condition query:";
+            msg = msg + " foreignPropertyName=" + foreignPropertyName;
+            msg = msg + " methodName=" + methodName;
+            throw new ConditionInvokingFailureException(msg);
+        }
+        try {
+            return (ConditionQuery) helpInvokingCQMethod(this, method, new Object[] {});
+        } catch (ReflectionFailureException e) {
+            String msg = "Failed to invoke the method for setting a condition(query):";
+            msg = msg + " foreignPropertyName=" + foreignPropertyName;
+            msg = msg + " methodName=" + methodName;
+            throw new ConditionInvokingFailureException(msg, e);
+        }
     }
 
     private PropertyNameCQContainer helpExtractingPropertyNameCQContainer(String name) {
@@ -1435,7 +1496,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         }
     }
 
-    private Method helpGettingCQMethod(ConditionQuery cq, String methodName, Class<?>[] argTypes, String property) {
+    private Method helpGettingCQMethod(ConditionQuery cq, String methodName, Class<?>[] argTypes) {
         return DfReflectionUtil.getPublicMethod(cq.getClass(), methodName, argTypes);
     }
 
@@ -1488,7 +1549,7 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
 
     @SuppressWarnings("unchecked")
     protected <PROPERTY extends Number> PROPERTY cTNum(Object obj, Class<PROPERTY> type) { // convert to number
-        return (PROPERTY)DfTypeUtil.toNumber(obj, type);
+        return (PROPERTY) DfTypeUtil.toNumber(obj, type);
     }
 
     /**
@@ -1508,11 +1569,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         return list;
     }
 
-    protected <PROPERTY extends Number> List<PROPERTY> cTNumL(Collection<? extends Classification> col, Class<PROPERTY> type) { // convert to number list
+    protected <PROPERTY extends Number> List<PROPERTY> cTNumL(Collection<? extends Classification> col,
+            Class<PROPERTY> type) { // convert to number list
         final List<PROPERTY> list = new ArrayList<PROPERTY>();
         for (Classification cls : col) {
             @SuppressWarnings("unchecked")
-            final PROPERTY value = (PROPERTY)DfTypeUtil.toNumber(cls.code(), type);
+            final PROPERTY value = (PROPERTY) DfTypeUtil.toNumber(cls.code(), type);
             list.add(value);
         }
         return list;
@@ -1711,8 +1773,8 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     @Override
     public String toString() {
         final String titleName = DfTypeUtil.toClassTitle(this);
-        return titleName + ":{aliasName=" + _aliasName + ", nestLevel=" + _nestLevel
-                + ", subQueryLevel=" + _subQueryLevel + ", foreignPropertyName=" + _foreignPropertyName
-                + ", relationPath=" + _relationPath + ", onClauseInline=" + _onClauseInline + "}";
+        return titleName + ":{aliasName=" + _aliasName + ", nestLevel=" + _nestLevel + ", subQueryLevel="
+                + _subQueryLevel + ", foreignPropertyName=" + _foreignPropertyName + ", relationPath=" + _relationPath
+                + ", onClauseInline=" + _onClauseInline + "}";
     }
 }

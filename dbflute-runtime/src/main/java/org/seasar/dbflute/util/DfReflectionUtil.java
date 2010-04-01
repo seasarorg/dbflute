@@ -100,7 +100,7 @@ public class DfReflectionUtil {
             return Class.forName(className, true, loader);
         } catch (ClassNotFoundException e) {
             String msg = "The class was not found: class=" + className + " loader=" + loader;
-            throw new IllegalStateException(msg, e);
+            throw new ReflectionFailureException(msg, e);
         }
     }
 
@@ -110,10 +110,10 @@ public class DfReflectionUtil {
             return clazz.newInstance();
         } catch (InstantiationException e) {
             String msg = "Failed to instantiate the class: " + clazz;
-            throw new IllegalStateException(msg, e);
+            throw new ReflectionFailureException(msg, e);
         } catch (IllegalAccessException e) {
             String msg = "Illegal access to the class: " + clazz;
-            throw new IllegalStateException(msg, e);
+            throw new ReflectionFailureException(msg, e);
         }
     }
 
@@ -123,7 +123,7 @@ public class DfReflectionUtil {
         } catch (NoSuchMethodException e) {
             String msg = "Such a method was not found:";
             msg = msg + " class=" + clazz + " argTypes=" + Arrays.asList(argTypes);
-            throw new IllegalStateException(msg, e);
+            throw new ReflectionFailureException(msg, e);
         }
     }
 
@@ -132,13 +132,13 @@ public class DfReflectionUtil {
             return constructor.newInstance(args);
         } catch (InstantiationException e) {
             String msg = "Failed to instantiate the class: " + constructor;
-            throw new IllegalStateException(msg, e);
+            throw new ReflectionFailureException(msg, e);
         } catch (IllegalAccessException e) {
             String msg = "Illegal access to the class: " + constructor;
-            throw new IllegalStateException(msg, e);
+            throw new ReflectionFailureException(msg, e);
         } catch (InvocationTargetException e) {
             String msg = "The InvocationTargetException occurred: " + constructor;
-            throw new IllegalStateException(msg, e.getTargetException());
+            throw new ReflectionFailureException(msg, e.getTargetException());
         }
     }
 
@@ -210,7 +210,7 @@ public class DfReflectionUtil {
             return field.get(target);
         } catch (IllegalAccessException e) {
             String msg = "Illegal access to the field: field=" + field + " target=" + target;
-            throw new IllegalStateException(msg, e);
+            throw new ReflectionFailureException(msg, e);
         }
     }
 
@@ -220,7 +220,7 @@ public class DfReflectionUtil {
             field.set(target, value);
         } catch (IllegalAccessException e) {
             String msg = "Illegal access to the field: field=" + field + " target=" + target;
-            throw new IllegalStateException(msg, e);
+            throw new ReflectionFailureException(msg, e);
         }
     }
 
@@ -294,12 +294,12 @@ public class DfReflectionUtil {
             String msg = "The InvocationTargetException occurred: ";
             msg = msg + " method=" + method + " target=" + target;
             msg = msg + " args=" + (args != null ? Arrays.asList(args) : "");
-            throw new IllegalStateException(msg, t);
+            throw new ReflectionFailureException(msg, t);
         } catch (IllegalAccessException e) {
             String msg = "Illegal access to the method:";
             msg = msg + " method =" + method;
             msg = msg + " args=" + (args != null ? Arrays.asList(args) : "");
-            throw new IllegalStateException(msg, e);
+            throw new ReflectionFailureException(msg, e);
         }
     }
 
@@ -401,6 +401,29 @@ public class DfReflectionUtil {
         @SuppressWarnings("unchecked")
         List<Type> emptyList = Collections.EMPTY_LIST;
         return emptyList;
+    }
+
+    public static class ReflectionFailureException extends RuntimeException {
+
+        /** Serial version UID. (Default) */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Constructor.
+         * @param msg Exception message. (NotNull)
+         */
+        public ReflectionFailureException(String msg) {
+            super(msg);
+        }
+
+        /**
+         * Constructor.
+         * @param msg Exception message. (NotNull)
+         * @param cause Throwable. (NotNull)
+         */
+        public ReflectionFailureException(String msg, Throwable cause) {
+            super(msg, cause);
+        }
     }
 
     // ===================================================================================

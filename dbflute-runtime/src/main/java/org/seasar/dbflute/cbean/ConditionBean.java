@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
 import org.seasar.dbflute.dbmeta.DBMeta;
+import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 import org.seasar.dbflute.jdbc.StatementConfig;
 
 /**
@@ -99,7 +100,7 @@ public interface ConditionBean extends PagingBean {
     /**
      * Lock for update.
      * <p>
-     * If you invoke this, your SQL lock target records for update.
+     * If you call this, your SQL lock target records for update.
      * It depends whether this method supports this on the database type.
      * </p>
      * @return this. (NotNull)
@@ -111,21 +112,21 @@ public interface ConditionBean extends PagingBean {
     //                                                                        ============
     /**
      * Set up various things for select-count-ignore-fetch-scope. {Internal}
-     * This method is for INTERNAL. Don't invoke this!
+     * This method is for INTERNAL. Don't call this!
      * @return this. (NotNull)
      */
     ConditionBean xsetupSelectCountIgnoreFetchScope();
 
     /**
      * Do after-care for select-count-ignore-fetch-scope. {Internal}
-     * This method is for INTERNAL. Don't invoke this!
+     * This method is for INTERNAL. Don't call this!
      * @return this. (NotNull)
      */
     ConditionBean xafterCareSelectCountIgnoreFetchScope();
 
     /**
      * Is set up various things for select-count-ignore-fetch-scope? {Internal}
-     * This method is for INTERNAL. Don't invoke this!
+     * This method is for INTERNAL. Don't call this!
      * @return Determination.
      */
     boolean isSelectCountIgnoreFetchScope();
@@ -187,6 +188,7 @@ public interface ConditionBean extends PagingBean {
      * </pre>
      * A method with parameters (using fixed condition) is unsupported.
      * @param foreignPropertyNamePath The path string. (NotNull, NotTrimmedEmpty)
+     * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
     void invokeSetupSelect(String foreignPropertyNamePath);
 

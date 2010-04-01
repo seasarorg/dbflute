@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
@@ -93,6 +94,12 @@ public class ColumnInfo {
     //                                                                              Finder
     //                                                                              ======
     public Method findSetter() {
+        final Class<? extends Entity> entityType = _dbmeta.getEntityType();
+        final Method method = findMethod(entityType, buildAccessorName("set"), new Class<?>[] { _propertyType });
+        if (method == null) {
+            String msg = "";
+            throw new IllegalStateException(msg);
+        }
         return findMethod(_dbmeta.getEntityType(), buildAccessorName("set"), new Class<?>[] { _propertyType });
     }
 

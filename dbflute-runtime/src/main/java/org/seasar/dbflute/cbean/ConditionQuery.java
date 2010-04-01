@@ -17,6 +17,7 @@ package org.seasar.dbflute.cbean;
 
 import org.seasar.dbflute.cbean.cvalue.ConditionValue;
 import org.seasar.dbflute.cbean.sqlclause.SqlClause;
+import org.seasar.dbflute.exception.ConditionInvokingFailureException;
 
 /**
  * The condition-query as interface.
@@ -107,6 +108,7 @@ public interface ConditionQuery {
      * Invoke getting value.
      * @param columnFlexibleName The flexible name of the column. (NotNull and NotEmpty)
      * @return The conditionValue. (NotNull)
+     * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
     ConditionValue invokeValue(String columnFlexibleName);
 
@@ -115,6 +117,7 @@ public interface ConditionQuery {
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
      * @param conditionKeyName The name of the conditionKey. (NotNull)
      * @param value The value of the condition. (NotNull)
+     * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
     void invokeQuery(String columnFlexibleName, String conditionKeyName, Object value);
 
@@ -122,6 +125,7 @@ public interface ConditionQuery {
      * Invoke adding orderBy. {ResolveRelation}
      * @param columnFlexibleName The flexible name of the column allowed to contain relations. (NotNull and NotEmpty)
      * @param isAsc Is it ascend?
+     * @throws ConditionInvokingFailureException When the method to the column is not found and the method is failed.
      */
     void invokeOrderBy(String columnFlexibleName, boolean isAsc);
 
@@ -130,6 +134,7 @@ public interface ConditionQuery {
      * A method with parameters (using fixed condition) is unsupported.
      * @param foreignPropertyName The property name of the foreign relation. (NotNull and NotEmpty)
      * @return The conditionQuery of the foreign relation as interface. (NotNull)
+     * @throws ConditionInvokingFailureException When the method to the property is not found and the method is failed.
      */
     ConditionQuery invokeForeignCQ(String foreignPropertyName);
 }

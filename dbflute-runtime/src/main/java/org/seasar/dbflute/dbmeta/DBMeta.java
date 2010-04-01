@@ -62,7 +62,7 @@ public interface DBMeta {
      * Get the current DB definition.
      * @return The current DB definition. (NotNull)
      */
-    public DBDef getCurrentDBDef();
+    DBDef getCurrentDBDef();
 
     // ===================================================================================
     //                                                                          Table Info
@@ -71,25 +71,25 @@ public interface DBMeta {
      * Get the DB name of the table.
      * @return The DB name of the table. (NotNull)
      */
-    public String getTableDbName();
+    String getTableDbName();
 
     /**
      * Get the property name(JavaBeansRule) of table.
      * @return The property name(JavaBeansRule) of table. (NotNull)
      */
-    public String getTablePropertyName();
+    String getTablePropertyName();
 
     /**
      * Get the SQL name of table.
      * @return The SQL name of table. (NotNull)
      */
-    public String getTableSqlName();
+    String getTableSqlName();
 
     /**
      * Get the alias of the table.
      * @return The alias of the table. (Nullable: when it cannot get an alias from meta)
      */
-    public String getTableAlias();
+    String getTableAlias();
 
     /**
      * Get the comment of the table. <br />
@@ -97,7 +97,7 @@ public interface DBMeta {
      * this result does NOT contain it and its delimiter.  
      * @return The comment of the table. (Nullable: when it cannot get a comment from meta)
      */
-    public String getTableComment();
+    String getTableComment();
 
     // ===================================================================================
     //                                                                         Column Info
@@ -107,7 +107,7 @@ public interface DBMeta {
      * @param columnFlexibleName The flexible name of the column. (NotNull)
      * @return Determination.
      */
-    public boolean hasColumn(String columnFlexibleName);
+    boolean hasColumn(String columnFlexibleName);
 
     /**
      * Find the information of the column by the flexible name of the column.
@@ -119,13 +119,13 @@ public interface DBMeta {
      * @param columnFlexibleName The flexible name of the column. (NotNull)
      * @return The information of the column. (NotNull)
      */
-    public ColumnInfo findColumnInfo(String columnFlexibleName);
+    ColumnInfo findColumnInfo(String columnFlexibleName);
 
     /**
      * Get the list of column information.
      * @return The list of column information. (NotNull and NotEmpty)
      */
-    public List<ColumnInfo> getColumnInfoList();
+    List<ColumnInfo> getColumnInfoList();
 
     // ===================================================================================
     //                                                                         Unique Info
@@ -134,19 +134,19 @@ public interface DBMeta {
      * Get primary unique info.
      * @return Primary unique info. (NotNull)
      */
-    public UniqueInfo getPrimaryUniqueInfo();
+    UniqueInfo getPrimaryUniqueInfo();
 
     /**
      * Has primary-key?
      * @return Determination.
      */
-    public boolean hasPrimaryKey();
+    boolean hasPrimaryKey();
 
     /**
      * Has two or more primary-keys?
      * @return Determination.
      */
-    public boolean hasTwoOrMorePrimaryKeys();
+    boolean hasTwoOrMorePrimaryKeys();
 
     // ===================================================================================
     //                                                                       Relation Info
@@ -159,7 +159,7 @@ public interface DBMeta {
      * @param relationPropertyName The flexible name of the relation property. (NotNull)
      * @return Relation info. (NotNull)
      */
-    public RelationInfo findRelationInfo(String relationPropertyName);
+    RelationInfo findRelationInfo(String relationPropertyName);
 
     // -----------------------------------------------------
     //                                       Foreign Element
@@ -169,27 +169,27 @@ public interface DBMeta {
      * @param foreignPropName The flexible name of the foreign property. (NotNull)
      * @return Determination. (NotNull)
      */
-    public boolean hasForeign(String foreignPropName);
+    boolean hasForeign(String foreignPropName);
 
     /**
      * Find foreign DB meta.
      * @param foreignPropName The flexible name of the foreign property. (NotNull)
      * @return Foreign DBMeta. (NotNull)
      */
-    public DBMeta findForeignDBMeta(String foreignPropName);
+    DBMeta findForeignDBMeta(String foreignPropName);
 
     /**
      * Find foreign info.
      * @param foreignPropName The flexible name of the foreign property. (NotNull)
      * @return Foreign info. (NotNull)
      */
-    public ForeignInfo findForeignInfo(String foreignPropName);
+    ForeignInfo findForeignInfo(String foreignPropName);
 
     /**
      * Get the list of foreign information.
      * @return The list of foreign information. (NotNull)
      */
-    public List<ForeignInfo> getForeignInfoList();
+    List<ForeignInfo> getForeignInfoList();
 
     // -----------------------------------------------------
     //                                      Referrer Element
@@ -199,27 +199,27 @@ public interface DBMeta {
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Determination. (NotNull)
      */
-    public boolean hasReferrer(String referrerPropertyName);
+    boolean hasReferrer(String referrerPropertyName);
 
     /**
      * Find referrer DB meta.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Referrer DBMeta. (NotNull)
      */
-    public DBMeta findReferrerDBMeta(String referrerPropertyName);
+    DBMeta findReferrerDBMeta(String referrerPropertyName);
 
     /**
      * Find referrer information.
      * @param referrerPropertyName The flexible name of the referrer property. (NotNull)
      * @return Referrer information. (NotNull)
      */
-    public ReferrerInfo findReferrerInfo(String referrerPropertyName);
+    ReferrerInfo findReferrerInfo(String referrerPropertyName);
 
     /**
      * Get the list of referrer information.
      * @return The list of referrer information. (NotNull)
      */
-    public List<ReferrerInfo> getReferrerInfoList();
+    List<ReferrerInfo> getReferrerInfoList();
 
     // -----------------------------------------------------
     //                                        Relation Trace
@@ -233,17 +233,17 @@ public interface DBMeta {
          * Get the trace of relation.
          * @return The trace of relation as the list of relation info. (NotNull)
          */
-        public List<RelationInfo> getTraceRelation();
+        List<RelationInfo> getTraceRelation();
 
         /**
          * Get the trace of column.
          * @return The trace of column as column info. (Nullable)
          */
-        public ColumnInfo getTraceColumn();
+        ColumnInfo getTraceColumn();
     }
 
     public static interface RelationTraceFixHandler {
-        public void handleFixedTrace(RelationTrace relationTrace);
+        void handleFixedTrace(RelationTrace relationTrace);
     }
 
     // ===================================================================================
@@ -253,7 +253,7 @@ public interface DBMeta {
      * Has identity?
      * @return Determination.
      */
-    public boolean hasIdentity();
+    boolean hasIdentity();
 
     // ===================================================================================
     //                                                                       Sequence Info
@@ -262,31 +262,31 @@ public interface DBMeta {
      * Has sequence?
      * @return Determination.
      */
-    public boolean hasSequence();
+    boolean hasSequence();
 
     /**
      * Get the sequence name.
      * @return The sequence name. (Nullable: If it does not have sequence, returns null.)
      */
-    public String getSequenceName();
+    String getSequenceName();
 
     /**
      * Get the SQL for next value of sequence.
      * @return The SQL for next value of sequence. (Nullable: If it does not have sequence, returns null.)
      */
-    public String getSequenceNextValSql();
+    String getSequenceNextValSql();
 
     /**
      * Get the increment size of sequence.
      * @return The increment size of sequence. (Nullable: If it is unknown, returns null.)
      */
-    public Integer getSequenceIncrementSize();
+    Integer getSequenceIncrementSize();
 
     /**
      * Get the cache size of sequence. (The cache means sequence cache on DBFlute)
      * @return The cache size of sequence. (Nullable: If it does not use cache, returns null.)
      */
-    public Integer getSequenceCacheSize();
+    Integer getSequenceCacheSize();
 
     // ===================================================================================
     //                                                                Optimistic Lock Info
@@ -295,25 +295,25 @@ public interface DBMeta {
      * Has version no?
      * @return Determination.
      */
-    public boolean hasVersionNo();
+    boolean hasVersionNo();
 
     /**
      * Get the column information of version no.
      * @return The column information of version no. (Nullable: If it doesn't have the column, return null.)
      */
-    public ColumnInfo getVersionNoColumnInfo();
+    ColumnInfo getVersionNoColumnInfo();
 
     /**
      * Has update date?
      * @return Determination.
      */
-    public boolean hasUpdateDate();
+    boolean hasUpdateDate();
 
     /**
      * Get the column information of update date.
      * @return The column information of update date. (Nullable: If it doesn't have the column, return null.)
      */
-    public ColumnInfo getUpdateDateColumnInfo();
+    ColumnInfo getUpdateDateColumnInfo();
 
     // ===================================================================================
     //                                                                  Common Column Info
@@ -322,7 +322,7 @@ public interface DBMeta {
      * Has common column?
      * @return Determination.
      */
-    public boolean hasCommonColumn();
+    boolean hasCommonColumn();
 
     // ===================================================================================
     //                                                                       Name Handling
@@ -332,21 +332,21 @@ public interface DBMeta {
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return Determination.
      */
-    public boolean hasFlexibleName(String flexibleName);
+    boolean hasFlexibleName(String flexibleName);
 
     /**
      * Find DB name by flexible name. {Target objects are TABLE and COLUMN}
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return The DB name of anything. (NotNull and NotEmpty)
      */
-    public String findDbName(String flexibleName);
+    String findDbName(String flexibleName);
 
     /**
      * Find property name(JavaBeansRule) by flexible name. {Target objects are TABLE and COLUMN}
      * @param flexibleName The flexible name. (NotNull and NotEmpty)
      * @return The DB name of anything. (NotNull and NotEmpty)
      */
-    public String findPropertyName(String flexibleName);
+    String findPropertyName(String flexibleName);
 
     // ===================================================================================
     //                                                                           Type Name
@@ -355,25 +355,25 @@ public interface DBMeta {
      * Get the type name of entity.
      * @return The type name of entity. (NotNull)
      */
-    public String getEntityTypeName();
+    String getEntityTypeName();
 
     /**
      * Get the type name of condition-bean.
      * @return The type name of condition-bean. (Nullable: If the condition-bean does not exist)
      */
-    public String getConditionBeanTypeName();
+    String getConditionBeanTypeName();
 
     /**
      * Get the type name of DAO.
      * @return The type name of DAO. (Nullable: If the DAO does not exist)
      */
-    public String getDaoTypeName();
+    String getDaoTypeName();
 
     /**
      * Get the type name of behavior.
      * @return The type name of behavior. (Nullable: If the behavior does not exist)
      */
-    public String getBehaviorTypeName();
+    String getBehaviorTypeName();
 
     // ===================================================================================
     //                                                                         Object Type
@@ -382,7 +382,7 @@ public interface DBMeta {
      * Get the type of entity.
      * @return The type of entity. (NotNull)
      */
-    public Class<? extends Entity> getEntityType();
+    Class<? extends Entity> getEntityType();
 
     // ===================================================================================
     //                                                                     Object Instance
@@ -391,7 +391,7 @@ public interface DBMeta {
      * New the instance of entity.
      * @return The instance of entity. (NotNull)
      */
-    public Entity newEntity();
+    Entity newEntity();
 
     // ===================================================================================
     //                                                                     Entity Handling
@@ -406,7 +406,7 @@ public interface DBMeta {
      * @param entity Target entity. (NotNull)
      * @param primaryKeyMap Primary-key map. (NotNull and NotEmpty)
      */
-    public void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap);
+    void acceptPrimaryKeyMap(Entity entity, Map<String, ? extends Object> primaryKeyMap);
 
     /**
      * Accept primary-key map-string.
@@ -415,7 +415,7 @@ public interface DBMeta {
      * @param entity Target entity. (NotNull)
      * @param primaryKeyMapString Primary-key map-string. (NotNull)
      */
-    public void acceptPrimaryKeyMapString(Entity entity, String primaryKeyMapString);
+    void acceptPrimaryKeyMapString(Entity entity, String primaryKeyMapString);
 
     /**
      * Accept column-value map.
@@ -424,7 +424,7 @@ public interface DBMeta {
      * @param entity Target entity. (NotNull)
      * @param columnValueMap Column-value map. (NotNull and NotEmpty)
      */
-    public void acceptColumnValueMap(Entity entity, Map<String, ? extends Object> columnValueMap);
+    void acceptColumnValueMap(Entity entity, Map<String, ? extends Object> columnValueMap);
 
     /**
      * Accept column-value map-string.
@@ -433,7 +433,7 @@ public interface DBMeta {
      * @param entity Target entity. (NotNull)
      * @param columnValueMapString Column-value map-string. (NotNull)
      */
-    public void acceptColumnValueMapString(Entity entity, String columnValueMapString);
+    void acceptColumnValueMapString(Entity entity, String columnValueMapString);
 
     // -----------------------------------------------------
     //                                               Extract
@@ -451,7 +451,7 @@ public interface DBMeta {
      * @param entity Target entity. (NotNull)
      * @return Primary-key map-string. (NotNull)
      */
-    public String extractPrimaryKeyMapString(Entity entity);
+    String extractPrimaryKeyMapString(Entity entity);
 
     /**
      * Extract primary-key map-string.
@@ -462,15 +462,14 @@ public interface DBMeta {
      * @param equal Equal. (NotNull)
      * @return Primary-key map-string. (NotNull)
      */
-    public String extractPrimaryKeyMapString(Entity entity, String startBrace, String endBrace, String delimiter,
-            String equal);
+    String extractPrimaryKeyMapString(Entity entity, String startBrace, String endBrace, String delimiter, String equal);
 
     /**
      * Extract column-value map-string. Delimiter is at-mark and semicolon.
      * @param entity Target entity. (NotNull)
      * @return Column-value map-string. (NotNull)
      */
-    public String extractColumnValueMapString(Entity entity);
+    String extractColumnValueMapString(Entity entity);
 
     /**
      * Extract column-value map-string.
@@ -481,8 +480,7 @@ public interface DBMeta {
      * @param equal Equal. (NotNull)
      * @return Column-value map-string. (NotNull)
      */
-    public String extractColumnValueMapString(Entity entity, String startBrace, String endBrace, String delimiter,
-            String equal);
+    String extractColumnValueMapString(Entity entity, String startBrace, String endBrace, String delimiter, String equal);
 
     // -----------------------------------------------------
     //                                               Convert
@@ -492,28 +490,28 @@ public interface DBMeta {
      * @param entity Target entity. (NotNull)
      * @return The list of column value. (NotNull)
      */
-    public List<Object> convertToColumnValueList(Entity entity);
+    List<Object> convertToColumnValueList(Entity entity);
 
     /**
      * Convert entity to column value as map.
      * @param entity Target entity. (NotNull)
      * @return The map of column value. (NotNull)
      */
-    public Map<String, Object> convertToColumnValueMap(Entity entity);
+    Map<String, Object> convertToColumnValueMap(Entity entity);
 
     /**
      * Convert entity to column string-value as list.
      * @param entity Target entity. (NotNull)
      * @return The list of column string-value. (NotNull)
      */
-    public List<String> convertToColumnStringValueList(Entity entity);
+    List<String> convertToColumnStringValueList(Entity entity);
 
     /**
      * Convert entity to column string-value as map.
      * @param entity Target entity. (NotNull)
      * @return The map of column string-value. (NotNull)
      */
-    public Map<String, String> convertToColumnStringValueMap(Entity entity);
+    Map<String, String> convertToColumnStringValueMap(Entity entity);
 
     // ===================================================================================
     //                                                                          Map String
@@ -522,25 +520,25 @@ public interface DBMeta {
      * Create map list string that is prepared. (for INTERNAL)
      * @return Map list string that is prepared. (NotNull)
      */
-    public MapListString createMapListString();
+    MapListString createMapListString();
 
     /**
      * Create map string builder that is prepared. (for INTERNAL)
      * @return Map string builder that is prepared. (NotNull)
      */
-    public MapStringBuilder createMapStringBuilder();
+    MapStringBuilder createMapStringBuilder();
 
     // ===================================================================================
     //                                                               Entity Property Setup
     //                                                               =====================
     // It's very INTERNAL!
     /**
-     * Has the setupper of entity property by the name of property? <br />
+     * Has the set-upper of entity property by the name of property? <br />
      * Comparing is so flexible. {Ignore cases and underscore}
      * @param propertyName The name of the property. (NotNull)
      * @return Determination.
      */
-    public boolean hasEntityPropertySetupper(String propertyName);
+    boolean hasEntityPropertySetupper(String propertyName);
 
     /**
      * Set up entity property. (for INTERNAL)
@@ -548,10 +546,10 @@ public interface DBMeta {
      * @param entity The entity for the property. (NotNull)
      * @param value The value of the property. (Nullable)
      */
-    public void setupEntityProperty(String propertyName, Object entity, Object value);
+    void setupEntityProperty(String propertyName, Object entity, Object value);
 
     /**
-     * The setupper of entity property. <br />
+     * The set-upper of entity property. <br />
      * This class is for Internal. Don't use this!
      * @param <ENTITY_TYPE> The type of entity.
      */
