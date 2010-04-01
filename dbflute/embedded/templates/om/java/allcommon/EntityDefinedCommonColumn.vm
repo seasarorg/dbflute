@@ -33,16 +33,16 @@ public interface ${glEntityDefinedCommonColumn} extends Entity {
 #foreach ($classificationMap in $classificationList)
 
     /**
-     * Classify the value of ${uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
-     */
-    void classify${javaName}${classificationMap.get('name')}();
-
-    /**
      * Set the value of ${uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     void set${javaName}_${classificationMap.get('name')}();
+
+    /**
+     * Same as set${javaName}_${classificationMap.get('name')}. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    void classify${javaName}${classificationMap.get('name')}();
 
     /**
      * Is the value of ${uncapitalisedJavaName} '${classificationMap.get('name')}'? <br />
