@@ -178,6 +178,50 @@ public class DfStringUtil {
     }
 
     // ===================================================================================
+    //                                                                      Scope Handling
+    //                                                                      ==============
+    public static String extractFirstScope(String targetStr, String beginMark, String endMark) {
+        if (targetStr == null || beginMark == null || endMark == null) {
+            return null;
+        }
+        final String ret;
+        {
+            String tmp = targetStr;
+            final int startIndex = tmp.indexOf(beginMark);
+            if (startIndex < 0) {
+                return null;
+            }
+            tmp = tmp.substring(startIndex + beginMark.length());
+            if (tmp.indexOf(endMark) < 0) {
+                return null;
+            }
+            ret = tmp.substring(0, tmp.indexOf(endMark)).trim();
+        }
+        return ret;
+    }
+
+    public static List<String> extractAllScope(String targetStr, String beginMark, String endMark) {
+        if (targetStr == null || beginMark == null || endMark == null) {
+            return new ArrayList<String>();
+        }
+        final List<String> resultList = new ArrayList<String>();
+        String tmp = targetStr;
+        while (true) {
+            final int startIndex = tmp.indexOf(beginMark);
+            if (startIndex < 0) {
+                break;
+            }
+            tmp = tmp.substring(startIndex + beginMark.length());
+            if (tmp.indexOf(endMark) < 0) {
+                break;
+            }
+            resultList.add(tmp.substring(0, tmp.indexOf(endMark)).trim());
+            tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
+        }
+        return resultList;
+    }
+
+    // ===================================================================================
     //                                                                    Initial Handling
     //                                                                    ================
     public static String initCap(String str) {
@@ -223,48 +267,23 @@ public class DfStringUtil {
 
     }
 
-    // ===================================================================================
-    //                                                                      Scope Handling
-    //                                                                      ==============
-    public static String extractFirstScope(String targetStr, String beginMark, String endMark) {
-        if (targetStr == null || beginMark == null || endMark == null) {
-            return null;
+    /**
+     * Adjust initial character(s) as beans property. <br />
+     * Basically same as initUncap() method except only when
+     * it starts with two upper case character, for example 'EMecha'
+     * @param name The resource name for beans property that has'nt been adjusted yet. (Nullable: if null, returns null)
+     * @return The name as beans property that initial is adjusted. (Nullable: when the argument is null)
+     */
+    public static String initBeansProp(String name) { // according to Java Beans rule
+        if (isNullOrTrimmedEmpty(name)) {
+            return name;
         }
-        final String ret;
-        {
-            String tmp = targetStr;
-            final int startIndex = tmp.indexOf(beginMark);
-            if (startIndex < 0) {
-                return null;
-            }
-            tmp = tmp.substring(startIndex + beginMark.length());
-            if (tmp.indexOf(endMark) < 0) {
-                return null;
-            }
-            ret = tmp.substring(0, tmp.indexOf(endMark)).trim();
+        if (name.length() > 1 && isUpperCase(name.charAt(0), name.charAt(1))) { // for example 'EMecha'
+            return name;
         }
-        return ret;
-    }
-
-    public static List<String> extractAllScope(String targetStr, String beginMark, String endMark) {
-        if (targetStr == null || beginMark == null || endMark == null) {
-            return new ArrayList<String>();
-        }
-        final List<String> resultList = new ArrayList<String>();
-        String tmp = targetStr;
-        while (true) {
-            final int startIndex = tmp.indexOf(beginMark);
-            if (startIndex < 0) {
-                break;
-            }
-            tmp = tmp.substring(startIndex + beginMark.length());
-            if (tmp.indexOf(endMark) < 0) {
-                break;
-            }
-            resultList.add(tmp.substring(0, tmp.indexOf(endMark)).trim());
-            tmp = tmp.substring(tmp.indexOf(endMark) + endMark.length());
-        }
-        return resultList;
+        final char chars[] = name.toCharArray();
+        chars[0] = Character.toLowerCase(chars[0]);
+        return new String(chars);
     }
 
     // ===================================================================================
@@ -315,19 +334,6 @@ public class DfStringUtil {
         }
         sb.append(camelName.substring(pos, camelName.length()).toUpperCase());
         return sb.toString();
-    }
-
-    public static String toBeansPropertyName(String name) { // according to Java Beans rule
-        if (isNullOrTrimmedEmpty(name)) {
-            return name;
-        }
-        name = camelize(name);
-        if (name.length() > 1 && isUpperCase(name.charAt(0), name.charAt(1))) {
-            return name;
-        }
-        final char chars[] = name.toCharArray();
-        chars[0] = Character.toLowerCase(chars[0]);
-        return new String(chars);
     }
 
     private static boolean isUpperCase(char c) {

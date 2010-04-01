@@ -3,11 +3,11 @@ package org.seasar.dbflute.util;
 import static org.seasar.dbflute.util.DfStringUtil.camelize;
 import static org.seasar.dbflute.util.DfStringUtil.decamelize;
 import static org.seasar.dbflute.util.DfStringUtil.extractFirstScope;
+import static org.seasar.dbflute.util.DfStringUtil.initBeansProp;
 import static org.seasar.dbflute.util.DfStringUtil.removeLineComment;
 import static org.seasar.dbflute.util.DfStringUtil.rtrim;
 import static org.seasar.dbflute.util.DfStringUtil.splitList;
 import static org.seasar.dbflute.util.DfStringUtil.splitListTrimmed;
-import static org.seasar.dbflute.util.DfStringUtil.toBeansPropertyName;
 
 import java.util.List;
 
@@ -76,6 +76,21 @@ public class DfStringUtilTest extends PlainTestCase {
     }
 
     // ===================================================================================
+    //                                                                    Initial Handling
+    //                                                                    ================
+    public void test_initBeansProp_basic() {
+        assertEquals("fooName", initBeansProp("FooName"));
+        assertEquals("fooName", initBeansProp("fooName"));
+        assertEquals("BFooName", initBeansProp("BFooName"));
+        assertEquals("bFooName", initBeansProp("bFooName"));
+        assertEquals("bbFooName", initBeansProp("bbFooName"));
+        assertEquals("f", initBeansProp("f"));
+        assertEquals("f", initBeansProp("F"));
+        assertEquals("FOO_NAME", initBeansProp("FOO_NAME"));
+        assertEquals("foo_name", initBeansProp("foo_name"));
+    }
+
+    // ===================================================================================
     //                                                                       Name Handling
     //                                                                       =============
     public void test_camelize_basic() {
@@ -86,6 +101,8 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("FooNBar", camelize("foo_nBar"));
         assertEquals("FooNBar", DfStringUtil.camelize("FOO_nBar"));
         assertEquals("Foo", DfStringUtil.camelize("FOO"));
+        assertEquals("FooName", DfStringUtil.camelize("FooName"));
+        assertEquals("FName", DfStringUtil.camelize("FName"));
     }
 
     public void test_decamelize_basic() {
@@ -96,18 +113,6 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("FOO__NAME_BAR", DfStringUtil.decamelize("foo_NameBar"));
         assertEquals("F_O_O__N_A_M_E", DfStringUtil.decamelize("FOO_NAME"));
         assertEquals("FOO_NAME", DfStringUtil.decamelize("foo_name"));
-    }
-
-    public void test_toBeanPropertyName_basic() {
-        assertEquals("fooName", DfStringUtil.toBeansPropertyName("FooName"));
-        assertEquals("fooName", DfStringUtil.toBeansPropertyName("fooName"));
-        assertEquals("BFooName", toBeansPropertyName("BFooName"));
-        assertEquals("BFooName", DfStringUtil.toBeansPropertyName("bFooName"));
-        assertEquals("bbFooName", DfStringUtil.toBeansPropertyName("bbFooName"));
-        assertEquals("f", DfStringUtil.toBeansPropertyName("f"));
-        assertEquals("f", DfStringUtil.toBeansPropertyName("F"));
-        assertEquals("fooName", DfStringUtil.toBeansPropertyName("FOO_NAME"));
-        assertEquals("fooName", DfStringUtil.toBeansPropertyName("foo_name"));
     }
 
     // ===================================================================================

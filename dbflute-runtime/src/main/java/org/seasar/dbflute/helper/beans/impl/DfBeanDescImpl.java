@@ -315,21 +315,21 @@ public class DfBeanDescImpl implements DfBeanDesc {
                         || m.getReturnType() == void.class) {
                     continue;
                 }
-                final String propertyName = toBeansPropertyName(methodName.substring(3));
+                final String propertyName = initBeansProp(methodName.substring(3));
                 setupReadMethod(m, propertyName);
             } else if (methodName.startsWith("is")) {
                 if (m.getParameterTypes().length != 0 || !m.getReturnType().equals(Boolean.TYPE)
                         && !m.getReturnType().equals(Boolean.class)) {
                     continue;
                 }
-                final String propertyName = toBeansPropertyName(methodName.substring(2));
+                final String propertyName = initBeansProp(methodName.substring(2));
                 setupReadMethod(m, propertyName);
             } else if (methodName.startsWith("set")) {
                 if (m.getParameterTypes().length != 1 || methodName.equals("setClass")
                         || m.getReturnType() != void.class) {
                     continue;
                 }
-                final String propertyName = toBeansPropertyName(methodName.substring(3));
+                final String propertyName = initBeansProp(methodName.substring(3));
                 setupWriteMethod(m, propertyName);
             }
         }
@@ -339,8 +339,8 @@ public class DfBeanDescImpl implements DfBeanDesc {
         _invalidPropertyNames.clear();
     }
 
-    private static String toBeansPropertyName(String name) {
-        return DfStringUtil.toBeansPropertyName(name);
+    private static String initBeansProp(String name) {
+        return DfStringUtil.initBeansProp(name);
     }
 
     private void addPropertyDesc(DfPropertyDesc propertyDesc) {
