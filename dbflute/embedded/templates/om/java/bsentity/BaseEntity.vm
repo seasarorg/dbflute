@@ -151,13 +151,13 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
   #set ($existTop = true)
 #end
     /**
-     * Classify the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
      * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
      */
-    public void classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
+    public void set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cls) {
 #if ($col.isJavaNativeStringObject())
         set${col.javaName}(cls != null ? cls.code() : null);
 #elseif ($col.isJavaNativeValueOfAbleObject())
@@ -168,31 +168,31 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     }
 
     /**
-     * Set the value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. <br />
+     * Same as set${col.javaName}As${col.classificationName}(cls). <br />
 #if ($existTop && $classificationTopMap.containsKey('topComment'))
      * $classificationTopMap.get('topComment')
 #end
      * @param cls The value of ${col.uncapitalisedJavaName} as the classification of ${col.classificationName}. (Nullable)
      */
-    public void set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName} cls) {
-        classify${col.javaName}(cls);
+    public void classify${col.javaName}(${glCDef}.${col.classificationName} cls) {
+        set${col.javaName}As${col.classificationName}(cls);
     }
 
 #foreach ($classificationMap in $col.classificationMapList)
-    /**
-     * Classify the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
-     * $database.buildClassificationApplicationComment($classificationMap)
-     */
-    public void classify${col.javaName}${classificationMap.get('name')}() {
-        classify${col.javaName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
-    }
-
     /**
      * Set the value of ${col.uncapitalisedJavaName} as ${classificationMap.get('name')}. <br />
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${col.javaName}_${classificationMap.get('name')}() {
-        classify${col.javaName}${classificationMap.get('name')}();
+        set${col.javaName}As${col.classificationName}(${glCDef}.${col.classificationName}.${classificationMap.get('name')});
+    }
+
+    /**
+     * Same as set${col.javaName}_${classificationMap.get('name')}. <br />
+     * $database.buildClassificationApplicationComment($classificationMap)
+     */
+    public void classify${col.javaName}${classificationMap.get('name')}() {
+        set${col.javaName}_${classificationMap.get('name')}();
     }
 
 #end
