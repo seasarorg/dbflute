@@ -34,12 +34,14 @@ import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.dbmeta.info.ReferrerInfo;
 import org.seasar.dbflute.dbmeta.info.RelationInfo;
 import org.seasar.dbflute.dbmeta.info.UniqueInfo;
+import org.seasar.dbflute.exception.IllegalClassificationCodeException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.mapstring.MapListString;
 import org.seasar.dbflute.helper.mapstring.MapStringBuilder;
 import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.helper.mapstring.impl.MapStringBuilderImpl;
 import org.seasar.dbflute.jdbc.Classification;
+import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfAssertUtil;
 import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
@@ -182,7 +184,7 @@ public abstract class AbstractDBMeta implements DBMeta {
     protected ColumnInfo cci(String columnDbName, String columnAlias, boolean notNull, String propertyName,
             Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
             Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
-            String columnComment, String foreignListExp, String referrerListExp) { // createColumnInfo()
+            String columnComment, String foreignListExp, String referrerListExp, ClassificationMeta classificationMeta) { // createColumnInfo()
         final String delimiter = ",";
         List<String> foreignPropList = null;
         if (foreignListExp != null && foreignListExp.trim().length() > 0) {
@@ -194,7 +196,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         }
         return new ColumnInfo(this, columnDbName, columnAlias, notNull, propertyName, propertyType, primary,
                 autoIncrement, columnDbType, columnSize, columnDecimalDigits, commonColumn, optimisticLockType,
-                columnComment, foreignPropList, referrerPropList);
+                columnComment, foreignPropList, referrerPropList, classificationMeta);
     }
 
     /**
@@ -845,6 +847,49 @@ public abstract class AbstractDBMeta implements DBMeta {
         return setupper;
     }
 
+    protected Classification getCls(ColumnInfo columnInfo, Object code) { // getClassification
+        assertObjectNotNull("columnInfo", columnInfo);
+        if (code == null) {
+            return null;
+        }
+        final ClassificationMeta classificationMeta = columnInfo.getClassificationMeta();
+        if (classificationMeta == null) {
+            return null;
+        }
+        return classificationMeta.codeOf(code);
+    }
+
+    protected void chkCls(ColumnInfo columnInfo, Object code) { // checkClassification
+        assertObjectNotNull("columnInfo", columnInfo);
+        if (code == null) {
+            return; // no check null value which means no existence on DB
+        }
+        final Classification classification = getCls(columnInfo, code);
+        if (classification == null) {
+            throwIllegalClassificationCodeException(columnInfo, code);
+        }
+    }
+
+    protected void throwIllegalClassificationCodeException(ColumnInfo columnInfo, Object code) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Failed to get the classification!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Advice]" + ln();
+        msg = msg + "Please confirm the data of classication column on your database." + ln();
+        msg = msg + "The column data may NOT be one of defined classification on DBFlute." + ln();
+        msg = msg + ln();
+        msg = msg + "[Data]" + ln() + code + ln();
+        msg = msg + ln();
+        msg = msg + "[Classication]" + ln() + columnInfo.getClassificationMeta() + ln();
+        msg = msg + ln();
+        msg = msg + "[Table]" + ln() + getTableDbName() + ln();
+        msg = msg + ln();
+        msg = msg + "[Column]" + ln() + columnInfo.getColumnDbName() + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new IllegalClassificationCodeException(msg);
+    }
+
     // ===================================================================================
     //                                                                          Util Class
     //                                                                          ==========
@@ -1170,17 +1215,17 @@ public abstract class AbstractDBMeta implements DBMeta {
         } else {
             map = newConcurrentHashMap(getTablePropertyName().toLowerCase(), getTableDbName());
         }
-        Method[] methods = this.getClass().getMethods();
-        String columnInfoMethodPrefix = "column";
+        final Method[] methods = this.getClass().getMethods();
+        final String columnInfoMethodPrefix = "column";
         try {
             for (Method method : methods) {
-                String name = method.getName();
+                final String name = method.getName();
                 if (!name.startsWith(columnInfoMethodPrefix)) {
                     continue;
                 }
-                ColumnInfo columnInfo = (ColumnInfo) method.invoke(this);
-                String dbName = columnInfo.getColumnDbName();
-                String propertyName = columnInfo.getPropertyName();
+                final ColumnInfo columnInfo = (ColumnInfo) method.invoke(this);
+                final String dbName = columnInfo.getColumnDbName();
+                final String propertyName = columnInfo.getPropertyName();
                 if (dbNameKey) {
                     map.put(dbName.toLowerCase(), propertyName);
                 } else {

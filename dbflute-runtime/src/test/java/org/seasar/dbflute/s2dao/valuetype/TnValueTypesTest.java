@@ -12,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.seasar.dbflute.jdbc.Classification;
+import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.mock.MockValueType;
 import org.seasar.dbflute.unit.PlainTestCase;
@@ -129,7 +130,7 @@ public class TnValueTypesTest extends PlainTestCase {
             return null;
         }
 
-        public DataType dataType() {
+        public ClassificationMeta meta() {
             return null;
         }
     }

@@ -16,29 +16,20 @@
 package org.seasar.dbflute.jdbc;
 
 /**
- * The basic interface of classification. <br />
+ * The meta of classification. <br />
  * It's an internal interface for DBFlute runtime.
  * @author jflute
  */
-public interface Classification {
+public interface ClassificationMeta {
 
     /**
-     * @return The code of the classification. (NotNull)
+     * @param code The code of the classification. (Nullable)
+     * @return The instance of the classification. (Nullable: when not found and code is null)
      */
-    String code();
+    Classification codeOf(Object code);
 
     /**
-     * @return The name of the classification. (NotNull)
+     * @return The instance of the code type for the classification. (NotNull)
      */
-    String name();
-
-    /**
-     * @return The code of the classification. (Nullable: when an alias is not specified in its setting)
-     */
-    String alias();
-
-    /**
-     * @return The meta of the classification. (NotNull)
-     */
-    ClassificationMeta meta();
+    ClassificationCodeType codeType();
 }

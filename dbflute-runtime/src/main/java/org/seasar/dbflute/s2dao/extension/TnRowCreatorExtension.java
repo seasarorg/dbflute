@@ -51,8 +51,8 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DBMeta _dbmeta;
-    protected boolean _beanAssignable;
+    protected DBMeta _fixedDBMeta;
+    protected boolean _creatableByDBMeta;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -69,14 +69,34 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         if (beanClass != null) {
             final DBMeta dbmeta = findDBMetaByClass(beanClass);
             if (dbmeta != null) {
-                rowCreator.setDBMeta(dbmeta);
-                rowCreator.setBeanAssignable(isBeanAssignableFromEntity(beanClass, dbmeta.getEntityType()));
+                rowCreator.setFixedDBMeta(dbmeta);
+                rowCreator.setCreatableByDBMeta(isCreatableByDBMeta(beanClass, dbmeta.getEntityType()));
             }
         }
         return rowCreator;
     }
 
-    protected static boolean isBeanAssignableFromEntity(Class<?> beanClass, Class<?> entityType) {
+    protected static DBMeta findDBMetaByClass(Class<?> beanClass) {
+        if (!Entity.class.isAssignableFrom(beanClass)) {
+            return null;
+        }
+        // getting from entity because the bean may be customize entity.
+        final Object instance = newInstance(beanClass); // only when initialization
+        return ((Entity) instance).getDBMeta();
+    }
+
+    protected static Object newInstance(Class<?> clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (InstantiationException e) {
+            throw new IllegalStateException(e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    protected static boolean isCreatableByDBMeta(Class<?> beanClass, Class<?> entityType) {
+        // Returns false when the bean is not related to the entity or is a sub class of the entity.
         return beanClass.isAssignableFrom(entityType);
     }
 
@@ -99,16 +119,16 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         final Map<String, Integer> selectIndexMap = ResourceContext.getSelectIndexMap();
         final Object row;
         final DBMeta dbmeta;
-        if (_dbmeta != null) {
-            dbmeta = _dbmeta;
-            if (_beanAssignable) {
-                row = dbmeta.newEntity();
+        if (_fixedDBMeta != null) {
+            if (_creatableByDBMeta) {
+                row = _fixedDBMeta.newEntity();
             } else {
                 row = newBean(beanClass);
             }
+            dbmeta = _fixedDBMeta;
         } else {
             row = newBean(beanClass);
-            dbmeta = findDBMeta(row);
+            dbmeta = findCachedDBMeta(row);
         }
         try {
             if (dbmeta != null) {
@@ -203,7 +223,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
      * @param row The instance of row. (NotNull)
      * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
      */
-    public static DBMeta findDBMeta(Object row) {
+    public static DBMeta findCachedDBMeta(Object row) {
         return DBMetaCacheHandler.findDBMeta(row);
     }
 
@@ -212,7 +232,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
      * @param tableName The name of table. (NotNull)
      * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
      */
-    public static DBMeta findDBMeta(Class<?> rowType, String tableName) {
+    public static DBMeta findCachedDBMeta(Class<?> rowType, String tableName) {
         return DBMetaCacheHandler.findDBMeta(rowType, tableName);
     }
 
@@ -226,7 +246,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
                 return null;
             }
             final Entity entity = (Entity) row;
-            DBMeta dbmeta = findCachedDBMeta(entity.getClass());
+            DBMeta dbmeta = getCachedDBMeta(entity.getClass());
             if (dbmeta != null) {
                 return dbmeta;
             }
@@ -236,7 +256,7 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
 
         public static DBMeta findDBMeta(Class<?> rowType, String tableName) {
-            DBMeta dbmeta = findCachedDBMeta(rowType);
+            DBMeta dbmeta = getCachedDBMeta(rowType);
             if (dbmeta != null) {
                 return dbmeta;
             }
@@ -246,13 +266,13 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
             return dbmeta;
         }
 
-        protected static DBMeta findCachedDBMeta(Class<?> rowType) {
-            Map<Class<?>, DBMeta> dbmetaCache = findDBMetaCache();
-            if (dbmetaCache == null) {
-                dbmetaCache = new HashMap<Class<?>, DBMeta>();
-                InternalMapContext.setObject(DBMETA_CACHE_KEY, dbmetaCache);
+        protected static DBMeta getCachedDBMeta(Class<?> rowType) {
+            Map<Class<?>, DBMeta> contextCacheMap = getDBMetaContextCacheMap();
+            if (contextCacheMap == null) {
+                contextCacheMap = new HashMap<Class<?>, DBMeta>();
+                InternalMapContext.setObject(DBMETA_CACHE_KEY, contextCacheMap);
             }
-            return dbmetaCache.get(rowType);
+            return contextCacheMap.get(rowType);
         }
 
         protected static void cacheDBMeta(Entity entity, DBMeta dbmeta) {
@@ -260,31 +280,13 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
         }
 
         protected static void cacheDBMeta(Class<?> type, DBMeta dbmeta) {
-            final Map<Class<?>, DBMeta> dbmetaCache = findDBMetaCache();
+            final Map<Class<?>, DBMeta> dbmetaCache = getDBMetaContextCacheMap();
             dbmetaCache.put(type, dbmeta);
         }
 
         @SuppressWarnings("unchecked")
-        protected static Map<Class<?>, DBMeta> findDBMetaCache() {
+        protected static Map<Class<?>, DBMeta> getDBMetaContextCacheMap() {
             return (Map<Class<?>, DBMeta>) InternalMapContext.getObject(DBMETA_CACHE_KEY);
-        }
-    }
-
-    protected static DBMeta findDBMetaByClass(Class<?> beanClass) {
-        final Object instance = newInstance(beanClass);
-        if (!(instance instanceof Entity)) {
-            return null;
-        }
-        return ((Entity) instance).getDBMeta();
-    }
-
-    protected static Object newInstance(Class<?> clazz) {
-        try {
-            return clazz.newInstance();
-        } catch (InstantiationException e) {
-            throw new IllegalStateException(e);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
         }
     }
 
@@ -298,11 +300,11 @@ public class TnRowCreatorExtension extends TnRowCreatorImpl {
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public void setDBMeta(DBMeta dbmeta) {
-        this._dbmeta = dbmeta;
+    public void setFixedDBMeta(DBMeta fixedDBMeta) {
+        this._fixedDBMeta = fixedDBMeta;
     }
 
-    public void setBeanAssignable(boolean beanAssignable) {
-        this._beanAssignable = beanAssignable;
+    public void setCreatableByDBMeta(boolean creatableByDBMeta) {
+        this._creatableByDBMeta = creatableByDBMeta;
     }
 }

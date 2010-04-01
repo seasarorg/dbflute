@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 import org.seasar.dbflute.jdbc.Classification;
+import org.seasar.dbflute.jdbc.ClassificationCodeType;
 import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
@@ -65,9 +66,9 @@ public class ClassificationType extends TnAbstractValueType {
                 throw new IllegalStateException(msg);
             }
             final Classification cls = (Classification) value;
-            if (Classification.DataType.String.equals(cls.dataType())) {
+            if (ClassificationCodeType.String.equals(cls.meta().codeType())) {
                 ps.setString(index, cls.code());
-            } else if (Classification.DataType.Number.equals(cls.dataType())) {
+            } else if (ClassificationCodeType.Number.equals(cls.meta().codeType())) {
                 ps.setInt(index, DfTypeUtil.toInteger(cls.code()));
             } else {
                 ps.setObject(index, cls.code());

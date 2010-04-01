@@ -13,32 +13,31 @@
  * either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package org.seasar.dbflute.jdbc;
+package org.seasar.dbflute.exception;
 
 /**
- * The basic interface of classification. <br />
- * It's an internal interface for DBFlute runtime.
+ * The exception of when the illegal classification code is found.
  * @author jflute
  */
-public interface Classification {
+public class IllegalClassificationCodeException extends RuntimeException {
+
+    /** Serial version UID. (Default) */
+    private static final long serialVersionUID = 1L;
 
     /**
-     * @return The code of the classification. (NotNull)
+     * Constructor.
+     * @param msg Exception message. (NotNull)
      */
-    String code();
+    public IllegalClassificationCodeException(String msg) {
+        super(msg);
+    }
 
     /**
-     * @return The name of the classification. (NotNull)
+     * Constructor.
+     * @param msg Exception message. (NotNull)
+     * @param cause Throwable. (NotNull)
      */
-    String name();
-
-    /**
-     * @return The code of the classification. (Nullable: when an alias is not specified in its setting)
-     */
-    String alias();
-
-    /**
-     * @return The meta of the classification. (NotNull)
-     */
-    ClassificationMeta meta();
+    public IllegalClassificationCodeException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

@@ -14,6 +14,7 @@ import org.seasar.dbflute.exception.IfCommentNullPointerException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedExpressionException;
 import org.seasar.dbflute.exception.IfCommentUnsupportedTypeComparisonException;
 import org.seasar.dbflute.jdbc.Classification;
+import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.unit.PlainTestCase;
 import org.seasar.dbflute.util.DfTypeUtil;
@@ -766,15 +767,15 @@ public class IfCommentEvaluatorTest extends PlainTestCase {
             return null;
         }
 
-        public DataType dataType() {
-            return null;
-        }
-
         public String code() {
             return "Pixy";
         }
 
         public String alias() {
+            return null;
+        }
+
+        public ClassificationMeta meta() {
             return null;
         }
     }

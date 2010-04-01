@@ -103,7 +103,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
     }
 
     protected DBMeta findDBMeta(Class<?> rowType, String tableName) {
-        return TnRowCreatorExtension.findDBMeta(rowType, tableName);
+        return TnRowCreatorExtension.findCachedDBMeta(rowType, tableName);
     }
 
     @Override
@@ -163,7 +163,7 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
      * @return The interface of DBMeta. (Nullable: If it's null, it means NotFound.)
      */
     protected DBMeta findDBMeta(Object row) {
-        return TnRowCreatorExtension.findDBMeta(row);
+        return TnRowCreatorExtension.findCachedDBMeta(row);
     }
 
     @Override

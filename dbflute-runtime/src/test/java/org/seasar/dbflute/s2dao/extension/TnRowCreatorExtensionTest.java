@@ -11,9 +11,9 @@ public class TnRowCreatorExtensionTest extends TestCase {
     public void test_isBeanAssignableFromEntity() {
         // ## Arrange & Act & Assert ##
         Class<?> entityType = ExCustomizeEntity.class;
-        assertTrue(TnRowCreatorExtension.isBeanAssignableFromEntity(BsCustomizeEntity.class, entityType));
-        assertTrue(TnRowCreatorExtension.isBeanAssignableFromEntity(ExCustomizeEntity.class, entityType));
-        assertFalse(TnRowCreatorExtension.isBeanAssignableFromEntity(ManualCustomizeEntity.class, entityType));
+        assertTrue(TnRowCreatorExtension.isCreatableByDBMeta(BsCustomizeEntity.class, entityType));
+        assertTrue(TnRowCreatorExtension.isCreatableByDBMeta(ExCustomizeEntity.class, entityType));
+        assertFalse(TnRowCreatorExtension.isCreatableByDBMeta(ManualCustomizeEntity.class, entityType));
     }
     
     protected static class BsCustomizeEntity {

@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
+import org.seasar.dbflute.jdbc.ClassificationMeta;
 
 /**
  * The information of column.
@@ -52,6 +53,7 @@ public class ColumnInfo {
     protected final String _columnComment;
     protected final List<String> _foreignPropList;
     protected final List<String> _referrerPropList;
+    protected final ClassificationMeta _classificationMeta;
 
     // ===================================================================================
     //                                                                         Constructor
@@ -59,7 +61,8 @@ public class ColumnInfo {
     public ColumnInfo(DBMeta dbmeta, String columnDbName, String columnAlias, boolean notNull, String propertyName,
             Class<?> propertyType, boolean primary, boolean autoIncrement, String columnDbType, Integer columnSize,
             Integer columnDecimalDigits, boolean commonColumn, OptimisticLockType optimisticLockType,
-            String columnComment, List<String> foreignPropList, List<String> referrerPropList) {
+            String columnComment, List<String> foreignPropList, List<String> referrerPropList,
+            ClassificationMeta classificationMeta) {
         assertObjectNotNull("dbmeta", dbmeta);
         assertObjectNotNull("columnDbName", columnDbName);
         assertObjectNotNull("propertyName", propertyName);
@@ -80,7 +83,7 @@ public class ColumnInfo {
         this._columnComment = columnComment;
         this._foreignPropList = foreignPropList != null ? foreignPropList : EMPTY_LIST;
         this._referrerPropList = referrerPropList != null ? referrerPropList : EMPTY_LIST;
-
+        this._classificationMeta = classificationMeta;
     }
 
     // ===================================================================================
@@ -315,5 +318,13 @@ public class ColumnInfo {
             referrerInfoList.add(getDBMeta().findReferrerInfo(fkProp));
         }
         return Collections.unmodifiableList(referrerInfoList); // as read-only
+    }
+
+    /**
+     * Get the meta of classification related to the column.
+     * @return The instance of classification meta. (Nullable)
+     */
+    public ClassificationMeta getClassificationMeta() {
+        return _classificationMeta;
     }
 }
