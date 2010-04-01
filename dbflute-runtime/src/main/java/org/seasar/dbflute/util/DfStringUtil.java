@@ -55,7 +55,7 @@ public class DfStringUtil {
         if (text == null || fromText == null || toText == null) {
             return null;
         }
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         int pos = 0;
         int pos2 = 0;
         do {

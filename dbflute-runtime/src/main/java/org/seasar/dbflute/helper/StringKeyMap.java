@@ -251,7 +251,7 @@ public class StringKeyMap<VALUE> implements Map<String, VALUE> {
         if (text == null || fromText == null || toText == null) {
             return null;
         }
-        StringBuilder sb = new StringBuilder(100);
+        StringBuilder sb = new StringBuilder();
         int pos = 0;
         int pos2 = 0;
         while (true) {
