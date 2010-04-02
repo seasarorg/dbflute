@@ -1072,6 +1072,20 @@ public class Column {
         }
     }
 
+    public boolean isDifferentJavaNativeFK() {
+        if (!isForeignKey()) {
+            return false;
+        }
+        final List<ForeignKey> foreignKeyList = getForeignKeyList();
+        for (ForeignKey fk : foreignKeyList) {
+            final Column foreignColumn = fk.getForeignColumnByLocalColumn(this);
+            if (!getJavaNative().equals(foreignColumn.getJavaNative())) {
+                return true; // if one at least exists, returns true
+            }
+        }
+        return false;
+    }
+
     // -----------------------------------------------------
     //                                              Referrer
     //                                              --------
@@ -1192,6 +1206,20 @@ public class Column {
         }
         sb.delete(0, delimiter.length());
         return "\"" + sb.toString() + "\"";
+    }
+
+    public boolean isDifferentJavaNativeReferrer() {
+        if (!isForeignKey()) {
+            return false;
+        }
+        final List<ForeignKey> referrerList = getReferrerList();
+        for (ForeignKey referrer : referrerList) {
+            final Column referrerColumn = referrer.getLocalColumnByForeignColumn(this);
+            if (!getJavaNative().equals(referrerColumn.getJavaNative())) {
+                return true; // if one at least exists, returns true
+            }
+        }
+        return false;
     }
 
     // ===================================================================================
@@ -1316,6 +1344,13 @@ public class Column {
     public boolean isJavaNativeValueOfAbleObject() { // Java Only: valueOf-able
         List<Object> list = Arrays.asList(new Object[] { "Integer", "Long", "Short", "Byte", "Boolean", "Character" });
         return containsAsEndsWith(getJavaNative(), list);
+    }
+
+    public boolean isJavaNativeNumberDifferentBetweenRelation() {
+        if (!isJavaNativeNumberObject()) {
+            return false;
+        }
+        return isDifferentJavaNativeFK() || isDifferentJavaNativeReferrer();
     }
 
     // - - - - -

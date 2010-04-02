@@ -50,12 +50,16 @@ public class ${glImplementedSqlClauseCreator} implements SqlClauseCreator {
             sqlClause = new SqlClauseSqlite(tableDbName).provider(dbmetaProvider);
         } else {
             // for the database when generating
-            sqlClause = new SqlClause${database.generateDbName}(tableDbName).provider(dbmetaProvider);
+            sqlClause = createDefaultSqlClause(tableDbName, dbmetaProvider);
         }
         if (isDisableSelectIndex()) {
             sqlClause.disableSelectIndex();
         }
         return sqlClause;
+    }
+
+    protected SqlClause createDefaultSqlClause(String tableDbName, DBMetaProvider dbmetaProvider) {
+        return new SqlClause${database.generateDbName}(tableDbName).provider(dbmetaProvider);
     }
 
     protected boolean isCurrentDBDef(DBDef currentDBDef) {

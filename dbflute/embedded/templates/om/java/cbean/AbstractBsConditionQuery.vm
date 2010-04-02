@@ -913,7 +913,7 @@ public abstract class ${myClassName} extends AbstractConditionQuery {
      * $database.buildClassificationApplicationComment($classificationMap)
      */
     public void set${tmpJavaName}_Equal_${classificationMap.get('name')}() {
-        reg${tmpJavaName}(CK_EQ, new ${col.javaNative}(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
+        reg${tmpJavaName}(CK_EQ, ${col.javaNative}.valueOf(${glCDef}.${col.classificationName}.${classificationMap.get('name')}.code()));
     }
 #end
 #end

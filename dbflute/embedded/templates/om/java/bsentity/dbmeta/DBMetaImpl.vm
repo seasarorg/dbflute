@@ -331,7 +331,11 @@ public class ${myClassName} extends AbstractDBMeta {
     }}
 #else
     public static class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
+#if ($col.isJavaNativeNumberDifferentBetweenRelation())
+    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(convTN(v, ${col.javaNative}.class)); } }
+#else
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
+#end
 #end
 #end
 }
