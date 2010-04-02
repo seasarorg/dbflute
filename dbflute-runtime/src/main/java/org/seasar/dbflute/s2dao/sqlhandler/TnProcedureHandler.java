@@ -125,7 +125,7 @@ public class TnProcedureHandler extends TnBasicHandler {
     }
 
     /**
-     * Handle not-parameter result set, for example, MySQL and (MS) SQLServer.
+     * Handle not-parameter result set, for example, MySQL, DB2 and (MS) SQLServer.
      * @param cs The statement of procedure. (NotNull)
      * @param pmb The parameter bean from arguments. (NotNull)
      * @param executed The return value of execute() that means whether the first result is a result set. 

@@ -28,7 +28,7 @@ import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
  */
 public class OracleResultSetType extends TnAbstractValueType {
 
-    protected static int CURSOR = -10;
+    public static final int CURSOR = -10;
 
     public OracleResultSetType() {
         super(CURSOR);
