@@ -665,7 +665,7 @@ public abstract class $myClassName implements ${myEntityInterfaceName}, Serializ
     /**
      * {@inheritDoc}
      */
-    ${col.propertySettingModifier} void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
+    public void set${javaName}(${javaNative} ${uncapitalisedJavaName}) {
         set${targetJavaName}(${uncapitalisedJavaName});
     }
 #end
