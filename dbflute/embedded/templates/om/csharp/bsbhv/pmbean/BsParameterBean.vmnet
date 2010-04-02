@@ -1,6 +1,7 @@
 #set ($myClassName = "${myExtendedParameterBeanClassName}")
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 using ${glPackageBaseCommon};
@@ -8,6 +9,9 @@ using ${glPackageBaseCommon};
 using ${glPackageBaseCommonCBeanOutsidesql};
 #end
 using ${glPackageBaseCommonCOption};
+#if ($database.isPmbMetaDataRefCustomizeEntity($pmbClassName))
+using ${glPackageExtendedCustomizeEntity};
+#end
 
 namespace ${glPackageExtendedParameterBean} {
 

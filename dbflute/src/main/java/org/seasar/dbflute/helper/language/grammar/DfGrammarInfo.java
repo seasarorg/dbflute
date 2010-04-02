@@ -24,9 +24,14 @@ public interface DfGrammarInfo {
      * @return The definition of 'public static'. (NotNull)
      */
     public String getPublicStaticDefinition();
-    
+
     /**
-     * @return The definition of 'java.util.List<java.util.Map<key, value>>'. (NotNull)
+     * @return The definition of 'List(element)'. (NotNull)
+     */
+    public String getGenericListClassName(String element);
+
+    /**
+     * @return The definition of 'List(Map(key, value))'. (NotNull)
      */
     public String getGenericMapListClassName(String key, String value);
 }

@@ -21,6 +21,10 @@ public class DfGrammarInfoJava implements DfGrammarInfo {
         return "public static final";
     }
 
+    public String getGenericListClassName(String element) {
+        return "List<" + element + ">";
+    }
+
     public String getGenericMapListClassName(String key, String value) {
         return "List<Map<" + key + ", " + value + ">>";
     }

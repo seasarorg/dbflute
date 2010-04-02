@@ -44,7 +44,7 @@ public class DfCustomizeEntityMetaExtractor {
             metaInfo.setSql2EntityRelatedTableName(sql2EntityRelatedTableName);
 
             String columnName = md.getColumnLabel(i);
-            String relatedColumnName = md.getColumnName(i);
+            final String relatedColumnName = md.getColumnName(i);
             metaInfo.setSql2EntityRelatedColumnName(relatedColumnName);
             if (columnName == null || columnName.trim().length() == 0) {
                 columnName = relatedColumnName;

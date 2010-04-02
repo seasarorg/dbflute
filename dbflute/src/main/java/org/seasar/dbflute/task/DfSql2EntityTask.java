@@ -682,7 +682,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
                     _entityInfoMap.put(entityName, column.getColumnMetaInfoMap());
                     existsCustomizeEntity = true;
-                    propertyType = "List<" + entityName + ">";
+                    propertyType = convertProcedureListPropertyType(entityName);
                 }
                 propertyNameTypeMap.put(propertyName, propertyType);
                 final DfProcedureColumnType procedureColumnType = column.getProcedureColumnType();
@@ -701,7 +701,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
                     final String entityName = convertProcedurePmbNameToEntityName(pmbName, propertyName);
                     _entityInfoMap.put(entityName, result.getColumnMetaInfoMap());
                     existsCustomizeEntity = true;
-                    propertyType = "List<" + entityName + ">";
+                    propertyType = convertProcedureListPropertyType(entityName);
                 }
                 propertyNameTypeMap.put(propertyName, propertyType);
                 propertyNameOptionMap.put(propertyName, DfProcedureColumnType.procedureColumnResult.toString());
@@ -801,6 +801,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return entityName;
     }
 
+    protected String convertProcedureListPropertyType(String entityName) {
+        final DfGrammarInfo grammarInfo = getBasicProperties().getLanguageDependencyInfo().getGrammarInfo();
+        return grammarInfo.getGenericListClassName(entityName);
+    }
+
     protected String filterProcedureName4PmbNameAboutVendorDependency(String procedureName) {
         // Because SQLServer returns 'Abc;1'.
         if (getBasicProperties().isDatabaseSQLServer() && procedureName.contains(";")) {
@@ -842,7 +847,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
         final Set<String> entityNameSet = _entityInfoMap.keySet();
         for (String entityName : entityNameSet) {
-            final Map<String, DfColumnMetaInfo> columnJdbcTypeMap = _entityInfoMap.get(entityName);
+            final Map<String, DfColumnMetaInfo> columnMetaInfoMap = _entityInfoMap.get(entityName);
 
             final Table tbl = new Table();
             tbl.setName(entityName);
@@ -852,19 +857,19 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             _log.info(entityName + " --> " + tbl.getName() + " : " + tbl.getJavaName() + " : "
                     + tbl.getUncapitalisedJavaName());
 
-            final boolean allCommonColumn = hasAllCommonColumn(columnJdbcTypeMap);
-            final Set<String> columnNameSet = columnJdbcTypeMap.keySet();
+            final boolean allCommonColumn = hasAllCommonColumn(columnMetaInfoMap);
+            final Set<String> columnNameSet = columnMetaInfoMap.keySet();
             for (String columnName : columnNameSet) {
                 final Column column = new Column();
                 setupColumnName(columnName, column);
                 setupPrimaryKey(entityName, columnName, column);
-                setupTorqueType(columnJdbcTypeMap, columnName, column, allCommonColumn);
-                setupDbType(columnJdbcTypeMap, columnName, column);
-                setupColumnSizeContainsDigit(columnJdbcTypeMap, columnName, column);
-                setupColumnComment(columnJdbcTypeMap, columnName, column);
-                setupSql2EntityRelatedTableName(columnJdbcTypeMap, columnName, column);
-                setupSql2EntityRelatedColumnName(columnJdbcTypeMap, columnName, column);
-                setupSql2EntityForcedJavaNative(columnJdbcTypeMap, columnName, column);
+                setupTorqueType(columnMetaInfoMap, columnName, column, allCommonColumn);
+                setupDbType(columnMetaInfoMap, columnName, column);
+                setupColumnSizeContainsDigit(columnMetaInfoMap, columnName, column);
+                setupColumnComment(columnMetaInfoMap, columnName, column);
+                setupSql2EntityRelatedTableName(columnMetaInfoMap, columnName, column);
+                setupSql2EntityRelatedColumnName(columnMetaInfoMap, columnName, column);
+                setupSql2EntityForcedJavaNative(columnMetaInfoMap, columnName, column);
 
                 tbl.addColumn(column);
                 _log.info("   " + (column.isPrimaryKey() ? "*" : " ") + columnName + " --> " + column.getName() + " : "
@@ -895,15 +900,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected void setupColumnName(String columnName, final Column col) {
-        if (needsConvert(columnName)) {
+        if (needsConvertToJavaName(columnName)) {
             col.setName(columnName);
         } else {
             col.setupNeedsJavaNameConvertFalse();
-            if (columnName.length() > 1) {
-                col.setName(columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
-            } else {
-                col.setName(columnName.toUpperCase());
-            }
+            col.setName(DfStringUtil.initCap(columnName));
         }
     }
 
@@ -1028,23 +1029,36 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return factory.create(appData);
     }
 
-    protected boolean needsConvert(String columnName) {
+    protected boolean needsConvertToJavaName(String columnName) {
         if (columnName == null || columnName.trim().length() == 0) {
             String msg = "The columnName is invalid: " + columnName;
             throw new IllegalArgumentException(msg);
         }
-        if (columnName.indexOf("_") < 0) {
-            final char[] columnCharArray = columnName.toCharArray();
-            for (char ch : columnCharArray) {
-                // If the character is not number and not upper case...
-                if (!Character.isDigit(ch) && !Character.isUpperCase(ch)) {
-                    return false;
-                }
-            }
-            return true; // All characters are upper case!
-        } else {
-            return true; // Contains connector character!
+        if (columnName.contains("_")) {
+            return true; // contains connector!
         }
+        // here 'BIRHDATE' or 'birthdate' or 'Birthdate'
+        // or 'memberStatus' or 'MemberStatus'
+        final char[] columnCharArray = columnName.toCharArray();
+        boolean existsUpper = false;
+        boolean existsLower = false;
+        for (char ch : columnCharArray) {
+            if (Character.isDigit(ch)) {
+                continue;
+            }
+            if (Character.isUpperCase(ch)) {
+                existsUpper = true;
+                continue;
+            }
+            if (Character.isLowerCase(ch)) {
+                existsLower = true;
+                continue;
+            }
+        }
+        final boolean camelCase = existsUpper && existsLower;
+        // if it's camelCase, no needs to convert
+        // (all characters that are upper or lower case needs to convert)
+        return !camelCase;
     }
 
     // ===================================================================================
