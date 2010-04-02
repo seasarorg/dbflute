@@ -39,6 +39,7 @@ public class ToSingleByteOptionParts {
     public boolean isToSingleByteSpace() {
         return _toSingleByteSpace;
     }
+
     public void toSingleByteSpace() {
         _toSingleByteSpace = true;
     }

@@ -30,8 +30,8 @@ import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.dbmeta.DBMeta.OptimisticLockType;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The information of column.
@@ -163,7 +163,7 @@ public class ColumnInfo {
     //                                                                      General Helper
     //                                                                      ==============
     protected String initCap(final String name) {
-        return DfStringUtil.initCap(name);
+        return Srl.initCap(name);
     }
 
     protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {

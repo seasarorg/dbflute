@@ -31,8 +31,7 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnInsertAutoHandler(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData,
+    public TnInsertAutoHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
             TnPropertyType[] propertyTypes) {
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
         setOptimisticLockHandling(false);
@@ -41,15 +40,15 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-	@Override
+    @Override
     protected void setupBindVariables(Object bean) {
         setupInsertBindVariables(bean);
         setExceptionMessageSqlArgs(bindVariables);
     }
 
-	@Override
+    @Override
     protected void preUpdateBean(Object bean) {
-	    TnBeanMetaData bmd = getBeanMetaData();
+        TnBeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {
             TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
             if (generator.isSelfGenerate()) {
@@ -57,10 +56,10 @@ public class TnInsertAutoHandler extends TnAbstractAutoHandler {
             }
         }
     }
-	
-	@Override
+
+    @Override
     protected void postUpdateBean(Object bean, int ret) {
-	    TnBeanMetaData bmd = getBeanMetaData();
+        TnBeanMetaData bmd = getBeanMetaData();
         for (int i = 0; i < bmd.getIdentifierGeneratorSize(); i++) {
             TnIdentifierGenerator generator = bmd.getIdentifierGenerator(i);
             if (!generator.isSelfGenerate()) {

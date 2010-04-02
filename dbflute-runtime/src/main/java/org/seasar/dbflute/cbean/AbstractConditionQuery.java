@@ -41,10 +41,10 @@ import org.seasar.dbflute.jdbc.ParameterUtil;
 import org.seasar.dbflute.jdbc.ParameterUtil.ShortCharHandlingMode;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTraceViewUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 
 /**
@@ -664,12 +664,12 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
         String subQueryClause;
         if (columnName.contains(",") && relatedColumnName.contains(",")) {
             // Two-or-More Primary Keys
-            final List<String> columnNameSplit = DfStringUtil.splitList(columnName, ",");
+            final List<String> columnNameSplit = Srl.splitList(columnName, ",");
             final String[] realColumnNames = new String[columnNameSplit.size()];
             for (int i = 0; i < columnNameSplit.size(); i++) {
                 realColumnNames[i] = getExistsSubQueryRealColumnName(columnNameSplit.get(i).trim());
             }
-            final List<String> relatedColumnSplit = DfStringUtil.splitList(relatedColumnName, ",");
+            final List<String> relatedColumnSplit = Srl.splitList(relatedColumnName, ",");
             final String[] relatedColumnNames = new String[columnNameSplit.size()];
             for (int i = 0; i < relatedColumnSplit.size(); i++) {
                 relatedColumnNames[i] = relatedColumnSplit.get(i).trim();
@@ -1679,15 +1679,15 @@ public abstract class AbstractConditionQuery implements ConditionQuery {
     //                                                                      General Helper
     //                                                                      ==============
     protected final String replaceString(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     protected String initCap(String str) {
-        return DfStringUtil.initCap(str);
+        return Srl.initCap(str);
     }
 
     protected String initUncap(String str) {
-        return DfStringUtil.initUncap(str);
+        return Srl.initUncap(str);
     }
 
     protected String ln() {

@@ -86,9 +86,11 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
     //                                                                  ==================
     protected static class InternalIdentifierResultSetHandler implements TnResultSetHandler {
         private ValueType valueType;
+
         public InternalIdentifierResultSetHandler(ValueType valueType) {
             this.valueType = valueType;
         }
+
         public Object handle(ResultSet rs) throws SQLException {
             if (rs.next()) {
                 return valueType.getValue(rs, 1);
@@ -109,6 +111,7 @@ public abstract class TnIdentifierAbstractGenerator implements TnIdentifierGener
                 return null; // unreachable
             }
         }
+
         public CallableStatement createCallableStatement(Connection conn, String sql) {
             try {
                 return conn.prepareCall(sql);

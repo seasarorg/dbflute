@@ -67,7 +67,7 @@ public class ResultBeanBuilder<ENTITY> {
         rb.setOrderByClause(cb.getSqlComponentOfOrderByClause());
         return rb;
     }
-    
+
     /**
      * Build the result bean of list as empty. {for CB}
      * @param pb The bean of paging. (NotNull)

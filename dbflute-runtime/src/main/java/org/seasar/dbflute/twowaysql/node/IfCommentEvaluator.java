@@ -39,9 +39,9 @@ import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.DfTypeUtil.ParseTimestampException;
 
 /**
@@ -112,7 +112,7 @@ public class IfCommentEvaluator {
         if (_expression == null || _expression.trim().length() == 0) {
             throwIfCommentEmptyExpressionException();
         }
-        String filtered = DfStringUtil.replace(_expression, "()", "");
+        String filtered = Srl.replace(_expression, "()", "");
         if (filtered.contains("(") || filtered.contains(")")) {
             throwIfCommentUnsupportedExpressionException();
         }
@@ -635,7 +635,7 @@ public class IfCommentEvaluator {
     }
 
     protected List<String> splitList(String str, String delimiter) {
-        return DfStringUtil.splitList(str, delimiter);
+        return Srl.splitList(str, delimiter);
     }
 
     // ===================================================================================

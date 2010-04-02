@@ -30,9 +30,8 @@ public class TnInsertBatchAutoHandler extends TnAbstractBatchAutoHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnInsertBatchAutoHandler(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            TnPropertyType[] propertyTypes) {
+    public TnInsertBatchAutoHandler(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
         setOptimisticLockHandling(false);
     }
@@ -40,7 +39,7 @@ public class TnInsertBatchAutoHandler extends TnAbstractBatchAutoHandler {
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-	@Override
+    @Override
     protected void setupBindVariables(Object bean) {
         setupInsertBindVariables(bean);
     }

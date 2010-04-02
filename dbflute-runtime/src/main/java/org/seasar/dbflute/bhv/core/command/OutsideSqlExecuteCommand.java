@@ -65,7 +65,7 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
         outsideSqlContext.setMethodName(getCommandName());
         outsideSqlContext.setStatementConfig(option.getStatementConfig());
         outsideSqlContext.setTableDbName(option.getTableDbName());
-		outsideSqlContext.setupBehaviorQueryPathIfNeeds();
+        outsideSqlContext.setupBehaviorQueryPathIfNeeds();
         OutsideSqlContext.setOutsideSqlContextOnThread(outsideSqlContext);
     }
 
@@ -109,8 +109,8 @@ public class OutsideSqlExecuteCommand extends AbstractOutsideSqlCommand<Integer>
         // - - - - - - - - - - - - - - -
         // The attribute of SqlCommand.
         // - - - - - - - - - - - - - - -
-        final String[] argNames = (pmb != null ? new String[] {"pmb"} : new String[]{});
-        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] {pmb.getClass()} : new Class<?>[]{});
+        final String[] argNames = (pmb != null ? new String[] { "pmb" } : new String[] {});
+        final Class<?>[] argTypes = (pmb != null ? new Class<?>[] { pmb.getClass() } : new Class<?>[] {});
 
         return createUpdateDynamicCommand(argNames, argTypes, sql);
     }

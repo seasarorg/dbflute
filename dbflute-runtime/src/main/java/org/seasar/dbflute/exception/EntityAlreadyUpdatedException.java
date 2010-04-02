@@ -23,14 +23,14 @@ public class EntityAlreadyUpdatedException extends SQLFailureException {
 
     /** Serial version UID. (Default) */
     private static final long serialVersionUID = 1L;
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     private Object bean;
 
     private int rows;
-    
+
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
@@ -44,7 +44,7 @@ public class EntityAlreadyUpdatedException extends SQLFailureException {
         this.bean = bean;
         this.rows = rows;
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

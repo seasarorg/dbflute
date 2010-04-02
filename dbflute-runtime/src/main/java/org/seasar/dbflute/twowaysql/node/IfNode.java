@@ -17,7 +17,7 @@ package org.seasar.dbflute.twowaysql.node;
 
 import org.seasar.dbflute.exception.IfCommentWrongExpressionException;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -78,7 +78,7 @@ public class IfNode extends ContainerNode {
     }
 
     protected String replace(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     // ===================================================================================

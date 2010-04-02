@@ -25,7 +25,7 @@ import java.util.Set;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.dbmeta.DBMeta;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The information of referrer relation.
@@ -156,7 +156,7 @@ public class ReferrerInfo implements RelationInfo {
     //                                                                      General Helper
     //                                                                      ==============
     protected String initCap(final String name) {
-        return DfStringUtil.initCap(name);
+        return Srl.initCap(name);
     }
 
     protected Method findMethod(Class<?> clazz, String methodName, Class<?>[] argTypes) {

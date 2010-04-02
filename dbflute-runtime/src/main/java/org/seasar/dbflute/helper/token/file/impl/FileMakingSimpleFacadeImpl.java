@@ -41,15 +41,17 @@ public class FileMakingSimpleFacadeImpl implements FileMakingSimpleFacade {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void makeFromRowList(final String filename, final java.util.List<java.util.List<String>> rowList, final FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public void makeFromRowList(final String filename, final java.util.List<java.util.List<String>> rowList,
+            final FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
         final FileMakingCallback fileMakingCallback = new FileMakingCallback() {
             protected int rowCount = 0;
+
             public FileMakingRowResource getRowResource() {
                 ++rowCount;
                 if (rowList.size() < rowCount) {
                     return null;// The End!
                 }
-                final java.util.List<String> valueList = (java.util.List<String>)rowList.get(rowCount - 1);
+                final java.util.List<String> valueList = (java.util.List<String>) rowList.get(rowCount - 1);
                 final FileMakingRowResource fileMakingRowResource = new FileMakingRowResource();
                 fileMakingRowResource.setValueList(valueList);
                 return fileMakingRowResource;
@@ -67,15 +69,17 @@ public class FileMakingSimpleFacadeImpl implements FileMakingSimpleFacade {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public byte[] makeFromRowList(final java.util.List<java.util.List<String>> rowList, final FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
+    public byte[] makeFromRowList(final java.util.List<java.util.List<String>> rowList,
+            final FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException {
         final FileMakingCallback fileMakingCallback = new FileMakingCallback() {
             protected int rowCount = 0;
+
             public FileMakingRowResource getRowResource() {
                 ++rowCount;
                 if (rowList.size() < rowCount) {
                     return null;// The End!
                 }
-                final java.util.List<String> valueList = (java.util.List<String>)rowList.get(rowCount - 1);
+                final java.util.List<String> valueList = (java.util.List<String>) rowList.get(rowCount - 1);
                 final FileMakingRowResource fileMakingRowResource = new FileMakingRowResource();
                 fileMakingRowResource.setValueList(valueList);
                 return fileMakingRowResource;

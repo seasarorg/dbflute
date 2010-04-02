@@ -31,19 +31,20 @@ import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 @SuppressWarnings("unchecked")
 public class TnBeanArrayResultSetHandler extends TnBeanListResultSetHandler {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
-	 * @param beanMetaData Bean meta data. (NotNull)
+     * @param beanMetaData Bean meta data. (NotNull)
      * @param rowCreator Row creator. (NotNull)
      * @param relationRowCreator Relation row creator. (NotNul)
      */
-    public TnBeanArrayResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator, TnRelationRowCreator relationRowCreator) {
+    public TnBeanArrayResultSetHandler(TnBeanMetaData beanMetaData, TnRowCreator rowCreator,
+            TnRelationRowCreator relationRowCreator) {
         super(beanMetaData, rowCreator, relationRowCreator);
     }
-	
-	// ===================================================================================
+
+    // ===================================================================================
     //                                                                              Handle
     //                                                                              ======
     public Object handle(ResultSet rs) throws SQLException {

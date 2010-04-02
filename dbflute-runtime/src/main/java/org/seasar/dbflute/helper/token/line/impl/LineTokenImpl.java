@@ -22,7 +22,7 @@ import java.util.List;
 import org.seasar.dbflute.helper.token.line.LineMakingOption;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -80,10 +80,10 @@ public class LineTokenImpl implements LineToken {
                 value = value.trim();
             }
             if (quoteAll) {
-                value = DfStringUtil.replace(value, "\"", "\"\"");
+                value = Srl.replace(value, "\"", "\"\"");
                 sb.append(delimiter).append("\"").append(value).append("\"");
             } else if (quoteMinimamlly && needsQuote(value, delimiter)) {
-                value = DfStringUtil.replace(value, "\"", "\"\"");
+                value = Srl.replace(value, "\"", "\"\"");
                 sb.append(delimiter).append("\"").append(value).append("\"");
             } else {
                 sb.append(delimiter).append(value);

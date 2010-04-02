@@ -26,8 +26,8 @@ import org.seasar.dbflute.XLog;
 import org.seasar.dbflute.exception.SequenceCacheIllegalStateException;
 import org.seasar.dbflute.exception.SequenceCacheSizeNotDividedIncrementSizeException;
 import org.seasar.dbflute.resource.ResourceContext;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The handler of sequence cache.
@@ -132,7 +132,7 @@ public class SequenceCacheHandler {
 
     protected String buildNextValSqlOnOracle(String nextValSql, Integer divided, Integer unionCount) {
         final StringBuilder sb = new StringBuilder();
-        sb.append(DfStringUtil.replace(nextValSql, "from dual", ln() + "  from ("));
+        sb.append(Srl.replace(nextValSql, "from dual", ln() + "  from ("));
         final Integer maxDualCountInOneJoin = 10;
         int allRecordCount = 0;
         boolean reached = false;
@@ -171,7 +171,7 @@ public class SequenceCacheHandler {
     protected final String buildNextValSqlOnOracleUsingConnectBy(String nextValSql, Integer divided, Integer unionCount) {
         final StringBuilder sb = new StringBuilder();
         final String viewSql = "select level from dual connect by level <= " + unionCount;
-        sb.append(DfStringUtil.replace(nextValSql, "from dual", "from (" + viewSql + ")"));
+        sb.append(Srl.replace(nextValSql, "from dual", "from (" + viewSql + ")"));
         return sb.toString();
     }
 
@@ -179,7 +179,7 @@ public class SequenceCacheHandler {
         final StringBuilder sb = new StringBuilder();
         final String viewSql = "values (1) union all select N + 1 from NUM where n <= " + unionCount;
         sb.append("with NUM (N) as (").append(viewSql).append(")");
-        sb.append(ln()).append(DfStringUtil.replace(nextValSql, "values", "select")).append(" from NUM");
+        sb.append(ln()).append(Srl.replace(nextValSql, "values", "select")).append(" from NUM");
         return sb.toString();
     }
 

@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.seasar.dbflute.dbmeta.DBMeta;
 
-
 /**
  * The class of referrer information.
  * @author jflute

@@ -20,7 +20,6 @@ import org.seasar.dbflute.bhv.core.SqlExecutionCreator;
 import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
 import org.seasar.dbflute.s2dao.sqlcommand.TnUpdateModifiedOnlyCommand;
 
-
 /**
  * @author jflute
  */
@@ -60,7 +59,7 @@ public class UpdateEntityCommand extends AbstractEntityCommand {
         cmd.setVersionNoAutoIncrementOnMemory(isOptimisticLockHandling());
         return cmd;
     }
-    
+
     protected boolean isOptimisticLockHandling() {
         return true;
     }

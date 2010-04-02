@@ -79,7 +79,8 @@ public class ConditionKeyEqual extends ConditionKey {
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value, ConditionOption option) {
+    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+            ConditionOption option) {
         throw new UnsupportedOperationException("doAddWhereClause with condition-option is unsupported!!!");
     }
 
@@ -100,7 +101,8 @@ public class ConditionKeyEqual extends ConditionKey {
      * @param location Location. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location, ConditionOption option) {
+    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
+            ConditionOption option) {
         throw new UnsupportedOperationException("doSetupConditionValue with condition-option is unsupported!!!");
     }
 }

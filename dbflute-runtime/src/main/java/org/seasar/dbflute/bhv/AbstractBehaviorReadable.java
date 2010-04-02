@@ -52,9 +52,9 @@ import org.seasar.dbflute.helper.token.file.FileMakingHeaderInfo;
 import org.seasar.dbflute.helper.token.file.FileMakingOption;
 import org.seasar.dbflute.helper.token.file.FileMakingSimpleFacade;
 import org.seasar.dbflute.helper.token.file.impl.FileMakingSimpleFacadeImpl;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The abstract class of readable behavior.
@@ -179,7 +179,7 @@ public abstract class AbstractBehaviorReadable implements BehaviorReadable {
         final List<String> aliasList = cb.getSqlClause().getSpecifiedDerivingAliasList();
         for (String alias : aliasList) { // if derived referrer does not exist, empty loop
             final Method[] methods = entityType.getMethods();
-            final String expectedName = "set" + DfStringUtil.replace(alias, "_", "");
+            final String expectedName = "set" + Srl.replace(alias, "_", "");
             boolean exists = false;
             for (Method method : methods) {
                 final String methodName = method.getName();

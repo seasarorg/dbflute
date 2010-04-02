@@ -89,7 +89,7 @@ public class GeneralCharacterImpl implements GeneralCharacter {
             if (currentChar >= 0xff01 && currentChar <= 0xff5e) {
                 sb.append(toSingleByteCharacter(currentChar));
 
-            // It needs to  append more mark...
+                // It needs to  append more mark...
             } else if (currentChar == '\u2019' || currentChar == '\u2018' || currentChar == '\u2032') {
                 sb.append('\'');
             } else if (currentChar == '\u201d' || currentChar == '\u201c' || currentChar == '\u2033') {

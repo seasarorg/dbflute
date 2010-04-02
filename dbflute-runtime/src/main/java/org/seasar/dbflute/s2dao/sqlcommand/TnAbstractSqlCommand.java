@@ -26,14 +26,14 @@ import org.seasar.dbflute.jdbc.StatementFactory;
  */
 public abstract class TnAbstractSqlCommand implements TnSqlCommand, SqlExecution {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     private DataSource dataSource;
     private StatementFactory statementFactory;
     private String sql;
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnAbstractSqlCommand(DataSource dataSource, StatementFactory statementFactory) {
@@ -41,7 +41,7 @@ public abstract class TnAbstractSqlCommand implements TnSqlCommand, SqlExecution
         this.statementFactory = statementFactory;
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public DataSource getDataSource() {

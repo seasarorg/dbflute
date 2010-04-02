@@ -28,7 +28,8 @@ public interface FileMakingSimpleFacade {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void makeFromRowList(final String filename, final java.util.List<java.util.List<String>> rowList, final FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public void makeFromRowList(final String filename, final java.util.List<java.util.List<String>> rowList,
+            final FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
 
     /**
      * Make bytes from row-list.
@@ -38,5 +39,6 @@ public interface FileMakingSimpleFacade {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public byte[] makeFromRowList(final java.util.List<java.util.List<String>> rowList, final FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public byte[] makeFromRowList(final java.util.List<java.util.List<String>> rowList,
+            final FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
 }

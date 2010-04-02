@@ -32,8 +32,8 @@ import org.seasar.dbflute.jdbc.ValueType;
 import org.seasar.dbflute.resource.ResourceContext;
 import org.seasar.dbflute.s2dao.metadata.TnProcedureParameterType.TnProcedureParameterAccessor;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -130,7 +130,7 @@ public class TnProcedureMetaDataFactory {
     //                                                             Parameter Specification
     //                                                             =======================
     protected TnProcedureParameterSpec parseParameterSpec(String specExp, DfPropertyDesc parameterDesc) {
-        final List<String> list = DfStringUtil.splitListTrimmed(specExp, ",");
+        final List<String> list = Srl.splitListTrimmed(specExp, ",");
         if (list.size() != 2) {
             String msg = "The size of parameterInfo elements was illegal:";
             msg = msg + " elements=" + list + " spec=" + specExp;

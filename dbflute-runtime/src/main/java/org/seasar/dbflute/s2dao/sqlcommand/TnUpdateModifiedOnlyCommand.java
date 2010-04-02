@@ -31,18 +31,19 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
  */
 public class TnUpdateModifiedOnlyCommand extends TnUpdateAutoDynamicCommand {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnUpdateModifiedOnlyCommand(DataSource dataSource, StatementFactory statementFactory) {
         super(dataSource, statementFactory);
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                 No.1 Point Override
     //                                                                 ===================
     @Override
-    protected TnPropertyType[] createUpdatePropertyTypes(final TnBeanMetaData bmd, final Object bean, final String[] propertyNames) {
+    protected TnPropertyType[] createUpdatePropertyTypes(final TnBeanMetaData bmd, final Object bean,
+            final String[] propertyNames) {
         final Set<?> modifiedPropertyNames = getBeanMetaData().getModifiedPropertyNames(bean);
         final List<TnPropertyType> types = new ArrayList<TnPropertyType>();
         final String timestampPropertyName = bmd.getTimestampPropertyName();

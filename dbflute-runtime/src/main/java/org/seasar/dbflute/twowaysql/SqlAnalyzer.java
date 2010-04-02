@@ -33,8 +33,8 @@ import org.seasar.dbflute.twowaysql.node.IfNode;
 import org.seasar.dbflute.twowaysql.node.Node;
 import org.seasar.dbflute.twowaysql.node.PrefixSqlNode;
 import org.seasar.dbflute.twowaysql.node.SqlNode;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -143,7 +143,7 @@ public class SqlAnalyzer {
 
     protected void parseIf() {
         final String condition = _tokenizer.getToken().substring(2).trim();
-        if (DfStringUtil.isNullOrEmpty(condition)) {
+        if (Srl.is_Null_or_Empty(condition)) {
             throwIfCommentConditionNotFoundException();
         }
         final IfNode ifNode = createIfNode(condition);
@@ -354,7 +354,7 @@ public class SqlAnalyzer {
     }
 
     protected final String replaceString(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     // ===================================================================================

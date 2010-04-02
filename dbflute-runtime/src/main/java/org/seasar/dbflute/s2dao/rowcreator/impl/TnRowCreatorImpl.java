@@ -26,7 +26,7 @@ import org.seasar.dbflute.s2dao.metadata.TnPropertyMapping;
 import org.seasar.dbflute.s2dao.metadata.TnPropertyType;
 import org.seasar.dbflute.s2dao.rowcreator.TnRowCreator;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -83,7 +83,7 @@ public abstract class TnRowCreatorImpl implements TnRowCreator {
     protected void setupPropertyCacheNotPersistentElement(Map<String, TnPropertyMapping> proprertyCache,
             Set<String> selectColumnSet, TnPropertyType pt) throws SQLException {
         for (String columnName : selectColumnSet) {
-            String columnNameNotUnsco = DfStringUtil.replace(columnName, "_", "");
+            String columnNameNotUnsco = Srl.replace(columnName, "_", "");
             if (columnNameNotUnsco.equalsIgnoreCase(pt.getColumnName())) {
                 proprertyCache.put(columnName, pt);
                 break;

@@ -39,9 +39,9 @@ import org.seasar.dbflute.helper.mapstring.impl.MapListStringImpl;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 import org.seasar.dbflute.util.DfReflectionUtil.ReflectionFailureException;
 
 /**
@@ -907,7 +907,7 @@ public abstract class AbstractConditionBean implements ConditionBean {
     //                                                                      General Helper
     //                                                                      ==============
     protected String initCap(String str) {
-        return DfStringUtil.initCap(str);
+        return Srl.initCap(str);
     }
 
     protected String ln() {

@@ -19,7 +19,8 @@ package org.seasar.dbflute.dbmeta.hierarchy.basic;
  * @author jflute
  * @param <SOURCE_ROW> The type of source.
  */
-public class HierarchySourceListIterator<SOURCE_ROW> implements org.seasar.dbflute.dbmeta.hierarchy.HierarchySourceIterator {
+public class HierarchySourceListIterator<SOURCE_ROW> implements
+        org.seasar.dbflute.dbmeta.hierarchy.HierarchySourceIterator {
 
     protected java.util.List<? extends Object> sourceRowList;
 

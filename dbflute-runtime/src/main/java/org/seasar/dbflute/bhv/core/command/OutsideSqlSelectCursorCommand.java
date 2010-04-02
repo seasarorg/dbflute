@@ -53,7 +53,7 @@ public class OutsideSqlSelectCursorCommand extends AbstractOutsideSqlSelectComma
         super.setupOutsideSqlContext(outsideSqlContext);
         outsideSqlContext.setCursorHandler(_cursorHandler);
     }
-    
+
     // ===================================================================================
     //                                                                     Extension Point
     //                                                                     ===============

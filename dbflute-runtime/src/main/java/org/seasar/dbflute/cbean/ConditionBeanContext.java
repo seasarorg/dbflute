@@ -37,8 +37,8 @@ import org.seasar.dbflute.exception.SpecifyDerivedReferrerInvalidColumnSpecifica
 import org.seasar.dbflute.exception.SpecifyDerivedReferrerUnmatchedColumnTypeException;
 import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.factory.SqlAnalyzerFactory;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The context of condition-bean.
@@ -815,10 +815,10 @@ public class ConditionBeanContext {
     }
 
     protected static String initCap(String str) {
-        return DfStringUtil.initCap(str);
+        return Srl.initCap(str);
     }
 
     protected static String initUncap(String str) {
-        return DfStringUtil.initUncap(str);
+        return Srl.initUncap(str);
     }
 }

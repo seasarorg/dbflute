@@ -20,7 +20,6 @@ import java.util.List;
 import org.seasar.dbflute.Entity;
 import org.seasar.dbflute.cbean.ConditionBean;
 
-
 /**
  * The class of load referrer option.
  * @param <REFERRER_CONDITION_BEAN> The type of referrer condition-bean.
@@ -52,7 +51,8 @@ public class LoadReferrerOption<REFERRER_CONDITION_BEAN extends ConditionBean, R
         this._conditionBeanSetupper = conditionBeanSetupper;
     }
 
-    public LoadReferrerOption(ConditionBeanSetupper<REFERRER_CONDITION_BEAN> conditionBeanSetupper, EntityListSetupper<REFERRER_ENTITY> entityListSetupper) {
+    public LoadReferrerOption(ConditionBeanSetupper<REFERRER_CONDITION_BEAN> conditionBeanSetupper,
+            EntityListSetupper<REFERRER_ENTITY> entityListSetupper) {
         this._conditionBeanSetupper = conditionBeanSetupper;
         this._entityListSetupper = entityListSetupper;
     }

@@ -34,7 +34,8 @@ public class AccordingToOrderOption<ELEMENT_TYPE, ID_TYPE> {
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========
-    public void setupOrderedResource(List<ID_TYPE> orderedUniqueIdList, AccordingToOrderIdExtractor<ELEMENT_TYPE, ID_TYPE> idExtractor) {
+    public void setupOrderedResource(List<ID_TYPE> orderedUniqueIdList,
+            AccordingToOrderIdExtractor<ELEMENT_TYPE, ID_TYPE> idExtractor) {
         setOrderedUniqueIdList(orderedUniqueIdList);
         setIdExtractor(idExtractor);
     }

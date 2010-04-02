@@ -62,7 +62,8 @@ public interface MapStringBuilder {
         // =====================================================================================
         //                                                                           Constructor
         //                                                                           ===========
-        public DifferentDelimiterCountException(String msg, java.util.List<String> columnNameList, java.util.List<String> valueList) {
+        public DifferentDelimiterCountException(String msg, java.util.List<String> columnNameList,
+                java.util.List<String> valueList) {
             super(msg);
             _columnNameList = columnNameList;
             _valueList = valueList;
@@ -74,6 +75,7 @@ public interface MapStringBuilder {
         public java.util.List<String> getColumnNameList() {
             return _columnNameList;
         }
+
         public java.util.List<String> getValueList() {
             return _valueList;
         }

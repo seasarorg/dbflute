@@ -1,13 +1,13 @@
 package org.seasar.dbflute.util;
 
-import static org.seasar.dbflute.util.DfStringUtil.camelize;
-import static org.seasar.dbflute.util.DfStringUtil.decamelize;
-import static org.seasar.dbflute.util.DfStringUtil.extractFirstScope;
-import static org.seasar.dbflute.util.DfStringUtil.initBeansProp;
-import static org.seasar.dbflute.util.DfStringUtil.removeLineComment;
-import static org.seasar.dbflute.util.DfStringUtil.rtrim;
-import static org.seasar.dbflute.util.DfStringUtil.splitList;
-import static org.seasar.dbflute.util.DfStringUtil.splitListTrimmed;
+import static org.seasar.dbflute.util.Srl.camelize;
+import static org.seasar.dbflute.util.Srl.decamelize;
+import static org.seasar.dbflute.util.Srl.extractFirstScope;
+import static org.seasar.dbflute.util.Srl.initBeansProp;
+import static org.seasar.dbflute.util.Srl.removeLineComment;
+import static org.seasar.dbflute.util.Srl.rtrim;
+import static org.seasar.dbflute.util.Srl.splitList;
+import static org.seasar.dbflute.util.Srl.splitListTrimmed;
 
 import java.util.List;
 
@@ -47,7 +47,6 @@ public class DfStringUtilTest extends PlainTestCase {
     //                                                                                Trim
     //                                                                                ====
     public void test_rtrim_default() {
-        assertNull(rtrim(null));
         assertEquals(" foo", rtrim(" foo "));
         assertEquals(" foo", rtrim(" foo \n "));
         assertEquals(" foo", rtrim(" foo \n \n"));
@@ -56,7 +55,6 @@ public class DfStringUtilTest extends PlainTestCase {
     }
 
     public void test_rtrim_originalTrimTarget() {
-        assertNull(DfStringUtil.rtrim(null, "\n"));
         assertEquals(" foo ", DfStringUtil.rtrim(" foo \n", "\n"));
         assertEquals(" foo \n ", DfStringUtil.rtrim(" foo \n ", "\n"));
         assertEquals(" foo \r", DfStringUtil.rtrim(" foo \r\n", "\n"));

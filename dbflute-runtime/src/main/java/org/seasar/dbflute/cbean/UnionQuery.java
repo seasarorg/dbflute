@@ -27,7 +27,7 @@ package org.seasar.dbflute.cbean;
  * @param <UNION_CB> The type of condition-bean for union.
  */
 public interface UnionQuery<UNION_CB extends ConditionBean> {
-    
+
     /**
      * Set up your query condition for union. <br />
      * Don't call the method 'setupSelect_Xxx()' and 'addOrderBy_Xxx...()'

@@ -246,7 +246,7 @@ public class LikeSearchOption extends SimpleStringOption {
     public WhereClauseArranger getWhereClauseArranger() { // for application extension
         return null; // as default
     }
-    
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============

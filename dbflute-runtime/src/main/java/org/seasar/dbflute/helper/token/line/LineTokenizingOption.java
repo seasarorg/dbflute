@@ -27,7 +27,6 @@ public class LineTokenizingOption {
 
     protected boolean _handleEmtpyAsNull;
 
-
     // ===================================================================================
     //                                                                         Easy-to-Use
     //                                                                         ===========

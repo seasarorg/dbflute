@@ -21,7 +21,7 @@ import java.util.List;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.node.NodeUtil.IllegalParameterBeanHandler;
 import org.seasar.dbflute.twowaysql.pmbean.ParameterBean;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -43,7 +43,7 @@ public class EmbeddedValueNode extends AbstractNode {
     public EmbeddedValueNode(String expression, String testValue, String specifiedSql, boolean blockNullParameter) {
         this._expression = expression;
         this._testValue = testValue;
-        this._nameList = DfStringUtil.splitList(expression, ".");
+        this._nameList = Srl.splitList(expression, ".");
         this._specifiedSql = specifiedSql;
         this._blockNullParameter = blockNullParameter;
     }

@@ -38,8 +38,8 @@ import org.seasar.dbflute.dbmeta.info.ForeignInfo;
 import org.seasar.dbflute.exception.IllegalConditionBeanOperationException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.util.DfAssertUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The abstract class of SQL clause.
@@ -2358,7 +2358,7 @@ public abstract class AbstractSqlClause implements SqlClause {
     //                                                                      General Helper
     //                                                                      ==============
     protected String replaceString(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     protected String ln() {

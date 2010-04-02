@@ -20,7 +20,7 @@ package org.seasar.dbflute.dbway;
  * @author jflute
  */
 public interface ExtensionOperand {
-    
+
     /**
      * Get the value of operand.
      * @return The value of operand. (Nullable)

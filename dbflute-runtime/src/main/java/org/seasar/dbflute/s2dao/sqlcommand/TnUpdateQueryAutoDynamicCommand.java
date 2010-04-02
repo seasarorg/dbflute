@@ -40,8 +40,8 @@ import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 import org.seasar.dbflute.twowaysql.context.CommandContextCreator;
 import org.seasar.dbflute.twowaysql.node.Node;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -221,7 +221,7 @@ public class TnUpdateQueryAutoDynamicCommand implements TnSqlCommand, SqlExecuti
     //                                                                      General Helper
     //                                                                      ==============
     protected String replace(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     protected String ln() {

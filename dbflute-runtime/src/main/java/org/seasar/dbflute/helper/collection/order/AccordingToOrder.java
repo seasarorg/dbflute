@@ -30,5 +30,6 @@ public interface AccordingToOrder {
      * @param <ELEMENT_TYPE> The type of element.
      * @param <ID_TYPE> The type of ID.
      */
-    <ELEMENT_TYPE, ID_TYPE> void order(List<ELEMENT_TYPE> unorderedList, AccordingToOrderOption<ELEMENT_TYPE, ID_TYPE> option);
+    <ELEMENT_TYPE, ID_TYPE> void order(List<ELEMENT_TYPE> unorderedList,
+            AccordingToOrderOption<ELEMENT_TYPE, ID_TYPE> option);
 }

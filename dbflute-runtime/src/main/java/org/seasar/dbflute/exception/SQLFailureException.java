@@ -37,7 +37,7 @@ public class SQLFailureException extends RuntimeException {
         super(msg, cause);
         sqlEx = cause;
     }
-	
+
     public SQLException getSQLException() {
         return sqlEx;
     }

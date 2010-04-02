@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.seasar.dbflute.exception.CharParameterShortSizeException;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -62,9 +62,9 @@ public class ParameterUtil {
             return value;
         }
         if (mode.equals(ShortCharHandlingMode.RFILL)) {
-            return DfStringUtil.rfill(value, size);
+            return Srl.rfill(value, size);
         } else if (mode.equals(ShortCharHandlingMode.LFILL)) {
-            return DfStringUtil.lfill(value, size);
+            return Srl.lfill(value, size);
         } else if (mode.equals(ShortCharHandlingMode.EXCEPTION)) {
             String msg = "The size of the parameter '" + parameterName + "' should be " + size + ":";
             msg = msg + " value=[" + value + "] size=" + value.length();

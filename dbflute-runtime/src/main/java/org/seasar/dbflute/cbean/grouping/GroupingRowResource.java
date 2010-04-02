@@ -39,7 +39,7 @@ public class GroupingRowResource<ENTITY> {
      * @return Does the list of grouping row size up the break count?
      */
     public boolean isSizeUpBreakCount() {
-        return _elementCurrentIndex == (_breakCount-1);
+        return _elementCurrentIndex == (_breakCount - 1);
     }
 
     // =====================================================================================

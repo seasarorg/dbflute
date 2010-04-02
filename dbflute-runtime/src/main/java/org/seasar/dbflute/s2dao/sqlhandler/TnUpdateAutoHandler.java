@@ -30,8 +30,7 @@ public class TnUpdateAutoHandler extends TnAbstractAutoHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnUpdateAutoHandler(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData,
+    public TnUpdateAutoHandler(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData,
             TnPropertyType[] propertyTypes) {
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
     }
@@ -39,13 +38,13 @@ public class TnUpdateAutoHandler extends TnAbstractAutoHandler {
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-	@Override
+    @Override
     protected void setupBindVariables(Object bean) {
         setupUpdateBindVariables(bean);
         setExceptionMessageSqlArgs(bindVariables);
     }
 
-	@Override
+    @Override
     protected void postUpdateBean(Object bean, int ret) {
         updateVersionNoIfNeed(bean);
         updateTimestampIfNeed(bean);

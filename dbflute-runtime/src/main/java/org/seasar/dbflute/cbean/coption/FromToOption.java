@@ -68,11 +68,13 @@ public class FromToOption implements ConditionOption {
     //                                                                                Main
     //                                                                                ====
     public FromToOption greaterThan() {
-        _fromDateGreaterThan = true; return this;
+        _fromDateGreaterThan = true;
+        return this;
     }
 
     public FromToOption lessThan() {
-        _toDateLessThan = true; return this;
+        _toDateLessThan = true;
+        return this;
     }
 
     /**
@@ -88,7 +90,8 @@ public class FromToOption implements ConditionOption {
      * @return this. (NotNull)
      */
     public FromToOption compareAsDate() {
-        _compareAsDate = true; return this;
+        _compareAsDate = true;
+        return this;
     }
 
     // ===================================================================================

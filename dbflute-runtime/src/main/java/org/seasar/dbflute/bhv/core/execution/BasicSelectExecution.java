@@ -23,7 +23,6 @@ import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
 
-
 /**
  * @author jflute
  */
@@ -44,7 +43,8 @@ public class BasicSelectExecution extends TnAbstractDynamicCommand {
      * @param statementFactory The factory of statement.
      * @param resultSetHandler The handler of resultSet.
      */
-    public BasicSelectExecution(DataSource dataSource, StatementFactory statementFactory, TnResultSetHandler resultSetHandler) {
+    public BasicSelectExecution(DataSource dataSource, StatementFactory statementFactory,
+            TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory);
         this.resultSetHandler = resultSetHandler;
     }

@@ -32,7 +32,7 @@ import org.seasar.dbflute.helper.token.line.LineMakingOption;
 import org.seasar.dbflute.helper.token.line.LineToken;
 import org.seasar.dbflute.helper.token.line.LineTokenizingOption;
 import org.seasar.dbflute.helper.token.line.impl.LineTokenImpl;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -322,7 +322,7 @@ public class FileTokenImpl implements FileToken {
         if (value.endsWith("\"")) {
             value = value.substring(0, value.length() - 1);
         }
-        value = DfStringUtil.replace(value, "\"\"", "\"");
+        value = Srl.replace(value, "\"\"", "\"");
         return value;
     }
 

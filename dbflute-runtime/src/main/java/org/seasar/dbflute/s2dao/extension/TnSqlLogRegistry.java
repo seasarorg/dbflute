@@ -54,7 +54,7 @@ public class TnSqlLogRegistry {
     public static boolean exists() {
         return exists;
     }
-    
+
     public static boolean setupSqlLogRegistry() {
         if (!exists) {
             return false;

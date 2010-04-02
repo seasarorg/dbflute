@@ -37,8 +37,8 @@ import org.seasar.dbflute.helper.beans.exception.DfBeanFieldNotFoundException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanMethodNotFoundException;
 import org.seasar.dbflute.helper.beans.exception.DfBeanPropertyNotFoundException;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * {Refers to Seasar and Extends its class}
@@ -340,7 +340,7 @@ public class DfBeanDescImpl implements DfBeanDesc {
     }
 
     private static String initBeansProp(String name) {
-        return DfStringUtil.initBeansProp(name);
+        return Srl.initBeansProp(name);
     }
 
     private void addPropertyDesc(DfPropertyDesc propertyDesc) {

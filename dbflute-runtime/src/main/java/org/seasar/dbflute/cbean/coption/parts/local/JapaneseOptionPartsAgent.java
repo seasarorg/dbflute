@@ -45,6 +45,7 @@ public class JapaneseOptionPartsAgent {
     public boolean isRemoveLastLongVowel() {
         return _removeLastLongVowel;
     }
+
     public void removeLastLongVowel() {
         _removeLastLongVowel = true;
     }

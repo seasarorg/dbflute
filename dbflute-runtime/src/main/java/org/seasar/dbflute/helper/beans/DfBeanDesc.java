@@ -42,7 +42,7 @@ public interface DfBeanDesc {
     Constructor<?> getSuitableConstructor(Object[] args) throws DfBeanConstructorNotFoundException;
 
     Constructor<?> getConstructor(Class<?>[] paramTypes);
-    
+
     // ===================================================================================
     //                                                                            Property
     //                                                                            ========
@@ -51,9 +51,9 @@ public interface DfBeanDesc {
     DfPropertyDesc getPropertyDesc(String propertyName) throws DfBeanPropertyNotFoundException;
 
     int getPropertyDescSize();
-    
+
     List<String> getProppertyNameList();
-    
+
     // ===================================================================================
     //                                                                               Field
     //                                                                               =====
@@ -62,6 +62,7 @@ public interface DfBeanDesc {
     Field getField(String fieldName) throws DfBeanFieldNotFoundException;
 
     int getFieldSize();
+
     // ===================================================================================
     //                                                                              Method
     //                                                                              ======
@@ -78,11 +79,13 @@ public interface DfBeanDesc {
     boolean hasMethod(String methodName);
 
     String[] getMethodNames();
-    
+
     // ===================================================================================
     //                                                                          Reflection
     //                                                                          ==========
     Object newInstance(Object[] args) throws DfBeanConstructorNotFoundException;
+
     Object invoke(Object target, String methodName, Object[] args) throws DfBeanMethodNotFoundException;
+
     Object getFieldValue(String fieldName, Object target) throws DfBeanFieldNotFoundException;
 }

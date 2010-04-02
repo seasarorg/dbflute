@@ -27,10 +27,10 @@ public interface BehaviorSelector {
      * Initialize condition-bean meta data. <br />
      */
     public void initializeConditionBeanMetaData();
-	
+
     /**
      * Select behavior.
-	 * @param <BEHAVIOR> The type of behavior.
+     * @param <BEHAVIOR> The type of behavior.
      * @param behaviorType Behavior type. (NotNull)
      * @return Behavior. (NotNull)
      */

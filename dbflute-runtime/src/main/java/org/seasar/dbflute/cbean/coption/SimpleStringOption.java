@@ -19,7 +19,7 @@ import org.seasar.dbflute.cbean.coption.parts.SplitOptionParts;
 import org.seasar.dbflute.cbean.coption.parts.ToSingleByteOptionParts;
 import org.seasar.dbflute.cbean.coption.parts.ToUpperLowerCaseOptionParts;
 import org.seasar.dbflute.cbean.coption.parts.local.JapaneseOptionPartsAgent;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The class of simple-string-option.
@@ -164,7 +164,7 @@ public class SimpleStringOption implements ConditionOption {
     //                                                                        General Helper
     //                                                                        ==============
     protected String replace(String text, String fromText, String toText) {
-	    return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     // =====================================================================================
@@ -172,12 +172,20 @@ public class SimpleStringOption implements ConditionOption {
     //                                                                              ========
     public Object createDeepCopy() {
         final SimpleStringOption deepCopy = newDeepCopyInstance();
-        deepCopy._splitOptionParts = _splitOptionParts != null ? (SplitOptionParts)_splitOptionParts.createDeepCopy() : null;
-        deepCopy._toUpperLowerCaseOptionParts = _toUpperLowerCaseOptionParts != null ? (ToUpperLowerCaseOptionParts)_toUpperLowerCaseOptionParts.createDeepCopy() : null;
-        deepCopy._toSingleByteCaseOptionParts = _toSingleByteCaseOptionParts != null ? (ToSingleByteOptionParts)_toSingleByteCaseOptionParts.createDeepCopy() : null;
-        deepCopy._japaneseOptionPartsAgent = _japaneseOptionPartsAgent != null ? (JapaneseOptionPartsAgent)_japaneseOptionPartsAgent.createDeepCopy() : null;
+        deepCopy._splitOptionParts = _splitOptionParts != null ? (SplitOptionParts) _splitOptionParts.createDeepCopy()
+                : null;
+        deepCopy._toUpperLowerCaseOptionParts = _toUpperLowerCaseOptionParts != null ? (ToUpperLowerCaseOptionParts) _toUpperLowerCaseOptionParts
+                .createDeepCopy()
+                : null;
+        deepCopy._toSingleByteCaseOptionParts = _toSingleByteCaseOptionParts != null ? (ToSingleByteOptionParts) _toSingleByteCaseOptionParts
+                .createDeepCopy()
+                : null;
+        deepCopy._japaneseOptionPartsAgent = _japaneseOptionPartsAgent != null ? (JapaneseOptionPartsAgent) _japaneseOptionPartsAgent
+                .createDeepCopy()
+                : null;
         return deepCopy;
     }
+
     protected SimpleStringOption newDeepCopyInstance() {
         return new SimpleStringOption();
     }

@@ -68,17 +68,19 @@ public class ConditionKeyNotLikeSearch extends ConditionKey {
      * @param value Condition value. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value, ConditionOption option) {
+    protected void doAddWhereClause(List<String> conditionList, String columnName, ConditionValue value,
+            ConditionOption option) {
         if (option == null) {
             String msg = "The argument[option] should not be null: columnName=" + columnName + " value=" + value;
             throw new IllegalArgumentException(msg);
         }
         if (!(option instanceof LikeSearchOption)) {
-            String msg = "The argument[option] should be LikeSearchOption: columnName=" + columnName + " value=" + value;
+            String msg = "The argument[option] should be LikeSearchOption: columnName=" + columnName + " value="
+                    + value;
             throw new IllegalArgumentException(msg);
         }
         final String location = value.getNotLikeSearchLocation(); // from NotLikeSearch
-        final LikeSearchOption myOption = (LikeSearchOption)option;
+        final LikeSearchOption myOption = (LikeSearchOption) option;
         final String rearOption = myOption.getRearOption();
         final ExtensionOperand extOperand = myOption.getExtensionOperand();
         String operand = extOperand != null ? extOperand.operand() : null;
@@ -114,7 +116,8 @@ public class ConditionKeyNotLikeSearch extends ConditionKey {
      * @param location Location. (NotNull)
      * @param option Condition option. (NotNull)
      */
-    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location, ConditionOption option) {
-        conditionValue.setNotLikeSearch((String)value, (LikeSearchOption)option).setNotLikeSearchLocation(location);
+    protected void doSetupConditionValue(ConditionValue conditionValue, Object value, String location,
+            ConditionOption option) {
+        conditionValue.setNotLikeSearch((String) value, (LikeSearchOption) option).setNotLikeSearchLocation(location);
     }
 }

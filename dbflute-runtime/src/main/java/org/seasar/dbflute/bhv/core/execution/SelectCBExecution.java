@@ -27,9 +27,8 @@ import org.seasar.dbflute.s2dao.jdbc.TnResultSetHandler;
 import org.seasar.dbflute.s2dao.sqlcommand.TnAbstractDynamicCommand;
 import org.seasar.dbflute.s2dao.sqlhandler.TnBasicSelectHandler;
 import org.seasar.dbflute.twowaysql.context.CommandContext;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
-
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -51,7 +50,8 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
      * @param statementFactory The factory of statement.
      * @param resultSetHandler The handler of resultSet.
      */
-    public SelectCBExecution(DataSource dataSource, StatementFactory statementFactory, TnResultSetHandler resultSetHandler) {
+    public SelectCBExecution(DataSource dataSource, StatementFactory statementFactory,
+            TnResultSetHandler resultSetHandler) {
         super(dataSource, statementFactory);
         this.resultSetHandler = resultSetHandler;
     }
@@ -126,7 +126,8 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
         return bindVariableTypesArray;
     }
 
-    protected void addBindVariableInfo(CommandContext ctx, List<Object> bindVariableList, List<Class<?>> bindVariableTypeList) {
+    protected void addBindVariableInfo(CommandContext ctx, List<Object> bindVariableList,
+            List<Class<?>> bindVariableTypeList) {
         final Object[] bindVariables = ctx.getBindVariables();
         addBindVariableList(bindVariableList, bindVariables);
         final Class<?>[] bindVariableTypes = ctx.getBindVariableTypes();
@@ -134,13 +135,13 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
     }
 
     protected void addBindVariableList(List<Object> bindVariableList, Object[] bindVariables) {
-        for (int i=0; i < bindVariables.length; i++) {
+        for (int i = 0; i < bindVariables.length; i++) {
             bindVariableList.add(bindVariables[i]);
         }
     }
 
     protected void addBindVariableTypeList(List<Class<?>> bindVariableTypeList, Class<?>[] bindVariableTypes) {
-        for (int i=0; i < bindVariableTypes.length; i++) {
+        for (int i = 0; i < bindVariableTypes.length; i++) {
             bindVariableTypeList.add(bindVariableTypes[i]);
         }
     }
@@ -149,7 +150,7 @@ public class SelectCBExecution extends TnAbstractDynamicCommand {
     //                                                                      General Helper
     //                                                                      ==============
     protected final String replaceString(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     protected String getLineSeparator() {

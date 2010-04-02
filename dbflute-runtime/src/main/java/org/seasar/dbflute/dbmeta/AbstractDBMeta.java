@@ -49,9 +49,9 @@ import org.seasar.dbflute.jdbc.Classification;
 import org.seasar.dbflute.jdbc.ClassificationMeta;
 import org.seasar.dbflute.util.DfAssertUtil;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The abstract class of DB meta.
@@ -1247,19 +1247,19 @@ public abstract class AbstractDBMeta implements DBMeta {
     //                                       String Handling
     //                                       ---------------
     protected final String replaceString(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     protected final List<String> splitListTrimmed(String str, String delimiter) {
-        return DfStringUtil.splitListTrimmed(str, delimiter);
+        return Srl.splitListTrimmed(str, delimiter);
     }
 
     protected final String initCap(String str) {
-        return DfStringUtil.initCap(str);
+        return Srl.initCap(str);
     }
 
     protected final String initUncap(String str) {
-        return DfStringUtil.initUncap(str);
+        return Srl.initUncap(str);
     }
 
     protected final String ln() {

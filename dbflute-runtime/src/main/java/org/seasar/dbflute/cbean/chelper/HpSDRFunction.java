@@ -180,6 +180,6 @@ public class HpSDRFunction<REFERRER_CB extends ConditionBean, LOCAL_CQ extends C
     //}
 
     //protected String replaceString(String text, String fromText, String toText) {
-    //    return DfStringUtil.replace(text, fromText, toText);
+    //    return Srl.replace(text, fromText, toText);
     //}
 }

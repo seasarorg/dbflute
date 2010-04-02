@@ -30,9 +30,8 @@ public class TnDeleteBatchAutoHandler extends TnAbstractBatchAutoHandler {
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnDeleteBatchAutoHandler(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData,
-            TnPropertyType[] propertyTypes) {
+    public TnDeleteBatchAutoHandler(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
 
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
     }
@@ -40,7 +39,7 @@ public class TnDeleteBatchAutoHandler extends TnAbstractBatchAutoHandler {
     // ===================================================================================
     //                                                                            Override
     //                                                                            ========
-	@Override
+    @Override
     protected void setupBindVariables(Object bean) {
         setupDeleteBindVariables(bean);
     }

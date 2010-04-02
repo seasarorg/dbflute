@@ -28,8 +28,8 @@ import org.seasar.dbflute.dbmeta.DBMetaProvider;
 import org.seasar.dbflute.jdbc.CursorHandler;
 import org.seasar.dbflute.jdbc.StatementConfig;
 import org.seasar.dbflute.util.DfResourceUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * The context of outside-SQL.
@@ -370,7 +370,7 @@ public class OutsideSqlContext {
     }
 
     protected static String replaceString(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     protected static String getLineSeparator() {

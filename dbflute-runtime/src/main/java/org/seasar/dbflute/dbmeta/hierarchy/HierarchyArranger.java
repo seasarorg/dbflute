@@ -668,8 +668,8 @@ public class HierarchyArranger<LOCAL_ENTITY extends Entity> {
             final Class<?>[] parameterTypes = method.getParameterTypes();
             String msg = "Invoking method threw the exception:" + lineSeparator;
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * *" + lineSeparator;
-            msg = msg + "[" + DfTypeUtil.toClassTitle(method.getDeclaringClass()) + "." + method.getName()
-                    + "()]" + lineSeparator;
+            msg = msg + "[" + DfTypeUtil.toClassTitle(method.getDeclaringClass()) + "." + method.getName() + "()]"
+                    + lineSeparator;
             msg = msg + " methodArgTypes     = {" + createTypeViewFromTypeArray(parameterTypes) + "}" + lineSeparator;
             msg = msg + " specifiedArgValues = {" + createValueViewFromValueArray(args) + "}" + lineSeparator;
             msg = msg + " specifiedArgTypes  = {" + createTypeViewFromValueArray(args) + "}" + lineSeparator;

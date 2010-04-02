@@ -38,7 +38,7 @@ public class PageGroupOption implements java.io.Serializable {
     /**
      * @return The view string of all attribute values. (NotNull)
      */
-	@Override
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
 
@@ -46,7 +46,7 @@ public class PageGroupOption implements java.io.Serializable {
 
         return sb.toString();
     }
-	
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========

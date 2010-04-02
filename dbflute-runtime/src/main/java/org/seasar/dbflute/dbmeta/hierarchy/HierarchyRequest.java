@@ -213,11 +213,13 @@ public class HierarchyRequest<LOCAL_ENTITY extends Entity> {
                 final DBMeta expectedDBMeta = destinationDBMeta;
                 if (!expectedDBMeta.equals(actualDBMeta)) {
                     String msg = "The wrong destinationColumnInfo!" + getLineSeparator();
-                    msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + getLineSeparator();
+                    msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *"
+                            + getLineSeparator();
                     msg = msg + "The dbmeta of destinationColumnInfo is difference from";
                     msg = msg + " the one of Your Local Entity:" + getLineSeparator();
                     msg = msg + "- - - - -" + getLineSeparator();
-                    msg = msg + "destinationColumnInfo=" + currentElement.getDestinationColumnInfo() + getLineSeparator();
+                    msg = msg + "destinationColumnInfo=" + currentElement.getDestinationColumnInfo()
+                            + getLineSeparator();
                     msg = msg + "localEntity=" + destinationDBMeta.getEntityTypeName() + getLineSeparator();
                     msg = msg + "* * * * * * * * * */" + getLineSeparator();
                     throw new IllegalStateException(msg);

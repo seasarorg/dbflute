@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.s2dao.metadata;
 
-
 /**
  * {Refers to Seasar and Extends its class}
  * @author jflute

@@ -27,53 +27,53 @@ public class InScopeOption extends SimpleStringOption {
     //                                                                                 Split
     //                                                                                 =====
     public InScopeOption splitBySpace() {
-        return (InScopeOption)doSplitBySpace();
+        return (InScopeOption) doSplitBySpace();
     }
 
     public InScopeOption splitBySpace(int splitLimitCount) {
-        return (InScopeOption)doSplitBySpace(splitLimitCount);
+        return (InScopeOption) doSplitBySpace(splitLimitCount);
     }
 
     public InScopeOption splitBySpaceContainsDoubleByte() {
-        return (InScopeOption)doSplitBySpaceContainsDoubleByte();
+        return (InScopeOption) doSplitBySpaceContainsDoubleByte();
     }
 
     public InScopeOption splitBySpaceContainsDoubleByte(int splitLimitCount) {
-        return (InScopeOption)doSplitBySpaceContainsDoubleByte(splitLimitCount);
+        return (InScopeOption) doSplitBySpaceContainsDoubleByte(splitLimitCount);
     }
 
     public InScopeOption splitByPipeLine() {
-        return (InScopeOption)doSplitByPipeLine();
+        return (InScopeOption) doSplitByPipeLine();
     }
 
     public InScopeOption splitByPipeLine(int splitLimitCount) {
-        return (InScopeOption)doSplitByPipeLine(splitLimitCount);
+        return (InScopeOption) doSplitByPipeLine(splitLimitCount);
     }
 
     // =====================================================================================
     //                                                                   To Upper/Lower Case
     //                                                                   ===================
     public InScopeOption toUpperCase() {
-        return (InScopeOption)doToUpperCase();
+        return (InScopeOption) doToUpperCase();
     }
 
     public InScopeOption toLowerCase() {
-        return (InScopeOption)doToLowerCase();
+        return (InScopeOption) doToLowerCase();
     }
 
     // =====================================================================================
     //                                                                        To Single Byte
     //                                                                        ==============
     public InScopeOption toSingleByteSpace() {
-        return (InScopeOption)doToSingleByteSpace();
+        return (InScopeOption) doToSingleByteSpace();
     }
 
     public InScopeOption toSingleByteAlphabetNumber() {
-        return (InScopeOption)doToSingleByteAlphabetNumber();
+        return (InScopeOption) doToSingleByteAlphabetNumber();
     }
 
     public InScopeOption toSingleByteAlphabetNumberMark() {
-        return (InScopeOption)doToSingleByteAlphabetNumberMark();
+        return (InScopeOption) doToSingleByteAlphabetNumberMark();
     }
 
     // =====================================================================================
@@ -92,7 +92,7 @@ public class InScopeOption extends SimpleStringOption {
     //                                                                            ==========
     public java.util.List<String> generateRealValueList(java.util.List<String> valueList) {
         final java.util.List<String> resultList = new java.util.ArrayList<String>();
-        for (final java.util.Iterator<String> ite = valueList.iterator(); ite.hasNext(); ) {
+        for (final java.util.Iterator<String> ite = valueList.iterator(); ite.hasNext();) {
             final String value = ite.next();
             resultList.add(generateRealValue(value));
         }

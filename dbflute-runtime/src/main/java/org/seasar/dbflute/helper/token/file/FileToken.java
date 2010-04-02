@@ -29,7 +29,8 @@ public interface FileToken {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void tokenize(String filename, FileTokenizingCallback fileTokenizingCallback, FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public void tokenize(String filename, FileTokenizingCallback fileTokenizingCallback,
+            FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException;
 
     /**
      * Tokenize token-file data of a specified file.
@@ -43,7 +44,8 @@ public interface FileToken {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void tokenize(java.io.InputStream inputStream, FileTokenizingCallback fileTokenizingCallback, FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public void tokenize(java.io.InputStream inputStream, FileTokenizingCallback fileTokenizingCallback,
+            FileTokenizingOption fileTokenizingOption) throws java.io.FileNotFoundException, java.io.IOException;
 
     /**
      * Make token-file from specified row resources.
@@ -53,7 +55,8 @@ public interface FileToken {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void make(String filename, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public void make(String filename, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption)
+            throws java.io.FileNotFoundException, java.io.IOException;
 
     /**
      * Make token-file from specified row resources.
@@ -67,5 +70,6 @@ public interface FileToken {
      * @throws java.io.FileNotFoundException
      * @throws java.io.IOException
      */
-    public void make(java.io.OutputStream outputStream, FileMakingCallback fileMakingCallback, FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
+    public void make(java.io.OutputStream outputStream, FileMakingCallback fileMakingCallback,
+            FileMakingOption fileMakingOption) throws java.io.FileNotFoundException, java.io.IOException;
 }

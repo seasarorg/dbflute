@@ -26,7 +26,7 @@ import org.seasar.dbflute.helper.beans.impl.DfBeanDescImpl;
  * @author jflute
  */
 public class DfBeanDescFactory {
-    
+
     // ===================================================================================
     //                                                                          Definition
     //                                                                          ==========

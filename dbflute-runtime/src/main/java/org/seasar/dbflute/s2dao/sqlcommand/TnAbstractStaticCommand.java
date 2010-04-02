@@ -26,12 +26,12 @@ import org.seasar.dbflute.s2dao.metadata.TnBeanMetaData;
  */
 public abstract class TnAbstractStaticCommand extends TnAbstractSqlCommand {
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
     private TnBeanMetaData beanMetaData;
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     public TnAbstractStaticCommand(DataSource dataSource, StatementFactory statementFactory, TnBeanMetaData beanMetaData) {
@@ -39,7 +39,7 @@ public abstract class TnAbstractStaticCommand extends TnAbstractSqlCommand {
         this.beanMetaData = beanMetaData;
     }
 
-	// ===================================================================================
+    // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
     public TnBeanMetaData getBeanMetaData() {

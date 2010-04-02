@@ -28,9 +28,9 @@ import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.twowaysql.pmbean.MapParameterBean;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -270,7 +270,7 @@ public class ValueAndTypeSetupper {
     //                                                                      General Helper
     //                                                                      ==============
     protected String initCap(String name) {
-        return DfStringUtil.initCap(name);
+        return Srl.initCap(name);
     }
 
     protected String ln() {

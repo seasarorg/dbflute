@@ -43,13 +43,14 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
     //                                                                          Definition
     //                                                                          ==========
     /** Log instance. */
-    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory.getLog(TnAbstractBatchAutoHandler.class);
+    private static final org.apache.commons.logging.Log _log = org.apache.commons.logging.LogFactory
+            .getLog(TnAbstractBatchAutoHandler.class);
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public TnAbstractBatchAutoHandler(DataSource dataSource,
-            StatementFactory statementFactory, TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
+    public TnAbstractBatchAutoHandler(DataSource dataSource, StatementFactory statementFactory,
+            TnBeanMetaData beanMetaData, TnPropertyType[] propertyTypes) {
         super(dataSource, statementFactory, beanMetaData, propertyTypes);
     }
 
@@ -97,12 +98,12 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
         if (list == null) {
             throw new IllegalArgumentException("list");
         }
-		if (list.isEmpty()) {
-		    if (_log.isDebugEnabled()) {
+        if (list.isEmpty()) {
+            if (_log.isDebugEnabled()) {
                 _log.debug("Skip executeBatch() bacause of the empty list.");
             }
-			return new int[0];
-		}
+            return new int[0];
+        }
         final Connection connection = getConnection();
         try {
             final PreparedStatement ps = prepareStatement(connection);
@@ -148,9 +149,9 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
             handleBatchUpdateResultWithOptimisticLockByResult(list, result);
         }
     }
-    
+
     protected boolean isCurrentDBDef(DBDef currentDBDef) {
-	    return ResourceContext.isCurrentDBDef(currentDBDef);
+        return ResourceContext.isCurrentDBDef(currentDBDef);
     }
 
     protected void handleBatchUpdateResultWithOptimisticLockByUpdateCount(List<?> list, int updateCount) {
@@ -226,7 +227,7 @@ public abstract class TnAbstractBatchAutoHandler extends TnAbstractAutoHandler {
             return null; // unreachable
         }
     }
-	
+
     protected void addBatch(PreparedStatement ps) {
         try {
             ps.addBatch();

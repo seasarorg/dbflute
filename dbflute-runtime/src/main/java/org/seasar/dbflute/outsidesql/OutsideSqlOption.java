@@ -36,7 +36,7 @@ public class OutsideSqlOption {
 
     /** The configuration of statement. (Nullable) */
     protected StatementConfig _statementConfig;
-    
+
     protected String _sourcePagingRequestType = "non";
 
     // -----------------------------------------------------
