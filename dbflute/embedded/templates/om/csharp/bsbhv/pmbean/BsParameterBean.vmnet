@@ -113,6 +113,7 @@ namespace ${glPackageExtendedParameterBean} {
         //                                                                        ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($variableName = "_$database.initUncap(${propertyName})")
+#set ($argumentName = "$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
         public ${propertyType} ${database.initCap($propertyName)} {
 #if ($propertyType.endsWith("String"))
@@ -126,29 +127,29 @@ namespace ${glPackageExtendedParameterBean} {
         }
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
-        public void Set${database.initCap($propertyName)}(${propertyType} ${propertyName}, ${glLikeSearchOption} ${propertyName}Option) {
-            ${variableName} = ${propertyName};
+        public void Set${database.initCap($propertyName)}(${propertyType} ${argumentName}, ${glLikeSearchOption} ${propertyName}Option) {
+            ${variableName} = ${argumentName};
             ${variableName}InternalLikeSearchOption = ${propertyName}Option;
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
 
-        public void Set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${propertyName}) {
-            ${variableName} = ${propertyName};
+        public void Set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${argumentName}) {
+            ${variableName} = ${argumentName};
             ${variableName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikePrefix();
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionContainSearch($pmbClassName, $propertyName))
 
-        public void Set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${propertyName}) {
-            ${variableName} = ${propertyName};
+        public void Set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${argumentName}) {
+            ${variableName} = ${argumentName};
             ${variableName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikeContain();
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionSuffixSearch($pmbClassName, $propertyName))
 
-        public void Set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${propertyName}) {
-            ${variableName} = ${propertyName};
+        public void Set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${argumentName}) {
+            ${variableName} = ${argumentName};
             ${variableName}InternalLikeSearchOption = new ${glLikeSearchOption}().LikeSuffix();
         }
 #end
@@ -160,14 +161,14 @@ namespace ${glPackageExtendedParameterBean} {
 #end
 #if ($database.isPmbMetaDataPropertyOptionFromDate($pmbClassName, $propertyName))
 
-        public void Set${database.initCap($propertyName)}_FromDate(${propertyType} ${propertyName}) {
-            ${variableName} = new ${glFromToOption}().CompareAsDate().filterFromDate(${propertyName});
+        public void Set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}) {
+            ${variableName} = new ${glFromToOption}().CompareAsDate().filterFromDate(${argumentName});
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
 
-        public void Set${database.initCap($propertyName)}_ToDate(${propertyType} ${propertyName}) {
-            ${variableName} = new ${glFromToOption}().CompareAsDate().filterToDate(${propertyName});
+        public void Set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
+            ${variableName} = new ${glFromToOption}().CompareAsDate().filterToDate(${argumentName});
         }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))

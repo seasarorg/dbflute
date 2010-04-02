@@ -196,6 +196,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
     //                                                                            ========
 #foreach ($propertyName in $database.getPmbMetaDataPropertySet($pmbClassName))
 #set ($variableName = "_$database.initUncap(${propertyName})")
+#set ($argumentName = "$database.initUncap(${propertyName})")
 #set ($propertyType = $database.getPmbMetaDataPropertyType($pmbClassName, $propertyName))
     /**
      * [get] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
@@ -222,32 +223,32 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (Nullable)
      */
-    public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}) {
-        ${variableName} = ${propertyName};
+    public void set${database.initCap($propertyName)}(${propertyType} ${argumentName}) {
+        ${variableName} = ${argumentName};
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionLikeSearch($pmbClassName, $propertyName))
 
     /**
      * [set as likeSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${propertyName} The value of ${propertyName}. (Nullable)
-     * @param ${propertyName}Option The option of likeSearch for ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName}Option The option of likeSearch for ${propertyName}. (Nullable)
      */
-    public void set${database.initCap($propertyName)}(${propertyType} ${propertyName}, LikeSearchOption ${propertyName}Option) {
-        ${variableName} = ${propertyName};
-        ${variableName}InternalLikeSearchOption = ${propertyName}Option;
+    public void set${database.initCap($propertyName)}(${propertyType} ${argumentName}, LikeSearchOption ${argumentName}Option) {
+        ${variableName} = ${argumentName};
+        ${variableName}InternalLikeSearchOption = ${argumentName}Option;
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionPrefixSearch($pmbClassName, $propertyName))
 
     /**
      * [set as prefixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (Nullable)
      */
-    public void set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${propertyName}) {
-        ${variableName} = ${propertyName};
+    public void set${database.initCap($propertyName)}_PrefixSearch(${propertyType} ${argumentName}) {
+        ${variableName} = ${argumentName};
         ${variableName}InternalLikeSearchOption = new LikeSearchOption().likePrefix();
     }
 #end
@@ -255,10 +256,10 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set as containSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (Nullable)
      */
-    public void set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${propertyName}) {
-        ${variableName} = ${propertyName};
+    public void set${database.initCap($propertyName)}_ContainSearch(${propertyType} ${argumentName}) {
+        ${variableName} = ${argumentName};
         ${variableName}InternalLikeSearchOption = new LikeSearchOption().likeContain();
     }
 #end
@@ -266,10 +267,10 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set as suffixSearch] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (Nullable)
      */
-    public void set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${propertyName}) {
-        ${variableName} = ${propertyName};
+    public void set${database.initCap($propertyName)}_SuffixSearch(${propertyType} ${argumentName}) {
+        ${variableName} = ${argumentName};
         ${variableName}InternalLikeSearchOption = new LikeSearchOption().likeSuffix();
     }
 #end
@@ -287,20 +288,20 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
 
     /**
      * [set as fromDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (Nullable)
      */
-    public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${propertyName}) {
-        ${variableName} = new FromToOption().compareAsDate().filterFromDate(${propertyName});
+    public void set${database.initCap($propertyName)}_FromDate(${propertyType} ${argumentName}) {
+        ${variableName} = new FromToOption().compareAsDate().filterFromDate(${argumentName});
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionToDate($pmbClassName, $propertyName))
 
     /**
      * [set as toDate] ${propertyName}${database.getPmbMetaDataPropertyRefColumnInfo($pmbClassName, $propertyName)}
-     * @param ${propertyName} The value of ${propertyName}. (Nullable)
+     * @param ${argumentName} The value of ${propertyName}. (Nullable)
      */
-    public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${propertyName}) {
-        ${variableName} = new FromToOption().compareAsDate().filterToDate(${propertyName});
+    public void set${database.initCap($propertyName)}_ToDate(${propertyType} ${argumentName}) {
+        ${variableName} = new FromToOption().compareAsDate().filterToDate(${argumentName});
     }
 #end
 #if ($database.isPmbMetaDataPropertyOptionClassification($pmbClassName, $propertyName))

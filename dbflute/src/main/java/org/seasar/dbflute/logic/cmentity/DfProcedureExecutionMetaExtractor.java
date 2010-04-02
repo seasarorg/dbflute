@@ -107,7 +107,7 @@ public class DfProcedureExecutionMetaExtractor {
                     }
                     final Map<String, DfColumnMetaInfo> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
                     final DfProcedureNotParamResultMetaInfo notParamResult = new DfProcedureNotParamResultMetaInfo();
-                    notParamResult.setPropertyName("notParamResultList" + (closetIndex + 1));
+                    notParamResult.setPropertyName("notParamResult" + (closetIndex + 1));
                     notParamResult.setColumnMetaInfoMap(columnMetaInfoMap);
                     procedure.addNotParamResult(notParamResult);
                     ++closetIndex;
