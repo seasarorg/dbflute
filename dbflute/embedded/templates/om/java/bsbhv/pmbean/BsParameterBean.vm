@@ -105,6 +105,7 @@ public class ${myClassName}${database.getPmbMetaDataSuperClassDefinition($pmbCla
      public boolean isEscapeStatement() {
          return true; // as default
      }
+
 #end
 #if ($database.hasPmbMetaDataSafetyResultDefitinion($pmbClassName))
     // ===================================================================================

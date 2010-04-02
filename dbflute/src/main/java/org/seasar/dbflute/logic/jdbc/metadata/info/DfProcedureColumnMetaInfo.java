@@ -1,5 +1,6 @@
 package org.seasar.dbflute.logic.jdbc.metadata.info;
 
+import java.sql.Types;
 import java.util.Map;
 
 import org.seasar.dbflute.DfBuildProperties;
@@ -55,6 +56,20 @@ public class DfProcedureColumnMetaInfo {
         String comment = columnComment;
         comment = prop.resolvePreTextForSchemaHtml(comment);
         return comment;
+    }
+
+    public boolean isPostgreSQLCursor(DfProcedureColumnMetaInfo column) {
+        final String key = "cursor";
+        final int jdbcType = column.getJdbcType();
+        final String dbTypeName = column.getDbTypeName();
+        return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains(key);
+    }
+
+    public boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
+        final String key = "cursor";
+        final int jdbcType = column.getJdbcType();
+        final String dbTypeName = column.getDbTypeName();
+        return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains(key);
     }
 
     @Override

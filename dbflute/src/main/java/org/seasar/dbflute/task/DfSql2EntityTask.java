@@ -18,7 +18,6 @@ package org.seasar.dbflute.task;
 import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -773,15 +772,21 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (column.hasColumnMetaInfo()) {
             return true;
         }
-        final int jdbcType = column.getJdbcType();
-        final String dbTypeName = column.getDbTypeName();
-        if (getBasicProperties().isDatabaseOracle()) {
-            return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor");
-        } else if (getBasicProperties().isDatabasePostgreSQL()) {
-            return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("refcursor");
+        if (isPostgreSQLCursor(column)) {
+            return true;
+        } else if (isOracleCursor(column)) {
+            return true;
         } else {
             return false;
         }
+    }
+
+    protected boolean isPostgreSQLCursor(DfProcedureColumnMetaInfo column) {
+        return getBasicProperties().isDatabaseOracle() && column.isPostgreSQLCursor(column);
+    }
+
+    protected boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
+        return getBasicProperties().isDatabasePostgreSQL() && column.isOracleCursor(column);
     }
 
     protected String convertProcedureNameToPmbName(String procedureUniqueName) {

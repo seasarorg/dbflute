@@ -19,7 +19,6 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,9 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMeta
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
+import org.seasar.dbflute.s2dao.valuetype.TnValueTypes;
+import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreSQLResultSetType;
 import org.seasar.dbflute.util.DfTypeUtil;
 
 /**
@@ -77,6 +79,11 @@ public class DfProcedureExecutionMetaExtractor {
 
     protected void doExtractExecutionMetaData(DataSource dataSource, DfProcedureMetaInfo procedure) throws SQLException {
         final List<DfProcedureColumnMetaInfo> columnList = procedure.getProcedureColumnList();
+        if (!needsToCall(columnList)) {
+            final String name = procedure.getProcedureFullName();
+            _log.info("*not needed to call: " + name + " params=" + buildParameterTypeView(columnList));
+            return;
+        }
         final List<Object> testValueList = new ArrayList<Object>();
         final boolean existsReturn = existsReturnValue(columnList);
         setupTestValueList(columnList, testValueList);
@@ -113,7 +120,15 @@ public class DfProcedureExecutionMetaExtractor {
                     ++index;
                     continue;
                 }
-                final Object obj = cs.getObject(index + 1);
+                final int paramIndex = (index + 1);
+                final Object obj;
+                if (isPostgreSQLCursor(column)) {
+                    obj = TnValueTypes.POSTGRESQL_RESULT_SET.getValue(cs, paramIndex);
+                } else if (isOracleCursor(column)) {
+                    obj = TnValueTypes.ORACLE_RESULT_SET.getValue(cs, paramIndex);
+                } else {
+                    obj = cs.getObject(paramIndex); // as default
+                }
                 if (obj instanceof ResultSet) {
                     rs = (ResultSet) obj;
                     final Map<String, DfColumnMetaInfo> columnMetaInfoMap = extractColumnMetaInfoMap(rs, sql);
@@ -144,6 +159,38 @@ public class DfProcedureExecutionMetaExtractor {
             }
         }
         return false;
+    }
+
+    protected boolean needsToCall(List<DfProcedureColumnMetaInfo> columnList) {
+        if (!isOracle() && !isPostgreSQL()) {
+            return true; // because of for getting notParamResult
+        }
+        // Here Oracle or PostgreSQL (that don't support notParamResult)
+        for (DfProcedureColumnMetaInfo column : columnList) {
+            final DfProcedureColumnType columnType = column.getProcedureColumnType();
+            if (DfProcedureColumnType.procedureColumnOut.equals(columnType)
+                    || DfProcedureColumnType.procedureColumnInOut.equals(columnType)
+                    || DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected String buildParameterTypeView(List<DfProcedureColumnMetaInfo> columnList) {
+        final StringBuilder sb = new StringBuilder();
+        final String prefix = "procedureColumn";
+        for (DfProcedureColumnMetaInfo column : columnList) {
+            String name = column.getProcedureColumnType().name();
+            if (name.startsWith(prefix)) {
+                name = name.substring(prefix.length());
+            }
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(name);
+        }
+        return sb.toString();
     }
 
     protected void setupTestValueList(List<DfProcedureColumnMetaInfo> columnList, List<Object> testValueList) {
@@ -222,36 +269,38 @@ public class DfProcedureExecutionMetaExtractor {
             List<Object> testValueList, List<DfProcedureColumnMetaInfo> boundColumnList) throws SQLException {
         int index = 0;
         for (DfProcedureColumnMetaInfo column : columnList) {
+            final int paramIndex = (index + 1);
             final DfProcedureColumnType columnType = column.getProcedureColumnType();
             if (DfProcedureColumnType.procedureColumnReturn.equals(columnType)) {
-                cs.registerOutParameter(index + 1, column.getJdbcType());
+                cs.registerOutParameter(paramIndex, column.getJdbcType());
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnIn.equals(columnType)) {
-                cs.setObject(index + 1, testValueList.remove(0));
+                cs.setObject(paramIndex, testValueList.remove(0));
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnOut.equals(columnType)) {
-                if (isOracleCursor(column)) {
-                    cs.registerOutParameter(index + 1, -10); // means cursor in Oracle
+                if (isPostgreSQLCursor(column)) {
+                    cs.registerOutParameter(paramIndex, PostgreSQLResultSetType.CURSOR);
+                } else if (isOracleCursor(column)) {
+                    cs.registerOutParameter(paramIndex, OracleResultSetType.CURSOR);
                 } else {
-                    cs.registerOutParameter(index + 1, column.getJdbcType());
+                    cs.registerOutParameter(paramIndex, column.getJdbcType());
                 }
                 boundColumnList.add(column);
             } else if (DfProcedureColumnType.procedureColumnInOut.equals(columnType)) {
-                cs.registerOutParameter(index + 1, column.getJdbcType());
-                cs.setObject(index + 1, testValueList.remove(0));
+                cs.registerOutParameter(paramIndex, column.getJdbcType());
+                cs.setObject(paramIndex, testValueList.remove(0));
                 boundColumnList.add(column);
             }
             ++index;
         }
     }
 
+    protected boolean isPostgreSQLCursor(DfProcedureColumnMetaInfo column) {
+        return isPostgreSQL() && column.isPostgreSQLCursor(column);
+    }
+
     protected boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
-        if (!isOracle()) {
-            return false;
-        }
-        final int jdbcType = column.getJdbcType();
-        final String dbTypeName = column.getDbTypeName();
-        return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains("cursor");
+        return isOracle() && column.isOracleCursor(column);
     }
 
     protected Map<String, DfColumnMetaInfo> extractColumnMetaInfoMap(ResultSet rs, String sql) throws SQLException {
