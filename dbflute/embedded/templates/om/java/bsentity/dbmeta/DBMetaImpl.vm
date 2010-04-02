@@ -325,15 +325,16 @@ public class ${myClassName} extends AbstractDBMeta {
     { public void setup(${myExtendedObjectClassName} e, Object v) {
         ColumnInfo col = column${col.javaBeansRulePropertyNameInitCap}();
 #if ($col.isCheckSelectedClassification())
-        chkCls(col, v);
+        ccls(col, v);
 #end
-        e.set${col.javaName}As${col.classificationName}((${glCDef}.${col.classificationName})getCls(col, v));
+        e.set${col.javaName}As${col.classificationName}((${glCDef}.${col.classificationName})gcls(col, v));
     }}
 #else
-    public static class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
-#if ($col.isJavaNativeNumberDifferentBetweenRelation())
-    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(convTN(v, ${col.javaNative}.class)); } }
+#if ($col.isJavaNativeNumberObject())
+    public class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
+    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctn(v, ${col.javaNative}.class)); } }
 #else
+    public static class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
 #end
 #end
