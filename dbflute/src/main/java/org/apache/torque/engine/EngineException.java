@@ -60,7 +60,7 @@ import org.apache.commons.lang.exception.NestableException;
  * @author Modified by jflute
  */
 public class EngineException extends NestableException {
-    
+
     private static final long serialVersionUID = 1L;
 
     /**

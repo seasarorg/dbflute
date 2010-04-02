@@ -19,7 +19,7 @@ package org.seasar.dbflute.helper.io.data;
  * @author jflute
  */
 public class DfSeparatedDataSeveralHandlingInfo {
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========

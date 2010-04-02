@@ -13,11 +13,11 @@ public class DfGeneratedClassPackageDefaultJava implements DfGeneratedClassPacka
     public String getBaseDaoPackage() {
         return "bsdao";
     }
-    
+
     public String getCursorSimplePackageName() {
         return "cursor";
     }
-    
+
     public String getParameterBeanSimplePackageName() {
         return "pmbean";
     }

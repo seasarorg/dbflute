@@ -62,8 +62,7 @@ import org.apache.torque.engine.EngineException;
  * The generic interface to a name generation algorithm.
  * @author Modified by jflute
  */
-public interface NameGenerator
-{
+public interface NameGenerator {
     /**
      * The character used by most implementations as the separator
      * between name elements.

@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfFixedConditionInvalidClassificationEmbeddedCommentException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfFixedConditionInvalidClassificationEmbeddedCommentException(String msg) {
         super(msg);
     }

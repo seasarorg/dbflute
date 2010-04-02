@@ -37,7 +37,7 @@ import org.apache.tools.ant.BuildException;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.jdbc.DfRunnerInformation;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -463,7 +463,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
         }
         String lineComment = line.substring(lineCommentIndex);
         if (lineComment.indexOf("?") >= 0) {
-            lineComment = DfStringUtil.replace(line, "?", "Q");
+            lineComment = Srl.replace(line, "?", "Q");
         }
         return sqlClause + lineComment;
     }

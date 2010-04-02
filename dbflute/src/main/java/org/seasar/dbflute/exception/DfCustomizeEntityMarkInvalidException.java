@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfCustomizeEntityMarkInvalidException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfCustomizeEntityMarkInvalidException(String msg) {
         super(msg);
     }

@@ -29,7 +29,7 @@ import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlChecker;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.bs.DfAbstractSqlExecutionTask;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -102,11 +102,11 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
             }
 
             protected String removeBlockComment(final String sql) {
-                return DfStringUtil.removeBlockComment(sql);
+                return Srl.removeBlockComment(sql);
             }
 
             protected String removeLineComment(final String sql) {
-                return DfStringUtil.removeLineComment(sql);
+                return Srl.removeLineComment(sql);
             }
 
             @Override
@@ -162,7 +162,7 @@ public class DfOutsideSqlTestTask extends DfAbstractSqlExecutionTask {
             }
 
             protected List<String> getListBetweenBeginEndMark(String targetStr, String beginMark, String endMark) {
-                return DfStringUtil.extractAllScope(targetStr, beginMark, endMark);
+                return Srl.extractAllScope(targetStr, beginMark, endMark);
             }
         };
     }

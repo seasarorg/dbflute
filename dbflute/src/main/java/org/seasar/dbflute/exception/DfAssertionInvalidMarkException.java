@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfAssertionInvalidMarkException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfAssertionInvalidMarkException(String msg) {
         super(msg);
     }

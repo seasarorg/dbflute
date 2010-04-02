@@ -7,7 +7,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -32,17 +32,17 @@ public class DfProcedureMetaInfo {
         final DfBasicProperties basicProp = DfBuildProperties.getInstance().getBasicProperties();
         final DfDatabaseProperties databaseProp = DfBuildProperties.getInstance().getDatabaseProperties();
         if (basicProp.isDatabaseOracle()) {
-            if (databaseProp.hasAdditionalSchema() && DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureSchema)) {
+            if (databaseProp.hasAdditionalSchema() && Srl.is_NotNull_and_NotTrimmedEmpty(procedureSchema)) {
                 sb.append(procedureSchema).append(".");
             }
-            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureCatalog)) {
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureCatalog)) {
                 sb.append(procedureCatalog).append(".");
             }
         } else {
-            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureCatalog)) {
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureCatalog)) {
                 sb.append(procedureCatalog).append(".");
             }
-            if (databaseProp.hasAdditionalSchema() && DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureSchema)) {
+            if (databaseProp.hasAdditionalSchema() && Srl.is_NotNull_and_NotTrimmedEmpty(procedureSchema)) {
                 sb.append(procedureSchema).append(".");
             }
         }
@@ -53,7 +53,7 @@ public class DfProcedureMetaInfo {
     }
 
     public boolean hasProcedureComment() {
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(procedureComment);
+        return Srl.is_NotNull_and_NotTrimmedEmpty(procedureComment);
     }
 
     public String getProcedureCommentForSchemaHtml() {

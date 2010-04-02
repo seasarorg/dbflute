@@ -14,8 +14,8 @@ import org.seasar.dbflute.dbmeta.info.UniqueInfo;
 import org.seasar.dbflute.helper.beans.DfBeanDesc;
 import org.seasar.dbflute.helper.beans.factory.DfBeanDescFactory;
 import org.seasar.dbflute.util.DfReflectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 import org.seasar.framework.container.S2Container;
 
 /**
@@ -274,7 +274,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * @param resource The resource of DBFlute. (NotNull)
      */
     protected void selectSetup(BuriDataFieldType src, Method method, DfBeanDesc beanDesc, DBFluteResource resource) {
-        if (!DfStringUtil.isNullOrEmpty(src.getSelect())) {
+        if (!DfStringUtil.is_Null_or_Empty(src.getSelect())) {
             return;
         }
         if (isSelectMethod(src, method)) {
@@ -310,7 +310,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * @param resource The resource of DBFlute. (NotNull)
      */
     protected void selectManySetup(BuriDataFieldType src, Method method, DfBeanDesc beanDesc, DBFluteResource resource) {
-        if (!DfStringUtil.isNullOrEmpty(src.getSelectMany())) {
+        if (!DfStringUtil.is_Null_or_Empty(src.getSelectMany())) {
             return;
         }
         if (isSelectManyMethod(src, method)) {
@@ -346,7 +346,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
         if (isInsertMethod(src, method)) {
             String daoName = src.getCache().get(BEHAVIOR_KEY).toString();
             String insertOgnl = daoName + "." + method.getName() + "(#data)";
-            if (!DfStringUtil.isNullOrEmpty(src.getInsert())) {
+            if (!DfStringUtil.is_Null_or_Empty(src.getInsert())) {
                 String insertStr = src.getInsert();
                 StringBuffer strBuff = new StringBuffer();
                 strBuff.append(insertStr);
@@ -384,7 +384,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * @param resource The resource of DBFlute. (NotNull)
      */
     protected void updateSetup(BuriDataFieldType src, Method method, DfBeanDesc beanDesc, DBFluteResource resource) {
-        if (!DfStringUtil.isNullOrEmpty(src.getUpdate())) {
+        if (!DfStringUtil.is_Null_or_Empty(src.getUpdate())) {
             return;
         }
         if (isUpdateMethod(src, method)) {
@@ -418,7 +418,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * @param resource The resource of DBFlute. (NotNull)
      */
     protected void deleteSetup(BuriDataFieldType src, Method method, DfBeanDesc beanDesc, DBFluteResource resource) {
-        if (!DfStringUtil.isNullOrEmpty(src.getDelete())) {
+        if (!DfStringUtil.is_Null_or_Empty(src.getDelete())) {
             return;
         }
         if (isDeleteMethod(src, method)) {
@@ -452,7 +452,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
      * @param resource The resource of DBFlute. (NotNull)
      */
     protected void tableNameSetup(BuriDataFieldType src, Method method, DfBeanDesc beanDesc, DBFluteResource resource) {
-        if (!DfStringUtil.isNullOrEmpty(src.getTableName())) {
+        if (!DfStringUtil.is_Null_or_Empty(src.getTableName())) {
             return;
         }
         src.setTableName(resource.getDBMeta().getTableDbName());
@@ -472,7 +472,7 @@ public class ${glBehaviorToDataAccessRule} extends AbstractBuriDataFieldProcRule
             String daoName = src.getCache().get(BEHAVIOR_KEY).toString();
             String pkey = (String) src.getCache().get(BEHAVIOR_KEY + "_KeyName");
             String selectNextVal = "#data." + pkey + " = " + daoName + "." + method.getName() + "()";
-            if (!DfStringUtil.isNullOrEmpty(src.getInsert())) {
+            if (!DfStringUtil.is_Null_or_Empty(src.getInsert())) {
                 final String insertStr = src.getInsert();
                 final StringBuilder sb = new StringBuilder();
                 sb.append(selectNextVal.toString());

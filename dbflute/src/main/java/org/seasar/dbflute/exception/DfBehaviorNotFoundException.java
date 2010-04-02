@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfBehaviorNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfBehaviorNotFoundException(String msg) {
         super(msg);
     }

@@ -7,7 +7,7 @@ import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.util.DfCollectionUtil;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 public class DfProcedureColumnMetaInfo {
 
@@ -22,7 +22,7 @@ public class DfProcedureColumnMetaInfo {
 
     public String getColumnDisplayNameForSchemaHtml() {
         final StringBuilder sb = new StringBuilder();
-        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(columnName)) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(columnName)) {
             sb.append(columnName);
         } else {
             if (DfProcedureColumnType.procedureColumnReturn.equals(procedureColumnType)) {
@@ -48,7 +48,7 @@ public class DfProcedureColumnMetaInfo {
     }
 
     public boolean hasColumnComment() {
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(getColumnComment());
+        return Srl.is_NotNull_and_NotTrimmedEmpty(getColumnComment());
     }
 
     public String getColumnCommentForSchemaHtml() {

@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfParameterBeanDuplicateException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfParameterBeanDuplicateException(String msg) {
         super(msg);
     }

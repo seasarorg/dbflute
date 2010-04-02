@@ -74,7 +74,7 @@ import org.seasar.dbflute.properties.DfClassificationProperties;
 import org.seasar.dbflute.properties.DfMultipleFKPropertyProperties;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationElement;
 import org.seasar.dbflute.properties.assistant.classification.DfClassificationTop;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**
@@ -1044,15 +1044,15 @@ public class ForeignKey {
     //                                                                      General Helper
     //                                                                      ==============
     protected String replace(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     protected String initCap(String str) {
-        return DfStringUtil.initCap(str);
+        return Srl.initCap(str);
     }
 
     protected String initUncap(String str) {
-        return DfStringUtil.initUncap(str);
+        return Srl.initUncap(str);
     }
 
     // ===================================================================================

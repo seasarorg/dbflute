@@ -72,7 +72,7 @@ import org.seasar.dbflute.properties.DfCommonColumnProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.task.bs.DfAbstractTexenTask;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -608,11 +608,11 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     }
 
     protected String removeBlockComment(final String sql) {
-        return DfStringUtil.removeBlockComment(sql);
+        return Srl.removeBlockComment(sql);
     }
 
     protected String removeLineComment(final String sql) {
-        return DfStringUtil.removeLineComment(sql); // with removing CR
+        return Srl.removeLineComment(sql); // with removing CR
     }
 
     protected String resolveEntityNameIfNeeds(String className, File file) {
@@ -792,12 +792,12 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     protected String convertProcedureNameToPmbName(String procedureUniqueName) {
         procedureUniqueName = replaceString(procedureUniqueName, ".", "_");
         procedureUniqueName = filterProcedureName4PmbNameAboutVendorDependency(procedureUniqueName);
-        return DfStringUtil.camelize(procedureUniqueName) + "Pmb";
+        return Srl.camelize(procedureUniqueName) + "Pmb";
     }
 
     protected String convertProcedurePmbNameToEntityName(String pmbName, String propertyName) {
         final String baseName = pmbName.substring(0, pmbName.length() - "Pmb".length());
-        final String entityName = baseName + DfStringUtil.initCap(propertyName);
+        final String entityName = baseName + Srl.initCap(propertyName);
         return entityName;
     }
 
@@ -816,7 +816,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
 
     protected String convertColumnNameToPropertyName(String columnName) {
         columnName = filterColumnNameAboutVendorDependency(columnName);
-        return DfStringUtil.initBeansProp(DfStringUtil.camelize(columnName));
+        return Srl.initBeansProp(Srl.camelize(columnName));
     }
 
     protected String filterColumnNameAboutVendorDependency(String columnName) {
@@ -904,7 +904,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             col.setName(columnName);
         } else {
             col.setupNeedsJavaNameConvertFalse();
-            col.setName(DfStringUtil.initCap(columnName));
+            col.setName(Srl.initCap(columnName));
         }
     }
 
@@ -1079,7 +1079,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
     //                                                                      General Helper
     //                                                                      ==============
     public String replaceString(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     public String getSlashPath(File file) {

@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfParameterBeanMarkInvalidException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfParameterBeanMarkInvalidException(String msg) {
         super(msg);
     }

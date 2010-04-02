@@ -19,7 +19,7 @@ package org.seasar.dbflute.helper.jdbc.generatedsql;
  * @author jflute
  */
 public interface DfGeneratedSqlExecutor {
-    
+
     public void execute(String sql, String aliasName);
 
     public void execute(String sql, String aliasName, DfGeneratedSqlExecuteOption option);

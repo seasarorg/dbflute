@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfCommentExtractingFailureException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfCommentExtractingFailureException(String msg) {
         super(msg);
     }

@@ -22,7 +22,7 @@ import java.util.Map;
  * @author jflute
  */
 public class DfForeignKeyMetaInfo {
-    
+
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
@@ -33,7 +33,7 @@ public class DfForeignKeyMetaInfo {
     protected String _foreignTableName;
 
     protected Map<String, String> _columnNameMap = new LinkedHashMap<String, String>();
-    
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -41,7 +41,7 @@ public class DfForeignKeyMetaInfo {
     public String toString() {
         return _foreignKeyName + "-{" + _localTableName + ":" + _foreignTableName + "--" + _columnNameMap + "}";
     }
-    
+
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
@@ -72,7 +72,7 @@ public class DfForeignKeyMetaInfo {
     public Map<String, String> getColumnNameMap() {
         return _columnNameMap;
     }
-    
+
     public void setColumnNameMap(Map<String, String> columnNameMap) {
         if (columnNameMap == null) {
             throw new IllegalArgumentException("The argument 'columnNameMap' should not be null!");

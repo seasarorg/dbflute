@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfRequiredOutsideSqlTitleNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfRequiredOutsideSqlTitleNotFoundException(String msg) {
         super(msg);
     }

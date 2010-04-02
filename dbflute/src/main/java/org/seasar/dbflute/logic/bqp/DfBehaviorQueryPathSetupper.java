@@ -48,7 +48,7 @@ import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -141,11 +141,11 @@ public class DfBehaviorQueryPathSetupper {
             if (tableKeyName.endsWith(bhvSuffix)) {
                 tableKeyName = tableKeyName.substring(0, tableKeyName.length() - bhvSuffix.length());
             }
-            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(projectPrefix) && tableKeyName.startsWith(projectPrefix)) {
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(projectPrefix) && tableKeyName.startsWith(projectPrefix)) {
                 tableKeyName = tableKeyName.substring(projectPrefix.length());
             }
             final String basePrefix = basicProperties.getBasePrefix();
-            if (DfStringUtil.isNotNullAndNotTrimmedEmpty(basePrefix) && tableKeyName.startsWith(basePrefix)) {
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(basePrefix) && tableKeyName.startsWith(basePrefix)) {
                 tableKeyName = tableKeyName.substring(basePrefix.length(), tableKeyName.length());
             }
             resultMap.put(tableKeyName, entry.getValue());
@@ -476,9 +476,9 @@ public class DfBehaviorQueryPathSetupper {
                         definitionLineSb.append(indent);
                         definitionLineSb.append(grammarInfo.getPublicStaticDefinition());
                         final String subDirectoryPath = behaviorQueryElementMap.get("subDirectoryPath");
-                        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(subDirectoryPath)) {
-                            final String subDirectoryName = DfStringUtil.replace(subDirectoryPath, "/", "_");
-                            final String subDirectoryValue = DfStringUtil.replace(subDirectoryPath, "/", ":");
+                        if (Srl.is_NotNull_and_NotTrimmedEmpty(subDirectoryPath)) {
+                            final String subDirectoryName = Srl.replace(subDirectoryPath, "/", "_");
+                            final String subDirectoryValue = Srl.replace(subDirectoryPath, "/", ":");
                             definitionLineSb.append(" String PATH_");
                             definitionLineSb.append(subDirectoryName).append("_").append(behaviorQueryPath);
                             definitionLineSb.append(" = \"");
@@ -559,7 +559,7 @@ public class DfBehaviorQueryPathSetupper {
     //                                                                      General Helper
     //                                                                      ==============
     public String replaceString(String text, String fromText, String toText) {
-        return DfStringUtil.replace(text, fromText, toText);
+        return Srl.replace(text, fromText, toText);
     }
 
     public String getSlashPath(File file) {

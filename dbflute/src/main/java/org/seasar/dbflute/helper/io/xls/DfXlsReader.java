@@ -43,9 +43,9 @@ import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnType;
 import org.seasar.dbflute.helper.dataset.types.DfDtsColumnTypes;
 import org.seasar.dbflute.helper.io.data.impl.DfSeparatedDataHandlerImpl;
-import org.seasar.dbflute.util.DfStringUtil;
 import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * {Refers to S2Container and Extends it}
@@ -320,7 +320,7 @@ public class DfXlsReader {
                         s = "\"" + s + "\""; // for preventing trimming later
                     }
                 } else {
-                    s = DfStringUtil.rtrim(s);
+                    s = Srl.rtrim(s);
                 }
             }
             if ("".equals(s)) {

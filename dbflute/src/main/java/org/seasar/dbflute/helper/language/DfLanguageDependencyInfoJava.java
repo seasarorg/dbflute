@@ -25,7 +25,7 @@ import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDicon;
 import org.seasar.dbflute.helper.language.properties.DfDefaultDBFluteDiconJava;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefault;
 import org.seasar.dbflute.helper.language.properties.DfGeneratedClassPackageDefaultJava;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -91,7 +91,7 @@ public class DfLanguageDependencyInfoJava implements DfLanguageDependencyInfo {
         if (!path.contains(PATH_MAVEN_SRC_MAIN_JAVA)) {
             return path;
         }
-        return DfStringUtil.replace(path, PATH_MAVEN_SRC_MAIN_JAVA, PATH_MAVEN_SRC_MAIN_RESOURCES);
+        return Srl.replace(path, PATH_MAVEN_SRC_MAIN_JAVA, PATH_MAVEN_SRC_MAIN_RESOURCES);
     }
 
     public String getDefaultSequenceType() {

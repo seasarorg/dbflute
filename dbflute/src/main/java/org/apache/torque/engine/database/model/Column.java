@@ -62,7 +62,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.DfBuildProperties;
@@ -74,7 +73,7 @@ import org.seasar.dbflute.properties.DfBuriProperties;
 import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfIncludeQueryProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**
@@ -282,7 +281,8 @@ public class Column {
             if (needsJavaNameConvert()) {
                 _javaName = getDatabaseChecked().convertJavaNameByJdbcNameAsColumn(getName());
             } else {
-                _javaName = getName();
+                // initial-capitalize only
+                _javaName = initCap(getName());
             }
             _javaName = filterBuriJavaNameIfNeeds(_javaName); // for Buri
         }
@@ -314,7 +314,7 @@ public class Column {
      * Get variable name to use in Java sources (= uncapitalized java name)
      */
     public String getUncapitalisedJavaName() { // allowed spell miss
-        return StringUtils.uncapitalise(getJavaName());
+        return Srl.initUncap(getJavaName());
     }
 
     // -----------------------------------------------------
@@ -324,7 +324,7 @@ public class Column {
      * Get variable name to use in Java sources (= uncapitalized java name)
      */
     public String getJavaBeansRulePropertyName() {
-        return DfStringUtil.initBeansProp(getJavaName());
+        return Srl.initBeansProp(getJavaName());
     }
 
     public String getJavaBeansRulePropertyNameInitCap() {
@@ -958,7 +958,7 @@ public class Column {
                 continue;
             }
             List<String> columnsNameList = fks[i].getLocalColumns();
-            if (!DfStringUtil.containsIgnoreCase(myColumnName, columnsNameList)) {
+            if (!Srl.containsIgnoreCase(columnsNameList, myColumnName)) {
                 return true;
             }
         }
@@ -967,7 +967,7 @@ public class Column {
     }
 
     protected String filterUnderscore(String name) {
-        return DfStringUtil.replace(name, "_", "");
+        return Srl.replace(name, "_", "");
     }
 
     /**

@@ -57,9 +57,9 @@ package org.apache.torque.engine.database.model;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.StringUtils;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * A <code>NameGenerator</code> implementation for Java-esque names.
@@ -123,7 +123,7 @@ public class JavaNameGenerator implements NameGenerator {
             if (availableToLowerInGeneratorUnderscoreMethod) {
                 namePart = namePart.toLowerCase();
             }
-            name.append(StringUtils.capitalise(namePart));
+            name.append(initCap(namePart));
         }
         return name.toString();
     }
@@ -141,7 +141,7 @@ public class JavaNameGenerator implements NameGenerator {
         StringTokenizer tok = new StringTokenizer(schemaName, String.valueOf(STD_SEPARATOR_CHAR));
         while (tok.hasMoreTokens()) {
             String namePart = (String) tok.nextElement();
-            name.append(StringUtils.capitalise(namePart));
+            name.append(initCap(namePart));
         }
         return name.toString();
     }
@@ -154,5 +154,9 @@ public class JavaNameGenerator implements NameGenerator {
      */
     protected final String nochangeMethod(String name) {
         return name;
+    }
+
+    public String initCap(String str) {
+        return Srl.initCap(str);
     }
 }

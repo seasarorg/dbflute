@@ -65,7 +65,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
@@ -84,7 +83,7 @@ import org.seasar.dbflute.properties.DfDocumentProperties;
 import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**
@@ -237,7 +236,7 @@ public class Table {
             for (i = 0, size = _foreignKeys.size(); i < size; i++) {
                 ForeignKey fk = (ForeignKey) _foreignKeys.get(i);
                 name = fk.getName();
-                if (StringUtils.isEmpty(name)) {
+                if (Srl.is_Null_or_Empty(name)) {
                     name = acquireConstraintName("FK", i + 1);
                     fk.setName(name);
                 }
@@ -246,7 +245,7 @@ public class Table {
             for (i = 0, size = _indices.size(); i < size; i++) {
                 Index index = (Index) _indices.get(i);
                 name = index.getName();
-                if (StringUtils.isEmpty(name)) {
+                if (Srl.is_Null_or_Empty(name)) {
                     name = acquireConstraintName("I", i + 1);
                     index.setName(name);
                 }
@@ -569,7 +568,7 @@ public class Table {
      * Get variable name to use in Java sources (= uncapitalized java name)
      */
     public String getUncapitalisedJavaName() { // allowed spell miss
-        return DfStringUtil.initUncap(getJavaName());
+        return Srl.initUncap(getJavaName());
     }
 
     // -----------------------------------------------------
@@ -579,7 +578,7 @@ public class Table {
      * Get property name to use in Java sources (according to java beans rule)
      */
     public String getJavaBeansRulePropertyName() {
-        return DfStringUtil.initBeansProp(getJavaName());
+        return Srl.initBeansProp(getJavaName());
     }
 
     // -----------------------------------------------------
@@ -712,7 +711,7 @@ public class Table {
     protected String getSchemaPrefix() {
         if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
             // schema of DB2 may have space either size
-            return DfStringUtil.initCapTrimmed(_schema);
+            return Srl.initCapTrimmed(_schema);
         }
         return "";
     }
@@ -997,7 +996,7 @@ public class Table {
         for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey key = iter.next();
             List<String> localColumns = key.getLocalColumns();
-            if (DfStringUtil.containsIgnoreCase(columnName, localColumns)) {
+            if (Srl.containsIgnoreCase(localColumns, columnName)) {
                 if (firstFK == null) {
                     firstFK = key;
                 }
@@ -1011,7 +1010,7 @@ public class Table {
         for (Iterator<ForeignKey> iter = _foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey key = iter.next();
             List<String> localColumns = key.getLocalColumns();
-            if (DfStringUtil.containsIgnoreCase(columnName, localColumns)) {
+            if (Srl.containsIgnoreCase(localColumns, columnName)) {
                 fkList.add(key);
             }
         }
@@ -1192,8 +1191,8 @@ public class Table {
         if (tableOne.equalsIgnoreCase(tableTwo)) {
             return true;
         }
-        tableOne = DfStringUtil.replace(tableOne, "_", "");
-        tableTwo = DfStringUtil.replace(tableTwo, "_", "");
+        tableOne = Srl.replace(tableOne, "_", "");
+        tableTwo = Srl.replace(tableTwo, "_", "");
         if (tableOne.equalsIgnoreCase(tableTwo)) {
             return true;
         }
@@ -2365,7 +2364,7 @@ public class Table {
     }
 
     public String getUpdateDateUncapitalisedJavaName() {
-        return StringUtils.uncapitalise(getUpdateDateJavaName());
+        return Srl.initUncap(getUpdateDateJavaName());
     }
 
     public String getUpdateDatePropertyName() {
@@ -2441,7 +2440,7 @@ public class Table {
     }
 
     protected String buildVersionNoUncapitalisedJavaName(String versionNoJavaName) {
-        return StringUtils.uncapitalise(versionNoJavaName);
+        return Srl.initUncap(versionNoJavaName);
     }
 
     // ===================================================================================
@@ -2551,10 +2550,10 @@ public class Table {
 
     protected String convertCommonColumnName(String commonColumnName, DfCommonColumnProperties prop) {
         String filteredCommonColumn = prop.filterCommonColumn(commonColumnName);
-        filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "TABLE_NAME", getName());
-        filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "table_name", getName());
-        filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "TableName", getJavaName());
-        filteredCommonColumn = DfStringUtil.replace(filteredCommonColumn, "tablename", getJavaName());
+        filteredCommonColumn = Srl.replace(filteredCommonColumn, "TABLE_NAME", getName());
+        filteredCommonColumn = Srl.replace(filteredCommonColumn, "table_name", getName());
+        filteredCommonColumn = Srl.replace(filteredCommonColumn, "TableName", getJavaName());
+        filteredCommonColumn = Srl.replace(filteredCommonColumn, "tablename", getJavaName());
         return filteredCommonColumn;
     }
 
@@ -2727,9 +2726,9 @@ public class Table {
 
     public String getBehaviorQueryPathDisplayName(String behaviorQueryPath) {
         final String subDirectoryPath = getBehaviorQueryPathSubDirectoryPath(behaviorQueryPath);
-        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(subDirectoryPath)) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(subDirectoryPath)) {
             final String connector = "_";
-            return DfStringUtil.replace(subDirectoryPath, "/", connector) + connector + behaviorQueryPath;
+            return Srl.replace(subDirectoryPath, "/", connector) + connector + behaviorQueryPath;
         } else {
             return behaviorQueryPath;
         }
@@ -2737,7 +2736,7 @@ public class Table {
 
     public String getBehaviorQueryPathFileName(String behaviorQueryPath) {
         final String path = getBehaviorQueryPathPath(behaviorQueryPath);
-        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(path)) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(path)) {
             final int fileNameIndex = path.lastIndexOf("/");
             if (fileNameIndex >= 0) {
                 return path.substring(fileNameIndex + "/".length());
@@ -2752,59 +2751,59 @@ public class Table {
     public String getBehaviorQueryPathSubDirectoryPath(String behaviorQueryPath) {
         final Map<String, String> elementMap = getBehaviorQueryPathElementMap(behaviorQueryPath);
         final String subDirectoryPath = elementMap.get("subDirectoryPath");
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(subDirectoryPath) ? subDirectoryPath : "";
+        return Srl.is_NotNull_and_NotTrimmedEmpty(subDirectoryPath) ? subDirectoryPath : "";
     }
 
     public String getBehaviorQueryPathPath(String behaviorQueryPath) {
         final Map<String, String> elementMap = getBehaviorQueryPathElementMap(behaviorQueryPath);
         final String path = elementMap.get("path");
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(path) ? path : "";
+        return Srl.is_NotNull_and_NotTrimmedEmpty(path) ? path : "";
     }
 
     public boolean hasBehaviorQueryPathCustomizeEntity(String behaviorQueryPath) {
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(getBehaviorQueryPathCustomizeEntity(behaviorQueryPath));
+        return Srl.is_NotNull_and_NotTrimmedEmpty(getBehaviorQueryPathCustomizeEntity(behaviorQueryPath));
     }
 
     public String getBehaviorQueryPathCustomizeEntity(String behaviorQueryPath) {
         final Map<String, String> elementMap = getBehaviorQueryPathElementMap(behaviorQueryPath);
         final String customizeEntity = elementMap.get("customizeEntity");
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(customizeEntity) ? customizeEntity : "";
+        return Srl.is_NotNull_and_NotTrimmedEmpty(customizeEntity) ? customizeEntity : "";
     }
 
     public boolean hasBehaviorQueryPathParameterBean(String behaviorQueryPath) {
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(getBehaviorQueryPathParameterBean(behaviorQueryPath));
+        return Srl.is_NotNull_and_NotTrimmedEmpty(getBehaviorQueryPathParameterBean(behaviorQueryPath));
     }
 
     public String getBehaviorQueryPathParameterBean(String behaviorQueryPath) {
         final Map<String, String> elementMap = getBehaviorQueryPathElementMap(behaviorQueryPath);
         final String parameterBean = elementMap.get("parameterBean");
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(parameterBean) ? parameterBean : "";
+        return Srl.is_NotNull_and_NotTrimmedEmpty(parameterBean) ? parameterBean : "";
     }
 
     public boolean hasBehaviorQueryPathCursor(String behaviorQueryPath) {
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(getBehaviorQueryPathCursor(behaviorQueryPath));
+        return Srl.is_NotNull_and_NotTrimmedEmpty(getBehaviorQueryPathCursor(behaviorQueryPath));
     }
 
     public String getBehaviorQueryPathCursor(String behaviorQueryPath) {
         final Map<String, String> elementMap = getBehaviorQueryPathElementMap(behaviorQueryPath);
         final String cursor = elementMap.get("cursor");
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(cursor) ? cursor : "";
+        return Srl.is_NotNull_and_NotTrimmedEmpty(cursor) ? cursor : "";
     }
 
     public String getBehaviorQueryPathCursorForSchemaHtml(String behaviorQueryPath) {
         final String cursor = getBehaviorQueryPathCursor(behaviorQueryPath);
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(cursor) ? " *" + cursor : "";
+        return Srl.is_NotNull_and_NotTrimmedEmpty(cursor) ? " *" + cursor : "";
     }
 
     public String getBehaviorQueryPathTitle(String behaviorQueryPath) {
         final Map<String, String> elementMap = getBehaviorQueryPathElementMap(behaviorQueryPath);
         final String title = elementMap.get("title");
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(title) ? title : "";
+        return Srl.is_NotNull_and_NotTrimmedEmpty(title) ? title : "";
     }
 
     public String getBehaviorQueryPathTitleForSchemaHtml(String behaviorQueryPath) {
         String title = getBehaviorQueryPathTitle(behaviorQueryPath);
-        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(title)) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(title)) {
             final DfDocumentProperties prop = getProperties().getDocumentProperties();
             title = prop.resolveTextForSchemaHtml(title);
             return "(" + title + ")";
@@ -2814,18 +2813,18 @@ public class Table {
     }
 
     public boolean hasBehaviorQueryPathDescription(String behaviorQueryPath) {
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(getBehaviorQueryPathDescription(behaviorQueryPath));
+        return Srl.is_NotNull_and_NotTrimmedEmpty(getBehaviorQueryPathDescription(behaviorQueryPath));
     }
 
     public String getBehaviorQueryPathDescription(String behaviorQueryPath) {
         final Map<String, String> elementMap = getBehaviorQueryPathElementMap(behaviorQueryPath);
         final String description = elementMap.get("description");
-        return DfStringUtil.isNotNullAndNotTrimmedEmpty(description) ? description : "";
+        return Srl.is_NotNull_and_NotTrimmedEmpty(description) ? description : "";
     }
 
     public String getBehaviorQueryPathDescriptionForSchemaHtml(String behaviorQueryPath) {
         String description = getBehaviorQueryPathDescription(behaviorQueryPath);
-        if (DfStringUtil.isNotNullAndNotTrimmedEmpty(description)) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(description)) {
             final DfDocumentProperties prop = getProperties().getDocumentProperties();
             description = prop.resolvePreTextForSchemaHtml(description);
             return description;

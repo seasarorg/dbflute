@@ -118,8 +118,7 @@ public class DfDtsSqlServerSqlTableWriter extends DfDtsSqlTableWriter {
     private static Connection getConnection(DataSource dataSource) {
         try {
             return dataSource.getConnection();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
     }

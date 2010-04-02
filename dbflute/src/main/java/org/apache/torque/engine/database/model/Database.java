@@ -70,7 +70,6 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.EngineException;
@@ -99,7 +98,7 @@ import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfSequenceIdentityProperties.SequenceDefinitionMapChecker;
 import org.seasar.dbflute.properties.assistant.DfTableFinder;
 import org.seasar.dbflute.properties.assistant.commoncolumn.CommonColumnSetupResource;
-import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**
@@ -1041,7 +1040,7 @@ public class Database {
 
     public String filterDBFluteDiconBhvAp(String filePath) { // as utility for application behavior
         if (filePath.endsWith(".dicon")) {
-            filePath = DfStringUtil.replace(filePath, ".dicon", "++.dicon");
+            filePath = Srl.replace(filePath, ".dicon", "++.dicon");
         }
         return filePath;
     }
@@ -1079,7 +1078,7 @@ public class Database {
 
     public String filterDBFluteBeansBhvAp(String filePath) { // as utility for application behavior
         if (filePath.endsWith(".xml")) {
-            filePath = DfStringUtil.replace(filePath, ".xml", "BhvAp.xml");
+            filePath = Srl.replace(filePath, ".xml", "BhvAp.xml");
         }
         return filePath;
     }
@@ -1093,7 +1092,7 @@ public class Database {
 
     public String filterDBFluteModuleBhvAp(String filePath) { // as utility for application behavior
         if (filePath.endsWith(".java")) {
-            filePath = DfStringUtil.replace(filePath, ".java", "BhvAp.java");
+            filePath = Srl.replace(filePath, ".java", "BhvAp.java");
         }
         return filePath;
     }
@@ -1759,31 +1758,33 @@ public class Database {
     //                                                                 Name Convert Helper
     //                                                                 ===================
     public String convertJavaNameByJdbcNameAsTable(String jdbcName) {
-        // Don't use DfStringUtil.camelize() because
+        // Don't use Srl.camelize() because
         // it saves compatible and here simple is best.
-        // (DfStringUtil.camelize() is used at parameter bean and other sub objects)
+        // (Srl.camelize() is used at parameter bean and other sub objects)
         if (getBasicProperties().isTableNameCamelCase()) {
-            return jdbcName;
+            // initial-capitalize only
+            return initCap(jdbcName);
         }
         final List<String> inputs = new ArrayList<String>(2);
         inputs.add(jdbcName);
         inputs.add(getDefaultJavaNamingMethod());
-        return StringUtils.capitalise(generateName(inputs)); // use title case
+        return initCap(generateName(inputs)); // use title case
     }
 
     public String convertJavaNameByJdbcNameAsColumn(String jdbcName) {
         // same policy as table naming
         if (getBasicProperties().isColumnNameCamelCase()) {
-            return jdbcName;
+            // initial-capitalize only
+            return initCap(jdbcName);
         }
         final List<String> inputs = new ArrayList<String>(2);
         inputs.add(jdbcName);
         inputs.add(getDefaultJavaNamingMethod());
-        return StringUtils.capitalise(generateName(inputs)); // use title case
+        return initCap(generateName(inputs)); // use title case
     }
 
     public String convertUncapitalisedJavaNameByJdbcNameAsColumn(String jdbcName) {
-        return DfStringUtil.initUncap(convertJavaNameByJdbcNameAsColumn(jdbcName));
+        return Srl.initUncap(convertJavaNameByJdbcNameAsColumn(jdbcName));
     }
 
     /**
@@ -1864,11 +1865,11 @@ public class Database {
     //                                                String
     //                                                ------
     public String initCap(String str) {
-        return DfStringUtil.initCap(str);
+        return Srl.initCap(str);
     }
 
     public String initUncap(String str) {
-        return DfStringUtil.initUncap(str);
+        return Srl.initUncap(str);
     }
 
     public boolean isInitNumber(String str) {

@@ -61,7 +61,7 @@ import org.xml.sax.Attributes;
  * @author Modified by jflute
  */
 public class IdMethodParameter {
-    
+
     private String name;
     private String value;
     private Table parentTable;

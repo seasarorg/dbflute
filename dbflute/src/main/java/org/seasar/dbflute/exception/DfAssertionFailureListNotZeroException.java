@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfAssertionFailureListNotZeroException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfAssertionFailureListNotZeroException(String msg) {
         super(msg);
     }

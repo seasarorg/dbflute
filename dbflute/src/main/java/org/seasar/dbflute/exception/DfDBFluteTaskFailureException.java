@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfDBFluteTaskFailureException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfDBFluteTaskFailureException(String msg) {
         super(msg);
     }

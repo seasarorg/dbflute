@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfParameterBeanReferenceTableNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfParameterBeanReferenceTableNotFoundException(String msg) {
         super(msg);
     }

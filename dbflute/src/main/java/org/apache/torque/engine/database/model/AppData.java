@@ -58,9 +58,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.torque.engine.EngineException;
 import org.apache.torque.engine.database.transform.DTDResolver;
+import org.seasar.dbflute.util.Srl;
 import org.xml.sax.Attributes;
 
 /**
@@ -125,7 +125,7 @@ public class AppData {
      * @return String name
      */
     public String getShortName() {
-        return StringUtils.replace(_name, "-schema", "");
+        return Srl.replace(_name, "-schema", "");
     }
 
     /**

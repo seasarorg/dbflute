@@ -19,6 +19,6 @@ package org.seasar.dbflute.logic.schemainitializer;
  * @author jflute
  */
 public interface DfSchemaInitializer {
-    
+
     public void initializeSchema();
 }

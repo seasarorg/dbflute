@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfTableDataRegistrationFailureException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfTableDataRegistrationFailureException(String msg) {
         super(msg);
     }

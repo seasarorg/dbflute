@@ -47,6 +47,7 @@ public class DfDtsModifiedState extends DfDtsAbstractRowState {
             }
         }
         buf.setLength(buf.length() - 5);
-        return new DfDtsSqlContext(buf.toString(), argList.toArray(), argTypeList.toArray(new Class[argTypeList.size()]));
+        return new DfDtsSqlContext(buf.toString(), argList.toArray(), argTypeList
+                .toArray(new Class[argTypeList.size()]));
     }
 }

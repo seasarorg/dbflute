@@ -15,28 +15,27 @@
  */
 package org.seasar.dbflute.helper.jdbc.determiner;
 
-
 /**
  * @author jflute
  */
 public class DfJdbcDeterminerMsAccess implements DfJdbcDeterminer {
-    
+
     public boolean isSchemaNameEmptyAllowed() {
         return false;
     }
-    
+
     public boolean isPrimaryKeyExtractingSupported() {
         return false;
     }
-    
+
     public boolean isForeignKeyExtractingSupported() {
         return false;
     }
-    
+
     public boolean isBlockCommentValid() {
         return false;
     }
-    
+
     public boolean isLineCommentValid() {
         return false;
     }

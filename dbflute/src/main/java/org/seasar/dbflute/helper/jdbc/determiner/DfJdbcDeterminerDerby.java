@@ -15,28 +15,27 @@
  */
 package org.seasar.dbflute.helper.jdbc.determiner;
 
-
 /**
  * @author jflute
  */
 public class DfJdbcDeterminerDerby implements DfJdbcDeterminer {
-    
+
     public boolean isSchemaNameEmptyAllowed() {
         return true;
     }
-    
+
     public boolean isPrimaryKeyExtractingSupported() {
         return true;
     }
-    
+
     public boolean isForeignKeyExtractingSupported() {
         return true;
     }
-    
+
     public boolean isBlockCommentValid() {
         return false;
     }
-    
+
     public boolean isLineCommentValid() {
         return true;
     }

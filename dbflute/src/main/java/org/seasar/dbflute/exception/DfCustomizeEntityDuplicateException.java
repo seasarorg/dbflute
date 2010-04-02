@@ -6,7 +6,7 @@ package org.seasar.dbflute.exception;
 public class DfCustomizeEntityDuplicateException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
-    
+
     public DfCustomizeEntityDuplicateException(String msg) {
         super(msg);
     }

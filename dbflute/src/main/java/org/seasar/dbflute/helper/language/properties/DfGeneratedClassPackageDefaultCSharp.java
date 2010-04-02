@@ -12,7 +12,7 @@ public class DfGeneratedClassPackageDefaultCSharp implements DfGeneratedClassPac
     public String getBaseDaoPackage() {
         return "BsDao";
     }
-    
+
     public String getCursorSimplePackageName() {
         return "Cursor";
     }

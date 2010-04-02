@@ -10,6 +10,7 @@ import org.seasar.dbflute.twowaysql.SqlAnalyzer;
 import org.seasar.dbflute.twowaysql.node.IfCommentEvaluator;
 import org.seasar.dbflute.twowaysql.node.ParameterFinder;
 import org.seasar.dbflute.util.DfStringUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -123,7 +124,7 @@ public class DfOutsideSqlChecker {
         }
         final DfOutsideSqlMarkAnalyzer analyzer = new DfOutsideSqlMarkAnalyzer();
         final String title = analyzer.getTitle(sql);
-        if (DfStringUtil.isNullOrTrimmedEmpty(title)) {
+        if (Srl.is_Null_or_TrimmedEmpty(title)) {
             throwRequiredOutsideSqlTitleNotFoundException(fileName, sql);
         }
     }
@@ -158,7 +159,7 @@ public class DfOutsideSqlChecker {
         }
         final DfOutsideSqlMarkAnalyzer analyzer = new DfOutsideSqlMarkAnalyzer();
         final String description = analyzer.getDescription(sql);
-        if (DfStringUtil.isNullOrTrimmedEmpty(description)) {
+        if (Srl.is_Null_or_TrimmedEmpty(description)) {
             throwRequiredOutsideSqlDescriptionNotFoundException(fileName, sql);
         }
     }

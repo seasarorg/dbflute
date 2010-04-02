@@ -15,15 +15,18 @@
  */
 package org.seasar.dbflute.helper.jdbc.determiner;
 
-
 /**
  * @author jflute
  */
 public interface DfJdbcDeterminer {
-    
+
     public boolean isSchemaNameEmptyAllowed();
+
     public boolean isPrimaryKeyExtractingSupported();
+
     public boolean isForeignKeyExtractingSupported();
+
     public boolean isBlockCommentValid();
+
     public boolean isLineCommentValid();
 }
