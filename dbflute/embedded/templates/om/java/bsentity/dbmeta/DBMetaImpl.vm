@@ -319,8 +319,9 @@ public class ${myClassName} extends AbstractDBMeta {
     { findEps(_epsMap, propertyName).setup((${myExtendedObjectClassName})entity, value); }
 
 #foreach ($col in $table.columns)
-    public class Eps${col.javaName} implements Eps<${myExtendedObjectClassName}>
+#set ($setupperClassName = "Eps${col.javaName}")
 #if ($col.isCheckSelectedClassification() || $col.isForceClassificationSetting())
+    public class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
     { public void setup(${myExtendedObjectClassName} e, Object v) {
         ColumnInfo col = column${col.javaBeansRulePropertyNameInitCap}();
 #if ($col.isCheckSelectedClassification())
@@ -329,6 +330,7 @@ public class ${myClassName} extends AbstractDBMeta {
         e.set${col.javaName}As${col.classificationName}((${glCDef}.${col.classificationName})getCls(col, v));
     }}
 #else
+    public static class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
 #end
 #end
