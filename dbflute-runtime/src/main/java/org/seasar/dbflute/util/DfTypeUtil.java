@@ -371,7 +371,7 @@ public final class DfTypeUtil {
             return toInteger((String) obj);
         } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new Integer(createDateFormat(pattern).format(obj));
+                return Integer.valueOf(createDateFormat(pattern).format(obj));
             }
             return Integer.valueOf((int) ((java.util.Date) obj).getTime());
         } else if (obj instanceof Boolean) {
@@ -417,7 +417,7 @@ public final class DfTypeUtil {
             return toLong((String) obj);
         } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new Long(createDateFormat(pattern).format(obj));
+                return Long.valueOf(createDateFormat(pattern).format(obj));
             }
             return Long.valueOf(((java.util.Date) obj).getTime());
         } else if (obj instanceof Boolean) {
@@ -458,14 +458,14 @@ public final class DfTypeUtil {
         } else if (obj instanceof Double) {
             return (Double) obj;
         } else if (obj instanceof Number) {
-            return new Double(((Number) obj).doubleValue());
+            return Double.valueOf(((Number) obj).doubleValue());
         } else if (obj instanceof String) {
             return toDouble((String) obj);
         } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new Double(createDateFormat(pattern).format(obj));
+                return Double.valueOf(createDateFormat(pattern).format(obj));
             }
-            return new Double(((java.util.Date) obj).getTime());
+            return Double.valueOf(((java.util.Date) obj).getTime());
         } else if (obj instanceof byte[]) {
             return toDouble(toSerializable((byte[]) obj)); // recursive
         } else {
@@ -502,14 +502,14 @@ public final class DfTypeUtil {
         } else if (obj instanceof Float) {
             return (Float) obj;
         } else if (obj instanceof Number) {
-            return new Float(((Number) obj).floatValue());
+            return Float.valueOf(((Number) obj).floatValue());
         } else if (obj instanceof String) {
             return toFloat((String) obj);
         } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new Float(createDateFormat(pattern).format(obj));
+                return Float.valueOf(createDateFormat(pattern).format(obj));
             }
-            return new Float(((java.util.Date) obj).getTime());
+            return Float.valueOf(((java.util.Date) obj).getTime());
         } else if (obj instanceof byte[]) {
             return toFloat(toSerializable((byte[]) obj)); // recursive
         } else {
@@ -597,7 +597,7 @@ public final class DfTypeUtil {
             return toByte((String) obj);
         } else if (obj instanceof java.util.Date) {
             if (pattern != null) {
-                return new Byte(createDateFormat(pattern).format(obj));
+                return Byte.valueOf(createDateFormat(pattern).format(obj));
             }
             return Byte.valueOf((byte) ((java.util.Date) obj).getTime());
         } else if (obj instanceof Boolean) {
@@ -647,7 +647,7 @@ public final class DfTypeUtil {
             if (pattern != null) {
                 return new BigDecimal(createDateFormat(pattern).format(obj));
             }
-            return new BigDecimal(Long.toString(((java.util.Date) obj).getTime()));
+            return BigDecimal.valueOf(((java.util.Date) obj).getTime());
         } else if (obj instanceof String) {
             String s = (String) obj;
             if (s == null || s.trim().length() == 0) {
