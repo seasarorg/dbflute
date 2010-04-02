@@ -190,6 +190,7 @@ public class DfProcedureExecutionMetaExtractor {
             }
             sb.append(name);
         }
+        sb.insert(0, "{").append("}");
         return sb.toString();
     }
 
