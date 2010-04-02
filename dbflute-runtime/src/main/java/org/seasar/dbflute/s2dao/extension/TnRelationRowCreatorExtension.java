@@ -207,7 +207,10 @@ public class TnRelationRowCreatorExtension extends TnRelationRowCreatorImpl {
 
     @Override
     protected int getLimitRelationNestLevel() {
-        return 2; // for Compatible
+        // basically unused on DBFlute because only ConditionBean uses relation row,
+        // and ConditionBean supports unlimited relation nest level.
+        // So this limit size is always used after hasConditionBean().
+        return 2; // for Compatible (old parameter)
     }
 
     protected TnRelationRowCreationResource createResourceForRow(ResultSet rs, TnRelationPropertyType rpt,

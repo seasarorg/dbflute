@@ -179,16 +179,18 @@ public class TnBeanListResultSetHandler extends TnAbstractBeanResultSetHandler {
     protected TnRelationKey createRelationKey(ResultSet rs, TnRelationPropertyType rpt, Set<String> columnNames,
             Map<String, Object> relKeyValues, Map<String, Integer> selectIndexMap) throws SQLException {
         final List<Object> keyList = new ArrayList<Object>();
-        final TnBeanMetaData bmd = rpt.getBeanMetaData();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
             final ValueType valueType;
             String columnName = rpt.getMyKey(i);
-            if (columnNames.contains(columnName)) {
+            if (columnNames.contains(columnName)) { // the local column exists on select clause
+                // basically here because local columns for relation key
+                // are required on ConditionBean (when it uses setupSelect)
                 final TnPropertyType pt = getBeanMetaData().getPropertyTypeByColumnName(columnName);
                 valueType = pt.getValueType();
-            } else {
-                final TnPropertyType pt = bmd.getPropertyTypeByColumnName(rpt.getYourKey(i));
-                columnName = pt.getColumnName() + buildRelationNoSuffix(rpt);
+            } else { // the local column does not exist on select clause so it uses a foreign column
+                final TnPropertyType pt = rpt.getBeanMetaData().getPropertyTypeByColumnName(rpt.getYourKey(i));
+                final String relationNoSuffix = buildRelationNoSuffix(rpt);
+                columnName = pt.getColumnName() + relationNoSuffix; // switch to foreign column
                 if (columnNames.contains(columnName)) {
                     valueType = pt.getValueType();
                 } else {

@@ -295,20 +295,24 @@ public final class DfTypeUtil {
     //                                                                              Number
     //                                                                              ======
     public static Number toNumber(Object obj, Class<?> type) {
+        if (obj == null) {
+            return null;
+        }
+        // Integer, Long and BigDecimal are prior
         if (type == Integer.class) {
             return toInteger(obj);
-        } else if (type == Double.class) {
-            return toDouble(obj);
         } else if (type == Long.class) {
             return toLong(obj);
+        } else if (type == BigDecimal.class) {
+            return toBigDecimal(obj);
+        } else if (type == Double.class) {
+            return toDouble(obj);
         } else if (type == Float.class) {
             return toFloat(obj);
         } else if (type == Short.class) {
             return toShort(obj);
         } else if (type == Byte.class) {
             return toByte(obj);
-        } else if (type == BigDecimal.class) {
-            return toBigDecimal(obj);
         } else if (type == BigInteger.class) {
             return toBigInteger(obj);
         }

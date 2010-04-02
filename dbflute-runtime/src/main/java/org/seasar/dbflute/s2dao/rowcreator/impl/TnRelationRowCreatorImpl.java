@@ -17,10 +17,8 @@ package org.seasar.dbflute.s2dao.rowcreator.impl;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.beans.DfPropertyDesc;
@@ -77,7 +75,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
 
     protected void setupRelationKeyValue(TnRelationRowCreationResource res) {
         final TnRelationPropertyType rpt = res.getRelationPropertyType();
-        final TnBeanMetaData bmd = rpt.getBeanMetaData();
+        final TnBeanMetaData relBmd = rpt.getBeanMetaData();
         for (int i = 0; i < rpt.getKeySize(); ++i) {
             final String columnName = rpt.getMyKey(i) + res.getBaseSuffix();
 
@@ -96,34 +94,13 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
             }
 
             final String yourKey = rpt.getYourKey(i);
-            final TnPropertyType pt = bmd.getPropertyTypeByColumnName(yourKey);
+            final TnPropertyType pt = relBmd.getPropertyTypeByColumnName(yourKey);
             final DfPropertyDesc pd = pt.getPropertyDesc();
             pd.setValue(res.getRow(), value);
-            continue;
         }
     }
 
-    protected void setupRelationAllValue(TnRelationRowCreationResource res) throws SQLException {
-        final Map<String, TnPropertyMapping> propertyCacheElement = res.extractPropertyCacheElement();
-        final Set<Entry<String, TnPropertyMapping>> entrySet = propertyCacheElement.entrySet();
-        for (Entry<String, TnPropertyMapping> entry : entrySet) {
-            final TnPropertyMapping mapping = entry.getValue();
-            res.setCurrentPropertyType(mapping);
-            if (!isValidRelationPerPropertyLoop(res)) {
-                res.clearRowInstance();
-                return;
-            }
-            setupRelationProperty(res);
-        }
-        if (!isValidRelationAfterPropertyLoop(res)) {
-            res.clearRowInstance();
-            return;
-        }
-        res.clearValidValueCount();
-        if (res.hasNextRelationProperty() && res.hasNextRelationLevel()) {
-            setupNextRelationRow(res);
-        }
-    }
+    protected abstract void setupRelationAllValue(TnRelationRowCreationResource res) throws SQLException;
 
     protected boolean isValidRelationPerPropertyLoop(TnRelationRowCreationResource res) throws SQLException {
         return true;// Always true as default. This method is for extension(for override).
@@ -225,37 +202,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
             Set<String> selectColumnSet, Map<String, Map<String, TnPropertyMapping>> relationPropertyCache,
             String baseSuffix, String relationNoSuffix, int limitRelationNestLevel) throws SQLException;
 
-    protected void setupPropertyCache(TnRelationRowCreationResource res) throws SQLException {
-        // - - - - - - - - - - - 
-        // Recursive Call Point!
-        // - - - - - - - - - - -
-        res.initializePropertyCacheElement();
-
-        // Check whether the relation is target or not.
-        if (!isTargetRelation(res)) {
-            return;
-        }
-
-        // Set up property cache about current beanMetaData.
-        final TnBeanMetaData nextBmd = res.getRelationBeanMetaData();
-        final List<TnPropertyType> ptList = nextBmd.getPropertyTypeList();
-        for (TnPropertyType pt : ptList) {
-            res.setCurrentPropertyType(pt);
-            setupPropertyCacheElement(res);
-        }
-
-        // Set up next relation.
-        if (res.hasNextRelationProperty() && res.hasNextRelationLevel()) {
-            res.backupRelationPropertyType();
-            res.incrementCurrentRelationNestLevel();
-            try {
-                setupNextPropertyCache(res, nextBmd);
-            } finally {
-                res.restoreRelationPropertyType();
-                res.decrementCurrentRelationNestLevel();
-            }
-        }
-    }
+    protected abstract void setupPropertyCache(TnRelationRowCreationResource res) throws SQLException;
 
     protected void setupPropertyCacheElement(TnRelationRowCreationResource res) throws SQLException {
         final String columnName = res.buildRelationColumnName();
@@ -318,11 +265,7 @@ public abstract class TnRelationRowCreatorImpl implements TnRelationRowCreator {
         return true;
     }
 
-    protected boolean isCreateDeadLink() {
-        return true;
-    }
+    protected abstract boolean isCreateDeadLink();
 
-    protected int getLimitRelationNestLevel() {
-        return 1;
-    }
+    protected abstract int getLimitRelationNestLevel();
 }

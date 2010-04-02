@@ -79,13 +79,10 @@ public class Srl {
     //                                                                                Trim
     //                                                                                ====
     public static final String rtrim(String str) {
-        assertStringNotNull(str);
         return doRTrim(str, null);
     }
 
     public static final String rtrim(String str, String trimStr) {
-        assertStringNotNull(str);
-        assertObjectNotNull("trimStr", trimStr);
         return doRTrim(str, trimStr);
     }
 

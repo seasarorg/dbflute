@@ -18,6 +18,7 @@ package org.seasar.dbflute.dbmeta;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -865,7 +866,7 @@ public abstract class AbstractDBMeta implements DBMeta {
         return setupper;
     }
 
-    protected Classification getCls(ColumnInfo columnInfo, Object code) { // getClassification
+    protected Classification gcls(ColumnInfo columnInfo, Object code) { // getClassification
         assertObjectNotNull("columnInfo", columnInfo);
         if (code == null) {
             return null;
@@ -877,12 +878,12 @@ public abstract class AbstractDBMeta implements DBMeta {
         return classificationMeta.codeOf(code);
     }
 
-    protected void chkCls(ColumnInfo columnInfo, Object code) { // checkClassification
+    protected void ccls(ColumnInfo columnInfo, Object code) { // checkClassification
         assertObjectNotNull("columnInfo", columnInfo);
         if (code == null) {
             return; // no check null value which means no existence on DB
         }
-        final Classification classification = getCls(columnInfo, code);
+        final Classification classification = gcls(columnInfo, code);
         if (classification == null) {
             throwIllegalClassificationCodeException(columnInfo, code);
         }
@@ -906,6 +907,23 @@ public abstract class AbstractDBMeta implements DBMeta {
         msg = msg + "[Column]" + ln() + columnInfo.getColumnDbName() + ln();
         msg = msg + "* * * * * * * * * */";
         throw new IllegalClassificationCodeException(msg);
+    }
+
+    protected Integer cti(Object value) { // convertToInteger
+        return DfTypeUtil.toInteger(value);
+    }
+
+    protected Long ctl(Object value) { // convertToLong
+        return DfTypeUtil.toLong(value);
+    }
+
+    protected BigDecimal ctb(Object value) { // convertToBigDecimal
+        return DfTypeUtil.toBigDecimal(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <NUMBER extends Number> NUMBER ctn(Object value, Class<NUMBER> type) { // convertToNumber
+        return (NUMBER) DfTypeUtil.toNumber(value, type);
     }
 
     // ===================================================================================
