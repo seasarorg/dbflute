@@ -1291,6 +1291,18 @@ public class Column {
     // - - - - - -
     // [Pinpoint]
     // - - - - - -
+    public boolean isJavaNativeInteger() {
+        return getJavaNative().equals("Integer");
+    }
+
+    public boolean isJavaNativeLong() {
+        return getJavaNative().equals("Long");
+    }
+
+    public boolean isJavaNativeBigDecimal() {
+        return getJavaNative().equals("java.math.BigDecimal");
+    }
+
     public boolean isJavaNativeUtilDate() {
         return getJavaNative().equals("java.util.Date");
     }

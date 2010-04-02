@@ -330,9 +330,21 @@ public class ${myClassName} extends AbstractDBMeta {
         e.set${col.javaName}As${col.classificationName}((${glCDef}.${col.classificationName})gcls(col, v));
     }}
 #else
+## /- - - - - - - - - - - - - - - - - - - -
+## for different type between relation
+## (Integer, Long and BigDecimal are prior)
+## - - - - - - - - - -/
 #if ($col.isJavaNativeNumberObject())
     public class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
+#if ($col.isJavaNativeInteger())
+    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(cti(v)); } }
+#elseif ($col.isJavaNativeLong())
+    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctl(v)); } }
+#elseif ($col.isJavaNativeBigDecimal())
+    { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctb(v)); } }
+#else
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}(ctn(v, ${col.javaNative}.class)); } }
+#end
 #else
     public static class ${setupperClassName} implements Eps<${myExtendedObjectClassName}>
     { public void setup(${myExtendedObjectClassName} e, Object v) { e.set${col.javaName}((${col.javaNative})v); } }
