@@ -27,10 +27,12 @@ import org.seasar.dbflute.s2dao.valuetype.TnAbstractValueType;
  * {Refers to Seasar and Extends its class}
  * @author jflute
  */
-public class PostgreResultSetType extends TnAbstractValueType {
+public class PostgreSQLResultSetType extends TnAbstractValueType {
 
-    public PostgreResultSetType() {
-        super(Types.OTHER);
+    public static final int CURSOR = Types.OTHER;
+
+    public PostgreSQLResultSetType() {
+        super(CURSOR);
     }
 
     public Object getValue(ResultSet resultSet, int index) throws SQLException {

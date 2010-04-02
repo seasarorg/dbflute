@@ -34,10 +34,10 @@ public class TnProcedureValueTypeProvider {
             return TnValueTypes.getPluginValueType(name);
         }
         if (List.class.isAssignableFrom(type)) { // is for out parameter cursor.
-            if (DBDef.Oracle.equals(currentDBDef)) {
+            if (DBDef.PostgreSQL.equals(currentDBDef)) {
+                return TnValueTypes.POSTGRESQL_RESULT_SET;
+            } else if (DBDef.Oracle.equals(currentDBDef)) {
                 return TnValueTypes.ORACLE_RESULT_SET;
-            } else if (DBDef.PostgreSQL.equals(currentDBDef)) {
-                return TnValueTypes.POSTGRE_RESULT_SET;
             } else {
                 return TnValueTypes.SERIALIZABLE_BYTE_ARRAY;
             }

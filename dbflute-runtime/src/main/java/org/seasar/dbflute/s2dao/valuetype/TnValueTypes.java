@@ -52,7 +52,7 @@ import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsSqlDateType;
 import org.seasar.dbflute.s2dao.valuetype.basic.UtilDateAsTimestampType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.BytesType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.OracleResultSetType;
-import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreResultSetType;
+import org.seasar.dbflute.s2dao.valuetype.plugin.PostgreSQLResultSetType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.SerializableType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.TnBytesOidType;
 import org.seasar.dbflute.s2dao.valuetype.plugin.TnStringClobType;
@@ -67,36 +67,36 @@ public class TnValueTypes {
     //                                                                          Definition
     //                                                                          ==========
     // basic (object)
-    public final static ValueType STRING = new StringType();
-    public final static ValueType CHARACTER = new CharacterType();
-    public final static ValueType BYTE = new ByteType();
-    public final static ValueType SHORT = new ShortType();
-    public final static ValueType INTEGER = new IntegerType();
-    public final static ValueType LONG = new LongType();
-    public final static ValueType FLOAT = new FloatType();
-    public final static ValueType DOUBLE = new DoubleType();
-    public final static ValueType BIGDECIMAL = new BigDecimalType();
-    public final static ValueType BIGINTEGER = new BigIntegerType();
-    public final static ValueType TIME = new TimeType();
-    public final static ValueType SQLDATE = new SqlDateType();
-    public final static ValueType UTILDATE_AS_SQLDATE = new UtilDateAsSqlDateType();
-    public final static ValueType UTILDATE_AS_TIMESTAMP = new UtilDateAsTimestampType();
-    public final static ValueType TIMESTAMP = new TimestampType();
-    public final static ValueType BINARY = new BinaryType();
-    public final static ValueType BINARY_STREAM = new BinaryStreamType();
-    public final static ValueType BOOLEAN = new BooleanType();
-    public final static ValueType UUID = new UUIDType();
+    public static final ValueType STRING = new StringType();
+    public static final ValueType CHARACTER = new CharacterType();
+    public static final ValueType BYTE = new ByteType();
+    public static final ValueType SHORT = new ShortType();
+    public static final ValueType INTEGER = new IntegerType();
+    public static final ValueType LONG = new LongType();
+    public static final ValueType FLOAT = new FloatType();
+    public static final ValueType DOUBLE = new DoubleType();
+    public static final ValueType BIGDECIMAL = new BigDecimalType();
+    public static final ValueType BIGINTEGER = new BigIntegerType();
+    public static final ValueType TIME = new TimeType();
+    public static final ValueType SQLDATE = new SqlDateType();
+    public static final ValueType UTILDATE_AS_SQLDATE = new UtilDateAsSqlDateType();
+    public static final ValueType UTILDATE_AS_TIMESTAMP = new UtilDateAsTimestampType();
+    public static final ValueType TIMESTAMP = new TimestampType();
+    public static final ValueType BINARY = new BinaryType();
+    public static final ValueType BINARY_STREAM = new BinaryStreamType();
+    public static final ValueType BOOLEAN = new BooleanType();
+    public static final ValueType UUID = new UUIDType();
 
     // basic (interface)
-    public final static ValueType CLASSIFICATION = new ClassificationType(); // DBFlute original class
+    public static final ValueType CLASSIFICATION = new ClassificationType(); // DBFlute original class
 
     // basic (default)
-    public final static ValueType OBJECT = new ObjectType();
+    public static final ValueType OBJECT = new ObjectType();
 
     // plug-in
-    public final static ValueType ORACLE_RESULT_SET = new OracleResultSetType();
-    public final static ValueType POSTGRE_RESULT_SET = new PostgreResultSetType();
-    public final static ValueType SERIALIZABLE_BYTE_ARRAY = new SerializableType(BytesType.BYTES_TRAIT);
+    public static final ValueType POSTGRESQL_RESULT_SET = new PostgreSQLResultSetType();
+    public static final ValueType ORACLE_RESULT_SET = new OracleResultSetType();
+    public static final ValueType SERIALIZABLE_BYTE_ARRAY = new SerializableType(BytesType.BYTES_TRAIT);
 
     // class type
     private static final Class<?> BYTE_ARRAY_CLASS = new byte[0].getClass();
