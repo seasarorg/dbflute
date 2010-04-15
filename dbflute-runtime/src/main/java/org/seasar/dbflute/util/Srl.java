@@ -49,6 +49,14 @@ public class Srl {
         return !is_Null_or_TrimmedEmpty(str);
     }
 
+    public static final boolean isEmpty(final String str) {
+        return str != null && str.length() == 0;
+    }
+
+    public static final boolean isTrimmedEmpty(final String str) {
+        return str != null && str.trim().length() == 0;
+    }
+
     // ===================================================================================
     //                                                                             Replace
     //                                                                             =======
