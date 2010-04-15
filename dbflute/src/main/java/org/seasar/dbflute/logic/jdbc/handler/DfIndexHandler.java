@@ -39,19 +39,19 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                        Meta Getting
     //                                                                        ============
-    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String catalogSchema,
-            DfTableMetaInfo tableMetaInfo, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
-        catalogSchema = filterSchemaName(catalogSchema);
-        catalogSchema = tableMetaInfo.selectMetaExtractingSchemaName(catalogSchema);
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo,
+            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
+        final String catalogSchema = tableMetaInfo.getCatalogSchema();
         final String tableName = tableMetaInfo.getTableName();
         if (tableMetaInfo.isTableTypeView()) {
-            return new LinkedHashMap<String, Map<Integer, String>>();
+            return newLinkedHashMap();
         }
         return getIndexMap(dbMeta, catalogSchema, tableName, uniqueKeyMap);
     }
 
-    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String catalogSchema, String tableName,
-            Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String catalogSchema,
+            String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
+        catalogSchema = filterSchemaName(catalogSchema);
         Map<String, Map<Integer, String>> resultMap = doGetIndexMap(dbMeta, catalogSchema, tableName, uniqueKeyMap);
         if (resultMap.isEmpty()) { // for lower case
             resultMap = doGetIndexMap(dbMeta, catalogSchema, tableName.toLowerCase(), uniqueKeyMap);

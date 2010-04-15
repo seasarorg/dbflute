@@ -267,7 +267,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                 };
                 final DatabaseMetaData dbMetaData = conn.getMetaData();
                 final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfoMap = handler.getForeignKeyMetaInfo(
-                        dbMetaData, _schema, tableMetaInfo);
+                        dbMetaData, tableMetaInfo);
                 final Set<String> keySet = foreignKeyMetaInfoMap.keySet();
                 for (String foreignKeyName : keySet) {
                     final DfForeignKeyMetaInfo foreignKeyMetaInfo = foreignKeyMetaInfoMap.get(foreignKeyName);

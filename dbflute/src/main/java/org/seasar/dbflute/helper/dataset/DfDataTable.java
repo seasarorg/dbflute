@@ -134,7 +134,7 @@ public class DfDataTable {
         return _hasMetaData;
     }
 
-    public void setupMetaData(DatabaseMetaData metaData, String schemaName) {
+    public void setupMetaData(DatabaseMetaData metaData, String schemaName) throws SQLException {
         final Map<String, DfColumnMetaInfo> metaMap = extractColumnMetaMap(metaData, schemaName);
         final Set<String> primaryKeySet = getPrimaryKeySet(metaData, schemaName);
         for (int i = 0; i < getColumnSize(); ++i) {
@@ -159,7 +159,8 @@ public class DfDataTable {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected Map<String, DfColumnMetaInfo> extractColumnMetaMap(DatabaseMetaData metaData, String schemaName) {
+    protected Map<String, DfColumnMetaInfo> extractColumnMetaMap(DatabaseMetaData metaData, String schemaName)
+            throws SQLException {
         final List<DfColumnMetaInfo> metaList = new DfColumnHandler().getColumnList(metaData, schemaName, _tableName);
         final Map<String, DfColumnMetaInfo> metaMap = new HashMap<String, DfColumnMetaInfo>();
         for (DfColumnMetaInfo metaInfo : metaList) {

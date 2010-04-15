@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.dataset.DfDataRow;
 import org.seasar.dbflute.helper.dataset.DfDataTable;
 import org.seasar.dbflute.helper.dataset.states.DfDtsRowState;
@@ -30,8 +31,13 @@ public class DfDtsSqlTableWriter implements DfDtsTableWriter {
     }
 
     public void write(DfDataTable table) {
-        if (!table.hasMetaData()) {
-            setupMetaData(table);
+        try {
+            if (!table.hasMetaData()) {
+                setupMetaData(table);
+            }
+        } catch (SQLException e) {
+            String msg = "Failed to set up meta data: " + table;
+            throw new SQLFailureException(msg, e);
         }
         doWrite(table);
     }
@@ -44,7 +50,7 @@ public class DfDtsSqlTableWriter implements DfDtsTableWriter {
         }
     }
 
-    private void setupMetaData(DfDataTable table) {
+    private void setupMetaData(DfDataTable table) throws SQLException {
         Connection con = getConnection(dataSource);
         try {
             table.setupMetaData(getMetaData(con), _schemaName);

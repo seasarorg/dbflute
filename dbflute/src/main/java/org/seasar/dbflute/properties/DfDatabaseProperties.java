@@ -190,12 +190,12 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
     }
 
-    public Map<String, DfAdditionalSchemaInfo> getAdditionalSchemaMap() {
+    protected Map<String, DfAdditionalSchemaInfo> getAdditionalSchemaMap() {
         if (_additionalSchemaMap != null) {
             return _additionalSchemaMap;
         }
         assertOldStyleAdditionalSchema();
-        _additionalSchemaMap = new AdditionalSchemaLinkedHashMap<DfAdditionalSchemaInfo>();
+        _additionalSchemaMap = newLinkedHashMap();
         final Map<String, Object> additionalSchemaMap = getVairousStringKeyMap("additionalSchemaMap");
         if (additionalSchemaMap == null) {
             return _additionalSchemaMap;
@@ -229,34 +229,6 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             _additionalSchemaMap.put(schemaName, info);
         }
         return _additionalSchemaMap;
-    }
-
-    public static class AdditionalSchemaLinkedHashMap<VALUE> extends LinkedHashMap<String, VALUE> {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public VALUE get(Object key) {
-            final VALUE value = super.get(key);
-            if (value != null) {
-                return value;
-            }
-            if (key == null || !(key instanceof String)) {
-                return null;
-            }
-            final String schemaName = (String) key;
-            if (!schemaName.contains(".")) {
-                return null;
-            }
-            final String catalog = Srl.substringFirstFront(schemaName, ".");
-            final String pureSchema = Srl.substringFirstRear(schemaName, ".");
-            final String newKey;
-            if (NO_NAME_SCHEMA.equals(pureSchema)) { // basically for MySQL
-                newKey = catalog;
-            } else {
-                newKey = pureSchema;
-            }
-            return super.get(newKey);
-        }
     }
 
     protected void setupAdditionalSchemaObjectTypeTargetList(DfAdditionalSchemaInfo info, Map<String, Object> elementMap) {
@@ -328,8 +300,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
     }
 
-    public DfAdditionalSchemaInfo getAdditionalSchemaInfo(String schema) {
-        return getAdditionalSchemaMap().get(schema);
+    public List<String> getAdditionalSchemaNameList() {
+        return new ArrayList<String>(getAdditionalSchemaMap().keySet());
     }
 
     public boolean hasAdditionalSchema() {
@@ -346,15 +318,38 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return false;
     }
 
+    public DfAdditionalSchemaInfo getAdditionalSchemaInfo(String schema) {
+        if (schema == null) {
+            return null;
+        }
+        final Map<String, DfAdditionalSchemaInfo> map = getAdditionalSchemaMap();
+        final DfAdditionalSchemaInfo value = map.get(schema);
+        if (value != null) {
+            return value;
+        }
+        if (!schema.contains(".")) {
+            return null;
+        }
+        final String catalog = Srl.substringFirstFront(schema, ".");
+        final String pureSchema = Srl.substringFirstRear(schema, ".");
+        final String newKey;
+        if (NO_NAME_SCHEMA.equals(pureSchema)) { // basically for MySQL
+            newKey = catalog;
+        } else {
+            newKey = pureSchema;
+        }
+        return map.get(newKey);
+    }
+
     public boolean isAdditionalSchema(String schema) {
-        return getAdditionalSchemaMap().containsKey(schema);
+        return getAdditionalSchemaInfo(schema) != null;
     }
 
     public boolean isCatalogAdditionalSchema(String schema) {
         if (!isAdditionalSchema(schema)) {
             return false;
         }
-        DfAdditionalSchemaInfo info = getAdditionalSchemaInfo(schema);
+        final DfAdditionalSchemaInfo info = getAdditionalSchemaInfo(schema);
         final String schemaName = info.getSchemaName();
         return schemaName.contains(".");
     }

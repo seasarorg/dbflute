@@ -46,9 +46,6 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
     /** The map for except column. (Lazy) */
     private Map<String, List<String>> _columnExceptMap;
 
-    /** The map of additional schema. (Lazy) */
-    private Map<String, DfAdditionalSchemaInfo> _additionalSchemaMap;
-
     protected final List<String> getTableExceptList() { // for main schema
         if (_tableExceptList == null) {
             _tableExceptList = getProperties().getDatabaseProperties().getTableExceptList();
@@ -68,13 +65,6 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
             _columnExceptMap = getProperties().getDatabaseProperties().getColumnExceptMap();
         }
         return _columnExceptMap;
-    }
-
-    protected final Map<String, DfAdditionalSchemaInfo> getAdditionalSchemaMap() { // for additional schema
-        if (_additionalSchemaMap == null) {
-            _additionalSchemaMap = getProperties().getDatabaseProperties().getAdditionalSchemaMap();
-        }
-        return _additionalSchemaMap;
     }
 
     // ===================================================================================
@@ -97,8 +87,7 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
 
     protected List<String> getRealTableExceptList(String catalogSchema) { // extension point
         if (catalogSchema != null) {
-            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getAdditionalSchemaMap();
-            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(catalogSchema);
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(catalogSchema);
             if (schemaInfo != null) {
                 return schemaInfo.getTableExceptList();
             }
@@ -108,8 +97,7 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
 
     protected List<String> getRealTableTargetList(String catalogSchema) { // extension point
         if (catalogSchema != null) {
-            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getAdditionalSchemaMap();
-            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(catalogSchema);
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(catalogSchema);
             if (schemaInfo != null) {
                 return schemaInfo.getTableTargetList();
             }
@@ -141,8 +129,7 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
 
     protected Map<String, List<String>> getRealColumnExceptMap(String schemaName) { // extension point
         if (schemaName != null) {
-            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getAdditionalSchemaMap();
-            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(schemaName);
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(schemaName);
             if (schemaInfo != null) {
                 return new HashMap<String, List<String>>(); // unsupported at additional schema
             }
@@ -152,5 +139,9 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
 
     protected boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
+    }
+
+    protected final DfAdditionalSchemaInfo getAdditionalSchemaInfo(String catalogSchema) {
+        return getProperties().getDatabaseProperties().getAdditionalSchemaInfo(catalogSchema);
     }
 }

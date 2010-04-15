@@ -45,15 +45,13 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     /**
      * Retrieves a list of the columns composing the primary key for a given table.
      * @param metaData JDBC meta data. (NotNull)
-     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return The meta information of primary keys. (NotNull)
      * @throws SQLException
      */
-    public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, String catalogSchema,
-            DfTableMetaInfo tableMetaInfo) throws SQLException {
-        catalogSchema = filterSchemaName(catalogSchema);
-        catalogSchema = tableMetaInfo.selectMetaExtractingSchemaName(catalogSchema);
+    public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo)
+            throws SQLException {
+        final String catalogSchema = tableMetaInfo.getCatalogSchema();
         final String tableName = tableMetaInfo.getTableName();
         return getPrimaryKey(metaData, catalogSchema, tableName);
     }
@@ -69,7 +67,6 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, String catalogSchema, String tableName)
             throws SQLException {
         catalogSchema = filterSchemaName(catalogSchema);
-
         final DfPrimaryKeyMetaInfo info = new DfPrimaryKeyMetaInfo();
         if (!isPrimaryKeyExtractingSupported()) {
             return info;
@@ -156,20 +153,20 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                          Unique Key
     //                                                                          ==========
-    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, String catalogSchema,
-            DfTableMetaInfo tableMetaInfo) throws SQLException { // Non Primary Key Only
-        catalogSchema = filterSchemaName(catalogSchema);
-        catalogSchema = tableMetaInfo.selectMetaExtractingSchemaName(catalogSchema);
+    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
+            throws SQLException { // Non Primary Key Only
+        final String catalogSchema = tableMetaInfo.getCatalogSchema();
         final String tableName = tableMetaInfo.getTableName();
         if (tableMetaInfo.isTableTypeView()) {
-            return new LinkedHashMap<String, Map<Integer, String>>();
+            return newLinkedHashMap();
         }
-        final DfPrimaryKeyMetaInfo pkInfo = getPrimaryKey(dbMeta, catalogSchema, tableMetaInfo);
+        final DfPrimaryKeyMetaInfo pkInfo = getPrimaryKey(dbMeta, tableMetaInfo);
         return getUniqueKeyMap(dbMeta, catalogSchema, tableName, pkInfo.getPrimaryKeyList());
     }
 
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, String catalogSchema,
             String tableName, List<String> pkList) throws SQLException { // non primary key only
+        catalogSchema = filterSchemaName(catalogSchema);
         Map<String, Map<Integer, String>> resultMap = doGetUniqueKeyMap(dbMeta, catalogSchema, tableName, pkList);
         if (resultMap.isEmpty()) { // for lower case
             resultMap = doGetUniqueKeyMap(dbMeta, catalogSchema, tableName.toLowerCase(), pkList);

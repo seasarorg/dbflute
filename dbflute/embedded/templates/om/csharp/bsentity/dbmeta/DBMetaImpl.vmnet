@@ -150,7 +150,7 @@ namespace ${myDBMetaPackageName} {
 #end
 #if ($table.isUseSequence())
         public override bool HasSequence { get { return true; } }
-        public override String SequenceName { get { return "${table.definedSequenceName}"; } }
+        public override String SequenceName { get { return "${table.sequenceSqlName}"; } }
         public override String SequenceNextValSql { get { return "${table.sequenceNextValSql}"; } }
         public override int? SequenceIncrementSize { get { return ${table.sequenceIncrementSizeExpression}; } }
         public override int? SequenceCacheSize { get { return ${table.sequenceCacheSizeExpression}; } }

@@ -20,9 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -91,20 +89,20 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final String tableSchema = resultSet.getString("TABLE_SCHEM");
                 final String tableComment = resultSet.getString("REMARKS");
 
-                final String schemaExp;
+                final String catalogSchema;
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(tableCatalog)) {
                     // basically for additionalSchema
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(tableSchema)) {
-                        schemaExp = tableCatalog + "." + tableSchema;
+                        catalogSchema = tableCatalog + "." + tableSchema;
                     } else {
                         // basically MySQL
-                        schemaExp = tableCatalog + "." + DfDatabaseProperties.NO_NAME_SCHEMA;
+                        catalogSchema = tableCatalog + "." + DfDatabaseProperties.NO_NAME_SCHEMA;
                     }
                 } else {
-                    schemaExp = tableSchema;
+                    catalogSchema = tableSchema;
                 }
 
-                if (isTableExcept(schemaExp, tableName)) {
+                if (isTableExcept(catalogSchema, tableName)) {
                     _log.info(tableName + " is excepted!");
                     continue;
                 }
@@ -116,7 +114,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
                 tableMetaInfo.setTableName(tableName);
                 tableMetaInfo.setTableType(tableType);
-                tableMetaInfo.setCatalogSchema(schemaExp);
+                tableMetaInfo.setCatalogSchema(catalogSchema);
                 tableMetaInfo.setTableComment(tableComment);
                 tableList.add(tableMetaInfo);
             }
@@ -125,8 +123,6 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 resultSet.close();
             }
         }
-
-        resolveSameNameTable(tableList);
         return tableList;
     }
 
@@ -151,8 +147,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
 
     protected String[] getRealObjectTypeTargetArray(String schemaName) {
         if (schemaName != null) {
-            final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getAdditionalSchemaMap();
-            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(schemaName);
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(schemaName);
             if (schemaInfo != null) {
                 final List<String> objectTypeTargetList = schemaInfo.getObjectTypeTargetList();
                 assertObjectTypeTargetListNotEmpty(schemaName, objectTypeTargetList);
@@ -169,33 +164,6 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
             String msg = "The property 'objectTypeTargetList' should be required:";
             msg = msg + " schemaName=" + schemaName;
             throw new IllegalStateException(msg);
-        }
-    }
-
-    /**
-     * Resolve same name table.
-     * If the same table names exist, it marks about it.
-     * @param tableMetaInfoList The list of table meta info. (NotNull)
-     */
-    protected void resolveSameNameTable(final List<DfTableMetaInfo> tableMetaInfoList) {
-        final Set<String> tableNameSet = new HashSet<String>();
-        final Set<String> sameNameTableNameSet = new HashSet<String>();
-        for (DfTableMetaInfo info : tableMetaInfoList) {
-            final String tableName = info.getTableName();
-            if (tableNameSet.contains(tableName)) {
-                sameNameTableNameSet.add(tableName);
-            }
-            tableNameSet.add(tableName);
-        }
-        if (tableNameSet.size() == tableMetaInfoList.size()) {
-            return;
-        }
-        for (DfTableMetaInfo tableMetaInfo : tableMetaInfoList) {
-            final String tableName = tableMetaInfo.getTableName();
-            if (sameNameTableNameSet.contains(tableName)) {
-                _log.info("$ sameNameTable --> " + tableMetaInfo);
-                tableMetaInfo.setExistSameNameTable(true);
-            }
         }
     }
 }

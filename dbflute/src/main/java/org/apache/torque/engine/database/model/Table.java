@@ -349,7 +349,7 @@ public class Table {
     //                                          Table Schema
     //                                          ------------
     public String getDisplaySchema() {
-        if (getDatabaseProperties().hasCatalogAdditionalSchema()) {
+        if (isCatalogAdditionalSchema()) {
             return getCatalogSchema();
         } else {
             if (hasSchema()) {
@@ -364,16 +364,20 @@ public class Table {
         if (!hasSchema()) {
             return _schema;
         }
+        if (!_schema.contains(".")) {
+            return _schema;
+        }
         final int dotIndex = _schema.indexOf(".");
         if (dotIndex < 0) {
             return _schema;
         }
-        final String catalogName = _schema.substring(0, dotIndex);
-        final String schemaName = _schema.substring(dotIndex + ".".length());
+        final String catalogName = Srl.substringFirstFront(_schema, ".");
+        final String schemaName = Srl.substringFirstRear(_schema, ".");
         if (DfDatabaseProperties.NO_NAME_SCHEMA.equals(schemaName)) {
             return catalogName;
+        } else {
+            return catalogName + "." + schemaName;
         }
-        return catalogName + "." + schemaName;
     }
 
     protected String getPureSchema() { // NOT contain catalog name
@@ -381,6 +385,10 @@ public class Table {
             return _schema;
         }
         return Srl.substringFirstRear(getCatalogSchema(), ".");
+    }
+
+    protected String getPlainSchema() {
+        return _schema;
     }
 
     /**
@@ -392,7 +400,7 @@ public class Table {
     }
 
     public boolean hasSchema() {
-        return _schema != null && _schema.trim().length() > 0;
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_schema);
     }
 
     public boolean isMainSchema() {
@@ -401,14 +409,14 @@ public class Table {
 
     public boolean isAdditionalSchema() {
         if (hasSchema()) {
-            return getDatabaseProperties().isAdditionalSchema(_schema);
+            return getDatabaseProperties().isAdditionalSchema(getPlainSchema());
         }
         return false;
     }
 
     public boolean isCatalogAdditionalSchema() {
         if (hasSchema()) {
-            return getDatabaseProperties().isCatalogAdditionalSchema(_schema);
+            return getDatabaseProperties().isCatalogAdditionalSchema(getPlainSchema());
         }
         return false;
     }
@@ -2086,18 +2094,45 @@ public class Table {
     }
 
     /**
-     * Get the value of sequence name from definition map.
-     * @return The defined sequence name. (NotNull: If a sequence is not found, return empty string.)
+     * Get the value of sequence name defined at definition map.
+     * @return The string as name. (NotNull: If a sequence is not found, return empty string.)
      */
     public String getDefinedSequenceName() {
         if (!isUseSequence()) {
             return "";
         }
         final String sequenceName = getSequenceIdentityProperties().getSequenceName(getName());
-        if (sequenceName == null || sequenceName.trim().length() == 0) {
+        if (Srl.is_Null_or_TrimmedEmpty(sequenceName)) {
             final String serialSequenceName = extractPostgreSQLSerialSequenceName();
-            if (serialSequenceName != null && serialSequenceName.trim().length() > 0) {
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(serialSequenceName)) {
                 return serialSequenceName;
+            }
+            return ""; // if it uses sequence, unreachable
+        }
+        return sequenceName;
+    }
+
+    /**
+     * Get the value of sequence name for SQL.
+     * @return The string as name. (NotNull: If a sequence is not found, return empty string.)
+     */
+    public String getSequenceSqlName() {
+        if (!isUseSequence()) {
+            return "";
+        }
+        final String sequenceName = getSequenceIdentityProperties().getSequenceName(getName());
+        if (Srl.is_Null_or_TrimmedEmpty(sequenceName)) {
+            final String serialSequenceName = extractPostgreSQLSerialSequenceName();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(serialSequenceName)) {
+                String prefix = null;
+                if (isAvailableAddingSchemaToTableSqlName()) {
+                    if (isAvailableAddingCatalogToTableSqlName()) {
+                        prefix = getCatalogSchema();
+                    } else {
+                        prefix = getPureSchema();
+                    }
+                }
+                return (prefix != null ? prefix + "." : "") + serialSequenceName;
             }
             return ""; // if it uses sequence, unreachable
         }
@@ -2108,12 +2143,12 @@ public class Table {
      * Get the SQL for next value of sequence.
      * @return The SQL for next value of sequence. (NotNull: If a sequence is not found, return empty string.)
      */
-    public String getSequenceNextValSql() {
+    public String getSequenceNextValSql() { // basically for C#
         if (!isUseSequence()) {
             return "";
         }
         final DBDef dbdef = getBasicProperties().getCurrentDBDef();
-        final String sequenceName = getDefinedSequenceName();
+        final String sequenceName = getSequenceSqlName();
         final String sql = dbdef.dbway().buildSequenceNextValSql(sequenceName);
         return sql != null ? sql : "";
     }
@@ -2504,7 +2539,9 @@ public class Table {
             return false;
         }
         if (isAdditionalSchema()) {
-            final DfAdditionalSchemaInfo schemaInfo = getDatabaseProperties().getAdditionalSchemaInfo(_schema);
+            final DfDatabaseProperties prop = getDatabaseProperties();
+            final String schema = getPlainSchema();
+            final DfAdditionalSchemaInfo schemaInfo = prop.getAdditionalSchemaInfo(schema);
             if (schemaInfo.isSuppressCommonColumn()) {
                 return false;
             }

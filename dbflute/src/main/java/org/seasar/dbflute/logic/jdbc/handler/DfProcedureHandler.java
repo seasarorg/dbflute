@@ -129,9 +129,8 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             return;
         }
         final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
-        final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = databaseProperties.getAdditionalSchemaMap();
-        final Set<String> additionalSchemaSet = additionalSchemaMap.keySet();
-        for (String additionalSchema : additionalSchemaSet) {
+        final List<String> additionalSchemaList = databaseProperties.getAdditionalSchemaNameList();
+        for (String additionalSchema : additionalSchemaList) {
             final List<DfProcedureMetaInfo> additionalProcedureList = getPlainProcedureList(metaData, additionalSchema);
             for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
                 final String procedureCatalog = metaInfo.getProcedureCatalog();
@@ -205,8 +204,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 return true;
             }
         }
-        final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = databaseProperties.getAdditionalSchemaMap();
-        final DfAdditionalSchemaInfo additionalSchemaInfo = additionalSchemaMap.get(synonymOwner);
+        final DfAdditionalSchemaInfo additionalSchemaInfo = databaseProperties.getAdditionalSchemaInfo(synonymOwner);
         if (additionalSchemaInfo != null && additionalSchemaInfo.hasObjectTypeSynonym()) {
             return true;
         }

@@ -101,7 +101,7 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
             _log.info("...Incrementing serial type sequence");
             for (DfTableMetaInfo tableMetaInfo : tableList) {
                 final String tableName = tableMetaInfo.getTableName();
-                final DfPrimaryKeyMetaInfo pkInfo = uniqueKeyHandler.getPrimaryKey(metaData, _schema, tableMetaInfo);
+                final DfPrimaryKeyMetaInfo pkInfo = uniqueKeyHandler.getPrimaryKey(metaData, tableMetaInfo);
                 final List<String> pkList = pkInfo.getPrimaryKeyList();
                 if (pkList.size() != 1) {
                     continue;

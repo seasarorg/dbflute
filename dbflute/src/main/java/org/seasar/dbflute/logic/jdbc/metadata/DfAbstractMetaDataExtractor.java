@@ -62,16 +62,16 @@ public abstract class DfAbstractMetaDataExtractor {
         return Srl.substringFirstFront(schemaName, ".");
     }
 
-    protected String extractPureSchemaName(String schemaName) { // for DBMS that supports both schema and catalog
-        if (Srl.is_Null_or_Empty(schemaName)) {
-            return filterSchemaName(schemaName);
+    protected String extractPureSchemaName(String catalogSchema) { // for DBMS that supports both schema and catalog
+        if (Srl.is_Null_or_Empty(catalogSchema)) {
+            return filterSchemaName(catalogSchema);
         }
-        int dotIndex = schemaName.indexOf(".");
+        int dotIndex = catalogSchema.indexOf(".");
         if (dotIndex < 0) {
-            return filterSchemaName(schemaName);
+            return filterSchemaName(catalogSchema);
         }
         // basically additionalSchema with Database only
-        final String pureSchemaName = Srl.substringFirstRear(schemaName, ".");
+        final String pureSchemaName = Srl.substringFirstRear(catalogSchema, ".");
         if (DfDatabaseProperties.NO_NAME_SCHEMA.equals(pureSchemaName)) {
             return null;
         }

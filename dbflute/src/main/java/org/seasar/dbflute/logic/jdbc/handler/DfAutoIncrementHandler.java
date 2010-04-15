@@ -51,10 +51,16 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 // Basically it does not come here.
                 // But if it's schema requirement or reservation word, it comes here. 
                 try {
-                    final String sqlSchemaName = filterNoNameSchema(tableMetaInfo.getCatalogSchema());
-                    recoverySql = buildMetaDataSql(primaryKeyColumnName, sqlSchemaName + "." + tableName);
+                    final String schemaPrefix = extractPureSchemaName(tableMetaInfo.getCatalogSchema());
+                    recoverySql = buildMetaDataSql(primaryKeyColumnName, schemaPrefix + "." + tableName);
                     rs = st.executeQuery(recoverySql);
                 } catch (SQLException ignored) {
+                    try {
+                        final String schemaPrefix = filterNoNameSchema(tableMetaInfo.getCatalogSchema());
+                        recoverySql = buildMetaDataSql(primaryKeyColumnName, schemaPrefix + "." + tableName);
+                        rs = st.executeQuery(recoverySql);
+                    } catch (SQLException completelyIgnored) {
+                    }
                     rs = retryForReservationWordTable(st, tableName, primaryKeyColumnName);
                     if (rs == null) {
                         ignoredMessage = ignored.getMessage();
@@ -70,11 +76,18 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 }
             }
         } catch (SQLException e) {
-            String msg = "Failed to execute the SQL for getting auto-increment:";
-            msg = msg + " sql=" + sql;
-            msg = msg + " message=" + e.getMessage();
-            msg = msg + " recoverySql=" + recoverySql;
-            msg = msg + " recoveryMessage=" + ignoredMessage;
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "Failed to execute the SQL for getting auto-increment!" + ln();
+            msg = msg + ln();
+            msg = msg + "[SQL]" + ln() + sql + ln();
+            msg = msg + ln();
+            msg = msg + "[Message]" + ln() + e.getMessage() + ln();
+            msg = msg + ln();
+            msg = msg + "[Recovery Sql]" + ln() + recoverySql + ln();
+            msg = msg + ln();
+            msg = msg + "[Recovery Message]" + ln() + ignoredMessage + ln();
+            msg = msg + "* * * * * * * * * */";
             throw new IllegalStateException(msg, e);
         } finally {
             if (st != null) {

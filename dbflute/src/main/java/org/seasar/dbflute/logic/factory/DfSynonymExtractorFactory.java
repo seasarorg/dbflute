@@ -56,7 +56,7 @@ public class DfSynonymExtractorFactory {
         if (mainSchema != null && mainSchema.trim().length() > 0) {
             schemaList.add(_databaseProperties.getDatabaseSchema());
         }
-        schemaList.addAll(_databaseProperties.getAdditionalSchemaMap().keySet());
+        schemaList.addAll(_databaseProperties.getAdditionalSchemaNameList());
         return schemaList;
     }
 }

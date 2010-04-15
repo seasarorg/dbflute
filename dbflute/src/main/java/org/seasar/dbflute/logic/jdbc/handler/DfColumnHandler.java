@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.DfColumnNotFoundException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
@@ -58,7 +59,7 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
      * @return The map of column meta information. The key is column name. (NotNull)
      */
     public Map<String, DfColumnMetaInfo> getColumnMetaInfo(DatabaseMetaData metaData, String catalogSchema,
-            String tableName) {
+            String tableName) throws SQLException {
         final List<DfColumnMetaInfo> columns = getColumnList(metaData, catalogSchema, tableName);
         final Map<String, DfColumnMetaInfo> map = new LinkedHashMap<String, DfColumnMetaInfo>();
         for (DfColumnMetaInfo metaInfo : columns) {
@@ -70,14 +71,12 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     /**
      * Get the list of column meta information.
      * @param metaData The meta data of database. (NotNull)
-     * @param catalogSchema The name of schema. (Nullable)
      * @param tableMetaInfo The meta information of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String catalogSchema,
-            DfTableMetaInfo tableMetaInfo) {
-        catalogSchema = filterSchemaName(catalogSchema);
-        catalogSchema = tableMetaInfo.selectMetaExtractingSchemaName(catalogSchema);
+    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo)
+            throws SQLException {
+        final String catalogSchema = tableMetaInfo.getCatalogSchema();
         final String tableName = tableMetaInfo.getTableName();
         return getColumnList(metaData, catalogSchema, tableName);
     }
@@ -89,7 +88,8 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
      * @param tableName The name of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String catalogSchema, String tableName) {
+    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String catalogSchema, String tableName)
+            throws SQLException {
         catalogSchema = filterSchemaName(catalogSchema);
         final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;
@@ -108,9 +108,12 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
                 upperSpare = metaData.getColumns(catalogName, pureSchemaName, tableName.toUpperCase(), null);
                 setupColumnMetaInfo(columns, upperSpare, catalogSchema, tableName);
             }
-        } catch (SQLException e) {
-            String msg = "SQLException occured: schemaName=" + catalogSchema + " tableName=" + tableName;
-            throw new IllegalStateException(msg);
+            if (columns.isEmpty()) {
+                String msg = "Failed to get columns:";
+                msg = msg + " catalogName=" + catalogName + " schemaName=" + pureSchemaName;
+                msg = msg + " tableName=" + tableName;
+                throw new DfColumnNotFoundException(msg);
+            }
         } finally {
             if (columnResultSet != null) {
                 try {

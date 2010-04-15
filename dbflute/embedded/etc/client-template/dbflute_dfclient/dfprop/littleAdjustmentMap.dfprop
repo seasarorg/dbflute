@@ -4,6 +4,7 @@
 # The various settings about a little adjustment.
 # 
 # o isAvailableAddingSchemaToTableSqlName: (NotRequired - Default false)
+# o isAvailableAddingCatalogToTableSqlName: (NotRequired - Default false)
 # o isAvailableDatabaseDependency: (NotRequired - Default false)
 # o isAvailableNonPrimaryKeyWritable: (NotRequired - Default false)
 # o isCheckSelectedClassification: (NotRequired - Default false)
@@ -30,6 +31,18 @@ map:{
     #     Non.
     #
     #; isAvailableAddingSchemaToTableSqlName = false
+    # - - - - - - - - - -/
+
+    # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # o isAvailableAddingCatalogToTableSqlName: (NotRequired - Default false)
+    #   [true]
+    #     Add catalog to table SQL name. (The table name on query is CATALOG.SCHEMA.TABLE)
+    #     This property works only when isAvailableAddingSchemaToTableSqlName is true.
+    #
+    #   [false]
+    #     Non.
+    #
+    #; isAvailableAddingCatalogToTableSqlName = false
     # - - - - - - - - - -/
 
     # /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

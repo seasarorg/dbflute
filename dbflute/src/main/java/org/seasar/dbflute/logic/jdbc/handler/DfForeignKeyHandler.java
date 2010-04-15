@@ -50,15 +50,13 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     /**
      * Retrieves a list of foreign key columns for a given table.
      * @param dbMeta JDBC meta data. (NotNull)
-     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
      * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String catalogSchema,
+    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta,
             DfTableMetaInfo tableMetaInfo) throws SQLException {
-        catalogSchema = filterSchemaName(catalogSchema);
-        catalogSchema = tableMetaInfo.selectMetaExtractingSchemaName(catalogSchema);
+        final String catalogSchema = tableMetaInfo.getCatalogSchema();
         final String tableName = tableMetaInfo.getTableName();
         return getForeignKeyMetaInfo(dbMeta, catalogSchema, tableName);
     }
@@ -73,6 +71,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
      */
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String catalogSchema,
             String tableName) throws SQLException {
+        catalogSchema = filterSchemaName(catalogSchema);
         Map<String, DfForeignKeyMetaInfo> resultMap = doGetForeignKeyMetaInfo(dbMeta, catalogSchema, tableName);
         if (resultMap.isEmpty()) { // for lower case
             resultMap = doGetForeignKeyMetaInfo(dbMeta, catalogSchema, tableName.toLowerCase());

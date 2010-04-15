@@ -75,14 +75,6 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return resultMap;
     }
 
-    public String getSequenceProp(String tableName) {
-        final String sequenceProp = getSequenceDefinitionMap().get(tableName);
-        if (sequenceProp == null || sequenceProp.trim().length() == 0) {
-            return null;
-        }
-        return sequenceProp;
-    }
-
     public String getSequenceName(String tableName) {
         final String sequenceProp = getSequenceDefinitionMap().get(tableName);
         if (sequenceProp == null || sequenceProp.trim().length() == 0) {
@@ -98,6 +90,60 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             return null;
         }
         return sequenceName;
+    }
+
+    protected String getSequenceProp(String tableName) {
+        final String sequenceProp = getSequenceDefinitionMap().get(tableName);
+        if (sequenceProp == null || sequenceProp.trim().length() == 0) {
+            return null;
+        }
+        return sequenceProp;
+    }
+
+    // -----------------------------------------------------
+    //                                          Sequence Map
+    //                                          ------------
+    protected Map<String, DfSequenceMetaInfo> _sequenceMetaInfoMap;
+
+    protected Map<String, DfSequenceMetaInfo> getSequenceMap(DataSource dataSource) {
+        if (_sequenceMetaInfoMap != null) {
+            return _sequenceMetaInfoMap;
+        }
+        final DfSequenceExtractorFactory factory = new DfSequenceExtractorFactory(dataSource, getBasicProperties(),
+                getDatabaseProperties());
+        final DfSequenceExtractor sequenceExtractor = factory.createSequenceExtractor();
+        if (sequenceExtractor != null) {
+            try {
+                _sequenceMetaInfoMap = sequenceExtractor.getSequenceMap();
+            } catch (RuntimeException continued) { // because of supplement
+                _log.info("Failed to get sequence map: " + continued.getMessage());
+                _sequenceMetaInfoMap = new HashMap<String, DfSequenceMetaInfo>();
+            }
+        } else {
+            _sequenceMetaInfoMap = new HashMap<String, DfSequenceMetaInfo>();
+        }
+        return _sequenceMetaInfoMap;
+    }
+
+    protected DfSequenceMetaInfo getSequenceElement(String catalogSchema, String sequenceName,
+            Map<String, DfSequenceMetaInfo> sequenceMap) {
+        DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
+        if (info != null) {
+            return info;
+        }
+        if (sequenceName.contains(".")) {
+            return null;
+        }
+        info = sequenceMap.get(catalogSchema + "." + sequenceName);
+        if (info != null) {
+            return info;
+        }
+        final String pureSchema = Srl.substringFirstRear(catalogSchema, ".");
+        info = sequenceMap.get(pureSchema + "." + sequenceName);
+        if (info != null) {
+            return info;
+        }
+        return info;
     }
 
     // -----------------------------------------------------
@@ -194,52 +240,6 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         } else {
             return null;
         }
-    }
-
-    // -----------------------------------------------------
-    //                                          Sequence Map
-    //                                          ------------
-    protected Map<String, DfSequenceMetaInfo> _sequenceMetaInfoMap;
-
-    protected Map<String, DfSequenceMetaInfo> getSequenceMap(DataSource dataSource) {
-        if (_sequenceMetaInfoMap != null) {
-            return _sequenceMetaInfoMap;
-        }
-        final DfSequenceExtractorFactory factory = new DfSequenceExtractorFactory(dataSource, getBasicProperties(),
-                getDatabaseProperties());
-        final DfSequenceExtractor sequenceExtractor = factory.createSequenceExtractor();
-        if (sequenceExtractor != null) {
-            try {
-                _sequenceMetaInfoMap = sequenceExtractor.getSequenceMap();
-            } catch (RuntimeException continued) { // because of supplement
-                _log.info("Failed to get sequence map: " + continued.getMessage());
-                _sequenceMetaInfoMap = new HashMap<String, DfSequenceMetaInfo>();
-            }
-        } else {
-            _sequenceMetaInfoMap = new HashMap<String, DfSequenceMetaInfo>();
-        }
-        return _sequenceMetaInfoMap;
-    }
-
-    protected DfSequenceMetaInfo getSequenceElement(String catalogSchema, String sequenceName,
-            Map<String, DfSequenceMetaInfo> sequenceMap) {
-        DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
-        if (info != null) {
-            return info;
-        }
-        if (sequenceName.contains(".")) {
-            return null;
-        }
-        info = sequenceMap.get(catalogSchema + "." + sequenceName);
-        if (info != null) {
-            return info;
-        }
-        final String pureSchema = Srl.substringFirstRear(catalogSchema, ".");
-        info = sequenceMap.get(pureSchema + "." + sequenceName);
-        if (info != null) {
-            return info;
-        }
-        return info;
     }
 
     // -----------------------------------------------------

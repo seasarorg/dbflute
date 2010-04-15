@@ -77,6 +77,7 @@ import org.apache.xerces.dom.DocumentTypeImpl;
 import org.apache.xml.serialize.Method;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
+import org.seasar.dbflute.exception.DfTableDuplicateException;
 import org.seasar.dbflute.exception.DfTableNotFoundException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.factory.DfDbCommentExtractorFactory;
@@ -99,7 +100,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymExtractor;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
-import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
 import org.seasar.dbflute.util.Srl;
 import org.w3c.dom.Element;
@@ -508,14 +508,40 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         final List<DfTableMetaInfo> tableList = _tableHandler.getTableList(dbMeta, _schema);
         helpTableComments(tableList, _url, _schema);
         resolveAdditionalSchema(dbMeta, tableList);
+        assertDuplicateTable(tableList);
         return tableList;
+    }
+
+    protected void assertDuplicateTable(List<DfTableMetaInfo> tableList) {
+        final Set<String> tableNameSet = StringSet.createAsCaseInsensitive();
+        final Set<String> duplicateTableSet = StringSet.createAsCaseInsensitive();
+        for (DfTableMetaInfo info : tableList) {
+            final String tableName = info.getTableName();
+            if (tableNameSet.contains(tableName)) {
+                duplicateTableSet.add(tableName);
+            } else {
+                tableNameSet.add(tableName);
+            }
+        }
+        // obviously unsupported
+        if (!duplicateTableSet.isEmpty()) {
+            String msg = "Look! Read the message below." + ln();
+            msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+            msg = msg + "The same-name table between different schema is unsupported!" + ln();
+            msg = msg + ln();
+            msg = msg + "[Advice]" + ln();
+            msg = msg + "Use view or synonym (or alias) that refers to the table." + ln();
+            msg = msg + ln();
+            msg = msg + "[Duplicate Table]" + ln() + duplicateTableSet + ln();
+            msg = msg + "* * * * * * * * * */";
+            throw new DfTableDuplicateException(msg);
+        }
     }
 
     protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMetaInfo> tableList)
             throws SQLException {
-        final Map<String, DfAdditionalSchemaInfo> schemaMap = getDatabaseProperties().getAdditionalSchemaMap();
-        final Set<String> schemaSet = schemaMap.keySet();
-        for (String schema : schemaSet) {
+        final List<String> schemaList = getDatabaseProperties().getAdditionalSchemaNameList();
+        for (String schema : schemaList) {
             final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, schema);
             for (DfTableMetaInfo metaInfo : additionalTableList) {
                 final String metaDataSchema = metaInfo.getCatalogSchema();
@@ -607,8 +633,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      * @throws SQLException
      */
     public List<DfColumnMetaInfo> getColumns(DatabaseMetaData dbMeta, DfTableMetaInfo table) throws SQLException {
-        final String schema = getHandlerUseSchema(table);
-        List<DfColumnMetaInfo> columnList = _columnHandler.getColumnList(dbMeta, schema, table);
+        List<DfColumnMetaInfo> columnList = _columnHandler.getColumnList(dbMeta, table);
         if (canHandleSynonym(table) && columnList.isEmpty()) {
             DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
             if (synonym != null && synonym.isDBLink()) {
@@ -657,8 +682,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     protected DfPrimaryKeyMetaInfo getPrimaryColumnMetaInfo(DatabaseMetaData dbMeta, DfTableMetaInfo table)
             throws SQLException {
-        final String schema = getHandlerUseSchema(table);
-        final DfPrimaryKeyMetaInfo pkInfo = _uniqueKeyHandler.getPrimaryKey(dbMeta, schema, table);
+        final DfPrimaryKeyMetaInfo pkInfo = _uniqueKeyHandler.getPrimaryKey(dbMeta, table);
         final List<String> pkList = pkInfo.getPrimaryKeyList();
         if (!canHandleSynonym(table) || !pkList.isEmpty()) {
             return pkInfo;
@@ -683,8 +707,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     protected Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, DfTableMetaInfo table)
             throws SQLException {
-        final String schema = getHandlerUseSchema(table);
-        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyHandler.getUniqueKeyMap(dbMeta, schema, table);
+        final Map<String, Map<Integer, String>> uniqueKeyMap = _uniqueKeyHandler.getUniqueKeyMap(dbMeta, table);
         if (!canHandleSynonym(table) || !uniqueKeyMap.isEmpty()) {
             return uniqueKeyMap;
         }
@@ -747,26 +770,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     protected Map<String, DfForeignKeyMetaInfo> getForeignKeys(DatabaseMetaData dbMeta, DfTableMetaInfo table)
             throws SQLException {
-        final String schema = getHandlerUseSchema(table);
         final Map<String, DfForeignKeyMetaInfo> foreignKeyMetaInfo = _foreignKeyHandler.getForeignKeyMetaInfo(dbMeta,
-                schema, table);
+                table);
         if (!canHandleSynonym(table) || !foreignKeyMetaInfo.isEmpty()) {
             return foreignKeyMetaInfo;
         }
         final DfSynonymMetaInfo synonym = getSynonymMetaInfo(table);
         return synonym != null ? synonym.getForeignKeyMetaInfoMap() : foreignKeyMetaInfo;
-    }
-
-    protected String getHandlerUseSchema(DfTableMetaInfo tableMetaInfo) {
-        return isAdditionalSchemaTable(tableMetaInfo) ? tableMetaInfo.getCatalogSchema() : _schema;
-    }
-
-    protected boolean isAdditionalSchemaTable(DfTableMetaInfo tableMetaInfo) {
-        final String schema = tableMetaInfo.getCatalogSchema();
-        if (Srl.is_Null_or_TrimmedEmpty(schema)) {
-            return false;
-        }
-        return getDatabaseProperties().isAdditionalSchema(schema);
     }
 
     // -----------------------------------------------------
@@ -782,9 +792,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
      */
     protected Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, DfTableMetaInfo table,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException {
-        final String schema = getHandlerUseSchema(table);
-        final Map<String, Map<Integer, String>> indexMap = _indexHandler.getIndexMap(dbMeta, schema, table,
-                uniqueKeyMap);
+        final Map<String, Map<Integer, String>> indexMap = _indexHandler.getIndexMap(dbMeta, table, uniqueKeyMap);
         if (!canHandleSynonym(table) || !indexMap.isEmpty()) {
             return indexMap;
         }

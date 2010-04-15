@@ -72,14 +72,6 @@ public class DfTableMetaInfo {
     // ===================================================================================
     //                                                                        Name Builder
     //                                                                        ============
-    public String selectMetaExtractingSchemaName(String schemaName) {
-        if (isExistSameNameTable()) {
-            return _catalogSchema;
-        } else {
-            return schemaName;
-        }
-    }
-
     public String buildTableDisplayName() {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_catalogSchema)) {
             return _catalogSchema + "." + _tableName;
@@ -171,14 +163,6 @@ public class DfTableMetaInfo {
 
     public void setTableComment(String tableComment) {
         this._tableComment = tableComment;
-    }
-
-    public boolean isExistSameNameTable() {
-        return _existSameNameTable;
-    }
-
-    public void setExistSameNameTable(boolean existSameNameTable) {
-        this._existSameNameTable = existSameNameTable;
     }
 
     public boolean isOutOfGenerateTarget() {
