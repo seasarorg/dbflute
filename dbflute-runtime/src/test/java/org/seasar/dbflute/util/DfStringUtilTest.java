@@ -8,6 +8,10 @@ import static org.seasar.dbflute.util.Srl.removeLineComment;
 import static org.seasar.dbflute.util.Srl.rtrim;
 import static org.seasar.dbflute.util.Srl.splitList;
 import static org.seasar.dbflute.util.Srl.splitListTrimmed;
+import static org.seasar.dbflute.util.Srl.substringFirstFront;
+import static org.seasar.dbflute.util.Srl.substringFirstRear;
+import static org.seasar.dbflute.util.Srl.substringLastFront;
+import static org.seasar.dbflute.util.Srl.substringLastRear;
 
 import java.util.List;
 
@@ -59,6 +63,33 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals(" foo \n ", DfStringUtil.rtrim(" foo \n ", "\n"));
         assertEquals(" foo \r", DfStringUtil.rtrim(" foo \r\n", "\n"));
         assertEquals(" foo ", DfStringUtil.rtrim(" foo \r\n", "\r\n"));
+    }
+
+    // ===================================================================================
+    //                                                                           SubString
+    //                                                                           ==========
+    public void test_substringFirstFront_basic() {
+        assertEquals("foo", substringFirstFront("foo.bar", "."));
+        assertEquals("foo", substringFirstFront("foo.bar.don", "."));
+        assertEquals("foobar", substringFirstFront("foobar", "."));
+    }
+
+    public void test_substringFirstRear_basic() {
+        assertEquals("bar", substringFirstRear("foo.bar", "."));
+        assertEquals("bar.don", substringFirstRear("foo.bar.don", "."));
+        assertEquals("foobar", substringFirstRear("foobar", "."));
+    }
+
+    public void test_substringLastFront_basic() {
+        assertEquals("foo", substringLastFront("foo.bar", "."));
+        assertEquals("foo.bar", substringLastFront("foo.bar.don", "."));
+        assertEquals("foobar", substringLastFront("foobar", "."));
+    }
+
+    public void test_substringLastRear_basic() {
+        assertEquals("bar", substringLastRear("foo.bar", "."));
+        assertEquals("don", substringLastRear("foo.bar.don", "."));
+        assertEquals("foobar", substringLastRear("foobar", "."));
     }
 
     // ===================================================================================

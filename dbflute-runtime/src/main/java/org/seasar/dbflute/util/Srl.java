@@ -103,6 +103,45 @@ public class Srl {
     }
 
     // ===================================================================================
+    //                                                                           SubString
+    //                                                                           =========
+    public static final String substringFirstFront(String str, String delimiter) {
+        assertStringNotNull(str);
+        final int delimiterIndex = str.indexOf(delimiter);
+        if (delimiterIndex < 0) {
+            return str;
+        }
+        return str.substring(0, delimiterIndex);
+    }
+
+    public static final String substringFirstRear(String str, String delimiter) {
+        assertStringNotNull(str);
+        final int delimiterIndex = str.indexOf(delimiter);
+        if (delimiterIndex < 0) {
+            return str;
+        }
+        return str.substring(delimiterIndex + delimiter.length());
+    }
+
+    public static final String substringLastFront(String str, String delimiter) {
+        assertStringNotNull(str);
+        final int delimiterIndex = str.lastIndexOf(delimiter);
+        if (delimiterIndex < 0) {
+            return str;
+        }
+        return str.substring(0, delimiterIndex);
+    }
+
+    public static final String substringLastRear(String str, String delimiter) {
+        assertStringNotNull(str);
+        final int delimiterIndex = str.lastIndexOf(delimiter);
+        if (delimiterIndex < 0) {
+            return str;
+        }
+        return str.substring(delimiterIndex + delimiter.length());
+    }
+
+    // ===================================================================================
     //                                                                                Fill
     //                                                                                ====
     public static final String rfill(String str, int size) {
