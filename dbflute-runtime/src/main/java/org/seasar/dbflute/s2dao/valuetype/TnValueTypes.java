@@ -225,9 +225,24 @@ public class TnValueTypes {
     //                                                 Basic
     //                                                 -----
     /**
+     * Find the value type by object instance and class type. <br />
+     * Object instance is prior searching key.
+     * @param obj The object instance. (Nullable: if null, returns object type)
+     * @param clazz The type of class. (Nullable: if null, returns object type)
+     * @return The value type. (NotNull: if not found, returns object type)
+     */
+    public static ValueType findValueType(Object obj, Class<?> clazz) {
+        final ValueType valueType = getValueType(obj);
+        if (!OBJECT.equals(valueType)) {
+            return valueType;
+        }
+        return getValueType(clazz);
+    }
+
+    /**
      * Get the value type by object instance.
      * @param obj The object instance. (Nullable: if null, returns object type)
-     * @return The value type. (NotNull)
+     * @return The value type. (NotNull: if not found, returns object type)
      */
     public static ValueType getValueType(Object obj) {
         if (obj == null) {
@@ -243,7 +258,7 @@ public class TnValueTypes {
      * Because frequently the ENUM has application own interfaces.
      * Actually Classification of DBFlute matches the pattern.
      * @param clazz The type of class. (Nullable: if null, returns object type)
-     * @return The value type. (NotNull)
+     * @return The value type. (NotNull: if not found, returns object type)
      */
     public static ValueType getValueType(Class<?> clazz) {
         if (clazz == null) {

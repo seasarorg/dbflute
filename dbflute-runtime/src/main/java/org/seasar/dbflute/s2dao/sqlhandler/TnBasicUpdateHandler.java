@@ -43,17 +43,17 @@ public class TnBasicUpdateHandler extends TnBasicHandler {
     }
 
     public int execute(Object[] args, Class<?>[] argTypes) {
-        Connection connection = getConnection();
+        final Connection conn = getConnection();
         try {
-            return execute(connection, args, argTypes);
+            return execute(conn, args, argTypes);
         } finally {
-            close(connection);
+            close(conn);
         }
     }
 
     public int execute(Connection connection, Object[] args, Class<?>[] argTypes) {
         logSql(args, argTypes);
-        PreparedStatement ps = prepareStatement(connection);
+        final PreparedStatement ps = prepareStatement(connection);
         try {
             bindArgs(ps, args, argTypes);
             return executeUpdate(ps);

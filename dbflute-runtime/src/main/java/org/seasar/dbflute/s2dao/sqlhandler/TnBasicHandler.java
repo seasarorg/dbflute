@@ -132,16 +132,7 @@ public class TnBasicHandler {
     }
 
     protected ValueType findValueType(Object arg, Class<?> argType) {
-        ValueType valueType = TnValueTypes.getValueType(arg);
-        if (valueType != null) {
-            return valueType;
-        }
-        valueType = TnValueTypes.getValueType(argType);
-        if (valueType != null) {
-            return valueType;
-        }
-        String msg = "Unknown type: argType=" + argType + " args=" + arg;
-        throw new IllegalStateException(msg);
+        return TnValueTypes.findValueType(arg, argType);
     }
 
     protected Class<?>[] getArgTypes(Object[] args) {
