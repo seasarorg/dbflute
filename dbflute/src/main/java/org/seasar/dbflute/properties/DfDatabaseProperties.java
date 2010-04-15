@@ -203,7 +203,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         final Set<Entry<String, Object>> entrySet = additionalSchemaMap.entrySet();
         for (Entry<String, Object> entry : entrySet) {
             final String schemaName = entry.getKey();
-            Object obj = entry.getValue();
+            final Object obj = entry.getValue();
             if (obj == null) {
                 String msg = "The value of schema in the property 'additionalSchemaMap' should be required:";
                 msg = msg + " schema=" + schemaName;

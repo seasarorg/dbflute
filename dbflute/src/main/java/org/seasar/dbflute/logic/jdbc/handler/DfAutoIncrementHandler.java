@@ -21,6 +21,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -29,6 +32,14 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
  */
 public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
 
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final Log _log = LogFactory.getLog(DfAutoIncrementHandler.class);
+
+    // ===================================================================================
+    //                                                                                Main
+    //                                                                                ====
     /**
      * Is auto-increment column?
      * @param conn Connection.
@@ -39,10 +50,12 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
     public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName) {
         final String tableName = tableMetaInfo.getTableName();
         final String sql = buildMetaDataSql(primaryKeyColumnName, tableName);
-        String recoverySql = null;
         Statement st = null;
         ResultSet rs = null;
-        String ignoredMessage = null;
+        String recoverySql1 = null;
+        String recoverySql2 = null;
+        String recoveryMessage1 = null;
+        String recoveryMessage2 = null;
         try {
             st = conn.createStatement();
             try {
@@ -52,19 +65,24 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 // But if it's schema requirement or reservation word, it comes here. 
                 try {
                     final String schemaPrefix = extractPureSchemaName(tableMetaInfo.getCatalogSchema());
-                    recoverySql = buildMetaDataSql(primaryKeyColumnName, schemaPrefix + "." + tableName);
-                    rs = st.executeQuery(recoverySql);
-                } catch (SQLException ignored) {
+                    recoverySql1 = buildMetaDataSql(primaryKeyColumnName, schemaPrefix + "." + tableName);
+                    rs = st.executeQuery(recoverySql1);
+                } catch (SQLException recovery1ex) {
                     try {
                         final String schemaPrefix = filterNoNameSchema(tableMetaInfo.getCatalogSchema());
-                        recoverySql = buildMetaDataSql(primaryKeyColumnName, schemaPrefix + "." + tableName);
-                        rs = st.executeQuery(recoverySql);
-                    } catch (SQLException completelyIgnored) {
-                    }
-                    rs = retryForReservationWordTable(st, tableName, primaryKeyColumnName);
-                    if (rs == null) {
-                        ignoredMessage = ignored.getMessage();
-                        throw e;
+                        recoverySql2 = buildMetaDataSql(primaryKeyColumnName, schemaPrefix + "." + tableName);
+                        rs = st.executeQuery(recoverySql2);
+                    } catch (SQLException recovery2ex) {
+                        try {
+                            rs = retryForReservationWordTable(st, tableName, primaryKeyColumnName);
+                        } catch (SQLException reservationEx) {
+                            _log.info("Failed to recover by quotetation: " + reservationEx.getMessage());
+                        }
+                        if (rs == null) {
+                            recoveryMessage1 = recovery1ex.getMessage();
+                            recoveryMessage2 = recovery2ex.getMessage();
+                            throw e;
+                        }
                     }
                 }
             }
@@ -75,20 +93,21 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                     return md.isAutoIncrement(i);
                 }
             }
+            String msg = "The primaryKeyColumnName is not found in the table: ";
+            msg = msg + tableName + " - " + primaryKeyColumnName;
+            throw new IllegalStateException(msg); // unreachable
         } catch (SQLException e) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
             msg = msg + "Failed to execute the SQL for getting auto-increment!" + ln();
             msg = msg + ln();
-            msg = msg + "[SQL]" + ln() + sql + ln();
+            msg = msg + "[SQL]" + ln() + sql + ln() + e.getMessage() + ln();
             msg = msg + ln();
-            msg = msg + "[Message]" + ln() + e.getMessage() + ln();
+            msg = msg + "[Recovery1]" + ln() + recoverySql1 + ln() + recoveryMessage1 + ln();
             msg = msg + ln();
-            msg = msg + "[Recovery Sql]" + ln() + recoverySql + ln();
-            msg = msg + ln();
-            msg = msg + "[Recovery Message]" + ln() + ignoredMessage + ln();
+            msg = msg + "[Recovery2]" + ln() + recoverySql2 + ln() + recoveryMessage2 + ln();
             msg = msg + "* * * * * * * * * */";
-            throw new IllegalStateException(msg, e);
+            throw new SQLFailureException(msg, e);
         } finally {
             if (st != null) {
                 try {
@@ -103,28 +122,20 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 }
             }
         }
-        String msg = "The primaryKeyColumnName is not found in the table: ";
-        msg = msg + tableName + " - " + primaryKeyColumnName;
-        throw new IllegalStateException(msg);
     }
 
     protected String buildMetaDataSql(String primaryKeyColumnName, String tableName) {
         return "select " + primaryKeyColumnName + " from " + tableName + " where 0 = 1";
     }
 
-    protected ResultSet retryForReservationWordTable(Statement stmt, String tableName, String primaryKeyColumnName) {
-        tableName = "\"" + tableName + "\"";
-        ResultSet rs = null;
-        try {
-            rs = stmt.executeQuery(buildMetaDataSql(primaryKeyColumnName, tableName));
-        } catch (SQLException e) {
+    protected ResultSet retryForReservationWordTable(Statement stmt, String tableName, String primaryKeyColumnName)
+            throws SQLException {
+        if (isSQLServer()) {
             tableName = "[" + tableName + "]";
-            try {
-                rs = stmt.executeQuery(buildMetaDataSql(primaryKeyColumnName, tableName));
-            } catch (SQLException ignored) {
-            }
+        } else {
+            tableName = "\"" + tableName + "\"";
         }
         // 'SchemaName + ReservationWord' is unsupported!
-        return rs;
+        return stmt.executeQuery(buildMetaDataSql(primaryKeyColumnName, tableName));
     }
 }

@@ -132,7 +132,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             return info;
         }
         if (sequenceName.contains(".")) {
-            return null;
+            sequenceName = Srl.substringLastRear(sequenceName, "."); // pure sequence name
         }
         info = sequenceMap.get(catalogSchema + "." + sequenceName);
         if (info != null) {
