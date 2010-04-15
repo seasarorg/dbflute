@@ -33,6 +33,7 @@ import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.handler.DfProcedureHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureSynonymMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
@@ -41,7 +42,8 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
  * @author jflute
  * @since 0.9.6.2 (2009/12/08 Tuesday)
  */
-public class DfProcedureSynonymExtractorOracle implements DfProcedureSynonymExtractor {
+public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtractor implements
+        DfProcedureSynonymExtractor {
 
     // ===================================================================================
     //                                                                          Definition

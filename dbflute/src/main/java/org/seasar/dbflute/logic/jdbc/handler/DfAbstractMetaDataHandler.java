@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.logic.jdbc.handler;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,14 +23,23 @@ import java.util.Map;
 import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
 import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
+import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.seasar.dbflute.properties.DfBasicProperties;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfNameHintUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
  */
-public class DfAbstractMetaDataHandler {
+public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
+
+    // ===================================================================================
+    //                                                                          Definition
+    //                                                                          ==========
+    private static final List<String> EMPTY_STRING_LIST = DfCollectionUtil.emptyList();
 
     // ===================================================================================
     //                                                                           Attribute
@@ -135,7 +143,7 @@ public class DfAbstractMetaDataHandler {
         if (columnExceptList == null) { // no definition about the table
             return false;
         }
-        return !isTargetByHint(columnName, new ArrayList<String>(), columnExceptList);
+        return !isTargetByHint(columnName, EMPTY_STRING_LIST, columnExceptList);
     }
 
     protected Map<String, List<String>> getRealColumnExceptMap(String schemaName) { // extension point
@@ -158,7 +166,7 @@ public class DfAbstractMetaDataHandler {
     //                                                        ============================
     protected String filterSchemaName(String schemaName) {
         // The driver throws the exception if the value is empty string.
-        if (schemaName != null && schemaName.trim().length() == 0 && !isSchemaNameEmptyAllowed()) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(schemaName) && !isSchemaNameEmptyAllowed()) {
             return null;
         }
         return schemaName;
@@ -191,12 +199,20 @@ public class DfAbstractMetaDataHandler {
         return DfBuildProperties.getInstance().getBasicProperties();
     }
 
-    protected boolean isOracle() {
-        return getBasicProperties().isDatabaseOracle();
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return DfBuildProperties.getInstance().getDatabaseProperties();
+    }
+
+    protected boolean isMySQL() {
+        return getBasicProperties().isDatabaseMySQL();
     }
 
     protected boolean isPostgreSQL() {
         return getBasicProperties().isDatabasePostgreSQL();
+    }
+
+    protected boolean isOracle() {
+        return getBasicProperties().isDatabaseOracle();
     }
 
     protected boolean isDB2() {

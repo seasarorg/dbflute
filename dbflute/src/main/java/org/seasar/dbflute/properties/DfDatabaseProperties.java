@@ -18,6 +18,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.properties.assistant.DfConnectionProperties;
 import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -28,6 +29,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     //                                                                          Definition
     //                                                                          ==========
     private static final Log _log = LogFactory.getLog(DfDatabaseProperties.class);
+    public static final String NO_NAME_SCHEMA = "$$NoNameSchema$$"; // basically for MySQL
 
     // ===================================================================================
     //                                                                         Constructor
@@ -193,7 +195,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             return _additionalSchemaMap;
         }
         assertOldStyleAdditionalSchema();
-        _additionalSchemaMap = new LinkedHashMap<String, DfAdditionalSchemaInfo>();
+        _additionalSchemaMap = new AdditionalSchemaLinkedHashMap<DfAdditionalSchemaInfo>();
         final Map<String, Object> additionalSchemaMap = getVairousStringKeyMap("additionalSchemaMap");
         if (additionalSchemaMap == null) {
             return _additionalSchemaMap;
@@ -227,6 +229,34 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             _additionalSchemaMap.put(schemaName, info);
         }
         return _additionalSchemaMap;
+    }
+
+    public static class AdditionalSchemaLinkedHashMap<VALUE> extends LinkedHashMap<String, VALUE> {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public VALUE get(Object key) {
+            final VALUE value = super.get(key);
+            if (value != null) {
+                return value;
+            }
+            if (key == null || !(key instanceof String)) {
+                return null;
+            }
+            final String schemaName = (String) key;
+            if (!schemaName.contains(".")) {
+                return null;
+            }
+            final String catalog = Srl.substringFirstFront(schemaName, ".");
+            final String pureSchema = Srl.substringFirstRear(schemaName, ".");
+            final String newKey;
+            if (NO_NAME_SCHEMA.equals(pureSchema)) { // basically for MySQL
+                newKey = catalog;
+            } else {
+                newKey = pureSchema;
+            }
+            return super.get(newKey);
+        }
     }
 
     protected void setupAdditionalSchemaObjectTypeTargetList(DfAdditionalSchemaInfo info, Map<String, Object> elementMap) {
@@ -298,56 +328,35 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
     }
 
+    public DfAdditionalSchemaInfo getAdditionalSchemaInfo(String schema) {
+        return getAdditionalSchemaMap().get(schema);
+    }
+
     public boolean hasAdditionalSchema() {
         return !getAdditionalSchemaMap().isEmpty();
+    }
+
+    public boolean hasCatalogAdditionalSchema() {
+        final Set<String> keySet = getAdditionalSchemaMap().keySet();
+        for (String key : keySet) {
+            if (key.contains(".")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isAdditionalSchema(String schema) {
         return getAdditionalSchemaMap().containsKey(schema);
     }
 
-    // -----------------------------------------------------
-    //                              Supplementary Connection
-    //                              ------------------------
-    // Maybe it is available at the future. (@0.9.6.2) 
-    // So this method modifier is protected until it will be available.
-    protected Connection getAdditionalSchemaSupplementaryConnection(String schema) {
-        if (!hasAdditionalSchemaSupplementaryConnection(schema)) {
-            String msg = "The additional schema should have supplementary connection informations:";
-            msg = msg + " schema=" + schema;
-            throw new IllegalStateException(msg);
-        }
-        final String driver = getDatabaseDriver();
-        final String url = getAdditionalSchemaSupplementaryConnectionUrl(schema);
-        final String user = getAdditionalSchemaSupplementaryConnectionUser(schema);
-        final String password = getAdditionalSchemaSupplementaryConnectionPassword(schema);
-        return createConnection(driver, url, schema, user, password);
-    }
-
-    public boolean hasAdditionalSchemaSupplementaryConnection(String schema) {
+    public boolean isCatalogAdditionalSchema(String schema) {
         if (!isAdditionalSchema(schema)) {
             return false;
         }
-        final String user = getAdditionalSchemaMap().get(schema).getSupplementaryConnectionUser();
-        return user != null && user.trim().length() > 0;
-    }
-
-    protected String getAdditionalSchemaSupplementaryConnectionUrl(String schema) {
-        return getDatabaseUrl();
-    }
-
-    protected String getAdditionalSchemaSupplementaryConnectionUser(String schema) {
-        if (!hasAdditionalSchemaSupplementaryConnection(schema)) {
-            return null;
-        }
-        return getAdditionalSchemaMap().get(schema).getSupplementaryConnectionUser();
-    }
-
-    protected String getAdditionalSchemaSupplementaryConnectionPassword(String schema) {
-        if (!hasAdditionalSchemaSupplementaryConnection(schema)) {
-            return null;
-        }
-        return getAdditionalSchemaMap().get(schema).getSupplementaryConnectionPassword();
+        DfAdditionalSchemaInfo info = getAdditionalSchemaInfo(schema);
+        final String schemaName = info.getSchemaName();
+        return schemaName.contains(".");
     }
 
     // -----------------------------------------------------

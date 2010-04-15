@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
 import org.seasar.dbflute.util.DfSystemUtil;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -79,8 +80,12 @@ public class DfTableMetaInfo {
         }
     }
 
+    public String buildTableDisplayName() {
+        return buildTableNameWithSchema();
+    }
+
     public String buildTableNameWithSchema() {
-        if (_tableSchema != null && _tableSchema.trim().length() != 0) {
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(_tableSchema)) {
             return _tableSchema + "." + _tableName;
         } else {
             return _tableName;

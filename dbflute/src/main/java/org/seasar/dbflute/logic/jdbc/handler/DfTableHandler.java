@@ -29,7 +29,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * This class generates an XML schema of an existing database from JDBC meta data.
@@ -49,25 +51,60 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
      * Get all the table names in the current database that are not system tables. <br />
      * This does not contain additional schema. only specified schema is considered.
      * @param dbMeta JDBC database meta data. (NotNull)
-     * @param schemaName The name of schema. (Nullable)
+     * @param schemaName The name of schema that can contain catalog name as prefix. (Nullable)
      * @return The list of all the table meta info in a database.
      * @throws SQLException
      */
     public List<DfTableMetaInfo> getTableList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
+        return doGetTableList(dbMeta, schemaName);
+    }
+
+    protected List<DfTableMetaInfo> doGetTableList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
         schemaName = filterSchemaName(schemaName);
         final String[] objectTypes = getRealObjectTypeTargetArray(schemaName);
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
             _log.info("...Getting tables: schema=" + schemaName + " objectTypes=" + Arrays.asList(objectTypes));
-            resultSet = dbMeta.getTables(null, schemaName, "%", objectTypes);
+            final String catalogName = extractCatalogName(schemaName);
+            final String realSchemaName = extractRealSchemaName(schemaName);
+            resultSet = dbMeta.getTables(catalogName, realSchemaName, "%", objectTypes);
             while (resultSet.next()) {
-                final String tableName = resultSet.getString(3);
-                final String tableType = resultSet.getString(4);
+                final String tableName = resultSet.getString("TABLE_NAME");
+                final String tableType = resultSet.getString("TABLE_TYPE");
+                final String tableCatalog;
+                {
+                    String tmpCatalog = resultSet.getString("TABLE_CAT");
+                    if (Srl.is_Null_or_TrimmedEmpty(tmpCatalog)) { // because PostgreSQL returns null
+                        if (Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
+                            tmpCatalog = catalogName;
+                        } else {
+                            if (getBasicProperties().isDatabasePostgreSQL()) {
+                                String url = getDatabaseProperties().getDatabaseUrl();
+                                url = Srl.substringFirstFront(url, "?");
+                                tmpCatalog = Srl.substringLastRear(url, "/");
+                            }
+                        }
+                    }
+                    tableCatalog = tmpCatalog;
+                }
                 final String tableSchema = resultSet.getString("TABLE_SCHEM");
                 final String tableComment = resultSet.getString("REMARKS");
 
-                if (isTableExcept(schemaName, tableName)) {
+                final String schemaExp;
+                if (Srl.is_NotNull_and_NotTrimmedEmpty(tableCatalog)) {
+                    // basically for additionalSchema
+                    if (Srl.is_NotNull_and_NotTrimmedEmpty(tableSchema)) {
+                        schemaExp = tableCatalog + "." + tableSchema;
+                    } else {
+                        // basically MySQL
+                        schemaExp = tableCatalog + "." + DfDatabaseProperties.NO_NAME_SCHEMA;
+                    }
+                } else {
+                    schemaExp = tableSchema;
+                }
+
+                if (isTableExcept(schemaExp, tableName)) {
                     _log.info(tableName + " is excepted!");
                     continue;
                 }
@@ -79,7 +116,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
                 tableMetaInfo.setTableName(tableName);
                 tableMetaInfo.setTableType(tableType);
-                tableMetaInfo.setTableSchema(tableSchema);
+                tableMetaInfo.setTableSchema(schemaExp);
                 tableMetaInfo.setTableComment(tableComment);
                 tableList.add(tableMetaInfo);
             }

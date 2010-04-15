@@ -984,6 +984,10 @@ public class Database {
         return getDatabaseProperties().hasAdditionalSchema();
     }
 
+    public boolean hasCatalogAdditionalSchema() {
+        return getDatabaseProperties().hasCatalogAdditionalSchema();
+    }
+
     // ===================================================================================
     //                                                                Dependency Injection
     //                                                                ====================

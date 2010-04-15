@@ -17,7 +17,6 @@ package org.seasar.dbflute.logic.jdbc.metadata.sequence;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.helper.jdbc.facade.DfJdbcFacade;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -54,20 +54,10 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
         _log.info("...Loading sequence informations");
         final Map<String, DfSequenceMetaInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final String schemaCondition;
-        if (!_allSchemaList.isEmpty()) {
-            final StringBuilder sb = new StringBuilder();
-            for (String schema : _allSchemaList) {
-                if (sb.length() > 0) {
-                    sb.append(",");
-                }
-                sb.append("'").append(schema).append("'");
-            }
-            schemaCondition = sb.toString();
-        } else {
-            return new HashMap<String, DfSequenceMetaInfo>();
+        final String sql = buildMetaSelectSql();
+        if (sql == null) {
+            return DfCollectionUtil.emptyMap();
         }
-        final String sql = "select * from SYSCAT.SEQUENCES where SEQSCHEMA in (" + schemaCondition + ")";
         _log.info(sql);
         final List<String> columnList = new ArrayList<String>();
         columnList.add("SEQSCHEMA");
@@ -80,12 +70,12 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
         logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
             final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
-            String sequenceOwner = recordMap.get("SEQSCHEMA");
+            String sequenceSchema = recordMap.get("SEQSCHEMA");
 
             // trim because DB2 returns "char(8)-owner"
-            sequenceOwner = sequenceOwner != null ? sequenceOwner.trim() : null;
+            sequenceSchema = sequenceSchema != null ? sequenceSchema.trim() : null;
 
-            info.setSequenceOwner(sequenceOwner);
+            info.setSequenceSchema(sequenceSchema);
             final String sequenceName = recordMap.get("SEQNAME");
             info.setSequenceName(sequenceName);
             final String minValue = recordMap.get("MINVALUE");
@@ -94,11 +84,29 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
             info.setMaximumValue(maxValue != null ? new BigDecimal(maxValue) : null);
             final String incrementSize = recordMap.get("INCREMENT");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
-            final String key = buildSequenceMapKey(sequenceOwner, sequenceName);
+            final String key = buildSequenceMapKey(sequenceSchema, sequenceName);
             resultMap.put(key, info);
             logSb.append(ln()).append(" ").append(key).append(" = ").append(info.toString());
         }
         _log.info(logSb.toString());
         return resultMap;
+    }
+
+    protected String buildMetaSelectSql() {
+        final String schemaCondition;
+        if (!_allSchemaList.isEmpty()) {
+            final StringBuilder sb = new StringBuilder();
+            for (String schema : _allSchemaList) {
+                if (sb.length() > 0) {
+                    sb.append(",");
+                }
+                final String realSchemaName = extractRealSchemaName(schema);
+                sb.append("'").append(realSchemaName).append("'");
+            }
+            schemaCondition = sb.toString();
+        } else {
+            return null;
+        }
+        return "select * from SYSCAT.SEQUENCES where SEQSCHEMA in (" + schemaCondition + ")";
     }
 }

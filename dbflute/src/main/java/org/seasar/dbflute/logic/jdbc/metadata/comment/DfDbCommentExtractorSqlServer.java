@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.seasar.dbflute.util.Srl;
+
 /**
  * @author jflute
  * @since 0.9.5.3 (2009/08/06 Thursday)
@@ -30,12 +32,19 @@ public class DfDbCommentExtractorSqlServer extends DfDbCommentExtractorBase {
     //                                                                    Select Meta Data
     //                                                                    ================
     protected List<UserTabComments> selectUserTabComments(Connection conn, Set<String> tableSet) {
+        // tables of other databases are unsupported
         final StringBuilder sb = new StringBuilder();
         sb.append("select cast(objtype as nvarchar(500)) as OBJECT_TYPE");
         sb.append(", cast(objname as nvarchar(500)) as TABLE_NAME");
         sb.append(", cast(value as nvarchar(4000)) as COMMENTS");
         sb.append(" from fn_listextendedproperty");
-        sb.append("('MS_Description', 'schema', '").append(_schema).append("'");
+        sb.append("('MS_Description'");
+        final String catalogName = extractCatalogName(_schema);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
+            sb.append(", 'database', '").append(catalogName).append("'");
+        }
+        final String realSchemaName = extractRealSchemaName(_schema);
+        sb.append(", 'schema', '").append(realSchemaName).append("'");
         sb.append(", 'table', default, default, default)");
         sb.append(" order by TABLE_NAME asc");
         final String sql = sb.toString();
@@ -53,12 +62,19 @@ public class DfDbCommentExtractorSqlServer extends DfDbCommentExtractorBase {
     }
 
     protected String buildUserColCommentsSql(String tableName) {
+        // columns of other databases are unsupported
         final StringBuilder sb = new StringBuilder();
         sb.append("select '").append(tableName).append("' as TABLE_NAME");
         sb.append(", cast(objname as nvarchar(500)) as COLUMN_NAME");
         sb.append(", cast(value as nvarchar(4000)) as COMMENTS");
         sb.append(" from fn_listextendedproperty");
-        sb.append("('MS_Description', 'schema', '").append(_schema).append("'");
+        sb.append("('MS_Description'");
+        final String catalogName = extractCatalogName(_schema);
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
+            sb.append(", 'database', '").append(catalogName).append("'");
+        }
+        final String realSchemaName = extractRealSchemaName(_schema);
+        sb.append(", 'schema', '").append(realSchemaName).append("'");
         sb.append(", 'table', '").append(tableName).append("', 'column', default)");
         sb.append(" order by TABLE_NAME asc, COLUMN_NAME asc");
         return sb.toString();

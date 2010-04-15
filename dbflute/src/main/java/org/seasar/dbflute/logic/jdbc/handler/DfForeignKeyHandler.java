@@ -90,7 +90,9 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         final Map<String, String> exceptedFKKeyMap = new LinkedHashMap<String, String>();
         ResultSet foreignKeys = null;
         try {
-            foreignKeys = dbMeta.getImportedKeys(null, schemaName, tableName);
+            final String catalogName = extractCatalogName(schemaName);
+            final String realSchemaName = extractRealSchemaName(schemaName);
+            foreignKeys = dbMeta.getImportedKeys(catalogName, realSchemaName, tableName);
             while (foreignKeys.next()) {
                 final String foreignSchemaName = foreignKeys.getString(2);
                 final String foreignTableName = foreignKeys.getString(3);

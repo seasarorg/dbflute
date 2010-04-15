@@ -31,12 +31,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.seasar.dbflute.exception.DfCommentExtractingFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
+import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 
 /**
  * @author jflute
  * @since 0.9.5.3 (2009/08/06 Thursday)
  */
-public abstract class DfDbCommentExtractorBase implements DfDbCommentExtractor {
+public abstract class DfDbCommentExtractorBase extends DfAbstractMetaDataExtractor implements DfDbCommentExtractor {
 
     // ===================================================================================
     //                                                                          Definition
@@ -203,13 +204,6 @@ public abstract class DfDbCommentExtractorBase implements DfDbCommentExtractor {
 
     protected String filterColumnComments(String comments) { // extension point
         return comments; // as default
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String ln() {
-        return "\n";
     }
 
     // ===================================================================================

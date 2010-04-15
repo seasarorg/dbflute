@@ -40,6 +40,7 @@ import org.seasar.dbflute.logic.jdbc.handler.DfForeignKeyHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfIndexHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
+import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserColComments;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
@@ -52,7 +53,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfSynonymMetaInfo;
  * @author jflute
  * @since 0.9.3 (2009/02/24 Tuesday)
  */
-public class DfSynonymExtractorOracle implements DfSynonymExtractor {
+public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implements DfSynonymExtractor {
 
     // ===================================================================================
     //                                                                          Definition
@@ -580,10 +581,6 @@ public class DfSynonymExtractorOracle implements DfSynonymExtractor {
                 }
             }
         }
-    }
-
-    protected String ln() {
-        return "\n";
     }
 
     // ===================================================================================

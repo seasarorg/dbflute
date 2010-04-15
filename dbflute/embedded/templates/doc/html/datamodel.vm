@@ -223,7 +223,7 @@
 #foreach ($table in $database.tableDisplaySortedList)
 	<tr>
 #if ($database.hasAdditionalSchema())
-		<td class="schemacell">#if ($table.hasSchema()) ${table.schema}#else &nbsp;#end</td>
+		<td class="schemacell">#if ($table.hasSchema()) ${table.displaySchema}#else &nbsp;#end</td>
 #end
 #if ($database.isAliasDelimiterInDbCommentValid())
 		<td class="aliascell">${table.alias}</td>

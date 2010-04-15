@@ -134,9 +134,13 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         for (String additionalSchema : additionalSchemaSet) {
             final List<DfProcedureMetaInfo> additionalProcedureList = getPlainProcedureList(metaData, additionalSchema);
             for (DfProcedureMetaInfo metaInfo : additionalProcedureList) {
+                final String procedureCatalog = metaInfo.getProcedureCatalog();
+                if (procedureCatalog == null || procedureCatalog.trim().length() == 0) {
+                    metaInfo.setProcedureCatalog(extractCatalogName(additionalSchema));
+                }
                 final String procedureSchema = metaInfo.getProcedureSchema();
                 if (procedureSchema == null || procedureSchema.trim().length() == 0) {
-                    metaInfo.setProcedureSchema(additionalSchema);
+                    metaInfo.setProcedureSchema(extractRealSchemaName(additionalSchema));
                 }
             }
             procedureList.addAll(additionalProcedureList);
@@ -330,11 +334,14 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         final List<DfProcedureMetaInfo> metaInfoList = new ArrayList<DfProcedureMetaInfo>();
         ResultSet columnResultSet = null;
         try {
-            ResultSet procedureRs = metaData.getProcedures(null, schemaName, null);
+            final String catalogName = extractCatalogName(schemaName);
+            final String realSchemaName = extractRealSchemaName(schemaName);
+            final ResultSet procedureRs = metaData.getProcedures(catalogName, realSchemaName, null);
             setupProcedureMetaInfo(metaInfoList, procedureRs);
             for (DfProcedureMetaInfo procedureMetaInfo : metaInfoList) {
                 String procedureName = procedureMetaInfo.getProcedureName();
-                ResultSet columnRs = metaData.getProcedureColumns(null, schemaName, procedureName, null);
+                final ResultSet columnRs = metaData.getProcedureColumns(catalogName, realSchemaName, procedureName,
+                        null);
                 setupProcedureColumnMetaInfo(procedureMetaInfo, columnRs);
             }
         } catch (SQLException e) {

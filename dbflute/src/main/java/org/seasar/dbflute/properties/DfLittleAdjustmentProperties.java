@@ -48,6 +48,10 @@ public final class DfLittleAdjustmentProperties extends DfAbstractHelperProperti
         return isProperty("isAvailableAddingSchemaToTableSqlName", false);
     }
 
+    public boolean isAvailableAddingCatalogToTableSqlName() {
+        return isProperty("isAvailableAddingCatalogToTableSqlName", false);
+    }
+    
     // ===================================================================================
     //                                                                 Database Dependency
     //                                                                 ===================

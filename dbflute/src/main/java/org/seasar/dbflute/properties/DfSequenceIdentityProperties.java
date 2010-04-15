@@ -20,6 +20,7 @@ import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.factory.DfSequenceExtractorFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.sequence.DfSequenceExtractor;
+import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -118,10 +119,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     protected BigDecimal getSequenceMinimumValue(String schemaName, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
-        if (info == null) {
-            info = sequenceMap.get(schemaName + "." + sequenceName);
-        }
+        final DfSequenceMetaInfo info = getSequenceElement(schemaName, sequenceName, sequenceMap);
         if (info != null) {
             final BigDecimal minimumValue = info.getMinimumValue();
             if (minimumValue != null) {
@@ -153,10 +151,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     protected BigDecimal getSequenceMaximumValue(String schemaName, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
-        if (info == null) {
-            info = sequenceMap.get(schemaName + "." + sequenceName);
-        }
+        final DfSequenceMetaInfo info = getSequenceElement(schemaName, sequenceName, sequenceMap);
         if (info != null) {
             final BigDecimal maximumValue = info.getMaximumValue();
             if (maximumValue != null) {
@@ -187,10 +182,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
 
     protected Integer getSequenceIncrementSize(String schemaName, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
-        if (info == null) {
-            info = sequenceMap.get(schemaName + "." + sequenceName);
-        }
+        final DfSequenceMetaInfo info = getSequenceElement(schemaName, sequenceName, sequenceMap);
         if (info != null) {
             final Integer incrementSize = info.getIncrementSize();
             if (incrementSize != null) {
@@ -226,6 +218,19 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
             _sequenceMetaInfoMap = new HashMap<String, DfSequenceMetaInfo>();
         }
         return _sequenceMetaInfoMap;
+    }
+
+    protected DfSequenceMetaInfo getSequenceElement(String schemaName, String sequenceName,
+            Map<String, DfSequenceMetaInfo> sequenceMap) {
+        DfSequenceMetaInfo info = sequenceMap.get(schemaName + "." + sequenceName);
+        if (info == null) {
+            final String pureSchema = Srl.substringFirstRear(schemaName, ".");
+            info = sequenceMap.get(pureSchema + "." + sequenceName);
+            if (info == null) {
+                info = sequenceMap.get(sequenceName);
+            }
+        }
+        return info;
     }
 
     // -----------------------------------------------------

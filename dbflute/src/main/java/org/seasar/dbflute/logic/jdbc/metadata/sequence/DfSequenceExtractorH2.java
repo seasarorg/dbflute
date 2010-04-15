@@ -52,22 +52,10 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
         _log.info("...Loading sequence informations");
         final Map<String, DfSequenceMetaInfo> resultMap = StringKeyMap.createAsFlexibleOrdered();
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final String schemaCondition;
-        if (!_allSchemaList.isEmpty()) {
-            final StringBuilder sb = new StringBuilder();
-            for (String schema : _allSchemaList) {
-                if (sb.length() > 0) {
-                    sb.append(",");
-                }
-                sb.append("'").append(schema).append("'");
-            }
-            schemaCondition = sb.toString();
-        } else {
-            schemaCondition = "'PUBLIC'";
-        }
-        final String sql = buildMetaSelectSql(schemaCondition);
+        final String sql = buildMetaSelectSql();
         _log.info(sql);
         final List<String> columnList = new ArrayList<String>();
+        columnList.add("SEQUENCE_CATALOG");
         columnList.add("SEQUENCE_SCHEMA");
         columnList.add("SEQUENCE_NAME");
         // no column on H2 (why?)
@@ -79,8 +67,10 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
         logSb.append(ln()).append("[SEQUENCE]");
         for (Map<String, String> recordMap : resultList) {
             final DfSequenceMetaInfo info = new DfSequenceMetaInfo();
-            final String sequenceOwner = recordMap.get("SEQUENCE_SCHEMA");
-            info.setSequenceOwner(sequenceOwner);
+            final String sequenceCatalog = recordMap.get("SEQUENCE_CATALOG");
+            info.setSequenceCatalog(sequenceCatalog);
+            final String sequenceSchema = recordMap.get("SEQUENCE_SCHEMA");
+            info.setSequenceSchema(sequenceSchema);
             final String sequenceName = recordMap.get("SEQUENCE_NAME");
             info.setSequenceName(sequenceName);
             //final String minimumValue = recordMap.get("MINIMUM_VALUE");
@@ -89,8 +79,7 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
             //nfo.setMaximumValue(maximumValue != null ? new BigDecimal(maximumValue) : null);
             final String incrementSize = recordMap.get("INCREMENT");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
-            final String keyOwner = sequenceOwner.equalsIgnoreCase("public") ? null : sequenceOwner;
-            final String key = buildSequenceMapKey(keyOwner, sequenceName);
+            final String key = buildSequenceMapKey(sequenceSchema, sequenceName);
             resultMap.put(key, info);
             logSb.append(ln()).append(" ").append(key).append(" = ").append(info.toString());
         }
@@ -98,7 +87,21 @@ public class DfSequenceExtractorH2 extends DfSequenceExtractorBase {
         return resultMap;
     }
 
-    protected String buildMetaSelectSql(String schemas) {
-        return "select * from INFORMATION_SCHEMA.SEQUENCES where SEQUENCE_SCHEMA in (" + schemas + ")";
+    protected String buildMetaSelectSql() {
+        final String schemaCondition;
+        if (!_allSchemaList.isEmpty()) {
+            final StringBuilder sb = new StringBuilder();
+            for (String schema : _allSchemaList) {
+                if (sb.length() > 0) {
+                    sb.append(",");
+                }
+                final String realSchemaName = extractRealSchemaName(schema);
+                sb.append("'").append(realSchemaName).append("'");
+            }
+            schemaCondition = sb.toString();
+        } else {
+            schemaCondition = "'PUBLIC'";
+        }
+        return "select * from INFORMATION_SCHEMA.SEQUENCES where SEQUENCE_SCHEMA in (" + schemaCondition + ")";
     }
 }

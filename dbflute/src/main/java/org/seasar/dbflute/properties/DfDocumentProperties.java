@@ -276,10 +276,10 @@ public final class DfDocumentProperties extends DfAbstractHelperProperties {
                         if (mainSchema2) {
                             return 1;
                         }
-                        // Unreachable!
+                        // unreachable!
                     }
-                    final String schema1 = table1.getSchema();
-                    final String schema2 = table2.getSchema();
+                    final String schema1 = table1.getDisplaySchema();
+                    final String schema2 = table2.getDisplaySchema();
                     if (schema1 != null && schema2 != null && !schema1.equals(schema2)) {
                         return schema1.compareTo(schema2);
                     }

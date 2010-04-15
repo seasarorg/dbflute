@@ -68,7 +68,9 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
         ResultSet parts = null;
         try {
             final boolean uniqueKeyOnly = false;
-            parts = dbMeta.getIndexInfo(null, schemaName, tableName, uniqueKeyOnly, true);
+            final String catalogName = extractCatalogName(schemaName);
+            final String realSchemaName = extractRealSchemaName(schemaName);
+            parts = dbMeta.getIndexInfo(catalogName, realSchemaName, tableName, uniqueKeyOnly, true);
             while (parts.next()) {
                 final String indexName = parts.getString(6);
                 final boolean isNonUnique;

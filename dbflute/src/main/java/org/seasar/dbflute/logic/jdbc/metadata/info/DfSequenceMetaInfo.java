@@ -25,7 +25,8 @@ public class DfSequenceMetaInfo {
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected String sequenceOwner;
+    protected String sequenceCatalog; // nullable
+    protected String sequenceSchema;
     protected String sequenceName;
     protected BigDecimal minimumValue;
     protected BigDecimal maximumValue;
@@ -36,20 +37,27 @@ public class DfSequenceMetaInfo {
     //                                                                      ==============
     @Override
     public String toString() {
-        return sequenceOwner + "." + sequenceName + ":{" + minimumValue + " to " + maximumValue + ", increment "
+        return sequenceSchema + "." + sequenceName + ":{" + minimumValue + " to " + maximumValue + ", increment "
                 + incrementSize + "}";
     }
 
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-
-    public String getSequenceOwner() {
-        return sequenceOwner;
+    public String getSequenceCatalog() {
+        return sequenceCatalog;
     }
 
-    public void setSequenceOwner(String sequenceOwner) {
-        this.sequenceOwner = sequenceOwner;
+    public void setSequenceCatalog(String sequenceCatalog) {
+        this.sequenceCatalog = sequenceCatalog;
+    }
+
+    public String getSequenceSchema() {
+        return sequenceSchema;
+    }
+
+    public void setSequenceSchema(String sequenceSchema) {
+        this.sequenceSchema = sequenceSchema;
     }
 
     public String getSequenceName() {

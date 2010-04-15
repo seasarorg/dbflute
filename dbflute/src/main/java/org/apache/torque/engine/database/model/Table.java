@@ -348,12 +348,39 @@ public class Table {
     // -----------------------------------------------------
     //                                          Table Schema
     //                                          ------------
-    /**
-     * Get the schema of the Table
-     * @return The schema. (Nullable)
-     */
-    public String getSchema() {
-        return _schema;
+    public String getDisplaySchema() {
+        if (getDatabaseProperties().hasCatalogAdditionalSchema()) {
+            return getCatalogSchema();
+        } else {
+            if (hasSchema()) {
+                return getPureSchema();
+            } else {
+                return "";
+            }
+        }
+    }
+
+    protected String getCatalogSchema() { // contains catalog name
+        if (!hasSchema()) {
+            return _schema;
+        }
+        final int dotIndex = _schema.indexOf(".");
+        if (dotIndex < 0) {
+            return _schema;
+        }
+        final String catalogName = _schema.substring(0, dotIndex);
+        final String schemaName = _schema.substring(dotIndex + ".".length());
+        if (DfDatabaseProperties.NO_NAME_SCHEMA.equals(schemaName)) {
+            return catalogName;
+        }
+        return catalogName + "." + schemaName;
+    }
+
+    protected String getPureSchema() { // NOT contain catalog name
+        if (!hasSchema()) {
+            return _schema;
+        }
+        return Srl.substringFirstRear(getCatalogSchema(), ".");
     }
 
     /**
@@ -373,8 +400,15 @@ public class Table {
     }
 
     public boolean isAdditionalSchema() {
-        if (_schema != null && _schema.trim().length() > 0) {
+        if (hasSchema()) {
             return getDatabaseProperties().isAdditionalSchema(_schema);
+        }
+        return false;
+    }
+
+    public boolean isCatalogAdditionalSchema() {
+        if (hasSchema()) {
+            return getDatabaseProperties().isCatalogAdditionalSchema(_schema);
         }
         return false;
     }
@@ -441,7 +475,7 @@ public class Table {
         final StringBuilder sb = new StringBuilder();
         sb.append("type=").append(_type);
         if (isAdditionalSchema()) {
-            sb.append(", schema=").append(_schema);
+            sb.append(", schema=").append(getDisplaySchema());
         }
         sb.append(", primaryKey={").append(getPrimaryKeyNameCommaString()).append("}");
         sb.append(", nameLength=").append(getName().length());
@@ -467,22 +501,32 @@ public class Table {
      */
     public String getTableSqlName() {
         final String tableName = quoteTableNameIfNeeds(_name);
-        return processSchemaPrefix(tableName);
+        return processSchemaSqlPrefix(tableName);
     }
 
     public String getTableSqlNameDirectUse() {
         final String tableName = quoteTableNameIfNeedsDirectUse(_name);
-        return processSchemaPrefix(tableName);
+        return processSchemaSqlPrefix(tableName);
     }
 
-    protected String processSchemaPrefix(String tableName) {
-        if (isAvailableAddingSchemaToTableSqlName()) {
-            if (_schema != null && _schema.trim().length() > 0) {
-                return _schema + "." + tableName;
+    protected String processSchemaSqlPrefix(String tableName) {
+        if (hasSchema()) {
+            final String catalogSchema = getCatalogSchema();
+            final String pureSchema = getPureSchema();
+            if (isAvailableAddingSchemaToTableSqlName()) {
+                if (isAvailableAddingCatalogToTableSqlName()) {
+                    return catalogSchema + "." + tableName;
+                } else {
+                    return pureSchema + "." + tableName;
+                }
             }
-        }
-        if (isAdditionalSchema()) { // for resolving additional schema
-            return _schema + "." + tableName;
+            if (isAdditionalSchema()) { // for resolving additional schema
+                if (isCatalogAdditionalSchema()) {
+                    return catalogSchema + "." + tableName;
+                } else {
+                    return pureSchema + "." + tableName;
+                }
+            }
         }
         return tableName;
     }
@@ -588,11 +632,7 @@ public class Table {
         final String projectPrefix = getDatabase().getProjectPrefix();
         final String basePrefix = getDatabase().getBasePrefix();
         final String baseSuffixForEntity = getDatabase().getBaseSuffixForEntity();
-        if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
-            return projectPrefix + basePrefix + getSchemaPrefix() + getJavaName() + baseSuffixForEntity;
-        } else {
-            return projectPrefix + basePrefix + getJavaName() + baseSuffixForEntity;
-        }
+        return projectPrefix + basePrefix + getSchemaClassPrefix() + getJavaName() + baseSuffixForEntity;
     }
 
     public String getBaseDaoClassName() {
@@ -615,11 +655,7 @@ public class Table {
     public String getAbstractBaseConditionQueryClassName() {
         final String projectPrefix = getDatabase().getProjectPrefix();
         final String basePrefix = getDatabase().getBasePrefix();
-        if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
-            return projectPrefix + "Abstract" + basePrefix + getSchemaPrefix() + getJavaName() + "CQ";
-        } else {
-            return projectPrefix + "Abstract" + basePrefix + getJavaName() + "CQ";
-        }
+        return projectPrefix + "Abstract" + basePrefix + getSchemaClassPrefix() + getJavaName() + "CQ";
     }
 
     public String getBaseConditionQueryClassName() {
@@ -632,19 +668,11 @@ public class Table {
     }
 
     protected String buildExtendedEntityClassName(String projectPrefix) {
-        if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
-            return projectPrefix + getSchemaPrefix() + getJavaName();
-        } else {
-            return projectPrefix + getJavaName();
-        }
+        return projectPrefix + getSchemaClassPrefix() + getJavaName();
     }
 
     public String getRelationTraceClassName() {
-        if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
-            return getSchemaPrefix() + getJavaName();
-        } else {
-            return getJavaName();
-        }
+        return getSchemaClassPrefix() + getJavaName();
     }
 
     public String getDBMetaClassName() {
@@ -708,10 +736,17 @@ public class Table {
         return getExtendedEntityClassName() + "Nsst";
     }
 
-    protected String getSchemaPrefix() {
-        if (_schema != null && _schema.trim().length() != 0 && isExistSameNameTable()) {
+    protected String getSchemaClassPrefix() {
+        if (hasSchema() && isExistSameNameTable()) {
+            String schemaName;
+            if (isCatalogAdditionalSchema()) {
+                schemaName = getCatalogSchema();
+            } else {
+                schemaName = getPureSchema();
+            }
             // schema of DB2 may have space either size
-            return Srl.initCapTrimmed(_schema);
+            schemaName = Srl.replace(schemaName, " ", "");
+            return Srl.initCapTrimmed(schemaName.toLowerCase());
         }
         return "";
     }
@@ -727,7 +762,7 @@ public class Table {
         int count = 0;
         for (Table table : tableList) {
             final String name = table.getName();
-            if (_name.equals(name)) {
+            if (_name.equalsIgnoreCase(name)) {
                 ++count;
                 if (count > 1) {
                     _existSameNameTable = true;
@@ -2088,11 +2123,12 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        BigDecimal value = prop.getSequenceMinimumValueByTableName(ds, getSchema(), getName());
+        final String catalogSchema = getCatalogSchema();
+        BigDecimal value = prop.getSequenceMinimumValueByTableName(ds, catalogSchema, getName());
         if (value == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
             if (sequenceName != null && sequenceName.trim().length() > 0) {
-                value = prop.getSequenceMinimumValueBySequenceName(ds, getSchema(), sequenceName);
+                value = prop.getSequenceMinimumValueBySequenceName(ds, catalogSchema, sequenceName);
             }
         }
         return value;
@@ -2109,11 +2145,12 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        BigDecimal value = prop.getSequenceMaximumValueByTableName(ds, getSchema(), getName());
+        final String catalogSchema = getCatalogSchema();
+        BigDecimal value = prop.getSequenceMaximumValueByTableName(ds, catalogSchema, getName());
         if (value == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
             if (sequenceName != null && sequenceName.trim().length() > 0) {
-                value = prop.getSequenceMaximumValueBySequenceName(ds, getSchema(), sequenceName);
+                value = prop.getSequenceMaximumValueBySequenceName(ds, catalogSchema, sequenceName);
             }
         }
         return value;
@@ -2130,11 +2167,12 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        Integer size = prop.getSequenceIncrementSizeByTableName(ds, getSchema(), getName());
+        final String catalogSchema = getCatalogSchema();
+        Integer size = prop.getSequenceIncrementSizeByTableName(ds, catalogSchema, getName());
         if (size == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
             if (sequenceName != null && sequenceName.trim().length() > 0) {
-                size = prop.getSequenceIncrementSizeBySequenceName(ds, getSchema(), sequenceName);
+                size = prop.getSequenceIncrementSizeBySequenceName(ds, catalogSchema, sequenceName);
             }
         }
         return size;
@@ -2151,7 +2189,8 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        return prop.getSequenceCacheSize(ds, getSchema(), getName());
+        final String catalogSchema = getCatalogSchema();
+        return prop.getSequenceCacheSize(ds, catalogSchema, getName());
     }
 
     public String getSequenceCacheSizeExpression() {
@@ -2464,8 +2503,7 @@ public class Table {
             return false;
         }
         if (isAdditionalSchema()) {
-            final Map<String, DfAdditionalSchemaInfo> schemaMap = getDatabaseProperties().getAdditionalSchemaMap();
-            final DfAdditionalSchemaInfo schemaInfo = schemaMap.get(_schema);
+            final DfAdditionalSchemaInfo schemaInfo = getDatabaseProperties().getAdditionalSchemaInfo(_schema);
             if (schemaInfo.isSuppressCommonColumn()) {
                 return false;
             }
@@ -2572,6 +2610,10 @@ public class Table {
     //                                                     ===============================
     protected boolean isAvailableAddingSchemaToTableSqlName() {
         return getProperties().getLittleAdjustmentProperties().isAvailableAddingSchemaToTableSqlName();
+    }
+
+    protected boolean isAvailableAddingCatalogToTableSqlName() {
+        return getProperties().getLittleAdjustmentProperties().isAvailableAddingCatalogToTableSqlName();
     }
 
     // ===================================================================================

@@ -124,7 +124,9 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
 
     protected ResultSet getPrimaryKeyResultSetFromDBMeta(DatabaseMetaData dbMeta, String schemaName, String tableName) {
         try {
-            return dbMeta.getPrimaryKeys(null, schemaName, tableName);
+            final String catalogName = extractCatalogName(schemaName);
+            final String realSchemaName = extractRealSchemaName(schemaName);
+            return dbMeta.getPrimaryKeys(catalogName, realSchemaName, tableName);
         } catch (SQLException ignored) {
             // patch: MySQL throws SQLException when the table was not found
             return null;
@@ -186,7 +188,9 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         ResultSet parts = null;
         try {
             final boolean uniqueKeyOnly = true;
-            parts = dbMeta.getIndexInfo(null, schemaName, tableName, uniqueKeyOnly, true);
+            final String catalogName = extractCatalogName(schemaName);
+            final String realSchemaName = extractRealSchemaName(schemaName);
+            parts = dbMeta.getIndexInfo(catalogName, realSchemaName, tableName, uniqueKeyOnly, true);
             while (parts.next()) {
                 final boolean isNonUnique;
                 {

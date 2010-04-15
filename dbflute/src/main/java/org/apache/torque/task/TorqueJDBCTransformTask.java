@@ -101,6 +101,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfSynonymExtractor;
 import org.seasar.dbflute.properties.DfAdditionalTableProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.task.bs.DfAbstractTask;
+import org.seasar.dbflute.util.Srl;
 import org.w3c.dom.Element;
 
 /**
@@ -254,7 +255,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
         // Create database node. (The beginning of schema XML!)
         _databaseNode = _doc.createElement("database");
-        _databaseNode.setAttribute("name", _schema);
+        _databaseNode.setAttribute("name", _schema); // as main schema
 
         // * * * * * *
         // Table Loop
@@ -263,7 +264,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         for (int i = 0; i < tableList.size(); i++) {
             final DfTableMetaInfo tableMataInfo = tableList.get(i);
             if (tableMataInfo.isOutOfGenerateTarget()) {
-                _log.info("$ " + tableMataInfo.buildTableNameWithSchema() + " is out of generate target!");
+                _log.info("$ " + tableMataInfo.buildTableDisplayName() + " is out of generate target!");
                 continue;
             }
             _log.info("$ " + tableMataInfo);
@@ -271,11 +272,13 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             final Element tableElement = _doc.createElement("table");
             tableElement.setAttribute("name", tableMataInfo.getTableName());
             tableElement.setAttribute("type", tableMataInfo.getTableType());
-            if (tableMataInfo.getTableSchema() != null && tableMataInfo.getTableSchema().trim().length() != 0) {
-                tableElement.setAttribute("schema", tableMataInfo.getTableSchema());
+            final String tableSchema = tableMataInfo.getTableSchema();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(tableSchema)) {
+                tableElement.setAttribute("schema", tableSchema);
             }
-            if (tableMataInfo.getTableComment() != null && tableMataInfo.getTableComment().trim().length() != 0) {
-                tableElement.setAttribute("comment", tableMataInfo.getTableComment());
+            final String tableComment = tableMataInfo.getTableComment();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(tableComment)) {
+                tableElement.setAttribute("comment", tableComment);
             }
             final DfPrimaryKeyMetaInfo pkInfo = getPrimaryColumnMetaInfo(dbMetaData, tableMataInfo);
             final List<DfColumnMetaInfo> columns = getColumns(dbMetaData, tableMataInfo);
@@ -512,16 +515,16 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             throws SQLException {
         final Map<String, DfAdditionalSchemaInfo> schemaMap = getDatabaseProperties().getAdditionalSchemaMap();
         final Set<String> schemaSet = schemaMap.keySet();
-        for (String additionalSchema : schemaSet) {
-            final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, additionalSchema);
+        for (String schema : schemaSet) {
+            final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, schema);
             for (DfTableMetaInfo metaInfo : additionalTableList) {
                 final String metaDataSchema = metaInfo.getTableSchema();
                 if (metaDataSchema == null || metaDataSchema.trim().length() == 0) {
-                    metaInfo.setTableSchema(additionalSchema);
+                    metaInfo.setTableSchema(schema);
                 }
             }
             // URL is null because of for additional schema here
-            helpTableComments(additionalTableList, null, additionalSchema);
+            helpTableComments(additionalTableList, null, schema);
             tableList.addAll(additionalTableList);
         }
     }
@@ -760,7 +763,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
 
     protected boolean isAdditionalSchemaTable(DfTableMetaInfo tableMetaInfo) {
         final String schema = tableMetaInfo.getTableSchema();
-        if (schema == null || schema.trim().length() == 0) {
+        if (Srl.is_Null_or_TrimmedEmpty(schema)) {
             return false;
         }
         return getDatabaseProperties().isAdditionalSchema(schema);

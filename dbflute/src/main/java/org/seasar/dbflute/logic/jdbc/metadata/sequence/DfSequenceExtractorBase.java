@@ -20,13 +20,14 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfSequenceMetaInfo;
 
 /**
  * @author jflute
  * @since 0.9.6.4 (2010/01/16 Saturday)
  */
-public abstract class DfSequenceExtractorBase implements DfSequenceExtractor {
+public abstract class DfSequenceExtractorBase extends DfAbstractMetaDataExtractor implements DfSequenceExtractor {
 
     // ===================================================================================
     //                                                                           Attribute
@@ -51,14 +52,8 @@ public abstract class DfSequenceExtractorBase implements DfSequenceExtractor {
 
     protected abstract Map<String, DfSequenceMetaInfo> doGetSequenceMap();
 
-    protected String buildSequenceMapKey(String sequenceOwner, String sequenceName) {
-        return (sequenceOwner != null ? sequenceOwner + "." : "") + sequenceName;
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String ln() {
-        return "\n";
+    // *same schema and same sequence name in different database is unsupported
+    protected String buildSequenceMapKey(String schema, String name) {
+        return (schema != null ? schema + "." : "") + name;
     }
 }
