@@ -272,9 +272,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             final Element tableElement = _doc.createElement("table");
             tableElement.setAttribute("name", tableMataInfo.getTableName());
             tableElement.setAttribute("type", tableMataInfo.getTableType());
-            final String tableSchema = tableMataInfo.getTableSchema();
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(tableSchema)) {
-                tableElement.setAttribute("schema", tableSchema);
+            final String catalogSchema = tableMataInfo.getCatalogSchema();
+            if (Srl.is_NotNull_and_NotTrimmedEmpty(catalogSchema)) {
+                tableElement.setAttribute("schema", catalogSchema);
             }
             final String tableComment = tableMataInfo.getTableComment();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(tableComment)) {
@@ -518,9 +518,9 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
         for (String schema : schemaSet) {
             final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, schema);
             for (DfTableMetaInfo metaInfo : additionalTableList) {
-                final String metaDataSchema = metaInfo.getTableSchema();
+                final String metaDataSchema = metaInfo.getCatalogSchema();
                 if (metaDataSchema == null || metaDataSchema.trim().length() == 0) {
-                    metaInfo.setTableSchema(schema);
+                    metaInfo.setCatalogSchema(schema);
                 }
             }
             // URL is null because of for additional schema here
@@ -758,11 +758,11 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     }
 
     protected String getHandlerUseSchema(DfTableMetaInfo tableMetaInfo) {
-        return isAdditionalSchemaTable(tableMetaInfo) ? tableMetaInfo.getTableSchema() : _schema;
+        return isAdditionalSchemaTable(tableMetaInfo) ? tableMetaInfo.getCatalogSchema() : _schema;
     }
 
     protected boolean isAdditionalSchemaTable(DfTableMetaInfo tableMetaInfo) {
-        final String schema = tableMetaInfo.getTableSchema();
+        final String schema = tableMetaInfo.getCatalogSchema();
         if (Srl.is_Null_or_TrimmedEmpty(schema)) {
             return false;
         }
@@ -824,8 +824,18 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             String msg = "The table meta information should be for synonym: " + table;
             throw new IllegalStateException(msg);
         }
-        final String key = table.buildTableNameWithSchema();
-        return _supplementarySynonymInfoMap.get(key);
+        final String catalogSchema = table.getCatalogSchema();
+        final String tableName = table.getTableName();
+        DfSynonymMetaInfo info = _supplementarySynonymInfoMap.get(catalogSchema + "." + tableName);
+        if (info != null) {
+            return info;
+        }
+        final String pureSchemaName = Srl.substringFirstRear(catalogSchema, ".");
+        info = _supplementarySynonymInfoMap.get(pureSchemaName + "." + tableName);
+        if (info != null) {
+            return info;
+        }
+        return null;
     }
 
     // ===================================================================================

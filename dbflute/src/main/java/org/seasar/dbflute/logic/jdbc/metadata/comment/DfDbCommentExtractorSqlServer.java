@@ -43,7 +43,7 @@ public class DfDbCommentExtractorSqlServer extends DfDbCommentExtractorBase {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
             sb.append(", 'database', '").append(catalogName).append("'");
         }
-        final String realSchemaName = extractRealSchemaName(_schema);
+        final String realSchemaName = extractPureSchemaName(_schema);
         sb.append(", 'schema', '").append(realSchemaName).append("'");
         sb.append(", 'table', default, default, default)");
         sb.append(" order by TABLE_NAME asc");
@@ -73,7 +73,7 @@ public class DfDbCommentExtractorSqlServer extends DfDbCommentExtractorBase {
         if (Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
             sb.append(", 'database', '").append(catalogName).append("'");
         }
-        final String realSchemaName = extractRealSchemaName(_schema);
+        final String realSchemaName = extractPureSchemaName(_schema);
         sb.append(", 'schema', '").append(realSchemaName).append("'");
         sb.append(", 'table', '").append(tableName).append("', 'column', default)");
         sb.append(" order by TABLE_NAME asc, COLUMN_NAME asc");

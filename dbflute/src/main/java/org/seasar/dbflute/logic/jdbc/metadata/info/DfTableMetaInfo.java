@@ -34,7 +34,7 @@ public class DfTableMetaInfo {
 
     protected String _tableType;
 
-    protected String _tableSchema;
+    protected String _catalogSchema;
 
     protected String _tableComment;
 
@@ -74,19 +74,15 @@ public class DfTableMetaInfo {
     //                                                                        ============
     public String selectMetaExtractingSchemaName(String schemaName) {
         if (isExistSameNameTable()) {
-            return _tableSchema;
+            return _catalogSchema;
         } else {
             return schemaName;
         }
     }
 
     public String buildTableDisplayName() {
-        return buildTableNameWithSchema();
-    }
-
-    public String buildTableNameWithSchema() {
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(_tableSchema)) {
-            return _tableSchema + "." + _tableName;
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(_catalogSchema)) {
+            return _catalogSchema + "." + _tableName;
         } else {
             return _tableName;
         }
@@ -133,8 +129,8 @@ public class DfTableMetaInfo {
                 comment = _tableComment;
             }
         }
-        if (_tableSchema != null && _tableSchema.trim().length() != 0) {
-            return _tableSchema + "." + _tableName + "(" + _tableType + ")"
+        if (_catalogSchema != null && _catalogSchema.trim().length() != 0) {
+            return _catalogSchema + "." + _tableName + "(" + _tableType + ")"
                     + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
         } else {
             return _tableName + "(" + _tableType + ")"
@@ -161,12 +157,12 @@ public class DfTableMetaInfo {
         this._tableType = tableType;
     }
 
-    public String getTableSchema() {
-        return _tableSchema;
+    public String getCatalogSchema() {
+        return _catalogSchema;
     }
 
-    public void setTableSchema(String tableSchema) {
-        this._tableSchema = tableSchema;
+    public void setCatalogSchema(String catalogSchema) {
+        this._catalogSchema = catalogSchema;
     }
 
     public String getTableComment() {

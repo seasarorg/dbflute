@@ -140,7 +140,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 }
                 final String procedureSchema = metaInfo.getProcedureSchema();
                 if (procedureSchema == null || procedureSchema.trim().length() == 0) {
-                    metaInfo.setProcedureSchema(extractRealSchemaName(additionalSchema));
+                    metaInfo.setProcedureSchema(extractPureSchemaName(additionalSchema));
                 }
             }
             procedureList.addAll(additionalProcedureList);
@@ -314,39 +314,39 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
      * Get the list of plain procedures. <br />
      * It selects procedures of main schema only.
      * @param metaData The meta data of database. (NotNull)
-     * @param schemaName The name of schema. (Nullable)
+     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
      * @return The list of procedure meta information. (NotNull)
      */
-    public List<DfProcedureMetaInfo> getPlainProcedureList(DatabaseMetaData metaData, String schemaName)
+    public List<DfProcedureMetaInfo> getPlainProcedureList(DatabaseMetaData metaData, String catalogSchema)
             throws SQLException {
-        schemaName = filterSchemaName(schemaName);
+        catalogSchema = filterSchemaName(catalogSchema);
 
         // /- - - - - - - - - - - - - - - - - - - - - -
         // Set up default schema name of PostgreSQL.
         // Because PostgreSQL returns system procedures.
         // - - - - - - - - - -/
         if (isPostgreSQL()) {
-            if (schemaName == null || schemaName.trim().length() == 0) {
-                schemaName = "public";
+            if (catalogSchema == null || catalogSchema.trim().length() == 0) {
+                catalogSchema = "public";
             }
         }
 
         final List<DfProcedureMetaInfo> metaInfoList = new ArrayList<DfProcedureMetaInfo>();
         ResultSet columnResultSet = null;
         try {
-            final String catalogName = extractCatalogName(schemaName);
-            final String realSchemaName = extractRealSchemaName(schemaName);
-            final ResultSet procedureRs = metaData.getProcedures(catalogName, realSchemaName, null);
+            final String catalogName = extractCatalogName(catalogSchema);
+            final String pureSchemaName = extractPureSchemaName(catalogSchema);
+            final ResultSet procedureRs = metaData.getProcedures(catalogName, pureSchemaName, null);
             setupProcedureMetaInfo(metaInfoList, procedureRs);
             for (DfProcedureMetaInfo procedureMetaInfo : metaInfoList) {
                 String procedureName = procedureMetaInfo.getProcedureName();
-                final ResultSet columnRs = metaData.getProcedureColumns(catalogName, realSchemaName, procedureName,
+                final ResultSet columnRs = metaData.getProcedureColumns(catalogName, pureSchemaName, procedureName,
                         null);
                 setupProcedureColumnMetaInfo(procedureMetaInfo, columnRs);
             }
         } catch (SQLException e) {
             String msg = "Failed to get a list of procedures:";
-            msg = msg + " schemaName=" + schemaName;
+            msg = msg + " schemaName=" + catalogSchema;
             throw new DfJDBCException(msg, e);
         } finally {
             if (columnResultSet != null) {

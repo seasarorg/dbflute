@@ -92,7 +92,7 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
             }
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
 
-            final String key = buildSequenceMapKey(sequenceSchema, sequenceName);
+            final String key = buildSequenceMapKey(sequenceCatalog, sequenceSchema, sequenceName);
             resultMap.put(key, info);
             logSb.append(ln()).append(" ").append(key).append(" = ").append(info.toString());
         }
@@ -108,13 +108,14 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
                 if (sb.length() > 0) {
                     sb.append(",");
                 }
-                final String realSchemaName = extractRealSchemaName(schema);
+                final String realSchemaName = extractPureSchemaName(schema);
                 sb.append("'").append(realSchemaName).append("'");
             }
             schemaCondition = sb.toString();
         } else {
             schemaCondition = "'public'";
         }
+        // it allowed to exist unused sequences so it does not use catalog condition 
         return "select * from information_schema.sequences where sequence_schema in (" + schemaCondition + ")";
     }
 

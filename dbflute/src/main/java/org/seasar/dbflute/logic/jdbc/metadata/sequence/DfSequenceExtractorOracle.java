@@ -80,7 +80,7 @@ public class DfSequenceExtractorOracle extends DfSequenceExtractorBase {
             info.setMaximumValue(maxValue != null ? new BigDecimal(maxValue) : null);
             final String incrementSize = recordMap.get("INCREMENT_BY");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
-            final String key = buildSequenceMapKey(sequenceSchema, sequenceName);
+            final String key = buildSequenceMapKey(null, sequenceSchema, sequenceName);
             resultMap.put(key, info);
             logSb.append(ln()).append(" ").append(key).append(" = ").append(info.toString());
         }

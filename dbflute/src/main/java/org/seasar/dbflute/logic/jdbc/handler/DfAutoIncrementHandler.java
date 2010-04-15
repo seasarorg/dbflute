@@ -51,8 +51,8 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 // Basically it does not come here.
                 // But if it's schema requirement or reservation word, it comes here. 
                 try {
-                    final String tableNameWithSchema = tableMetaInfo.buildTableNameWithSchema();
-                    recoverySql = buildMetaDataSql(primaryKeyColumnName, tableNameWithSchema);
+                    final String sqlSchemaName = filterNoNameSchema(tableMetaInfo.getCatalogSchema());
+                    recoverySql = buildMetaDataSql(primaryKeyColumnName, sqlSchemaName + "." + tableName);
                     rs = st.executeQuery(recoverySql);
                 } catch (SQLException ignored) {
                     rs = retryForReservationWordTable(st, tableName, primaryKeyColumnName);

@@ -53,13 +53,13 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     /**
      * Get the map of column meta information.
      * @param metaData The meta data of database. (NotNull)
-     * @param schemaName The name of schema. (Nullable)
+     * @param catalogSchema The name of schema. (Nullable)
      * @param tableName The name of table. (NotNull, CaseInsensitive)
      * @return The map of column meta information. The key is column name. (NotNull)
      */
-    public Map<String, DfColumnMetaInfo> getColumnMetaInfo(DatabaseMetaData metaData, String schemaName,
+    public Map<String, DfColumnMetaInfo> getColumnMetaInfo(DatabaseMetaData metaData, String catalogSchema,
             String tableName) {
-        final List<DfColumnMetaInfo> columns = getColumnList(metaData, schemaName, tableName);
+        final List<DfColumnMetaInfo> columns = getColumnList(metaData, catalogSchema, tableName);
         final Map<String, DfColumnMetaInfo> map = new LinkedHashMap<String, DfColumnMetaInfo>();
         for (DfColumnMetaInfo metaInfo : columns) {
             map.put(metaInfo.getColumnName(), metaInfo);
@@ -70,46 +70,46 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     /**
      * Get the list of column meta information.
      * @param metaData The meta data of database. (NotNull)
-     * @param schemaName The name of schema. (Nullable)
+     * @param catalogSchema The name of schema. (Nullable)
      * @param tableMetaInfo The meta information of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String schemaName,
+    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String catalogSchema,
             DfTableMetaInfo tableMetaInfo) {
-        schemaName = filterSchemaName(schemaName);
-        schemaName = tableMetaInfo.selectMetaExtractingSchemaName(schemaName);
+        catalogSchema = filterSchemaName(catalogSchema);
+        catalogSchema = tableMetaInfo.selectMetaExtractingSchemaName(catalogSchema);
         final String tableName = tableMetaInfo.getTableName();
-        return getColumnList(metaData, schemaName, tableName);
+        return getColumnList(metaData, catalogSchema, tableName);
     }
 
     /**
      * Get the list of column meta information.
      * @param metaData The meta data of database. (NotNull)
-     * @param schemaName The name of schema. (Nullable)
+     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
      * @param tableName The name of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String schemaName, String tableName) {
-        schemaName = filterSchemaName(schemaName);
+    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String catalogSchema, String tableName) {
+        catalogSchema = filterSchemaName(catalogSchema);
         final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;
         ResultSet lowerSpare = null;
         ResultSet upperSpare = null;
         try {
-            final String catalogName = extractCatalogName(schemaName);
-            final String realSchemaName = extractRealSchemaName(schemaName);
-            columnResultSet = metaData.getColumns(catalogName, realSchemaName, tableName, null);
-            setupColumnMetaInfo(columns, columnResultSet, schemaName, tableName);
+            final String catalogName = extractCatalogName(catalogSchema);
+            final String pureSchemaName = extractPureSchemaName(catalogSchema);
+            columnResultSet = metaData.getColumns(catalogName, pureSchemaName, tableName, null);
+            setupColumnMetaInfo(columns, columnResultSet, catalogSchema, tableName);
             if (columns.isEmpty()) { // for lower case
-                lowerSpare = metaData.getColumns(catalogName, realSchemaName, tableName.toLowerCase(), null);
-                setupColumnMetaInfo(columns, lowerSpare, schemaName, tableName);
+                lowerSpare = metaData.getColumns(catalogName, pureSchemaName, tableName.toLowerCase(), null);
+                setupColumnMetaInfo(columns, lowerSpare, catalogSchema, tableName);
             }
             if (columns.isEmpty()) { // for upper case
-                upperSpare = metaData.getColumns(catalogName, realSchemaName, tableName.toUpperCase(), null);
-                setupColumnMetaInfo(columns, upperSpare, schemaName, tableName);
+                upperSpare = metaData.getColumns(catalogName, pureSchemaName, tableName.toUpperCase(), null);
+                setupColumnMetaInfo(columns, upperSpare, catalogSchema, tableName);
             }
         } catch (SQLException e) {
-            String msg = "SQLException occured: schemaName=" + schemaName + " tableName=" + tableName;
+            String msg = "SQLException occured: schemaName=" + catalogSchema + " tableName=" + tableName;
             throw new IllegalStateException(msg);
         } finally {
             if (columnResultSet != null) {

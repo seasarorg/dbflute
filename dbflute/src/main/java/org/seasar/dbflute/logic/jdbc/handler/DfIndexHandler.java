@@ -39,38 +39,38 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
     // ===================================================================================
     //                                                                        Meta Getting
     //                                                                        ============
-    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String schemaName,
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String catalogSchema,
             DfTableMetaInfo tableMetaInfo, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
-        schemaName = filterSchemaName(schemaName);
-        schemaName = tableMetaInfo.selectMetaExtractingSchemaName(schemaName);
+        catalogSchema = filterSchemaName(catalogSchema);
+        catalogSchema = tableMetaInfo.selectMetaExtractingSchemaName(catalogSchema);
         final String tableName = tableMetaInfo.getTableName();
         if (tableMetaInfo.isTableTypeView()) {
             return new LinkedHashMap<String, Map<Integer, String>>();
         }
-        return getIndexMap(dbMeta, schemaName, tableName, uniqueKeyMap);
+        return getIndexMap(dbMeta, catalogSchema, tableName, uniqueKeyMap);
     }
 
-    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String schemaName, String tableName,
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String catalogSchema, String tableName,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
-        Map<String, Map<Integer, String>> resultMap = doGetIndexMap(dbMeta, schemaName, tableName, uniqueKeyMap);
+        Map<String, Map<Integer, String>> resultMap = doGetIndexMap(dbMeta, catalogSchema, tableName, uniqueKeyMap);
         if (resultMap.isEmpty()) { // for lower case
-            resultMap = doGetIndexMap(dbMeta, schemaName, tableName.toLowerCase(), uniqueKeyMap);
+            resultMap = doGetIndexMap(dbMeta, catalogSchema, tableName.toLowerCase(), uniqueKeyMap);
         }
         if (resultMap.isEmpty()) { // for upper case
-            resultMap = doGetIndexMap(dbMeta, schemaName, tableName.toUpperCase(), uniqueKeyMap);
+            resultMap = doGetIndexMap(dbMeta, catalogSchema, tableName.toUpperCase(), uniqueKeyMap);
         }
         return resultMap;
     }
 
-    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData dbMeta, String schemaName,
+    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData dbMeta, String catalogSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
         final Map<String, Map<Integer, String>> indexMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {
             final boolean uniqueKeyOnly = false;
-            final String catalogName = extractCatalogName(schemaName);
-            final String realSchemaName = extractRealSchemaName(schemaName);
-            parts = dbMeta.getIndexInfo(catalogName, realSchemaName, tableName, uniqueKeyOnly, true);
+            final String catalogName = extractCatalogName(catalogSchema);
+            final String pureSchemaName = extractPureSchemaName(catalogSchema);
+            parts = dbMeta.getIndexInfo(catalogName, pureSchemaName, tableName, uniqueKeyOnly, true);
             while (parts.next()) {
                 final String indexName = parts.getString(6);
                 final boolean isNonUnique;
@@ -96,7 +96,7 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
                 if (columnName == null || columnName.trim().length() == 0) {
                     continue;
                 }
-                if (isColumnExcept(schemaName, tableName, columnName)) {
+                if (isColumnExcept(catalogSchema, tableName, columnName)) {
                     continue;
                 }
                 final Integer ordinalPosition;

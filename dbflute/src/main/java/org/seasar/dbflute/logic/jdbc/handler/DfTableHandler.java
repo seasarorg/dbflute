@@ -67,7 +67,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         try {
             _log.info("...Getting tables: schema=" + schemaName + " objectTypes=" + Arrays.asList(objectTypes));
             final String catalogName = extractCatalogName(schemaName);
-            final String realSchemaName = extractRealSchemaName(schemaName);
+            final String realSchemaName = extractPureSchemaName(schemaName);
             resultSet = dbMeta.getTables(catalogName, realSchemaName, "%", objectTypes);
             while (resultSet.next()) {
                 final String tableName = resultSet.getString("TABLE_NAME");
@@ -116,7 +116,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
                 tableMetaInfo.setTableName(tableName);
                 tableMetaInfo.setTableType(tableType);
-                tableMetaInfo.setTableSchema(schemaExp);
+                tableMetaInfo.setCatalogSchema(schemaExp);
                 tableMetaInfo.setTableComment(tableComment);
                 tableList.add(tableMetaInfo);
             }

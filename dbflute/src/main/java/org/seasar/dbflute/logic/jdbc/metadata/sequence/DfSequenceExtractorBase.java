@@ -52,8 +52,7 @@ public abstract class DfSequenceExtractorBase extends DfAbstractMetaDataExtracto
 
     protected abstract Map<String, DfSequenceMetaInfo> doGetSequenceMap();
 
-    // *same schema and same sequence name in different database is unsupported
-    protected String buildSequenceMapKey(String schema, String name) {
-        return (schema != null ? schema + "." : "") + name;
+    protected String buildSequenceMapKey(String catalog, String schema, String name) {
+        return (catalog != null ? catalog + "." : "") + (schema != null ? schema + "." : "") + name;
     }
 }

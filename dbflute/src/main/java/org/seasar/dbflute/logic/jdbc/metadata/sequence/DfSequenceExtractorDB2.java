@@ -84,7 +84,10 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
             info.setMaximumValue(maxValue != null ? new BigDecimal(maxValue) : null);
             final String incrementSize = recordMap.get("INCREMENT");
             info.setIncrementSize(incrementSize != null ? Integer.valueOf(incrementSize) : null);
-            final String key = buildSequenceMapKey(sequenceSchema, sequenceName);
+
+            // DB2 does not return sequence catalog so catalog argument is null
+            final String key = buildSequenceMapKey(null, sequenceSchema, sequenceName);
+
             resultMap.put(key, info);
             logSb.append(ln()).append(" ").append(key).append(" = ").append(info.toString());
         }
@@ -100,7 +103,7 @@ public class DfSequenceExtractorDB2 extends DfSequenceExtractorBase {
                 if (sb.length() > 0) {
                     sb.append(",");
                 }
-                final String realSchemaName = extractRealSchemaName(schema);
+                final String realSchemaName = extractPureSchemaName(schema);
                 sb.append("'").append(realSchemaName).append("'");
             }
             schemaCondition = sb.toString();

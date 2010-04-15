@@ -15,6 +15,12 @@
  */
 package org.seasar.dbflute.logic.jdbc.metadata;
 
+import java.util.LinkedHashMap;
+
+import org.seasar.dbflute.DfBuildProperties;
+import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
+import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
+import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.util.Srl;
 
@@ -26,15 +32,22 @@ public abstract class DfAbstractMetaDataExtractor {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
+    protected String filterSchemaName(String schemaName) {
+        // The driver throws the exception if the value is empty string.
+        if (Srl.isTrimmedEmpty(schemaName) && !isSchemaNameEmptyAllowed()) {
+            return null;
+        }
+        return schemaName;
+    }
+
     protected String filterNoNameSchema(String schemaName) { // basically for MySQL
         if (Srl.is_Null_or_TrimmedEmpty(schemaName)) {
             return schemaName;
         }
-        final String suffix = "." + DfDatabaseProperties.NO_NAME_SCHEMA;
-        if (!schemaName.endsWith(suffix)) {
+        if (!schemaName.endsWith("." + DfDatabaseProperties.NO_NAME_SCHEMA)) {
             return schemaName;
         }
-        return schemaName.substring(0, schemaName.lastIndexOf(suffix));
+        return filterSchemaName(Srl.substringLastFront(schemaName, "."));
     }
 
     protected String extractCatalogName(String schemaName) { // for DBMS that supports both schema and catalog
@@ -46,23 +59,85 @@ public abstract class DfAbstractMetaDataExtractor {
             return null;
         }
         // basically additionalSchema with Database only
-        return schemaName.substring(0, dotIndex);
+        return Srl.substringFirstFront(schemaName, ".");
     }
 
-    protected String extractRealSchemaName(String schemaName) { // for DBMS that supports both schema and catalog
+    protected String extractPureSchemaName(String schemaName) { // for DBMS that supports both schema and catalog
         if (Srl.is_Null_or_Empty(schemaName)) {
-            return schemaName;
+            return filterSchemaName(schemaName);
         }
         int dotIndex = schemaName.indexOf(".");
         if (dotIndex < 0) {
-            return schemaName;
+            return filterSchemaName(schemaName);
         }
         // basically additionalSchema with Database only
-        final String realSchemaName = schemaName.substring(dotIndex + ".".length());
-        if (DfDatabaseProperties.NO_NAME_SCHEMA.equals(realSchemaName)) {
+        final String pureSchemaName = Srl.substringFirstRear(schemaName, ".");
+        if (DfDatabaseProperties.NO_NAME_SCHEMA.equals(pureSchemaName)) {
             return null;
         }
-        return realSchemaName;
+        return filterSchemaName(pureSchemaName);
+    }
+
+    // ===================================================================================
+    //                                                        Database Dependency Resolver
+    //                                                        ============================
+    protected boolean isSchemaNameEmptyAllowed() {
+        return createJdbcDeterminer().isSchemaNameEmptyAllowed();
+    }
+
+    protected boolean isPrimaryKeyExtractingSupported() {
+        return createJdbcDeterminer().isPrimaryKeyExtractingSupported();
+    }
+
+    protected boolean isForeignKeyExtractingSupported() {
+        return createJdbcDeterminer().isForeignKeyExtractingSupported();
+    }
+
+    protected DfJdbcDeterminer createJdbcDeterminer() {
+        return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    protected DfBuildProperties getProperties() {
+        return DfBuildProperties.getInstance();
+    }
+
+    protected DfBasicProperties getBasicProperties() {
+        return DfBuildProperties.getInstance().getBasicProperties();
+    }
+
+    protected DfDatabaseProperties getDatabaseProperties() {
+        return DfBuildProperties.getInstance().getDatabaseProperties();
+    }
+
+    protected boolean isMySQL() {
+        return getBasicProperties().isDatabaseMySQL();
+    }
+
+    protected boolean isPostgreSQL() {
+        return getBasicProperties().isDatabasePostgreSQL();
+    }
+
+    protected boolean isOracle() {
+        return getBasicProperties().isDatabaseOracle();
+    }
+
+    protected boolean isDB2() {
+        return getBasicProperties().isDatabaseDB2();
+    }
+
+    protected boolean isSQLServer() {
+        return getBasicProperties().isDatabaseSQLServer();
+    }
+
+    protected boolean isSQLite() {
+        return getBasicProperties().isDatabaseSQLite();
+    }
+
+    protected boolean isMsAccess() {
+        return getBasicProperties().isDatabaseMsAccess();
     }
 
     // ===================================================================================
@@ -70,5 +145,9 @@ public abstract class DfAbstractMetaDataExtractor {
     //                                                                      ==============
     protected String ln() {
         return "\n";
+    }
+
+    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
+        return new LinkedHashMap<KEY, VALUE>();
     }
 }

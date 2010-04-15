@@ -103,23 +103,23 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Minimum Value
     //                                         -------------
-    public BigDecimal getSequenceMinimumValueByTableName(DataSource dataSource, String schemaName, String tableName) {
+    public BigDecimal getSequenceMinimumValueByTableName(DataSource dataSource, String catalogSchema, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
         }
-        return getSequenceMinimumValueBySequenceName(dataSource, schemaName, sequenceName);
+        return getSequenceMinimumValueBySequenceName(dataSource, catalogSchema, sequenceName);
     }
 
-    public BigDecimal getSequenceMinimumValueBySequenceName(DataSource dataSource, String schemaName,
+    public BigDecimal getSequenceMinimumValueBySequenceName(DataSource dataSource, String catalogSchema,
             String sequenceName) {
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
-        return getSequenceMinimumValue(schemaName, sequenceName, sequenceMap);
+        return getSequenceMinimumValue(catalogSchema, sequenceName, sequenceMap);
     }
 
-    protected BigDecimal getSequenceMinimumValue(String schemaName, String sequenceName,
+    protected BigDecimal getSequenceMinimumValue(String catalogSchema, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        final DfSequenceMetaInfo info = getSequenceElement(schemaName, sequenceName, sequenceMap);
+        final DfSequenceMetaInfo info = getSequenceElement(catalogSchema, sequenceName, sequenceMap);
         if (info != null) {
             final BigDecimal minimumValue = info.getMinimumValue();
             if (minimumValue != null) {
@@ -135,23 +135,23 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Maximum Value
     //                                         -------------
-    public BigDecimal getSequenceMaximumValueByTableName(DataSource dataSource, String schemaName, String tableName) {
+    public BigDecimal getSequenceMaximumValueByTableName(DataSource dataSource, String catalogSchema, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
         }
-        return getSequenceMaximumValueBySequenceName(dataSource, schemaName, sequenceName);
+        return getSequenceMaximumValueBySequenceName(dataSource, catalogSchema, sequenceName);
     }
 
-    public BigDecimal getSequenceMaximumValueBySequenceName(DataSource dataSource, String schemaName,
+    public BigDecimal getSequenceMaximumValueBySequenceName(DataSource dataSource, String catalogSchema,
             String sequenceName) {
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
-        return getSequenceMaximumValue(schemaName, sequenceName, sequenceMap);
+        return getSequenceMaximumValue(catalogSchema, sequenceName, sequenceMap);
     }
 
-    protected BigDecimal getSequenceMaximumValue(String schemaName, String sequenceName,
+    protected BigDecimal getSequenceMaximumValue(String catalogSchema, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        final DfSequenceMetaInfo info = getSequenceElement(schemaName, sequenceName, sequenceMap);
+        final DfSequenceMetaInfo info = getSequenceElement(catalogSchema, sequenceName, sequenceMap);
         if (info != null) {
             final BigDecimal maximumValue = info.getMaximumValue();
             if (maximumValue != null) {
@@ -167,22 +167,23 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                        Increment Size
     //                                        --------------
-    public Integer getSequenceIncrementSizeByTableName(DataSource dataSource, String schemaName, String tableName) {
+    public Integer getSequenceIncrementSizeByTableName(DataSource dataSource, String catalogSchema, String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
         }
-        return getSequenceIncrementSizeBySequenceName(dataSource, schemaName, sequenceName);
+        return getSequenceIncrementSizeBySequenceName(dataSource, catalogSchema, sequenceName);
     }
 
-    public Integer getSequenceIncrementSizeBySequenceName(DataSource dataSource, String schemaName, String sequenceName) {
+    public Integer getSequenceIncrementSizeBySequenceName(DataSource dataSource, String catalogSchema,
+            String sequenceName) {
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
-        return getSequenceIncrementSize(schemaName, sequenceName, sequenceMap);
+        return getSequenceIncrementSize(catalogSchema, sequenceName, sequenceMap);
     }
 
-    protected Integer getSequenceIncrementSize(String schemaName, String sequenceName,
+    protected Integer getSequenceIncrementSize(String catalogSchema, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        final DfSequenceMetaInfo info = getSequenceElement(schemaName, sequenceName, sequenceMap);
+        final DfSequenceMetaInfo info = getSequenceElement(catalogSchema, sequenceName, sequenceMap);
         if (info != null) {
             final Integer incrementSize = info.getIncrementSize();
             if (incrementSize != null) {
@@ -220,15 +221,23 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return _sequenceMetaInfoMap;
     }
 
-    protected DfSequenceMetaInfo getSequenceElement(String schemaName, String sequenceName,
+    protected DfSequenceMetaInfo getSequenceElement(String catalogSchema, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        DfSequenceMetaInfo info = sequenceMap.get(schemaName + "." + sequenceName);
-        if (info == null) {
-            final String pureSchema = Srl.substringFirstRear(schemaName, ".");
-            info = sequenceMap.get(pureSchema + "." + sequenceName);
-            if (info == null) {
-                info = sequenceMap.get(sequenceName);
-            }
+        DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
+        if (info != null) {
+            return info;
+        }
+        if (sequenceName.contains(".")) {
+            return null;
+        }
+        info = sequenceMap.get(catalogSchema + "." + sequenceName);
+        if (info != null) {
+            return info;
+        }
+        final String pureSchema = Srl.substringFirstRear(catalogSchema, ".");
+        info = sequenceMap.get(pureSchema + "." + sequenceName);
+        if (info != null) {
+            return info;
         }
         return info;
     }
@@ -236,7 +245,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                  (DBFlute) Cache Size
     //                                  --------------------
-    public Integer getSequenceCacheSize(DataSource dataSource, String schemaName, String tableName) {
+    public Integer getSequenceCacheSize(DataSource dataSource, String catalogSchema, String tableName) {
         final String sequenceProp = getSequenceProp(tableName);
         if (sequenceProp == null) {
             return null;
@@ -263,13 +272,13 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         final String cacheSizeProp = cacheValue.substring(0, endMarkIndex).trim();
         final String sequenceName = getSequenceName(tableName);
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
-        final Integer incrementSize = getSequenceIncrementSize(schemaName, sequenceName, sequenceMap);
+        final Integer incrementSize = getSequenceIncrementSize(catalogSchema, sequenceName, sequenceMap);
         if (cacheSizeProp != null && cacheSizeProp.trim().length() > 0) { // cacheSize is specified
             final Integer cacheSize = castCacheSize(cacheSizeProp, tableName, sequenceProp, sequenceName);
-            assertCacheSizeOverOne(cacheSize, schemaName, tableName, sequenceProp, sequenceName, incrementSize);
+            assertCacheSizeOverOne(cacheSize, catalogSchema, tableName, sequenceProp, sequenceName, incrementSize);
             if (incrementSize != null) { // can get it from meta
-                assertIncrementSizeNotDecrement(incrementSize, schemaName, tableName, sequenceProp, sequenceName);
-                assertExtraValueZero(cacheSize, incrementSize, schemaName, tableName, sequenceProp, sequenceName);
+                assertIncrementSizeNotDecrement(incrementSize, catalogSchema, tableName, sequenceProp, sequenceName);
+                assertExtraValueZero(cacheSize, incrementSize, catalogSchema, tableName, sequenceProp, sequenceName);
 
                 // *no limit because of self-responsibility
                 //assertCacheSizeOfBatchWayNotTooLarge(cacheSize, schemaName, tableName, sequenceProp, sequenceName, incrementSize);
@@ -281,10 +290,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
                 return cacheSize; // increment way
             }
         } else { // cacheSize is omitted
-            assertIncrementSizeExistsIfNoCacheSize(incrementSize, schemaName, tableName, sequenceProp, sequenceName);
-            assertIncrementSizeNotDecrement(incrementSize, schemaName, tableName, sequenceProp, sequenceName);
+            assertIncrementSizeExistsIfNoCacheSize(incrementSize, catalogSchema, tableName, sequenceProp, sequenceName);
+            assertIncrementSizeNotDecrement(incrementSize, catalogSchema, tableName, sequenceProp, sequenceName);
             // the cacheSize is same as actual increment size
-            assertCacheSizeOverOne(incrementSize, schemaName, tableName, sequenceProp, sequenceName, incrementSize);
+            assertCacheSizeOverOne(incrementSize, catalogSchema, tableName, sequenceProp, sequenceName, incrementSize);
             return incrementSize; // increment way
         }
     }

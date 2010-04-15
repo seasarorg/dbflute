@@ -737,6 +737,7 @@ public class Table {
     }
 
     protected String getSchemaClassPrefix() {
+        // *however DBFlute does not completely support same-name table between schemas.
         if (hasSchema() && isExistSameNameTable()) {
             String schemaName;
             if (isCatalogAdditionalSchema()) {

@@ -16,20 +16,13 @@
 package org.seasar.dbflute.logic.jdbc.handler;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.seasar.dbflute.DfBuildProperties;
-import org.seasar.dbflute.helper.jdbc.determiner.DfJdbcDeterminer;
-import org.seasar.dbflute.logic.factory.DfJdbcDeterminerFactory;
 import org.seasar.dbflute.logic.jdbc.metadata.DfAbstractMetaDataExtractor;
-import org.seasar.dbflute.properties.DfBasicProperties;
-import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
 import org.seasar.dbflute.util.DfCollectionUtil;
 import org.seasar.dbflute.util.DfNameHintUtil;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -89,23 +82,23 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
     //                                                                ====================
     /**
      * Is the table name out of sight?
-     * @param schemaName The name of schema. (Nullable)
+     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
      * @param tableName The name of table. (NotNull)
      * @return Determination.
      */
-    public boolean isTableExcept(String schemaName, final String tableName) {
+    public boolean isTableExcept(String catalogSchema, final String tableName) {
         if (tableName == null) {
             throw new IllegalArgumentException("The argument 'tableName' should not be null.");
         }
-        final List<String> tableTargetList = getRealTableTargetList(schemaName);
-        final List<String> tableExceptList = getRealTableExceptList(schemaName);
+        final List<String> tableTargetList = getRealTableTargetList(catalogSchema);
+        final List<String> tableExceptList = getRealTableExceptList(catalogSchema);
         return !isTargetByHint(tableName, tableTargetList, tableExceptList);
     }
 
-    protected List<String> getRealTableExceptList(String schemaName) { // extension point
-        if (schemaName != null) {
+    protected List<String> getRealTableExceptList(String catalogSchema) { // extension point
+        if (catalogSchema != null) {
             final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getAdditionalSchemaMap();
-            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(schemaName);
+            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(catalogSchema);
             if (schemaInfo != null) {
                 return schemaInfo.getTableExceptList();
             }
@@ -113,10 +106,10 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
         return getTableExceptList();
     }
 
-    protected List<String> getRealTableTargetList(String schemaName) { // extension point
-        if (schemaName != null) {
+    protected List<String> getRealTableTargetList(String catalogSchema) { // extension point
+        if (catalogSchema != null) {
             final Map<String, DfAdditionalSchemaInfo> additionalSchemaMap = getAdditionalSchemaMap();
-            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(schemaName);
+            final DfAdditionalSchemaInfo schemaInfo = additionalSchemaMap.get(catalogSchema);
             if (schemaInfo != null) {
                 return schemaInfo.getTableTargetList();
             }
@@ -126,19 +119,19 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
 
     /**
      * Is the column of the table out of sight?
-     * @param schemaName The name of schema. (Nullable)
+     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
      * @param tableName The name of table. (NotNull)
      * @param columnName The name of column. (NotNull)
      * @return Determination.
      */
-    public boolean isColumnExcept(String schemaName, String tableName, String columnName) {
+    public boolean isColumnExcept(String catalogSchema, String tableName, String columnName) {
         if (tableName == null) {
             throw new IllegalArgumentException("The argument 'tableName' should not be null.");
         }
         if (columnName == null) {
             throw new IllegalArgumentException("The argument 'columnName' should not be null.");
         }
-        final Map<String, List<String>> columnExceptMap = getRealColumnExceptMap(schemaName);
+        final Map<String, List<String>> columnExceptMap = getRealColumnExceptMap(catalogSchema);
         final List<String> columnExceptList = columnExceptMap.get(tableName);
         if (columnExceptList == null) { // no definition about the table
             return false;
@@ -159,86 +152,5 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
 
     protected boolean isTargetByHint(final String name, final List<String> targetList, final List<String> exceptList) {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
-    }
-
-    // ===================================================================================
-    //                                                        Database Dependency Resolver
-    //                                                        ============================
-    protected String filterSchemaName(String schemaName) {
-        // The driver throws the exception if the value is empty string.
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(schemaName) && !isSchemaNameEmptyAllowed()) {
-            return null;
-        }
-        return schemaName;
-    }
-
-    protected boolean isSchemaNameEmptyAllowed() {
-        return createJdbcDeterminer().isSchemaNameEmptyAllowed();
-    }
-
-    protected boolean isPrimaryKeyExtractingSupported() {
-        return createJdbcDeterminer().isPrimaryKeyExtractingSupported();
-    }
-
-    protected boolean isForeignKeyExtractingSupported() {
-        return createJdbcDeterminer().isForeignKeyExtractingSupported();
-    }
-
-    protected DfJdbcDeterminer createJdbcDeterminer() {
-        return new DfJdbcDeterminerFactory(getBasicProperties()).createJdbcDeterminer();
-    }
-
-    // ===================================================================================
-    //                                                                          Properties
-    //                                                                          ==========
-    protected DfBuildProperties getProperties() {
-        return DfBuildProperties.getInstance();
-    }
-
-    protected DfBasicProperties getBasicProperties() {
-        return DfBuildProperties.getInstance().getBasicProperties();
-    }
-
-    protected DfDatabaseProperties getDatabaseProperties() {
-        return DfBuildProperties.getInstance().getDatabaseProperties();
-    }
-
-    protected boolean isMySQL() {
-        return getBasicProperties().isDatabaseMySQL();
-    }
-
-    protected boolean isPostgreSQL() {
-        return getBasicProperties().isDatabasePostgreSQL();
-    }
-
-    protected boolean isOracle() {
-        return getBasicProperties().isDatabaseOracle();
-    }
-
-    protected boolean isDB2() {
-        return getBasicProperties().isDatabaseDB2();
-    }
-
-    protected boolean isSQLServer() {
-        return getBasicProperties().isDatabaseSQLServer();
-    }
-
-    protected boolean isSQLite() {
-        return getBasicProperties().isDatabaseSQLite();
-    }
-
-    protected boolean isMsAccess() {
-        return getBasicProperties().isDatabaseMsAccess();
-    }
-
-    // ===================================================================================
-    //                                                                      General Helper
-    //                                                                      ==============
-    protected String ln() {
-        return "\n";
-    }
-
-    protected <KEY, VALUE> LinkedHashMap<KEY, VALUE> newLinkedHashMap() {
-        return new LinkedHashMap<KEY, VALUE>();
     }
 }

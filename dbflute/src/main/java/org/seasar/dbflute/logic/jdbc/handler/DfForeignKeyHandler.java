@@ -49,39 +49,41 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
     //                                                                         ===========
     /**
      * Retrieves a list of foreign key columns for a given table.
-     * @param dbMeta JDBC meta data.
-     * @param tableMetaInfo The meta information of table.
+     * @param dbMeta JDBC meta data. (NotNull)
+     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
+     * @param tableMetaInfo The meta information of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String schemaName,
+    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String catalogSchema,
             DfTableMetaInfo tableMetaInfo) throws SQLException {
-        schemaName = filterSchemaName(schemaName);
-        schemaName = tableMetaInfo.selectMetaExtractingSchemaName(schemaName);
+        catalogSchema = filterSchemaName(catalogSchema);
+        catalogSchema = tableMetaInfo.selectMetaExtractingSchemaName(catalogSchema);
         final String tableName = tableMetaInfo.getTableName();
-        return getForeignKeyMetaInfo(dbMeta, schemaName, tableName);
+        return getForeignKeyMetaInfo(dbMeta, catalogSchema, tableName);
     }
 
     /**
      * Retrieves a list of foreign key columns for a given table.
-     * @param dbMeta JDBC meta data.
-     * @param tableName The name of table.
+     * @param dbMeta JDBC meta data. (NotNull)
+     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
+     * @param tableName The name of table. (NotNull)
      * @return A list of foreign keys in <code>tableName</code>.
      * @throws SQLException
      */
-    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String schemaName,
+    public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData dbMeta, String catalogSchema,
             String tableName) throws SQLException {
-        Map<String, DfForeignKeyMetaInfo> resultMap = doGetForeignKeyMetaInfo(dbMeta, schemaName, tableName);
+        Map<String, DfForeignKeyMetaInfo> resultMap = doGetForeignKeyMetaInfo(dbMeta, catalogSchema, tableName);
         if (resultMap.isEmpty()) { // for lower case
-            resultMap = doGetForeignKeyMetaInfo(dbMeta, schemaName, tableName.toLowerCase());
+            resultMap = doGetForeignKeyMetaInfo(dbMeta, catalogSchema, tableName.toLowerCase());
         }
         if (resultMap.isEmpty()) { // for upper case
-            resultMap = doGetForeignKeyMetaInfo(dbMeta, schemaName, tableName.toUpperCase());
+            resultMap = doGetForeignKeyMetaInfo(dbMeta, catalogSchema, tableName.toUpperCase());
         }
         return resultMap;
     }
 
-    protected Map<String, DfForeignKeyMetaInfo> doGetForeignKeyMetaInfo(DatabaseMetaData dbMeta, String schemaName,
+    protected Map<String, DfForeignKeyMetaInfo> doGetForeignKeyMetaInfo(DatabaseMetaData dbMeta, String catalogSchema,
             String tableName) throws SQLException {
         final Map<String, DfForeignKeyMetaInfo> fkMap = new LinkedHashMap<String, DfForeignKeyMetaInfo>();
         if (!isForeignKeyExtractingSupported()) {
@@ -90,9 +92,9 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         final Map<String, String> exceptedFKKeyMap = new LinkedHashMap<String, String>();
         ResultSet foreignKeys = null;
         try {
-            final String catalogName = extractCatalogName(schemaName);
-            final String realSchemaName = extractRealSchemaName(schemaName);
-            foreignKeys = dbMeta.getImportedKeys(catalogName, realSchemaName, tableName);
+            final String catalogName = extractCatalogName(catalogSchema);
+            final String pureSchemaName = extractPureSchemaName(catalogSchema);
+            foreignKeys = dbMeta.getImportedKeys(catalogName, pureSchemaName, tableName);
             while (foreignKeys.next()) {
                 final String foreignSchemaName = foreignKeys.getString(2);
                 final String foreignTableName = foreignKeys.getString(3);
@@ -110,7 +112,7 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
                 // check except columns
                 final String localColumnName = foreignKeys.getString(8);
                 final String foreignColumnName = foreignKeys.getString(4);
-                assertFKColumnNotExcepted(schemaName, tableName, localColumnName);
+                assertFKColumnNotExcepted(catalogSchema, tableName, localColumnName);
                 assertPKColumnNotExcepted(foreignSchemaName, foreignTableName, foreignColumnName);
 
                 DfForeignKeyMetaInfo metaInfo = fkMap.get(fkName);
@@ -142,20 +144,20 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
         return filterSameForeignKeyMetaInfo(fkMap);
     }
 
-    protected void assertFKColumnNotExcepted(String schemaName, String tableName, String columnName) {
-        if (isColumnExcept(schemaName, tableName, columnName)) {
+    protected void assertFKColumnNotExcepted(String catalogSchema, String tableName, String columnName) {
+        if (isColumnExcept(catalogSchema, tableName, columnName)) {
             String msg = "FK columns are unsupported on 'columnExcept' property:";
-            msg = msg + " schemaName=" + schemaName;
+            msg = msg + " schemaName=" + catalogSchema;
             msg = msg + " tableName=" + tableName;
             msg = msg + " columnName=" + columnName;
             throw new DfIllegalPropertySettingException(msg);
         }
     }
 
-    protected void assertPKColumnNotExcepted(String schemaName, String tableName, String columnName) {
-        if (isColumnExcept(schemaName, tableName, columnName)) {
+    protected void assertPKColumnNotExcepted(String catalogSchema, String tableName, String columnName) {
+        if (isColumnExcept(catalogSchema, tableName, columnName)) {
             String msg = "PK columns are unsupported on 'columnExcept' property:";
-            msg = msg + " schemaName=" + schemaName;
+            msg = msg + " schemaName=" + catalogSchema;
             msg = msg + " tableName=" + tableName;
             msg = msg + " columnName=" + columnName;
             throw new DfIllegalPropertySettingException(msg);
