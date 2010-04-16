@@ -20,7 +20,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +28,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.handler.DfAutoIncrementHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
@@ -37,6 +37,7 @@ import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
+import org.seasar.dbflute.util.DfCollectionUtil;
 
 /**
  * @author jflute
@@ -65,7 +66,8 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
         try {
             handleSerialTypeSequence(tableSequenceMap);
         } catch (SQLException e) {
-            throw new IllegalStateException(e);
+            String msg = "Failed to handle serial type sequence: " + tableSequenceMap;
+            throw new SQLFailureException(msg, e);
         }
     }
 
@@ -75,12 +77,12 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
         final DfTableHandler tableHandler = new DfTableHandler() {
             @Override
             protected List<String> getRealTableExceptList(String schemaName) {
-                return new ArrayList<String>(); // All table target!
+                return DfCollectionUtil.emptyList(); // all tables are target!
             }
 
             @Override
             protected List<String> getRealTableTargetList(String schemaName) {
-                return new ArrayList<String>(); // All table target!
+                return DfCollectionUtil.emptyList(); // all tables are target!
             }
         };
         Connection conn = null;
@@ -110,7 +112,7 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                 if (!autoIncrementHandler.isAutoIncrementColumn(conn, tableMetaInfo, primaryKeyColumnName)) {
                     continue;
                 }
-                final Map<String, DfColumnMetaInfo> columnMetaMap = columnHandler.getColumnMetaInfo(metaData, _schema,
+                final Map<String, DfColumnMetaInfo> columnMetaMap = columnHandler.getColumnMap(metaData, _schema,
                         tableName);
                 final DfColumnMetaInfo columnMetaInfo = columnMetaMap.get(primaryKeyColumnName);
                 final String defaultValue = columnMetaInfo.getDefaultValue();
@@ -142,12 +144,6 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                     continue;
                 }
                 callSequenceLoop(st, sequenceName, actualValue);
-
-                // *It's an old style.
-                //String sql = "select setval('" + sequenceName + "', (select max(" + primaryKeyColumnName + ")";
-                //sql = sql + " from " + tableName + "))";
-                //_log.info(sql);
-                //st.execute(sql);
             }
         } finally {
             if (st != null) {

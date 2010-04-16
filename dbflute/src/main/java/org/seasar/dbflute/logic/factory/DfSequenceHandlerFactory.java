@@ -30,21 +30,21 @@ public class DfSequenceHandlerFactory {
     }
 
     public DfSequenceHandler createSequenceHandler() {
-        final String schema = _databaseProperties.getDatabaseSchema();
-        final List<String> allSchemaList = createAllSchemaList();
+        final String mainSchema = _databaseProperties.getDatabaseSchema();
+        final List<String> allSchemaList = createUniqueSchemaList();
         if (_basicProperties.isDatabasePostgreSQL()) {
-            return new DfSequenceHandlerPostgreSQL(_dataSource, schema, allSchemaList);
+            return new DfSequenceHandlerPostgreSQL(_dataSource, mainSchema, allSchemaList);
         } else if (_basicProperties.isDatabaseOracle()) {
-            return new DfSequenceHandlerOracle(_dataSource, schema, allSchemaList);
+            return new DfSequenceHandlerOracle(_dataSource, mainSchema, allSchemaList);
         } else if (_basicProperties.isDatabaseDB2()) {
-            return new DfSequenceHandlerDB2(_dataSource, schema, allSchemaList);
+            return new DfSequenceHandlerDB2(_dataSource, mainSchema, allSchemaList);
         } else if (_basicProperties.isDatabaseH2()) {
-            return new DfSequenceHandlerH2(_dataSource, schema, allSchemaList);
+            return new DfSequenceHandlerH2(_dataSource, mainSchema, allSchemaList);
         }
         return null;
     }
 
-    protected List<String> createAllSchemaList() { // not only main schema but also additional schemas
+    protected List<String> createUniqueSchemaList() { // not only main schema but also additional schemas
         final List<String> schemaList = new ArrayList<String>();
         final String mainSchema = _databaseProperties.getDatabaseSchema();
         if (mainSchema != null && mainSchema.trim().length() > 0) {

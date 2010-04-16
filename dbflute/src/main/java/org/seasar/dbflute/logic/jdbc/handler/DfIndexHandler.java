@@ -41,35 +41,35 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
     //                                                                        ============
     public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo,
             Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
-        final String catalogSchema = tableMetaInfo.getCatalogSchema();
+        final String uniqueSchema = tableMetaInfo.getUniqueSchema();
         final String tableName = tableMetaInfo.getTableName();
         if (tableMetaInfo.isTableTypeView()) {
             return newLinkedHashMap();
         }
-        return getIndexMap(dbMeta, catalogSchema, tableName, uniqueKeyMap);
+        return getIndexMap(dbMeta, uniqueSchema, tableName, uniqueKeyMap);
     }
 
-    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String catalogSchema,
+    public Map<String, Map<Integer, String>> getIndexMap(DatabaseMetaData dbMeta, String uniqueSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // non unique only
-        catalogSchema = filterSchemaName(catalogSchema);
-        Map<String, Map<Integer, String>> resultMap = doGetIndexMap(dbMeta, catalogSchema, tableName, uniqueKeyMap);
+        uniqueSchema = filterSchemaName(uniqueSchema);
+        Map<String, Map<Integer, String>> resultMap = doGetIndexMap(dbMeta, uniqueSchema, tableName, uniqueKeyMap);
         if (resultMap.isEmpty()) { // for lower case
-            resultMap = doGetIndexMap(dbMeta, catalogSchema, tableName.toLowerCase(), uniqueKeyMap);
+            resultMap = doGetIndexMap(dbMeta, uniqueSchema, tableName.toLowerCase(), uniqueKeyMap);
         }
         if (resultMap.isEmpty()) { // for upper case
-            resultMap = doGetIndexMap(dbMeta, catalogSchema, tableName.toUpperCase(), uniqueKeyMap);
+            resultMap = doGetIndexMap(dbMeta, uniqueSchema, tableName.toUpperCase(), uniqueKeyMap);
         }
         return resultMap;
     }
 
-    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData dbMeta, String catalogSchema,
+    protected Map<String, Map<Integer, String>> doGetIndexMap(DatabaseMetaData dbMeta, String uniqueSchema,
             String tableName, Map<String, Map<Integer, String>> uniqueKeyMap) throws SQLException { // Non Unique Only
         final Map<String, Map<Integer, String>> indexMap = new LinkedHashMap<String, Map<Integer, String>>();
         ResultSet parts = null;
         try {
             final boolean uniqueKeyOnly = false;
-            final String catalogName = extractCatalogName(catalogSchema);
-            final String pureSchemaName = extractPureSchemaName(catalogSchema);
+            final String catalogName = extractCatalogName(uniqueSchema);
+            final String pureSchemaName = extractPureSchemaName(uniqueSchema);
             parts = dbMeta.getIndexInfo(catalogName, pureSchemaName, tableName, uniqueKeyOnly, true);
             while (parts.next()) {
                 final String indexName = parts.getString(6);
@@ -96,7 +96,7 @@ public class DfIndexHandler extends DfAbstractMetaDataHandler {
                 if (columnName == null || columnName.trim().length() == 0) {
                     continue;
                 }
-                if (isColumnExcept(catalogSchema, tableName, columnName)) {
+                if (isColumnExcept(uniqueSchema, tableName, columnName)) {
                     continue;
                 }
                 final Integer ordinalPosition;

@@ -32,46 +32,46 @@ public abstract class DfAbstractMetaDataExtractor {
     // ===================================================================================
     //                                                                       Assist Helper
     //                                                                       =============
-    protected String filterSchemaName(String schemaName) {
+    protected String filterSchemaName(String uniqueSchema) {
         // The driver throws the exception if the value is empty string.
-        if (Srl.isTrimmedEmpty(schemaName) && !isSchemaNameEmptyAllowed()) {
+        if (Srl.isTrimmedEmpty(uniqueSchema) && !isSchemaNameEmptyAllowed()) {
             return null;
         }
-        return schemaName;
+        return uniqueSchema;
     }
 
-    protected String filterNoNameSchema(String schemaName) { // basically for MySQL
-        if (Srl.is_Null_or_TrimmedEmpty(schemaName)) {
-            return schemaName;
+    protected String extractCatalogSchema(String uniqueSchema) { // basically for MySQL
+        if (Srl.is_Null_or_TrimmedEmpty(uniqueSchema)) {
+            return uniqueSchema;
         }
-        if (!schemaName.endsWith("." + DfDatabaseProperties.NO_NAME_SCHEMA)) {
-            return schemaName;
+        if (!uniqueSchema.endsWith("." + DfDatabaseProperties.NO_NAME_SCHEMA)) {
+            return uniqueSchema;
         }
-        return filterSchemaName(Srl.substringLastFront(schemaName, "."));
+        return filterSchemaName(Srl.substringLastFront(uniqueSchema, "."));
     }
 
-    protected String extractCatalogName(String schemaName) { // for DBMS that supports both schema and catalog
-        if (Srl.is_Null_or_Empty(schemaName)) {
+    protected String extractCatalogName(String uniqueSchema) { // for DBMS that supports both schema and catalog
+        if (Srl.is_Null_or_Empty(uniqueSchema)) {
             return null;
         }
-        int dotIndex = schemaName.indexOf(".");
+        int dotIndex = uniqueSchema.indexOf(".");
         if (dotIndex < 0) {
             return null;
         }
         // basically additionalSchema with Database only
-        return Srl.substringFirstFront(schemaName, ".");
+        return Srl.substringFirstFront(uniqueSchema, ".");
     }
 
-    protected String extractPureSchemaName(String catalogSchema) { // for DBMS that supports both schema and catalog
-        if (Srl.is_Null_or_Empty(catalogSchema)) {
-            return filterSchemaName(catalogSchema);
+    protected String extractPureSchemaName(String uniqueSchema) { // for DBMS that supports both schema and catalog
+        if (Srl.is_Null_or_Empty(uniqueSchema)) {
+            return filterSchemaName(uniqueSchema);
         }
-        int dotIndex = catalogSchema.indexOf(".");
+        int dotIndex = uniqueSchema.indexOf(".");
         if (dotIndex < 0) {
-            return filterSchemaName(catalogSchema);
+            return filterSchemaName(uniqueSchema);
         }
         // basically additionalSchema with Database only
-        final String pureSchemaName = Srl.substringFirstRear(catalogSchema, ".");
+        final String pureSchemaName = Srl.substringFirstRear(uniqueSchema, ".");
         if (DfDatabaseProperties.NO_NAME_SCHEMA.equals(pureSchemaName)) {
             return null;
         }

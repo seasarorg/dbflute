@@ -106,7 +106,7 @@ public class Table {
     private List<IdMethodParameter> _idMethodParameters;
     private String _name;
     private String _type;
-    private String _schema;
+    private String _plainSchema;
     private String _plainComment;
     private String _description;
     private String _javaName;
@@ -168,7 +168,7 @@ public class Table {
     public void loadFromXML(Attributes attrib) {
         _name = attrib.getValue("name");
         _type = attrib.getValue("type");
-        _schema = attrib.getValue("schema");
+        _plainSchema = attrib.getValue("schema");
         _plainComment = attrib.getValue("comment");
         _javaName = attrib.getValue("javaName");
 
@@ -348,6 +348,10 @@ public class Table {
     // -----------------------------------------------------
     //                                          Table Schema
     //                                          ------------
+    protected String getPlainSchema() {
+        return _plainSchema;
+    }
+
     public String getDisplaySchema() {
         if (isCatalogAdditionalSchema()) {
             return getCatalogSchema();
@@ -362,17 +366,17 @@ public class Table {
 
     protected String getCatalogSchema() { // contains catalog name
         if (!hasSchema()) {
-            return _schema;
+            return _plainSchema;
         }
-        if (!_schema.contains(".")) {
-            return _schema;
+        if (!_plainSchema.contains(".")) {
+            return _plainSchema;
         }
-        final int dotIndex = _schema.indexOf(".");
+        final int dotIndex = _plainSchema.indexOf(".");
         if (dotIndex < 0) {
-            return _schema;
+            return _plainSchema;
         }
-        final String catalogName = Srl.substringFirstFront(_schema, ".");
-        final String schemaName = Srl.substringFirstRear(_schema, ".");
+        final String catalogName = Srl.substringFirstFront(_plainSchema, ".");
+        final String schemaName = Srl.substringFirstRear(_plainSchema, ".");
         if (DfDatabaseProperties.NO_NAME_SCHEMA.equals(schemaName)) {
             return catalogName;
         } else {
@@ -382,25 +386,13 @@ public class Table {
 
     protected String getPureSchema() { // NOT contain catalog name
         if (!hasSchema()) {
-            return _schema;
+            return _plainSchema;
         }
         return Srl.substringFirstRear(getCatalogSchema(), ".");
     }
 
-    protected String getPlainSchema() {
-        return _schema;
-    }
-
-    /**
-     * Set the schema of the Table
-     * @param schema The name of schema. (Nullable)
-     */
-    public void setSchema(String schema) {
-        this._schema = schema;
-    }
-
     public boolean hasSchema() {
-        return Srl.is_NotNull_and_NotTrimmedEmpty(_schema);
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_plainSchema);
     }
 
     public boolean isMainSchema() {
@@ -426,10 +418,6 @@ public class Table {
     //                                         -------------
     public String getPlainComment() {
         return _plainComment;
-    }
-
-    public void setPlainComment(String plainComment) {
-        this._plainComment = plainComment;
     }
 
     public boolean hasComment() {
@@ -509,15 +497,15 @@ public class Table {
      */
     public String getTableSqlName() {
         final String tableName = quoteTableNameIfNeeds(_name);
-        return processSchemaSqlPrefix(tableName);
+        return filterSchemaSqlPrefix(tableName);
     }
 
     public String getTableSqlNameDirectUse() {
         final String tableName = quoteTableNameIfNeedsDirectUse(_name);
-        return processSchemaSqlPrefix(tableName);
+        return filterSchemaSqlPrefix(tableName);
     }
 
-    protected String processSchemaSqlPrefix(String tableName) {
+    protected String filterSchemaSqlPrefix(String tableName) {
         if (hasSchema()) {
             final String catalogSchema = getCatalogSchema();
             final String pureSchema = getPureSchema();
@@ -744,6 +732,8 @@ public class Table {
         return getExtendedEntityClassName() + "Nsst";
     }
 
+    // *same-name tables between different schemas are unsupported at 0.9.6.8
+
     protected String getSchemaClassPrefix() {
         // *however DBFlute does not completely support same-name table between schemas.
         if (hasSchema() && isExistSameNameTable()) {
@@ -875,12 +865,7 @@ public class Table {
      * Returns an Array containing all the columns in the table
      */
     public Column[] getColumns() {
-        int size = _columnList.size();
-        Column[] tbls = new Column[size];
-        for (int i = 0; i < size; i++) {
-            tbls[i] = (Column) _columnList.get(i);
-        }
-        return tbls;
+        return _columnList.toArray(new Column[] {});
     }
 
     // -----------------------------------------------------
@@ -913,52 +898,6 @@ public class Table {
         }
         sb.delete(0, ", ".length());
         return sb.toString();
-    }
-
-    /**
-     * Get insert clause values as sql comment. {insertClauseValuesWithSqlComment}
-     * <pre>
-     * For availableNonPrimaryKeyWritable.
-     * </pre>
-     * @return Insert clause values with sql comment.
-     */
-    public String getInsertClauseValuesAsSqlComment() {
-        final StringBuilder sb = new StringBuilder();
-
-        final List<Column> ls = _columnList;
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            final Column col = (Column) ls.get(i);
-            sb.append(", /*pmb.").append(col.getUncapitalisedJavaName()).append("*/null ");
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    /**
-     * Get insert clause values with sql comment. {insertClauseValuesWithSqlComment}
-     * <pre>
-     * For availableNonPrimaryKeyWritable.
-     * </pre>
-     * @return Insert clause values with sql comment.
-     */
-    public String getInsertClauseValuesAsQuetionMark() {
-        final StringBuilder sb = new StringBuilder();
-
-        final List<Column> ls = _columnList;
-        int size = ls.size();
-        for (int i = 0; i < size; i++) {
-            sb.append(", ? ");
-        }
-        sb.delete(0, ", ".length());
-        return sb.toString();
-    }
-
-    /**
-     * Utility method to get the number of columns in this table
-     */
-    public int getNumColumns() {
-        return _columnList.size();
     }
 
     /**

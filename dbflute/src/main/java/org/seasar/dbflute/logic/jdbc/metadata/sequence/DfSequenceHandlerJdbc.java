@@ -50,15 +50,15 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     //                                                                           =========
     protected DataSource _dataSource;
     protected String _schema;
-    protected List<String> _allSchemaList;
+    protected List<String> _uniqueSchemaList;
 
     // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
-    public DfSequenceHandlerJdbc(DataSource dataSource, String schema, List<String> allSchemaList) {
+    public DfSequenceHandlerJdbc(DataSource dataSource, String schema, List<String> uniqueSchemaList) {
         _dataSource = dataSource;
         _schema = schema;
-        _allSchemaList = allSchemaList;
+        _uniqueSchemaList = uniqueSchemaList;
     }
 
     // ===================================================================================

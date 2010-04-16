@@ -312,28 +312,28 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
      * Get the list of plain procedures. <br />
      * It selects procedures of main schema only.
      * @param metaData The meta data of database. (NotNull)
-     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
+     * @param uniqueSchema The unique name of schema that can contain catalog name and no-name mark. (Nullable)
      * @return The list of procedure meta information. (NotNull)
      */
-    public List<DfProcedureMetaInfo> getPlainProcedureList(DatabaseMetaData metaData, String catalogSchema)
+    public List<DfProcedureMetaInfo> getPlainProcedureList(DatabaseMetaData metaData, String uniqueSchema)
             throws SQLException {
-        catalogSchema = filterSchemaName(catalogSchema);
+        uniqueSchema = filterSchemaName(uniqueSchema);
 
         // /- - - - - - - - - - - - - - - - - - - - - -
         // Set up default schema name of PostgreSQL.
         // Because PostgreSQL returns system procedures.
         // - - - - - - - - - -/
         if (isPostgreSQL()) {
-            if (catalogSchema == null || catalogSchema.trim().length() == 0) {
-                catalogSchema = "public";
+            if (uniqueSchema == null || uniqueSchema.trim().length() == 0) {
+                uniqueSchema = "public";
             }
         }
 
         final List<DfProcedureMetaInfo> metaInfoList = new ArrayList<DfProcedureMetaInfo>();
         ResultSet columnResultSet = null;
         try {
-            final String catalogName = extractCatalogName(catalogSchema);
-            final String pureSchemaName = extractPureSchemaName(catalogSchema);
+            final String catalogName = extractCatalogName(uniqueSchema);
+            final String pureSchemaName = extractPureSchemaName(uniqueSchema);
             final ResultSet procedureRs = metaData.getProcedures(catalogName, pureSchemaName, null);
             setupProcedureMetaInfo(metaInfoList, procedureRs);
             for (DfProcedureMetaInfo procedureMetaInfo : metaInfoList) {
@@ -344,7 +344,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             }
         } catch (SQLException e) {
             String msg = "Failed to get a list of procedures:";
-            msg = msg + " schemaName=" + catalogSchema;
+            msg = msg + " uniqueSchema=" + uniqueSchema;
             throw new DfJDBCException(msg, e);
         } finally {
             if (columnResultSet != null) {

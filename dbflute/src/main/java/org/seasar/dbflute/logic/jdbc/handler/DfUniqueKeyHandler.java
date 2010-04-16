@@ -51,7 +51,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
      */
     public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
-        final String catalogSchema = tableMetaInfo.getCatalogSchema();
+        final String catalogSchema = tableMetaInfo.getUniqueSchema();
         final String tableName = tableMetaInfo.getTableName();
         return getPrimaryKey(metaData, catalogSchema, tableName);
     }
@@ -59,14 +59,14 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     /**
      * Retrieves a list of the columns composing the primary key for a given table.
      * @param metaData JDBC meta data. (NotNull)
-     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
+     * @param uniqueSchema The name of schema that can contain catalog name and no-name mark. (Nullable)
      * @param tableName The name of table. (NotNull)
      * @return The meta information of primary keys. (NotNull)
      * @throws SQLException
      */
-    public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, String catalogSchema, String tableName)
+    public DfPrimaryKeyMetaInfo getPrimaryKey(DatabaseMetaData metaData, String uniqueSchema, String tableName)
             throws SQLException {
-        catalogSchema = filterSchemaName(catalogSchema);
+        uniqueSchema = filterSchemaName(uniqueSchema);
         final DfPrimaryKeyMetaInfo info = new DfPrimaryKeyMetaInfo();
         if (!isPrimaryKeyExtractingSupported()) {
             return info;
@@ -75,7 +75,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         ResultSet lowerSpare = null;
         ResultSet upperSpare = null;
         try {
-            parts = getPrimaryKeyResultSetFromDBMeta(metaData, catalogSchema, tableName);
+            parts = getPrimaryKeyResultSetFromDBMeta(metaData, uniqueSchema, tableName);
             if (parts != null) {
                 while (parts.next()) {
                     final String columnName = getPrimaryKeyColumnNameFromDBMeta(parts);
@@ -84,7 +84,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 }
             }
             if (!info.hasPrimaryKey()) { // for lower case
-                lowerSpare = getPrimaryKeyResultSetFromDBMeta(metaData, catalogSchema, tableName.toLowerCase());
+                lowerSpare = getPrimaryKeyResultSetFromDBMeta(metaData, uniqueSchema, tableName.toLowerCase());
                 if (lowerSpare != null) {
                     while (lowerSpare.next()) {
                         final String columnName = getPrimaryKeyColumnNameFromDBMeta(lowerSpare);
@@ -94,7 +94,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 }
             }
             if (!info.hasPrimaryKey()) { // for upper case
-                upperSpare = getPrimaryKeyResultSetFromDBMeta(metaData, catalogSchema, tableName.toUpperCase());
+                upperSpare = getPrimaryKeyResultSetFromDBMeta(metaData, uniqueSchema, tableName.toUpperCase());
                 if (upperSpare != null) {
                     while (upperSpare.next()) {
                         final String columnName = getPrimaryKeyColumnNameFromDBMeta(upperSpare);
@@ -104,7 +104,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 }
             }
             // check except columns
-            assertPrimaryKeyNotExcepted(info, catalogSchema, tableName);
+            assertPrimaryKeyNotExcepted(info, uniqueSchema, tableName);
         } finally {
             if (parts != null) {
                 parts.close();
@@ -138,12 +138,12 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         return resultSet.getString(6); // PK_NAME
     }
 
-    protected void assertPrimaryKeyNotExcepted(DfPrimaryKeyMetaInfo info, String catalogSchema, String tableName) {
+    protected void assertPrimaryKeyNotExcepted(DfPrimaryKeyMetaInfo info, String uniqueSchema, String tableName) {
         final List<String> primaryKeyList = info.getPrimaryKeyList();
         for (String primaryKey : primaryKeyList) {
-            if (isColumnExcept(catalogSchema, tableName, primaryKey)) {
+            if (isColumnExcept(uniqueSchema, tableName, primaryKey)) {
                 String msg = "PK columns are unsupported on 'columnExcept' property:";
-                msg = msg + " schemaName=" + catalogSchema + " tableName=" + tableName;
+                msg = msg + " uniqueSchema=" + uniqueSchema + " tableName=" + tableName;
                 msg = msg + " primaryKey=" + primaryKey;
                 throw new DfIllegalPropertySettingException(msg);
             }
@@ -155,7 +155,7 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
     //                                                                          ==========
     public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, DfTableMetaInfo tableMetaInfo)
             throws SQLException { // Non Primary Key Only
-        final String catalogSchema = tableMetaInfo.getCatalogSchema();
+        final String catalogSchema = tableMetaInfo.getUniqueSchema();
         final String tableName = tableMetaInfo.getTableName();
         if (tableMetaInfo.isTableTypeView()) {
             return newLinkedHashMap();
@@ -164,20 +164,20 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         return getUniqueKeyMap(dbMeta, catalogSchema, tableName, pkInfo.getPrimaryKeyList());
     }
 
-    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, String catalogSchema,
+    public Map<String, Map<Integer, String>> getUniqueKeyMap(DatabaseMetaData dbMeta, String uniqueSchema,
             String tableName, List<String> pkList) throws SQLException { // non primary key only
-        catalogSchema = filterSchemaName(catalogSchema);
-        Map<String, Map<Integer, String>> resultMap = doGetUniqueKeyMap(dbMeta, catalogSchema, tableName, pkList);
+        uniqueSchema = filterSchemaName(uniqueSchema);
+        Map<String, Map<Integer, String>> resultMap = doGetUniqueKeyMap(dbMeta, uniqueSchema, tableName, pkList);
         if (resultMap.isEmpty()) { // for lower case
-            resultMap = doGetUniqueKeyMap(dbMeta, catalogSchema, tableName.toLowerCase(), pkList);
+            resultMap = doGetUniqueKeyMap(dbMeta, uniqueSchema, tableName.toLowerCase(), pkList);
         }
         if (resultMap.isEmpty()) { // for upper case
-            resultMap = doGetUniqueKeyMap(dbMeta, catalogSchema, tableName.toUpperCase(), pkList);
+            resultMap = doGetUniqueKeyMap(dbMeta, uniqueSchema, tableName.toUpperCase(), pkList);
         }
         return resultMap;
     }
 
-    protected Map<String, Map<Integer, String>> doGetUniqueKeyMap(DatabaseMetaData dbMeta, String catalogSchema,
+    protected Map<String, Map<Integer, String>> doGetUniqueKeyMap(DatabaseMetaData dbMeta, String uniqueSchema,
             String tableName, List<String> pkList) throws SQLException { // non primary key only
         final StringSet pkSet = StringSet.createAsFlexible();
         pkSet.addAll(pkList);
@@ -185,8 +185,8 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         ResultSet parts = null;
         try {
             final boolean uniqueKeyOnly = true;
-            final String catalogName = extractCatalogName(catalogSchema);
-            final String pureSchemaName = extractPureSchemaName(catalogSchema);
+            final String catalogName = extractCatalogName(uniqueSchema);
+            final String pureSchemaName = extractPureSchemaName(uniqueSchema);
             parts = dbMeta.getIndexInfo(catalogName, pureSchemaName, tableName, uniqueKeyOnly, true);
             while (parts.next()) {
                 final boolean isNonUnique;
@@ -213,8 +213,8 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
                 }
 
                 // check except columns
-                if (isColumnExcept(catalogSchema, tableName, columnName)) {
-                    assertUQColumnNotExcepted(catalogSchema, tableName, columnName);
+                if (isColumnExcept(uniqueSchema, tableName, columnName)) {
+                    assertUQColumnNotExcepted(uniqueSchema, tableName, columnName);
                 }
 
                 final String indexName = parts.getString(6);
@@ -254,10 +254,10 @@ public class DfUniqueKeyHandler extends DfAbstractMetaDataHandler {
         return uniqueMap;
     }
 
-    protected void assertUQColumnNotExcepted(String schemaName, String tableName, String columnName) {
-        if (isColumnExcept(schemaName, tableName, columnName)) {
+    protected void assertUQColumnNotExcepted(String uniqueSchema, String tableName, String columnName) {
+        if (isColumnExcept(uniqueSchema, tableName, columnName)) {
             String msg = "UQ columns are unsupported on 'columnExcept' property:";
-            msg = msg + " schemaName=" + schemaName;
+            msg = msg + " uniqueSchema=" + uniqueSchema;
             msg = msg + " tableName=" + tableName;
             msg = msg + " columnName=" + columnName;
             throw new DfIllegalPropertySettingException(msg);

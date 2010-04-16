@@ -31,15 +31,10 @@ public class DfTableMetaInfo {
     //                                                                           Attribute
     //                                                                           =========
     protected String _tableName;
-
     protected String _tableType;
-
-    protected String _catalogSchema;
-
     protected String _tableComment;
-
+    protected String _uniqueSchema;
     protected boolean _existSameNameTable;
-
     protected boolean _outOfGenerateTarget;
 
     // ===================================================================================
@@ -73,8 +68,8 @@ public class DfTableMetaInfo {
     //                                                                        Name Builder
     //                                                                        ============
     public String buildTableDisplayName() {
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(_catalogSchema)) {
-            return _catalogSchema + "." + _tableName;
+        if (Srl.is_NotNull_and_NotTrimmedEmpty(_uniqueSchema)) {
+            return _uniqueSchema + "." + _tableName;
         } else {
             return _tableName;
         }
@@ -121,8 +116,8 @@ public class DfTableMetaInfo {
                 comment = _tableComment;
             }
         }
-        if (_catalogSchema != null && _catalogSchema.trim().length() != 0) {
-            return _catalogSchema + "." + _tableName + "(" + _tableType + ")"
+        if (_uniqueSchema != null && _uniqueSchema.trim().length() != 0) {
+            return _uniqueSchema + "." + _tableName + "(" + _tableType + ")"
                     + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
         } else {
             return _tableName + "(" + _tableType + ")"
@@ -149,20 +144,20 @@ public class DfTableMetaInfo {
         this._tableType = tableType;
     }
 
-    public String getCatalogSchema() {
-        return _catalogSchema;
-    }
-
-    public void setCatalogSchema(String catalogSchema) {
-        this._catalogSchema = catalogSchema;
-    }
-
     public String getTableComment() {
         return _tableComment;
     }
 
     public void setTableComment(String tableComment) {
         this._tableComment = tableComment;
+    }
+
+    public String getUniqueSchema() {
+        return _uniqueSchema;
+    }
+
+    public void setUniqueSchema(String uniqueSchema) {
+        this._uniqueSchema = uniqueSchema;
     }
 
     public boolean isOutOfGenerateTarget() {

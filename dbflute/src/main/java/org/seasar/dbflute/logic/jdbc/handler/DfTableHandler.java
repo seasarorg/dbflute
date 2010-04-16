@@ -49,24 +49,24 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
      * Get all the table names in the current database that are not system tables. <br />
      * This does not contain additional schema. only specified schema is considered.
      * @param dbMeta JDBC database meta data. (NotNull)
-     * @param schemaName The name of schema that can contain catalog name as prefix. (Nullable)
+     * @param uniqueSchema The unique name of schema that can contain catalog name and no-name mark. (Nullable)
      * @return The list of all the table meta info in a database.
      * @throws SQLException
      */
-    public List<DfTableMetaInfo> getTableList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
-        return doGetTableList(dbMeta, schemaName);
+    public List<DfTableMetaInfo> getTableList(DatabaseMetaData dbMeta, String uniqueSchema) throws SQLException {
+        return doGetTableList(dbMeta, uniqueSchema);
     }
 
-    protected List<DfTableMetaInfo> doGetTableList(DatabaseMetaData dbMeta, String schemaName) throws SQLException {
-        schemaName = filterSchemaName(schemaName);
-        final String[] objectTypes = getRealObjectTypeTargetArray(schemaName);
+    protected List<DfTableMetaInfo> doGetTableList(DatabaseMetaData dbMeta, String uniqueSchema) throws SQLException {
+        uniqueSchema = filterSchemaName(uniqueSchema);
+        final String[] objectTypes = getRealObjectTypeTargetArray(uniqueSchema);
         final List<DfTableMetaInfo> tableList = new ArrayList<DfTableMetaInfo>();
         ResultSet resultSet = null;
         try {
-            _log.info("...Getting tables: schema=" + schemaName + " objectTypes=" + Arrays.asList(objectTypes));
-            final String catalogName = extractCatalogName(schemaName);
-            final String realSchemaName = extractPureSchemaName(schemaName);
-            resultSet = dbMeta.getTables(catalogName, realSchemaName, "%", objectTypes);
+            _log.info("...Getting tables: schema=" + uniqueSchema + " objectTypes=" + Arrays.asList(objectTypes));
+            final String catalogName = extractCatalogName(uniqueSchema);
+            final String pureSchemaName = extractPureSchemaName(uniqueSchema);
+            resultSet = dbMeta.getTables(catalogName, pureSchemaName, "%", objectTypes);
             while (resultSet.next()) {
                 final String tableName = resultSet.getString("TABLE_NAME");
                 final String tableType = resultSet.getString("TABLE_TYPE");
@@ -89,20 +89,22 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final String tableSchema = resultSet.getString("TABLE_SCHEM");
                 final String tableComment = resultSet.getString("REMARKS");
 
-                final String catalogSchema;
+                final String tableUniqueSchema;
                 if (Srl.is_NotNull_and_NotTrimmedEmpty(tableCatalog)) {
                     // basically for additionalSchema
+                    final String schemaPart;
                     if (Srl.is_NotNull_and_NotTrimmedEmpty(tableSchema)) {
-                        catalogSchema = tableCatalog + "." + tableSchema;
+                        schemaPart = tableSchema;
                     } else {
                         // basically MySQL
-                        catalogSchema = tableCatalog + "." + DfDatabaseProperties.NO_NAME_SCHEMA;
+                        schemaPart = DfDatabaseProperties.NO_NAME_SCHEMA;
                     }
+                    tableUniqueSchema = tableCatalog + "." + schemaPart;
                 } else {
-                    catalogSchema = tableSchema;
+                    tableUniqueSchema = tableSchema;
                 }
 
-                if (isTableExcept(catalogSchema, tableName)) {
+                if (isTableExcept(tableUniqueSchema, tableName)) {
                     _log.info(tableName + " is excepted!");
                     continue;
                 }
@@ -114,7 +116,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final DfTableMetaInfo tableMetaInfo = new DfTableMetaInfo();
                 tableMetaInfo.setTableName(tableName);
                 tableMetaInfo.setTableType(tableType);
-                tableMetaInfo.setCatalogSchema(catalogSchema);
+                tableMetaInfo.setUniqueSchema(tableUniqueSchema);
                 tableMetaInfo.setTableComment(tableComment);
                 tableList.add(tableMetaInfo);
             }
@@ -145,24 +147,24 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         return false;
     }
 
-    protected String[] getRealObjectTypeTargetArray(String schemaName) {
-        if (schemaName != null) {
-            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(schemaName);
+    protected String[] getRealObjectTypeTargetArray(String uniqueSchema) {
+        if (uniqueSchema != null) {
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(uniqueSchema);
             if (schemaInfo != null) {
                 final List<String> objectTypeTargetList = schemaInfo.getObjectTypeTargetList();
-                assertObjectTypeTargetListNotEmpty(schemaName, objectTypeTargetList);
+                assertObjectTypeTargetListNotEmpty(uniqueSchema, objectTypeTargetList);
                 return objectTypeTargetList.toArray(new String[objectTypeTargetList.size()]);
             }
         }
         final List<String> objectTypeTargetList = getProperties().getDatabaseProperties().getObjectTypeTargetList();
-        assertObjectTypeTargetListNotEmpty(schemaName, objectTypeTargetList);
+        assertObjectTypeTargetListNotEmpty(uniqueSchema, objectTypeTargetList);
         return objectTypeTargetList.toArray(new String[objectTypeTargetList.size()]);
     }
 
-    protected void assertObjectTypeTargetListNotEmpty(String schemaName, List<String> objectTypeTargetList) {
+    protected void assertObjectTypeTargetListNotEmpty(String uniqueSchema, List<String> objectTypeTargetList) {
         if (objectTypeTargetList == null || objectTypeTargetList.isEmpty()) {
             String msg = "The property 'objectTypeTargetList' should be required:";
-            msg = msg + " schemaName=" + schemaName;
+            msg = msg + " uniqueSchema=" + uniqueSchema;
             throw new IllegalStateException(msg);
         }
     }

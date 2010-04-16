@@ -34,7 +34,7 @@ public class DfDbCommentExtractorMySql extends DfDbCommentExtractorBase {
         sb.append(", table_name as TABLE_NAME");
         sb.append(", table_comment as COMMENTS");
         sb.append(" from information_schema.tables");
-        sb.append(" where table_schema = '").append(filterNoNameSchema(_schema)).append("'");
+        sb.append(" where table_schema = '").append(extractCatalogSchema(_schema)).append("'");
         sb.append(" order by table_name asc");
         final String sql = sb.toString();
         return doSelectUserTabComments(sql, conn, tableSet);
@@ -58,7 +58,7 @@ public class DfDbCommentExtractorMySql extends DfDbCommentExtractorBase {
         sb.append(", column_name as COLUMN_NAME");
         sb.append(", column_comment as COMMENTS");
         sb.append(" from information_schema.columns");
-        sb.append(" where table_schema = '").append(filterNoNameSchema(_schema)).append("'");
+        sb.append(" where table_schema = '").append(extractCatalogSchema(_schema)).append("'");
         sb.append(" order by table_name asc, column_name asc");
         final String sql = sb.toString();
         return doSelectUserColComments(sql, conn, tableSet);

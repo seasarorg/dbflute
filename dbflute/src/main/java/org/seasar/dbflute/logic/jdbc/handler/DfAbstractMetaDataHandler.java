@@ -15,7 +15,6 @@
  */
 package org.seasar.dbflute.logic.jdbc.handler;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,22 +71,22 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
     //                                                                ====================
     /**
      * Is the table name out of sight?
-     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
+     * @param uniqueSchema The name of schema that can contain catalog name and no-name schema. (Nullable)
      * @param tableName The name of table. (NotNull)
      * @return Determination.
      */
-    public boolean isTableExcept(String catalogSchema, final String tableName) {
+    public boolean isTableExcept(String uniqueSchema, final String tableName) {
         if (tableName == null) {
             throw new IllegalArgumentException("The argument 'tableName' should not be null.");
         }
-        final List<String> tableTargetList = getRealTableTargetList(catalogSchema);
-        final List<String> tableExceptList = getRealTableExceptList(catalogSchema);
+        final List<String> tableTargetList = getRealTableTargetList(uniqueSchema);
+        final List<String> tableExceptList = getRealTableExceptList(uniqueSchema);
         return !isTargetByHint(tableName, tableTargetList, tableExceptList);
     }
 
-    protected List<String> getRealTableExceptList(String catalogSchema) { // extension point
-        if (catalogSchema != null) {
-            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(catalogSchema);
+    protected List<String> getRealTableExceptList(String uniqueSchema) { // extension point
+        if (uniqueSchema != null) {
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(uniqueSchema);
             if (schemaInfo != null) {
                 return schemaInfo.getTableExceptList();
             }
@@ -95,9 +94,9 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
         return getTableExceptList();
     }
 
-    protected List<String> getRealTableTargetList(String catalogSchema) { // extension point
-        if (catalogSchema != null) {
-            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(catalogSchema);
+    protected List<String> getRealTableTargetList(String uniqueSchema) { // extension point
+        if (uniqueSchema != null) {
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(uniqueSchema);
             if (schemaInfo != null) {
                 return schemaInfo.getTableTargetList();
             }
@@ -107,19 +106,19 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
 
     /**
      * Is the column of the table out of sight?
-     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
+     * @param uniqueSchema The name of schema that can contain catalog name and no-name mark. (Nullable)
      * @param tableName The name of table. (NotNull)
      * @param columnName The name of column. (NotNull)
      * @return Determination.
      */
-    public boolean isColumnExcept(String catalogSchema, String tableName, String columnName) {
+    public boolean isColumnExcept(String uniqueSchema, String tableName, String columnName) {
         if (tableName == null) {
             throw new IllegalArgumentException("The argument 'tableName' should not be null.");
         }
         if (columnName == null) {
             throw new IllegalArgumentException("The argument 'columnName' should not be null.");
         }
-        final Map<String, List<String>> columnExceptMap = getRealColumnExceptMap(catalogSchema);
+        final Map<String, List<String>> columnExceptMap = getRealColumnExceptMap(uniqueSchema);
         final List<String> columnExceptList = columnExceptMap.get(tableName);
         if (columnExceptList == null) { // no definition about the table
             return false;
@@ -127,11 +126,11 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
         return !isTargetByHint(columnName, EMPTY_STRING_LIST, columnExceptList);
     }
 
-    protected Map<String, List<String>> getRealColumnExceptMap(String schemaName) { // extension point
-        if (schemaName != null) {
-            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(schemaName);
+    protected Map<String, List<String>> getRealColumnExceptMap(String uniqueSchema) { // extension point
+        if (uniqueSchema != null) {
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(uniqueSchema);
             if (schemaInfo != null) {
-                return new HashMap<String, List<String>>(); // unsupported at additional schema
+                return DfCollectionUtil.emptyMap(); // unsupported at additional schema
             }
         }
         return getColumnExceptMap();
@@ -141,7 +140,7 @@ public class DfAbstractMetaDataHandler extends DfAbstractMetaDataExtractor {
         return DfNameHintUtil.isTargetByHint(name, targetList, exceptList);
     }
 
-    protected final DfAdditionalSchemaInfo getAdditionalSchemaInfo(String catalogSchema) {
-        return getProperties().getDatabaseProperties().getAdditionalSchemaInfo(catalogSchema);
+    protected final DfAdditionalSchemaInfo getAdditionalSchemaInfo(String uniqueSchema) {
+        return getProperties().getDatabaseProperties().getAdditionalSchemaInfo(uniqueSchema);
     }
 }

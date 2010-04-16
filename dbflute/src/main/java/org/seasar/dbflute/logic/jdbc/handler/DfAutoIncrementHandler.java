@@ -23,7 +23,7 @@ import java.sql.Statement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.seasar.dbflute.exception.SQLFailureException;
+import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
 
 /**
@@ -47,7 +47,8 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
      * @param primaryKeyColumnName Primary-key column-name.
      * @return Auto-increment column name. (Nullable)
      */
-    public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName) {
+    public boolean isAutoIncrementColumn(Connection conn, DfTableMetaInfo tableMetaInfo, String primaryKeyColumnName)
+            throws SQLException {
         final String tableName = tableMetaInfo.getTableName();
         final String sql = buildMetaDataSql(primaryKeyColumnName, tableName);
         Statement st = null;
@@ -64,12 +65,12 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
                 // Basically it does not come here.
                 // But if it's schema requirement or reservation word, it comes here. 
                 try {
-                    final String schemaPrefix = extractPureSchemaName(tableMetaInfo.getCatalogSchema());
+                    final String schemaPrefix = extractPureSchemaName(tableMetaInfo.getUniqueSchema());
                     recoverySql1 = buildMetaDataSql(primaryKeyColumnName, schemaPrefix + "." + tableName);
                     rs = st.executeQuery(recoverySql1);
                 } catch (SQLException recovery1ex) {
                     try {
-                        final String schemaPrefix = filterNoNameSchema(tableMetaInfo.getCatalogSchema());
+                        final String schemaPrefix = extractCatalogSchema(tableMetaInfo.getUniqueSchema());
                         recoverySql2 = buildMetaDataSql(primaryKeyColumnName, schemaPrefix + "." + tableName);
                         rs = st.executeQuery(recoverySql2);
                     } catch (SQLException recovery2ex) {
@@ -107,7 +108,7 @@ public class DfAutoIncrementHandler extends DfAbstractMetaDataHandler {
             msg = msg + ln();
             msg = msg + "[Recovery2]" + ln() + recoverySql2 + ln() + recoveryMessage2 + ln();
             msg = msg + "* * * * * * * * * */";
-            throw new SQLFailureException(msg, e);
+            throw new DfJDBCException(msg, e);
         } finally {
             if (st != null) {
                 try {

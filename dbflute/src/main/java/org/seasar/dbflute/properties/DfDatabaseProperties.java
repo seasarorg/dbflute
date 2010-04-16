@@ -43,8 +43,8 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     // ===================================================================================
-    //                                                                          Basic Info
-    //                                                                          ==========
+    //                                                                     Connection Info
+    //                                                                     ===============
     protected DatabaseInfo _databaseInfo = new DatabaseInfo();
 
     public String getDatabaseDriver() {
@@ -73,6 +73,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return !databaseUser.equalsIgnoreCase(databaseSchema);
     }
 
+    // ===================================================================================
+    //                                                                         Option Info
+    //                                                                         ===========
     // -----------------------------------------------------
     //                                 Connection Properties
     //                                 ---------------------
@@ -178,6 +181,7 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                 Additional Schema Map
     //                                 ---------------------
+    // key is unique-schema
     protected Map<String, DfAdditionalSchemaInfo> _additionalSchemaMap;
 
     protected void assertOldStyleAdditionalSchema() {
@@ -202,11 +206,11 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
         final Set<Entry<String, Object>> entrySet = additionalSchemaMap.entrySet();
         for (Entry<String, Object> entry : entrySet) {
-            final String schemaName = entry.getKey();
+            final String uniqueSchema = entry.getKey();
             final Object obj = entry.getValue();
             if (obj == null) {
                 String msg = "The value of schema in the property 'additionalSchemaMap' should be required:";
-                msg = msg + " schema=" + schemaName;
+                msg = msg + " uniqueSchema=" + uniqueSchema;
                 msg = msg + " additionalSchemaMap=" + additionalSchemaMap;
                 throw new DfRequiredPropertyNotFoundException(msg);
             }
@@ -219,18 +223,21 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             final Map<String, Object> elementMap = (Map<String, Object>) obj;
 
             final DfAdditionalSchemaInfo info = new DfAdditionalSchemaInfo();
-            info.setSchemaName(schemaName);
+            info.setSchemaName(uniqueSchema);
             setupAdditionalSchemaObjectTypeTargetList(info, elementMap);
             setupAdditionalSchemaTableExceptList(info, elementMap);
             setupAdditionalSchemaTableTargetList(info, elementMap);
             info.setSuppressCommonColumn(isProperty("isSuppressCommonColumn", false, elementMap));
             setupAdditionalSchemaSupplementaryConnectionMap(info, elementMap);
 
-            _additionalSchemaMap.put(schemaName, info);
+            _additionalSchemaMap.put(uniqueSchema, info);
         }
         return _additionalSchemaMap;
     }
 
+    // -----------------------------------------------------
+    //                              Additional Schema Option
+    //                              ------------------------
     protected void setupAdditionalSchemaObjectTypeTargetList(DfAdditionalSchemaInfo info, Map<String, Object> elementMap) {
         final Object obj = elementMap.get("objectTypeTargetList");
         if (obj == null) {
@@ -300,6 +307,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
     }
 
+    // -----------------------------------------------------
+    //                            Additional Schema Accessor
+    //                            --------------------------
     public List<String> getAdditionalSchemaNameList() {
         return new ArrayList<String>(getAdditionalSchemaMap().keySet());
     }
@@ -318,20 +328,20 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return false;
     }
 
-    public DfAdditionalSchemaInfo getAdditionalSchemaInfo(String schema) {
-        if (schema == null) {
+    public DfAdditionalSchemaInfo getAdditionalSchemaInfo(String uniqueSchema) {
+        if (uniqueSchema == null) {
             return null;
         }
         final Map<String, DfAdditionalSchemaInfo> map = getAdditionalSchemaMap();
-        final DfAdditionalSchemaInfo value = map.get(schema);
+        final DfAdditionalSchemaInfo value = map.get(uniqueSchema);
         if (value != null) {
             return value;
         }
-        if (!schema.contains(".")) {
+        if (!uniqueSchema.contains(".")) {
             return null;
         }
-        final String catalog = Srl.substringFirstFront(schema, ".");
-        final String pureSchema = Srl.substringFirstRear(schema, ".");
+        final String catalog = Srl.substringFirstFront(uniqueSchema, ".");
+        final String pureSchema = Srl.substringFirstRear(uniqueSchema, ".");
         final String newKey;
         if (NO_NAME_SCHEMA.equals(pureSchema)) { // basically for MySQL
             newKey = catalog;
@@ -341,22 +351,22 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return map.get(newKey);
     }
 
-    public boolean isAdditionalSchema(String schema) {
-        return getAdditionalSchemaInfo(schema) != null;
+    public boolean isAdditionalSchema(String uniqueSchema) {
+        return getAdditionalSchemaInfo(uniqueSchema) != null;
     }
 
-    public boolean isCatalogAdditionalSchema(String schema) {
-        if (!isAdditionalSchema(schema)) {
+    public boolean isCatalogAdditionalSchema(String uniqueSchema) {
+        if (!isAdditionalSchema(uniqueSchema)) {
             return false;
         }
-        final DfAdditionalSchemaInfo info = getAdditionalSchemaInfo(schema);
+        final DfAdditionalSchemaInfo info = getAdditionalSchemaInfo(uniqueSchema);
         final String schemaName = info.getSchemaName();
         return schemaName.contains(".");
     }
 
-    // -----------------------------------------------------
-    //                                     VariousMap Helper
-    //                                     -----------------
+    // ===================================================================================
+    //                                                                   VariousMap Helper
+    //                                                                   =================
     @SuppressWarnings("unchecked")
     protected List<String> getVairousStringList(String key) {
         return getVairousStringList(key, Collections.EMPTY_LIST);
@@ -406,9 +416,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         return variousMap.get(key);
     }
 
-    // -----------------------------------------------------
-    //                                         Database Info
-    //                                         -------------
+    // ===================================================================================
+    //                                                                  Information Object
+    //                                                                  ==================
     public class DatabaseInfo {
 
         private static final String KEY_DRIVER = "driver";
@@ -572,9 +582,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
         }
     }
 
-    // -----------------------------------------------------
-    //                                   Connection Creation
-    //                                   -------------------
+    // ===================================================================================
+    //                                                                   Connection Helper
+    //                                                                   =================
     public Connection createMainSchemaConnection() {
         final String driver = getDatabaseDriver();
         final String url = getDatabaseUrl();

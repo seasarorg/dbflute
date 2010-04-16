@@ -272,7 +272,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             final Element tableElement = _doc.createElement("table");
             tableElement.setAttribute("name", tableMataInfo.getTableName());
             tableElement.setAttribute("type", tableMataInfo.getTableType());
-            final String catalogSchema = tableMataInfo.getCatalogSchema();
+            final String catalogSchema = tableMataInfo.getUniqueSchema();
             if (Srl.is_NotNull_and_NotTrimmedEmpty(catalogSchema)) {
                 tableElement.setAttribute("schema", catalogSchema);
             }
@@ -541,16 +541,16 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
     protected void resolveAdditionalSchema(DatabaseMetaData dbMeta, List<DfTableMetaInfo> tableList)
             throws SQLException {
         final List<String> schemaList = getDatabaseProperties().getAdditionalSchemaNameList();
-        for (String schema : schemaList) {
-            final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, schema);
+        for (String catalogSchema : schemaList) {
+            final List<DfTableMetaInfo> additionalTableList = _tableHandler.getTableList(dbMeta, catalogSchema);
             for (DfTableMetaInfo metaInfo : additionalTableList) {
-                final String metaDataSchema = metaInfo.getCatalogSchema();
+                final String metaDataSchema = metaInfo.getUniqueSchema();
                 if (metaDataSchema == null || metaDataSchema.trim().length() == 0) {
-                    metaInfo.setCatalogSchema(schema);
+                    metaInfo.setUniqueSchema(catalogSchema);
                 }
             }
             // URL is null because of for additional schema here
-            helpTableComments(additionalTableList, null, schema);
+            helpTableComments(additionalTableList, null, catalogSchema);
             tableList.addAll(additionalTableList);
         }
     }
@@ -832,7 +832,7 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             String msg = "The table meta information should be for synonym: " + table;
             throw new IllegalStateException(msg);
         }
-        final String catalogSchema = table.getCatalogSchema();
+        final String catalogSchema = table.getUniqueSchema();
         final String tableName = table.getTableName();
         DfSynonymMetaInfo info = _supplementarySynonymInfoMap.get(catalogSchema + "." + tableName);
         if (info != null) {

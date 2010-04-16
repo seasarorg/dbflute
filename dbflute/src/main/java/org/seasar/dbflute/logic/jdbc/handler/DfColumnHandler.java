@@ -52,23 +52,6 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
     //                                                                        Meta Getting
     //                                                                        ============
     /**
-     * Get the map of column meta information.
-     * @param metaData The meta data of database. (NotNull)
-     * @param catalogSchema The name of schema. (Nullable)
-     * @param tableName The name of table. (NotNull, CaseInsensitive)
-     * @return The map of column meta information. The key is column name. (NotNull)
-     */
-    public Map<String, DfColumnMetaInfo> getColumnMetaInfo(DatabaseMetaData metaData, String catalogSchema,
-            String tableName) throws SQLException {
-        final List<DfColumnMetaInfo> columns = getColumnList(metaData, catalogSchema, tableName);
-        final Map<String, DfColumnMetaInfo> map = new LinkedHashMap<String, DfColumnMetaInfo>();
-        for (DfColumnMetaInfo metaInfo : columns) {
-            map.put(metaInfo.getColumnName(), metaInfo);
-        }
-        return map;
-    }
-
-    /**
      * Get the list of column meta information.
      * @param metaData The meta data of database. (NotNull)
      * @param tableMetaInfo The meta information of table. (NotNull, CaseInsensitive)
@@ -76,37 +59,37 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
      */
     public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, DfTableMetaInfo tableMetaInfo)
             throws SQLException {
-        final String catalogSchema = tableMetaInfo.getCatalogSchema();
+        final String uniqueSchema = tableMetaInfo.getUniqueSchema();
         final String tableName = tableMetaInfo.getTableName();
-        return getColumnList(metaData, catalogSchema, tableName);
+        return getColumnList(metaData, uniqueSchema, tableName);
     }
 
     /**
      * Get the list of column meta information.
      * @param metaData The meta data of database. (NotNull)
-     * @param catalogSchema The name of schema that can contain catalog name. (Nullable)
+     * @param uniqueSchema The unique name of schema that can contain catalog name and no-name mark. (Nullable)
      * @param tableName The name of table. (NotNull, CaseInsensitive)
      * @return The list of column meta information. (NotNull)
      */
-    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String catalogSchema, String tableName)
+    public List<DfColumnMetaInfo> getColumnList(DatabaseMetaData metaData, String uniqueSchema, String tableName)
             throws SQLException {
-        catalogSchema = filterSchemaName(catalogSchema);
+        uniqueSchema = filterSchemaName(uniqueSchema);
         final List<DfColumnMetaInfo> columns = new ArrayList<DfColumnMetaInfo>();
         ResultSet columnResultSet = null;
         ResultSet lowerSpare = null;
         ResultSet upperSpare = null;
         try {
-            final String catalogName = extractCatalogName(catalogSchema);
-            final String pureSchemaName = extractPureSchemaName(catalogSchema);
+            final String catalogName = extractCatalogName(uniqueSchema);
+            final String pureSchemaName = extractPureSchemaName(uniqueSchema);
             columnResultSet = metaData.getColumns(catalogName, pureSchemaName, tableName, null);
-            setupColumnMetaInfo(columns, columnResultSet, catalogSchema, tableName);
+            setupColumnMetaInfo(columns, columnResultSet, uniqueSchema, tableName);
             if (columns.isEmpty()) { // for lower case
                 lowerSpare = metaData.getColumns(catalogName, pureSchemaName, tableName.toLowerCase(), null);
-                setupColumnMetaInfo(columns, lowerSpare, catalogSchema, tableName);
+                setupColumnMetaInfo(columns, lowerSpare, uniqueSchema, tableName);
             }
             if (columns.isEmpty()) { // for upper case
                 upperSpare = metaData.getColumns(catalogName, pureSchemaName, tableName.toUpperCase(), null);
-                setupColumnMetaInfo(columns, upperSpare, catalogSchema, tableName);
+                setupColumnMetaInfo(columns, upperSpare, uniqueSchema, tableName);
             }
             if (columns.isEmpty()) {
                 String msg = "Failed to get columns:";
@@ -192,6 +175,23 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         // /= = = = = = = = = = = = = = = = = = = = = = = = = = = 
         // The duplication handling is mainly for Oracle Synonym.
         // = = = = = = = = = =/
+    }
+
+    /**
+     * Get the map of column meta information.
+     * @param metaData The meta data of database. (NotNull)
+     * @param uniqueSchema The unique name of schema that can contain catalog name and no-name mark. (Nullable)
+     * @param tableName The name of table. (NotNull, CaseInsensitive)
+     * @return The map of column meta information. The key is column name. (NotNull)
+     */
+    public Map<String, DfColumnMetaInfo> getColumnMap(DatabaseMetaData metaData, String uniqueSchema, String tableName)
+            throws SQLException {
+        final List<DfColumnMetaInfo> columns = getColumnList(metaData, uniqueSchema, tableName);
+        final Map<String, DfColumnMetaInfo> map = new LinkedHashMap<String, DfColumnMetaInfo>();
+        for (DfColumnMetaInfo metaInfo : columns) {
+            map.put(metaInfo.getColumnName(), metaInfo);
+        }
+        return map;
     }
 
     // ===================================================================================
