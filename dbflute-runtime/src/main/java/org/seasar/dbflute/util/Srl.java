@@ -150,6 +150,25 @@ public class Srl {
     }
 
     // ===================================================================================
+    //                                                                             Connect
+    //                                                                             =======
+    public static final String connectPrefix(String str, String prefix, String delimiter) {
+        assertStringNotNull(str);
+        if (is_NotNull_and_NotTrimmedEmpty(prefix)) {
+            str = prefix + delimiter + str;
+        }
+        return str;
+    }
+
+    public static final String connectSuffix(String str, String suffix, String delimiter) {
+        assertStringNotNull(str);
+        if (is_NotNull_and_NotTrimmedEmpty(suffix)) {
+            str = str + delimiter + suffix;
+        }
+        return str;
+    }
+
+    // ===================================================================================
     //                                                                                Fill
     //                                                                                ====
     public static final String rfill(String str, int size) {

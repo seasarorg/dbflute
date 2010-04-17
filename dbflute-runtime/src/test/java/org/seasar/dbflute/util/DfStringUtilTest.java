@@ -1,6 +1,8 @@
 package org.seasar.dbflute.util;
 
 import static org.seasar.dbflute.util.Srl.camelize;
+import static org.seasar.dbflute.util.Srl.connectPrefix;
+import static org.seasar.dbflute.util.Srl.connectSuffix;
 import static org.seasar.dbflute.util.Srl.decamelize;
 import static org.seasar.dbflute.util.Srl.extractFirstScope;
 import static org.seasar.dbflute.util.Srl.initBeansProp;
@@ -67,7 +69,7 @@ public class DfStringUtilTest extends PlainTestCase {
 
     // ===================================================================================
     //                                                                           SubString
-    //                                                                           ==========
+    //                                                                           =========
     public void test_substringFirstFront_basic() {
         assertEquals("foo", substringFirstFront("foo.bar", "."));
         assertEquals("foo", substringFirstFront("foo.bar.don", "."));
@@ -90,6 +92,25 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("bar", substringLastRear("foo.bar", "."));
         assertEquals("don", substringLastRear("foo.bar.don", "."));
         assertEquals("foobar", substringLastRear("foobar", "."));
+    }
+
+    // ===================================================================================
+    //                                                                             Connect
+    //                                                                             =======
+    public void test_connectPrefix_basic() {
+        assertEquals("foo", connectPrefix("foo", null, "."));
+        assertEquals("foo", connectPrefix("foo", "", "."));
+        assertEquals("foo", connectPrefix("foo", " ", "."));
+        assertEquals("bar.foo", connectPrefix("foo", "bar", "."));
+        assertEquals("bar/foo", connectPrefix("foo", "bar", "/"));
+    }
+
+    public void test_connectSuffix_basic() {
+        assertEquals("foo", connectSuffix("foo", null, "."));
+        assertEquals("foo", connectSuffix("foo", "", "."));
+        assertEquals("foo", connectSuffix("foo", " ", "."));
+        assertEquals("foo.bar", connectSuffix("foo", "bar", "."));
+        assertEquals("foo/bar", connectSuffix("foo", "bar", "/"));
     }
 
     // ===================================================================================
