@@ -175,10 +175,10 @@ public abstract class DfAbstractTask extends Task {
         sb.append(ln).append("    user   = " + _userId);
         sb.append(ln).append("    props  = " + _connectionProperties);
 
-        final DfReplaceSchemaProperties replaceSchemaProp = getProperties().getReplaceSchemaProperties();
-        sb.append(ln).append("    dataLoadingType  = " + replaceSchemaProp.getDataLoadingType());
         final String additionalSchemaDisp = buildAdditionalSchemaDisp();
         sb.append(ln).append("    additionalSchema = " + additionalSchemaDisp);
+        final DfReplaceSchemaProperties replaceSchemaProp = getProperties().getReplaceSchemaProperties();
+        sb.append(ln).append("    dataLoadingType  = " + replaceSchemaProp.getDataLoadingType());
         final String refreshProjectDisp = buildRefreshProjectDisp();
         sb.append(ln).append("    refreshProject   = " + refreshProjectDisp);
 
@@ -229,6 +229,9 @@ public abstract class DfAbstractTask extends Task {
 
     private String buildRefreshProjectDisp() {
         final DfRefreshProperties refreshProp = getProperties().getRefreshProperties();
+        if (!refreshProp.hasRefreshDefinition()) {
+            return "";
+        }
         final List<String> refreshProjectList = refreshProp.getProjectNameList();
         final String disp;
         if (refreshProjectList.size() == 1) {
