@@ -74,24 +74,41 @@ public class DfStringUtilTest extends PlainTestCase {
         assertEquals("foo", substringFirstFront("foo.bar", "."));
         assertEquals("foo", substringFirstFront("foo.bar.don", "."));
         assertEquals("foobar", substringFirstFront("foobar", "."));
+        assertEquals("foo/bar", substringFirstFront("foo/bar.don.moo", "."));
+        assertEquals("foo", substringFirstFront("foo/bar.don.moo", ".", "/"));
+        assertEquals("foo", substringFirstFront("foo.bar.don.moo", ".", "/"));
+        assertEquals("foo", substringFirstFront("foo.bar.don.moo", "/", "."));
     }
 
     public void test_substringFirstRear_basic() {
         assertEquals("bar", substringFirstRear("foo.bar", "."));
         assertEquals("bar.don", substringFirstRear("foo.bar.don", "."));
         assertEquals("foobar", substringFirstRear("foobar", "."));
+        assertEquals("don.moo", substringFirstRear("foo/bar.don.moo", "."));
+        assertEquals("bar.don.moo", substringFirstRear("foo/bar.don.moo", ".", "/"));
+        assertEquals("bar.don.moo", substringFirstRear("foo.bar.don.moo", ".", "/"));
+        assertEquals("bar.don.moo", substringFirstRear("foo.bar.don.moo", "/", "."));
     }
 
     public void test_substringLastFront_basic() {
         assertEquals("foo", substringLastFront("foo.bar", "."));
         assertEquals("foo.bar", substringLastFront("foo.bar.don", "."));
         assertEquals("foobar", substringLastFront("foobar", "."));
+        assertEquals("foo.bar", substringLastFront("foo.bar.don/moo", "."));
+        assertEquals("foo.bar.don", substringLastFront("foo.bar.don/moo", ".", "/"));
+        assertEquals("foo.bar.don", substringLastFront("foo.bar.don.moo", ".", "/"));
+        assertEquals("foo.bar.don", substringLastFront("foo.bar.don.moo", "/", "."));
+
     }
 
     public void test_substringLastRear_basic() {
         assertEquals("bar", substringLastRear("foo.bar", "."));
         assertEquals("don", substringLastRear("foo.bar.don", "."));
         assertEquals("foobar", substringLastRear("foobar", "."));
+        assertEquals("don/moo", substringLastRear("foo.bar.don/moo", "."));
+        assertEquals("moo", substringLastRear("foo.bar.don/moo", ".", "/"));
+        assertEquals("moo", substringLastRear("foo.bar.don.moo", ".", "/"));
+        assertEquals("moo", substringLastRear("foo.bar.don.moo", "/", "."));
     }
 
     // ===================================================================================

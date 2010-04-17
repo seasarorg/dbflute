@@ -113,40 +113,90 @@ public class Srl {
     // ===================================================================================
     //                                                                           SubString
     //                                                                           =========
-    public static final String substringFirstFront(String str, String delimiter) {
+    public static final String substringFirstFront(String str, String... delimiters) {
         assertStringNotNull(str);
-        final int delimiterIndex = str.indexOf(delimiter);
-        if (delimiterIndex < 0) {
+        Integer firstIndex = null;
+        for (String delimiter : delimiters) {
+            final int currentIndex = str.indexOf(delimiter);
+            if (currentIndex < 0) {
+                continue;
+            }
+            if (firstIndex == null) {
+                firstIndex = currentIndex;
+            } else if (currentIndex >= 0 && firstIndex > currentIndex) {
+                firstIndex = currentIndex;
+            }
+        }
+        if (firstIndex == null || firstIndex < 0) {
             return str;
         }
-        return str.substring(0, delimiterIndex);
+        return str.substring(0, firstIndex);
     }
 
-    public static final String substringFirstRear(String str, String delimiter) {
+    public static final String substringFirstRear(String str, String... delimiters) {
         assertStringNotNull(str);
-        final int delimiterIndex = str.indexOf(delimiter);
-        if (delimiterIndex < 0) {
+        Integer firstIndex = null;
+        Integer delimiterLength = null;
+        for (String delimiter : delimiters) {
+            final int currentIndex = str.indexOf(delimiter);
+            if (currentIndex < 0) {
+                continue;
+            }
+            if (firstIndex == null) {
+                firstIndex = currentIndex;
+                delimiterLength = delimiter.length();
+            } else if (currentIndex >= 0 && firstIndex > currentIndex) {
+                firstIndex = currentIndex;
+                delimiterLength = delimiter.length();
+            }
+        }
+        if (firstIndex == null || firstIndex < 0) {
             return str;
         }
-        return str.substring(delimiterIndex + delimiter.length());
+        return str.substring(firstIndex + delimiterLength);
     }
 
-    public static final String substringLastFront(String str, String delimiter) {
+    public static final String substringLastFront(String str, String... delimiters) {
         assertStringNotNull(str);
-        final int delimiterIndex = str.lastIndexOf(delimiter);
-        if (delimiterIndex < 0) {
+        Integer lastIndex = null;
+        for (String delimiter : delimiters) {
+            final int currentIndex = str.lastIndexOf(delimiter);
+            if (currentIndex < 0) {
+                continue;
+            }
+            if (lastIndex == null) {
+                lastIndex = currentIndex;
+            } else if (currentIndex >= 0 && lastIndex < currentIndex) {
+                lastIndex = currentIndex;
+            }
+        }
+        if (lastIndex == null || lastIndex < 0) {
             return str;
         }
-        return str.substring(0, delimiterIndex);
+        return str.substring(0, lastIndex);
     }
 
-    public static final String substringLastRear(String str, String delimiter) {
+    public static final String substringLastRear(String str, String... delimiters) {
         assertStringNotNull(str);
-        final int delimiterIndex = str.lastIndexOf(delimiter);
-        if (delimiterIndex < 0) {
+        Integer lastIndex = null;
+        Integer delimiterLength = null;
+        for (String delimiter : delimiters) {
+            final int currentIndex = str.lastIndexOf(delimiter);
+            if (currentIndex < 0) {
+                continue;
+            }
+            if (lastIndex == null) {
+                lastIndex = currentIndex;
+                delimiterLength = delimiter.length();
+            } else if (currentIndex >= 0 && lastIndex < currentIndex) {
+                lastIndex = currentIndex;
+                delimiterLength = delimiter.length();
+            }
+        }
+        if (lastIndex == null || lastIndex < 0) {
             return str;
         }
-        return str.substring(delimiterIndex + delimiter.length());
+        return str.substring(lastIndex + delimiterLength);
     }
 
     // ===================================================================================
