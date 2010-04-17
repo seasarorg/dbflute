@@ -400,7 +400,6 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 fr.read(template);
                 contents = new String(template);
             } catch (Exception e) {
-                System.out.println(e);
                 e.printStackTrace();
             } finally {
                 if (fr != null) {

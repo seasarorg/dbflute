@@ -78,7 +78,6 @@ public class DfProcedureMetaInfo {
     }
 
     public void setProcedureSchema(UnifiedSchema procedureSchema) {
-        System.out.println("*****: " + getProcedureName() + " : " + procedureSchema.toString());
         this.procedureSchema = procedureSchema;
     }
 
