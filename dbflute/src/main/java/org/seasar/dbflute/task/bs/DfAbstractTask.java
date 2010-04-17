@@ -118,45 +118,7 @@ public abstract class DfAbstractTask extends Task {
             if (isValidTaskEndInformation() || failure) {
                 try {
                     long after = getTaskAfterTimeMillis();
-                    String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
-                    StringBuilder sb = new StringBuilder();
-                    String ln = ln();
-                    sb.append(ln);
-                    sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-                    sb.append(ln).append("[Task End]: " + getPerformanceView(after - before));
-                    if (failure) {
-                        sb.append(ln).append("    * * * * * *");
-                        sb.append(ln).append("    * Failure *");
-                        sb.append(ln).append("    * * * * * *");
-                    }
-                    sb.append(ln);
-                    sb.append(ln).append("  DBFLUTE_CLIENT: {" + getBasicProperties().getProjectName() + "}");
-                    sb.append(ln).append("    database  = " + getBasicProperties().getDatabaseType());
-                    sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
-                    sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
-                    sb.append(ln).append("    package   = " + getBasicProperties().getPackageBase());
-                    sb.append(ln);
-                    sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + environmentType + "}");
-                    sb.append(ln).append("    driver = " + _driver);
-                    sb.append(ln).append("    url    = " + _url);
-                    sb.append(ln).append("    schema = " + _mainSchema);
-                    sb.append(ln).append("    user   = " + _userId);
-                    sb.append(ln).append("    props  = " + _connectionProperties);
-                    final DfReplaceSchemaProperties replaceSchemaProp = getProperties().getReplaceSchemaProperties();
-                    sb.append(ln).append("    dataLoadingType  = " + replaceSchemaProp.getDataLoadingType());
-                    final DfDatabaseProperties databaseProp = getDatabaseProperties();
-                    final List<UnifiedSchema> additionalSchemaList = databaseProp.getAdditionalSchemaList();
-                    sb.append(ln).append("    additionalSchema = " + additionalSchemaList);
-                    final DfRefreshProperties refreshProp = getProperties().getRefreshProperties();
-                    final List<String> refreshProjectList = refreshProp.getProjectNameList();
-                    sb.append(ln).append("    refreshProject   = " + refreshProjectList);
-                    final String finalInformation = getFinalInformation();
-                    if (finalInformation != null) {
-                        sb.append(ln);
-                        sb.append(finalInformation);
-                    }
-                    sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");
-                    _log.info(sb.toString());
+                    showFinalMessage(before, after, failure);
                 } catch (RuntimeException e) {
                     _log.info("*Failed to show final message!", e);
                 }
@@ -175,16 +137,113 @@ public abstract class DfAbstractTask extends Task {
         return System.currentTimeMillis();
     }
 
-    protected boolean isValidTaskEndInformation() {
-        return true;
-    }
-
     protected void logException(Exception e) {
         DfAntTaskUtil.logException(e, getDisplayTaskName());
     }
 
     protected void logError(Error e) {
         DfAntTaskUtil.logError(e, getDisplayTaskName());
+    }
+
+    protected boolean isValidTaskEndInformation() {
+        return true;
+    }
+
+    protected void showFinalMessage(long before, long after, boolean failure) {
+        final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
+        final StringBuilder sb = new StringBuilder();
+        final String ln = ln();
+        sb.append(ln);
+        sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+        sb.append(ln).append("[Task End]: " + getPerformanceView(after - before));
+        if (failure) {
+            sb.append(ln).append("    * * * * * *");
+            sb.append(ln).append("    * Failure *");
+            sb.append(ln).append("    * * * * * *");
+        }
+        sb.append(ln);
+        sb.append(ln).append("  DBFLUTE_CLIENT: {" + getBasicProperties().getProjectName() + "}");
+        sb.append(ln).append("    database  = " + getBasicProperties().getDatabaseType());
+        sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
+        sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
+        sb.append(ln).append("    package   = " + getBasicProperties().getPackageBase());
+        sb.append(ln);
+        sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + environmentType + "}");
+        sb.append(ln).append("    driver = " + _driver);
+        sb.append(ln).append("    url    = " + _url);
+        sb.append(ln).append("    schema = " + _mainSchema);
+        sb.append(ln).append("    user   = " + _userId);
+        sb.append(ln).append("    props  = " + _connectionProperties);
+
+        final DfReplaceSchemaProperties replaceSchemaProp = getProperties().getReplaceSchemaProperties();
+        sb.append(ln).append("    dataLoadingType  = " + replaceSchemaProp.getDataLoadingType());
+        final String additionalSchemaDisp = buildAdditionalSchemaDisp();
+        sb.append(ln).append("    additionalSchema = " + additionalSchemaDisp);
+        final String refreshProjectDisp = buildRefreshProjectDisp();
+        sb.append(ln).append("    refreshProject   = " + refreshProjectDisp);
+
+        final String finalInformation = getFinalInformation();
+        if (finalInformation != null) {
+            sb.append(ln);
+            sb.append(finalInformation);
+        }
+        sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");
+        _log.info(sb.toString());
+    }
+
+    private String buildAdditionalSchemaDisp() {
+        final DfDatabaseProperties databaseProp = getDatabaseProperties();
+        final List<UnifiedSchema> additionalSchemaList = databaseProp.getAdditionalSchemaList();
+        String disp;
+        if (additionalSchemaList.size() == 1) {
+            final UnifiedSchema unifiedSchema = additionalSchemaList.get(0);
+            final String identifiedSchema = unifiedSchema.getIdentifiedSchema();
+            disp = identifiedSchema;
+            if (unifiedSchema.isCatalogAdditionalSchema()) {
+                disp = disp + "(catalog)";
+            } else if (unifiedSchema.isMainSchema()) { // should NOT be true
+                disp = disp + "(main)";
+            } else if (unifiedSchema.isUnknownSchema()) { // should NOT be true
+                disp = disp + "(unknown)";
+            }
+        } else {
+            final StringBuilder sb = new StringBuilder();
+            for (UnifiedSchema unifiedSchema : additionalSchemaList) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                final String identifiedSchema = unifiedSchema.getIdentifiedSchema();
+                sb.append(identifiedSchema);
+                if (unifiedSchema.isCatalogAdditionalSchema()) {
+                    sb.append("(catalog)");
+                } else if (unifiedSchema.isMainSchema()) { // should NOT be true
+                    sb.append("(main)");
+                } else if (unifiedSchema.isUnknownSchema()) { // should NOT be true
+                    sb.append("(unknown)");
+                }
+            }
+            disp = sb.toString();
+        }
+        return disp;
+    }
+
+    private String buildRefreshProjectDisp() {
+        final DfRefreshProperties refreshProp = getProperties().getRefreshProperties();
+        final List<String> refreshProjectList = refreshProp.getProjectNameList();
+        final String disp;
+        if (refreshProjectList.size() == 1) {
+            disp = refreshProjectList.get(0);
+        } else {
+            final StringBuilder sb = new StringBuilder();
+            for (String refreshProject : refreshProjectList) {
+                if (sb.length() > 0) {
+                    sb.append(", ");
+                }
+                sb.append(refreshProject);
+            }
+            disp = sb.toString();
+        }
+        return disp;
     }
 
     protected String getDisplayTaskName() {
