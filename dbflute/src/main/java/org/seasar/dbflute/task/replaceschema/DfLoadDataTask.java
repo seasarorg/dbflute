@@ -86,6 +86,7 @@ public class DfLoadDataTask extends DfAbstractReplaceSchemaTask {
         final DfSeparatedDataHandlerImpl handler = new DfSeparatedDataHandlerImpl();
         handler.setLoggingInsertSql(isLoggingInsertSql());
         handler.setDataSource(getDataSource());
+        handler.setUnifiedSchema(_mainSchema);
         final DfSeparatedDataSeveralHandlingInfo handlingInfo = new DfSeparatedDataSeveralHandlingInfo();
         handlingInfo.setBasePath(directoryPath);
         handlingInfo.setTypeName(typeName);

@@ -102,7 +102,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                               -------
     @Override
     public final void execute() { // completely override
-        boolean failure = false;
+        Throwable cause = null;
         long before = getTaskBeforeTimeMillis();
         try {
             initializeDatabaseInfo();
@@ -111,7 +111,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             }
             doExecute();
         } catch (Exception e) {
-            failure = true;
+            cause = e;
             try {
                 logException(e);
             } catch (Throwable ignored) {
@@ -119,7 +119,7 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                 _log.error("*Failed to execute DBFlute Task!", e);
             }
         } catch (Error e) {
-            failure = true;
+            cause = e;
             try {
                 logError(e);
             } catch (Throwable ignored) {
@@ -139,15 +139,15 @@ public abstract class DfAbstractTexenTask extends TexenTask {
                     }
                 }
             }
-            if (isValidTaskEndInformation() || failure) {
+            if (isValidTaskEndInformation() || cause != null) {
                 try {
                     long after = getTaskAfterTimeMillis();
-                    showFinalMessage(before, after, failure);
+                    showFinalMessage(before, after, cause != null);
                 } catch (RuntimeException e) {
                     _log.info("*Failed to show final message!", e);
                 }
             }
-            if (failure) {
+            if (cause != null) {
                 throwTaskFailure();
             }
         }
@@ -173,17 +173,15 @@ public abstract class DfAbstractTexenTask extends TexenTask {
         return true;
     }
 
-    protected void showFinalMessage(long before, long after, boolean failure) {
+    protected void showFinalMessage(long before, long after, boolean abort) {
         final String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
         final StringBuilder sb = new StringBuilder();
         final String ln = ln();
         sb.append(ln);
         sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-        sb.append(ln).append("[Task End]: " + getPerformanceView(after - before));
-        if (failure) {
-            sb.append(ln).append("    * * * * * *");
-            sb.append(ln).append("    * Failure *");
-            sb.append(ln).append("    * * * * * *");
+        sb.append(ln).append("[Task End]: ").append(getPerformanceView(after - before));
+        if (abort) {
+            sb.append(" *Abort");
         }
         sb.append(ln);
         sb.append(ln).append("  DBFLUTE_CLIENT: {" + getBasicProperties().getProjectName() + "}");

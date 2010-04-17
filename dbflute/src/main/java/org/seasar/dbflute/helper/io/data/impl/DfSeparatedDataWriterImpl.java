@@ -53,22 +53,14 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                           Attribute
     //                                                                           =========
-    protected DataSource _dataSource;
-
-    protected UnifiedSchema _unifiedSchema;
-
     protected boolean _loggingInsertSql;
-
+    protected DataSource _dataSource;
+    protected UnifiedSchema _unifiedSchema;
     protected String _filename;
-
     protected String _encoding;
-
     protected String _delimiter;
-
     protected boolean _errorContinue;
-
     protected Map<String, Map<String, String>> _convertValueMap;
-
     protected Map<String, String> _defaultValueMap;
 
     /** The cache map of meta info. The key is table name. */
@@ -647,11 +639,11 @@ public class DfSeparatedDataWriterImpl extends DfAbsractDataWriter implements Df
     // ===================================================================================
     //                                                                            Accessor
     //                                                                            ========
-    public UnifiedSchema getSchemaName() {
+    public UnifiedSchema getUnifiedSchema() {
         return _unifiedSchema;
     }
 
-    public void setSchemaName(UnifiedSchema unifiedSchema) {
+    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
         this._unifiedSchema = unifiedSchema;
     }
 

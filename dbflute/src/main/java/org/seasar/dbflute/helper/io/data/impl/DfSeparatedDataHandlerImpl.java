@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataHandler;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataResultInfo;
 import org.seasar.dbflute.helper.io.data.DfSeparatedDataSeveralHandlingInfo;
@@ -53,6 +54,8 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
     protected boolean _loggingInsertSql;
 
     protected DataSource _dataSource;
+
+    protected UnifiedSchema _unifiedSchema;
 
     // ===================================================================================
     //                                                                                Main
@@ -99,6 +102,7 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
                     final DfSeparatedDataWriterImpl writerImpl = new DfSeparatedDataWriterImpl();
                     writerImpl.setLoggingInsertSql(isLoggingInsertSql());
                     writerImpl.setDataSource(_dataSource);
+                    writerImpl.setUnifiedSchema(_unifiedSchema);
                     writerImpl.setFilename(fileNamePath);
                     writerImpl.setEncoding(elementName);
                     writerImpl.setDelimiter(info.getDelimter());
@@ -175,5 +179,13 @@ public class DfSeparatedDataHandlerImpl implements DfSeparatedDataHandler {
 
     public void setDataSource(DataSource dataSource) {
         this._dataSource = dataSource;
+    }
+
+    public UnifiedSchema getUnifiedSchema() {
+        return _unifiedSchema;
+    }
+
+    public void setUnifiedSchema(UnifiedSchema unifiedSchema) {
+        this._unifiedSchema = unifiedSchema;
     }
 }

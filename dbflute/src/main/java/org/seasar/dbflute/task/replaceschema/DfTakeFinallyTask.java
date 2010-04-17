@@ -363,7 +363,7 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
                 return null;
             }
             final String line2 = br.readLine();
-            List<String> detailList = new ArrayList<String>();
+            final List<String> detailList = new ArrayList<String>();
             if (line2 != null) {
                 while (true) {
                     String line3 = br.readLine();
@@ -376,8 +376,6 @@ public class DfTakeFinallyTask extends DfAbstractReplaceSchemaTask {
 
             final StringBuilder sb = new StringBuilder();
             final String ln = ln();
-
-            sb.append(ln).append("*Final Information");
 
             // Create Schema
             sb.append(ln).append(" ").append(line);

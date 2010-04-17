@@ -266,7 +266,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                 // SQL defines "--" as a comment to EOL
                 // and in Oracle it may contain a hint
                 // so we cannot just remove it, instead we must end it
-                if (line.trim().startsWith("--")) {// If this line is comment only, ...
+                if (line.trim().startsWith("--")) { // If this line is comment only, ...
                     // * * * * * * * * * * *
                     // Line for Line Comment
                     // * * * * * * * * * * *
@@ -279,7 +279,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                         continue;
                     } else if (line.trim().contains("#df:end#")) {
                         inGroup = false;
-                        sql = removeTerminater4ToolIfNeeds(sql);// [DBFLUTE-309]
+                        sql = removeTerminater4ToolIfNeeds(sql); // [DBFLUTE-309]
                         addSqlToList(sqlList, sql);
 
                         // End Point of SQL!
@@ -317,7 +317,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
                     } else {
                         lineConnect = "";
                     }
-                    if (line.indexOf("--") >= 0) {// If this line contains both SQL and comment, ...
+                    if (line.indexOf("--") >= 0) { // If this line contains both SQL and comment, ...
                         // With Line Comment
                         line = replaceCommentQuestionMarkIfNeeds(line);
                         sql = sql + lineConnect + line + ln();
@@ -355,7 +355,7 @@ public abstract class DfSqlFileRunnerBase implements DfSqlFileRunner {
             }
             sql = sql.trim();
             if (sql.length() > 0) {
-                addSqlToList(sqlList, sql);// for Last SQL
+                addSqlToList(sqlList, sql); // for Last SQL
             }
         } catch (IOException e) {
             throw new RuntimeException("The method 'extractSqlList()' threw the exception!", e);
