@@ -7,11 +7,11 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.6 (2009/10/31 Saturday)
  */
-public class DfUrlAnalyzerMySql implements DfUrlAnalyzer {
+public class DfUrlAnalyzerPostgreSQL implements DfUrlAnalyzer {
 
     protected String _url;
 
-    public DfUrlAnalyzerMySql(String url) {
+    public DfUrlAnalyzerPostgreSQL(String url) {
         this._url = url;
     }
 
