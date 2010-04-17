@@ -14,7 +14,7 @@ public class DfJDBCException extends SQLException {
     }
 
     public DfJDBCException(String msg, SQLException e) {
-        super(msg);
+        super(msg, e.getSQLState(), e.getErrorCode());
         setNextException(e);
     }
 }

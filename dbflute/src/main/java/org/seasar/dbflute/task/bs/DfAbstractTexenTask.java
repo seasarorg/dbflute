@@ -56,6 +56,7 @@ import org.seasar.dbflute.logic.various.DfAntTaskUtil;
 import org.seasar.dbflute.properties.DfBasicProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
 import org.seasar.dbflute.properties.DfRefreshProperties;
+import org.seasar.dbflute.properties.DfReplaceSchemaProperties;
 
 /**
  * The abstract class of texen task.
@@ -90,8 +91,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     /** Connection properties. */
     protected Properties _connectionProperties;
 
-    /** Data source creator. (for help) */
-    protected DfSimpleDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
+    /** The simple creator of data source. (NotNull) */
+    protected final DfSimpleDataSourceCreator _dataSourceCreator = new DfSimpleDataSourceCreator();
 
     // ===================================================================================
     //                                                                                Main
@@ -101,7 +102,8 @@ public abstract class DfAbstractTexenTask extends TexenTask {
     //                                               -------
     @Override
     public final void execute() { // completely override
-        long before = System.currentTimeMillis();
+        boolean failure = false;
+        long before = getTaskBeforeTimeMillis();
         try {
             initializeDatabaseInfo();
             if (isUseDataSource()) {
@@ -109,61 +111,96 @@ public abstract class DfAbstractTexenTask extends TexenTask {
             }
             doExecute();
         } catch (Exception e) {
+            failure = true;
             try {
                 logException(e);
             } catch (Throwable ignored) {
-                _log.warn("Ignored exception occured!", ignored);
-                _log.error("Failed to execute DBFlute Task!", e);
+                _log.warn("*Ignored exception occured!", ignored);
+                _log.error("*Failed to execute DBFlute Task!", e);
             }
-            throwTaskFailure();
         } catch (Error e) {
+            failure = true;
             try {
                 logError(e);
             } catch (Throwable ignored) {
-                _log.warn("Ignored exception occured!", ignored);
-                _log.error("Failed to execute DBFlute Task!", e);
+                _log.warn("*Ignored exception occured!", ignored);
+                _log.error("*Failed to execute DBFlute Task!", e);
             }
-            throwTaskFailure();
         } finally {
             if (isUseDataSource()) {
                 try {
                     commitDataSource();
-                } catch (SQLException ignored) {
+                } catch (Exception ignored) {
                 } finally {
                     try {
                         destroyDataSource();
-                    } catch (SQLException ignored) {
-                        _log.warn("Failed to destroy data source! (Ignored)", ignored);
+                    } catch (Exception ignored) {
+                        _log.warn("*Failed to destroy data source: " + ignored.getMessage());
                     }
                 }
             }
-            long after = System.currentTimeMillis();
-            String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
-            StringBuilder sb = new StringBuilder();
-            String ln = ln();
-            sb.append(ln);
-            sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
-            sb.append(ln).append("[Task End]: " + getPerformanceView(after - before));
-            sb.append(ln);
-            sb.append(ln).append("  MY_PROJECT_NAME: {" + getBasicProperties().getProjectName() + "}");
-            sb.append(ln).append("    database  = " + getBasicProperties().getDatabaseType());
-            sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
-            sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
-            sb.append(ln);
-            sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + environmentType + "}");
-            sb.append(ln).append("    driver = " + _driver);
-            sb.append(ln).append("    url    = " + _url);
-            sb.append(ln).append("    schema = " + _mainSchema);
-            sb.append(ln).append("    user   = " + _userId);
-            sb.append(ln).append("    props  = " + _connectionProperties);
-            String finalInformation = getFinalInformation();
-            if (finalInformation != null) {
-                sb.append(ln);
-                sb.append(finalInformation);
+            if (isValidTaskEndInformation() || failure) {
+                try {
+                    long after = getTaskAfterTimeMillis();
+                    String environmentType = DfEnvironmentType.getInstance().getEnvironmentType();
+                    StringBuilder sb = new StringBuilder();
+                    String ln = ln();
+                    sb.append(ln);
+                    sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/");
+                    sb.append(ln).append("[Task End]: " + getPerformanceView(after - before));
+                    if (failure) {
+                        sb.append(ln).append("    * * * * * *");
+                        sb.append(ln).append("    * Failure *");
+                        sb.append(ln).append("    * * * * * *");
+                    }
+                    sb.append(ln);
+                    sb.append(ln).append("  DBFLUTE_CLIENT: {" + getBasicProperties().getProjectName() + "}");
+                    sb.append(ln).append("    database  = " + getBasicProperties().getDatabaseType());
+                    sb.append(ln).append("    language  = " + getBasicProperties().getTargetLanguage());
+                    sb.append(ln).append("    container = " + getBasicProperties().getTargetContainerName());
+                    sb.append(ln).append("    package   = " + getBasicProperties().getPackageBase());
+                    sb.append(ln);
+                    sb.append(ln).append("  DBFLUTE_ENVIRONMENT_TYPE: {" + environmentType + "}");
+                    sb.append(ln).append("    driver = " + _driver);
+                    sb.append(ln).append("    url    = " + _url);
+                    sb.append(ln).append("    schema = " + _mainSchema);
+                    sb.append(ln).append("    user   = " + _userId);
+                    sb.append(ln).append("    props  = " + _connectionProperties);
+                    final DfReplaceSchemaProperties replaceSchemaProp = getProperties().getReplaceSchemaProperties();
+                    sb.append(ln).append("    dataLoadingType  = " + replaceSchemaProp.getDataLoadingType());
+                    final DfDatabaseProperties databaseProp = getDatabaseProperties();
+                    final List<UnifiedSchema> additionalSchemaList = databaseProp.getAdditionalSchemaList();
+                    sb.append(ln).append("    additionalSchema = " + additionalSchemaList);
+                    final DfRefreshProperties refreshProp = getProperties().getRefreshProperties();
+                    final List<String> refreshProjectList = refreshProp.getProjectNameList();
+                    sb.append(ln).append("    refreshProject   = " + refreshProjectList);
+                    final String finalInformation = getFinalInformation();
+                    if (finalInformation != null) {
+                        sb.append(ln);
+                        sb.append(finalInformation);
+                    }
+                    sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");
+                    _log.info(sb.toString());
+                } catch (RuntimeException e) {
+                    _log.info("*Failed to show final message!", e);
+                }
             }
-            sb.append(ln).append("_/_/_/_/_/_/_/_/_/_/" + " {" + getDisplayTaskName() + "}");
-            _log.info(sb.toString());
+            if (failure) {
+                throwTaskFailure();
+            }
         }
+    }
+
+    protected long getTaskBeforeTimeMillis() {
+        return System.currentTimeMillis();
+    }
+
+    protected long getTaskAfterTimeMillis() {
+        return System.currentTimeMillis();
+    }
+
+    protected boolean isValidTaskEndInformation() {
+        return true;
     }
 
     protected void logException(Exception e) {
