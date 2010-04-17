@@ -58,14 +58,14 @@ public class DfProcedureColumnMetaInfo {
         return comment;
     }
 
-    public boolean isPostgreSQLCursor(DfProcedureColumnMetaInfo column) {
+    public boolean isCursorPostgreSQL(DfProcedureColumnMetaInfo column) {
         final String key = "cursor";
         final int jdbcType = column.getJdbcType();
         final String dbTypeName = column.getDbTypeName();
         return jdbcType == Types.OTHER && dbTypeName != null && dbTypeName.toLowerCase().contains(key);
     }
 
-    public boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
+    public boolean isCursorOracle(DfProcedureColumnMetaInfo column) {
         final String key = "cursor";
         final int jdbcType = column.getJdbcType();
         final String dbTypeName = column.getDbTypeName();

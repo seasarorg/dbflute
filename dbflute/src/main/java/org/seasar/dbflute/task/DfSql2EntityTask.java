@@ -775,21 +775,21 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         if (column.hasColumnMetaInfo()) {
             return true;
         }
-        if (isPostgreSQLCursor(column)) {
+        if (isCursorPostgreSQL(column)) {
             return true;
-        } else if (isOracleCursor(column)) {
+        } else if (isCursorOracle(column)) {
             return true;
         } else {
             return false;
         }
     }
 
-    protected boolean isPostgreSQLCursor(DfProcedureColumnMetaInfo column) {
-        return getBasicProperties().isDatabaseOracle() && column.isPostgreSQLCursor(column);
+    protected boolean isCursorPostgreSQL(DfProcedureColumnMetaInfo column) {
+        return getBasicProperties().isDatabaseOracle() && column.isCursorPostgreSQL(column);
     }
 
-    protected boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
-        return getBasicProperties().isDatabasePostgreSQL() && column.isOracleCursor(column);
+    protected boolean isCursorOracle(DfProcedureColumnMetaInfo column) {
+        return getBasicProperties().isDatabasePostgreSQL() && column.isCursorOracle(column);
     }
 
     protected String convertProcedureNameToPmbName(String procedureName) {

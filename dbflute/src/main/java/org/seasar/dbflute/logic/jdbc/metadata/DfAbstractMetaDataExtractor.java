@@ -79,31 +79,31 @@ public abstract class DfAbstractMetaDataExtractor {
         return DfBuildProperties.getInstance().getDatabaseProperties();
     }
 
-    protected boolean isMySQL() {
+    protected boolean isDatabaseMySQL() {
         return getBasicProperties().isDatabaseMySQL();
     }
 
-    protected boolean isPostgreSQL() {
+    protected boolean isDatabasePostgreSQL() {
         return getBasicProperties().isDatabasePostgreSQL();
     }
 
-    protected boolean isOracle() {
+    protected boolean isDatabaseOracle() {
         return getBasicProperties().isDatabaseOracle();
     }
 
-    protected boolean isDB2() {
+    protected boolean isDatabaseDB2() {
         return getBasicProperties().isDatabaseDB2();
     }
 
-    protected boolean isSQLServer() {
+    protected boolean isDatabaseSQLServer() {
         return getBasicProperties().isDatabaseSQLServer();
     }
 
-    protected boolean isSQLite() {
+    protected boolean isDatabaseSQLite() {
         return getBasicProperties().isDatabaseSQLite();
     }
 
-    protected boolean isMsAccess() {
+    protected boolean isDatabaseMsAccess() {
         return getBasicProperties().isDatabaseMSAccess();
     }
 

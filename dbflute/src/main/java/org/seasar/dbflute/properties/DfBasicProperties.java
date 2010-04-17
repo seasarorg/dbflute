@@ -133,7 +133,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
     }
 
     public boolean isDatabaseSchemaCanBeOmitted() {
-        return isDatabaseH2() || isDatabasePostgreSQL() || isDatabaseMySQL();
+        return isDatabaseMySQL() || isDatabaseSQLite();
     }
 
     // ===================================================================================

@@ -299,11 +299,11 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected boolean isPostgreSQLCursor(DfProcedureColumnMetaInfo column) {
-        return isPostgreSQL() && column.isPostgreSQLCursor(column);
+        return isPostgreSQL() && column.isCursorPostgreSQL(column);
     }
 
     protected boolean isOracleCursor(DfProcedureColumnMetaInfo column) {
-        return isOracle() && column.isOracleCursor(column);
+        return isOracle() && column.isCursorOracle(column);
     }
 
     protected Map<String, DfColumnMetaInfo> extractColumnMetaInfoMap(ResultSet rs, String sql) throws SQLException {

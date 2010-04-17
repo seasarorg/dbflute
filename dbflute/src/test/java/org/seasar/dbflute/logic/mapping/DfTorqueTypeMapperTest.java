@@ -106,15 +106,15 @@ public class DfTorqueTypeMapperTest {
             return this;
         }
 
-        public boolean isTargetLanguageJava() {
+        public boolean isLangJava() {
             return _targetLanguageJava;
         }
 
-        public boolean isDatabaseOracle() {
+        public boolean isDbmsOracle() {
             return _databaseOracle;
         }
 
-        public boolean isDatabasePostgreSQL() {
+        public boolean isDbmsPostgreSQL() {
             return _databasePostgreSQL;
         }
     }

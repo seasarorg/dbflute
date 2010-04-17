@@ -338,7 +338,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             {
                 final String plainCatalog = procedureRs.getString("PROCEDURE_CAT");
                 String packagePrefix = "";
-                if (isOracle()) {
+                if (isDatabaseOracle()) {
                     packagePrefix = plainCatalog + ".";
                     procedureCatalog = null; // because Oracle treats catalog as package
                 } else {
@@ -448,7 +448,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
         final String sqlName = metaInfo.getProcedureSchema().buildSqlName(metaInfo.getProcedureName());
         // DB2 needs schema prefix for calling procedures. (actually tried)
-        if (isDB2() && !sqlName.contains(".")) {
+        if (isDatabaseDB2() && !sqlName.contains(".")) {
             return Srl.connectPrefix(sqlName, metaInfo.getProcedureSchema().getPureSchema(), ".");
         } else {
             return sqlName;
@@ -468,7 +468,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     }
 
     protected void adjustPostgreSQLResultSetParameter(DfProcedureMetaInfo procedureMetaInfo) {
-        if (!isPostgreSQL()) {
+        if (!isDatabasePostgreSQL()) {
             return;
         }
         final List<DfProcedureColumnMetaInfo> columnMetaInfoList = procedureMetaInfo.getProcedureColumnList();

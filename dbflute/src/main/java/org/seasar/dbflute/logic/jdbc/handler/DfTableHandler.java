@@ -113,10 +113,10 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
     }
 
     public boolean isSystemTableForDBMS(String tableName) {
-        if (isOracle() && tableName.startsWith("BIN$")) {
+        if (isDatabaseOracle() && tableName.startsWith("BIN$")) {
             return true;
         }
-        if (isSQLServer()) {
+        if (isDatabaseSQLServer()) {
             final Set<String> systemSet = StringSet.createAsFlexible();
             systemSet.add("sysobjects");
             systemSet.add("sysconstraints");
@@ -125,7 +125,7 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 return true;
             }
         }
-        if (isSQLite() && tableName.startsWith("sqlite_")) {
+        if (isDatabaseSQLite() && tableName.startsWith("sqlite_")) {
             return true;
         }
         return false;

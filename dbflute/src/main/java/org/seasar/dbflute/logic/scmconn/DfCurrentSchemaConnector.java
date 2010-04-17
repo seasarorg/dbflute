@@ -62,11 +62,18 @@ public class DfCurrentSchemaConnector {
     }
 
     public void connectSchema(Connection conn) throws SQLException {
-        if (_basicProperties.isDatabaseDB2() && _unifiedSchema.existsPureSchema()) {
-            final String sql = "SET CURRENT SCHEMA = " + _unifiedSchema.getPureSchema();
+        if (!_unifiedSchema.existsPureSchema()) {
+            return;
+        }
+        final String pureSchema = _unifiedSchema.getPureSchema();
+        if (_basicProperties.isDatabaseDB2()) {
+            final String sql = "SET CURRENT SCHEMA = " + pureSchema;
             executeCurrentSchemaSql(conn, sql);
-        } else if (_basicProperties.isDatabaseOracle() && _unifiedSchema.existsPureSchema()) {
-            final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + _unifiedSchema.getPureSchema();
+        } else if (_basicProperties.isDatabaseOracle()) {
+            final String sql = "ALTER SESSION SET CURRENT_SCHEMA = " + pureSchema;
+            executeCurrentSchemaSql(conn, sql);
+        } else if (_basicProperties.isDatabasePostgreSQL()) {
+            final String sql = "set search_path to " + pureSchema;
             executeCurrentSchemaSql(conn, sql);
         }
     }

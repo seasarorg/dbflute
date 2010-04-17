@@ -295,8 +295,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         }
         final Object obj = additionalDropMap.get("schema");
         if (obj == null) {
-            getBasicProperties().isDatabasePostgreSQL();
-            if (!isSchemaCanBeOmittedDBMS()) {
+            if (!isDatabaseSchemaCanBeOmitted()) {
                 String msg = "The schema is required:";
                 msg = msg + " additionalDropMap=" + additionalDropMap;
                 throw new DfRequiredPropertyNotFoundException(msg);
@@ -308,7 +307,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         return unifiedSchema;
     }
 
-    protected boolean isSchemaCanBeOmittedDBMS() {
+    protected boolean isDatabaseSchemaCanBeOmitted() {
         return getBasicProperties().isDatabaseSchemaCanBeOmitted();
     }
 

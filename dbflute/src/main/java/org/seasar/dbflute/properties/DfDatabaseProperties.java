@@ -35,6 +35,11 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     public static final String NO_NAME_SCHEMA = "$$NoNameSchema$$"; // basically for MySQL
 
     // ===================================================================================
+    //                                                                           Attribute
+    //                                                                           =========
+    protected DatabaseInfo _databaseInfo = new DatabaseInfo();
+
+    // ===================================================================================
     //                                                                         Constructor
     //                                                                         ===========
     /**
@@ -48,10 +53,6 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // ===================================================================================
     //                                                                     Connection Info
     //                                                                     ===============
-    protected DatabaseInfo _databaseInfo = new DatabaseInfo();
-    protected String _mainCatalog = null;
-    protected boolean _catalogDone = false;
-    protected UnifiedSchema _mainSchema = null;
 
     public String getDatabaseDriver() {
         return _databaseInfo.getDatabaseDriver();
@@ -60,6 +61,9 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     public String getDatabaseUrl() {
         return _databaseInfo.getDatabaseUrl();
     }
+
+    protected String _mainCatalog = null;
+    protected boolean _catalogDone = false;
 
     public String getDatabaseCatalog() { // as main catalog
         if (_catalogDone) {
@@ -81,13 +85,15 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     protected String filterDatabaseCatalog(String catalog) {
-        if (getBasicProperties().isDatabaseH2()) {
+        if (isDatabaseH2()) {
             if (Srl.is_NotNull_and_NotTrimmedEmpty(catalog)) {
                 catalog = catalog.toUpperCase();
             }
         }
         return catalog;
     }
+
+    protected UnifiedSchema _mainSchema = null;
 
     public UnifiedSchema getDatabaseSchema() { // as main schema
         if (_mainSchema != null) {
@@ -100,23 +106,23 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     }
 
     protected String filterDatabaseSchema(String schema) {
-        if (getBasicProperties().isDatabasePostgreSQL()) {
+        if (isDatabasePostgreSQL()) {
             if (Srl.is_Null_or_TrimmedEmpty(schema)) {
                 schema = "public";
             }
-        } else if (getBasicProperties().isDatabaseOracle()) {
+        } else if (isDatabaseOracle()) {
             if (Srl.is_NotNull_and_NotTrimmedEmpty(schema)) {
                 schema = schema.toUpperCase();
             }
-        } else if (getBasicProperties().isDatabaseDB2()) {
+        } else if (isDatabaseDB2()) {
             if (Srl.is_NotNull_and_NotTrimmedEmpty(schema)) {
                 schema = schema.toUpperCase();
             }
-        } else if (getBasicProperties().isDatabaseH2()) {
+        } else if (isDatabaseH2()) {
             if (Srl.is_Null_or_TrimmedEmpty(schema)) {
                 schema = "PUBLIC";
             }
-        } else if (getBasicProperties().isDatabaseDerby()) {
+        } else if (isDatabaseDerby()) {
             if (Srl.is_NotNull_and_NotTrimmedEmpty(schema)) {
                 schema = schema.toUpperCase();
             }
@@ -156,8 +162,14 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
     // -----------------------------------------------------
     //                                 Connection Properties
     //                                 ---------------------
+    protected Properties _databaseConnectionProperties;
+
     public Properties getDatabaseConnectionProperties() {
-        return _databaseInfo.getDatabaseConnectionProperties();
+        if (_databaseConnectionProperties != null) {
+            return _databaseConnectionProperties;
+        }
+        _databaseConnectionProperties = _databaseInfo.getDatabaseConnectionProperties();
+        return _databaseConnectionProperties;
     }
 
     // -----------------------------------------------------
@@ -664,6 +676,45 @@ public final class DfDatabaseProperties extends DfAbstractHelperProperties {
             }
             return null;
         }
+    }
+
+    // ===================================================================================
+    //                                                                          Properties
+    //                                                                          ==========
+    public boolean isDatabaseMySQL() {
+        return getBasicProperties().isDatabaseMySQL();
+    }
+
+    public boolean isDatabasePostgreSQL() {
+        return getBasicProperties().isDatabasePostgreSQL();
+    }
+
+    public boolean isDatabaseOracle() {
+        return getBasicProperties().isDatabaseOracle();
+    }
+
+    public boolean isDatabaseDB2() {
+        return getBasicProperties().isDatabaseDB2();
+    }
+
+    public boolean isDatabaseSQLServer() {
+        return getBasicProperties().isDatabaseSQLServer();
+    }
+
+    public boolean isDatabaseH2() {
+        return getBasicProperties().isDatabaseH2();
+    }
+
+    public boolean isDatabaseDerby() {
+        return getBasicProperties().isDatabaseDerby();
+    }
+
+    public boolean isDatabaseSQLite() {
+        return getBasicProperties().isDatabaseSQLite();
+    }
+
+    public boolean isDatabaseMSAccess() {
+        return getBasicProperties().isDatabaseMSAccess();
     }
 
     // ===================================================================================

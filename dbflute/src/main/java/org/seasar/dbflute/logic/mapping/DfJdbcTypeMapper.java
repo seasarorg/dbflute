@@ -41,11 +41,11 @@ public class DfJdbcTypeMapper {
     }
 
     public static interface Resource {
-        boolean isTargetLanguageJava();
+        boolean isLangJava();
 
-        boolean isDatabaseOracle();
+        boolean isDbmsOracle();
 
-        boolean isDatabasePostgreSQL();
+        boolean isDbmsPostgreSQL();
     }
 
     // ===================================================================================
@@ -114,7 +114,7 @@ public class DfJdbcTypeMapper {
             return getDateJdbcType();
         } else if (dbTypeName.toLowerCase().contains("clob")) {
             return getClobJdbcType();
-        } else if (_resource.isTargetLanguageJava() && dbTypeName.toLowerCase().contains("uuid")) {
+        } else if (_resource.isLangJava() && dbTypeName.toLowerCase().contains("uuid")) {
             // /- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
             // This is for Java only because the type has not been checked yet on C#.
             // - - - - - - - - - -/
@@ -147,25 +147,24 @@ public class DfJdbcTypeMapper {
     //                                    Type Determination
     //                                    ------------------
     public boolean isOracle_CompatibleDate(final int jdbcType, final String dbTypeName) {
-        return _resource.isDatabaseOracle() && java.sql.Types.TIMESTAMP == jdbcType
-                && "date".equalsIgnoreCase(dbTypeName);
+        return _resource.isDbmsOracle() && java.sql.Types.TIMESTAMP == jdbcType && "date".equalsIgnoreCase(dbTypeName);
     }
 
     public boolean isOracle_Clob(final String dbTypeName) {
-        return _resource.isDatabaseOracle() && "clob".equalsIgnoreCase(dbTypeName);
+        return _resource.isDbmsOracle() && "clob".equalsIgnoreCase(dbTypeName);
     }
 
     public boolean isOracle_BinaryFloatDouble(final int jdbcType, final String dbTypeName) {
-        return _resource.isDatabaseOracle()
+        return _resource.isDbmsOracle()
                 && ("binary_float".equalsIgnoreCase(dbTypeName) || "binary_double".equalsIgnoreCase(dbTypeName));
     }
 
     public boolean isPostgreSQL_Oid(final String dbTypeName) {
-        return _resource.isDatabasePostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
+        return _resource.isDbmsPostgreSQL() && "oid".equalsIgnoreCase(dbTypeName);
     }
 
     public boolean isPostgreSQL_Interval(final String dbTypeName) {
-        return _resource.isDatabasePostgreSQL() && "interval".equalsIgnoreCase(dbTypeName);
+        return _resource.isDbmsPostgreSQL() && "interval".equalsIgnoreCase(dbTypeName);
     }
 
     public boolean isUUID(final String dbTypeName) {

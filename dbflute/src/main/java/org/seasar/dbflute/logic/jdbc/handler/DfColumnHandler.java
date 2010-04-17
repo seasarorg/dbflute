@@ -221,21 +221,21 @@ public class DfColumnHandler extends DfAbstractMetaDataHandler {
         final DfTypeMappingProperties typeMappingProperties = getProperties().getTypeMappingProperties();
         final Map<String, String> nameToJdbcTypeMap = typeMappingProperties.getNameToJdbcTypeMap();
         final DfJdbcTypeMapper mapper = new DfJdbcTypeMapper(nameToJdbcTypeMap, new Resource() {
-            public boolean isTargetLanguageJava() {
+            public boolean isLangJava() {
                 return getBasicProperties().isTargetLanguageJava();
             }
 
-            public boolean isDatabaseOracle() {
-                return isOracle();
+            public boolean isDbmsOracle() {
+                return isDatabaseOracle();
             }
 
-            public boolean isDatabasePostgreSQL() {
-                return isPostgreSQL();
+            public boolean isDbmsPostgreSQL() {
+                return isDatabasePostgreSQL();
             }
 
             @Override
             public String toString() {
-                return "{" + isTargetLanguageJava() + ", " + isDatabaseOracle() + ", " + isDatabasePostgreSQL() + "}";
+                return "{" + isLangJava() + ", " + isDbmsOracle() + ", " + isDbmsPostgreSQL() + "}";
             }
         });
         return mapper;
