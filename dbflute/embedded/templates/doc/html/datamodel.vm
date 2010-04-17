@@ -191,7 +191,7 @@
 <body>
 <h1>Project Schema for ${database.projectName} (${database.databaseName})</h1>
 #if ($database.hasDatabaseSchema())
-<p class="mainschema">generated from <strong>${database.databaseSchema}</strong></p>
+<p class="mainschema">generated from <strong>${database.databaseSchema.catalogSchema}</strong></p>
 #end
 <p class="updatedate">${database.timestampExpression}</p>
 #if ($database.hasClassificationDefinitionMap())
