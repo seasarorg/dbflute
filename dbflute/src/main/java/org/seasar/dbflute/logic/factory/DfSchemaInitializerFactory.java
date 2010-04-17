@@ -124,6 +124,7 @@ public class DfSchemaInitializerFactory {
         if (_initializeType.equals(InitializeType.MAIN)) {
             initializer.setDataSource(_dataSource);
             initializer.setUnifiedSchema(_databaseProperties.getDatabaseSchema());
+            initializer.setUseFullQualifiedTableName(true);
             initializer.setDropGenerateTableOnly(_replaceSchemaProperties.isDropGenerateTableOnly());
             initializer.setDropGenerateProcedureOnly(_replaceSchemaProperties.isDropGenerateProcedureOnly());
             return;
@@ -138,7 +139,7 @@ public class DfSchemaInitializerFactory {
             initializer.setDataSource(getAdditionalDataSource());
             final UnifiedSchema unifiedSchema = getAdditionalDropSchema(_additionalDropMap);
             initializer.setUnifiedSchema(unifiedSchema);
-            initializer.setTableNameWithSchema(true); // because it may be other schema!
+            initializer.setUseFullQualifiedTableName(true); // because it may be other schema!
             initializer.setDropObjectTypeList(getAdditionalDropObjectTypeList(_additionalDropMap));
             initializer.setDropTableTargetList(getAdditionalDropTableTargetList(_additionalDropMap));
             initializer.setDropTableExceptList(getAdditionalDropTableExceptList(_additionalDropMap));

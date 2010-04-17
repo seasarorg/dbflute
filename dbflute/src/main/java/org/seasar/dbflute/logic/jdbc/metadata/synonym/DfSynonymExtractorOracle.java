@@ -194,12 +194,12 @@ public class DfSynonymExtractorOracle extends DfAbstractMetaDataExtractor implem
     }
 
     protected String buildSynonymMapKey(UnifiedSchema synonymOwner, String synonymName) {
-        return synonymOwner.buildPureSchemaElement(synonymName);
+        return synonymOwner.buildSchemaQualifiedName(synonymName);
     }
 
     protected void judgeSynonymSelectable(DfSynonymMetaInfo info) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final String synonymSqlName = info.buildPureSchemaSynonym();
+        final String synonymSqlName = info.buildSynonymSqlName();
         final String sql = "select * from " + synonymSqlName + " where 0 = 1";
         try {
             final List<String> columnList = new ArrayList<String>();

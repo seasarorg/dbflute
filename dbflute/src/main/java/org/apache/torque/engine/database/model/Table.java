@@ -169,7 +169,7 @@ public class Table {
         _name = attrib.getValue("name");
         _type = attrib.getValue("type");
         final String plainSchema = attrib.getValue("schema");
-        _unifiedSchema = UnifiedSchema.createAsDynamicSchema(plainSchema, getDatabaseProperties());
+        _unifiedSchema = UnifiedSchema.createAsDynamicSchema(plainSchema);
         _plainComment = attrib.getValue("comment");
         _javaName = attrib.getValue("javaName");
 
@@ -349,13 +349,16 @@ public class Table {
     // -----------------------------------------------------
     //                                          Table Schema
     //                                          ------------
-    public String getDisplaySchema() {
-        final String catalogSchema = getCatalogSchema();
-        return catalogSchema != null ? catalogSchema : "";
+    public UnifiedSchema getUnifiedSchema() {
+        return _unifiedSchema != null ? _unifiedSchema : null;
     }
 
-    protected String getCatalogSchema() { // contains catalog name
-        return _unifiedSchema != null ? _unifiedSchema.getCatalogSchema() : null;
+    public String getDisplaySchema() {
+        return _unifiedSchema != null ? _unifiedSchema.getDisplaySchema() : "";
+    }
+
+    protected String getPureCatalog() { // NOT contain catalog name
+        return _unifiedSchema != null ? _unifiedSchema.getPureSchema() : null;
     }
 
     protected String getPureSchema() { // NOT contain catalog name
@@ -367,15 +370,15 @@ public class Table {
     }
 
     public boolean isMainSchema() {
-        return !isAdditionalSchema();
+        return hasSchema() && getUnifiedSchema().isMainSchema();
     }
 
     public boolean isAdditionalSchema() {
-        return hasSchema() && getDatabaseProperties().isAdditionalSchema(_unifiedSchema);
+        return hasSchema() && getUnifiedSchema().isAdditionalSchema();
     }
 
     public boolean isCatalogAdditionalSchema() {
-        return hasSchema() && getDatabaseProperties().isCatalogAdditionalSchema(_unifiedSchema);
+        return hasSchema() && getUnifiedSchema().isCatalogAdditionalSchema();
     }
 
     // -----------------------------------------------------
@@ -472,22 +475,7 @@ public class Table {
 
     protected String filterSchemaSqlPrefix(String tableName) {
         if (hasSchema()) {
-            final String catalogSchema = getCatalogSchema();
-            final String pureSchema = getPureSchema();
-            if (isAvailableAddingSchemaToTableSqlName()) {
-                if (isAvailableAddingCatalogToTableSqlName()) {
-                    return catalogSchema + "." + tableName;
-                } else {
-                    return pureSchema + "." + tableName;
-                }
-            }
-            if (isAdditionalSchema()) { // for resolving additional schema
-                if (isCatalogAdditionalSchema()) {
-                    return catalogSchema + "." + tableName;
-                } else {
-                    return pureSchema + "." + tableName;
-                }
-            }
+            return _unifiedSchema.buildSqlName(tableName);
         }
         return tableName;
     }
@@ -697,20 +685,23 @@ public class Table {
         return getExtendedEntityClassName() + "Nsst";
     }
 
-    // *same-name tables between different schemas are unsupported at 0.9.6.8
-
     protected String getSchemaClassPrefix() {
-        // *however DBFlute does not completely support same-name table between schemas.
+        // *however same-name tables between different schemas are unsupported at 0.9.6.8
         if (hasSchema() && isExistSameNameTable()) {
-            String schemaName;
-            if (isCatalogAdditionalSchema()) {
-                schemaName = getCatalogSchema();
-            } else {
-                schemaName = getPureSchema();
-            }
             // schema of DB2 may have space either size
-            schemaName = Srl.replace(schemaName, " ", "");
-            return Srl.initCapTrimmed(schemaName.toLowerCase());
+            final String prefix;
+            if (isCatalogAdditionalSchema()) {
+                String pureCatalog = getPureCatalog();
+                pureCatalog = pureCatalog != null ? Srl.initCapTrimmed(pureCatalog.trim().toLowerCase()) : "";
+                String pureSchema = getPureSchema();
+                pureSchema = pureSchema != null ? Srl.initCapTrimmed(pureSchema.trim().toLowerCase()) : "";
+                prefix = pureCatalog + pureSchema;
+            } else {
+                String pureSchema = getPureSchema();
+                pureSchema = pureSchema != null ? Srl.initCapTrimmed(pureSchema.trim().toLowerCase()) : "";
+                prefix = pureSchema;
+            }
+            return prefix;
         }
         return "";
     }
@@ -2027,18 +2018,11 @@ public class Table {
         final String sequenceName = getSequenceIdentityProperties().getSequenceName(getName());
         if (Srl.is_Null_or_TrimmedEmpty(sequenceName)) {
             final String serialSequenceName = extractPostgreSQLSerialSequenceName();
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(serialSequenceName)) {
-                String prefix = null;
-                if (isAvailableAddingSchemaToTableSqlName()) {
-                    if (isAvailableAddingCatalogToTableSqlName()) {
-                        prefix = getCatalogSchema();
-                    } else {
-                        prefix = getPureSchema();
-                    }
-                }
-                return (prefix != null ? prefix + "." : "") + serialSequenceName;
+            if (Srl.is_Null_or_TrimmedEmpty(serialSequenceName)) {
+                String msg = "The sequence for serial type should exist when isUseSequence() is true!";
+                throw new IllegalStateException(msg);
             }
-            return ""; // if it uses sequence, unreachable
+            return hasSchema() ? getUnifiedSchema().buildSqlName(serialSequenceName) : serialSequenceName;
         }
         return sequenceName;
     }
@@ -2063,12 +2047,11 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        final String catalogSchema = getCatalogSchema();
-        BigDecimal value = prop.getSequenceMinimumValueByTableName(ds, catalogSchema, getName());
+        BigDecimal value = prop.getSequenceMinimumValueByTableName(ds, getUnifiedSchema(), getName());
         if (value == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
             if (sequenceName != null && sequenceName.trim().length() > 0) {
-                value = prop.getSequenceMinimumValueBySequenceName(ds, catalogSchema, sequenceName);
+                value = prop.getSequenceMinimumValueBySequenceName(ds, getUnifiedSchema(), sequenceName);
             }
         }
         return value;
@@ -2085,12 +2068,11 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        final String catalogSchema = getCatalogSchema();
-        BigDecimal value = prop.getSequenceMaximumValueByTableName(ds, catalogSchema, getName());
+        BigDecimal value = prop.getSequenceMaximumValueByTableName(ds, getUnifiedSchema(), getName());
         if (value == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
             if (sequenceName != null && sequenceName.trim().length() > 0) {
-                value = prop.getSequenceMaximumValueBySequenceName(ds, catalogSchema, sequenceName);
+                value = prop.getSequenceMaximumValueBySequenceName(ds, getUnifiedSchema(), sequenceName);
             }
         }
         return value;
@@ -2107,12 +2089,11 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        final String catalogSchema = getCatalogSchema();
-        Integer size = prop.getSequenceIncrementSizeByTableName(ds, catalogSchema, getName());
+        Integer size = prop.getSequenceIncrementSizeByTableName(ds, getUnifiedSchema(), getName());
         if (size == null) {
             final String sequenceName = extractPostgreSQLSerialSequenceName();
             if (sequenceName != null && sequenceName.trim().length() > 0) {
-                size = prop.getSequenceIncrementSizeBySequenceName(ds, catalogSchema, sequenceName);
+                size = prop.getSequenceIncrementSizeBySequenceName(ds, getUnifiedSchema(), sequenceName);
             }
         }
         return size;
@@ -2129,8 +2110,7 @@ public class Table {
         }
         final DfSequenceIdentityProperties prop = getSequenceIdentityProperties();
         final DataSource ds = getDatabase().getDataSource();
-        final String catalogSchema = getCatalogSchema();
-        return prop.getSequenceCacheSize(ds, catalogSchema, getName());
+        return prop.getSequenceCacheSize(ds, getUnifiedSchema(), getName());
     }
 
     public String getSequenceCacheSizeExpression() {

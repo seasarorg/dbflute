@@ -6,9 +6,9 @@ import org.seasar.dbflute.util.Srl;
  * @author jflute
  * @since 0.9.6.8 (2010/04/17 Saturday)
  */
-public class DfUrlAnalyzerMySQL extends DfUrlAnalyzerBase {
+public class DfUrlAnalyzerDerby extends DfUrlAnalyzerBase {
 
-    public DfUrlAnalyzerMySQL(String url) {
+    public DfUrlAnalyzerDerby(String url) {
         super(url);
     }
 

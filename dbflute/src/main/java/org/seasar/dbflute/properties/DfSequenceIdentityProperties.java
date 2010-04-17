@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfIllegalPropertySettingException;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
 import org.seasar.dbflute.helper.StringKeyMap;
@@ -125,7 +126,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         return _sequenceMetaInfoMap;
     }
 
-    protected DfSequenceMetaInfo getSequenceElement(String catalogSchema, String sequenceName,
+    protected DfSequenceMetaInfo getSequenceElement(UnifiedSchema unifiedSchema, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
         DfSequenceMetaInfo info = sequenceMap.get(sequenceName);
         if (info != null) {
@@ -134,12 +135,11 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         if (sequenceName.contains(".")) {
             sequenceName = Srl.substringLastRear(sequenceName, "."); // pure sequence name
         }
-        info = sequenceMap.get(catalogSchema + "." + sequenceName);
+        info = sequenceMap.get(unifiedSchema.buildFullQualifiedName(sequenceName));
         if (info != null) {
             return info;
         }
-        final String pureSchema = Srl.substringFirstRear(catalogSchema, ".");
-        info = sequenceMap.get(pureSchema + "." + sequenceName);
+        info = sequenceMap.get(unifiedSchema.buildSchemaQualifiedName(sequenceName));
         if (info != null) {
             return info;
         }
@@ -149,23 +149,24 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Minimum Value
     //                                         -------------
-    public BigDecimal getSequenceMinimumValueByTableName(DataSource dataSource, String catalogSchema, String tableName) {
+    public BigDecimal getSequenceMinimumValueByTableName(DataSource dataSource, UnifiedSchema unifiedSchema,
+            String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
         }
-        return getSequenceMinimumValueBySequenceName(dataSource, catalogSchema, sequenceName);
+        return getSequenceMinimumValueBySequenceName(dataSource, unifiedSchema, sequenceName);
     }
 
-    public BigDecimal getSequenceMinimumValueBySequenceName(DataSource dataSource, String catalogSchema,
+    public BigDecimal getSequenceMinimumValueBySequenceName(DataSource dataSource, UnifiedSchema unifiedSchema,
             String sequenceName) {
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
-        return getSequenceMinimumValue(catalogSchema, sequenceName, sequenceMap);
+        return getSequenceMinimumValue(unifiedSchema, sequenceName, sequenceMap);
     }
 
-    protected BigDecimal getSequenceMinimumValue(String catalogSchema, String sequenceName,
+    protected BigDecimal getSequenceMinimumValue(UnifiedSchema unifiedSchema, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        final DfSequenceMetaInfo info = getSequenceElement(catalogSchema, sequenceName, sequenceMap);
+        final DfSequenceMetaInfo info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
         if (info != null) {
             final BigDecimal minimumValue = info.getMinimumValue();
             if (minimumValue != null) {
@@ -181,23 +182,24 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                         Maximum Value
     //                                         -------------
-    public BigDecimal getSequenceMaximumValueByTableName(DataSource dataSource, String catalogSchema, String tableName) {
+    public BigDecimal getSequenceMaximumValueByTableName(DataSource dataSource, UnifiedSchema unifiedSchema,
+            String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
         }
-        return getSequenceMaximumValueBySequenceName(dataSource, catalogSchema, sequenceName);
+        return getSequenceMaximumValueBySequenceName(dataSource, unifiedSchema, sequenceName);
     }
 
-    public BigDecimal getSequenceMaximumValueBySequenceName(DataSource dataSource, String catalogSchema,
+    public BigDecimal getSequenceMaximumValueBySequenceName(DataSource dataSource, UnifiedSchema unifiedSchema,
             String sequenceName) {
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
-        return getSequenceMaximumValue(catalogSchema, sequenceName, sequenceMap);
+        return getSequenceMaximumValue(unifiedSchema, sequenceName, sequenceMap);
     }
 
-    protected BigDecimal getSequenceMaximumValue(String catalogSchema, String sequenceName,
+    protected BigDecimal getSequenceMaximumValue(UnifiedSchema unifiedSchema, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        final DfSequenceMetaInfo info = getSequenceElement(catalogSchema, sequenceName, sequenceMap);
+        final DfSequenceMetaInfo info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
         if (info != null) {
             final BigDecimal maximumValue = info.getMaximumValue();
             if (maximumValue != null) {
@@ -213,23 +215,24 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                        Increment Size
     //                                        --------------
-    public Integer getSequenceIncrementSizeByTableName(DataSource dataSource, String catalogSchema, String tableName) {
+    public Integer getSequenceIncrementSizeByTableName(DataSource dataSource, UnifiedSchema unifiedSchema,
+            String tableName) {
         final String sequenceName = getSequenceName(tableName);
         if (sequenceName == null) {
             return null;
         }
-        return getSequenceIncrementSizeBySequenceName(dataSource, catalogSchema, sequenceName);
+        return getSequenceIncrementSizeBySequenceName(dataSource, unifiedSchema, sequenceName);
     }
 
-    public Integer getSequenceIncrementSizeBySequenceName(DataSource dataSource, String catalogSchema,
+    public Integer getSequenceIncrementSizeBySequenceName(DataSource dataSource, UnifiedSchema unifiedSchema,
             String sequenceName) {
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
-        return getSequenceIncrementSize(catalogSchema, sequenceName, sequenceMap);
+        return getSequenceIncrementSize(unifiedSchema, sequenceName, sequenceMap);
     }
 
-    protected Integer getSequenceIncrementSize(String catalogSchema, String sequenceName,
+    protected Integer getSequenceIncrementSize(UnifiedSchema unifiedSchema, String sequenceName,
             Map<String, DfSequenceMetaInfo> sequenceMap) {
-        final DfSequenceMetaInfo info = getSequenceElement(catalogSchema, sequenceName, sequenceMap);
+        final DfSequenceMetaInfo info = getSequenceElement(unifiedSchema, sequenceName, sequenceMap);
         if (info != null) {
             final Integer incrementSize = info.getIncrementSize();
             if (incrementSize != null) {
@@ -245,7 +248,7 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     // -----------------------------------------------------
     //                                  (DBFlute) Cache Size
     //                                  --------------------
-    public Integer getSequenceCacheSize(DataSource dataSource, String catalogSchema, String tableName) {
+    public Integer getSequenceCacheSize(DataSource dataSource, UnifiedSchema unifiedSchema, String tableName) {
         final String sequenceProp = getSequenceProp(tableName);
         if (sequenceProp == null) {
             return null;
@@ -272,13 +275,13 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         final String cacheSizeProp = cacheValue.substring(0, endMarkIndex).trim();
         final String sequenceName = getSequenceName(tableName);
         final Map<String, DfSequenceMetaInfo> sequenceMap = getSequenceMap(dataSource);
-        final Integer incrementSize = getSequenceIncrementSize(catalogSchema, sequenceName, sequenceMap);
+        final Integer incrementSize = getSequenceIncrementSize(unifiedSchema, sequenceName, sequenceMap);
         if (cacheSizeProp != null && cacheSizeProp.trim().length() > 0) { // cacheSize is specified
             final Integer cacheSize = castCacheSize(cacheSizeProp, tableName, sequenceProp, sequenceName);
-            assertCacheSizeOverOne(cacheSize, catalogSchema, tableName, sequenceProp, sequenceName, incrementSize);
+            assertCacheSizeOverOne(cacheSize, unifiedSchema, tableName, sequenceProp, sequenceName, incrementSize);
             if (incrementSize != null) { // can get it from meta
-                assertIncrementSizeNotDecrement(incrementSize, catalogSchema, tableName, sequenceProp, sequenceName);
-                assertExtraValueZero(cacheSize, incrementSize, catalogSchema, tableName, sequenceProp, sequenceName);
+                assertIncrementSizeNotDecrement(incrementSize, unifiedSchema, tableName, sequenceProp, sequenceName);
+                assertExtraValueZero(cacheSize, incrementSize, unifiedSchema, tableName, sequenceProp, sequenceName);
 
                 // *no limit because of self-responsibility
                 //assertCacheSizeOfBatchWayNotTooLarge(cacheSize, schemaName, tableName, sequenceProp, sequenceName, incrementSize);
@@ -290,10 +293,10 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
                 return cacheSize; // increment way
             }
         } else { // cacheSize is omitted
-            assertIncrementSizeExistsIfNoCacheSize(incrementSize, catalogSchema, tableName, sequenceProp, sequenceName);
-            assertIncrementSizeNotDecrement(incrementSize, catalogSchema, tableName, sequenceProp, sequenceName);
+            assertIncrementSizeExistsIfNoCacheSize(incrementSize, unifiedSchema, tableName, sequenceProp, sequenceName);
+            assertIncrementSizeNotDecrement(incrementSize, unifiedSchema, tableName, sequenceProp, sequenceName);
             // the cacheSize is same as actual increment size
-            assertCacheSizeOverOne(incrementSize, catalogSchema, tableName, sequenceProp, sequenceName, incrementSize);
+            assertCacheSizeOverOne(incrementSize, unifiedSchema, tableName, sequenceProp, sequenceName, incrementSize);
             return incrementSize; // increment way
         }
     }
@@ -314,14 +317,14 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         }
     }
 
-    protected void assertCacheSizeOverOne(Integer cacheSize, String schemaName, String tableName, String sequenceProp,
-            String sequenceName, Integer incrementSize) {
+    protected void assertCacheSizeOverOne(Integer cacheSize, UnifiedSchema unifiedSchema, String tableName,
+            String sequenceProp, String sequenceName, Integer incrementSize) {
         if (cacheSize <= 1) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
             msg = msg + "The cacheSize should be over 1. (not minus, not zero, not one)" + ln();
             msg = msg + ln();
-            msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
+            msg = msg + "schema = " + unifiedSchema + ln() + "table = " + tableName + ln();
             msg = msg + "sequenceProp = " + sequenceProp + ln();
             msg = msg + "sequenceName = " + sequenceName + ln();
             msg = msg + "cacheSize = " + cacheSize + ln();
@@ -349,14 +352,14 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
     //    }
     //}
 
-    protected void assertIncrementSizeNotDecrement(Integer incrementSize, String schemaName, String tableName,
-            String sequenceProp, String sequenceName) {
+    protected void assertIncrementSizeNotDecrement(Integer incrementSize, UnifiedSchema unifiedSchema,
+            String tableName, String sequenceProp, String sequenceName) {
         if (incrementSize <= 0) { // contains zero just in case
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
             msg = msg + "The incrementSize should be increment! (NOT decrement)" + ln();
             msg = msg + ln();
-            msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
+            msg = msg + "schema = " + unifiedSchema + ln() + "table = " + tableName + ln();
             msg = msg + "sequenceProp = " + sequenceProp + ln();
             msg = msg + "sequenceName = " + sequenceName + ln();
             msg = msg + "incrementSize = " + incrementSize + ln();
@@ -365,15 +368,15 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         }
     }
 
-    protected void assertExtraValueZero(Integer cacheSize, Integer incrementSize, String schemaName, String tableName,
-            String sequenceProp, String sequenceName) {
+    protected void assertExtraValueZero(Integer cacheSize, Integer incrementSize, UnifiedSchema unifiedSchema,
+            String tableName, String sequenceProp, String sequenceName) {
         final Integer extraValue = cacheSize % incrementSize;
         if (extraValue != 0) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
             msg = msg + "The cacheSize cannot be divided by incrementSize!" + ln();
             msg = msg + ln();
-            msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
+            msg = msg + "schema = " + unifiedSchema + ln() + "table = " + tableName + ln();
             msg = msg + "sequenceProp = " + sequenceProp + ln();
             msg = msg + "sequenceName = " + sequenceName + ln();
             msg = msg + "cacheSize = " + cacheSize + ln();
@@ -384,14 +387,14 @@ public final class DfSequenceIdentityProperties extends DfAbstractHelperProperti
         }
     }
 
-    protected void assertIncrementSizeExistsIfNoCacheSize(Integer incrementSize, String schemaName, String tableName,
-            String sequenceProp, String sequenceName) {
+    protected void assertIncrementSizeExistsIfNoCacheSize(Integer incrementSize, UnifiedSchema unifiedSchema,
+            String tableName, String sequenceProp, String sequenceName) {
         if (incrementSize == null) {
             String msg = "Look! Read the message below." + ln();
             msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
             msg = msg + "Failed to get the cache size of sequence(by no increment size):" + ln();
             msg = msg + ln();
-            msg = msg + "schema = " + schemaName + ln() + "table = " + tableName + ln();
+            msg = msg + "schema = " + unifiedSchema + ln() + "table = " + tableName + ln();
             msg = msg + "sequenceProp = " + sequenceProp + ln();
             msg = msg + "sequenceName = " + sequenceName + ln();
             msg = msg + "incrementSize = " + incrementSize + ln();

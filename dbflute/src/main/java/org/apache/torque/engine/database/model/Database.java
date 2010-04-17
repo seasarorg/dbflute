@@ -737,7 +737,7 @@ public class Database {
     }
 
     public boolean isDatabaseMSAccess() {
-        return getBasicProperties().isDatabaseMsAccess();
+        return getBasicProperties().isDatabaseMSAccess();
     }
 
     // -----------------------------------------------------
@@ -976,8 +976,7 @@ public class Database {
     }
 
     public boolean hasDatabaseSchema() {
-        UnifiedSchema databaseSchema = getDatabaseSchema();
-        return databaseSchema.hasSchema();
+        return getDatabaseSchema().hasSchema();
     }
 
     public boolean hasAdditionalSchema() {

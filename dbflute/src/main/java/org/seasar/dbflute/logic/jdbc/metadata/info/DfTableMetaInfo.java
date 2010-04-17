@@ -18,7 +18,9 @@ package org.seasar.dbflute.logic.jdbc.metadata.info;
 import java.util.Map;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor.UserTabComments;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.util.DfSystemUtil;
 
 /**
@@ -67,24 +69,22 @@ public class DfTableMetaInfo {
     // ===================================================================================
     //                                                                       Name Building
     //                                                                       =============
-    public String buildTableDisplayName() {
-        return buildCatalogSchemaTable();
+    public String buildTableFullQualifiedName() {
+        return _unifiedSchema.buildFullQualifiedName(_tableName);
+    }
+
+    public String buildSchemaQualifiedName() {
+        return _unifiedSchema.buildSchemaQualifiedName(_tableName);
     }
 
     public String buildTableSqlName() {
-        return _unifiedSchema.buildSqlElement(_tableName);
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        final String quotedName = prop.quoteTableNameIfNeeds(_tableName, true);
+        return _unifiedSchema.buildSqlName(quotedName);
     }
 
-    public String buildCatalogSchemaTable() {
-        return _unifiedSchema.buildCatalogSchemaElement(_tableName);
-    }
-
-    public String buildIdentifiedSchemaTable() {
-        return _unifiedSchema.buildIdentifiedSchemaElement(_tableName);
-    }
-
-    public String buildPureSchemaTable() {
-        return _unifiedSchema.buildPureSchemaElement(_tableName);
+    public String buildTableDisplayName() {
+        return buildTableFullQualifiedName();
     }
 
     // ===================================================================================
@@ -128,7 +128,7 @@ public class DfTableMetaInfo {
                 comment = _tableComment;
             }
         }
-        return _unifiedSchema.buildCatalogSchemaElement(_tableName) + "(" + _tableType + ")"
+        return _unifiedSchema.buildFullQualifiedName(_tableName) + "(" + _tableType + ")"
                 + ((comment != null && comment.trim().length() > 0) ? " // " + comment : "");
     }
 

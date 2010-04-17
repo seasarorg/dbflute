@@ -128,7 +128,7 @@ public final class DfBasicProperties extends DfAbstractHelperProperties {
         return getDatabaseType().equalsIgnoreCase("sqlite");
     }
 
-    public boolean isDatabaseMsAccess() {
+    public boolean isDatabaseMSAccess() {
         return getDatabaseType().equalsIgnoreCase("msaccess");
     }
 

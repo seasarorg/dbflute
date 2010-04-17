@@ -41,7 +41,6 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfP
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
 import org.seasar.dbflute.logic.jdbc.metadata.synonym.DfProcedureSynonymExtractor;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
-import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties;
 import org.seasar.dbflute.properties.DfOutsideSqlProperties.ProcedureSynonymHandlingType;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
@@ -103,7 +102,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             if (handleDuplicateProcedure(metaInfo, procedureHandlingMap, mainSchema)) {
                 continue;
             }
-            procedureHandlingMap.put(metaInfo.getProcedureUniqueName(), metaInfo);
+            procedureHandlingMap.put(metaInfo.getProcedureFullQualifiedName(), metaInfo);
         }
 
         // arrange order (additional schema after main schema)
@@ -113,7 +112,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         for (Entry<String, DfProcedureMetaInfo> entry : entrySet) {
             final String key = entry.getKey();
             final DfProcedureMetaInfo metaInfo = entry.getValue();
-            if (databaseProperties.isAdditionalSchema(metaInfo.getProcedureSchema())) {
+            if (metaInfo.getProcedureSchema().isAdditionalSchema()) {
                 additionalSchemaProcedureMap.put(key, metaInfo);
             } else {
                 procedureOrderedMap.put(key, metaInfo); // main schema
@@ -218,29 +217,28 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         _log.info("...Filtering procedures by the property: before=" + procedureList.size());
         int passedCount = 0;
         for (DfProcedureMetaInfo metaInfo : procedureList) {
-            final String catalogSchemaProcedureName = buildCatalogSchemaProcedureName(metaInfo);
+            final String procedureDisplayName = metaInfo.getProcedureDisplayName();
             final String procedureCatalog = metaInfo.getProcedureCatalog();
             if (!outsideSqlProperties.isTargetProcedureCatalog(procedureCatalog)) {
-                _log.info("  passed: non-target catalog - " + catalogSchemaProcedureName);
+                _log.info("  passed: non-target catalog - " + procedureDisplayName);
                 ++passedCount;
                 continue;
             }
             final UnifiedSchema procedureSchema = metaInfo.getProcedureSchema();
             if (!outsideSqlProperties.isTargetProcedureSchema(procedureSchema.getPureSchema())) {
-                _log.info("  passed: non-target schema - " + catalogSchemaProcedureName);
+                _log.info("  passed: non-target schema - " + procedureDisplayName);
                 ++passedCount;
                 continue;
             }
-            if (!outsideSqlProperties.isTargetProcedureName(catalogSchemaProcedureName)) {
-                final String schemaProcedureName = buildSchemaProcedureName(metaInfo);
-                if (!outsideSqlProperties.isTargetProcedureName(schemaProcedureName)) {
-                    final String procedureName = metaInfo.getProcedureName();
-                    if (!outsideSqlProperties.isTargetProcedureName(procedureName)) {
-                        _log.info("  passed: non-target name - " + catalogSchemaProcedureName);
-                        ++passedCount;
-                        continue;
-                    }
-                }
+            final String procedureFullQualifiedName = metaInfo.getProcedureFullQualifiedName();
+            final String procedureSchemaQualifiedName = Srl.substringFirstFront(procedureFullQualifiedName, ".");
+            final String procedureName = metaInfo.getProcedureName();
+            if (!outsideSqlProperties.isTargetProcedureName(procedureFullQualifiedName)
+                    && !outsideSqlProperties.isTargetProcedureName(procedureSchemaQualifiedName)
+                    && !outsideSqlProperties.isTargetProcedureName(procedureName)) {
+                _log.info("  passed: non-target name - " + procedureDisplayName);
+                ++passedCount;
+                continue;
             }
             resultList.add(metaInfo);
         }
@@ -255,7 +253,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
     //                                   -------------------
     protected boolean handleDuplicateProcedure(DfProcedureMetaInfo metaInfo,
             Map<String, DfProcedureMetaInfo> procdureMap, UnifiedSchema schemaName) {
-        final String procedureUniqueName = metaInfo.getProcedureUniqueName();
+        final String procedureUniqueName = metaInfo.getProcedureFullQualifiedName();
         final DfProcedureMetaInfo first = procdureMap.get(procedureUniqueName);
         if (first == null) {
             return false;
@@ -310,7 +308,7 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
             final String catalogName = unifiedSchema.getPureCatalog();
             final String schemaName = unifiedSchema.getPureSchema();
             final ResultSet procedureRs = metaData.getProcedures(catalogName, schemaName, null);
-            setupProcedureMetaInfo(metaInfoList, procedureRs);
+            setupProcedureMetaInfo(metaInfoList, procedureRs, unifiedSchema);
             for (DfProcedureMetaInfo procedureMetaInfo : metaInfoList) {
                 String procedureName = procedureMetaInfo.getProcedureName();
                 final ResultSet columnRs = metaData.getProcedureColumns(catalogName, schemaName, procedureName, null);
@@ -331,24 +329,30 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         return metaInfoList;
     }
 
-    protected void setupProcedureMetaInfo(List<DfProcedureMetaInfo> procedureMetaInfoList, ResultSet procedureRs)
-            throws SQLException {
+    protected void setupProcedureMetaInfo(List<DfProcedureMetaInfo> procedureMetaInfoList, ResultSet procedureRs,
+            UnifiedSchema unifiedSchema) throws SQLException {
         while (procedureRs.next()) {
-            final String procedureCatalog = procedureRs.getString("PROCEDURE_CAT");
             final String procedureSchema = procedureRs.getString("PROCEDURE_SCHEM");
-            final String procedureName = procedureRs.getString("PROCEDURE_NAME");
+            final String procedureCatalog;
+            final String procedureName;
+            {
+                final String plainCatalog = procedureRs.getString("PROCEDURE_CAT");
+                String packagePrefix = "";
+                if (isOracle()) {
+                    packagePrefix = plainCatalog + ".";
+                    procedureCatalog = null; // because Oracle treats catalog as package
+                } else {
+                    if (Srl.is_NotNull_and_NotTrimmedEmpty(plainCatalog)) {
+                        procedureCatalog = plainCatalog;
+                    } else {
+                        procedureCatalog = unifiedSchema.getPureCatalog();
+                    }
+                }
+                final String plainName = procedureRs.getString("PROCEDURE_NAME");
+                procedureName = packagePrefix + plainName;
+            }
             final Integer procedureType = new Integer(procedureRs.getString("PROCEDURE_TYPE"));
             final String procedureComment = procedureRs.getString("REMARKS");
-
-            // /- - - - - - - - - - - - - - - - - - - - - -
-            // Remove system procedures of PostgreSQL.
-            // Because PostgreSQL returns system procedures.
-            // - - - - - - - - - -/
-            if (isPostgreSQL()) {
-                if (procedureName != null && procedureName.toLowerCase().startsWith("pl")) {
-                    continue;
-                }
-            }
 
             final DfProcedureMetaInfo metaInfo = new DfProcedureMetaInfo();
             metaInfo.setProcedureCatalog(procedureCatalog);
@@ -364,11 +368,10 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
                 throw new IllegalStateException("Unknown procedureType: " + procedureType);
             }
             metaInfo.setProcedureComment(procedureComment);
+            metaInfo.setProcedureFullQualifiedName(buildProcedureFullQualifiedName(metaInfo));
+            metaInfo.setProcedureSchemaQualifiedName(buildProcedureSchemaQualifiedName(metaInfo));
             metaInfo.setProcedureSqlName(buildProcedureSqlName(metaInfo));
             metaInfo.setProcedureDisplayName(metaInfo.getProcedureSqlName());
-            metaInfo.setCatalogSchemaProcedureName(buildCatalogSchemaProcedureName(metaInfo));
-            metaInfo.setSchemaProcedureName(buildSchemaProcedureName(metaInfo));
-            metaInfo.setProcedureUniqueName(buildProcedureUniqueName(metaInfo));
             procedureMetaInfoList.add(metaInfo);
         }
     }
@@ -442,57 +445,22 @@ public class DfProcedureHandler extends DfAbstractMetaDataHandler {
         adjustProcedureColumnList(procedureMetaInfo);
     }
 
-    protected String buildCatalogSchemaProcedureName(DfProcedureMetaInfo metaInfo) {
-        return buildProcedureArrangeName(metaInfo, true, true, true);
-    }
-
-    protected String buildSchemaProcedureName(DfProcedureMetaInfo metaInfo) {
-        return buildProcedureArrangeName(metaInfo, true, true, false);
-    }
-
     protected String buildProcedureSqlName(DfProcedureMetaInfo metaInfo) {
+        final String sqlName = metaInfo.getProcedureSchema().buildSqlName(metaInfo.getProcedureName());
         // DB2 needs schema prefix for calling procedures. (actually tried)
-        final boolean includeMainSchema = isDB2();
-        final DfLittleAdjustmentProperties prop = getProperties().getLittleAdjustmentProperties();
-        final boolean includeCatalog = prop.isAvailableAddingCatalogToTableSqlName();
-        return buildProcedureArrangeName(metaInfo, true, includeMainSchema, includeCatalog);
+        if (isDB2() && !sqlName.contains(".")) {
+            return Srl.connectPrefix(sqlName, metaInfo.getProcedureSchema().getPureSchema(), ".");
+        } else {
+            return sqlName;
+        }
     }
 
-    protected String buildProcedureUniqueName(DfProcedureMetaInfo metaInfo) {
-        return buildProcedureArrangeName(metaInfo, false, false, false);
+    protected String buildProcedureFullQualifiedName(DfProcedureMetaInfo metaInfo) {
+        return metaInfo.getProcedureSchema().buildFullQualifiedName(metaInfo.getProcedureName());
     }
 
-    protected String buildProcedureArrangeName(DfProcedureMetaInfo metaInfo, boolean includeSchema,
-            boolean includeMainSchema, boolean includeCatalog) {
-        final DfDatabaseProperties databaseProperties = getProperties().getDatabaseProperties();
-        final StringBuilder sb = new StringBuilder();
-        if (includeSchema) {
-            final UnifiedSchema procedureSchema = metaInfo.getProcedureSchema();
-            if (procedureSchema.hasSchema()) {
-                if (includeMainSchema) {
-                    sb.append(procedureSchema).append(".");
-                } else {
-                    if (databaseProperties.isAdditionalSchema(procedureSchema)) {
-                        sb.append(procedureSchema).append(".");
-                    }
-                }
-            }
-        }
-        final String procedureCatalog = metaInfo.getProcedureCatalog();
-        if (includeCatalog) {
-            if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureCatalog)) {
-                if (!getBasicProperties().isDatabaseOracle()) {
-                    sb.append(procedureCatalog).append(".");
-                }
-            }
-        }
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(procedureCatalog)) {
-            if (getBasicProperties().isDatabaseOracle()) {
-                sb.append(procedureCatalog).append("."); // Oracle treats catalog as package 
-            }
-        }
-        final String procedureName = metaInfo.getProcedureName();
-        return sb.append(procedureName).toString();
+    protected String buildProcedureSchemaQualifiedName(DfProcedureMetaInfo metaInfo) {
+        return metaInfo.getProcedureSchema().buildSchemaQualifiedName(metaInfo.getProcedureName());
     }
 
     protected void adjustProcedureColumnList(DfProcedureMetaInfo procedureMetaInfo) {

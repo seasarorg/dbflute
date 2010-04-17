@@ -69,15 +69,15 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
         try {
             conn = _dataSource.getConnection();
             final DatabaseMetaData metaData = conn.getMetaData();
-            final Map<String, DfProcedureMetaInfo> procedureFullNameKeyMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
+            final Map<String, DfProcedureMetaInfo> procedureMap = new LinkedHashMap<String, DfProcedureMetaInfo>();
             final List<DfProcedureMetaInfo> procedureList = new ArrayList<DfProcedureMetaInfo>();
             final DfProcedureHandler procedureHandler = new DfProcedureHandler();
             for (UnifiedSchema unifiedSchema : _targetSchemaList) {
                 procedureList.addAll(procedureHandler.getPlainProcedureList(metaData, unifiedSchema));
             }
             for (DfProcedureMetaInfo metaInfo : procedureList) {
-                final String procedureKeyName = metaInfo.getSchemaProcedureName();
-                procedureFullNameKeyMap.put(procedureKeyName, metaInfo);
+                final String procedureKeyName = metaInfo.getProcedureFullQualifiedName();
+                procedureMap.put(procedureKeyName, metaInfo);
             }
             statement = conn.createStatement();
             _log.info(sql);
@@ -111,8 +111,8 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
                     continue; // basically no way because it may be for DB Link Synonym
                 }
 
-                final String procedureKey = tableOwner.buildPureSchemaElement(tableName);
-                final DfProcedureMetaInfo procedureMetaInfo = procedureFullNameKeyMap.get(procedureKey);
+                final String procedureKey = tableOwner.buildFullQualifiedName(tableName);
+                final DfProcedureMetaInfo procedureMetaInfo = procedureMap.get(procedureKey);
                 if (procedureMetaInfo == null) {
                     // Synonym for Package Procedure has several problems.
                     // So it is not supported here.
@@ -174,12 +174,12 @@ public class DfProcedureSynonymExtractorOracle extends DfAbstractMetaDataExtract
     }
 
     protected String buildSynonymMapKey(UnifiedSchema synonymOwner, String synonymName) {
-        return synonymOwner.buildPureSchemaElement(synonymName);
+        return synonymOwner.buildFullQualifiedName(synonymName);
     }
 
     protected void judgeSynonymSelectable(DfSynonymMetaInfo info) {
         final DfJdbcFacade facade = new DfJdbcFacade(_dataSource);
-        final String synonymSqlName = info.buildPureSchemaSynonym();
+        final String synonymSqlName = info.buildSynonymSqlName();
         final String sql = "select * from " + synonymSqlName + " where 0 = 1";
         try {
             final List<String> columnList = new ArrayList<String>();

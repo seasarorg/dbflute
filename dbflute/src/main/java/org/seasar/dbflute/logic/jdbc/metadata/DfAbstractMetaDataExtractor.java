@@ -42,7 +42,7 @@ public abstract class DfAbstractMetaDataExtractor {
     }
 
     protected UnifiedSchema createAsDynamicSchema(String catalog, String schema) {
-        return UnifiedSchema.createAsDynamicSchema(catalog, schema, getDatabaseProperties());
+        return UnifiedSchema.createAsDynamicSchema(catalog, schema);
     }
 
     // ===================================================================================
@@ -104,7 +104,7 @@ public abstract class DfAbstractMetaDataExtractor {
     }
 
     protected boolean isMsAccess() {
-        return getBasicProperties().isDatabaseMsAccess();
+        return getBasicProperties().isDatabaseMSAccess();
     }
 
     // ===================================================================================

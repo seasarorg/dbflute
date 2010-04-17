@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.config.DfEnvironmentType;
 import org.seasar.dbflute.exception.DfIllegalPropertyTypeException;
+import org.seasar.dbflute.exception.DfJDBCException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.scmconn.DfCurrentSchemaConnector;
 import org.seasar.dbflute.properties.filereader.DfListStringFileReader;
@@ -548,7 +549,8 @@ public abstract class DfAbstractHelperProperties {
         }
     }
 
-    protected Connection createConnection(String driver, String url, UnifiedSchema unifiedSchema, String user, String password) {
+    protected Connection createConnection(String driver, String url, UnifiedSchema unifiedSchema, String user,
+            String password) {
         setupConnectionDriver(driver);
         try {
             final Connection conn = DriverManager.getConnection(url, user, password);
@@ -573,6 +575,17 @@ public abstract class DfAbstractHelperProperties {
         if (unifiedSchema.existsPureSchema()) {
             final DfCurrentSchemaConnector connector = new DfCurrentSchemaConnector(unifiedSchema, getBasicProperties());
             connector.connectSchema(conn);
+        }
+    }
+
+    protected String getConnectedCatalog(String driver, String url, String user, String password) throws SQLException {
+        setupConnectionDriver(driver);
+        try {
+            final Connection conn = DriverManager.getConnection(url, user, password);
+            return conn.getCatalog();
+        } catch (SQLException e) {
+            String msg = "Failed to connect: url=" + url + " user=" + user;
+            throw new DfJDBCException(msg, e);
         }
     }
 

@@ -30,14 +30,12 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
-import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringSet;
 import org.seasar.dbflute.logic.jdbc.handler.DfAutoIncrementHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfColumnHandler;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfPrimaryKeyMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfTableMetaInfo;
-import org.seasar.dbflute.util.Srl;
 
 /**
  * @author jflute
@@ -63,17 +61,18 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
     @Override
     public void incrementSequenceToDataMax(Map<String, String> tableSequenceMap) {
         super.incrementSequenceToDataMax(tableSequenceMap);
-        try {
-            handleSerialTypeSequence(tableSequenceMap);
-        } catch (SQLException e) {
-            String msg = "Failed to handle serial type sequence: " + tableSequenceMap;
-            throw new SQLFailureException(msg, e);
-        }
+        handleSerialTypeSequence(tableSequenceMap);
     }
 
-    protected void handleSerialTypeSequence(Map<String, String> tableSequenceMap) throws SQLException {
+    protected void handleSerialTypeSequence(Map<String, String> tableSequenceMap) {
         final StringSet doneSequenceSet = StringSet.createAsFlexibleOrdered();
         doneSequenceSet.addAll(tableSequenceMap.values());
+        DfTableMetaInfo tableInfo = null;
+        DfPrimaryKeyMetaInfo pkInfo = null;
+        String sequenceName = null;
+        String tableSqlName = null;
+        Integer actualValue = null;
+        String sequenceSqlName = null;
         Connection conn = null;
         Statement st = null;
         try {
@@ -85,8 +84,16 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
             _log.info("...Incrementing serial type sequence");
             final Set<Entry<String, DfTableMetaInfo>> entrySet = _tableMap.entrySet();
             for (Entry<String, DfTableMetaInfo> entry : entrySet) {
-                final DfTableMetaInfo tableInfo = entry.getValue();
-                final DfPrimaryKeyMetaInfo pkInfo = _uniqueKeyHandler.getPrimaryKey(metaData, tableInfo);
+                // clear elements that are also used exception message
+                tableInfo = null;
+                pkInfo = null;
+                sequenceName = null;
+                tableSqlName = null;
+                actualValue = null;
+                sequenceSqlName = null;
+
+                tableInfo = entry.getValue();
+                pkInfo = _uniqueKeyHandler.getPrimaryKey(metaData, tableInfo);
                 final List<String> pkList = pkInfo.getPrimaryKeyList();
                 if (pkList.size() != 1) {
                     continue;
@@ -113,25 +120,29 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                 if (endIndex < 0) {
                     continue;
                 }
-                final String sequenceName = excludedPrefixString.substring(0, endIndex);
+                sequenceName = excludedPrefixString.substring(0, endIndex);
                 if (doneSequenceSet.contains(sequenceName)) {
                     continue; // already done
                 }
-                final String tableSqlName = tableInfo.buildCatalogSchemaTable();
+                tableSqlName = tableInfo.buildTableSqlName();
                 final Integer count = selectCount(st, tableSqlName);
                 if (count == null || count == 0) {
                     // It is not necessary to increment because the table has no data.
                     continue;
                 }
-                final Integer actualValue = selectDataMax(st, tableInfo, primaryKeyColumnName);
+                actualValue = selectDataMax(st, tableInfo, primaryKeyColumnName);
                 if (actualValue == null) {
                     // It is not necessary to increment because the table has no data.
                     continue;
                 }
-                final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
-                final String sequenceSqlName = Srl.connectPrefix(sequenceName, unifiedSchema.getCatalogSchema(), ".");
+                // because sequence names of other schemas have already been qualified
+                //sequenceSqlName = tableInfo.getUnifiedSchema().buildSqlName(sequenceName);
+                sequenceSqlName = sequenceName;
                 callSequenceLoop(st, sequenceSqlName, actualValue);
             }
+        } catch (SQLException e) {
+            throwSerialTypeSequenceHandlingFailureException(tableInfo, pkInfo, sequenceName, tableSqlName, actualValue,
+                    sequenceSqlName, e);
         } finally {
             if (st != null) {
                 try {
@@ -148,6 +159,28 @@ public class DfSequenceHandlerPostgreSQL extends DfSequenceHandlerJdbc {
                 }
             }
         }
+    }
+
+    protected void throwSerialTypeSequenceHandlingFailureException(DfTableMetaInfo tableInfo,
+            DfPrimaryKeyMetaInfo pkInfo, String sequenceName, String tableSqlName, Integer actualValue,
+            String sequenceSqlName, SQLException e) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Failed to handle serial type sequence!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Table Info]" + ln() + tableInfo + ln();
+        msg = msg + ln();
+        msg = msg + "[Primary Key Info]" + ln() + pkInfo + ln();
+        msg = msg + ln();
+        msg = msg + "[Sequence Name]" + ln() + sequenceName + ln();
+        msg = msg + ln();
+        msg = msg + "[Table SQL Name]" + ln() + tableSqlName + ln();
+        msg = msg + ln();
+        msg = msg + "[Table Data Max]" + ln() + actualValue + ln();
+        msg = msg + ln();
+        msg = msg + "[Sequence SQL Name]" + ln() + sequenceSqlName + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new IllegalStateException(msg);
     }
 
     // ===================================================================================

@@ -63,7 +63,7 @@ public class DfSchemaInitializerPostgreSQL extends DfSchemaInitializerJdbc {
             sequenceNameList.add(recordMap.get(sequenceColumnName));
         }
         for (String sequenceName : sequenceNameList) {
-            final String sequenceSqlName = _unifiedSchema.buildSqlElement(sequenceName);
+            final String sequenceSqlName = _unifiedSchema.buildSqlName(sequenceName);
             final String dropSequenceSql = "drop sequence " + sequenceSqlName;
             _log.info(dropSequenceSql);
             jdbcFacade.execute(dropSequenceSql);

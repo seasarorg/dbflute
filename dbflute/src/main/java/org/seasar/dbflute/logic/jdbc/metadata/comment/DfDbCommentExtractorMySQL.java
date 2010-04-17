@@ -30,7 +30,7 @@ public class DfDbCommentExtractorMySQL extends DfDbCommentExtractorBase {
     //                                                                    ================
     protected List<UserTabComments> selectUserTabComments(Connection conn, Set<String> tableSet) {
         // MySQL treats catalog as schema in informations schema
-        if (_unifiedSchema.existsPureCatalog()) {
+        if (!_unifiedSchema.existsPureCatalog()) {
             String msg = "Extracting comments from MySQL requires pure catalog in unified schema:";
             msg = msg + " unifiedSchema=" + _unifiedSchema;
             throw new IllegalStateException(msg);
@@ -60,7 +60,7 @@ public class DfDbCommentExtractorMySQL extends DfDbCommentExtractorBase {
 
     protected List<UserColComments> selectUserColComments(Connection conn, Set<String> tableSet) {
         // MySQL treats catalog as schema in informations schema
-        if (_unifiedSchema.existsPureCatalog()) {
+        if (!_unifiedSchema.existsPureCatalog()) {
             String msg = "Extracting comments from MySQL requires pure catalog in unified schema:";
             msg = msg + " unifiedSchema=" + _unifiedSchema;
             throw new IllegalStateException(msg);

@@ -31,7 +31,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.exception.DfTableNotFoundException;
-import org.seasar.dbflute.exception.SQLFailureException;
 import org.seasar.dbflute.helper.StringKeyMap;
 import org.seasar.dbflute.logic.jdbc.handler.DfTableHandler;
 import org.seasar.dbflute.logic.jdbc.handler.DfUniqueKeyHandler;
@@ -66,8 +65,8 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         _tableMap = StringKeyMap.createAsFlexible();
         final DfTableHandler tableHandler = new DfTableHandler();
         final DatabaseMetaData metaData = conn.getMetaData();
-        final List<UnifiedSchema> uniqueSchemaList = _unifiedSchemaList;
-        for (UnifiedSchema unifiedSchema : uniqueSchemaList) {
+        final List<UnifiedSchema> unifiedSchemaList = _unifiedSchemaList;
+        for (UnifiedSchema unifiedSchema : unifiedSchemaList) {
             // same-name tables between different schemas are unsupported
             // so put all directly here
             _tableMap.putAll(tableHandler.getTableMap(metaData, unifiedSchema));
@@ -88,33 +87,46 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     public void incrementSequenceToDataMax(Map<String, String> tableSequenceMap) {
         final Map<String, List<String>> skippedMap = DfCollectionUtil.newLinkedHashMap();
         _log.info("...Incrementing sequences to max value of table data");
+        String tableName = null;
+        String sequenceName = null;
+        DfTableMetaInfo tableInfo = null;
+        DfPrimaryKeyMetaInfo pkInfo = null;
+        String tableSqlName = null;
+        Integer actualValue = null;
         Connection conn = null;
         Statement st = null;
-        String sequenceName = null;
         try {
-            initializeTableInfo(conn);
             conn = _dataSource.getConnection();
+            initializeTableInfo(conn);
             st = conn.createStatement();
             final Set<Entry<String, String>> entrySet = tableSequenceMap.entrySet();
             for (Entry<String, String> entry : entrySet) {
-                final String tableName = entry.getKey();
+                // clear elements that are also used exception message
+                tableName = null;
+                sequenceName = null;
+                tableInfo = null;
+                pkInfo = null;
+                tableSqlName = null;
+                actualValue = null;
+
+                tableName = entry.getKey();
                 sequenceName = entry.getValue();
                 assertValidSequence(sequenceName, tableName);
-                final DfTableMetaInfo tableInfo = findTableInfo(conn, tableName);
-                final DfPrimaryKeyMetaInfo pkInfo = findPrimaryKeyInfo(conn, tableInfo);
+                tableInfo = findTableInfo(conn, tableName);
+                pkInfo = findPrimaryKeyInfo(conn, tableInfo);
                 final List<String> pkList = pkInfo.getPrimaryKeyList();
                 if (pkList.size() != 1) {
                     skippedMap.put(tableName, pkList);
                     continue;
                 }
                 final String primaryKeyColumnName = pkList.get(0);
-                final String tableSqlName = tableInfo.buildCatalogSchemaTable();
+                tableSqlName = tableInfo.buildTableSqlName();
                 final Integer count = selectCount(st, tableSqlName);
                 if (count == null || count == 0) {
                     // It is not necessary to increment because the table has no data.
                     continue;
                 }
-                final Integer actualValue = selectDataMax(st, tableInfo, primaryKeyColumnName);
+                actualValue = selectDataMax(st, tableInfo, primaryKeyColumnName);
                 if (actualValue == null) {
                     // It is not necessary to increment because the table has no data.
                     continue;
@@ -122,20 +134,8 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
                 callSequenceLoop(st, sequenceName, actualValue);
             }
         } catch (SQLException e) {
-            String msg = "Look! Read the message below." + ln();
-            msg = msg + "/- - - - - - - - - - - - - - - - - - - - - - - - - - - -" + ln();
-            msg = msg + "Failed to increment sequences:" + ln();
-            msg = msg + ln();
-            msg = msg + "current = " + sequenceName + ln();
-            msg = msg + "tableSequenceMap:" + ln();
-            final Set<Entry<String, String>> entrySet = tableSequenceMap.entrySet();
-            for (Entry<String, String> entry : entrySet) {
-                msg = msg + "  " + entry.getKey() + " = " + entry.getValue() + ln();
-            }
-            msg = msg + ln();
-            msg = msg + "SQLException = " + e.getMessage() + ln();
-            msg = msg + " - - - - - - - - - -/";
-            throw new SQLFailureException(msg, e);
+            throwIncrementSequenceToDataMaxFailureException(tableName, sequenceName, tableInfo, pkInfo, tableSqlName,
+                    actualValue, e);
         } finally {
             if (st != null) {
                 try {
@@ -154,11 +154,11 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
         }
         if (!skippedMap.isEmpty()) {
             _log.info("*Unsupported incrementing sequences(multiple-PK):");
-            Set<Entry<String, List<String>>> skippedEntrySet = skippedMap.entrySet();
+            final Set<Entry<String, List<String>>> skippedEntrySet = skippedMap.entrySet();
             for (Entry<String, List<String>> skippedEntry : skippedEntrySet) {
-                String tableName = skippedEntry.getKey();
-                List<String> pkList = skippedEntry.getValue();
-                _log.info("    " + tableName + ": pk=" + pkList);
+                final String skippedTableName = skippedEntry.getKey();
+                final List<String> pkList = skippedEntry.getValue();
+                _log.info("    " + skippedTableName + ": pk=" + pkList);
             }
         }
     }
@@ -228,8 +228,7 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
 
     protected Integer selectDataMax(Statement statement, DfTableMetaInfo tableInfo, String primaryKeyColumnName)
             throws SQLException {
-        final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
-        final String tableSqlName = unifiedSchema.buildCatalogSchemaElement(tableInfo.getTableName());
+        final String tableSqlName = tableInfo.buildTableSqlName();
         final String sql = "select max(" + primaryKeyColumnName + ") as MAX_VALUE from " + tableSqlName;
         ResultSet rs = null;
         try {
@@ -263,6 +262,28 @@ public abstract class DfSequenceHandlerJdbc implements DfSequenceHandler {
     }
 
     protected abstract Integer selectNextVal(Statement statement, String sequenceName) throws SQLException;
+
+    protected void throwIncrementSequenceToDataMaxFailureException(String tableName, String sequenceName,
+            DfTableMetaInfo tableInfo, DfPrimaryKeyMetaInfo pkInfo, String tableSqlName, Integer actualValue,
+            SQLException e) {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Failed to handle serial type sequence!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Table Name]" + ln() + tableName + ln();
+        msg = msg + ln();
+        msg = msg + "[Sequence Name]" + ln() + sequenceName + ln();
+        msg = msg + ln();
+        msg = msg + "[Table Info]" + ln() + tableInfo + ln();
+        msg = msg + ln();
+        msg = msg + "[Primary Key Info]" + ln() + pkInfo + ln();
+        msg = msg + ln();
+        msg = msg + "[Table SQL Name]" + ln() + tableSqlName + ln();
+        msg = msg + ln();
+        msg = msg + "[Table Data Max]" + ln() + actualValue + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new IllegalStateException(msg);
+    }
 
     // ===================================================================================
     //                                                                      General Helper

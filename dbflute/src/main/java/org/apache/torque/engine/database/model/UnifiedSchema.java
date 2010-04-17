@@ -1,8 +1,10 @@
 package org.apache.torque.engine.database.model;
 
+import org.seasar.dbflute.DfBuildProperties;
 import org.seasar.dbflute.properties.DfDatabaseProperties;
+import org.seasar.dbflute.properties.DfLittleAdjustmentProperties;
 import org.seasar.dbflute.properties.assistant.DfAdditionalSchemaInfo;
-import org.seasar.dbflute.util.DfTypeUtil;
+import org.seasar.dbflute.util.DfSystemUtil;
 import org.seasar.dbflute.util.Srl;
 
 /**
@@ -52,39 +54,51 @@ public class UnifiedSchema {
         return Srl.is_NotNull_and_NotTrimmedEmpty(element) ? element.trim() : null;
     }
 
+    // -----------------------------------------------------
+    //                                               Creator
+    //                                               -------
     public static UnifiedSchema createAsMainSchema(String catalog, String schema) {
         return new UnifiedSchema(catalog, schema).asMainSchema();
     }
 
-    public static UnifiedSchema createAsAdditionalSchema(String catalog, String schema, boolean catalogSpecified) {
-        final UnifiedSchema unifiedSchema = new UnifiedSchema(catalog, schema);
-        if (catalogSpecified) {
+    public static UnifiedSchema createAsAdditionalSchema(String catalog, String schema, boolean explicitCatalog) {
+        final UnifiedSchema unifiedSchema = new UnifiedSchema(catalog, schema).asAdditionalSchema();
+        if (explicitCatalog) {
             unifiedSchema.asCatalogAdditionalSchema();
         }
         return unifiedSchema;
     }
 
-    public static UnifiedSchema createAsDynamicSchema(String schemaExpression, DfDatabaseProperties databaseProp) {
+    public static UnifiedSchema createAsDynamicSchema(String schemaExpression) {
+        final DfDatabaseProperties databaseProp = DfBuildProperties.getInstance().getDatabaseProperties();
         return new UnifiedSchema(schemaExpression).judgeSchema(databaseProp);
     }
 
-    public static UnifiedSchema createAsDynamicSchema(String catalog, String schema, DfDatabaseProperties databaseProp) {
+    public static UnifiedSchema createAsDynamicSchema(String catalog, String schema) {
+        final DfDatabaseProperties databaseProp = DfBuildProperties.getInstance().getDatabaseProperties();
         return new UnifiedSchema(catalog, schema).judgeSchema(databaseProp);
     }
 
+    // -----------------------------------------------------
+    //                                                Status
+    //                                                ------
     protected UnifiedSchema asMainSchema() {
         _mainSchema = true;
-        _additionalSchema = false;
-        _unknownSchema = false;
-        _catalogAdditionalSchema = false;
+        return this;
+    }
+
+    protected UnifiedSchema asAdditionalSchema() {
+        _additionalSchema = true;
         return this;
     }
 
     protected UnifiedSchema asCatalogAdditionalSchema() {
-        _mainSchema = false;
-        _additionalSchema = true;
-        _unknownSchema = false;
         _catalogAdditionalSchema = true;
+        return this;
+    }
+
+    protected UnifiedSchema asUnknownSchema() {
+        _unknownSchema = true;
         return this;
     }
 
@@ -94,10 +108,13 @@ public class UnifiedSchema {
             asMainSchema();
         } else {
             final DfAdditionalSchemaInfo info = databaseProp.getAdditionalSchemaInfo(this);
-            if (info != null && info.getUnifiedSchema().isCatalogAdditionalSchema()) {
-                asCatalogAdditionalSchema();
+            if (info != null) {
+                asAdditionalSchema();
+                if (info.getUnifiedSchema().isCatalogAdditionalSchema()) {
+                    asCatalogAdditionalSchema();
+                }
             } else {
-                _unknownSchema = true;
+                asUnknownSchema();
             }
         }
         return this;
@@ -106,16 +123,20 @@ public class UnifiedSchema {
     // ===================================================================================
     //                                                                   Schema Expression
     //                                                                   =================
-    public String getCatalogSchema() {
+    public String getDisplaySchema() {
+        return getCatalogSchema();
+    }
+
+    protected String getCatalogSchema() {
         final StringBuilder sb = new StringBuilder();
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_catalog)) {
             sb.append(_catalog);
         }
         if (Srl.is_NotNull_and_NotTrimmedEmpty(_schema)) {
-            if (sb.length() > 0) {
-                sb.append(".");
-            }
-            if (!NO_NAME_SCHEMA.equals(_schema)) {
+            if (!isNoNameSchema()) {
+                if (sb.length() > 0) {
+                    sb.append(".");
+                }
                 sb.append(_schema);
             }
         }
@@ -143,36 +164,64 @@ public class UnifiedSchema {
     }
 
     public String getPureSchema() {
-        if (Srl.is_NotNull_and_NotTrimmedEmpty(_schema) && NO_NAME_SCHEMA.equals(_schema)) {
+        if (isNoNameSchema()) {
             return null;
         }
         return _schema;
     }
 
+    protected String getSqlPrefixSchema() {
+        final DfLittleAdjustmentProperties prop = DfBuildProperties.getInstance().getLittleAdjustmentProperties();
+        if (prop.isAvailableAddingSchemaToTableSqlName()) {
+            if (prop.isAvailableAddingCatalogToTableSqlName()) {
+                return getCatalogSchema();
+            } else {
+                return getPureSchema();
+            }
+        }
+        if (_mainSchema) {
+            return "";
+        }
+        if (_additionalSchema) {
+            if (_catalogAdditionalSchema) {
+                return getCatalogSchema();
+            } else { // schema-only additional schema
+                return getPureSchema();
+            }
+        }
+        // as unknown
+        throwUnknownSchemaCannotUseSQLPrefixException();
+        return null; // unreachable
+    }
+
+    protected void throwUnknownSchemaCannotUseSQLPrefixException() {
+        String msg = "Look! Read the message below." + ln();
+        msg = msg + "/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *" + ln();
+        msg = msg + "Unknown schema is NOT supported to use SQL prefix!" + ln();
+        msg = msg + ln();
+        msg = msg + "[Unified Schema]" + ln() + toString() + ln();
+        msg = msg + "* * * * * * * * * */";
+        throw new IllegalStateException(msg);
+    }
+
     // ===================================================================================
     //                                                                 Unique Element Name
     //                                                                 ===================
-    public String buildSqlElement(String elementName) {
-        if (_mainSchema) {
-            return elementName;
-        }
-        if (_catalogAdditionalSchema) {
-            return buildCatalogSchemaElement(elementName);
-        } else { // schema-only additional schema
-            return buildPureSchemaElement(elementName);
-        }
-    }
-
-    public String buildCatalogSchemaElement(String elementName) {
+    public String buildFullQualifiedName(String elementName) {
         return Srl.connectPrefix(elementName, getCatalogSchema(), ".");
     }
 
-    public String buildIdentifiedSchemaElement(String elementName) {
+    public String buildSchemaQualifiedName(String elementName) {
+        return Srl.connectPrefix(elementName, getPureSchema(), ".");
+    }
+
+    public String buildIdentifiedName(String elementName) {
         return Srl.connectPrefix(elementName, getIdentifiedSchema(), ".");
     }
 
-    public String buildPureSchemaElement(String elementName) {
-        return Srl.connectPrefix(elementName, getPureSchema(), ".");
+    public String buildSqlName(String elementName) {
+        final String sqlPrefixSchema = getSqlPrefixSchema();
+        return Srl.connectPrefix(elementName, sqlPrefixSchema, ".");
     }
 
     // ===================================================================================
@@ -206,6 +255,10 @@ public class UnifiedSchema {
         return Srl.is_NotNull_and_NotTrimmedEmpty(getPureSchema());
     }
 
+    protected boolean isNoNameSchema() {
+        return Srl.is_NotNull_and_NotTrimmedEmpty(_schema) && NO_NAME_SCHEMA.equalsIgnoreCase(_schema);
+    }
+
     // ===================================================================================
     //                                                                      Basic Override
     //                                                                      ==============
@@ -219,7 +272,7 @@ public class UnifiedSchema {
         if (mySchema == null && yourSchema == null) {
             return true;
         }
-        return mySchema != null && mySchema.equals(yourSchema);
+        return mySchema != null && mySchema.equalsIgnoreCase(yourSchema);
     }
 
     @Override
@@ -230,6 +283,15 @@ public class UnifiedSchema {
 
     @Override
     public String toString() {
-        return DfTypeUtil.toClassTitle(this) + ":{" + getIdentifiedSchema() + "}";
+        return "{" + getIdentifiedSchema() + " as " + (isMainSchema() ? "main" : "")
+                + (isAdditionalSchema() ? "additional" : "") + (isCatalogAdditionalSchema() ? "(catalog)" : "")
+                + (isUnknownSchema() ? "unknown" : "") + "}";
+    }
+
+    // ===============================================================================
+    //                                                                  General Helper
+    //                                                                  ==============
+    protected String ln() {
+        return DfSystemUtil.getLineSeparator();
     }
 }

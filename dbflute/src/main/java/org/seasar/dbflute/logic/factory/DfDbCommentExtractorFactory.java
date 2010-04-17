@@ -4,9 +4,9 @@ import javax.sql.DataSource;
 
 import org.apache.torque.engine.database.model.UnifiedSchema;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractor;
-import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorMySql;
+import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorMySQL;
 import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorOracle;
-import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorSqlServer;
+import org.seasar.dbflute.logic.jdbc.metadata.comment.DfDbCommentExtractorSQLServer;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**
@@ -45,7 +45,7 @@ public class DfDbCommentExtractorFactory {
      */
     public DfDbCommentExtractor createDbCommentExtractor() {
         if (_basicProperties.isDatabaseMySQL()) {
-            final DfDbCommentExtractorMySql extractor = new DfDbCommentExtractorMySql();
+            final DfDbCommentExtractorMySQL extractor = new DfDbCommentExtractorMySQL();
             extractor.setDataSource(_dataSource);
             extractor.setUnifiedSchema(_unifiedSchema);
             return extractor;
@@ -55,7 +55,7 @@ public class DfDbCommentExtractorFactory {
             extractor.setUnifiedSchema(_unifiedSchema);
             return extractor;
         } else if (_basicProperties.isDatabaseSQLServer()) {
-            final DfDbCommentExtractorSqlServer extractor = new DfDbCommentExtractorSqlServer();
+            final DfDbCommentExtractorSQLServer extractor = new DfDbCommentExtractorSQLServer();
             extractor.setDataSource(_dataSource);
             extractor.setUnifiedSchema(_unifiedSchema);
             return extractor;

@@ -57,9 +57,9 @@ public class DfForeignKeyHandler extends DfAbstractMetaDataHandler {
      */
     public Map<String, DfForeignKeyMetaInfo> getForeignKeyMetaInfo(DatabaseMetaData metaData, DfTableMetaInfo tableInfo)
             throws SQLException {
-        final UnifiedSchema uniqueSchema = tableInfo.getUnifiedSchema();
+        final UnifiedSchema unifiedSchema = tableInfo.getUnifiedSchema();
         final String tableName = tableInfo.getTableName();
-        return getForeignKeyMetaInfo(metaData, uniqueSchema, tableName);
+        return getForeignKeyMetaInfo(metaData, unifiedSchema, tableName);
     }
 
     /**

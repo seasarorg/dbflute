@@ -68,11 +68,11 @@ public class DfProcedureExecutionMetaExtractor {
             throws SQLException {
         final DfOutsideSqlProperties prop = getProperties().getOutsideSqlProperties();
         for (DfProcedureMetaInfo procedure : procedureList) {
-            final String catalogSchemaProcedureName = procedure.getCatalogSchemaProcedureName();
-            final String schemaProcedureName = procedure.getSchemaProcedureName();
+            final String procedureFullQualifiedName = procedure.getProcedureFullQualifiedName();
+            final String procedureSchemaQualifiedName = procedure.getProcedureSchemaQualifiedName();
             final String procedureName = procedure.getProcedureName();
-            if (prop.isExecutionMetaProcedureName(catalogSchemaProcedureName)
-                    || prop.isExecutionMetaProcedureName(schemaProcedureName)
+            if (prop.isExecutionMetaProcedureName(procedureFullQualifiedName)
+                    || prop.isExecutionMetaProcedureName(procedureSchemaQualifiedName)
                     || prop.isExecutionMetaProcedureName(procedureName)) {
                 doExtractExecutionMetaData(dataSource, procedure);
             }
@@ -342,7 +342,7 @@ public class DfProcedureExecutionMetaExtractor {
     }
 
     protected boolean isMsAccess() {
-        return getBasicProperties().isDatabaseMsAccess();
+        return getBasicProperties().isDatabaseMSAccess();
     }
 
     // ===================================================================================

@@ -14,8 +14,11 @@ public class DfSql2EntityTaskTest {
 
         // ## Act & Assert ##
         assertTrue(task.needsConvertToJavaName("ADDRESS"));
-        assertFalse(task.needsConvertToJavaName("address"));
+        assertTrue(task.needsConvertToJavaName("MEMBER_ADDRESS"));
+        assertTrue(task.needsConvertToJavaName("address"));
         assertTrue(task.needsConvertToJavaName("ADDRESS1"));
-        assertFalse(task.needsConvertToJavaName("address1"));
+        assertTrue(task.needsConvertToJavaName("address1"));
+        assertFalse(task.needsConvertToJavaName("MemberAddress"));
+        assertFalse(task.needsConvertToJavaName("memberAddress"));
     }
 }

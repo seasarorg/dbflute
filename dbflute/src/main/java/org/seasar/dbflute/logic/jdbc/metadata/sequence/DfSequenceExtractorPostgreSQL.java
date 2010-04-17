@@ -135,7 +135,7 @@ public class DfSequenceExtractorPostgreSQL extends DfSequenceExtractorBase {
 
     protected String selectElementValue(DfJdbcFacade facade, UnifiedSchema unifiedSchema, String sequenceName,
             String elementName) {
-        String sql = buildElementValueSql(unifiedSchema.buildCatalogSchemaElement(sequenceName), elementName);
+        String sql = buildElementValueSql(unifiedSchema.buildSqlName(sequenceName), elementName);
         final List<String> columnList = new ArrayList<String>();
         columnList.add(elementName);
         final List<Map<String, String>> resultList = facade.selectStringList(sql, columnList);

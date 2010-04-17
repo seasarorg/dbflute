@@ -75,19 +75,12 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
                 final String tableType = resultSet.getString("TABLE_TYPE");
                 final String tableCatalog;
                 {
-                    String tmpCatalog = resultSet.getString("TABLE_CAT");
-                    if (Srl.is_Null_or_TrimmedEmpty(tmpCatalog)) { // because PostgreSQL returns null
-                        if (Srl.is_NotNull_and_NotTrimmedEmpty(catalogName)) {
-                            tmpCatalog = catalogName;
-                        } else {
-                            if (getBasicProperties().isDatabasePostgreSQL()) {
-                                String url = getDatabaseProperties().getDatabaseUrl();
-                                url = Srl.substringFirstFront(url, "?");
-                                tmpCatalog = Srl.substringLastRear(url, "/");
-                            }
-                        }
+                    final String plainCatalog = resultSet.getString("TABLE_CAT");
+                    if (Srl.is_NotNull_and_NotTrimmedEmpty(plainCatalog)) { // because PostgreSQL returns null
+                        tableCatalog = plainCatalog;
+                    } else {
+                        tableCatalog = catalogName;
                     }
-                    tableCatalog = tmpCatalog;
                 }
                 final String tableSchema = resultSet.getString("TABLE_SCHEM");
                 final String tableComment = resultSet.getString("REMARKS");
@@ -138,31 +131,31 @@ public class DfTableHandler extends DfAbstractMetaDataHandler {
         return false;
     }
 
-    protected String[] getRealObjectTypeTargetArray(UnifiedSchema uniqueSchema) {
-        if (uniqueSchema != null) {
-            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(uniqueSchema);
+    protected String[] getRealObjectTypeTargetArray(UnifiedSchema unifiedSchema) {
+        if (unifiedSchema != null) {
+            final DfAdditionalSchemaInfo schemaInfo = getAdditionalSchemaInfo(unifiedSchema);
             if (schemaInfo != null) {
                 final List<String> objectTypeTargetList = schemaInfo.getObjectTypeTargetList();
-                assertObjectTypeTargetListNotEmpty(uniqueSchema, objectTypeTargetList);
+                assertObjectTypeTargetListNotEmpty(unifiedSchema, objectTypeTargetList);
                 return objectTypeTargetList.toArray(new String[objectTypeTargetList.size()]);
             }
         }
         final List<String> objectTypeTargetList = getProperties().getDatabaseProperties().getObjectTypeTargetList();
-        assertObjectTypeTargetListNotEmpty(uniqueSchema, objectTypeTargetList);
+        assertObjectTypeTargetListNotEmpty(unifiedSchema, objectTypeTargetList);
         return objectTypeTargetList.toArray(new String[objectTypeTargetList.size()]);
     }
 
-    protected void assertObjectTypeTargetListNotEmpty(UnifiedSchema uniqueSchema, List<String> objectTypeTargetList) {
+    protected void assertObjectTypeTargetListNotEmpty(UnifiedSchema unifiedSchema, List<String> objectTypeTargetList) {
         if (objectTypeTargetList == null || objectTypeTargetList.isEmpty()) {
             String msg = "The property 'objectTypeTargetList' should be required:";
-            msg = msg + " uniqueSchema=" + uniqueSchema;
+            msg = msg + " unifiedSchema=" + unifiedSchema;
             throw new IllegalStateException(msg);
         }
     }
 
-    public Map<String, DfTableMetaInfo> getTableMap(DatabaseMetaData metaData, UnifiedSchema uniqueSchema)
+    public Map<String, DfTableMetaInfo> getTableMap(DatabaseMetaData metaData, UnifiedSchema unifiedSchema)
             throws SQLException {
-        final List<DfTableMetaInfo> tableList = getTableList(metaData, uniqueSchema);
+        final List<DfTableMetaInfo> tableList = getTableList(metaData, unifiedSchema);
         final Map<String, DfTableMetaInfo> map = DfCollectionUtil.newLinkedHashMap();
         for (DfTableMetaInfo tableInfo : tableList) {
             map.put(tableInfo.getTableName(), tableInfo);

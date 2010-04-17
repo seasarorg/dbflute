@@ -21,7 +21,7 @@ public class DfJdbcDeterminerFactory {
         if (_basicProperties.isDatabaseDerby()) {
             return new DfJdbcDeterminerDerby();
         }
-        if (_basicProperties.isDatabaseMsAccess()) {
+        if (_basicProperties.isDatabaseMSAccess()) {
             return new DfJdbcDeterminerMsAccess();
         }
         return new DfJdbcDeterminerDefault();

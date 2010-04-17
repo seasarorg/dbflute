@@ -16,12 +16,11 @@ public class DfProcedureMetaInfo {
     protected String procedureCatalog;
     protected UnifiedSchema procedureSchema;
     protected String procedureName;
+    protected DfProcedureType procedureType;
+    protected String procedureFullQualifiedName;
+    protected String procedureSchemaQualifiedName;
     protected String procedureSqlName;
     protected String procedureDisplayName;
-    protected String catalogSchemaProcedureName;
-    protected String schemaProcedureName;
-    protected DfProcedureType procedureType;
-    protected String procedureUniqueName;
     protected String procedureComment;
     protected boolean procedureSynonym;
 
@@ -79,6 +78,7 @@ public class DfProcedureMetaInfo {
     }
 
     public void setProcedureSchema(UnifiedSchema procedureSchema) {
+        System.out.println("*****: " + getProcedureName() + " : " + procedureSchema.toString());
         this.procedureSchema = procedureSchema;
     }
 
@@ -88,6 +88,30 @@ public class DfProcedureMetaInfo {
 
     public void setProcedureName(String procedureName) {
         this.procedureName = procedureName;
+    }
+
+    public DfProcedureType getProcedureType() {
+        return procedureType;
+    }
+
+    public void setProcedureType(DfProcedureType procedureType) {
+        this.procedureType = procedureType;
+    }
+
+    public String getProcedureFullQualifiedName() {
+        return procedureFullQualifiedName;
+    }
+
+    public void setProcedureFullQualifiedName(String procedureFullQualifiedName) {
+        this.procedureFullQualifiedName = procedureFullQualifiedName;
+    }
+
+    public String getProcedureSchemaQualifiedName() {
+        return procedureSchemaQualifiedName;
+    }
+
+    public void setProcedureSchemaQualifiedName(String procedureSchemaQualifiedName) {
+        this.procedureSchemaQualifiedName = procedureSchemaQualifiedName;
     }
 
     public String getProcedureSqlName() {
@@ -104,38 +128,6 @@ public class DfProcedureMetaInfo {
 
     public void setProcedureDisplayName(String procedureDisplayName) {
         this.procedureDisplayName = procedureDisplayName;
-    }
-
-    public String getCatalogSchemaProcedureName() {
-        return catalogSchemaProcedureName;
-    }
-
-    public void setCatalogSchemaProcedureName(String catalogSchemaProcedureName) {
-        this.catalogSchemaProcedureName = catalogSchemaProcedureName;
-    }
-
-    public String getSchemaProcedureName() {
-        return schemaProcedureName;
-    }
-
-    public void setSchemaProcedureName(String schemaProcedureName) {
-        this.schemaProcedureName = schemaProcedureName;
-    }
-
-    public String getProcedureUniqueName() {
-        return procedureUniqueName;
-    }
-
-    public void setProcedureUniqueName(String procedureUniqueName) {
-        this.procedureUniqueName = procedureUniqueName;
-    }
-
-    public DfProcedureType getProcedureType() {
-        return procedureType;
-    }
-
-    public void setProcedureType(DfProcedureType procedureType) {
-        this.procedureType = procedureType;
     }
 
     public String getProcedureComment() {

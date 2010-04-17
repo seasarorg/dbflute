@@ -67,36 +67,16 @@ public class DfSynonymMetaInfo {
     // ===================================================================================
     //                                                                       Name Building
     //                                                                       =============
-    public String buildSynonymDisplayName() {
-        return buildCatalogSchemaSynonym();
+    public String buildSynonymFullQualifiedName() {
+        return _synonymOwner.buildFullQualifiedName(_synonymName);
     }
 
-    public String buildCatalogSchemaSynonym() {
-        return _synonymOwner.buildCatalogSchemaElement(_synonymName);
+    public String buildSynonymSchemaQualifiedName() {
+        return _synonymOwner.buildSchemaQualifiedName(_synonymName);
     }
 
-    public String buildIdentifiedSchemaSynonym() {
-        return _synonymOwner.buildIdentifiedSchemaElement(_synonymName);
-    }
-
-    public String buildPureSchemaSynonym() {
-        return _synonymOwner.buildPureSchemaElement(_synonymName);
-    }
-
-    public String buildTableDisplayName() {
-        return buildCatalogSchemaTable();
-    }
-
-    public String buildCatalogSchemaTable() {
-        return _tableOwner.buildCatalogSchemaElement(_tableName);
-    }
-
-    public String buildIdentifiedSchemaTable() {
-        return _tableOwner.buildIdentifiedSchemaElement(_tableName);
-    }
-
-    public String buildPureSchemaTable() {
-        return _tableOwner.buildPureSchemaElement(_tableName);
+    public String buildSynonymSqlName() {
+        return _synonymOwner.buildSqlName(_synonymName);
     }
 
     // ===================================================================================

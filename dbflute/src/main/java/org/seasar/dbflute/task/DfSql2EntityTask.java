@@ -62,6 +62,7 @@ import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureNotParamResultMetaInfo;
 import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureColumnMetaInfo.DfProcedureColumnType;
+import org.seasar.dbflute.logic.jdbc.metadata.info.DfProcedureMetaInfo.DfProcedureType;
 import org.seasar.dbflute.logic.outsidesql.DfOutsideSqlMarkAnalyzer;
 import org.seasar.dbflute.logic.outsidesql.DfSqlFileNameResolver;
 import org.seasar.dbflute.logic.pkgresolver.DfStandardApiPackageResolver;
@@ -648,7 +649,6 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         _log.info("/= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =");
         final Map<String, DfProcedureMetaInfo> procdureHandlingMap = new HashMap<String, DfProcedureMetaInfo>();
         for (Entry<String, DfProcedureMetaInfo> entry : entrySet) {
-            final String procedureUniqueName = entry.getKey();
             final DfProcedureMetaInfo procedure = entry.getValue();
 
             final DfParameterBeanMetaData parameterBeanMetaData = new DfParameterBeanMetaData();
@@ -658,13 +658,16 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             final List<DfProcedureColumnMetaInfo> procedureColumnList = procedure.getProcedureColumnList();
             final List<DfProcedureNotParamResultMetaInfo> notParamResultList = procedure.getNotParamResultList();
 
-            final String pmbName = convertProcedureNameToPmbName(procedureUniqueName);
-            final String procedureSqlName = procedure.getProcedureSqlName();
-
-            _log.info("[" + pmbName + "]: " + procedureSqlName + " // " + procedure.getProcedureType());
-            if (procedureColumnList.isEmpty() && notParamResultList.isEmpty()) {
-                _log.info("    *No Parameter");
+            final String pmbName = convertProcedureNameToPmbName(procedure.getProcedureName());
+            {
+                final String procDisp = procedure.getProcedureDisplayName();
+                final DfProcedureType procType = procedure.getProcedureType();
+                _log.info("[" + pmbName + "]: " + procDisp + " // " + procType);
+                if (procedureColumnList.isEmpty() && notParamResultList.isEmpty()) {
+                    _log.info("    *No Parameter");
+                }
             }
+
             boolean existsCustomizeEntity = false;
             int index = 0;
             for (DfProcedureColumnMetaInfo column : procedureColumnList) {
@@ -714,7 +717,7 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
             parameterBeanMetaData.setPropertyNameTypeMap(propertyNameTypeMap);
             parameterBeanMetaData.setPropertyNameOptionMap(propertyNameOptionMap);
             parameterBeanMetaData.setPropertyNameColumnNameMap(propertyNameColumnNameMap);
-            parameterBeanMetaData.setProcedureName(procedureSqlName);
+            parameterBeanMetaData.setProcedureName(procedure.getProcedureSqlName());
             parameterBeanMetaData.setRefCustomizeEntity(existsCustomizeEntity);
             _pmbMetaDataMap.put(pmbName, parameterBeanMetaData);
             procdureHandlingMap.put(pmbName, procedure); // for duplicate check
@@ -789,10 +792,10 @@ public class DfSql2EntityTask extends DfAbstractTexenTask {
         return getBasicProperties().isDatabasePostgreSQL() && column.isOracleCursor(column);
     }
 
-    protected String convertProcedureNameToPmbName(String procedureUniqueName) {
-        procedureUniqueName = replaceString(procedureUniqueName, ".", "_");
-        procedureUniqueName = filterProcedureName4PmbNameAboutVendorDependency(procedureUniqueName);
-        return Srl.camelize(procedureUniqueName) + "Pmb";
+    protected String convertProcedureNameToPmbName(String procedureName) {
+        procedureName = replaceString(procedureName, ".", "_");
+        procedureName = filterProcedureName4PmbNameAboutVendorDependency(procedureName);
+        return Srl.camelize(procedureName) + "Pmb";
     }
 
     protected String convertProcedurePmbNameToEntityName(String pmbName, String propertyName) {

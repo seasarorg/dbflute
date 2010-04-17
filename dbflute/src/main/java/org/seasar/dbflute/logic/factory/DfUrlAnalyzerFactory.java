@@ -1,8 +1,14 @@
 package org.seasar.dbflute.logic.factory;
 
 import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzer;
+import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerDB2;
+import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerDerby;
+import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerH2;
+import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerMSAccess;
 import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerMySQL;
 import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerPostgreSQL;
+import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerSQLServer;
+import org.seasar.dbflute.logic.urlanalyzer.DfUrlAnalyzerSQLite;
 import org.seasar.dbflute.properties.DfBasicProperties;
 
 /**
@@ -38,7 +44,18 @@ public class DfUrlAnalyzerFactory {
             return new DfUrlAnalyzerPostgreSQL(_url);
         } else if (_basicProperties.isDatabaseOracle()) {
             return createNullAnalyzer();
+        } else if (_basicProperties.isDatabaseDB2()) {
+            return new DfUrlAnalyzerDB2(_url);
         } else if (_basicProperties.isDatabaseSQLServer()) {
+            return new DfUrlAnalyzerSQLServer(_url);
+        } else if (_basicProperties.isDatabaseH2()) {
+            return new DfUrlAnalyzerH2(_url);
+        } else if (_basicProperties.isDatabaseDerby()) {
+            return new DfUrlAnalyzerDerby(_url);
+        } else if (_basicProperties.isDatabaseSQLite()) {
+            return new DfUrlAnalyzerSQLite(_url);
+        } else if (_basicProperties.isDatabaseMSAccess()) {
+            return new DfUrlAnalyzerMSAccess(_url);
         }
         return createNullAnalyzer();
     }

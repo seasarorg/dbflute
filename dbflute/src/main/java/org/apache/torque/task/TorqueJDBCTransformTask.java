@@ -826,12 +826,12 @@ public class TorqueJDBCTransformTask extends DfAbstractTask {
             String msg = "The table meta information should be for synonym: " + table;
             throw new IllegalStateException(msg);
         }
-        String key = table.buildCatalogSchemaTable();
+        String key = table.buildTableFullQualifiedName();
         DfSynonymMetaInfo info = _supplementarySynonymInfoMap.get(key);
         if (info != null) {
             return info;
         }
-        key = table.buildPureSchemaTable();
+        key = table.buildSchemaQualifiedName();
         info = _supplementarySynonymInfoMap.get(key);
         if (info != null) {
             return info;

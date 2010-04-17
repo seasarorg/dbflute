@@ -3,23 +3,18 @@ package org.seasar.dbflute.logic.urlanalyzer;
 import org.seasar.dbflute.util.Srl;
 
 /**
- * 
  * @author jflute
- * @since 0.9.6 (2009/10/31 Saturday)
+ * @since 0.9.6.8 (2010/04/17 Saturday)
  */
-public class DfUrlAnalyzerPostgreSQL implements DfUrlAnalyzer {
-
-    protected String _url;
+public class DfUrlAnalyzerPostgreSQL extends DfUrlAnalyzerBase {
 
     public DfUrlAnalyzerPostgreSQL(String url) {
-        this._url = url;
+        super(url);
     }
 
-    public String extractCatalog() {
-        if (_url == null) {
-            return null;
-        }
-        final String pureUrl = Srl.substringFirstFront(_url, "?");
-        return Srl.substringFirstRear(pureUrl, "/");
+    protected String doExtractCatalog() {
+        final String pureUrl = Srl.substringFirstFront(_url, ";", "?", "&");
+        final String catalog = Srl.substringLastRear(pureUrl, "/", ":");
+        return !catalog.equals(pureUrl) ? catalog : null;
     }
 }

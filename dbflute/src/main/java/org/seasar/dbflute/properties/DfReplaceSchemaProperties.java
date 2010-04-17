@@ -225,8 +225,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
         final DfUrlAnalyzer analyzer = factory.createAnalyzer();
         final String catalog = analyzer.extractCatalog();
         final String schema = propertyMap.get("schema");
-        final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema,
-                getDatabaseProperties());
+        final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema);
         final String user = propertyMap.get("user");
         final String password = propertyMap.get("password");
         _log.info("...Creating a connection for additional user");
@@ -305,8 +304,7 @@ public final class DfReplaceSchemaProperties extends DfAbstractHelperProperties 
             return null;
         }
         final String schema = castToString(obj, "additionalDropMapList.schema");
-        final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema,
-                getDatabaseProperties());
+        final UnifiedSchema unifiedSchema = UnifiedSchema.createAsDynamicSchema(catalog, schema);
         return unifiedSchema;
     }
 

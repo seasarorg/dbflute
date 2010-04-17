@@ -53,7 +53,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                           =========
     protected DataSource _dataSource;
     protected UnifiedSchema _unifiedSchema;
-    protected boolean _tableNameWithSchema;
+    protected boolean _useFullQualifiedTableName;
     protected List<String> _dropObjectTypeList;
     protected List<String> _dropTableTargetList;
     protected List<String> _dropTableExceptList;
@@ -79,7 +79,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
             conn = _dataSource.getConnection();
             final List<DfTableMetaInfo> tableMetaInfoList;
             try {
-                final DatabaseMetaData dbMetaData = conn.getMetaData();
+                final DatabaseMetaData metaData = conn.getMetaData();
                 final DfTableHandler tableNameHandler = new DfTableHandler() {
                     @Override
                     protected String[] getRealObjectTypeTargetArray(UnifiedSchema unifiedSchema) {
@@ -116,7 +116,7 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
                         }
                     }
                 };
-                tableMetaInfoList = tableNameHandler.getTableList(dbMetaData, _unifiedSchema);
+                tableMetaInfoList = tableNameHandler.getTableList(metaData, _unifiedSchema);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -495,9 +495,9 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
     //                                                                       Assist Helper
     //                                                                       =============
     protected String filterTableName(String tableName) {
-        if (_tableNameWithSchema && _unifiedSchema.hasSchema()) {
-            tableName = _unifiedSchema.buildCatalogSchemaElement(tableName);
-            ;
+        // not use SQL name because of additional drop
+        if (_useFullQualifiedTableName && _unifiedSchema.hasSchema()) {
+            tableName = _unifiedSchema.buildFullQualifiedName(tableName);
         }
         return tableName;
     }
@@ -520,12 +520,12 @@ public class DfSchemaInitializerJdbc implements DfSchemaInitializer {
         _unifiedSchema = unifiedSchema;
     }
 
-    public boolean isTableNameWithSchema() {
-        return _tableNameWithSchema;
+    public boolean isUseFullQualifiedTableName() {
+        return _useFullQualifiedTableName;
     }
 
-    public void setTableNameWithSchema(boolean tableNameWithSchema) {
-        this._tableNameWithSchema = tableNameWithSchema;
+    public void setUseFullQualifiedTableName(boolean useFullQualifiedTableName) {
+        this._useFullQualifiedTableName = useFullQualifiedTableName;
     }
 
     public void setDropObjectTypeList(List<String> dropObjectTypeList) {
